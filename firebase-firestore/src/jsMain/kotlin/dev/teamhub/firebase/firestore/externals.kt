@@ -1,4 +1,4 @@
-package dev.teamhub.firebase
+package dev.teamhub.firebase.firestore
 
 import kotlin.js.Json
 import kotlin.js.Promise
@@ -7,98 +7,6 @@ import kotlin.js.Promise
 external object firebase {
 
     open class App
-    val apps : Array<App>
-    fun initializeApp(options: Any, name: String? = definedExternally) : App
-
-    interface FirebaseError {
-        var code: String
-        var message: String
-        var name: String
-    }
-
-    // AUTH
-    fun auth(): auth.Auth
-    object auth {
-        open class Auth {
-            val currentUser: user.User?
-
-            fun signInWithCustomToken(token: String): Promise<AuthResult>
-            fun signInAnonymously(): Promise<AuthResult>
-            fun signOut(): Promise<Unit>
-
-            fun onAuthStateChanged(nextOrObserver: (user.User) -> Unit): () -> Unit
-        }
-        interface AuthResult {
-            val user: user.User
-        }
-    }
-
-    // USER
-    fun User(a: Any,b: Any,c: Any): user.User
-    object user {
-        abstract class User {
-            val uid: String
-            val isAnonymous: Boolean
-
-            fun delete(): Promise<Unit>
-            fun reload(): Promise<Unit>
-        }
-    }
-
-    // DATABASE
-    fun database(): database.Database
-    object database {
-        fun enableLogging(logger: Boolean?, persistent: Boolean? = definedExternally)
-
-        open class Database {
-            fun ref(path: String? = definedExternally): Reference
-        }
-        open class ThenableReference
-
-        open class Reference {
-            fun remove(): Promise<Unit>
-            fun onDisconnect(): OnDisconnect
-
-            fun update(value: Any?): Promise<Unit>
-            fun set(value: Any?): Promise<Unit>
-            fun on(eventType: String?, callback: (data: DataSnapshot) -> Unit, cancelCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): (DataSnapshot) -> Unit
-            fun off(eventType: String?, callback: (data: DataSnapshot) -> Unit, context: Any? = definedExternally)
-            fun once(eventType: String, callback: (data: DataSnapshot) -> Unit, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): (DataSnapshot)->Unit
-            fun push(): ThenableReference
-        }
-        open class DataSnapshot {
-            fun `val`(): Any
-            fun exists(): Boolean
-            fun forEach(action: (a: DataSnapshot)-> Boolean): Boolean
-            fun numChildren(): Int
-        }
-
-        open class OnDisconnect {
-            fun update(value: Any?): Promise<Unit>
-            fun remove(): Promise<Unit>
-            fun cancel(): Promise<Unit>
-            fun set(value: Any?): Promise<Unit>
-        }
-
-        object ServerValue {
-            val TIMESTAMP: Map<String, String>
-        }
-    }
-
-    // FUNCTIONS
-    fun functions(app: App? = definedExternally): functions.Functions
-    object functions {
-        class Functions {
-            fun httpsCallable(name: String, options: Json?): HttpsCallable
-        }
-        class HttpsCallableResult {
-//            val data: Any
-        }
-        class HttpsCallable
-
-    }
-
-    // FIRESTORE
     fun firestore(): firestore.Firestore
     object firestore {
         fun setLogLevel(level: String)

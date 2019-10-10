@@ -1,14 +1,14 @@
 package dev.teamhub.firebase.firestore
 
+import dev.teamhub.firebase.FirebaseException
+import dev.teamhub.firebase.common.fromJson
+import dev.teamhub.firebase.common.toJson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
-import dev.teamhub.firebase.*
-import dev.teamhub.firebase.fromJson
-import dev.teamhub.firebase.toJson
-import kotlin.reflect.KClass
 import kotlin.js.Promise
 import kotlin.js.json
+import kotlin.reflect.KClass
 
 internal val firestore = js("require('firebase/firestore')")
 

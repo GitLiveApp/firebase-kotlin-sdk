@@ -17,7 +17,7 @@ val minSdkVersion by extra(14)
 
 subprojects {
 
-    group = "dev.teamhub"
+    group = "dev.teamhub.firebase"
 
     repositories {
         mavenLocal()

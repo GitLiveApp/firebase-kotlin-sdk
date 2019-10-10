@@ -3,10 +3,7 @@ plugins {
     kotlin("multiplatform")
     `maven-publish`
 }
-repositories {
-    mavenCentral()
-    google()
-}
+
 version = "0.1.0"
 
 android {
@@ -42,14 +39,15 @@ kotlin {
     }
 
     sourceSets {
-        val androidMain by getting {
+        val commonMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:17.1.0")
+                api(project(":firebase-app"))
+                implementation(project(":firebase-common"))
             }
         }
-        val jsMain by getting {
+        val androidMain by getting {
             dependencies {
-//                implementation(npm("firebase", "6.2.3"))
+                api("com.google.firebase:firebase-functions:17.0.0")
             }
         }
         val jvmMain by getting {
