@@ -1,0 +1,32 @@
+{
+  "name": "@teamhubapp/firebase-auth",
+  "version": "0.1.0",
+  "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
+  "main": "firebase-auth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk.git"
+  },
+  "keywords": [
+    "kotlin",
+    "multiplatform",
+    "kotlin-js",
+    "firebase"
+  ],
+  "author": "teamhub.dev",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk/issues"
+  },
+  "homepage": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk",
+  "dependencies": {
+    "@teamhubapp/firebase-app": "0.1.0",
+    "firebase": "6.2.3",
+    "kotlin": "1.3.50",
+    "kotlinx-coroutines-core": "1.2.2"
+  }
+}
+

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -58,3 +60,33 @@ kotlin {
     }
 }
 
+tasks {
+    val copyPackageJson by registering(Copy::class) {
+        from(file("package.json"))
+        into(file("$buildDir/node_module"))
+    }
+
+    val copyJS by registering(Copy::class) {
+        from(file("$buildDir/classes/kotlin/js/main/${project.name}.js"))
+        into(file("$buildDir/node_module"))
+    }
+
+    val copySourceMap by registering(Copy::class) {
+        from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
+        into(file("$buildDir/node_module"))
+    }
+
+    val publishToNpm by registering(Exec::class) {
+        doFirst {
+            mkdir("$buildDir/node_module")
+        }
+
+        dependsOn(copyPackageJson, copyJS, copySourceMap)
+        workingDir("$buildDir/node_module")
+        if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+            commandLine("cmd", "/c", "npm publish --registry https://npm.pkg.github.com/")
+        } else {
+            commandLine("npm", "publish", "--registry https://npm.pkg.github.com/")
+        }
+    }
+}
