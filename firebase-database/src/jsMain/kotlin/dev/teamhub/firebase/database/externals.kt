@@ -2,6 +2,9 @@ package dev.teamhub.firebase.database
 
 import kotlin.js.Promise
 
+@JsModule("firebase/database")
+external object database
+
 @JsModule("firebase/app")
 external object firebase {
 

@@ -2,6 +2,9 @@ package dev.teamhub.firebase.functions
 
 import kotlin.js.Json
 
+@JsModule("firebase/functions")
+external object functions
+
 @JsModule("firebase/app")
 external object firebase {
 

@@ -2,7 +2,6 @@ package dev.teamhub.firebase.firestore
 
 import dev.teamhub.firebase.FirebaseException
 import dev.teamhub.firebase.common.fromJson
-import dev.teamhub.firebase.common.toJson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
@@ -10,9 +9,12 @@ import kotlin.js.Promise
 import kotlin.js.json
 import kotlin.reflect.KClass
 
-internal val firestore = js("require('firebase/firestore')")
+fun toJson(data: Any?): Any? = when(data) {
+    is firebase.firestore.FieldValue -> data
+    else -> dev.teamhub.firebase.common.toJson(data)
+}
 
-actual fun getFirebaseFirestore() = rethrow { firebase.firestore() }
+actual fun getFirebaseFirestore() = rethrow { firestore; firebase.firestore() }
 
 actual typealias FirebaseFirestore = firebase.firestore.Firestore
 actual typealias QuerySnapshot = firebase.firestore.QuerySnapshot

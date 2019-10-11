@@ -5,7 +5,7 @@ import dev.teamhub.firebase.FirebaseNetworkException
 import kotlinx.coroutines.await
 import kotlin.js.Promise
 
-actual fun getFirebaseAuth() = rethrow { firebase.auth() }
+actual fun getFirebaseAuth() = rethrow { auth; firebase.auth() }
 
 actual typealias FirebaseAuth = firebase.auth.Auth
 

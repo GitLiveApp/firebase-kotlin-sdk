@@ -6,7 +6,6 @@ import kotlin.reflect.KClass
 
 fun toJson(data: Any?): Any? = when(data) {
     null -> null
-    is firebase.firestore.FieldValue -> data
     is Boolean -> data
     is Double -> data
     is String -> data

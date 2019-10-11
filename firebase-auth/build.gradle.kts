@@ -64,10 +64,17 @@ tasks {
         into(file("$buildDir/node_module"))
     }
 
-    val copyJS by registering(Copy::class) {
-        from(file("$buildDir/classes/kotlin/js/main/${project.name}.js"))
-        into(file("$buildDir/node_module"))
+    val copyJS by registering {
+        doLast {
+            val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
+            val into = File("$buildDir/node_module/${project.name}.js")
+            into.createNewFile()
+            into.writeText(from.readText()
+                .replace("require('firebase-", "require('@teamhubapp/firebase-")
+            )
+        }
     }
+
 
     val copySourceMap by registering(Copy::class) {
         from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))

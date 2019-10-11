@@ -5,7 +5,7 @@ import dev.teamhub.firebase.common.toJson
 import kotlinx.coroutines.await
 import kotlin.reflect.KClass
 
-actual fun getFirebaseDatabase() = rethrow { firebase.database() }
+actual fun getFirebaseDatabase() = rethrow { database; firebase.database() }
 
 actual typealias FirebaseDatabase = firebase.database.Database
 

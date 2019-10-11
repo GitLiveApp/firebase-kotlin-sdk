@@ -7,7 +7,7 @@ import kotlinx.coroutines.await
 import kotlin.js.Promise
 import kotlin.js.json
 
-actual fun getFirebaseFunctions() = rethrow { firebase.functions() }
+actual fun getFirebaseFunctions() = rethrow { functions; firebase.functions() }
 
 actual typealias FirebaseFunctions = firebase.functions.Functions
 actual typealias HttpsCallableResult = firebase.functions.HttpsCallableResult

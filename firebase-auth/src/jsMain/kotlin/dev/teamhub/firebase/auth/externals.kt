@@ -2,6 +2,9 @@ package dev.teamhub.firebase.auth
 
 import kotlin.js.Promise
 
+@JsModule("firebase/auth")
+external object auth
+
 @JsModule("firebase/app")
 external object firebase {
 

@@ -2,7 +2,7 @@
   "name": "@teamhubapp/firebase-common",
   "version": "0.1.0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
-  "main": "firebase-commmon.js",
+  "main": "firebase-common.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

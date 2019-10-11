@@ -3,6 +3,9 @@ package dev.teamhub.firebase.firestore
 import kotlin.js.Json
 import kotlin.js.Promise
 
+@JsModule("firebase/firestore")
+external object firestore
+
 @JsModule("firebase/app")
 external object firebase {
 
