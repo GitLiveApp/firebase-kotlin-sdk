@@ -9,4 +9,4 @@ assignees: ''
 
 | Library               | Class                            | Member                                        | Platforms                  |
 | :-----------------| :------------------------ | :----------------------------------- | :---------------------- |
-| e.g auth            | e.g FirebaseAu              | e.g signInWithGithub                   | e.g Android, iOS       |
+| e.g auth | e.g FirebaseAuth | e.g signInWithGithub  | e.g Android, iOS  |
