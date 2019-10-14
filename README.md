@@ -24,9 +24,15 @@ The following libraries are available for the various Firebase products.
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/TeamHubApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/TeamHubApp/firebase-kotlin-sdk/fork)
 
-## Configure Firebase
+## Getting started
 
-Since you most likely want to share your firebase configuration across platforms you should configure Firebase programatically in your common source instead of a platform-specific way (such as the Firebase configuration file on Android)
+### New to Firebase?
+
+Head over to the main Firebase documentation and follow the steps 
+
+### Configure Firebase
+
+Since you most likely want to share your firebase configuration across platforms you should configure Firebase programatically in your common source instead of a platform-specific configuration file.
 
 You can do this as follows:
 
