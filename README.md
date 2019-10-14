@@ -7,7 +7,7 @@
 
 The Firebase Kotlin SDK implements the client-side libraries used by applications using Firebase services. 
 
-It a light-weight Kotlin layer that mirrors the [Firebase Android SDK Kotlin Extensions](https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/) but connects to the correct native Firebase SDK for each target platform, enabling you to use Firebase directly from your common source in multiplatform projects targeting iOS, Android or JS.
+It a light-weight Kotlin layer that mirrors the [Firebase Android SDK Kotlin Extensions](https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/) but connects to the correct native Firebase SDK for each target platform, enabling you to use Firebase directly from your common source in multiplatform projects targeting *iOS*, *Android* or *JS*.
 
 ## Available libraries
 
