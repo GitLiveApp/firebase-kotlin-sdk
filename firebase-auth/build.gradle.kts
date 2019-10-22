@@ -49,7 +49,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:17.0.0")
+                api("com.google.firebase:firebase-auth:19.1.0")
             }
         }
         val jvmMain by getting {

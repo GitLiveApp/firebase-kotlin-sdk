@@ -46,7 +46,7 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:17.1.0")
+                api("com.google.firebase:firebase-common:19.2.0")
             }
         }
         val jsMain by getting {

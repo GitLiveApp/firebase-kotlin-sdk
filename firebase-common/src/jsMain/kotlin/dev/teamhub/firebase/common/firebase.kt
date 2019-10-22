@@ -40,9 +40,9 @@ fun fromJson(data: Any?, valueType: KClass<*>? = null): Any? = when(data) {
         val instance = js("Reflect").construct(valueType.js, emptyArray<Any>())
 
         val mangled = js("Object")
-                .keys(instance)
-                .unsafeCast<Array<String>>()
-                .associate { it.substringBefore("_") to it }
+            .keys(instance)
+            .unsafeCast<Array<String>>()
+            .associateBy { it.substringBefore("_") }
 
         (js("Object").entries(data) as Array<Array<Any>>)
                 .forEach { (key, value) ->

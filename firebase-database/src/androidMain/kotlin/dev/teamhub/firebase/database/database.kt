@@ -10,11 +10,27 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.OnDisconnect
 import com.google.firebase.database.ValueEventListener
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
 
 import kotlin.reflect.KClass
 
-actual fun getFirebaseDatabase() = FirebaseDatabase.getInstance()
+actual val Firebase.database
+    get() = FirebaseDatabase.getInstance()
+
+actual fun Firebase.database(url: String) =
+    FirebaseDatabase.getInstance(url)
+
+actual fun Firebase.database(app: FirebaseApp) =
+    FirebaseDatabase.getInstance(app.android)
+
+actual fun Firebase.database(app: FirebaseApp, url: String) =
+    FirebaseDatabase.getInstance(app.android, url)
+
+actual inline fun <reified T> DataSnapshot.getValue(): T? {
+    return getValue(object : GenericTypeIndicator<T>() {})
+}
 
 actual typealias LoggerLevel = Logger.Level
 

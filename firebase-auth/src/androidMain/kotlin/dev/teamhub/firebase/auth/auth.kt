@@ -1,53 +1,52 @@
 package dev.teamhub.firebase.auth
 
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-actual fun getFirebaseAuth() = FirebaseAuth.getInstance()
+actual val Firebase.auth
+    get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
-actual typealias FirebaseAuth = com.google.firebase.auth.FirebaseAuth
+actual fun Firebase.auth(app: FirebaseApp) =
+    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val FirebaseAuth.currentUser: FirebaseUser?
-    get() = TODO("not implemented")
+actual class FirebaseAuth internal constructor(val android: com.google.firebase.auth.FirebaseAuth) {
+    actual val currentUser: FirebaseUser?
+        get() = android.currentUser?.let { FirebaseUser(it) }
 
-actual suspend fun FirebaseAuth.awaitSignInWithCustomToken(token: String) = signInWithCustomToken(token).await()
+    actual suspend fun signInWithCustomToken(token: String) =
+        AuthResult(android.signInWithCustomToken(token).await())
 
-actual typealias AuthStateListener = com.google.firebase.auth.FirebaseAuth.AuthStateListener
+    actual suspend fun signInAnonymously() = AuthResult(android.signInAnonymously().await())
 
-actual typealias AuthResult = com.google.firebase.auth.AuthResult
+    actual val authStateChanged get() = callbackFlow {
+        val listener = object : AuthStateListener {
+            override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
+                offer(auth.currentUser?.let { FirebaseUser(it) })
+            }
+        }
+        android.addAuthStateListener(listener)
+        awaitClose { android.removeAuthStateListener(listener) }
+    }
 
-actual val AuthResult.user: FirebaseUser
-    get() = user
-
-actual typealias FirebaseUser = com.google.firebase.auth.FirebaseUser
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val FirebaseUser.uid: String
-    get() = TODO("not implemented")
-
-actual suspend fun FirebaseAuth.awaitSignInAnonymously() = signInAnonymously().await()
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val FirebaseUser.isAnonymous: Boolean
-    get() = TODO("not implemented")
-
-actual suspend fun FirebaseUser.awaitDelete() = delete().await().run { Unit }
-
-actual suspend fun FirebaseUser.awaitReload() = reload().await().run { Unit }
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseAuth.addAuthStateListener(listener: AuthStateListener) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual suspend fun signOut() = android.signOut()
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseAuth.removeAuthStateListener(listener: AuthStateListener) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
+    actual val user: FirebaseUser?
+        get() = android.user?.let { FirebaseUser(it) }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual suspend fun FirebaseAuth.signOut() {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
+    actual val uid: String
+        get() = android.uid
+    actual val isAnonymous: Boolean
+        get() = android.isAnonymous
+    actual suspend fun delete() = android.delete().await().run { Unit }
+    actual suspend fun reload() = android.reload().await().run { Unit }
 }
 
 actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
