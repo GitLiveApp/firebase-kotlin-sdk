@@ -10,19 +10,19 @@ import kotlinx.coroutines.await
 import kotlin.js.json
 
 actual val Firebase.functions: FirebaseFunctions
-    get() = rethrow { firebase.functions; FirebaseFunctions(firebase.functions()) }
+    get() = rethrow { dev.teamhub.firebase.common.functions; FirebaseFunctions(firebase.functions()) }
 
 actual fun Firebase.functions(region: String) =
-    rethrow { functions; FirebaseFunctions(firebase.app().functions(region)) }
+    rethrow { dev.teamhub.firebase.common.functions; FirebaseFunctions(firebase.app().functions(region)) }
 
 actual fun Firebase.functions(app: FirebaseApp) =
-    rethrow { functions; FirebaseFunctions(firebase.functions(app.js)) }
+    rethrow { dev.teamhub.firebase.common.functions; FirebaseFunctions(firebase.functions(app.js)) }
 
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
-    rethrow { functions; FirebaseFunctions(app.js.functions(region)) }
+    rethrow { dev.teamhub.firebase.common.functions; FirebaseFunctions(app.js.functions(region)) }
 
 actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
-    actual fun getHttpsCallable(name: String, timeout: Long?) =
+    actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 }
 

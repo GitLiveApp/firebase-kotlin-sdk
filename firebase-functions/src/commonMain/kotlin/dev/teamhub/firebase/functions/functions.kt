@@ -5,7 +5,7 @@ import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
 
 expect class FirebaseFunctions {
-    fun getHttpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+    fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
 }
 
 expect class HttpsCallableReference {

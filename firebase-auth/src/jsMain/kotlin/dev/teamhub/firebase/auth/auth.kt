@@ -9,7 +9,7 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-actual val Firebase.auth: FirebaseAuth
+actual val Firebase.auth
     get() = rethrow { dev.teamhub.firebase.common.auth; FirebaseAuth(firebase.auth()) }
 
 actual fun Firebase.auth(app: FirebaseApp) =
