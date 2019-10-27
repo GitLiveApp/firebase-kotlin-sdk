@@ -32,6 +32,13 @@ kotlin {
             }
         }
     }
+//    js("reactnative") {
+//        val main by compilations.getting {
+//            kotlinOptions {
+//                moduleKind = "commonjs"
+//            }
+//        }
+//    }
     android {
         publishLibraryVariants("release", "debug")
     }

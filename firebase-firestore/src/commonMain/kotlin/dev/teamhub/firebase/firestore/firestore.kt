@@ -1,107 +1,84 @@
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 package dev.teamhub.firebase.firestore
 
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.Flow
 
-expect fun getFirebaseFirestore(): FirebaseFirestore
+/** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
+expect val Firebase.firestore: FirebaseFirestore
 
-expect class FirebaseFirestore
+/** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
+expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
-expect fun FirebaseFirestore.getFirestoreSettings(): FirebaseFirestoreSettings
-expect fun FirebaseFirestore.setFirestoreSettings(settings: FirebaseFirestoreSettings)
-expect fun FirebaseFirestore.collection(collectionPath: String): CollectionReference
-expect fun FirebaseFirestore.document(documentPath: String): DocumentReference
-expect fun FirebaseFirestore.batch(): WriteBatch
-expect fun FirebaseFirestore.setLoggingEnabled(loggingEnabled: Boolean)
+expect class FirebaseFirestore {
+    var settings: FirebaseFirestoreSettings
+    fun collection(collectionPath: String): CollectionReference
+    fun document(documentPath: String): DocumentReference
+    fun batch(): WriteBatch
+    fun setLoggingEnabled(loggingEnabled: Boolean)
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+}
 
 expect annotation class IgnoreExtraProperties()
 expect annotation class Exclude()
 
-
-expect suspend fun <T> FirebaseFirestore.awaitRunTransaction(func: suspend (transaction: Transaction) -> T): T
-
-expect class Transaction
-expect fun Transaction.set(documentRef: DocumentReference, data: Map<String, Any>): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, data: Map<String, Any>, options: SetOptions): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, pojo: Any): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, pojo: Any, options: SetOptions): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, data: Map<String, Any>): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): Transaction
-expect fun Transaction.delete(documentRef: DocumentReference): Transaction
-expect suspend fun Transaction.awaitGet(documentRef: DocumentReference): DocumentSnapshot
-
-
-expect class FirebaseFirestoreSettingsBuilder constructor() {
-    constructor(settings: FirebaseFirestoreSettings)
+expect class Transaction {
+    fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): Transaction
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): Transaction
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): Transaction
+    fun update(documentRef: DocumentReference, data: Map<String, Any>): Transaction
+    fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): Transaction
+    fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): Transaction
+    fun delete(documentRef: DocumentReference): Transaction
+    suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
 
-expect fun FirebaseFirestoreSettingsBuilder.setPersistenceEnabled(enabled: Boolean): FirebaseFirestoreSettingsBuilder
-expect fun FirebaseFirestoreSettingsBuilder.setTimestampsInSnapshotsEnabled(enabled: Boolean): FirebaseFirestoreSettingsBuilder
-expect fun FirebaseFirestoreSettingsBuilder.build(): FirebaseFirestoreSettings
+data class FirebaseFirestoreSettings(
+    val persistenceEnabled: Boolean = true
+)
 
+expect class Query {
+    fun whereEqualTo(field: String, value: Any?): Query
+    fun whereEqualTo(path: FieldPath, value: Any?): Query
+    fun whereLessThan(field: String, value: Any): Query
+    fun whereLessThan(path: FieldPath, value: Any): Query
+    fun whereGreaterThan(field: String, value: Any): Query
+    fun whereGreaterThan(path: FieldPath, value: Any): Query
+    fun whereArrayContains(field: String, value: Any): Query
+    fun whereArrayContains(path: FieldPath, value: Any): Query
+    val snapshots: Flow<QuerySnapshot>
+    suspend fun get(): QuerySnapshot
+}
 
-expect class FirebaseFirestoreSettings
+expect class WriteBatch {
+    fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): WriteBatch
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): WriteBatch
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): WriteBatch
+    fun update(documentRef: DocumentReference, data: Map<String, Any>): WriteBatch
+    fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
+    fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
+    fun delete(documentRef: DocumentReference): WriteBatch
+    suspend fun commit()
+}
 
-expect open class Query
-expect fun Query.whereEqualTo(field: String, value: Any?): Query
-expect fun Query.whereEqualTo(path: FieldPath, value: Any?): Query
-expect fun Query.whereLessThan(field: String, value: Any): Query
-expect fun Query.whereLessThan(path: FieldPath, value: Any): Query
-expect fun Query.whereGreaterThan(field: String, value: Any): Query
-expect fun Query.whereGreaterThan(path: FieldPath, value: Any): Query
-expect fun Query.whereArrayContains(field: String, value: Any): Query
-expect fun Query.whereArrayContains(path: FieldPath, value: Any): Query
-expect fun Query.addSnapshotListener(listener: EventListener<QuerySnapshot>): ListenerRegistration
-expect fun Query.addSnapshotListener(listener: (snapshot: QuerySnapshot?, exception: FirebaseFirestoreException?) -> Unit): ListenerRegistration
+expect class DocumentReference {
+    val id: String
+    val snapshots: Flow<DocumentSnapshot>
+    suspend fun get(): DocumentSnapshot
+    suspend fun set(data: Any, merge: Boolean = false)
+    suspend fun set(data: Any, vararg mergeFields: String)
+    suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath)
+    suspend fun update(data: Map<String, Any>)
+    suspend fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any)
+    suspend fun update(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any)
+    suspend fun delete()
+}
 
-expect suspend fun Query.awaitGet(): QuerySnapshot
-
-expect class WriteBatch
-
-expect fun WriteBatch.set(documentRef: DocumentReference, data: Map<String, Any>): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, data: Map<String, Any>, options: SetOptions): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, pojo: Any): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, pojo: Any, options: SetOptions): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, data: Map<String, Any>): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
-expect fun WriteBatch.delete(documentRef: DocumentReference): WriteBatch
-
-expect suspend fun WriteBatch.awaitCommit()
-
-expect class DocumentReference
-
-expect fun DocumentReference.addSnapshotListener(listener: EventListener<DocumentSnapshot>): ListenerRegistration
-
-expect val DocumentReference.id: String
-
-expect fun DocumentReference.addSnapshotListener(listener: (snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) -> Unit): ListenerRegistration
-
-expect suspend fun DocumentReference.awaitGet(): DocumentSnapshot
-
-expect suspend fun DocumentReference.awaitSet(data: Map<String, Any>)
-
-expect suspend fun DocumentReference.awaitSet(pojo: Any)
-
-expect suspend fun DocumentReference.awaitSet(data: Map<String, Any>, options: SetOptions)
-
-expect suspend fun DocumentReference.awaitSet(pojo: Any, options: SetOptions)
-
-expect suspend fun DocumentReference.awaitUpdate(data: Map<String, Any>)
-
-expect suspend fun DocumentReference.awaitUpdate(field: String, value: Any?, vararg moreFieldsAndValues: Any)
-
-expect suspend fun DocumentReference.awaitUpdate(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any)
-
-expect suspend fun DocumentReference.awaitDelete()
-
-expect class CollectionReference : Query
-
-expect suspend fun CollectionReference.awaitAdd(data: Map<String, Any>): DocumentReference
-
-expect suspend fun CollectionReference.awaitAdd(pojo: Any): DocumentReference
+expect class CollectionReference : Query {
+    suspend fun add(data: Map<String, Any>): DocumentReference
+    suspend fun add(pojo: Any): DocumentReference
+}
 
 expect class FirebaseFirestoreException : FirebaseException
 
@@ -127,43 +104,44 @@ expect enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
-expect class QuerySnapshot
-
-expect val QuerySnapshot.documents: List<DocumentSnapshot>
-
-expect class DocumentSnapshot
-
-expect fun DocumentSnapshot.get(field: String): Any?
-expect fun DocumentSnapshot.getString(field: String): String?
-expect fun DocumentSnapshot.contains(field: String): Boolean
-expect fun <T: Any> DocumentSnapshot.toObject(valueType: KClass<T>): T
-expect fun DocumentSnapshot.exists(): Boolean
-
-expect val DocumentSnapshot.id: String
-expect val DocumentSnapshot.reference: DocumentReference
-
-expect interface ListenerRegistration
-
-expect fun ListenerRegistration.remove()
-
-
-expect interface EventListener<T> {
-    fun onEvent(snapshot: T?, exception: FirebaseFirestoreException?)
+expect class QuerySnapshot {
+    val documents: List<DocumentSnapshot>
 }
 
-expect class SetOptions
-
-expect fun mergeSetOptions(): SetOptions
-
-expect fun fieldPathOf(vararg fieldNames: String): FieldPath
+expect class DocumentSnapshot {
+    /**
+     * Returns the value at the field, converted to a POJO, or null if the field or document doesn't
+     * exist.
+     *
+     * @param field The path to the field.
+     * @param T The type to convert the field value to.
+     * @return The value at the given field or null.
+     */
+    inline fun <reified T> get(field: String): T?
+    fun contains(field: String): Boolean
+    /**
+     * Returns the contents of the document converted to a POJO or null if the document doesn't exist.
+     *
+     * @param T The type of the object to create.
+     * @return The contents of the document in an object of type T or null if the document doesn't
+     *     exist.
+     */
+    inline fun <reified T> toObject(): T?
+    val exists: Boolean
+    val id: String
+    val reference: DocumentReference
+}
 
 expect class FieldPath
 
-expect abstract class FieldValue
+expect fun FieldPath(vararg fieldNames: String): FieldPath
 
-expect fun deleteFieldValue(): FieldValue
+expect object FieldValue {
+    fun delete(): FieldValueImpl
+    fun arrayUnion(vararg elements: Any): FieldValueImpl
+    fun arrayRemove(vararg elements: Any): FieldValueImpl
+}
 
-expect fun arrayUnionFieldValue(vararg elements: Any): FieldValue
+expect abstract class FieldValueImpl
 
-expect fun arrayRemoveFieldValue(vararg elements: Any): FieldValue
 
