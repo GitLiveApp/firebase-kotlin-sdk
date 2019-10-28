@@ -1,6 +1,9 @@
 package dev.teamhub.firebase.firestore
 
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
+import dev.teamhub.firebase.common.firebase
 import dev.teamhub.firebase.common.fromJson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -14,7 +17,33 @@ fun toJson(data: Any?): Any? = when(data) {
     else -> dev.teamhub.firebase.common.toJson(data)
 }
 
-actual fun getFirebaseFirestore() = rethrow { firestore; firebase.firestore() }
+actual val Firebase.firestore get() =
+    rethrow { dev.teamhub.firebase.common.firestore; FirebaseFirestore(firebase.firestore()) }
+
+actual fun Firebase.firestore(app: FirebaseApp) =
+    rethrow { dev.teamhub.firebase.common.firestore; FirebaseFirestore(firebase.app().firestore()) }
+
+actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
+
+    actual var settings: FirebaseFirestoreSettings
+        get() = js.settings().run { FirebaseFirestoreSettings(js.isPersistenceEnabled) }
+        set(value) {
+            js.settings() = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
+        }
+
+    actual fun collection(collectionPath: String) = CollectionReference(js.collection(collectionPath))
+
+    actual fun document(documentPath: String) = DocumentReference(js.document(documentPath))
+
+    actual fun batch() = WriteBatch(js.batch())
+
+    actual fun setLoggingEnabled(loggingEnabled: Boolean) =
+        js.setLoggingEnabled(loggingEnabled)
+
+    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
+        android.runTransaction { runBlocking { Transaction(it).func() } }.await()
+}
+
 
 actual typealias FirebaseFirestore = firebase.firestore.Firestore
 actual typealias QuerySnapshot = firebase.firestore.QuerySnapshot

@@ -23,6 +23,7 @@ external object firebase {
         val options: Options
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
+        fun firestore(): firestore.Firestore
     }
 
     interface Options {
@@ -139,7 +140,6 @@ external object firebase {
         }
 
         open class Firestore {
-            var _th_settings: dynamic
             fun <T> runTransaction(func: (transaction: Transaction) -> Promise<T>): Promise<T>
             fun batch(): WriteBatch
             fun collection(collectionPath: String): CollectionReference

@@ -19,11 +19,11 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
-    actual var settings: FirebaseFirestoreSettings
-        get() = android.firestoreSettings.run { FirebaseFirestoreSettings(isPersistenceEnabled) }
-        set(value) {
-            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
-        }
+//    actual var settings: FirebaseFirestoreSettings
+//        get() = android.firestoreSettings.run { FirebaseFirestoreSettings(isPersistenceEnabled) }
+//        set(value) {
+//            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
+//        }
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
