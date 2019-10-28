@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk.git"
+    "url": "git+https://github.com/TeamHubApp/firebase-kotlin-sdk.git"
   },
   "keywords": [
     "kotlin",
@@ -19,9 +19,9 @@
   "author": "teamhub.dev",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk/issues"
+    "url": "https://github.com/TeamHubApp/firebase-kotlin-sdk/issues"
   },
-  "homepage": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk",
+  "homepage": "https://github.com/TeamHubApp/firebase-kotlin-sdk",
   "dependencies": {
     "@teamhubapp/firebase-app": "0.1.0",
     "firebase": "6.2.3",

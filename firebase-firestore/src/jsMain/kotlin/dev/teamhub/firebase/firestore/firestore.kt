@@ -64,7 +64,7 @@ actual fun FirebaseFirestore.setFirestoreSettings(settings: FirebaseFirestoreSet
     if(settings.enablePersistence) enablePersistence()
 }
 
-actual class FirebaseFirestoreException(message: String?, code: FirestoreExceptionCode) : FirebaseException(code.toString(), message)
+actual class FirebaseFirestoreException(message: String?, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), message)
 
 actual val QuerySnapshot.documents: List<DocumentSnapshot>
     get() = rethrow { docs.toList() }
