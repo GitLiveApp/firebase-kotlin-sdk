@@ -132,6 +132,10 @@ actual fun mergeSetOptions() = rethrow { NewOptions() }
 actual val DocumentReference.id: String
     get() = rethrow { id }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+actual val DocumentReference.path: String
+    get() = rethrow { path }
+
 actual fun DocumentReference.addSnapshotListener(listener: (snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) -> Unit) = rethrow {
     onSnapshot({ listener(it, undefined) }, { listener(undefined, FirebaseFirestoreException(it.message as String, FirestoreExceptionCode.UNKNOWN)) })
             .also { it.asDynamic().remove = { it() } }

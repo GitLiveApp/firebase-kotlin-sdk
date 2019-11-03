@@ -77,6 +77,8 @@ expect fun DocumentReference.addSnapshotListener(listener: EventListener<Documen
 
 expect val DocumentReference.id: String
 
+expect val DocumentReference.path: String
+
 expect fun DocumentReference.addSnapshotListener(listener: (snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) -> Unit): ListenerRegistration
 
 expect suspend fun DocumentReference.awaitGet(): DocumentSnapshot

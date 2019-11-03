@@ -55,6 +55,7 @@ external object firebase {
 
         open class DocumentReference {
             val id: String
+            val path: String
 
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
             fun set(data: Any, options: Any? = definedExternally): Promise<Unit>

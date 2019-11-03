@@ -84,6 +84,9 @@ actual suspend fun DocumentReference.awaitDelete() = delete().await().run { Unit
 actual val DocumentReference.id: String
     get() = id
 
+actual val DocumentReference.path: String
+    get() = path
+
 actual typealias WriteBatch = com.google.firebase.firestore.WriteBatch
 
 actual suspend fun WriteBatch.awaitCommit() = commit().await().run { Unit }
