@@ -50,10 +50,14 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-functions:17.0.0")
+                implementation("com.google.code.gson:gson:2.7")
             }
         }
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+            dependencies {
+                implementation("com.google.code.gson:gson:2.7")
+            }
         }
     }
 }
