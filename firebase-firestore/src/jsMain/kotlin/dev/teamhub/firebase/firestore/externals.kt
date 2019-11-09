@@ -37,6 +37,7 @@ external object firebase {
         }
 
         open class CollectionReference : Query {
+            val path: String
             fun add(data: Any): Promise<DocumentReference>
         }
 

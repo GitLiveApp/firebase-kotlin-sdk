@@ -30,6 +30,9 @@ actual fun DocumentReference.addSnapshotListener(listener: (snapshot: DocumentSn
 
 actual typealias CollectionReference = com.google.firebase.firestore.CollectionReference
 
+actual val CollectionReference.path: String
+    get() = path
+
 actual suspend fun CollectionReference.awaitAdd(data: Map<String, Any>) = add(data).await()
 
 actual suspend fun CollectionReference.awaitAdd(pojo: Any) = add(pojo).await()

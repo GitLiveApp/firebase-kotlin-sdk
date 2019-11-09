@@ -101,6 +101,8 @@ expect suspend fun DocumentReference.awaitDelete()
 
 expect class CollectionReference : Query
 
+expect val CollectionReference.path: String
+
 expect suspend fun CollectionReference.awaitAdd(data: Map<String, Any>): DocumentReference
 
 expect suspend fun CollectionReference.awaitAdd(pojo: Any): DocumentReference

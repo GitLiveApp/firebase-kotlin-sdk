@@ -187,6 +187,10 @@ actual suspend fun DocumentReference.awaitUpdate(data: Map<String, Any>) = rethr
 
 actual suspend fun DocumentReference.awaitDelete() = rethrow { delete().await() }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+actual val CollectionReference.path: String
+    get() = rethrow { path }
+
 actual suspend fun CollectionReference.awaitAdd(data: Map<String, Any>) = rethrow { add(toJson(data)!!).await() }
 
 actual suspend fun CollectionReference.awaitAdd(pojo: Any) = rethrow { add(toJson(pojo)!!).await() }
