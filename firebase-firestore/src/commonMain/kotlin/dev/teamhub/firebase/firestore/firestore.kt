@@ -38,7 +38,7 @@ data class FirebaseFirestoreSettings(
     val persistenceEnabled: Boolean = true
 )
 
-expect class Query {
+expect open class Query {
     fun whereEqualTo(field: String, value: Any?): Query
     fun whereEqualTo(path: FieldPath, value: Any?): Query
     fun whereLessThan(field: String, value: Any): Query
