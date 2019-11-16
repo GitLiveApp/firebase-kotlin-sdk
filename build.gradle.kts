@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     kotlin("multiplatform") version "1.3.50" apply false
 }
@@ -24,6 +26,13 @@ subprojects {
         mavenCentral()
         google()
         jcenter()
+    }
+
+    tasks.withType<KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
     }
 
     afterEvaluate  {

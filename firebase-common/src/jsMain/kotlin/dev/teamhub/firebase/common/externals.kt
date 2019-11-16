@@ -81,7 +81,7 @@ external object firebase {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
         }
         interface HttpsCallableResult {
-            val data: Any
+            val data: Any?
         }
         interface HttpsCallable {
             operator fun invoke(data: Any? = definedExternally): Promise<HttpsCallableResult>

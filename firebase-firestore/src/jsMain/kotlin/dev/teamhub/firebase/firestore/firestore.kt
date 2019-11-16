@@ -10,6 +10,7 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
+import kotlinx.serialization.DynamicObjectParser
 import kotlin.js.json
 
 fun toJson(data: Any?): Any? = when(data) {
@@ -188,8 +189,16 @@ actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
 actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
-    actual inline fun <reified T> toObject() = rethrow { fromJson(js.data(), T::class) as T? }
-    actual inline fun <reified T> get(field: String) = rethrow { fromJson(js.get(field), T::class) as T? }
+
+    actual inline fun <reified T: Any> data() =
+        rethrow { js.data()?.let { DynamicObjectParser().parse<T>(it) } }
+
+    actual inline fun <reified T: Any> get(field: String) =
+        rethrow { js.get(field)?.let { DynamicObjectParser().parse<T>(it) } }
+
+    actual inline fun <reified T : Any> getList(field: String): List<T>? =
+        rethrow { js.get(field).unsafeCast<Array<*>>().map { DynamicObjectParser().parse<T>(it) } }
+
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
     actual val exists get() =  rethrow { js.exists }
 }
@@ -233,10 +242,6 @@ actual enum class FirestoreExceptionCode {
     DATA_LOSS,
     UNAUTHENTICATED
 }
-
-actual annotation class IgnoreExtraProperties
-
-actual annotation class Exclude
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.firestore.rethrow { function() }
 

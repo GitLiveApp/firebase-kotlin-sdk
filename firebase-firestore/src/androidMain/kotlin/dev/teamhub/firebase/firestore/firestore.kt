@@ -1,8 +1,5 @@
 package dev.teamhub.firebase.firestore
 
-import com.google.firebase.firestore.Exclude
-import com.google.firebase.firestore.FirebaseFirestoreSettings.Builder
-import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.SetOptions
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
@@ -10,6 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Mapper
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -180,11 +178,27 @@ actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnaps
         get() = android.documents.map { DocumentSnapshot(it) }
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) {
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
-    actual inline fun <reified T> toObject() = android.toObject(T::class.java)
-    actual inline fun <reified T> get(field: String) = android.get(field, T::class.java)
+
+    actual inline fun <reified T: Any> data() =
+        android.data?.let { Mapper.unmap<T>(it) }
+
+    actual inline fun <reified T: Any> get(field: String) = when(T::class) {
+        Boolean::class -> android.get(field) as T?
+        String::class -> android.get(field) as T?
+        Long::class -> android.get(field) as T?
+        else -> android.get(field)?.let { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
+
+    actual inline fun <reified T: Any> getList(field: String) = when(T::class) {
+        Boolean::class -> android.get(field) as List<T>?
+        String::class -> android.get(field) as List<T>?
+        Long::class -> android.get(field) as List<T>?
+        else -> (android.get(field) as List<Any>?)?.map { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
 
     actual fun contains(field: String) = android.contains(field)
 
@@ -194,10 +208,6 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 actual typealias FieldPath = com.google.firebase.firestore.FieldPath
 
 actual fun FieldPath(vararg fieldNames: String) = FieldPath.of(*fieldNames)
-
-actual typealias IgnoreExtraProperties = IgnoreExtraProperties
-
-actual typealias Exclude = Exclude
 
 actual typealias FieldValueImpl = com.google.firebase.firestore.FieldValue
 

@@ -20,9 +20,6 @@ expect class FirebaseFirestore {
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
 }
 
-expect annotation class IgnoreExtraProperties()
-expect annotation class Exclude()
-
 expect class Transaction {
     fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): Transaction
     fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): Transaction
@@ -117,7 +114,8 @@ expect class DocumentSnapshot {
      * @param T The type to convert the field value to.
      * @return The value at the given field or null.
      */
-    inline fun <reified T> get(field: String): T?
+    inline fun <reified T: Any> get(field: String): T?
+    inline fun <reified T: Any> getList(field: String): List<T>?
     fun contains(field: String): Boolean
     /**
      * Returns the contents of the document converted to a POJO or null if the document doesn't exist.
@@ -126,7 +124,7 @@ expect class DocumentSnapshot {
      * @return The contents of the document in an object of type T or null if the document doesn't
      *     exist.
      */
-    inline fun <reified T> toObject(): T?
+    inline fun <reified T: Any> data(): T?
     val exists: Boolean
     val id: String
     val reference: DocumentReference

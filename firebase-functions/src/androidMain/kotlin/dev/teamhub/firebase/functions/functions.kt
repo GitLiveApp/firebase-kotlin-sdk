@@ -3,6 +3,7 @@ package dev.teamhub.firebase.functions
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Mapper
 import java.util.concurrent.TimeUnit
 
 actual val Firebase.functions
@@ -22,14 +23,30 @@ actual class FirebaseFunctions internal constructor(val android: com.google.fire
         HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } })
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) {
-    actual suspend fun call(data: Any?) = HttpsCallableResult(android.call(data).await())
     actual suspend fun call() = HttpsCallableResult(android.call().await())
+
+    actual suspend inline fun <reified T : Any> call(data: T) =
+        HttpsCallableResult(android.call((data as? Map<String, Any>)?.let { Mapper.map(it) } ?: data).await())
 }
 
-actual class HttpsCallableResult internal constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
-    actual val data: Any?
-        get() = android.data
+@Suppress("UNCHECKED_CAST")
+actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
+
+    actual inline fun <reified T: Any> get() = when(T::class) {
+        Boolean::class -> android.data as T?
+        String::class -> android.data as T?
+        Long::class -> android.data as T?
+        else -> android.data?.let { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
+
+    actual inline fun <reified T: Any> getList() = when(T::class) {
+        Boolean::class -> android.data as List<T>?
+        String::class -> android.data as List<T>?
+        Long::class -> android.data as List<T>?
+        else -> (android.data as List<Any>?)?.map { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
 }
 
 actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

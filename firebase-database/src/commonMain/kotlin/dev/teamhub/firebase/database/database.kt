@@ -5,9 +5,6 @@ import dev.teamhub.firebase.FirebaseApp
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 
-expect annotation class Exclude()
-expect annotation class IgnoreExtraProperties()
-
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
 expect val Firebase.database: FirebaseDatabase
 
@@ -44,7 +41,8 @@ expect class DataSnapshot {
      * Supports generics like List<> or Map<>. Use @JvmSuppressWildcards to force the compiler to
      * use the type `T`, and not `? extends T`.
      */
-    inline fun <reified T> value(): T?
+    inline fun <reified T : Any> value(): T?
+    inline fun <reified T : Any> values(): List<T>?
     fun child(path: String): DataSnapshot
     val children: Iterable<DataSnapshot>
 }

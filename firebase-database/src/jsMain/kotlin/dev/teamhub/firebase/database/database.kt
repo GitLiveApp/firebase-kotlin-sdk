@@ -10,6 +10,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.serialization.DynamicObjectParser
 
 actual val Firebase.database
     get() = rethrow { dev.teamhub.firebase.common.database; FirebaseDatabase(dev.teamhub.firebase.common.firebase.database()) }
@@ -57,8 +58,13 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
 
+    actual inline fun <reified T : Any> value(): T? =
+        rethrow { DynamicObjectParser().parse(js.`val`()) }
+
+    actual inline fun <reified T : Any> values(): List<T>? =
+        rethrow { js.`val`().unsafeCast<Array<*>>().map { DynamicObjectParser().parse<T>(it) } }
+
     actual val exists get() = rethrow { js.exists() }
-    actual inline fun <reified T> value(): T? = rethrow { fromJson(js.`val`(), T::class)  as T? }
     actual fun child(path: String) = DataSnapshot(js.child(path))
 
     actual val children: Iterable<DataSnapshot> = rethrow {
@@ -66,6 +72,7 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
             js.forEach { snapshot -> it.add(DataSnapshot(snapshot)) }
         }
     }
+
 }
 
 actual class OnDisconnect internal constructor(val js: firebase.database.OnDisconnect) {
@@ -79,9 +86,6 @@ actual typealias ServerValue = firebase.database.ServerValue
 
 actual class DatabaseException(error: dynamic) :
     RuntimeException("${error.code}: ${error.message}", error.unsafeCast<Throwable>())
-
-actual annotation class Exclude actual constructor()
-actual annotation class IgnoreExtraProperties actual constructor()
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.database.rethrow { function() }
 

@@ -9,12 +9,20 @@ expect class FirebaseFunctions {
 }
 
 expect class HttpsCallableReference {
-    suspend fun call(data: Any?): HttpsCallableResult
+    suspend inline fun <reified T: Any> call(data: T): HttpsCallableResult
     suspend fun call(): HttpsCallableResult
 }
 
 expect class HttpsCallableResult {
-    val data: Any?
+    /**
+     * Returns the contents of the document converted to a POJO or null if the document doesn't exist.
+     *
+     * @param T The type of the object to create.
+     * @return The contents of the document in an object of type T or null if the document doesn't
+     *     exist.
+     */
+    inline fun <reified T: Any> get(): T?
+    inline fun <reified T: Any> getList(): List<T>?
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

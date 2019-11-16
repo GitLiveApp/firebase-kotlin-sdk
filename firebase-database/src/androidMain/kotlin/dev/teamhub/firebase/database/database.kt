@@ -1,9 +1,8 @@
 package dev.teamhub.firebase.database
 
-import com.google.firebase.database.*
-import com.google.firebase.database.Exclude
-import com.google.firebase.database.IgnoreExtraProperties
+import com.google.firebase.database.Logger
 import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ValueEventListener
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import kotlinx.coroutines.CompletableDeferred
@@ -11,6 +10,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.Mapper
 
 actual val Firebase.database
     get() = FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance())
@@ -71,9 +71,24 @@ actual class DatabaseReference internal constructor(val android: com.google.fire
     actual suspend fun removeValue() = android.removeValue().await().run { Unit }
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
     actual val exists get() = android.exists()
-    actual inline fun <reified T> value(): T? = android.getValue(object : GenericTypeIndicator<T>() {})
+
+    actual inline fun <reified T: Any> value() = when(T::class) {
+        Boolean::class -> android.value as T?
+        String::class -> android.value as T?
+        Long::class -> android.value as T?
+        else -> android.value?.let { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
+
+    actual inline fun <reified T: Any> values() = when(T::class) {
+        Boolean::class -> android.value as List<T>?
+        String::class -> android.value as List<T>?
+        Long::class -> android.value as List<T>?
+        else -> (android.value as List<Any>?)?.map { Mapper.unmap<T>(it as Map<String, Any>) }
+    }
+
     actual fun child(path: String) = DataSnapshot(android.child(path))
     actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
 }
@@ -90,7 +105,4 @@ actual typealias DatabaseException = com.google.firebase.database.DatabaseExcept
 actual object ServerValue {
   actual val TIMESTAMP = ServerValue.TIMESTAMP
 }
-
-actual typealias Exclude = Exclude
-actual typealias IgnoreExtraProperties = IgnoreExtraProperties
 
