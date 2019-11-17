@@ -2,8 +2,10 @@ package dev.teamhub.firebase.database
 
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
 expect val Firebase.database: FirebaseDatabase
@@ -26,23 +28,19 @@ expect class FirebaseDatabase {
 expect class DatabaseReference {
     fun push(): DatabaseReference
     fun onDisconnect(): OnDisconnect
-    val valueEvents: Flow<DataSnapshot>
-    val singleValueEvent: Deferred<DataSnapshot>
-    suspend fun setValue(value: Any?)
+    val snapshots: Flow<DataSnapshot>
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> setValue(value: T)
+    suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>)
+    @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
     suspend fun removeValue()
 }
 
 expect class DataSnapshot {
     val exists: Boolean
-    /**
-     * Returns the content of the DataSnapshot converted to a POJO.
-     *
-     * Supports generics like List<> or Map<>. Use @JvmSuppressWildcards to force the compiler to
-     * use the type `T`, and not `? extends T`.
-     */
-    inline fun <reified T : Any> value(): T?
-    inline fun <reified T : Any> values(): List<T>?
+    inline fun <reified T: Any> value(): T
+    inline fun <reified T> value(strategy: DeserializationStrategy<T>): T
     fun child(path: String): DataSnapshot
     val children: Iterable<DataSnapshot>
 }
@@ -56,7 +54,10 @@ expect class DatabaseException : RuntimeException
 expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
-    suspend fun setValue(value: Any?)
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> setValue(value: T)
+    suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>)
+    @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
 }
 

@@ -190,14 +190,14 @@ external object firebase {
             fun delete(documentReference: DocumentReference): WriteBatch
             fun set(documentReference: DocumentReference, data: Any, options: Any? = definedExternally): WriteBatch
             fun update(documentReference: DocumentReference, data: Any): WriteBatch
-            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
+            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch
         }
 
         open class Transaction {
             fun get(documentReference: DocumentReference): Promise<DocumentSnapshot>
             fun set(documentReference: DocumentReference, data: Any, options: Any? = definedExternally): Transaction
             fun update(documentReference: DocumentReference, data: Any): Transaction
-            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any): Transaction
+            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any?): Transaction
             fun delete(documentReference: DocumentReference): Transaction
         }
 

@@ -4,19 +4,20 @@ import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
 import dev.teamhub.firebase.common.firebase
-import dev.teamhub.firebase.common.fromJson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.DynamicObjectParser
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.stringify
 import kotlin.js.json
 
-fun toJson(data: Any?): Any? = when(data) {
-    is firebase.firestore.FieldValue -> data
-    else -> dev.teamhub.firebase.common.toJson(data)
-}
+val json = Json(JsonConfiguration.Stable)
 
 actual val Firebase.firestore get() =
     rethrow { dev.teamhub.firebase.common.firestore; FirebaseFirestore(firebase.firestore()) }
@@ -47,29 +48,61 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("merge" to merge)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("merge" to merge)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("mergeFields" to mergeFields)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Map<String, Any>) =
-        rethrow { js.update(documentRef.js, toJson(data)!!) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("merge" to merge)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(documentRef.js, field, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(documentRef.js, fieldPath, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
+
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        rethrow { js.update(documentRef.js, JSON.parse(json.stringify(data))) }
+            .let { this }
+
+    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+        rethrow { js.update(documentRef.js, JSON.parse(json.stringify(strategy, data))) }
+            .let { this }
+
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.js,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+    }.let { this }
+
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.js,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+    }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         rethrow { js.delete(documentRef.js) }
@@ -81,29 +114,61 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
 actual class Transaction(val js: firebase.firestore.Transaction) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("merge" to merge)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("merge" to merge)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("mergeFields" to mergeFields)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, toJson(data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Map<String, Any>) =
-        rethrow { js.update(documentRef.js, toJson(data)!!) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("merge" to merge)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(documentRef.js, field, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(documentRef.js, fieldPath, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()) }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
+
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        rethrow { js.update(documentRef.js, JSON.parse(json.stringify(data))) }
+            .let { this }
+
+    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+        rethrow { js.update(documentRef.js, JSON.parse(json.stringify(strategy, data))) }
+            .let { this }
+
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.js,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+    }.let { this }
+
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.js,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+    }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         rethrow { js.delete(documentRef.js) }
@@ -118,23 +183,53 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val id: String
         get() =  rethrow { js.id }
 
-    actual suspend fun set(data: Any, merge: Boolean) =
-        rethrow { js.set(toJson(data)!!, json("merge" to merge)).await() }
+    actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) =
+        rethrow { js.set(JSON.parse(json.stringify(data)), json("merge" to merge)).await() }
 
-    actual suspend fun set(data: Any, vararg mergeFields: String) =
-        rethrow { js.set(toJson(data)!!, json("mergeFields" to mergeFields)).await() }
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String) =
+        rethrow { js.set(JSON.parse(json.stringify(data)), json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(toJson(data)!!, json("mergeFields" to mergeFieldsPaths)).await() }
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)).await() }
 
-    actual suspend fun update(data: Map<String, Any>) =
-        rethrow { js.update(toJson(data)!!).await() }
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+        rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("merge" to merge)).await() }
 
-    actual suspend fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(field, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()).await() }
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun update(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        rethrow { js.update(fieldPath, toJson(value)!!, *moreFieldsAndValues.mapIndexed { index, any -> if(index%2 == 0) any else toJson(any)!! }.toTypedArray()).await() }
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)).await() }
+
+    actual suspend inline fun <reified T: Any> update(data: T) =
+        rethrow { js.update(JSON.parse(json.stringify(data))).await() }
+
+    actual suspend inline fun <reified T> update(data: T, strategy: SerializationStrategy<T>) =
+        rethrow { js.update(JSON.parse(json.stringify(strategy, data))).await() }
+
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+            ?.await()
+    }.run { Unit }
+
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
+        js.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { JSON.parse<Any>(json.stringify(it)) })
+                }.toTypedArray()
+            )
+            ?.await()
+    }.run { Unit }
 
     actual suspend fun delete() = rethrow { js.delete().await() }
 
@@ -152,14 +247,29 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 actual open class Query(open val js: firebase.firestore.Query) {
 
     actual suspend fun get() =  rethrow { QuerySnapshot(js.get().await()) }
-    actual fun whereEqualTo(field: String, value: Any?) = rethrow { Query(js.where(field, "==", value)) }
-    actual fun whereEqualTo(path: FieldPath, value: Any?) = rethrow { Query(js.where(path, "==", value)) }
-    actual fun whereLessThan(field: String, value: Any) = rethrow { Query(js.where(field, "<", value)) }
-    actual fun whereLessThan(path: FieldPath, value: Any) = rethrow { Query(js.where(path, "<", value)) }
-    actual fun whereGreaterThan(field: String, value: Any) = rethrow { Query(js.where(field, ">", value)) }
-    actual fun whereGreaterThan(path: FieldPath, value: Any) = rethrow { Query(js.where(path, ">", value)) }
-    actual fun whereArrayContains(field: String, value: Any) = rethrow { Query(js.where(field, "array-contains", value)) }
-    actual fun whereArrayContains(path: FieldPath, value: Any) = rethrow { Query(js.where(path, "array-contains", value)) }
+
+    actual fun where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
+    actual fun where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path, "==", equalTo)) }
+
+    actual fun where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+        Query(
+            (lessThan?.let {js.where(field, "<", it) } ?: js).let { js ->
+                (greaterThan?.let { js.where(field, ">", it) } ?: js).let { js ->
+                    arrayContains?.let { js.where(field, "array-contains", it) } ?: js
+                }
+            }
+        )
+    }
+
+    actual fun where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+        Query(
+            (lessThan?.let {js.where(path, "<", it) } ?: js).let { js ->
+                (greaterThan?.let { js.where(path, ">", it) } ?: js).let { js ->
+                    arrayContains?.let { js.where(path, "array-contains", it) } ?: js
+                }
+            }
+        )
+    }
 
     actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {
@@ -173,8 +283,12 @@ actual open class Query(open val js: firebase.firestore.Query) {
 }
 
 actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {
-    actual suspend fun add(data: Map<String, Any>) = rethrow { DocumentReference(js.add(toJson(data)!!).await()) }
-    actual suspend fun add(pojo: Any) = rethrow { DocumentReference(js.add(toJson(pojo)!!).await()) }
+
+    actual suspend inline fun <reified T : Any> add(data: T) =
+        rethrow { DocumentReference(js.add(JSON.parse(json.stringify(data))).await()) }
+
+    actual suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>) =
+        rethrow { DocumentReference(js.add(JSON.parse(json.stringify(strategy, data))).await()) }
 }
 
 actual class FirebaseFirestoreException(message: String?, code: FirestoreExceptionCode) : FirebaseException(code.toString(), message)
@@ -187,17 +301,21 @@ actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
 }
 
 actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
+
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T: Any> data() =
-        rethrow { js.data()?.let { DynamicObjectParser().parse<T>(it) } }
+    actual inline fun <reified T: Any> data(): T? =
+        rethrow { DynamicObjectParser().parse<T>(js.data()) }
+
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>): T? =
+        rethrow { DynamicObjectParser().parse(js.data(), strategy) }
 
     actual inline fun <reified T: Any> get(field: String) =
-        rethrow { js.get(field)?.let { DynamicObjectParser().parse<T>(it) } }
+        rethrow { DynamicObjectParser().parse<T>(js.get(field)) }
 
-    actual inline fun <reified T : Any> getList(field: String): List<T>? =
-        rethrow { js.get(field).unsafeCast<Array<*>>().map { DynamicObjectParser().parse<T>(it) } }
+    actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
+        rethrow { DynamicObjectParser().parse(js.get(field), strategy) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
     actual val exists get() =  rethrow { js.exists }

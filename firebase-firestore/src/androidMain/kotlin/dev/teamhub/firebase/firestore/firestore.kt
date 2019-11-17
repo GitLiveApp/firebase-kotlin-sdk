@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.Mapper
+import kotlinx.serialization.*
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -38,27 +38,61 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
-        true -> android.set(documentRef.android, data, SetOptions.merge())
-        false -> android.set(documentRef.android, data)
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) = when(merge) {
+        true -> android.set(documentRef.android, Mapper.map(data), SetOptions.merge())
+        false -> android.set(documentRef.android, Mapper.map(data))
     }.let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        android.set(documentRef.android, data, SetOptions.mergeFields(*mergeFields))
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        android.set(documentRef.android, Mapper.map(data), SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        android.set(documentRef.android, data, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        android.set(documentRef.android, Mapper.map(data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Map<String, Any>) =
-        android.update(documentRef.android, data).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) = when(merge) {
+        true -> android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.merge())
+        false -> android.set(documentRef.android, Mapper.map(strategy, data))
+    }.let { this }
 
-    actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(documentRef.android, field, value, *moreFieldsAndValues).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.mergeFields(*mergeFields))
+            .let { this }
 
-    actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(documentRef.android, fieldPath, value, *moreFieldsAndValues).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
+            .let { this }
+
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        android.update(documentRef.android, Mapper.map(data)).let { this }
+
+    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+        android.update(documentRef.android, Mapper.map(strategy, data)).let { this }
+
+    @JvmName("updateFields")
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.android,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            ).let { this }
+
+    @JvmName("updateFieldPaths")
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.android,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -69,27 +103,61 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
-        true -> android.set(documentRef.android, data, SetOptions.merge())
-        false -> android.set(documentRef.android, data)
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) = when(merge) {
+        true -> android.set(documentRef.android, Mapper.map(data), SetOptions.merge())
+        false -> android.set(documentRef.android, Mapper.map(data))
     }.let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        android.set(documentRef.android, data, SetOptions.mergeFields(*mergeFields))
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        android.set(documentRef.android, Mapper.map(data), SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        android.set(documentRef.android, data, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        android.set(documentRef.android, Mapper.map(data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Map<String, Any>) =
-        android.update(documentRef.android, data).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) = when(merge) {
+        true -> android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.merge())
+        false -> android.set(documentRef.android, Mapper.map(strategy, data))
+    }.let { this }
 
-    actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(documentRef.android, field, value, *moreFieldsAndValues).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.mergeFields(*mergeFields))
+            .let { this }
 
-    actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(documentRef.android, fieldPath, value, *moreFieldsAndValues).let { this }
+    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
+            .let { this }
+
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        android.update(documentRef.android, Mapper.map(data)).let { this }
+
+    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+        android.update(documentRef.android, Mapper.map(strategy, data)).let { this }
+
+    @JvmName("updateFields")
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.android,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            ).let { this }
+
+    @JvmName("updateFieldPaths")
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                documentRef.android,
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -103,29 +171,63 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val id: String
         get() = android.id
 
-    actual suspend fun set(data: Any, merge: Boolean) = when(merge) {
-        true -> android.set(data, SetOptions.merge())
-        false -> android.set(data)
+    actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) = when(merge) {
+        true -> android.set(Mapper.map(data), SetOptions.merge())
+        false -> android.set(Mapper.map(data))
     }.await().run { Unit }
 
-    actual suspend fun set(data: Any, vararg mergeFields: String) =
-        android.set(data, SetOptions.mergeFields(*mergeFields))
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String) =
+        android.set(Mapper.map(data), SetOptions.mergeFields(*mergeFields))
             .await().run { Unit }
 
-    actual suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath) =
-        android.set(data, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
+        android.set(Mapper.map(data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .await().run { Unit }
 
-    actual suspend fun update(data: Map<String, Any>) =
-        android.update(data).await().run { Unit }
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, merge: Boolean) = when(merge) {
+        true -> android.set(Mapper.map(strategy, data), SetOptions.merge())
+        false -> android.set(Mapper.map(strategy, data))
+    }.await().run { Unit }
 
-    actual suspend fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(field, value, *moreFieldsAndValues)
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+        android.set(Mapper.map(strategy, data), SetOptions.mergeFields(*mergeFields))
             .await().run { Unit }
 
-    actual suspend fun update(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any) =
-        android.update(fieldPath, value, *moreFieldsAndValues)
+    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+        android.set(Mapper.map(strategy, data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .await().run { Unit }
+
+    actual suspend inline fun <reified T: Any> update(data: T) =
+        android.update(Mapper.map(data)).await().run { Unit }
+
+    actual suspend inline fun <reified T> update(data: T, strategy: SerializationStrategy<T>) =
+        android.update(Mapper.map(strategy, data)).await().run { Unit }
+
+    @JvmName("updateFields")
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            )
+            ?.await()
+            .run { Unit }
+
+    @JvmName("updateFieldPaths")
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        android.takeUnless { fieldsAndValues.isEmpty() }
+            ?.update(
+                fieldsAndValues[0].first,
+                fieldsAndValues[0].second,
+                *fieldsAndValues.flatMap { (field, value) ->
+                    listOf(field, value?.let { Mapper.map(value) })
+                }.toTypedArray()
+            )
+            ?.await()
+            .run { Unit }
 
     actual suspend fun delete() =
         android.delete().await().run { Unit }
@@ -145,14 +247,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
 actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
-    actual fun whereEqualTo(field: String, value: Any?) = Query(android.whereEqualTo(field, value))
-    actual fun whereEqualTo(path: FieldPath, value: Any?) = Query(android.whereEqualTo(path, value))
-    actual fun whereLessThan(field: String, value: Any) =  Query(android.whereLessThan(field, value))
-    actual fun whereLessThan(path: FieldPath, value: Any) = Query(android.whereLessThan(path, value))
-    actual fun whereGreaterThan(field: String, value: Any) = Query(android.whereGreaterThan(field, value))
-    actual fun whereGreaterThan(path: FieldPath, value: Any) = Query(android.whereGreaterThan(path, value))
-    actual fun whereArrayContains(field: String, value: Any) = Query(android.whereArrayContains(field, value))
-    actual fun whereArrayContains(path: FieldPath, value: Any) = Query(android.whereArrayContains(path, value))
+
+    actual fun where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
+    actual fun where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
 
     actual val snapshots get() = callbackFlow {
         val listener = android.addSnapshotListener { snapshot, exception ->
@@ -161,10 +258,30 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
         awaitClose { listener.remove() }
     }
+
+    actual fun where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+        (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android ->
+            (greaterThan?.let { android.whereGreaterThan(field, it) } ?: android).let { android ->
+                arrayContains?.let { android.whereArrayContains(field, it) } ?: android
+            }
+        }
+    )
+
+    actual fun where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+        (lessThan?.let { android.whereLessThan(path, it) } ?: android).let { android ->
+            (greaterThan?.let { android.whereGreaterThan(path, it) } ?: android).let { android ->
+                arrayContains?.let { android.whereArrayContains(path, it) } ?: android
+            }
+        }
+    )
 }
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
-    actual suspend fun add(data: Map<String, Any>) = DocumentReference(android.add(data).await())
-    actual suspend fun add(pojo: Any) = DocumentReference(android.add(pojo).await())
+
+    actual suspend inline fun <reified T : Any> add(data: T) =
+        DocumentReference(android.add(Mapper.map(data)).await())
+
+    actual suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>) =
+        DocumentReference(android.add(Mapper.map(strategy, data)).await())
 }
 
 actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException
@@ -178,27 +295,29 @@ actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnaps
         get() = android.documents.map { DocumentSnapshot(it) }
 }
 
+@Serializable
+data class Value<T>(val value: T)
+
 @Suppress("UNCHECKED_CAST")
 actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) {
+
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T: Any> data() =
-        android.data?.let { Mapper.unmap<T>(it) }
+    actual inline fun <reified T: Any> data() = android.data?.let { Mapper.unmap<T>(it) }
 
-    actual inline fun <reified T: Any> get(field: String) = when(T::class) {
-        Boolean::class -> android.get(field) as T?
-        String::class -> android.get(field) as T?
-        Long::class -> android.get(field) as T?
-        else -> android.get(field)?.let { Mapper.unmap<T>(it as Map<String, Any>) }
-    }
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+        android.data?.let { Mapper.unmap(strategy, it) }
 
-    actual inline fun <reified T: Any> getList(field: String) = when(T::class) {
-        Boolean::class -> android.get(field) as List<T>?
-        String::class -> android.get(field) as List<T>?
-        Long::class -> android.get(field) as List<T>?
-        else -> (android.get(field) as List<Any>?)?.map { Mapper.unmap<T>(it as Map<String, Any>) }
-    }
+    actual inline fun <reified T: Any> get(field: String) =
+        Mapper.unmapNullable<Value<T>>(mapOf("value" to android.get(field))).value
+
+    actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
+        object : KSerializer<T>, DeserializationStrategy<T> by strategy {
+            override fun serialize(encoder: Encoder, obj: T) = error("not supported")
+        }.let {
+            Mapper.unmapNullable(Value.serializer(it), mapOf("value" to android.get(field))).value
+        }
 
     actual fun contains(field: String) = android.contains(field)
 

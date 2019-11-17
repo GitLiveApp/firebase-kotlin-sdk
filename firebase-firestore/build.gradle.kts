@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     `maven-publish`
 }
 

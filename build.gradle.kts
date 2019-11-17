@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     kotlin("multiplatform") version "1.3.50" apply false
+    kotlin("plugin.serialization") version "1.3.50" apply false
 }
 
 buildscript {
