@@ -158,6 +158,7 @@ external object firebase {
         }
 
         open class CollectionReference : Query {
+            val path: String
             fun add(data: Any): Promise<DocumentReference>
         }
 
@@ -176,6 +177,7 @@ external object firebase {
 
         open class DocumentReference {
             val id: String
+            val path: String
 
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
             fun set(data: Any, options: Any? = definedExternally): Promise<Unit>

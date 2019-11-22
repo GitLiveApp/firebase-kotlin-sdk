@@ -287,6 +287,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
 actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {
 
+    actual val path: String
+        get() =  rethrow { js.path }
+
     actual suspend inline fun <reified T : Any> add(data: T) =
         rethrow { DocumentReference(js.add(JSON.parse(json.stringify(data))).await()) }
 
