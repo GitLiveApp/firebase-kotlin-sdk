@@ -52,13 +52,19 @@ expect class Transaction {
 //)
 
 expect open class Query {
-    fun where(field: String, equalTo: Any?): Query
-    fun where(path: FieldPath, equalTo: Any?): Query
-    fun where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    fun where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
+    internal fun _where(field: String, equalTo: Any?): Query
+    internal fun _where(path: FieldPath, equalTo: Any?): Query
+    internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
+    internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     val snapshots: Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
 }
+
+fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
+fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
+
 
 expect class WriteBatch {
     @ImplicitReflectionSerializer
@@ -152,6 +158,7 @@ expect class DocumentSnapshot {
 
     fun contains(field: String): Boolean
 
+    @ImplicitReflectionSerializer
     inline fun <reified T: Any> data(): T?
     inline fun <reified T> data(strategy: DeserializationStrategy<T>): T?
 

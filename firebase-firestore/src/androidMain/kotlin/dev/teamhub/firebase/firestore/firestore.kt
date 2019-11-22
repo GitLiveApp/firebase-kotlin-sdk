@@ -1,3 +1,4 @@
+@file:JvmName("android")
 package dev.teamhub.firebase.firestore
 
 import com.google.firebase.firestore.SetOptions
@@ -248,8 +249,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
 
-    actual fun where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
-    actual fun where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
+    internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
 
     actual val snapshots get() = callbackFlow {
         val listener = android.addSnapshotListener { snapshot, exception ->
@@ -259,7 +260,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         awaitClose { listener.remove() }
     }
 
-    actual fun where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android ->
             (greaterThan?.let { android.whereGreaterThan(field, it) } ?: android).let { android ->
                 arrayContains?.let { android.whereArrayContains(field, it) } ?: android
@@ -267,7 +268,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 
-    actual fun where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(path, it) } ?: android).let { android ->
             (greaterThan?.let { android.whereGreaterThan(path, it) } ?: android).let { android ->
                 arrayContains?.let { android.whereArrayContains(path, it) } ?: android

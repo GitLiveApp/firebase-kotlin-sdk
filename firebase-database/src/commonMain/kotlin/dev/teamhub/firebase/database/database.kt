@@ -39,6 +39,7 @@ expect class DatabaseReference {
 
 expect class DataSnapshot {
     val exists: Boolean
+    @ImplicitReflectionSerializer
     inline fun <reified T: Any> value(): T
     inline fun <reified T> value(strategy: DeserializationStrategy<T>): T
     fun child(path: String): DataSnapshot

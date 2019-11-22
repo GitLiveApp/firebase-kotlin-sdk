@@ -248,10 +248,10 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     actual suspend fun get() =  rethrow { QuerySnapshot(js.get().await()) }
 
-    actual fun where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
-    actual fun where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path, "==", equalTo)) }
+    internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path, "==", equalTo)) }
 
-    actual fun where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
             (lessThan?.let {js.where(field, "<", it) } ?: js).let { js ->
                 (greaterThan?.let { js.where(field, ">", it) } ?: js).let { js ->
@@ -261,7 +261,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
         )
     }
 
-    actual fun where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
             (lessThan?.let {js.where(path, "<", it) } ?: js).let { js ->
                 (greaterThan?.let { js.where(path, ">", it) } ?: js).let { js ->

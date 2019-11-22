@@ -9,7 +9,8 @@ repositories {
     mavenCentral()
     google()
 }
-version = "0.1.0"
+
+version = "0.1.0-dev"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
