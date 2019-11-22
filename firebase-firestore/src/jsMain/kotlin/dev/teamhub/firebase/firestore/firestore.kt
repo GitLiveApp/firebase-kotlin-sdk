@@ -183,6 +183,9 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val id: String
         get() =  rethrow { js.id }
 
+    actual val path: String
+        get() =  rethrow { js.path }
+
     actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) =
         rethrow { js.set(JSON.parse(json.stringify(data)), json("merge" to merge)).await() }
 
@@ -291,7 +294,7 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
         rethrow { DocumentReference(js.add(JSON.parse(json.stringify(strategy, data))).await()) }
 }
 
-actual class FirebaseFirestoreException(message: String?, code: FirestoreExceptionCode) : FirebaseException(code.toString(), message)
+actual class FirebaseFirestoreException(message: String?, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), message)
 
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 

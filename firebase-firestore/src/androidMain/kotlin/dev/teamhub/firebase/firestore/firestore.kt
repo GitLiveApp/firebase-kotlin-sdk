@@ -172,6 +172,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val id: String
         get() = android.id
 
+    actual val path: String
+        get() = path.id
+
     actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) = when(merge) {
         true -> android.set(Mapper.map(data), SetOptions.merge())
         false -> android.set(Mapper.map(data))
@@ -277,6 +280,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     )
 }
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
+
+    actual val path: String
+        get() = path.id
 
     actual suspend inline fun <reified T : Any> add(data: T) =
         DocumentReference(android.add(Mapper.map(data)).await())

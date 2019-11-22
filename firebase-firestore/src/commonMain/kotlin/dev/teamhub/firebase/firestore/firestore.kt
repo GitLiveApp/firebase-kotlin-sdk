@@ -92,6 +92,7 @@ expect class WriteBatch {
 expect class DocumentReference {
 
     val id: String
+    val path: String
     val snapshots: Flow<DocumentSnapshot>
     suspend fun get(): DocumentSnapshot
 
@@ -117,6 +118,7 @@ expect class DocumentReference {
 }
 
 expect class CollectionReference : Query {
+    val path: String
     @ImplicitReflectionSerializer
     suspend inline fun <reified T: Any> add(data: T): DocumentReference
     suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>): DocumentReference
