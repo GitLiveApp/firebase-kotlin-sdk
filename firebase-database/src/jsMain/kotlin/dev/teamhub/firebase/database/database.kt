@@ -46,7 +46,7 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
     actual suspend inline fun <reified T : Any> setValue(value: T) =
         rethrow { js.set(JSON.parse(json.stringify(value))).await() }
 
-    actual suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>) =
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, value))).await() }
 
     actual val snapshots get() = callbackFlow {
@@ -61,8 +61,8 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
 
-    actual inline fun <reified T: Any> value() =
-        rethrow { DynamicObjectParser().parse<T>(js.`val`()) }
+    actual inline fun <reified T> value() =
+        rethrow { DynamicObjectParser().parse<Any>(js.`val`()) as T }
 
     actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
         rethrow { DynamicObjectParser().parse(js.`val`(), strategy) }
@@ -89,7 +89,7 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
     actual suspend inline fun <reified T : Any> setValue(value: T) =
         rethrow { js.set(JSON.parse(json.stringify(value))).await() }
 
-    actual suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>) =
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, value))).await() }
 }
 

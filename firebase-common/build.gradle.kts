@@ -47,14 +47,19 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
         val jsMain by getting {
             dependencies {
 //                implementation(npm("firebase", "6.2.3"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
         }
         val jvmMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+            }
             kotlin.srcDir("src/androidMain/kotlin")
         }
     }

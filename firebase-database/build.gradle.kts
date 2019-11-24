@@ -3,7 +3,6 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization")
     `maven-publish`
 }
 
@@ -46,24 +45,24 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.13.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-database:17.0.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.13.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
         }
     }

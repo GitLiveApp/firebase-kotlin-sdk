@@ -4,11 +4,13 @@ package dev.teamhub.firebase.firestore
 import com.google.firebase.firestore.SetOptions
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.Mapper
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -117,7 +119,12 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         android.set(documentRef.android, Mapper.map(data), SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) = when(merge) {
+    actual inline fun <reified T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        merge: Boolean
+    ) = when(merge) {
         true -> android.set(documentRef.android, Mapper.map(strategy, data), SetOptions.merge())
         false -> android.set(documentRef.android, Mapper.map(strategy, data))
     }.let { this }
@@ -302,29 +309,20 @@ actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnaps
         get() = android.documents.map { DocumentSnapshot(it) }
 }
 
-@Serializable
-data class Value<T>(val value: T)
-
 @Suppress("UNCHECKED_CAST")
 actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) {
 
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T: Any> data() = android.data?.let { Mapper.unmap<T>(it) }
+    actual inline fun <reified T: Any> data() = Mapper.decode<T>(android.data)
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
-        android.data?.let { Mapper.unmap(strategy, it) }
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) = Mapper.decode(strategy, android.data)
 
-    actual inline fun <reified T: Any> get(field: String) =
-        Mapper.unmapNullable<Value<T>>(mapOf("value" to android.get(field))).value
+    actual inline fun <reified T> get(field: String) = Mapper.decode<T>(android.get(field))
 
     actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
-        object : KSerializer<T>, DeserializationStrategy<T> by strategy {
-            override fun serialize(encoder: Encoder, obj: T) = error("not supported")
-        }.let {
-            Mapper.unmapNullable(Value.serializer(it), mapOf("value" to android.get(field))).value
-        }
+        Mapper.decode(strategy, android.get(field))
 
     actual fun contains(field: String) = android.contains(field)
 

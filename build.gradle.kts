@@ -1,8 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
-    kotlin("multiplatform") version "1.3.50" apply false
-    kotlin("plugin.serialization") version "1.3.50" apply false
+    kotlin("multiplatform") version "1.3.60" apply false
 }
 
 buildscript {
@@ -32,6 +31,7 @@ subprojects {
     tasks.withType<KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
         )
     }
@@ -46,7 +46,7 @@ subprojects {
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.2")
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
             "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
-            "jvmMainApi"("app.teamhub:firebase-java:0.2.0")
+            "jvmMainApi"("app.teamhub:firebase-java:0.3.0")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.2")
         }
     }

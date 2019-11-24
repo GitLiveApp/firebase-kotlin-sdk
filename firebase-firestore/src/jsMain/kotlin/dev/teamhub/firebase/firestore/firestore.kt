@@ -126,7 +126,12 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+    actual inline fun <reified T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        merge: Boolean
+    ) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("merge" to merge)) }
             .let { this }
 
@@ -311,14 +316,14 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T: Any> data(): T? =
+    actual inline fun <reified T: Any> data(): T =
         rethrow { DynamicObjectParser().parse<T>(js.data()) }
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>): T? =
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>): T =
         rethrow { DynamicObjectParser().parse(js.data(), strategy) }
 
-    actual inline fun <reified T: Any> get(field: String) =
-        rethrow { DynamicObjectParser().parse<T>(js.get(field)) }
+    actual inline fun <reified T> get(field: String) =
+        rethrow { DynamicObjectParser().parse<Any>(js.get(field)) as T }
 
     actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
         rethrow { DynamicObjectParser().parse(js.get(field), strategy) }

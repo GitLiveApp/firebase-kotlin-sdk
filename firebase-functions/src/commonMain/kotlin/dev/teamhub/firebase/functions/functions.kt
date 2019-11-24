@@ -13,14 +13,14 @@ expect class FirebaseFunctions {
 
 expect class HttpsCallableReference {
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> call(data: T): HttpsCallableResult
+    suspend inline fun <reified T> call(data: T): HttpsCallableResult
     suspend inline fun <reified T> call(data: T, strategy: SerializationStrategy<T>): HttpsCallableResult
     suspend fun call(): HttpsCallableResult
 }
 
 expect class HttpsCallableResult {
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> data(): T
+    inline fun <reified T> data(): T
     inline fun <reified T> data(strategy: DeserializationStrategy<T>): T
 }
 

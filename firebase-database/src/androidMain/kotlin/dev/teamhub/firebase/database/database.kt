@@ -5,10 +5,13 @@ import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.Mapper
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 
 actual val Firebase.database
     get() = FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance())
@@ -31,9 +34,6 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)
 }
 
-@Serializable
-data class Value<T>(val value: T)
-
 actual class DatabaseReference internal constructor(val android: com.google.firebase.database.DatabaseReference) {
 
     actual fun push() = DatabaseReference(android.push())
@@ -54,34 +54,27 @@ actual class DatabaseReference internal constructor(val android: com.google.fire
     }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(Mapper.map(Value(value))["value"]).await().run { Unit }
+        android.setValue(Mapper.map(T::class.serializer(), value)).await().run { Unit }
 
-    actual suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>) =
-        object : KSerializer<T>, SerializationStrategy<T> by strategy {
-            override fun deserialize(decoder: Decoder) = error("not supported")
-        }.let {
-            android.setValue(Mapper.map(Value.serializer(it), Value(value))["value"]).await()
-        }.run { Unit }
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        android.setValue(Mapper.map(strategy, value)).await().run { Unit }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(Mapper.map(update)).await().run { Unit }
+        android.updateChildren(update.mapValues { Mapper.map(it) }).await().run { Unit }
 
     actual suspend fun removeValue() = android.removeValue().await().run { Unit }
 }
 
 @Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
+
     actual val exists get() = android.exists()
 
-    actual inline fun <reified T: Any> value() =
-        Mapper.unmapNullable<Value<T>>(mapOf("value" to android.value)).value
+    actual inline fun <reified T> value() =
+        Mapper.decode<T>(android.value)
 
     actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
-        object : KSerializer<T>, DeserializationStrategy<T> by strategy {
-            override fun serialize(encoder: Encoder, obj: T) = error("not supported")
-        }.let {
-            Mapper.unmapNullable(Value.serializer(it), mapOf("value" to android.value)).value
-        }
+        Mapper.decode(strategy,android.value)
 
     actual fun child(path: String) = DataSnapshot(android.child(path))
     actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
@@ -93,17 +86,13 @@ actual class OnDisconnect internal constructor(val android: com.google.firebase.
     actual suspend fun cancel() = android.cancel().await().run { Unit }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(Mapper.map(Value(value))["value"]).await().run { Unit }
+        android.setValue(Mapper.map(value)).await().run { Unit }
 
-    actual suspend inline fun <reified T> setValue(value: T, strategy: SerializationStrategy<T>) =
-        object : KSerializer<T>, SerializationStrategy<T> by strategy {
-            override fun deserialize(decoder: Decoder) = error("not supported")
-        }.let {
-            android.setValue(Mapper.map(Value.serializer(it), Value(value))["value"]).await()
-        }.run { Unit }
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        android.setValue(Mapper.map(strategy, value)).await().run { Unit }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(Mapper.map(update)).await().run { Unit }
+        android.updateChildren(update.mapValues { Mapper.map(it) }).await().run { Unit }
 }
 
 actual typealias DatabaseException = com.google.firebase.database.DatabaseException
