@@ -5,7 +5,8 @@ import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
-import dev.teamhub.firebase.Mapper
+import dev.teamhub.firebase.decode
+import dev.teamhub.firebase.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -54,13 +55,13 @@ actual class DatabaseReference internal constructor(val android: com.google.fire
     }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(Mapper.map(T::class.serializer(), value)).await().run { Unit }
+        android.setValue(encode(T::class.serializer(), value)).await().run { Unit }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(Mapper.map(strategy, value)).await().run { Unit }
+        android.setValue(encode(strategy, value)).await().run { Unit }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { Mapper.map(it) }).await().run { Unit }
+        android.updateChildren(update.mapValues { (_, it) -> encode(value = it) }).await().run { Unit }
 
     actual suspend fun removeValue() = android.removeValue().await().run { Unit }
 }
@@ -71,10 +72,10 @@ actual class DataSnapshot internal constructor(val android: com.google.firebase.
     actual val exists get() = android.exists()
 
     actual inline fun <reified T> value() =
-        Mapper.decode<T>(android.value)
+        decode<T>(value = android.value)
 
     actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
-        Mapper.decode(strategy,android.value)
+        decode(strategy, android.value)
 
     actual fun child(path: String) = DataSnapshot(android.child(path))
     actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
@@ -86,13 +87,13 @@ actual class OnDisconnect internal constructor(val android: com.google.firebase.
     actual suspend fun cancel() = android.cancel().await().run { Unit }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(Mapper.map(value)).await().run { Unit }
+        android.setValue(encode(value = value)).await().run { Unit }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(Mapper.map(strategy, value)).await().run { Unit }
+        android.setValue(encode(strategy, value)).await().run { Unit }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { Mapper.map(it) }).await().run { Unit }
+        android.updateChildren(update.mapValues { (_, it) -> encode(value = it) }).await().run { Unit }
 }
 
 actual typealias DatabaseException = com.google.firebase.database.DatabaseException

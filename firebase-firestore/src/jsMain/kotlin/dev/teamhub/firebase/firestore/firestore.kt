@@ -60,15 +60,15 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("merge" to merge)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
@@ -76,7 +76,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.update(documentRef.js, JSON.parse(json.stringify(data))) }
             .let { this }
 
-    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         rethrow { js.update(documentRef.js, JSON.parse(json.stringify(strategy, data))) }
             .let { this }
 
@@ -126,20 +126,15 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        merge: Boolean
-    ) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("merge" to merge)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         rethrow { js.set(documentRef.js, JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)) }
             .let { this }
 
@@ -147,7 +142,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { js.update(documentRef.js, JSON.parse(json.stringify(data))) }
             .let { this }
 
-    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, strategy: SerializationStrategy<T>) =
+    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         rethrow { js.update(documentRef.js, JSON.parse(json.stringify(strategy, data))) }
             .let { this }
 
@@ -200,19 +195,19 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
         rethrow { js.set(JSON.parse(json.stringify(data)), json("mergeFields" to mergeFieldsPaths)).await() }
 
-    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, merge: Boolean) =
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("merge" to merge)).await() }
 
-    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFields: String) =
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFields)).await() }
 
-    actual suspend inline fun <reified T> set(data: T, strategy: SerializationStrategy<T>, vararg mergeFieldsPaths: FieldPath) =
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, data)), json("mergeFields" to mergeFieldsPaths)).await() }
 
     actual suspend inline fun <reified T: Any> update(data: T) =
         rethrow { js.update(JSON.parse(json.stringify(data))).await() }
 
-    actual suspend inline fun <reified T> update(data: T, strategy: SerializationStrategy<T>) =
+    actual suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T) =
         rethrow { js.update(JSON.parse(json.stringify(strategy, data))).await() }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {

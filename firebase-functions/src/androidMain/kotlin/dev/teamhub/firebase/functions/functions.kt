@@ -2,7 +2,8 @@ package dev.teamhub.firebase.functions
 
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
-import dev.teamhub.firebase.Mapper
+import dev.teamhub.firebase.decode
+import dev.teamhub.firebase.encode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -29,19 +30,19 @@ actual class HttpsCallableReference internal constructor(val android: com.google
     actual suspend fun call() = HttpsCallableResult(android.call().await())
 
     actual suspend inline fun <reified T> call(data: T) =
-        HttpsCallableResult(android.call(Mapper.map(data as Any)).await())
+        HttpsCallableResult(android.call(encode(value = data as Any)).await())
 
     actual suspend inline fun <reified T> call(data: T, strategy: SerializationStrategy<T>) =
-        HttpsCallableResult(android.call(Mapper.map(strategy, data)).await())
+        HttpsCallableResult(android.call(encode(strategy, data)).await())
 }
 
 actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
 
     actual inline fun <reified T> data() =
-        Mapper.decode<T>(android.data)
+        decode<T>(value = android.data)
 
     actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
-        Mapper.decode(strategy, android.data)
+        decode(strategy, android.data)
 }
 
 actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

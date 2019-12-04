@@ -109,7 +109,7 @@ expect class DocumentReference {
 
     @ImplicitReflectionSerializer
     suspend inline fun <reified T: Any> update(data: T)
-    suspend inline fun <reified T> update(data: T, strategy: SerializationStrategy<T>)
+    suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T)
 
     suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
     suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
@@ -156,7 +156,7 @@ expect class DocumentSnapshot {
 
     @ImplicitReflectionSerializer
     inline fun <reified T> get(field: String): T
-    inline fun <reified T> get(strategy: DeserializationStrategy<T>, field: String): T
+    inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>): T
 
     fun contains(field: String): Boolean
 
