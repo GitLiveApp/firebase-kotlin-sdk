@@ -11,6 +11,7 @@ import kotlinx.serialization.DynamicObjectParser
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.modules.getContextualOrDefault
 import kotlinx.serialization.stringify
 
 actual val Firebase.database
@@ -43,8 +44,9 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
 
     actual suspend fun removeValue() = rethrow { js.remove().await() }
 
-    actual suspend inline fun <reified T : Any> setValue(value: T) =
-        rethrow { js.set(JSON.parse(json.stringify(value))).await() }
+    actual suspend fun setValue(value: Any?) = rethrow {
+        js.set(value?.let { JSON.parse<Any>(json.stringify(json.context.getContextualOrDefault(value), it)) }).await()
+    }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(JSON.parse(json.stringify(strategy, value))).await() }

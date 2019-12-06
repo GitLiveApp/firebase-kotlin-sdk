@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.serializer
 
 actual val Firebase.database
     get() = FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance())
@@ -54,8 +53,8 @@ actual class DatabaseReference internal constructor(val android: com.google.fire
         awaitClose { android.removeEventListener(listener) }
     }
 
-    actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(encode(T::class.serializer(), value)).await().run { Unit }
+    actual suspend fun  setValue(value: Any?) =
+        android.setValue(encode(value)).await().run { Unit }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value)).await().run { Unit }

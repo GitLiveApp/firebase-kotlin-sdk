@@ -30,7 +30,7 @@ expect class DatabaseReference {
     fun onDisconnect(): OnDisconnect
     val snapshots: Flow<DataSnapshot>
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> setValue(value: T)
+    suspend fun setValue(value: Any?)
     suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)
     @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
