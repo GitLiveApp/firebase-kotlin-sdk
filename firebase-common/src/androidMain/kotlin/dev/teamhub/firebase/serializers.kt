@@ -17,7 +17,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     lateinit var keys: List<String>
     lateinit var map: Map<String, Any?>
 
-    override val descriptor= object : SerialDescriptor {
+    override val descriptor = object : SerialDescriptor {
         override val kind = StructureKind.MAP
         override val name = "kotlin.Map<String, Any>"
         override fun getElementIndex(name: String) = keys.indexOf(name)
@@ -75,9 +75,9 @@ class FirebaseListSerializer : KSerializer<List<Any?>> {
 
     override fun deserialize(decoder: Decoder): List<Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
-        val list = MutableList<Any?>(collectionDecoder.decodeCollectionSize(descriptor)) { null }
+        val list = mutableListOf<Any?>()
         list.forEachIndexed { index, _ ->
-            list[index] = collectionDecoder.decodeNullableSerializableElement(index)
+            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
         }
         return list
     }

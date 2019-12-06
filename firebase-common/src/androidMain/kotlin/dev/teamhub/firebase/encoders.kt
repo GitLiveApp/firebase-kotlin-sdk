@@ -18,9 +18,9 @@ class FirebaseEncoder : Encoder {
 
     @Suppress("UNCHECKED_CAST")
     override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>) = when(desc.kind as StructureKind) {
-        StructureKind.LIST -> MutableList<Any?>(desc.elementsCount) { null }
+        StructureKind.LIST -> mutableListOf<Any?>()
             .also { value = it }
-            .let { FirebaseCompositeEncoder { _, index, value -> it[index] = value } }
+            .let { FirebaseCompositeEncoder { _, index, value -> it.add(index, value) } }
         StructureKind.MAP,  StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
             .also { value = it }
             .let { FirebaseCompositeEncoder { _, index, value -> it[desc.getElementName(index)] = value } }
