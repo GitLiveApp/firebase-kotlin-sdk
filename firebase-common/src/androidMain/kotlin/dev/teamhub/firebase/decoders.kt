@@ -3,15 +3,12 @@ package dev.teamhub.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.CompositeDecoder.Companion.READ_ALL
 import kotlinx.serialization.CompositeDecoder.Companion.READ_DONE
+import kotlinx.serialization.internal.UnitDescriptor
 import kotlinx.serialization.internal.nullable
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.getContextualOrDefault
 import kotlin.reflect.KClass
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T> encode(strategy: SerializationStrategy<T>? = null /*value?.let { EmptyModule.getContextualOrDefault(it::class as KClass<*>) } as SerializationStrategy<T>*/, value: T) =
-    value as Any?
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> decode(strategy: DeserializationStrategy<T> = EmptyModule.getContextualOrDefault(T::class as KClass<Any>).run { if(null is T) nullable else this } as DeserializationStrategy<T>, value: Any?): T {
@@ -75,7 +72,7 @@ class FirebaseClassDecoder(private val map: Map<String, Any?>) : FirebaseComposi
             ?: READ_DONE
 }
 
-open class FirebaseCompositeDecoder(
+open class FirebaseCompositeDecoder protected constructor(
     private val size: Int,
     private val get: (desc: SerialDescriptor, index: Int) -> Any?
 ): CompositeDecoder {
@@ -94,6 +91,10 @@ open class FirebaseCompositeDecoder(
 
     override fun <T : Any> decodeNullableSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T?>): T? =
         if(decodeNotNullMark(get(desc, index))) decodeSerializableElement(desc, index, deserializer) else decodeNull(get(desc, index))
+
+    fun decodeNullableSerializableElement(index: Int): Any? = get(UnitDescriptor, index)?.let { value ->
+        value.firebaseSerializer().let { decodeSerializableElement(it.descriptor, index, it) }
+    }
 
     override fun <T> updateSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>, old: T): T =
         throw UpdateNotSupportedException(deserializer.descriptor.name)
