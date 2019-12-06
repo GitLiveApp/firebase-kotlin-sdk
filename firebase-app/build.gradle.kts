@@ -98,9 +98,9 @@ tasks {
         dependsOn(copyPackageJson, copyJS, copySourceMap)
         workingDir("$buildDir/node_module")
         if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry https://npm.pkg.github.com/")
+            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
         } else {
-            commandLine("npm", "publish", "--registry https://npm.pkg.github.com/")
+            commandLine("npm", "publish", "--registry  http://localhost:4873")
         }
     }
 }
