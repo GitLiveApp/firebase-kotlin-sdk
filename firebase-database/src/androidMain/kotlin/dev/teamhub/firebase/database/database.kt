@@ -27,15 +27,10 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
         .filter { !it.value<Boolean>() }
         .produceIn(this)
 
-    try {
-        select<T> {
-            asDeferred().onAwait { it }
-            notConnected.onReceive { throw DatabaseException("Database not connected") }
-        }
-    } finally {
-        notConnected.cancel()
+    select<T> {
+        asDeferred().onAwait { it.also { notConnected.cancel() } }
+        notConnected.onReceive { throw DatabaseException("Database not connected") }
     }
-
 }
 
 actual val Firebase.database
