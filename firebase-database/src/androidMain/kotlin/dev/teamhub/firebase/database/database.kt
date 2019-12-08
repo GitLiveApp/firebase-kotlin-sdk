@@ -11,7 +11,6 @@ import dev.teamhub.firebase.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
@@ -21,21 +20,26 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
+
     val notConnected = Firebase.database
         .reference(".info/connected")
         .snapshots
         .filter { !it.value<Boolean>() }
-        .conflate()
         .produceIn(this)
 
-    select<T> {
-        asDeferred().onAwait { it }
-        notConnected.onReceive { throw DatabaseException("Database not connected") }
+    try {
+        select<T> {
+            asDeferred().onAwait { it }
+            notConnected.onReceive { throw DatabaseException("Database not connected") }
+        }
+    } finally {
+        notConnected.cancel()
     }
+
 }
 
 actual val Firebase.database
-    get() = FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance())
+        by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
 
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(url))
