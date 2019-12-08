@@ -1,5 +1,6 @@
 package dev.teamhub.firebase.database
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -9,10 +10,33 @@ import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.OnDisconnect
-import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.tasks.asDeferred
 
 import kotlin.reflect.KClass
+
+suspend fun <T> Task<T>.awaitWhileOnline(): T {
+    val notConnected = CompletableDeferred<Unit>()
+    val reference = getFirebaseDatabase().getReference(".info/connected")
+    val listener = reference.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                notConnected.completeExceptionally(error.toException())
+            }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.value == false) notConnected.complete(Unit)
+            }
+        })
+
+    try {
+        return select {
+            asDeferred().onAwait { it }
+            notConnected.onAwait { throw DatabaseException("Database not connected") }
+        }
+    } finally {
+        reference.removeEventListener(listener)
+    }
+}
 
 actual fun getFirebaseDatabase() = FirebaseDatabase.getInstance()
 
@@ -22,11 +46,11 @@ actual typealias FirebaseDatabase = FirebaseDatabase
 
 actual typealias DatabaseReference = DatabaseReference
 
-actual suspend fun DatabaseReference.awaitSetValue(value: Any?) = setValue(value).await().run { Unit }
+actual suspend fun DatabaseReference.awaitSetValue(value: Any?) = setValue(value).awaitWhileOnline().run { Unit }
 
-actual suspend fun DatabaseReference.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).await().run { Unit }
+actual suspend fun DatabaseReference.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).awaitWhileOnline().run { Unit }
 
-actual typealias ValueEventListener = ValueEventListener
+actual typealias ValueEventListener = com.google.firebase.database.ValueEventListener
 
 actual typealias DataSnapshot = DataSnapshot
 
@@ -52,17 +76,17 @@ actual typealias DatabaseError = DatabaseError
 
 actual typealias OnDisconnect = OnDisconnect
 
-actual suspend fun OnDisconnect.awaitRemoveValue() = removeValue().await().run { Unit }
+actual suspend fun OnDisconnect.awaitRemoveValue() = removeValue().awaitWhileOnline().run { Unit }
 
-actual suspend fun OnDisconnect.awaitCancel() = cancel().await().run { Unit }
+actual suspend fun OnDisconnect.awaitCancel() = cancel().awaitWhileOnline().run { Unit }
 
-actual suspend fun OnDisconnect.awaitSetValue(value: Any?) = setValue(value).await().run { Unit }
+actual suspend fun OnDisconnect.awaitSetValue(value: Any?) = setValue(value).awaitWhileOnline().run { Unit }
 
-actual suspend fun OnDisconnect.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).await().run { Unit }
+actual suspend fun OnDisconnect.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).awaitWhileOnline().run { Unit }
 
 actual val TIMESTAMP = ServerValue.TIMESTAMP
 
-actual suspend fun DatabaseReference.awaitRemoveValue() = removeValue().await().run { Unit }
+actual suspend fun DatabaseReference.awaitRemoveValue() = removeValue().awaitWhileOnline().run { Unit }
 
 actual fun FirebaseDatabase.getReference(path: String) = getReference(path)
 
