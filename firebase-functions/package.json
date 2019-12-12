@@ -1,6 +1,6 @@
 {
   "name": "@teamhubapp/firebase-functions",
-  "version": "0.1.0-beta1",
+  "version": "0.1.0-dev1",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-functions.js",
   "scripts": {
