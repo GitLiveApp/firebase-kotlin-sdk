@@ -10,21 +10,15 @@ fun encode(value: Any?): Any? = value?.let {
     FirebaseEncoder().apply { encode(it.firebaseSerializer(), it) }.value
 }
 
+expect fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
+
 class FirebaseEncoder : Encoder {
 
     var value: Any? = null
 
     override val context = EmptyModule
 
-    @Suppress("UNCHECKED_CAST")
-    override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>) = when(desc.kind as StructureKind) {
-        StructureKind.LIST -> mutableListOf<Any?>()
-            .also { value = it }
-            .let { FirebaseCompositeEncoder { _, index, value -> it.add(index, value) } }
-        StructureKind.MAP,  StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
-            .also { value = it }
-            .let { FirebaseCompositeEncoder { _, index, value -> it[desc.getElementName(index)] = value } }
-    }
+    override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>) = structureEncoder(desc, *typeParams)
 
     override fun encodeBoolean(value: Boolean) {
         this.value = value
@@ -81,10 +75,15 @@ class FirebaseEncoder : Encoder {
 }
 
 open class FirebaseCompositeEncoder(
+    private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
 ): CompositeEncoder {
 
     override val context = EmptyModule
+
+    override fun endStructure(desc: SerialDescriptor) {
+        super.endStructure(desc)
+    }
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
         set(desc, index, value?.let { FirebaseEncoder().apply { encode(serializer, value) }.value })

@@ -90,8 +90,9 @@ actual class DatabaseReference internal constructor(
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
+    @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(value = it) })
+        android.updateChildren(encode(update) as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
@@ -129,7 +130,7 @@ actual class OnDisconnect internal constructor(
         .run { Unit }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        android.setValue(encode(value = value))
+        android.setValue(encode(value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
@@ -139,7 +140,7 @@ actual class OnDisconnect internal constructor(
             .run { Unit}
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(value = it) })
+        android.updateChildren(update.mapValues { (_, it) -> encode(it) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 }

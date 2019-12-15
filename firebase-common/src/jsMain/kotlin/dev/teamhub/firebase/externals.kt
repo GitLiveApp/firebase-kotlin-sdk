@@ -1,4 +1,4 @@
-package dev.teamhub.firebase.common
+package dev.teamhub.firebase
 
 import kotlin.js.Json
 import kotlin.js.Promise

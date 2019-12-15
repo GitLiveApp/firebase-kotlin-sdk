@@ -1,6 +1,6 @@
 {
   "name": "@teamhubapp/firebase-firestore",
-  "version": "0.1.0-dev1",
+  "version": "0.1.0-dev9",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-firestore.js",
   "scripts": {
@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/TeamHubApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@teamhubapp/firebase-app": "0.1.0-beta1",
+    "@teamhubapp/firebase-app": "0.1.0-dev9",
     "firebase": "6.2.3",
-    "kotlin": "1.3.60",
-    "kotlinx-coroutines-core": "1.3.2"
+    "kotlin": "1.3.61",
+    "kotlinx-coroutines-core": "1.3.3"
   }
 }
 

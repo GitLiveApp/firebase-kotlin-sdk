@@ -44,6 +44,11 @@ kotlin {
     }
 
     sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
+            }
+        }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")

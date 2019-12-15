@@ -1,30 +1,23 @@
 package dev.teamhub.firebase.database
 
-import dev.teamhub.firebase.Firebase
-import dev.teamhub.firebase.FirebaseApp
-import dev.teamhub.firebase.common.firebase
+import dev.teamhub.firebase.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.DynamicObjectParser
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.modules.getContextualOrDefault
-import kotlinx.serialization.stringify
 
 actual val Firebase.database
-    get() = rethrow { dev.teamhub.firebase.common.database; FirebaseDatabase(dev.teamhub.firebase.common.firebase.database()) }
+    get() = rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.database()) }
 
 actual fun Firebase.database(app: FirebaseApp) =
-    rethrow { dev.teamhub.firebase.common.database; FirebaseDatabase(dev.teamhub.firebase.common.firebase.database(app.js)) }
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.database(app.js)) }
 
 actual fun Firebase.database(url: String) =
-    rethrow { dev.teamhub.firebase.common.database; FirebaseDatabase(dev.teamhub.firebase.common.firebase.app().database(url)) }
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.app().database(url)) }
 
 actual fun Firebase.database(app: FirebaseApp, url: String) =
-    rethrow { dev.teamhub.firebase.common.database; FirebaseDatabase(app.js.database(url)) }
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(app.js.database(url)) }
 
 actual class FirebaseDatabase internal constructor(val js: firebase.database.Database) {
     actual fun reference(path: String) = rethrow { DatabaseReference(js.ref(path)) }
@@ -32,7 +25,6 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
 }
 
-val json = Json(JsonConfiguration.Stable)
 
 actual class DatabaseReference internal constructor(val js: firebase.database.Reference) {
 
@@ -40,16 +32,16 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        rethrow { js.update(JSON.parse(json.stringify(update))).await() }
+        rethrow { js.update(encode(update)).await() }
 
     actual suspend fun removeValue() = rethrow { js.remove().await() }
 
     actual suspend fun setValue(value: Any?) = rethrow {
-        js.set(value?.let { JSON.parse<Any>(json.stringify(json.context.getContextualOrDefault(value), it)) }).await()
+        js.set(encode(value)).await()
     }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        rethrow { js.set(JSON.parse(json.stringify(strategy, value))).await() }
+        rethrow { js.set(encode(strategy, value)).await() }
 
     actual val snapshots get() = callbackFlow {
         val listener = js.on(
@@ -64,10 +56,10 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
 
     actual inline fun <reified T> value() =
-        rethrow { DynamicObjectParser().parse<Any>(js.`val`()) as T }
+        rethrow { decode<T>(value = js.`val`()) }
 
     actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
-        rethrow { DynamicObjectParser().parse(js.`val`(), strategy) }
+        rethrow { decode(strategy, js.`val`()) }
 
     actual val exists get() = rethrow { js.exists() }
     actual fun child(path: String) = DataSnapshot(js.child(path))
@@ -86,19 +78,19 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
     actual suspend fun cancel() =  rethrow { js.cancel().await() }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
-        rethrow { js.update(JSON.parse(json.stringify(update))).await() }
+        rethrow { js.update(encode(update)).await() }
 
     actual suspend inline fun <reified T : Any> setValue(value: T) =
-        rethrow { js.set(JSON.parse(json.stringify(value))).await() }
+        rethrow { js.set(encode(value)).await() }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        rethrow { js.set(JSON.parse(json.stringify(strategy, value))).await() }
+        rethrow { js.set(encode(strategy, value)).await() }
 }
 
 actual typealias ServerValue = firebase.database.ServerValue
 
 actual class DatabaseException(error: dynamic) :
-    RuntimeException("${error.code}: ${error.message}", error.unsafeCast<Throwable>())
+    RuntimeException("${error?.code}: ${error.message}", error.unsafeCast<Throwable>())
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.database.rethrow { function() }
 

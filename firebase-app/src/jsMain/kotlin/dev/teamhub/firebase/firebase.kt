@@ -1,6 +1,5 @@
 package dev.teamhub.firebase
 
-import dev.teamhub.firebase.common.firebase
 import kotlin.js.json
 
 actual val Firebase.app: FirebaseApp
@@ -38,7 +37,7 @@ private fun FirebaseOptions.toJson() = json(
     "gaTrackingId" to gaTrackingId
 )
 
-actual open class FirebaseException(code: String?, message: String?) : Exception("$code: $message")
-actual open class FirebaseNetworkException(code: String?, message: String?) : FirebaseException(code, message)
-actual open class FirebaseTooManyRequestsException(code: String?, message: String?) : FirebaseException(code, message)
-actual open class FirebaseApiNotAvailableException(code: String?, message: String?) : FirebaseException(code, message)
+actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)
+actual open class FirebaseNetworkException(code: String?, cause: Throwable) : FirebaseException(code, cause)
+actual open class FirebaseTooManyRequestsException(code: String?, cause: Throwable) : FirebaseException(code, cause)
+actual open class FirebaseApiNotAvailableException(code: String?, cause: Throwable) : FirebaseException(code, cause)

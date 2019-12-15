@@ -16,7 +16,9 @@ inline fun <reified T> decode(strategy: DeserializationStrategy<T> = EmptyModule
     return FirebaseDecoder(value).decode(strategy)
 }
 
-class FirebaseDecoder(private val value: Any?) : Decoder {
+expect fun FirebaseDecoder.structureDecoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder
+
+class FirebaseDecoder(internal val value: Any?) : Decoder {
 
     override val context: SerialModule
         get() = EmptyModule
@@ -24,13 +26,7 @@ class FirebaseDecoder(private val value: Any?) : Decoder {
     override val updateMode: UpdateMode = UpdateMode.BANNED
 
     @Suppress("UNCHECKED_CAST")
-    override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>) = when(desc.kind as StructureKind) {
-        StructureKind.CLASS -> FirebaseClassDecoder(value as Map<String, Any?>)
-        StructureKind.LIST -> FirebaseCompositeDecoder(value as List<*>)
-        StructureKind.MAP -> (value as Map<*, *>).let { map ->
-            FirebaseCompositeDecoder(map.flatMap { listOf(it.key, it.value) }, map.size)
-        }
-    }
+    override fun beginStructure(desc: SerialDescriptor, vararg typeParams: KSerializer<*>) = structureDecoder(desc, *typeParams)
 
     override fun decodeString() = decodeString(value)
 
@@ -60,27 +56,27 @@ class FirebaseDecoder(private val value: Any?) : Decoder {
 
 }
 
-class FirebaseClassDecoder(private val map: Map<String, Any?>) : FirebaseCompositeDecoder(
-    map.size, { desc, index -> map[desc.getElementName(index)] }
-) {
+class FirebaseClassDecoder(
+    size: Int,
+    private val containsKey: (name: String) -> Boolean,
+    get: (desc: SerialDescriptor, index: Int) -> Any?
+) : FirebaseCompositeDecoder(size, get) {
     private var index: Int = 0
 
     override fun decodeElementIndex(desc: SerialDescriptor): Int =
         (index until desc.elementsCount)
-            .firstOrNull { !desc.isElementOptional(it) || map.containsKey(desc.getElementName(it)) }
+            .firstOrNull { !desc.isElementOptional(it) || containsKey(desc.getElementName(it)) }
             ?.also { index = it + 1 }
             ?: READ_DONE
 }
 
-open class FirebaseCompositeDecoder protected constructor(
+open class FirebaseCompositeDecoder constructor(
     private val size: Int,
     private val get: (desc: SerialDescriptor, index: Int) -> Any?
 ): CompositeDecoder {
 
-    constructor(list: List<Any?>, size: Int = list.size): this(size,  { _, index -> list[index] })
-
     override val context = EmptyModule
-    override val updateMode = UpdateMode.BANNED
+    override val updateMode = UpdateMode.OVERWRITE
 
     override fun decodeElementIndex(desc: SerialDescriptor) = READ_ALL
 
@@ -97,10 +93,10 @@ open class FirebaseCompositeDecoder protected constructor(
     }
 
     override fun <T> updateSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>, old: T): T =
-        throw UpdateNotSupportedException(deserializer.descriptor.name)
+        deserializer.deserialize(FirebaseDecoder(get(desc, index)))
 
     override fun <T : Any> updateNullableSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T?>, old: T?): T? =
-        throw UpdateNotSupportedException(deserializer.descriptor.name)
+        if(decodeNotNullMark(get(desc, index))) decodeSerializableElement(desc, index, deserializer) else decodeNull(get(desc, index))
 
     override fun decodeBooleanElement(desc: SerialDescriptor, index: Int) = decodeBoolean(get(desc, index))
 

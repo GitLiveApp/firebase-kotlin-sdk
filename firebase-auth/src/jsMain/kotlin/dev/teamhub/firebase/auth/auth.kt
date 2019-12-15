@@ -1,19 +1,15 @@
 package dev.teamhub.firebase.auth
 
-import dev.teamhub.firebase.Firebase
-import dev.teamhub.firebase.FirebaseApp
-import dev.teamhub.firebase.FirebaseException
-import dev.teamhub.firebase.FirebaseNetworkException
-import dev.teamhub.firebase.common.firebase
+import dev.teamhub.firebase.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
 actual val Firebase.auth
-    get() = rethrow { dev.teamhub.firebase.common.auth; FirebaseAuth(firebase.auth()) }
+    get() = rethrow { dev.teamhub.firebase.auth; FirebaseAuth(firebase.auth()) }
 
 actual fun Firebase.auth(app: FirebaseApp) =
-    rethrow { dev.teamhub.firebase.common.auth; FirebaseAuth(firebase.auth(app.js)) }
+    rethrow { dev.teamhub.firebase.auth; FirebaseAuth(firebase.auth(app.js)) }
 
 actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
 
@@ -50,14 +46,14 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun reload() = rethrow { js.reload().await() }
 }
 
-actual open class FirebaseAuthException(code: String?, message: String?): FirebaseException(code, message)
-actual open class FirebaseAuthActionCodeException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthEmailException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthInvalidCredentialsException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthInvalidUserException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthRecentLoginRequiredException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthUserCollisionException(code: String?, message: String?): FirebaseAuthException(code, message)
-actual open class FirebaseAuthWebException(code: String?, message: String?): FirebaseAuthException(code, message)
+actual open class FirebaseAuthException(code: String?, cause: Throwable): FirebaseException(code, cause)
+actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthEmailException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthInvalidCredentialsException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthInvalidUserException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthRecentLoginRequiredException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthUserCollisionException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthWebException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 
 private inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.auth.rethrow { function() }
 
@@ -71,13 +67,13 @@ private inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-private fun errorToException(e: Throwable) = when(val code = e.asDynamic().code as String?) {
-    "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, e.message)
-    "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, e.message)
-    "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, e.message)
-    "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, e.message)
-    "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, e.message)
-    "auth/network-request-failed" -> FirebaseNetworkException(code, e.message)
+private fun errorToException(cause: Throwable) = when(val code = cause.asDynamic().code as String?) {
+    "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause)
+    "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause)
+    "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause)
+    "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause)
+    "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause)
+    "auth/network-request-failed" -> FirebaseNetworkException(code, cause)
 //                "auth/app-deleted" ->
 //                "auth/app-not-authorized" ->
 //                "auth/argument-error" ->
@@ -85,5 +81,5 @@ private fun errorToException(e: Throwable) = when(val code = e.asDynamic().code 
 //                "auth/operation-not-allowed" ->
 //                "auth/too-many-arguments" ->
 //                "auth/unauthorized-domain" ->
-    else -> FirebaseAuthException(code, e.message)
+    else -> FirebaseAuthException(code, cause)
 }
