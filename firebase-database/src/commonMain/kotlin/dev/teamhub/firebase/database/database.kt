@@ -2,6 +2,7 @@ package dev.teamhub.firebase.database
 
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.database.ChildEvent.Type.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -25,10 +26,24 @@ expect class FirebaseDatabase {
     fun setLoggingEnabled(enabled: Boolean)
 }
 
-expect class DatabaseReference {
+data class ChildEvent internal constructor(val type: Type, val snapshot: DataSnapshot, val previousChildName: String?) {
+    enum class Type {
+        ADDED,
+        CHANGED,
+        MOVED,
+        REMOVED
+    }
+}
+
+expect open class Query {
+    val valueEvents: Flow<DataSnapshot>
+    fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
+    fun orderByChild(path: String): Query
+}
+
+expect class DatabaseReference : Query {
     fun push(): DatabaseReference
     fun onDisconnect(): OnDisconnect
-    val snapshots: Flow<DataSnapshot>
     @ImplicitReflectionSerializer
     suspend fun setValue(value: Any?)
     suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)

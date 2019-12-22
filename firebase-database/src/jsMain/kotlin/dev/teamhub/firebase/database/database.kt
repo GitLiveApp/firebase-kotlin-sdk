@@ -25,8 +25,46 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
 }
 
+actual open class Query internal constructor(open val js: firebase.database.Query) {
 
-actual class DatabaseReference internal constructor(val js: firebase.database.Reference) {
+    actual fun orderByChild(path: String) = js.orderByChild(path).let { this }
+
+    actual val valueEvents get() = callbackFlow {
+        val listener = rethrow {
+            js.on(
+                "value",
+                { it, _ -> offer(DataSnapshot(it)) },
+                { close(DatabaseException(it)).run { Unit } }
+            )
+        }
+        awaitClose { rethrow { js.off("value", listener) } }
+    }
+
+    actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow {
+        val listeners = rethrow {
+            types.map { type ->
+                "child_${type.name.toLowerCase()}".let { eventType ->
+                    eventType to js.on(
+                        eventType,
+                        { snapshot, previousChildName ->
+                            offer(
+                                ChildEvent(
+                                    type,
+                                    DataSnapshot(snapshot),
+                                    previousChildName
+                                )
+                            )
+                        },
+                        { close(DatabaseException(it)).run { Unit } }
+                    )
+                }
+            }
+        }
+        awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } } }
+    }
+}
+
+actual class DatabaseReference internal constructor(override val js: firebase.database.Reference): Query(js) {
 
     actual fun push() = rethrow { DatabaseReference(js.push()) }
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
@@ -42,15 +80,6 @@ actual class DatabaseReference internal constructor(val js: firebase.database.Re
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
-
-    actual val snapshots get() = callbackFlow {
-        val listener = js.on(
-            "value",
-            { offer(DataSnapshot(it)) },
-            { close(DatabaseException(it)).run { Unit } }
-        )
-        awaitClose { js.off("value", listener) }
-    }
 }
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {

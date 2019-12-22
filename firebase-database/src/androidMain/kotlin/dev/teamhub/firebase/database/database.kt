@@ -1,11 +1,13 @@
 package dev.teamhub.firebase.database
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.Logger
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.database.ChildEvent.Type
 import dev.teamhub.firebase.decode
 import dev.teamhub.firebase.encode
 import kotlinx.coroutines.channels.awaitClose
@@ -23,7 +25,7 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
         .reference(".info/connected")
-        .snapshots
+        .valueEvents
         .filter { !it.value<Boolean>() }
         .produceIn(this)
 
@@ -59,15 +61,13 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)
 }
 
-actual class DatabaseReference internal constructor(
-    val android: com.google.firebase.database.DatabaseReference,
+actual open class Query internal constructor(
+    open val android: com.google.firebase.database.Query,
     val persistenceEnabled: Boolean
 ) {
+    actual fun orderByChild(path: String) = android.orderByChild(path).let { this }
 
-    actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
-    actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
-
-    actual val snapshots get() = callbackFlow {
+    actual val valueEvents get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 offer(DataSnapshot(snapshot))
@@ -80,6 +80,46 @@ actual class DatabaseReference internal constructor(
         android.addValueEventListener(listener)
         awaitClose { android.removeEventListener(listener) }
     }
+
+    actual fun childEvents(vararg types: Type) = callbackFlow {
+        val listener = object : ChildEventListener {
+
+            val moved by lazy { types.contains(Type.MOVED) }
+            override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(moved) offer(ChildEvent(Type.MOVED, DataSnapshot(snapshot), previousChildName))
+            }
+
+            val changed by lazy { types.contains(Type.CHANGED) }
+            override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(changed) offer(ChildEvent(Type.CHANGED, DataSnapshot(snapshot), previousChildName))
+            }
+
+            val added by lazy { types.contains(Type.ADDED) }
+            override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(added) offer(ChildEvent(Type.ADDED, DataSnapshot(snapshot), previousChildName))
+            }
+
+            val removed by lazy { types.contains(Type.REMOVED) }
+            override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
+                if(removed) offer(ChildEvent(Type.REMOVED, DataSnapshot(snapshot), null))
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                close(error.toException())
+            }
+        }
+        android.addChildEventListener(listener)
+        awaitClose { android.removeEventListener(listener) }
+    }
+}
+
+actual class DatabaseReference internal constructor(
+    override val android: com.google.firebase.database.DatabaseReference,
+    persistenceEnabled: Boolean
+): Query(android, persistenceEnabled) {
+
+    actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
+    actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
     actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }

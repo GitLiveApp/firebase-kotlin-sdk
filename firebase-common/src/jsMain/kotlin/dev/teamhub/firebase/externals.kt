@@ -15,6 +15,8 @@ external object database
 @JsModule("firebase/firestore")
 external object firestore
 
+typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
+
 @JsModule("firebase/app")
 external object firebase {
 
@@ -99,15 +101,19 @@ external object firebase {
         }
         open class ThenableReference : Reference
 
-        open class Reference {
+
+        open class Query {
+            fun on(eventType: String?, callback: SnapshotCallback, cancelCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
+            fun off(eventType: String?, callback: SnapshotCallback?, context: Any? = definedExternally)
+            fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
+            fun orderByChild(path: String): Query
+        }
+
+        open class Reference: Query {
             fun remove(): Promise<Unit>
             fun onDisconnect(): OnDisconnect
-
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
-            fun on(eventType: String?, callback: (data: DataSnapshot) -> Unit, cancelCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): (DataSnapshot) -> Unit
-            fun off(eventType: String?, callback: (data: DataSnapshot) -> Unit, context: Any? = definedExternally)
-            fun once(eventType: String, callback: (data: DataSnapshot) -> Unit, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): (DataSnapshot)->Unit
             fun push(): ThenableReference
         }
         open class DataSnapshot {
