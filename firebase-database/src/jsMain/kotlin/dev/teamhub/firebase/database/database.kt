@@ -49,8 +49,8 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
                         { snapshot, previousChildName ->
                             offer(
                                 ChildEvent(
-                                    type,
                                     DataSnapshot(snapshot),
+                                    type,
                                     previousChildName
                                 )
                             )
@@ -91,6 +91,7 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
         rethrow { decode(strategy, js.`val`()) }
 
     actual val exists get() = rethrow { js.exists() }
+    actual val key get() = rethrow { js.key }
     actual fun child(path: String) = DataSnapshot(js.child(path))
 
     actual val children: Iterable<DataSnapshot> = rethrow {

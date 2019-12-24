@@ -86,22 +86,22 @@ actual open class Query internal constructor(
 
             val moved by lazy { types.contains(Type.MOVED) }
             override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(moved) offer(ChildEvent(Type.MOVED, DataSnapshot(snapshot), previousChildName))
+                if(moved) offer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
             }
 
             val changed by lazy { types.contains(Type.CHANGED) }
             override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(changed) offer(ChildEvent(Type.CHANGED, DataSnapshot(snapshot), previousChildName))
+                if(changed) offer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
             }
 
             val added by lazy { types.contains(Type.ADDED) }
             override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(added) offer(ChildEvent(Type.ADDED, DataSnapshot(snapshot), previousChildName))
+                if(added) offer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
             }
 
             val removed by lazy { types.contains(Type.REMOVED) }
             override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
-                if(removed) offer(ChildEvent(Type.REMOVED, DataSnapshot(snapshot), null))
+                if(removed) offer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -145,6 +145,8 @@ actual class DatabaseReference internal constructor(
 actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
 
     actual val exists get() = android.exists()
+
+    actual val key get() = android.key
 
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)

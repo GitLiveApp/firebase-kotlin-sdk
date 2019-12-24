@@ -117,6 +117,7 @@ external object firebase {
             fun push(): ThenableReference
         }
         open class DataSnapshot {
+            val key: String?
             fun `val`(): Any
             fun exists(): Boolean
             fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean

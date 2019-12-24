@@ -26,7 +26,11 @@ expect class FirebaseDatabase {
     fun setLoggingEnabled(enabled: Boolean)
 }
 
-data class ChildEvent internal constructor(val type: Type, val snapshot: DataSnapshot, val previousChildName: String?) {
+data class ChildEvent internal constructor(
+    val snapshot: DataSnapshot,
+    val type: Type,
+    val previousChildName: String?
+) {
     enum class Type {
         ADDED,
         CHANGED,
@@ -54,6 +58,7 @@ expect class DatabaseReference : Query {
 
 expect class DataSnapshot {
     val exists: Boolean
+    val key: String?
     @ImplicitReflectionSerializer
     inline fun <reified T> value(): T
     inline fun <reified T> value(strategy: DeserializationStrategy<T>): T
