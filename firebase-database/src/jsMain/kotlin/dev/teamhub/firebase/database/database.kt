@@ -7,6 +7,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
+fun encode(value: Any?) =
+    encode(value, firebase.database.ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+    encode(strategy, value, firebase.database.ServerValue.TIMESTAMP)
+
+
 actual val Firebase.database
     get() = rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.database()) }
 
@@ -27,7 +33,7 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
 
 actual open class Query internal constructor(open val js: firebase.database.Query) {
 
-    actual fun orderByChild(path: String) = js.orderByChild(path).let { this }
+    actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
     actual val valueEvents get() = callbackFlow {
         val listener = rethrow {
@@ -62,10 +68,17 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
         }
         awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } } }
     }
+
+    actual fun startAt(value: String, key: String?) = Query(js.startAt(value, key))
+
+    actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key))
+
+    actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key))
 }
 
 actual class DatabaseReference internal constructor(override val js: firebase.database.Reference): Query(js) {
 
+    actual val key get() = rethrow { js.key }
     actual fun push() = rethrow { DatabaseReference(js.push()) }
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
@@ -116,8 +129,6 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
 }
-
-actual typealias ServerValue = firebase.database.ServerValue
 
 actual class DatabaseException(error: dynamic) :
     RuntimeException("${error?.code}: ${error.message}", error.unsafeCast<Throwable>())

@@ -3,16 +3,17 @@ package dev.teamhub.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? = FirebaseEncoder().apply { encode(strategy, value) }.value
+fun <T> encode(strategy: SerializationStrategy<T> , value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
+    FirebaseEncoder(positiveInfinity).apply { encode(strategy, value) }.value
 
 @ImplicitReflectionSerializer
-fun encode(value: Any?): Any? = value?.let {
-    FirebaseEncoder().apply { encode(it.firebaseSerializer(), it) }.value
+fun encode(value: Any?, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
+    FirebaseEncoder(positiveInfinity).apply { encode(it.firebaseSerializer(), it) }.value
 }
 
 expect fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
 
-class FirebaseEncoder : Encoder {
+class FirebaseEncoder(positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
 
     var value: Any? = null
 
@@ -33,7 +34,7 @@ class FirebaseEncoder : Encoder {
     }
 
     override fun encodeDouble(value: Double) {
-        this.value = value
+        this.value = encodeTimestamp(value)
     }
 
     override fun encodeEnum(enumDescription: SerialDescriptor, ordinal: Int) {
@@ -74,10 +75,18 @@ class FirebaseEncoder : Encoder {
 
 }
 
+abstract class TimestampEncoder(internal val positiveInfinity: Any) {
+    fun encodeTimestamp(value: Double) = when(value) {
+        Double.POSITIVE_INFINITY -> positiveInfinity
+        else -> value
+    }
+}
+
 open class FirebaseCompositeEncoder(
+    positiveInfinity: Any,
     private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
-): CompositeEncoder {
+): TimestampEncoder(positiveInfinity), CompositeEncoder {
 
     override val context = EmptyModule
 
@@ -86,10 +95,10 @@ open class FirebaseCompositeEncoder(
     }
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
-        set(desc, index, value?.let { FirebaseEncoder().apply { encode(serializer, value) }.value })
+        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value })
 
     override fun <T> encodeSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
-        set(desc, index, FirebaseEncoder().apply { encode(serializer, value) }.value)
+        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value)
 
     override fun encodeNonSerializableElement(desc: SerialDescriptor, index: Int, value: Any) = set(desc, index, value)
 
@@ -99,7 +108,7 @@ open class FirebaseCompositeEncoder(
 
     override fun encodeCharElement(desc: SerialDescriptor, index: Int, value: Char) = set(desc, index, value)
 
-    override fun encodeDoubleElement(desc: SerialDescriptor, index: Int, value: Double)  = set(desc, index, value)
+    override fun encodeDoubleElement(desc: SerialDescriptor, index: Int, value: Double)  = set(desc, index, encodeTimestamp(value))
 
     override fun encodeFloatElement(desc: SerialDescriptor, index: Int, value: Float) = set(desc, index, value)
 

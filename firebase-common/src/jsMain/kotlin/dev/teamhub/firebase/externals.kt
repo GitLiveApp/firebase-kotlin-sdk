@@ -107,15 +107,18 @@ external object firebase {
             fun off(eventType: String?, callback: SnapshotCallback?, context: Any? = definedExternally)
             fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
             fun orderByChild(path: String): Query
+            fun startAt(value: Any, key: String? = definedExternally): Query
         }
 
         open class Reference: Query {
+            val key: String?
             fun remove(): Promise<Unit>
             fun onDisconnect(): OnDisconnect
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
             fun push(): ThenableReference
         }
+
         open class DataSnapshot {
             val key: String?
             fun `val`(): Any
@@ -133,7 +136,7 @@ external object firebase {
         }
 
         object ServerValue {
-            val TIMESTAMP: Map<String, String>
+            val TIMESTAMP: Any
         }
     }
 

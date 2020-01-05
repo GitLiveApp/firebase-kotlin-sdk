@@ -9,7 +9,6 @@ import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.database.ChildEvent.Type
 import dev.teamhub.firebase.decode
-import dev.teamhub.firebase.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
@@ -20,6 +19,11 @@ import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+
+fun encode(value: Any?) =
+    dev.teamhub.firebase.encode(value, ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+    dev.teamhub.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
 
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
@@ -65,7 +69,13 @@ actual open class Query internal constructor(
     open val android: com.google.firebase.database.Query,
     val persistenceEnabled: Boolean
 ) {
-    actual fun orderByChild(path: String) = android.orderByChild(path).let { this }
+    actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
+
+    actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Double, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
     actual val valueEvents get() = callbackFlow {
         val listener = object : ValueEventListener {
@@ -118,6 +128,7 @@ actual class DatabaseReference internal constructor(
     persistenceEnabled: Boolean
 ): Query(android, persistenceEnabled) {
 
+    actual val key get() = android.key
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
@@ -188,8 +199,4 @@ actual class OnDisconnect internal constructor(
 }
 
 actual typealias DatabaseException = com.google.firebase.database.DatabaseException
-
-actual object ServerValue {
-  actual val TIMESTAMP = ServerValue.TIMESTAMP
-}
 

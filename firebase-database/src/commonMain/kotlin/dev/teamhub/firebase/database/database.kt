@@ -43,9 +43,13 @@ expect open class Query {
     val valueEvents: Flow<DataSnapshot>
     fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
     fun orderByChild(path: String): Query
+    fun startAt(value: String, key: String? = null): Query
+    fun startAt(value: Double, key: String? = null): Query
+    fun startAt(value: Boolean, key: String? = null): Query
 }
 
 expect class DatabaseReference : Query {
+    val key: String?
     fun push(): DatabaseReference
     fun onDisconnect(): OnDisconnect
     @ImplicitReflectionSerializer
@@ -66,8 +70,8 @@ expect class DataSnapshot {
     val children: Iterable<DataSnapshot>
 }
 
-expect object ServerValue {
-    val TIMESTAMP: Map<String, String>
+object ServerValue {
+    val TIMESTAMP = Double.POSITIVE_INFINITY
 }
 
 expect class DatabaseException : RuntimeException
