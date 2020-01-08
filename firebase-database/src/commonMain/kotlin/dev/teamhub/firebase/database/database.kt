@@ -51,6 +51,7 @@ expect open class Query {
 expect class DatabaseReference : Query {
     val key: String?
     fun push(): DatabaseReference
+    fun child(path: String): DatabaseReference
     fun onDisconnect(): OnDisconnect
     @ImplicitReflectionSerializer
     suspend fun setValue(value: Any?)

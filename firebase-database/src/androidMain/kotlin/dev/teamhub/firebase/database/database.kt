@@ -129,6 +129,9 @@ actual class DatabaseReference internal constructor(
 ): Query(android, persistenceEnabled) {
 
     actual val key get() = android.key
+
+    actual fun child(path: String) = DatabaseReference(android.child(path), persistenceEnabled)
+
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 

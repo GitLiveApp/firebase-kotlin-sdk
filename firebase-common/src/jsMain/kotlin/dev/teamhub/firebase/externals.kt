@@ -112,6 +112,7 @@ external object firebase {
 
         open class Reference: Query {
             val key: String?
+            fun child(path: String): Reference
             fun remove(): Promise<Unit>
             fun onDisconnect(): OnDisconnect
             fun update(value: Any?): Promise<Unit>

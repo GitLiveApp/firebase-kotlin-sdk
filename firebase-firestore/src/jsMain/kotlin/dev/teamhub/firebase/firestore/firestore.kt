@@ -172,10 +172,10 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
 actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 
     actual val id: String
-        get() =  rethrow { js.id }
+        get() = rethrow { js.id }
 
     actual val path: String
-        get() =  rethrow { js.path }
+        get() = rethrow { js.path }
 
     actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) =
         rethrow { js.set(encode(data)!!, json("merge" to merge)).await() }

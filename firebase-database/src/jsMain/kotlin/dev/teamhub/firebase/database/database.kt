@@ -80,6 +80,8 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
 
     actual val key get() = rethrow { js.key }
     actual fun push() = rethrow { DatabaseReference(js.push()) }
+    actual fun child(path: String) = rethrow { DatabaseReference(js.child(path)) }
+
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
     actual suspend fun updateChildren(update: Map<String, Any?>) =
