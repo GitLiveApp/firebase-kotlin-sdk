@@ -74,6 +74,9 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
     actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key))
 
     actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key))
+
+    override fun toString() = js.toString()
+
 }
 
 actual class DatabaseReference internal constructor(override val js: firebase.database.Reference): Query(js) {
