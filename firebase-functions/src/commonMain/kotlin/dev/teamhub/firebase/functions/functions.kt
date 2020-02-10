@@ -14,7 +14,7 @@ expect class FirebaseFunctions {
 expect class HttpsCallableReference {
     @ImplicitReflectionSerializer
     suspend inline fun <reified T> call(data: T): HttpsCallableResult
-    suspend inline fun <reified T> call(data: T, strategy: SerializationStrategy<T>): HttpsCallableResult
+    suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
     suspend fun call(): HttpsCallableResult
 }
 

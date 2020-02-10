@@ -32,7 +32,7 @@ actual class HttpsCallableReference internal constructor(val android: com.google
     actual suspend inline fun <reified T> call(data: T) =
         HttpsCallableResult(android.call(encode(data)).await())
 
-    actual suspend inline fun <reified T> call(data: T, strategy: SerializationStrategy<T>) =
+    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
         HttpsCallableResult(android.call(encode(strategy, data)).await())
 }
 
