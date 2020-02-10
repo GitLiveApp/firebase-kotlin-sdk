@@ -107,6 +107,7 @@ external object firebase {
             fun off(eventType: String?, callback: SnapshotCallback?, context: Any? = definedExternally)
             fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
             fun orderByChild(path: String): Query
+            fun orderByKey(): Query
             fun startAt(value: Any, key: String? = definedExternally): Query
         }
 

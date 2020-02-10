@@ -33,6 +33,7 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
 
 actual open class Query internal constructor(open val js: firebase.database.Query) {
 
+    actual fun orderByKey() = Query(js.orderByKey())
     actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
     actual val valueEvents get() = callbackFlow {

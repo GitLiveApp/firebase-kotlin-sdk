@@ -42,6 +42,7 @@ data class ChildEvent internal constructor(
 expect open class Query {
     val valueEvents: Flow<DataSnapshot>
     fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
+    fun orderByKey(): Query
     fun orderByChild(path: String): Query
     fun startAt(value: String, key: String? = null): Query
     fun startAt(value: Double, key: String? = null): Query

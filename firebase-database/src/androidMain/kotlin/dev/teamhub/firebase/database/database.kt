@@ -69,6 +69,8 @@ actual open class Query internal constructor(
     open val android: com.google.firebase.database.Query,
     val persistenceEnabled: Boolean
 ) {
+    actual fun orderByKey() = Query(android.orderByKey(), persistenceEnabled)
+
     actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
 
     actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
