@@ -9,6 +9,7 @@ import kotlinx.serialization.internal.nullable
 fun Any.firebaseSerializer() = (this::class.compiledSerializer() ?: this::class.defaultSerializer() ?: when(this) {
     is Map<*, *> -> FirebaseMapSerializer()
     is List<*> -> FirebaseListSerializer()
+    is Set<*> -> FirebaseListSerializer()
     else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
 }) as KSerializer<Any>
 
@@ -49,7 +50,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 }
 
-class FirebaseListSerializer : KSerializer<List<Any?>> {
+class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     lateinit var list: List<Any?>
 
@@ -62,11 +63,11 @@ class FirebaseListSerializer : KSerializer<List<Any?>> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun serialize(encoder: Encoder, obj: List<Any?>) {
-        list = obj
-        val collectionEncoder = encoder.beginCollection(descriptor, obj.size)
+    override fun serialize(encoder: Encoder, obj: Iterable<Any?>) {
+        list = obj.toList()
+        val collectionEncoder = encoder.beginCollection(descriptor, list.size)
         list.forEachIndexed { index, value ->
-            val serializer = value?.let { it::class.firebaseSerializer() } ?: UnitSerializer.nullable as KSerializer<Any>
+            val serializer = value?.firebaseSerializer() ?: UnitSerializer.nullable as KSerializer<Any>
             collectionEncoder.encodeNullableSerializableElement(
                 serializer.descriptor, index, serializer, value
             )
