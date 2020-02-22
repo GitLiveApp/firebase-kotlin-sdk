@@ -34,13 +34,13 @@ kotlin {
     }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64()
-//    jvm {
-//        val main by compilations.getting {
-//            kotlinOptions {
-//                jvmTarget = "1.8"
-//            }
-//        }
-//    }
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
