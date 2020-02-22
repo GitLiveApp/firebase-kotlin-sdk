@@ -32,13 +32,13 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-//    jvm {
-//        val main by compilations.getting {
-//            kotlinOptions {
-//                jvmTarget = "1.8"
-//            }
-//        }
-//    }
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -54,12 +54,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
-//        val jvmMain by getting {
-//            dependencies {
-//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
-//            }
-//            kotlin.srcDir("src/androidMain/kotlin")
-//        }
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+            }
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
         val jsMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
