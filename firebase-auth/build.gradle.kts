@@ -32,6 +32,14 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
+    val buildForDevice = project.findProperty("kotlin.native.cocoapods.target") == "ios_arm"
+    val iosMain by sourceSets.creating
+    if (buildForDevice) {
+        iosArm64("ios64")
+        sourceSets["ios64Main"].dependsOn(iosMain)
+    } else {
+        iosX64("ios")
+    }
     jvm {
         val main by compilations.getting {
             kotlinOptions {
@@ -50,6 +58,10 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-auth:17.0.0")
+            }
+        }
+        val iosMain by getting {
+            dependencies {
             }
         }
         val jvmMain by getting {

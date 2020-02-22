@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("native.cocoapods")
     `maven-publish`
 }
 repositories {
@@ -35,6 +36,14 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
+    val buildForDevice = project.findProperty("kotlin.native.cocoapods.target") == "ios_arm"
+    val iosMain by sourceSets.creating
+    if (buildForDevice) {
+        iosArm64("ios64")
+        sourceSets["ios64Main"].dependsOn(iosMain)
+    } else {
+        iosX64("ios")
+    }
     jvm {
         val main by compilations.getting {
             kotlinOptions {
@@ -56,6 +65,10 @@ kotlin {
         }
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val iosMain by getting {
+            dependencies {
+            }
         }
     }
 }
