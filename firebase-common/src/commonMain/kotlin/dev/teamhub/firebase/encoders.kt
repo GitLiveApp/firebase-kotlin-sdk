@@ -4,7 +4,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(positiveInfinity).apply { encode(strategy, value) }.value
+    FirebaseEncoder(positiveInfinity).apply { encode(strategy, value) }.value//.also { println("encoded $it") }
 
 @ImplicitReflectionSerializer
 fun encode(value: Any?, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
