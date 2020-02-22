@@ -32,21 +32,15 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    val buildForDevice = project.findProperty("kotlin.native.cocoapods.target") == "ios_arm"
-    val iosMain by sourceSets.creating
-    if (buildForDevice) {
-        iosArm64("ios64")
-        sourceSets["ios64Main"].dependsOn(iosMain)
-    } else {
-        iosX64("ios")
-    }
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    val iosArm64 = iosArm64()
+    val iosX64 = iosX64()
+//    jvm {
+//        val main by compilations.getting {
+//            kotlinOptions {
+//                jvmTarget = "1.8"
+//            }
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -62,7 +56,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
-        val iosMain by getting {
+        val iosMain by creating {
             dependencies {
             }
         }

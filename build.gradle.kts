@@ -28,13 +28,13 @@ subprojects {
         jcenter()
     }
 
-    tasks.withType<KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-        )
-    }
+//    tasks.withType<KotlinCompile<*>> {
+//        kotlinOptions.freeCompilerArgs += listOf(
+//            "-Xuse-experimental=kotlin.Experimental",
+//            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+//            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+//        )
+//    }
 
     afterEvaluate  {
         dependencies {

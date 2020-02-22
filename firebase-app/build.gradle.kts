@@ -63,7 +63,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":firebase-common"))
+                //implementation(project(":firebase-common"))
             }
         }
         val androidMain by getting {
