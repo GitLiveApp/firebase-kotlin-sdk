@@ -1,63 +1,90 @@
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 package dev.teamhub.firebase.database
 
-import kotlin.reflect.KClass
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.database.ChildEvent.Type.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.SerializationStrategy
 
-expect annotation class Exclude()
-expect annotation class IgnoreExtraProperties()
+/** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
+expect val Firebase.database: FirebaseDatabase
 
-expect fun getFirebaseDatabase(): FirebaseDatabase
+/** Returns the [FirebaseDatabase] instance for the specified [url]. */
+expect fun Firebase.database(url: String): FirebaseDatabase
 
-expect enum class LoggerLevel {
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR,
-    NONE
+/** Returns the [FirebaseDatabase] instance of the given [FirebaseApp]. */
+expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
+
+/** Returns the [FirebaseDatabase] instance of the given [FirebaseApp] and [url]. */
+expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
+
+expect class FirebaseDatabase {
+    fun reference(path: String): DatabaseReference
+    fun setPersistenceEnabled(enabled: Boolean)
+    fun setLoggingEnabled(enabled: Boolean)
 }
 
-expect class FirebaseDatabase
-
-expect fun FirebaseDatabase.getReference(path: String): DatabaseReference
-expect fun FirebaseDatabase.setPersistenceEnabled(enabled: Boolean)
-expect fun FirebaseDatabase.setLogLevel(logLevel: LoggerLevel)
-
-expect class DatabaseReference
-
-expect fun DatabaseReference.push(): DatabaseReference
-expect fun DatabaseReference.onDisconnect(): OnDisconnect
-expect fun DatabaseReference.addValueEventListener(listener: ValueEventListener): ValueEventListener
-expect fun DatabaseReference.addListenerForSingleValueEvent(listener: ValueEventListener)
-expect fun DatabaseReference.removeEventListener(listener: ValueEventListener)
-
-expect suspend fun DatabaseReference.awaitSetValue(value: Any?)
-expect suspend fun DatabaseReference.awaitUpdateChildren(update: Map<String, Any?>)
-expect suspend fun DatabaseReference.awaitRemoveValue()
-
-expect interface ValueEventListener {
-    fun onDataChange(data: DataSnapshot)
-    fun onCancelled(error: DatabaseError)
+data class ChildEvent internal constructor(
+    val snapshot: DataSnapshot,
+    val type: Type,
+    val previousChildName: String?
+) {
+    enum class Type {
+        ADDED,
+        CHANGED,
+        MOVED,
+        REMOVED
+    }
 }
 
-expect class DataSnapshot
+expect open class Query {
+    val valueEvents: Flow<DataSnapshot>
+    fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
+    fun orderByKey(): Query
+    fun orderByChild(path: String): Query
+    fun startAt(value: String, key: String? = null): Query
+    fun startAt(value: Double, key: String? = null): Query
+    fun startAt(value: Boolean, key: String? = null): Query
+}
 
-expect fun <T: Any> DataSnapshot.getValue(valueType: KClass<T>): T?
-expect fun DataSnapshot.exists(): Boolean
-expect fun DataSnapshot.getValue(): Any?
-expect fun DataSnapshot.child(path: String): DataSnapshot
-expect val DataSnapshot.children: Iterable<DataSnapshot>
+expect class DatabaseReference : Query {
+    val key: String?
+    fun push(): DatabaseReference
+    fun child(path: String): DatabaseReference
+    fun onDisconnect(): OnDisconnect
+    @ImplicitReflectionSerializer
+    suspend fun setValue(value: Any?)
+    suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)
+    @ImplicitReflectionSerializer
+    suspend fun updateChildren(update: Map<String, Any?>)
+    suspend fun removeValue()
+}
 
-expect val TIMESTAMP: Map<String, String>
+expect class DataSnapshot {
+    val exists: Boolean
+    val key: String?
+    @ImplicitReflectionSerializer
+    inline fun <reified T> value(): T
+    inline fun <reified T> value(strategy: DeserializationStrategy<T>): T
+    fun child(path: String): DataSnapshot
+    val children: Iterable<DataSnapshot>
+}
+
+object ServerValue {
+    val TIMESTAMP = Double.POSITIVE_INFINITY
+}
 
 expect class DatabaseException : RuntimeException
 
-expect class DatabaseError
+expect class OnDisconnect {
+    suspend fun removeValue()
+    suspend fun cancel()
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> setValue(value: T)
+    suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)
+    @ImplicitReflectionSerializer
+    suspend fun updateChildren(update: Map<String, Any?>)
+}
 
-expect fun DatabaseError.toException(): DatabaseException
-
-expect class OnDisconnect
-
-expect suspend fun OnDisconnect.awaitRemoveValue()
-expect suspend fun OnDisconnect.awaitCancel()
-expect suspend fun OnDisconnect.awaitSetValue(value: Any?)
-expect suspend fun OnDisconnect.awaitUpdateChildren(update: Map<String, Any?>)

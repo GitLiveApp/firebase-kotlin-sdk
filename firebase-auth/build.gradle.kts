@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-version = "0.1.0"
+version = "0.1.0-dev"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -57,7 +57,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:17.0.0")
+                api("com.google.firebase:firebase-auth:19.1.0")
             }
         }
         val iosMain by getting {
@@ -83,6 +83,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
+                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
             )
         }
     }
@@ -101,9 +102,9 @@ tasks {
         dependsOn(copyPackageJson, copyJS, copySourceMap)
         workingDir("$buildDir/node_module")
         if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry https://npm.pkg.github.com/")
+            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
         } else {
-            commandLine("npm", "publish", "--registry https://npm.pkg.github.com/")
+            commandLine("npm", "publish", "--registry  http://localhost:4873")
         }
     }
 }

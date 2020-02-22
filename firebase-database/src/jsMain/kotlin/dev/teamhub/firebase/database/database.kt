@@ -1,100 +1,152 @@
 package dev.teamhub.firebase.database
 
-import dev.teamhub.firebase.common.fromJson
-import dev.teamhub.firebase.common.toJson
+import dev.teamhub.firebase.*
 import kotlinx.coroutines.await
-import kotlin.reflect.KClass
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 
-actual fun getFirebaseDatabase() = rethrow { database; firebase.database() }
+fun encode(value: Any?) =
+    encode(value, firebase.database.ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+    encode(strategy, value, firebase.database.ServerValue.TIMESTAMP)
 
-actual typealias FirebaseDatabase = firebase.database.Database
 
-actual typealias DatabaseReference = firebase.database.Reference
+actual val Firebase.database
+    get() = rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.database()) }
 
-actual typealias DataSnapshot = firebase.database.DataSnapshot
+actual fun Firebase.database(app: FirebaseApp) =
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.database(app.js)) }
 
-actual typealias OnDisconnect = firebase.database.OnDisconnect
+actual fun Firebase.database(url: String) =
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(firebase.app().database(url)) }
 
-actual interface ValueEventListener {
-    actual fun onDataChange(data: DataSnapshot)
-    actual fun onCancelled(error: DatabaseError)
+actual fun Firebase.database(app: FirebaseApp, url: String) =
+    rethrow { dev.teamhub.firebase.database; FirebaseDatabase(app.js.database(url)) }
+
+actual class FirebaseDatabase internal constructor(val js: firebase.database.Database) {
+    actual fun reference(path: String) = rethrow { DatabaseReference(js.ref(path)) }
+    actual fun setPersistenceEnabled(enabled: Boolean) {}
+    actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
 }
 
-@Suppress("UNCHECKED_CAST")
-actual fun <T : Any> DataSnapshot.getValue(valueType: KClass<T>): T? = rethrow { fromJson(`val`(), valueType)  as T? }
-actual fun DataSnapshot.exists(): Boolean = rethrow { exists() }
-actual fun DataSnapshot.getValue(): Any? = rethrow { fromJson(`val`()) }
+actual open class Query internal constructor(open val js: firebase.database.Query) {
 
-actual class DatabaseError(internal val error: Error)
+    actual fun orderByKey() = Query(js.orderByKey())
+    actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
-actual val TIMESTAMP: Map<String, String>
-    get() = firebase.database.ServerValue.TIMESTAMP
-
-actual suspend fun DatabaseReference.awaitSetValue(value: Any?) = rethrow { set(toJson(value)).await() }
-actual suspend fun DatabaseReference.awaitUpdateChildren(update: Map<String, Any?>) = rethrow { update(toJson(update)).await() }
-
-actual suspend fun OnDisconnect.awaitRemoveValue() = rethrow { remove().await() }
-actual suspend fun OnDisconnect.awaitCancel() =  rethrow { cancel().await() }
-actual suspend fun OnDisconnect.awaitSetValue(value: Any?) =  rethrow { set(value).await() }
-actual suspend fun OnDisconnect.awaitUpdateChildren(update: Map<String, Any?>) =  rethrow { update(toJson(update)).await() }
-
-actual class DatabaseException(code: String?, message: String?) : RuntimeException("$code: $message")
-
-actual suspend fun DatabaseReference.awaitRemoveValue() =  rethrow { remove().await() }
-
-actual enum class LoggerLevel {
-    DEBUG, INFO, WARN, ERROR, NONE
-}
-
-actual fun FirebaseDatabase.getReference(path: String) = ref(path)
-
-actual fun FirebaseDatabase.setPersistenceEnabled(enabled: Boolean) {
-}
-
-actual fun FirebaseDatabase.setLogLevel(logLevel: LoggerLevel) = rethrow { firebase.database.enableLogging(logLevel != LoggerLevel.NONE) }
-
-actual fun DatabaseReference.push() = rethrow { push() as DatabaseReference }
-
-actual fun DatabaseReference.onDisconnect() = rethrow { onDisconnect() }
-
-actual fun DatabaseReference.addValueEventListener(listener: ValueEventListener) = rethrow {
-    on("value", { listener.onDataChange(it) }, { listener.onCancelled(DatabaseError(it)) })
-        .let { listener.asDynamic().callback = it }
-        .run { listener }
-}
-
-actual fun DatabaseReference.removeEventListener(listener: ValueEventListener) = rethrow { off("value", listener.asDynamic().callback) }
-
-
-actual fun DatabaseError.toException() = DatabaseException(error.asDynamic().code as String?, error.message)
-
-actual val DataSnapshot.children: Iterable<DataSnapshot>
-    get() = rethrow {
-        val children = ArrayList<DataSnapshot>(numChildren())
-        forEach {
-            children.add( it.`val`() as DataSnapshot )
+    actual val valueEvents get() = callbackFlow {
+        val listener = rethrow {
+            js.on(
+                "value",
+                { it, _ -> offer(DataSnapshot(it)) },
+                { close(DatabaseException(it)).run { Unit } }
+            )
         }
-        return children
+        awaitClose { rethrow { js.off("value", listener) } }
     }
 
-actual fun DatabaseReference.addListenerForSingleValueEvent(listener: ValueEventListener) = rethrow {
-    once("value", { listener.onDataChange(it) }, { listener.onCancelled(DatabaseError(it)) })
-        .let { listener.asDynamic().callback = it }
+    actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow {
+        val listeners = rethrow {
+            types.map { type ->
+                "child_${type.name.toLowerCase()}".let { eventType ->
+                    eventType to js.on(
+                        eventType,
+                        { snapshot, previousChildName ->
+                            offer(
+                                ChildEvent(
+                                    DataSnapshot(snapshot),
+                                    type,
+                                    previousChildName
+                                )
+                            )
+                        },
+                        { close(DatabaseException(it)).run { Unit } }
+                    )
+                }
+            }
+        }
+        awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } } }
+    }
+
+    actual fun startAt(value: String, key: String?) = Query(js.startAt(value, key))
+
+    actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key))
+
+    actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key))
+
+    override fun toString() = js.toString()
+
 }
 
-actual fun DataSnapshot.child(path: String) = rethrow { asDynamic().child(path).unsafeCast<DataSnapshot>() }
+actual class DatabaseReference internal constructor(override val js: firebase.database.Reference): Query(js) {
 
-actual annotation class Exclude actual constructor()
-actual annotation class IgnoreExtraProperties actual constructor()
+    actual val key get() = rethrow { js.key }
+    actual fun push() = rethrow { DatabaseReference(js.push()) }
+    actual fun child(path: String) = rethrow { DatabaseReference(js.child(path)) }
 
-private inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.database.rethrow { function() }
+    actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
-private inline fun <R> rethrow(function: () -> R): R {
+    actual suspend fun updateChildren(update: Map<String, Any?>) =
+        rethrow { js.update(encode(update)).await() }
+
+    actual suspend fun removeValue() = rethrow { js.remove().await() }
+
+    actual suspend fun setValue(value: Any?) = rethrow {
+        js.set(encode(value)).await()
+    }
+
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        rethrow { js.set(encode(strategy, value)).await() }
+}
+
+actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
+
+    actual inline fun <reified T> value() =
+        rethrow { decode<T>(value = js.`val`()) }
+
+    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+        rethrow { decode(strategy, js.`val`()) }
+
+    actual val exists get() = rethrow { js.exists() }
+    actual val key get() = rethrow { js.key }
+    actual fun child(path: String) = DataSnapshot(js.child(path))
+
+    actual val children: Iterable<DataSnapshot> = rethrow {
+        ArrayList<DataSnapshot>(js.numChildren()).also {
+            js.forEach { snapshot -> it.add(DataSnapshot(snapshot)) }
+        }
+    }
+
+}
+
+actual class OnDisconnect internal constructor(val js: firebase.database.OnDisconnect) {
+
+    actual suspend fun removeValue() = rethrow { js.remove().await() }
+    actual suspend fun cancel() =  rethrow { js.cancel().await() }
+
+    actual suspend fun updateChildren(update: Map<String, Any?>) =
+        rethrow { js.update(encode(update)).await() }
+
+    actual suspend inline fun <reified T : Any> setValue(value: T) =
+        rethrow { js.set(encode(value)).await() }
+
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        rethrow { js.set(encode(strategy, value)).await() }
+}
+
+actual class DatabaseException(error: dynamic) :
+    RuntimeException("${error?.code}: ${error.message}", error.unsafeCast<Throwable>())
+
+inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.database.rethrow { function() }
+
+inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
         throw e
     } catch(e: Throwable) {
-        throw DatabaseException(e.asDynamic().code as String?, e.message)
+        throw DatabaseException(e)
     }
 }

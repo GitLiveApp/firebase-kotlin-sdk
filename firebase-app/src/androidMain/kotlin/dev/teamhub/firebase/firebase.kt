@@ -10,48 +10,36 @@ actual typealias FirebaseTooManyRequestsException = com.google.firebase.Firebase
 
 actual typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
 
-actual fun initializeFirebaseApp(context: Any, options: FirebaseOptions) =
-    FirebaseApp.initializeApp(context as Context, options)
+actual val Firebase.app: FirebaseApp
+    get() = FirebaseApp(com.google.firebase.FirebaseApp.getInstance())
 
-actual typealias FirebaseApp = com.google.firebase.FirebaseApp
+actual fun Firebase.app(name: String): FirebaseApp =
+    FirebaseApp(com.google.firebase.FirebaseApp.getInstance(name))
 
-actual typealias FirebaseOptions = com.google.firebase.FirebaseOptions
+actual fun Firebase.initialize(context: Any?): FirebaseApp? =
+    com.google.firebase.FirebaseApp.initializeApp(context as Context)?.let { FirebaseApp(it) }
 
-actual typealias FirebaseOptionsBuilder = com.google.firebase.FirebaseOptions.Builder
+actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
+    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid(), name))
 
-actual fun getFirebaseApps(context: Any) = FirebaseApp.getApps(context as Context)
+actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
+    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid()))
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setApiKey(apiKey: String): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+actual class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
+    actual val name: String
+        get() = android.name
+    actual val options: FirebaseOptions
+        get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId) }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setApplicationId(applicationId: String): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)
+    .map { FirebaseApp(it) }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setDatabaseUrl(databaseUrl: String?): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setStorageBucket(storageBucket: String?): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setProjectId(projectId: String?): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.build(): FirebaseOptions {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun FirebaseOptionsBuilder.setGoogleAppId(googleAppId: String): FirebaseOptionsBuilder {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+private fun FirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Builder()
+    .setApplicationId(applicationId)
+    .setApiKey(apiKey)
+    .setDatabaseUrl(databaseUrl)
+    .setGaTrackingId(gaTrackingId)
+    .setStorageBucket(storageBucket)
+    .setProjectId(projectId)
+    .build()

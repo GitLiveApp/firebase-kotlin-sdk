@@ -1,134 +1,211 @@
 package dev.teamhub.firebase.database
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseException
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.Exclude
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.IgnoreExtraProperties
-import com.google.firebase.database.OnDisconnect
-import kotlinx.coroutines.CompletableDeferred
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.Logger
+import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ValueEventListener
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.database.ChildEvent.Type
+import dev.teamhub.firebase.decode
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 
-import kotlin.reflect.KClass
+fun encode(value: Any?) =
+    dev.teamhub.firebase.encode(value, ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+    dev.teamhub.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
 
-suspend fun <T> Task<T>.awaitWhileOnline(): T {
-    val notConnected = CompletableDeferred<Unit>()
-    val reference = getFirebaseDatabase().getReference(".info/connected")
-    val listener = reference.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-                notConnected.completeExceptionally(error.toException())
-            }
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.value == false) notConnected.complete(Unit)
-            }
-        })
+suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
-    try {
-        return select {
-            asDeferred().onAwait { it }
-            notConnected.onAwait { throw DatabaseException("Database not connected") }
-        }
-    } finally {
-        reference.removeEventListener(listener)
+    val notConnected = Firebase.database
+        .reference(".info/connected")
+        .valueEvents
+        .filter { !it.value<Boolean>() }
+        .produceIn(this)
+
+    select<T> {
+        asDeferred().onAwait { it.also { notConnected.cancel() } }
+        notConnected.onReceive { throw DatabaseException("Database not connected") }
     }
 }
 
-actual fun getFirebaseDatabase() = FirebaseDatabase.getInstance()
+actual val Firebase.database
+        by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
 
-actual typealias LoggerLevel = Logger.Level
+actual fun Firebase.database(url: String) =
+    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(url))
 
-actual typealias FirebaseDatabase = FirebaseDatabase
+actual fun Firebase.database(app: FirebaseApp) =
+    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
 
-actual typealias DatabaseReference = DatabaseReference
+actual fun Firebase.database(app: FirebaseApp, url: String) =
+    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-actual suspend fun DatabaseReference.awaitSetValue(value: Any?) = setValue(value).awaitWhileOnline().run { Unit }
+actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
 
-actual suspend fun DatabaseReference.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).awaitWhileOnline().run { Unit }
+    private var persistenceEnabled = true
 
-actual typealias ValueEventListener = com.google.firebase.database.ValueEventListener
+    actual fun reference(path: String) =
+        DatabaseReference(android.getReference(path), persistenceEnabled)
 
-actual typealias DataSnapshot = DataSnapshot
+    actual fun setPersistenceEnabled(enabled: Boolean) =
+        android.setPersistenceEnabled(enabled).also { persistenceEnabled = enabled }
 
-actual fun <T: Any> DataSnapshot.getValue(valueType: KClass<T>) = getValue(valueType.java)
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DataSnapshot.exists(): Boolean {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual fun setLoggingEnabled(enabled: Boolean) =
+        android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DataSnapshot.getValue(): Any? {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+actual open class Query internal constructor(
+    open val android: com.google.firebase.database.Query,
+    val persistenceEnabled: Boolean
+) {
+    actual fun orderByKey() = Query(android.orderByKey(), persistenceEnabled)
+
+    actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
+
+    actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Double, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual val valueEvents get() = callbackFlow {
+        println("adding value event listener to query ${this@Query}")
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                offer(DataSnapshot(snapshot))
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                close(error.toException())
+            }
+        }
+        android.addValueEventListener(listener)
+        awaitClose { android.removeEventListener(listener) }
+    }
+
+    actual fun childEvents(vararg types: Type) = callbackFlow {
+        println("adding child event listener to query ${this@Query}")
+        val listener = object : ChildEventListener {
+
+            val moved by lazy { types.contains(Type.MOVED) }
+            override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(moved) offer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
+            }
+
+            val changed by lazy { types.contains(Type.CHANGED) }
+            override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(changed) offer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
+            }
+
+            val added by lazy { types.contains(Type.ADDED) }
+            override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
+                if(added) offer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
+            }
+
+            val removed by lazy { types.contains(Type.REMOVED) }
+            override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
+                if(removed) offer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                close(error.toException())
+            }
+        }
+        android.addChildEventListener(listener)
+        awaitClose { android.removeEventListener(listener) }
+    }
+
+    override fun toString() = android.toString()
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val DataSnapshot.children: Iterable<DataSnapshot>
-    get() = TODO("not implemented")
+actual class DatabaseReference internal constructor(
+    override val android: com.google.firebase.database.DatabaseReference,
+    persistenceEnabled: Boolean
+): Query(android, persistenceEnabled) {
 
-actual typealias DatabaseException = DatabaseException
+    actual val key get() = android.key
 
-actual typealias DatabaseError = DatabaseError
+    actual fun child(path: String) = DatabaseReference(android.child(path), persistenceEnabled)
 
-actual typealias OnDisconnect = OnDisconnect
+    actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
+    actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
-actual suspend fun OnDisconnect.awaitRemoveValue() = removeValue().awaitWhileOnline().run { Unit }
+    actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
+        .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+        .run { Unit }
 
-actual suspend fun OnDisconnect.awaitCancel() = cancel().awaitWhileOnline().run { Unit }
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        android.setValue(encode(strategy, value))
+            .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+            .run { Unit }
 
-actual suspend fun OnDisconnect.awaitSetValue(value: Any?) = setValue(value).awaitWhileOnline().run { Unit }
+    @Suppress("UNCHECKED_CAST")
+    actual suspend fun updateChildren(update: Map<String, Any?>) =
+        android.updateChildren(encode(update) as Map<String, Any?>)
+            .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+            .run { Unit }
 
-actual suspend fun OnDisconnect.awaitUpdateChildren(update: Map<String, Any?>) = updateChildren(update).awaitWhileOnline().run { Unit }
-
-actual val TIMESTAMP = ServerValue.TIMESTAMP
-
-actual suspend fun DatabaseReference.awaitRemoveValue() = removeValue().awaitWhileOnline().run { Unit }
-
-actual fun FirebaseDatabase.getReference(path: String) = getReference(path)
-
-actual fun FirebaseDatabase.setPersistenceEnabled(enabled: Boolean) = setPersistenceEnabled(enabled)
-
-actual fun FirebaseDatabase.setLogLevel(logLevel: LoggerLevel) = setLogLevel(logLevel)
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseReference.push(): DatabaseReference {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual suspend fun removeValue() = android.removeValue()
+        .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+        .run { Unit }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseReference.onDisconnect(): OnDisconnect {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+@Suppress("UNCHECKED_CAST")
+actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
+
+    actual val exists get() = android.exists()
+
+    actual val key get() = android.key
+
+    actual inline fun <reified T> value() =
+        decode<T>(value = android.value)
+
+    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+        decode(strategy, android.value)
+
+    actual fun child(path: String) = DataSnapshot(android.child(path))
+    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseReference.addValueEventListener(listener: ValueEventListener): ValueEventListener {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+actual class OnDisconnect internal constructor(
+    val android: com.google.firebase.database.OnDisconnect,
+    val persistenceEnabled: Boolean
+) {
+
+    actual suspend fun removeValue() = android.removeValue()
+        .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+        .run { Unit }
+
+    actual suspend fun cancel() = android.cancel()
+        .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+        .run { Unit }
+
+    actual suspend inline fun <reified T : Any> setValue(value: T) =
+        android.setValue(encode(value))
+            .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+            .run { Unit }
+
+    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+        android.setValue(encode(strategy, value))
+            .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+            .run { Unit}
+
+    actual suspend fun updateChildren(update: Map<String, Any?>) =
+        android.updateChildren(update.mapValues { (_, it) -> encode(it) })
+            .run { if(persistenceEnabled) await() else awaitWhileOnline() }
+            .run { Unit }
 }
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseReference.removeEventListener(listener: ValueEventListener) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseError.toException(): DatabaseException {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DatabaseReference.addListenerForSingleValueEvent(listener: ValueEventListener) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual fun DataSnapshot.child(path: String): DataSnapshot {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
-
-actual typealias Exclude = Exclude
-actual typealias IgnoreExtraProperties = IgnoreExtraProperties
+actual typealias DatabaseException = com.google.firebase.database.DatabaseException
 

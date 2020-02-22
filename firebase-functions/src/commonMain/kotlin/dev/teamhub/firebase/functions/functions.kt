@@ -1,20 +1,40 @@
 package dev.teamhub.firebase.functions
 
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.SerializationStrategy
 
-expect fun getFirebaseFunctions(): FirebaseFunctions
+expect class FirebaseFunctions {
+    fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+}
 
-expect class FirebaseFunctions
-expect fun FirebaseFunctions.getHttpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+expect class HttpsCallableReference {
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T> call(data: T): HttpsCallableResult
+    suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
+    suspend fun call(): HttpsCallableResult
+}
 
-expect class HttpsCallableReference
+expect class HttpsCallableResult {
+    @ImplicitReflectionSerializer
+    inline fun <reified T> data(): T
+    inline fun <reified T> data(strategy: DeserializationStrategy<T>): T
+}
 
-expect suspend fun HttpsCallableReference.awaitCall(data: Any?): HttpsCallableResult
-expect suspend fun HttpsCallableReference.awaitCall(): HttpsCallableResult
+/** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */
+expect val Firebase.functions: FirebaseFunctions
 
-expect class HttpsCallableResult
+/** Returns the [FirebaseFunctions] instance of a given [region]. */
+expect fun Firebase.functions(region: String): FirebaseFunctions
 
-expect val HttpsCallableResult.data: Any
+/** Returns the [FirebaseFunctions] instance of a given [FirebaseApp]. */
+expect fun Firebase.functions(app: FirebaseApp): FirebaseFunctions
+
+/** Returns the [FirebaseFunctions] instance of a given [FirebaseApp] and [region]. */
+expect fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions
 
 expect class FirebaseFunctionsException: FirebaseException
 

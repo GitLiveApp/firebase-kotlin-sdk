@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-version = "0.1.0"
+version = "0.1.0-dev"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -53,12 +53,13 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
             }
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-functions:17.0.0")
-                implementation("com.google.code.gson:gson:2.7")
+                api("com.google.firebase:firebase-functions:19.0.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
         val iosMain by getting {
@@ -66,9 +67,14 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            kotlin.srcDir("src/androidMain/kotlin")
             dependencies {
-                implementation("com.google.code.gson:gson:2.7")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+            }
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
         }
     }
@@ -87,6 +93,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
+                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
             )
         }
     }
@@ -104,9 +111,9 @@ tasks {
         dependsOn(copyPackageJson, copyJS, copySourceMap)
         workingDir("$buildDir/node_module")
         if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry https://npm.pkg.github.com/")
+            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
         } else {
-            commandLine("npm", "publish", "--registry https://npm.pkg.github.com/")
+            commandLine("npm", "publish", "--registry  http://localhost:4873")
         }
     }
 }

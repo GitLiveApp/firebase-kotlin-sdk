@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     kotlin("multiplatform") version "1.3.61" apply false
 }
@@ -26,18 +28,26 @@ subprojects {
         jcenter()
     }
 
+    tasks.withType<KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+    }
+
     afterEvaluate  {
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.2.2")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.3")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.2.2")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.2.2")
+            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.3")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.3")
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
-            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
-            "jvmMainApi"("app.teamhub:firebase-java:0.2.0")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.2.2")
+            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+            "jvmMainApi"("app.teamhub:firebase-java:0.3.0")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.3")
         }
     }
 }
