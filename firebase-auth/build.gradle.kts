@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("native.cocoapods")
     `maven-publish`
 }
 
@@ -42,6 +43,14 @@ kotlin {
         }
     }
 
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -56,10 +65,27 @@ kotlin {
         }
         val iosMain by creating {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
             }
         }
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+        }
+
+        configure(listOf(iosArm64, iosX64)) {
+            compilations.getByName("main") {
+                source(sourceSets.get("iosMain"))
+                val firebaseAuth by cinterops.creating {
+                    packageName("cocoapods.FirebaseAuth")
+                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseAuth-6.17.0")
+                }
+            }
+        }
+
+        cocoapods {
+            summary = ""
+            homepage = ""
         }
     }
 }
