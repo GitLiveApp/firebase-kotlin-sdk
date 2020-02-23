@@ -48,6 +48,14 @@ kotlin {
         }
     }
 
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -74,18 +82,12 @@ kotlin {
         }
         val iosMain by creating {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
             }
         }
-
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))
-                    val firebasecore by cinterops.creating {
-                    packageName("cocoapods.FirebaseCore")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    //includeDirs("$projectDir/../native/Avalon/Pods/FirebaseCore/Firebase/Core/Public")
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseCore-6.0.2")
-                }
             }
         }
 

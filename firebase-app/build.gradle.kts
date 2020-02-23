@@ -58,7 +58,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                //implementation(project(":firebase-common"))
+                implementation(project(":firebase-common"))
             }
         }
         val androidMain by getting {
@@ -72,6 +72,24 @@ kotlin {
         val iosMain by creating {
             dependencies {
             }
+        }
+
+        configure(listOf(iosArm64, iosX64)) {
+            compilations.getByName("main") {
+                source(sourceSets.get("iosMain"))
+                val firebasecore by cinterops.creating {
+                    packageName("cocoapods.FirebaseCore")
+                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
+                    //includeDirs("$projectDir/../native/Avalon/Pods/FirebaseCore/Firebase/Core/Public")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseCore-6.0.2")
+                }
+            }
+        }
+
+        cocoapods {
+            summary = ""
+            homepage = ""
+            //pod("FirebaseCore", "~> 6.3.1")
         }
     }
 }
