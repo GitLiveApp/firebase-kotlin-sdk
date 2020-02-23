@@ -1,0 +1,4 @@
+language = Objective-C
+modules = FirebaseFirestore
+compilerOpts = -framework FirebaseFirestore
+linkerOpts = -framework FirebaseFirestore
