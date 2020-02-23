@@ -6,4 +6,4 @@ local.properties
 /**/*.iml
 
 firebase-app/src/iosMain/c_interop/modules/
-
+firebase-functions/src/iosMain/c_interop/modules/

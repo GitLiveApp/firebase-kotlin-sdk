@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("native.cocoapods")
     `maven-publish`
 }
 
@@ -42,6 +43,14 @@ kotlin {
         }
     }
 
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -58,6 +67,7 @@ kotlin {
         }
         val iosMain by creating {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
             }
         }
         val jvmMain by getting {
@@ -70,6 +80,22 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
+        }
+
+        configure(listOf(iosArm64, iosX64)) {
+            compilations.getByName("main") {
+                source(sourceSets.get("iosMain"))
+                val firebasefunctions by cinterops.creating {
+                    packageName("cocoapods.FirebaseFunctions")
+                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseFunctions-6.17.0")
+                }
+            }
+        }
+
+        cocoapods {
+            summary = ""
+            homepage = ""
         }
     }
 }
