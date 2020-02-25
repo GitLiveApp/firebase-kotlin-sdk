@@ -1,0 +1,4 @@
+language = Objective-C
+modules = FirebaseDatabase
+compilerOpts = -framework FirebaseDatabase
+linkerOpts = -framework FirebaseDatabase
