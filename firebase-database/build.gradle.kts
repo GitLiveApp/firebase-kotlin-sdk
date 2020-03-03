@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("native.cocoapods")
     `maven-publish`
 }
 
@@ -39,6 +40,16 @@ kotlin {
             }
         }
     }
+    val iosArm64 = iosArm64()
+    val iosX64 = iosX64()
+
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -64,6 +75,28 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
+        }
+        val iosMain by creating {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
+            }
+        }
+
+        configure(listOf(iosArm64, iosX64)) {
+            compilations.getByName("main") {
+                source(sourceSets.get("iosMain"))
+                val firebaseDatabase by cinterops.creating {
+                    packageName("cocoapods.FirebaseDatabase")
+                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseDatabase.def"))
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseDatabase-6.17.0")
+                }
+            }
+        }
+
+        cocoapods {
+            summary = ""
+            homepage = ""
         }
     }
 }

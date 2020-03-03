@@ -1,0 +1,18 @@
+package dev.teamhub.firebase
+
+import kotlinx.serialization.CompositeDecoder
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
+import kotlinx.serialization.StructureKind
+
+actual fun FirebaseDecoder.structureDecoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(desc.kind as StructureKind) {
+        StructureKind.CLASS -> (value as Map<*, *>).let { map ->
+            FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
+        }
+        StructureKind.LIST -> (value as List<*>).let {
+            FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
+        }
+        StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
+            FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
+        }
+    }

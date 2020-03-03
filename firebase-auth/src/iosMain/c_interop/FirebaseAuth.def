@@ -1,0 +1,4 @@
+language = Objective-C
+modules = FirebaseAuth
+compilerOpts = -framework FirebaseAuth
+linkerOpts = -framework FirebaseAuth

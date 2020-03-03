@@ -3,6 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("native.cocoapods")
     kotlin("plugin.serialization") version "1.3.61"
     `maven-publish`
 }
@@ -36,12 +37,24 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
+
+    val iosArm64 = iosArm64()
+    val iosX64 = iosX64()
+
     jvm {
         val main by compilations.getting {
             kotlinOptions {
                 jvmTarget = "1.8"
             }
         }
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
     }
 
     sourceSets {
@@ -73,6 +86,22 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
             kotlin.srcDir("src/androidTest/kotlin")
+        }
+        val iosMain by creating {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
+            }
+        }
+        configure(listOf(iosArm64, iosX64)) {
+            compilations.getByName("main") {
+                source(sourceSets.get("iosMain"))
+            }
+        }
+
+        cocoapods {
+            summary = "Firebase Core for iOS (plus community support for macOS and tvOS)"
+            homepage = "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk"
+            //pod("FirebaseCore", "~> 6.3.1")
         }
     }
 }
