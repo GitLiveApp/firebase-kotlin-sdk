@@ -1,111 +1,128 @@
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 package dev.teamhub.firebase.firestore
 
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.SerializationStrategy
 
-expect fun getFirebaseFirestore(): FirebaseFirestore
+/** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
+expect val Firebase.firestore: FirebaseFirestore
 
-expect class FirebaseFirestore
+/** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
+expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
-expect fun FirebaseFirestore.getFirestoreSettings(): FirebaseFirestoreSettings
-expect fun FirebaseFirestore.setFirestoreSettings(settings: FirebaseFirestoreSettings)
-expect fun FirebaseFirestore.collection(collectionPath: String): CollectionReference
-expect fun FirebaseFirestore.document(documentPath: String): DocumentReference
-expect fun FirebaseFirestore.batch(): WriteBatch
-expect fun FirebaseFirestore.setLoggingEnabled(loggingEnabled: Boolean)
-
-expect annotation class IgnoreExtraProperties()
-expect annotation class Exclude()
-
-
-expect suspend fun <T> FirebaseFirestore.awaitRunTransaction(func: suspend (transaction: Transaction) -> T): T
-
-expect class Transaction
-expect fun Transaction.set(documentRef: DocumentReference, data: Map<String, Any>): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, data: Map<String, Any>, options: SetOptions): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, pojo: Any): Transaction
-expect fun Transaction.set(documentRef: DocumentReference, pojo: Any, options: SetOptions): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, data: Map<String, Any>): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): Transaction
-expect fun Transaction.update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): Transaction
-expect fun Transaction.delete(documentRef: DocumentReference): Transaction
-expect suspend fun Transaction.awaitGet(documentRef: DocumentReference): DocumentSnapshot
-
-
-expect class FirebaseFirestoreSettingsBuilder constructor() {
-    constructor(settings: FirebaseFirestoreSettings)
+expect class FirebaseFirestore {
+//    var settings: FirebaseFirestoreSettings
+    fun collection(collectionPath: String): CollectionReference
+    fun document(documentPath: String): DocumentReference
+    fun batch(): WriteBatch
+    fun setLoggingEnabled(loggingEnabled: Boolean)
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
 }
 
-expect fun FirebaseFirestoreSettingsBuilder.setPersistenceEnabled(enabled: Boolean): FirebaseFirestoreSettingsBuilder
-expect fun FirebaseFirestoreSettingsBuilder.setTimestampsInSnapshotsEnabled(enabled: Boolean): FirebaseFirestoreSettingsBuilder
-expect fun FirebaseFirestoreSettingsBuilder.build(): FirebaseFirestoreSettings
+expect class Transaction {
+
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean = false): Transaction
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String): Transaction
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
+
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): Transaction
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): Transaction
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
+
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> update(documentRef: DocumentReference, data: T): Transaction
+    inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): Transaction
+
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): Transaction
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): Transaction
+
+    fun delete(documentRef: DocumentReference): Transaction
+    suspend fun get(documentRef: DocumentReference): DocumentSnapshot
+}
+
+//data class FirebaseFirestoreSettings(
+//    val persistenceEnabled: Boolean = true
+//)
+
+expect open class Query {
+    internal fun _where(field: String, equalTo: Any?): Query
+    internal fun _where(path: FieldPath, equalTo: Any?): Query
+    internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
+    internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
+    val snapshots: Flow<QuerySnapshot>
+    suspend fun get(): QuerySnapshot
+}
+
+fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
+fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 
 
-expect class FirebaseFirestoreSettings
+expect class WriteBatch {
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean = false): WriteBatch
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String): WriteBatch
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
 
-expect open class Query
-expect fun Query.whereEqualTo(field: String, value: Any?): Query
-expect fun Query.whereEqualTo(path: FieldPath, value: Any?): Query
-expect fun Query.whereLessThan(field: String, value: Any): Query
-expect fun Query.whereLessThan(path: FieldPath, value: Any): Query
-expect fun Query.whereGreaterThan(field: String, value: Any): Query
-expect fun Query.whereGreaterThan(path: FieldPath, value: Any): Query
-expect fun Query.whereArrayContains(field: String, value: Any): Query
-expect fun Query.whereArrayContains(path: FieldPath, value: Any): Query
-expect fun Query.addSnapshotListener(listener: EventListener<QuerySnapshot>): ListenerRegistration
-expect fun Query.addSnapshotListener(listener: (snapshot: QuerySnapshot?, exception: FirebaseFirestoreException?) -> Unit): ListenerRegistration
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
 
-expect suspend fun Query.awaitGet(): QuerySnapshot
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> update(documentRef: DocumentReference, data: T): WriteBatch
+    inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): WriteBatch
 
-expect class WriteBatch
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): WriteBatch
 
-expect fun WriteBatch.set(documentRef: DocumentReference, data: Map<String, Any>): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, data: Map<String, Any>, options: SetOptions): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, pojo: Any): WriteBatch
-expect fun WriteBatch.set(documentRef: DocumentReference, pojo: Any, options: SetOptions): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, data: Map<String, Any>): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
-expect fun WriteBatch.update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any): WriteBatch
-expect fun WriteBatch.delete(documentRef: DocumentReference): WriteBatch
+    fun delete(documentRef: DocumentReference): WriteBatch
+    suspend fun commit()
+}
 
-expect suspend fun WriteBatch.awaitCommit()
+expect class DocumentReference {
 
-expect class DocumentReference
+    val id: String
+    val path: String
+    val snapshots: Flow<DocumentSnapshot>
+    suspend fun get(): DocumentSnapshot
 
-expect fun DocumentReference.addSnapshotListener(listener: EventListener<DocumentSnapshot>): ListenerRegistration
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> set(data: T, merge: Boolean = false)
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String)
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath)
 
-expect val DocumentReference.id: String
+    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean = false)
+    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String)
+    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath)
 
-expect val DocumentReference.path: String
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> update(data: T)
+    suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T)
 
-expect fun DocumentReference.addSnapshotListener(listener: (snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) -> Unit): ListenerRegistration
+    suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
+    suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
 
-expect suspend fun DocumentReference.awaitGet(): DocumentSnapshot
+    suspend fun delete()
+}
 
-expect suspend fun DocumentReference.awaitSet(data: Map<String, Any>)
-
-expect suspend fun DocumentReference.awaitSet(pojo: Any)
-
-expect suspend fun DocumentReference.awaitSet(data: Map<String, Any>, options: SetOptions)
-
-expect suspend fun DocumentReference.awaitSet(pojo: Any, options: SetOptions)
-
-expect suspend fun DocumentReference.awaitUpdate(data: Map<String, Any>)
-
-expect suspend fun DocumentReference.awaitUpdate(field: String, value: Any?, vararg moreFieldsAndValues: Any)
-
-expect suspend fun DocumentReference.awaitUpdate(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any)
-
-expect suspend fun DocumentReference.awaitDelete()
-
-expect class CollectionReference : Query
-
-expect val CollectionReference.path: String
-
-expect suspend fun CollectionReference.awaitAdd(data: Map<String, Any>): DocumentReference
-
-expect suspend fun CollectionReference.awaitAdd(pojo: Any): DocumentReference
+expect class CollectionReference : Query {
+    val path: String
+    @ImplicitReflectionSerializer
+    suspend inline fun <reified T: Any> add(data: T): DocumentReference
+    suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>): DocumentReference
+}
 
 expect class FirebaseFirestoreException : FirebaseException
 
@@ -131,43 +148,37 @@ expect enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
-expect class QuerySnapshot
-
-expect val QuerySnapshot.documents: List<DocumentSnapshot>
-
-expect class DocumentSnapshot
-
-expect fun DocumentSnapshot.get(field: String): Any?
-expect fun DocumentSnapshot.getString(field: String): String?
-expect fun DocumentSnapshot.contains(field: String): Boolean
-expect fun <T: Any> DocumentSnapshot.toObject(valueType: KClass<T>): T
-expect fun DocumentSnapshot.exists(): Boolean
-
-expect val DocumentSnapshot.id: String
-expect val DocumentSnapshot.reference: DocumentReference
-
-expect interface ListenerRegistration
-
-expect fun ListenerRegistration.remove()
-
-
-expect interface EventListener<T> {
-    fun onEvent(snapshot: T?, exception: FirebaseFirestoreException?)
+expect class QuerySnapshot {
+    val documents: List<DocumentSnapshot>
 }
 
-expect class SetOptions
+expect class DocumentSnapshot {
 
-expect fun mergeSetOptions(): SetOptions
+    @ImplicitReflectionSerializer
+    inline fun <reified T> get(field: String): T
+    inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>): T
 
-expect fun fieldPathOf(vararg fieldNames: String): FieldPath
+    fun contains(field: String): Boolean
+
+    @ImplicitReflectionSerializer
+    inline fun <reified T: Any> data(): T
+    inline fun <reified T> data(strategy: DeserializationStrategy<T>): T
+
+    val exists: Boolean
+    val id: String
+    val reference: DocumentReference
+}
 
 expect class FieldPath
 
-expect abstract class FieldValue
+expect fun FieldPath(vararg fieldNames: String): FieldPath
 
-expect fun deleteFieldValue(): FieldValue
+expect object FieldValue {
+    fun delete(): FieldValueImpl
+    fun arrayUnion(vararg elements: Any): FieldValueImpl
+    fun arrayRemove(vararg elements: Any): FieldValueImpl
+}
 
-expect fun arrayUnionFieldValue(vararg elements: Any): FieldValue
+expect abstract class FieldValueImpl
 
-expect fun arrayRemoveFieldValue(vararg elements: Any): FieldValue
 

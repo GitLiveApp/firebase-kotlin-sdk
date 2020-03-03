@@ -1,37 +1,61 @@
 package dev.teamhub.firebase.functions
 
-import dev.teamhub.firebase.FirebaseException
-import dev.teamhub.firebase.common.fromJson
-import dev.teamhub.firebase.common.toJson
+import dev.teamhub.firebase.*
 import kotlinx.coroutines.await
-import kotlin.js.Promise
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 
-actual fun getFirebaseFunctions() = rethrow { functions; firebase.functions() }
+actual val Firebase.functions: FirebaseFunctions
+    get() = rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.functions()) }
 
-actual typealias FirebaseFunctions = firebase.functions.Functions
-actual typealias HttpsCallableResult = firebase.functions.HttpsCallableResult
-actual typealias HttpsCallableReference = firebase.functions.HttpsCallable
+actual fun Firebase.functions(region: String) =
+    rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.app().functions(region)) }
 
-actual val HttpsCallableResult.data: Any
-    get() = rethrow { fromJson(asDynamic().data as Any)!! }
+actual fun Firebase.functions(app: FirebaseApp) =
+    rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.functions(app.js)) }
 
-actual suspend fun HttpsCallableReference.awaitCall(data: Any?) = rethrow { this.asDynamic()(toJson(data)).unsafeCast<Promise<HttpsCallableResult>>().await() }
+actual fun Firebase.functions(app: FirebaseApp, region: String) =
+    rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(app.js.functions(region)) }
 
-actual suspend fun HttpsCallableReference.awaitCall() = rethrow { this.asDynamic()().unsafeCast<Promise<HttpsCallableResult>>().await() }
+actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
+    actual fun httpsCallable(name: String, timeout: Long?) =
+        rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
+}
 
-actual fun FirebaseFunctions.getHttpsCallable(name: String, timeout: Long?) = rethrow { httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) }) }
+@Suppress("UNCHECKED_CAST")
+actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) {
 
-actual open class FirebaseFunctionsException(code: String?, message: String?): FirebaseException(code, message)
+    actual suspend fun call() =
+        rethrow { HttpsCallableResult(js().await()) }
 
-private inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.functions.rethrow { function() }
+    actual suspend inline fun <reified T> call(data: T) =
+        rethrow { HttpsCallableResult(js(encode(data)).await()) }
 
-private inline fun <R> rethrow(function: () -> R): R {
+    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
+        rethrow { HttpsCallableResult(js(encode(strategy, data)).await()) }
+}
+
+actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCallableResult) {
+
+    actual inline fun <reified T> data() =
+        rethrow { decode<T>(value = js.data) }
+
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+        rethrow { decode(strategy, js.data) }
+
+}
+
+actual open class FirebaseFunctionsException(code: String?, cause: Throwable): FirebaseException(code, cause)
+
+inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.functions.rethrow { function() }
+
+inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
         throw e
     } catch(e: Throwable) {
-        throw FirebaseFunctionsException(e.asDynamic().code as String?, e.message)
+        throw FirebaseFunctionsException(e.asDynamic().code as String?, e)
     }
 }

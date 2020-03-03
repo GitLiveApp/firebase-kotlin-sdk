@@ -1,36 +1,33 @@
 @file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 package dev.teamhub.firebase.auth
 
+import dev.teamhub.firebase.Firebase
+import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
+import kotlinx.coroutines.flow.Flow
 
-expect fun getFirebaseAuth(): FirebaseAuth
+expect val Firebase.auth: FirebaseAuth
 
-expect interface AuthStateListener {
-    fun onAuthStateChanged(auth: FirebaseAuth)
+expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
+
+expect class FirebaseAuth {
+    val currentUser: FirebaseUser?
+    val authStateChanged: Flow<FirebaseUser?>
+    suspend fun signInWithCustomToken(token: String): AuthResult
+    suspend fun signInAnonymously(): AuthResult
+    suspend fun signOut()
 }
 
-expect class FirebaseAuth
+expect class AuthResult {
+    val user: FirebaseUser?
+}
 
-expect fun FirebaseAuth.addAuthStateListener(listener: AuthStateListener)
-expect fun FirebaseAuth.removeAuthStateListener(listener: AuthStateListener)
-expect suspend fun FirebaseAuth.signOut()
-
-expect val FirebaseAuth.currentUser: FirebaseUser?
-
-expect suspend fun FirebaseAuth.awaitSignInWithCustomToken(token: String): AuthResult
-expect suspend fun FirebaseAuth.awaitSignInAnonymously(): AuthResult
-
-expect interface AuthResult
-
-expect val AuthResult.user: FirebaseUser
-
-expect abstract class FirebaseUser
-
-expect val FirebaseUser.uid: String
-expect val FirebaseUser.isAnonymous: Boolean
-
-expect suspend fun FirebaseUser.awaitDelete()
-expect suspend fun FirebaseUser.awaitReload()
+expect class FirebaseUser {
+    val uid: String
+    val isAnonymous: Boolean
+    suspend fun delete()
+    suspend fun reload()
+}
 
 expect open class FirebaseAuthException: FirebaseException
 expect class FirebaseAuthActionCodeException: FirebaseAuthException

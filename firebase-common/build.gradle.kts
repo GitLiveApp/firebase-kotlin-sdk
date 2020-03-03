@@ -3,13 +3,14 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.serialization") version "1.3.61"
     `maven-publish`
 }
 repositories {
     mavenCentral()
     google()
 }
-version = "0.1.0"
+version = "0.1.0-dev"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -44,18 +45,34 @@ kotlin {
     }
 
     sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
+            }
+        }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:17.1.0")
+                api("com.google.firebase:firebase-common:19.2.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
         val jsMain by getting {
             dependencies {
 //                implementation(npm("firebase", "6.2.3"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
         }
         val jvmMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+            }
             kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidTest/kotlin")
         }
     }
 }
@@ -73,6 +90,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
+                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
             )
         }
     }
@@ -91,9 +109,9 @@ tasks {
         dependsOn(copyPackageJson, copyJS, copySourceMap)
         workingDir("$buildDir/node_module")
         if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry https://npm.pkg.github.com/")
+            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
         } else {
-            commandLine("npm", "publish", "--registry https://npm.pkg.github.com/")
+            commandLine("npm", "publish", "--registry  http://localhost:4873")
         }
     }
 }
