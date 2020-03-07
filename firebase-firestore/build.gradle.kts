@@ -65,12 +65,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
         }
-        val iosMain by creating {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
-            }
-        }
+        val iosMain by creating
         val jvmMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
