@@ -6,7 +6,10 @@ import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
 import kotlinx.cinterop.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import platform.Foundation.*
+import kotlinx.coroutines.CompletableDeferred
+
 
 actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
@@ -92,7 +95,6 @@ private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Un
     }
     job.await()
 }
-
 
 private fun NSError.toException() = when(domain) {
     FIRAuthErrorDomain -> when(code) {

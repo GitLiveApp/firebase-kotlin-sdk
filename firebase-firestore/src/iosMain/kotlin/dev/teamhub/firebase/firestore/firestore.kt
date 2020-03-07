@@ -8,7 +8,7 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.DeserializationStrategy
 
-actual open class FirebaseFirestoreException : FirebaseException()
+actual open class FirebaseFirestoreException(message: String) : FirebaseException(message)
 
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = TODO("not implemented")
 
