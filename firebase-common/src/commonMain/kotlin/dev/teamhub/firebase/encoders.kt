@@ -84,17 +84,12 @@ abstract class TimestampEncoder(internal val positiveInfinity: Any) {
     }
 }
 
-open class FirebaseCompositeEncoder(
+open class FirebaseCompositeEncoder constructor(
     positiveInfinity: Any,
-    private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
 ): TimestampEncoder(positiveInfinity), CompositeEncoder {
 
     override val context = EmptyModule
-
-    override fun endStructure(desc: SerialDescriptor) {
-        super.endStructure(desc)
-    }
 
     private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(this) {
         is MapLikeSerializer<*, *, *, *> -> FirebaseMapSerializer() as SerializationStrategy<T>

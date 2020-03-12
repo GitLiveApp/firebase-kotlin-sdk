@@ -31,10 +31,10 @@ actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
 private fun FirebaseOptions.toJson() = json(
     "apiKey" to apiKey,
     "applicationId" to applicationId,
-    "databaseURL" to databaseUrl,
-    "storageBucket" to storageBucket,
-    "projectId" to projectId,
-    "gaTrackingId" to gaTrackingId
+    "databaseURL" to (databaseUrl ?: undefined),
+    "storageBucket" to (storageBucket ?: undefined),
+    "projectId" to (projectId ?: undefined),
+    "gaTrackingId" to (gaTrackingId ?: undefined)
 )
 
 actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)

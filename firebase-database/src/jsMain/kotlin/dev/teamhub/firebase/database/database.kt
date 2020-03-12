@@ -70,11 +70,11 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
         awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } } }
     }
 
-    actual fun startAt(value: String, key: String?) = Query(js.startAt(value, key))
+    actual fun startAt(value: String, key: String?) = Query(js.startAt(value, key ?: undefined))
 
-    actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key))
+    actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key ?: undefined))
 
-    actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key))
+    actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key ?: undefined))
 
     override fun toString() = js.toString()
 
@@ -137,7 +137,7 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
 }
 
 actual class DatabaseException(error: dynamic) :
-    RuntimeException("${error?.code}: ${error.message}", error.unsafeCast<Throwable>())
+    RuntimeException("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.teamhub.firebase.database.rethrow { function() }
 
