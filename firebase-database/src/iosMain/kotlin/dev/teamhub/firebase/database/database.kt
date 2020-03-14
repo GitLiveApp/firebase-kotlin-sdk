@@ -1,144 +1,205 @@
 package dev.teamhub.firebase.database
 
+import cocoapods.FirebaseDatabase.*
+import cocoapods.FirebaseDatabase.FIRDataEventType.*
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import dev.teamhub.firebase.database.ChildEvent.Type
+import dev.teamhub.firebase.database.ChildEvent.Type.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.cinterop.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
+import platform.Foundation.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import dev.teamhub.firebase.decode
+import kotlinx.coroutines.selects.select
 
-/** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
-actual val Firebase.database: FirebaseDatabase
-    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+fun encode(value: Any?) =
+    dev.teamhub.firebase.encode(value, FIRServerValue.timestamp())
+fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+    dev.teamhub.firebase.encode(strategy, value, FIRServerValue.timestamp())
 
-/** Returns the [FirebaseDatabase] instance for the specified [url]. */
-actual fun Firebase.database(url: String): FirebaseDatabase {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+actual val Firebase.database
+        by lazy { FirebaseDatabase(FIRDatabase.database()) }
 
-/** Returns the [FirebaseDatabase] instance of the given [FirebaseApp]. */
-actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+actual fun Firebase.database(url: String) =
+    FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-/** Returns the [FirebaseDatabase] instance of the given [FirebaseApp] and [url]. */
-actual fun Firebase.database(
-    app: FirebaseApp,
-    url: String
-): FirebaseDatabase {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+actual fun Firebase.database(app: FirebaseApp) =
+    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
 
-actual class FirebaseDatabase {
-    actual fun reference(path: String): DatabaseReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+actual fun Firebase.database(app: FirebaseApp, url: String) =
+    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+
+actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
+
+    actual fun reference(path: String) =
+        DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
 
     actual fun setPersistenceEnabled(enabled: Boolean) {
+        ios.persistenceEnabled = enabled
     }
 
-    actual fun setLoggingEnabled(enabled: Boolean) {
-    }
+    actual fun setLoggingEnabled(enabled: Boolean) =
+        FIRDatabase.setLoggingEnabled(enabled)
 }
 
-actual open class Query {
-    actual val valueEvents: kotlinx.coroutines.flow.Flow<DataSnapshot>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    actual fun childEvents(vararg types: ChildEvent.Type): kotlinx.coroutines.flow.Flow<ChildEvent> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun orderByKey(): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun orderByChild(path: String): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun startAt(value: String, key: String?): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun startAt(value: Double, key: String?): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun startAt(value: Boolean, key: String?): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+fun Type.toEventType() = when(this) {
+    ADDED -> FIRDataEventTypeChildAdded
+    CHANGED -> FIRDataEventTypeChildChanged
+    MOVED -> FIRDataEventTypeChildMoved
+    REMOVED -> FIRDataEventTypeChildRemoved
 }
 
-actual class DatabaseReference : Query() {
-    actual val key: String?
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+actual open class Query internal constructor(
+    open val ios: FIRDatabaseQuery,
+    val persistenceEnabled: Boolean
+) {
+    actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
-    actual fun push(): DatabaseReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual fun orderByChild(path: String) = Query(ios.queryOrderedByChild(path), persistenceEnabled)
+
+    actual fun startAt(value: String, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Double, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+
+    actual fun startAt(value: Boolean, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+
+    actual val valueEvents get() = callbackFlow {
+        val handle = ios.observeEventType(
+            FIRDataEventTypeValue,
+            withBlock = { offer(DataSnapshot(it!!)) }
+        ) { close(DatabaseException(it.toString())) }
+        awaitClose { ios.removeObserverWithHandle(handle) }
     }
 
-    actual fun child(path: String): DatabaseReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual fun childEvents(vararg types: Type) = callbackFlow {
+        val handles = types.map { type ->
+            ios.observeEventType(
+                type.toEventType(),
+                andPreviousSiblingKeyWithBlock = { it, key -> offer(ChildEvent(DataSnapshot(it!!), type, key)) }
+            ) { close(DatabaseException(it.toString())) }
+        }
+        awaitClose {
+            handles.forEach { ios.removeObserverWithHandle(it) }
+        }
     }
 
-    actual fun onDisconnect(): OnDisconnect {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toString() = ios.toString()
+}
 
-    @ImplicitReflectionSerializer
+actual class DatabaseReference internal constructor(
+    override val ios: FIRDatabaseReference,
+    persistenceEnabled: Boolean
+): Query(ios, persistenceEnabled) {
+
+    actual val key get() = ios.key
+
+    actual fun child(path: String) = DatabaseReference(ios.child(path), persistenceEnabled)
+
+    actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
+    actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
+
     actual suspend fun setValue(value: Any?) {
+        ios.await(persistenceEnabled) { setValue(encode(value), it) }
     }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) {
+        ios.await(persistenceEnabled) { setValue(encode(strategy, value), it) }
     }
 
-    @ImplicitReflectionSerializer
+    @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>) {
+        ios.await(persistenceEnabled) { updateChildValues(encode(update) as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
+        ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
     }
 }
 
-actual class DataSnapshot {
-    actual val exists: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    actual val key: String?
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+@Suppress("UNCHECKED_CAST")
+actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T> value(): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual val exists get() = ios.exists()
 
-    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual val key: String? get() = ios.key
 
-    actual fun child(path: String): DataSnapshot {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T> value() =
+        decode<T>(value = ios.value)
 
-    actual val children: Iterable<DataSnapshot>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+        decode(strategy, ios.value)
+
+    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
+    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
 }
 
-actual class DatabaseException : RuntimeException()
-actual class OnDisconnect {
+actual class OnDisconnect internal constructor(
+    val ios: FIRDatabaseReference,
+    val persistenceEnabled: Boolean
+) {
     actual suspend fun removeValue() {
+        ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
     }
 
     actual suspend fun cancel() {
+        ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    @ImplicitReflectionSerializer
     actual suspend inline fun <reified T : Any> setValue(value: T) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value), it) }
     }
 
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value), it) }
     }
 
-    @ImplicitReflectionSerializer
     actual suspend fun updateChildren(update: Map<String, Any?>) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it) } as Map<Any?, *>, it) }
+    }
+}
+
+actual class DatabaseException(message: String) : RuntimeException(message)
+
+private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R>()
+    function { error, result ->
+        if(result != null) {
+            job.complete(result)
+        } else if(error != null) {
+            job.completeExceptionally(DatabaseException(error.toString()))
+        }
+    }
+    return job.run { if(whileOnline) awaitWhileOnline() else await() }
+}
+
+suspend fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
+    val job = CompletableDeferred<Unit>()
+    function { error, _ ->
+        if(error == null) {
+            job.complete(Unit)
+        } else {
+            job.completeExceptionally(DatabaseException(error.toString()))
+        }
+    }
+    job.run { if(whileOnline) awaitWhileOnline() else await() }
+}
+
+private suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
+
+    val notConnected = Firebase.database
+        .reference(".info/connected")
+        .valueEvents
+        .filter { !it.value<Boolean>() }
+        .produceIn(this)
+
+    select<T> {
+        onAwait { it.also { notConnected.cancel() } }
+        notConnected.onReceive { throw DatabaseException("Database not connected") }
     }
 }

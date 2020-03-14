@@ -1,420 +1,337 @@
 package dev.teamhub.firebase.firestore
 
-import dev.teamhub.firebase.Firebase
-import dev.teamhub.firebase.FirebaseApp
-import dev.teamhub.firebase.FirebaseException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.SerializationStrategy
+import cocoapods.FirebaseFirestore.*
+import dev.teamhub.firebase.*
+import kotlinx.cinterop.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
+import platform.Foundation.NSError
+import kotlinx.coroutines.runBlocking
 
-actual open class FirebaseFirestoreException : FirebaseException()
+actual val Firebase.firestore get() =
+    FirebaseFirestore(FIRFirestore.firestore())
 
-actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = TODO("not implemented")
+actual fun Firebase.firestore(app: FirebaseApp) =
+    FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
 
-/** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
-actual val Firebase.firestore: FirebaseFirestore
-    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+actual class FirebaseFirestore(val ios: FIRFirestore) {
 
-/** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
+
+    actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
+
+    actual fun batch() = WriteBatch(ios.batch())
+
+    actual fun setLoggingEnabled(loggingEnabled: Boolean) =
+        FIRFirestore.enableLogging(loggingEnabled)
+
+    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
+        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, error -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
 }
 
-actual class FirebaseFirestore {
-    actual fun collection(collectionPath: String): CollectionReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+actual class WriteBatch(val ios: FIRWriteBatch) {
 
-    actual fun document(documentPath: String): DocumentReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual fun batch(): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    actual fun setLoggingEnabled(loggingEnabled: Boolean) {
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-actual class Transaction {
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        merge: Boolean
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        vararg mergeFields: String
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        ios.updateData(encode(data) as Map<Any?, *>, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        merge: Boolean
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+        ios.updateData(encode(strategy, data) as Map<Any?, *>, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFields: String
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
+            ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> update(
-        documentRef: DocumentReference,
-        data: T
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun delete(documentRef: DocumentReference) =
+        ios.deleteDocument(documentRef.ios).let { this }
 
-    actual inline fun <reified T> update(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun update(
-        documentRef: DocumentReference,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun update(
-        documentRef: DocumentReference,
-        vararg fieldsAndValues: Pair<FieldPath, Any?>
-    ): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun delete(documentRef: DocumentReference): Transaction {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual suspend fun get(documentRef: DocumentReference): DocumentSnapshot {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual suspend fun commit() = await { ios.commitWithCompletion(it) }
 
 }
 
-actual open class Query {
-    internal actual fun _where(field: String, equalTo: Any?): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+actual class Transaction(val ios: FIRTransaction) {
 
-    internal actual fun _where(
-        path: FieldPath,
-        equalTo: Any?
-    ): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    internal actual fun _where(
-        field: String,
-        lessThan: Any?,
-        greaterThan: Any?,
-        arrayContains: Any?
-    ): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    internal actual fun _where(
-        path: FieldPath,
-        lessThan: Any?,
-        greaterThan: Any?,
-        arrayContains: Any?
-    ): Query {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+        ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    actual val snapshots: Flow<QuerySnapshot>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual suspend fun get(): QuerySnapshot {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-actual class WriteBatch {
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        merge: Boolean
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        vararg mergeFields: String
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+        ios.updateData(encode(data) as Map<Any?, *>, documentRef.ios).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> set(
-        documentRef: DocumentReference,
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+        ios.updateData(encode(strategy, data) as Map<Any?, *>, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        merge: Boolean
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
+        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFields: String
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun delete(documentRef: DocumentReference) =
+        ios.deleteDocument(documentRef.ios).let { this }
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> update(
-        documentRef: DocumentReference,
-        data: T
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual inline fun <reified T> update(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun update(
-        documentRef: DocumentReference,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun update(
-        documentRef: DocumentReference,
-        vararg fieldsAndValues: Pair<FieldPath, Any?>
-    ): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun delete(documentRef: DocumentReference): WriteBatch {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual suspend fun commit() {
-    }
+    actual suspend fun get(documentRef: DocumentReference) =
+        throwError { DocumentSnapshot(ios.getDocument(documentRef.ios, it)!!) }
 
 }
 
-actual class DocumentReference {
+actual class DocumentReference(val ios: FIRDocumentReference) {
+
     actual val id: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = ios.documentID
+
     actual val path: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    actual val snapshots: Flow<DocumentSnapshot>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = ios.path
 
-    actual suspend fun get(): DocumentSnapshot {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) =
+        await { ios.setData(encode(data)!! as Map<Any?, *>, merge, it) }
+
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String) =
+        await { ios.setData(encode(data)!! as Map<Any?, *>, mergeFields.asList(), it) }
+
+    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
+        await { ios.setData(encode(data)!! as Map<Any?, *>, mergeFieldsPaths.asList(), it) }
+
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+        await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, merge, it) }
+
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+        await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, mergeFields.asList(), it) }
+
+    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+        await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, mergeFieldsPaths.asList(), it) }
+
+    @Suppress("UNCHECKED_CAST")
+    actual suspend inline fun <reified T: Any> update(data: T) =
+        await { ios.updateData(encode(data) as Map<Any?, *>, it) }
+
+    @Suppress("UNCHECKED_CAST")
+    actual suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T) =
+        await { ios.updateData(encode(strategy, data) as Map<Any?, *>, it) }
+
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
+        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+
+    actual suspend fun delete() =
+        await { ios.deleteDocumentWithCompletion(it) }
+
+    actual suspend fun get() =
+        DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
+
+    actual val snapshots get() = callbackFlow {
+        val listener = ios.addSnapshotListener { snapshot, error ->
+            snapshot?.let { offer(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
     }
-
-    @ImplicitReflectionSerializer
-    actual suspend inline fun <reified T : Any> set(data: T, merge: Boolean) {
-    }
-
-    @ImplicitReflectionSerializer
-    actual suspend inline fun <reified T : Any> set(data: T, vararg mergeFields: String) {
-    }
-
-    @ImplicitReflectionSerializer
-    actual suspend inline fun <reified T : Any> set(
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ) {
-    }
-
-    actual suspend inline fun <reified T> set(
-        strategy: SerializationStrategy<T>,
-        data: T,
-        merge: Boolean
-    ) {
-    }
-
-    actual suspend inline fun <reified T> set(
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFields: String
-    ) {
-    }
-
-    actual suspend inline fun <reified T> set(
-        strategy: SerializationStrategy<T>,
-        data: T,
-        vararg mergeFieldsPaths: FieldPath
-    ) {
-    }
-
-    @ImplicitReflectionSerializer
-    actual suspend inline fun <reified T : Any> update(data: T) {
-    }
-
-    actual suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T) {
-    }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) {
-    }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) {
-    }
-
-    actual suspend fun delete() {
-    }
-
 }
 
-actual class CollectionReference : Query() {
-    actual val path: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+actual open class Query(open val ios: FIRQuery) {
 
-    @ImplicitReflectionSerializer
-    actual suspend inline fun <reified T : Any> add(data: T): DocumentReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
+
+    internal actual fun _where(field: String, equalTo: Any?) = Query(ios.queryWhereField(field, isEqualTo = equalTo!!))
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(ios.queryWhereFieldPath(path, isEqualTo = equalTo!!))
+
+    actual val snapshots get() = callbackFlow {
+        println("adding snapshot listener to query ${this@Query}")
+        val listener = ios.addSnapshotListener { snapshot, error ->
+            snapshot?.let { offer(QuerySnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
     }
 
-    actual suspend inline fun <reified T> add(
-        data: T,
-        strategy: SerializationStrategy<T>
-    ): DocumentReference {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+        (lessThan?.let { ios.queryWhereField(field, isLessThan = it!!) } ?: ios).let { ios ->
+            (greaterThan?.let { ios.queryWhereField(field, isGreaterThan = it!!) } ?: ios).let { ios ->
+                arrayContains?.let { ios.queryWhereField(field, arrayContains = it!!) } ?: ios
+            }
+        }
+    )
+
+    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+        (lessThan?.let { ios.queryWhereFieldPath(path, isLessThan = it!!) } ?: ios).let { ios ->
+            (greaterThan?.let { ios.queryWhereFieldPath(path, isGreaterThan = it!!) } ?: ios).let { ios ->
+                arrayContains?.let { ios.queryWhereFieldPath(path, arrayContains = it!!) } ?: ios
+            }
+        }
+    )
 }
+actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
+
+    actual val path: String
+        get() = ios.path
+
+    actual suspend inline fun <reified T : Any> add(data: T) =
+        DocumentReference(await { ios.addDocumentWithData(encode(data) as Map<Any?, *>, it) })
+
+    actual suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>) =
+        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data) as Map<Any?, *>) })
+}
+
+actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
+
+actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual enum class FirestoreExceptionCode {
-    OK, CANCELLED, UNKNOWN, INVALID_ARGUMENT, DEADLINE_EXCEEDED, NOT_FOUND, ALREADY_EXISTS, PERMISSION_DENIED, RESOURCE_EXHAUSTED, FAILED_PRECONDITION, ABORTED, OUT_OF_RANGE, UNIMPLEMENTED, INTERNAL, UNAVAILABLE, DATA_LOSS, UNAUTHENTICATED
+    OK,
+    CANCELLED,
+    UNKNOWN,
+    INVALID_ARGUMENT,
+    DEADLINE_EXCEEDED,
+    NOT_FOUND,
+    ALREADY_EXISTS,
+    PERMISSION_DENIED,
+    RESOURCE_EXHAUSTED,
+    FAILED_PRECONDITION,
+    ABORTED,
+    OUT_OF_RANGE,
+    UNIMPLEMENTED,
+    INTERNAL,
+    UNAVAILABLE,
+    DATA_LOSS,
+    UNAUTHENTICATED
 }
 
-actual class
-QuerySnapshot {
-    actual val documents: List<DocumentSnapshot>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+private fun NSError.toException() = when(domain) {
+    FIRFirestoreErrorDomain -> when(code) {
+        FIRFirestoreErrorCodeOK -> FirestoreExceptionCode.OK
+        FIRFirestoreErrorCodeCancelled -> FirestoreExceptionCode.CANCELLED
+        FIRFirestoreErrorCodeUnknown -> FirestoreExceptionCode.UNKNOWN
+        FIRFirestoreErrorCodeInvalidArgument -> FirestoreExceptionCode.INVALID_ARGUMENT
+        FIRFirestoreErrorCodeDeadlineExceeded -> FirestoreExceptionCode.DEADLINE_EXCEEDED
+        FIRFirestoreErrorCodeNotFound -> FirestoreExceptionCode.NOT_FOUND
+        FIRFirestoreErrorCodeAlreadyExists -> FirestoreExceptionCode.ALREADY_EXISTS
+        FIRFirestoreErrorCodePermissionDenied -> FirestoreExceptionCode.PERMISSION_DENIED
+        FIRFirestoreErrorCodeResourceExhausted -> FirestoreExceptionCode.RESOURCE_EXHAUSTED
+        FIRFirestoreErrorCodeFailedPrecondition -> FirestoreExceptionCode.FAILED_PRECONDITION
+        FIRFirestoreErrorCodeAborted -> FirestoreExceptionCode.ABORTED
+        FIRFirestoreErrorCodeOutOfRange -> FirestoreExceptionCode.OUT_OF_RANGE
+        FIRFirestoreErrorCodeUnimplemented -> FirestoreExceptionCode.UNIMPLEMENTED
+        FIRFirestoreErrorCodeInternal -> FirestoreExceptionCode.INTERNAL
+        FIRFirestoreErrorCodeUnavailable -> FirestoreExceptionCode.UNAVAILABLE
+        FIRFirestoreErrorCodeDataLoss -> FirestoreExceptionCode.DATA_LOSS
+        FIRFirestoreErrorCodeUnauthenticated -> FirestoreExceptionCode.UNAUTHENTICATED
+        else -> FirestoreExceptionCode.UNKNOWN
+    }
+    else -> FirestoreExceptionCode.UNKNOWN
+}.let { FirebaseFirestoreException(description!!, it) }
+
+actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
+    actual val documents
+        get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
 }
 
-actual class DocumentSnapshot {
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T> get(field: String): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+@Suppress("UNCHECKED_CAST")
+actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
-    actual inline fun <reified T> get(
-        field: String,
-        strategy: DeserializationStrategy<T>
-    ): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual val id get() = ios.documentID
 
-    actual fun contains(field: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual val reference get() = DocumentReference(ios.reference)
 
-    @ImplicitReflectionSerializer
-    actual inline fun <reified T : Any> data(): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T: Any> data() = decode<T>(value = ios.data())
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
 
-    actual val exists: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    actual val id: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    actual val reference: DocumentReference
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    actual inline fun <reified T> get(field: String) = decode<T>(value = ios.valueForField(field))
 
+    actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
+        decode(strategy, ios.valueForField(field))
+
+    actual fun contains(field: String) = ios.valueForField(field) != null
+
+    actual val exists get() = ios.exists
 }
 
-actual class FieldPath
+actual typealias FieldPath = FIRFieldPath
 
-actual fun FieldPath(vararg fieldNames: String): FieldPath {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-}
+actual fun FieldPath(vararg fieldNames: String) = FIRFieldPath(fieldNames.asList())
 
 actual object FieldValue {
-    actual fun delete(): FieldValueImpl {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    actual fun delete(): Any = FIRFieldValue.fieldValueForDelete()
+    actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
+    actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
+}
 
-    actual fun arrayUnion(vararg elements: Any): FieldValueImpl {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    actual fun arrayRemove(vararg elements: Any): FieldValueImpl {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
+    memScoped {
+        val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
+        val result = block(errorPointer)
+        val error: NSError? = errorPointer.pointed.value
+        if (error != null) {
+            throw error.toException()
+        }
+        return result
     }
 }
 
-actual abstract class FieldValueImpl
+suspend fun <T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
+    val job = CompletableDeferred<T>()
+    function { result, error ->
+        if(result != null) {
+            job.complete(result)
+        } else if(error != null) {
+            job.completeExceptionally(error.toException())
+        }
+    }
+    return job.await()
+}
+
+suspend fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
+    val job = CompletableDeferred<Unit>()
+    val result = function { error ->
+        if(error == null) {
+            job.complete(Unit)
+        } else {
+            job.completeExceptionally(error.toException())
+        }
+    }
+    job.await()
+    return result
+}

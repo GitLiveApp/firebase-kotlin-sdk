@@ -95,7 +95,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
                 documentRef.android,
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
                     listOf(field, value?.let { encode(value) })
                 }.toTypedArray()
             ).let { this }
@@ -167,7 +167,7 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
                 documentRef.android,
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
                     listOf(field, value?.let { encode(value) })
                 }.toTypedArray()
             ).let { this }
@@ -238,7 +238,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
             ?.update(
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
+                *fieldsAndValues.drop(1).flatMap { (field, value) ->
                     listOf(field, value?.let { encode(value) })
                 }.toTypedArray()
             )
@@ -340,11 +340,9 @@ actual typealias FieldPath = com.google.firebase.firestore.FieldPath
 
 actual fun FieldPath(vararg fieldNames: String) = FieldPath.of(*fieldNames)
 
-actual typealias FieldValueImpl = com.google.firebase.firestore.FieldValue
-
 actual object FieldValue {
-    actual fun delete() = FieldValueImpl.delete()
-    actual fun arrayUnion(vararg elements: Any) = FieldValueImpl.arrayUnion(*elements)
-    actual fun arrayRemove(vararg elements: Any) = FieldValueImpl.arrayRemove(*elements)
+    actual fun delete(): Any = com.google.firebase.firestore.FieldValue.delete()
+    actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
+    actual fun arrayRemove(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayRemove(*elements)
 }
 

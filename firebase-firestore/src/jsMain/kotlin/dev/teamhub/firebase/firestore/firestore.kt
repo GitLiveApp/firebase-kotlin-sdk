@@ -322,12 +322,11 @@ actual typealias FieldPath = firebase.firestore.FieldPath
 
 actual fun FieldPath(vararg fieldNames: String) = rethrow { FieldPath(fieldNames) }
 
-actual typealias FieldValueImpl = firebase.firestore.FieldValue
 
 actual object FieldValue {
-    actual fun delete() = rethrow { FieldValueImpl.delete() }
-    actual fun arrayUnion(vararg elements: Any) = rethrow { FieldValueImpl.arrayUnion(*elements) }
-    actual fun arrayRemove(vararg elements: Any) = rethrow { FieldValueImpl.arrayRemove(*elements) }
+    actual fun delete(): Any = rethrow { firebase.firestore.FieldValue.delete() }
+    actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
+    actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(

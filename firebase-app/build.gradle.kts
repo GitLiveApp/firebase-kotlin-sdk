@@ -53,7 +53,7 @@ kotlin {
     }
 
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
 
     sourceSets {
         val commonMain by getting {
@@ -69,10 +69,7 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
         }
-        val iosMain by creating {
-            dependencies {
-            }
-        }
+//        val iosMain by creating
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {

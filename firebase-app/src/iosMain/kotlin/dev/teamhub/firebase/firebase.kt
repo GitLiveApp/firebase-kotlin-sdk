@@ -1,32 +1,43 @@
 package dev.teamhub.firebase
 
-actual class FirebaseApp {
+import cocoapods.FirebaseCore.*
+
+actual open class FirebaseException(message: String) : Exception(message)
+actual open class FirebaseNetworkException(message: String) : FirebaseException(message)
+actual open class FirebaseTooManyRequestsException(message: String) : FirebaseException(message)
+actual open class FirebaseApiNotAvailableException(message: String) : FirebaseException(message)
+
+actual val Firebase.app: FirebaseApp
+    get() = FirebaseApp(FIRApp.defaultApp()!!)
+
+actual fun Firebase.app(name: String): FirebaseApp =
+    FirebaseApp(FIRApp.appNamed(name)!!)
+
+actual fun Firebase.initialize(context: Any?): FirebaseApp? =
+    FIRApp.configure().let { app }
+
+actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
+    FIRApp.configureWithName(name, options.toIos()).let { app(name) }
+
+actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
+    FIRApp.configureWithOptions(options.toIos()).let { app }
+
+actual class FirebaseApp internal constructor(val ios: FIRApp) {
     actual val name: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = ios.name
     actual val options: FirebaseOptions
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 }
 
-/** Returns the default firebase app instance. */
-actual val Firebase.app: FirebaseApp
-    get() = kotlin.TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+actual fun Firebase.apps(context: Any?) = FIRApp.allApps()!!
+    .values
+    .map { FirebaseApp(it as FIRApp) }
 
-actual fun Firebase.app(name: String): FirebaseApp = kotlin.TODO("not implemented")
-
-actual fun Firebase.apps(context: Any?): List<FirebaseApp> = kotlin.TODO("not implemented")
-
-actual fun Firebase.initialize(context: Any?): FirebaseApp? = kotlin.TODO("not implemented")
-
-/** Initializes and returns a FirebaseApp. */
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = kotlin.TODO("not implemented")
-
-/** Initializes and returns a FirebaseApp. */
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = kotlin.TODO("not implemented")
-
-actual open class FirebaseException : Exception()
-
-actual class FirebaseNetworkException : FirebaseException()
-
-actual open class FirebaseTooManyRequestsException : FirebaseException()
-
-actual open class FirebaseApiNotAvailableException : FirebaseException()
+private fun FirebaseOptions.toIos() = FIROptions().apply {
+        bundleID = this@toIos.applicationId
+        APIKey = this@toIos.apiKey
+        databaseURL = this@toIos.databaseUrl
+        trackingID = this@toIos.gaTrackingId
+        storageBucket = this@toIos.storageBucket
+        projectID = this@toIos.projectId
+    }
