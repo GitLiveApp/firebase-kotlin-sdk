@@ -41,7 +41,7 @@ kotlin {
         }
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -76,7 +76,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
             }
         }
-        val iosMain by creating
+//        val iosMain by creating
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
