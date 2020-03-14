@@ -56,30 +56,30 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore:19.0.2")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
         val iosMain by creating {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }
 

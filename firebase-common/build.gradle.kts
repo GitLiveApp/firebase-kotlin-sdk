@@ -4,7 +4,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.61"
+    kotlin("plugin.serialization") version "1.3.70"
     `maven-publish`
 }
 repositories {
@@ -60,24 +60,24 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
         val jsMain by getting {
             dependencies {
 //                implementation(npm("firebase", "6.2.3"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }
@@ -89,7 +89,7 @@ kotlin {
         }
         val iosMain by creating {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
         configure(listOf(iosArm64, iosX64)) {
