@@ -4,6 +4,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
+    kotlin("plugin.serialization") version "1.3.61"
     `maven-publish`
 }
 repositories {
@@ -79,6 +80,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidTest/kotlin")
         }
         val iosMain by getting {
             dependencies {

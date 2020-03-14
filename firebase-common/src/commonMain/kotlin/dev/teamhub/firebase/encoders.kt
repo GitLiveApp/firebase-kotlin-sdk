@@ -1,6 +1,8 @@
 package dev.teamhub.firebase
 
 import kotlinx.serialization.*
+import kotlinx.serialization.internal.ListLikeSerializer
+import kotlinx.serialization.internal.MapLikeSerializer
 import kotlinx.serialization.modules.EmptyModule
 
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
@@ -82,23 +84,24 @@ abstract class TimestampEncoder(internal val positiveInfinity: Any) {
     }
 }
 
-open class FirebaseCompositeEncoder(
+open class FirebaseCompositeEncoder constructor(
     positiveInfinity: Any,
-    private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
 ): TimestampEncoder(positiveInfinity), CompositeEncoder {
 
     override val context = EmptyModule
 
-    override fun endStructure(desc: SerialDescriptor) {
-        super.endStructure(desc)
+    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(this) {
+        is MapLikeSerializer<*, *, *, *> -> FirebaseMapSerializer() as SerializationStrategy<T>
+        is ListLikeSerializer<*, *, *> -> FirebaseListSerializer() as SerializationStrategy<T>
+        else -> this
     }
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
-        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value })
+        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer.toFirebase(), value) }.value })
 
     override fun <T> encodeSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
-        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value)
+        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer.toFirebase(), value) }.value)
 
     override fun encodeNonSerializableElement(desc: SerialDescriptor, index: Int, value: Any) = set(desc, index, value)
 
