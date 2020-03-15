@@ -10,7 +10,7 @@ actual fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeP
     StructureKind.LIST -> mutableListOf<Any?>()
         .also { value = it }
         .let { FirebaseCompositeEncoder(positiveInfinity) { _, index, value -> it.add(index, value) } }
-    StructureKind.MAP,  StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
+    StructureKind.MAP,  StructureKind.CLASS,  StructureKind.OBJECT -> mutableMapOf<Any?, Any?>()
         .also { value = it }
         .let { FirebaseCompositeEncoder(positiveInfinity) { _, index, value -> it[desc.getElementName(index)] = value } }
 }

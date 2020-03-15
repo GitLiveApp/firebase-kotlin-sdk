@@ -1,8 +1,6 @@
 package dev.teamhub.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.ListLikeSerializer
-import kotlinx.serialization.internal.MapLikeSerializer
 import kotlinx.serialization.modules.EmptyModule
 
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
@@ -91,10 +89,13 @@ open class FirebaseCompositeEncoder constructor(
 
     override val context = EmptyModule
 
-    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(this) {
-        is MapLikeSerializer<*, *, *, *> -> FirebaseMapSerializer() as SerializationStrategy<T>
-        is ListLikeSerializer<*, *, *> -> FirebaseListSerializer() as SerializationStrategy<T>
+    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(this.descriptor.kind) {
+        StructureKind.MAP -> FirebaseMapSerializer() as SerializationStrategy<T>
+        StructureKind.LIST -> FirebaseListSerializer() as SerializationStrategy<T>
         else -> this
+    }
+
+    override fun endStructure(descriptor: SerialDescriptor) {
     }
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =

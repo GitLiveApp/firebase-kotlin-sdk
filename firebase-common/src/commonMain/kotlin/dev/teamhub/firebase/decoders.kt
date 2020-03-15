@@ -3,8 +3,8 @@ package dev.teamhub.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.CompositeDecoder.Companion.READ_ALL
 import kotlinx.serialization.CompositeDecoder.Companion.READ_DONE
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.internal.UnitDescriptor
-import kotlinx.serialization.internal.nullable
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.getContextualOrDefault
@@ -118,6 +118,8 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeUnitElement(desc: SerialDescriptor, index: Int) = decodeUnit(get(desc, index))
 
+    override fun endStructure(descriptor: SerialDescriptor) {
+    }
 }
 
 private fun decodeString(value: Any?) = value.toString()
