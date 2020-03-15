@@ -3,26 +3,33 @@ package dev.teamhub.firebase.functions
 import dev.teamhub.firebase.*
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 
+@InternalSerializationApi
 actual val Firebase.functions: FirebaseFunctions
     get() = rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.functions()) }
 
+@InternalSerializationApi
 actual fun Firebase.functions(region: String) =
     rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.app().functions(region)) }
 
+@InternalSerializationApi
 actual fun Firebase.functions(app: FirebaseApp) =
     rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(firebase.functions(app.js)) }
 
+@InternalSerializationApi
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     rethrow { dev.teamhub.firebase.functions; FirebaseFunctions(app.js.functions(region)) }
 
+@InternalSerializationApi
 actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 }
 
+@InternalSerializationApi
 @Suppress("UNCHECKED_CAST")
 actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) {
 

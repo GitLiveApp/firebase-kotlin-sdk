@@ -35,13 +35,14 @@ kotlin {
     }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64()
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+
+    // jvm {
+    //     val main by compilations.getting {
+    //         kotlinOptions {
+    //             jvmTarget = "1.8"
+    //         }
+    //     }
+    // }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -60,24 +61,27 @@ kotlin {
             }
         }
         val androidMain by getting {
+            dependsOn(commonMain)
             dependencies {
-                api("com.google.firebase:firebase-firestore:19.0.2")
+                api("com.google.firebase:firebase-firestore:21.4.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
         val iosMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-            }
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
+        // val jvmMain by getting {
+        //     dependencies {
+        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+        //     }
+        //     kotlin.srcDir("src/androidMain/kotlin")
+        // }
         val jsMain by getting {
+            dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
@@ -89,7 +93,7 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseFirestore-6.17.0")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseFirestore-1.3.2")
                 }
             }
         }

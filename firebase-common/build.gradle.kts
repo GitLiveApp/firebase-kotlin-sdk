@@ -41,13 +41,13 @@ kotlin {
     val iosArm64 = iosArm64()
     val iosX64 = iosX64()
 
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    // jvm {
+    //     val main by compilations.getting {
+    //         kotlinOptions {
+    //             jvmTarget = "1.8"
+    //         }
+    //     }
+    // }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -64,30 +64,40 @@ kotlin {
             }
         }
         val androidMain by getting {
+            dependsOn(commonMain)
             dependencies {
-                api("com.google.firebase:firebase-common:19.2.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-            }
-        }
-        val jsMain by getting {
-            dependencies {
-//                implementation(npm("firebase", "6.2.3"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
-            }
-        }
-        val jvmMain by getting {
-            dependencies {
+                api("com.google.firebase:firebase-common:19.3.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }
-        val jvmTest by getting {
+        val androidTest by getting {
             dependencies {
+                implementation(kotlin("test"))
                 implementation(kotlin("test-junit"))
             }
-            kotlin.srcDir("src/androidTest/kotlin")
         }
+        val jsMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                // implementation(npm("firebase", "6.2.3"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+            }
+        }
+        // val jvmMain by getting {
+        //     dependencies {
+        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+        //     }
+        // }
+        // val jvmTest by getting {
+        //     dependencies {
+        //         implementation(kotlin("test"))
+        //         implementation(kotlin("test-junit"))
+        //     }
+        //     kotlin.srcDir("src/androidTest/kotlin")
+        // }
         val iosMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }

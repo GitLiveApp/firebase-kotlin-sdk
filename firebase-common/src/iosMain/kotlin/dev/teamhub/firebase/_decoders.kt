@@ -12,7 +12,7 @@ actual fun FirebaseDecoder.structureDecoder(desc: SerialDescriptor, vararg typeP
         StructureKind.LIST -> (value as List<*>).let {
             FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
         }
-        StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
+        StructureKind.MAP, StructureKind.OBJECT  -> (value as Map<*, *>).entries.toList().let {
             FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
         }
     }

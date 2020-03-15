@@ -2,6 +2,7 @@ package dev.teamhub.firebase.database
 
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -41,10 +42,10 @@ actual class FirebaseDatabase {
 }
 
 actual open class Query {
-    actual val valueEvents: kotlinx.coroutines.flow.Flow<DataSnapshot>
+    actual val valueEvents: Flow<DataSnapshot>
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-    actual fun childEvents(vararg types: ChildEvent.Type): kotlinx.coroutines.flow.Flow<ChildEvent> {
+    actual fun childEvents(vararg types: ChildEvent.Type): Flow<ChildEvent> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

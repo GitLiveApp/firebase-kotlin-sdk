@@ -10,11 +10,12 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("com.android.tools.build:gradle:3.6.1")
     }
 }
 
 val targetSdkVersion by extra(28)
+val androidToolsVersion by extra("29.0.1")
 val minSdkVersion by extra(14)
 
 subprojects {
@@ -42,12 +43,13 @@ subprojects {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
             "jsMainImplementation"(kotlin("stdlib-js"))
             "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.4")
+            "androidMainImplementation"(kotlin("stdlib-jdk8"))
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
-            "jvmMainImplementation"(kotlin("stdlib-jdk8"))
-            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
-            "jvmMainApi"("app.teamhub:firebase-java:0.3.1")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
+            //"jvmMainImplementation"(kotlin("stdlib-jdk8"))
+            //"jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
+            //"jvmMainApi"("app.teamhub:firebase-java:0.3.1")
+            //"jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
         }
     }
 }

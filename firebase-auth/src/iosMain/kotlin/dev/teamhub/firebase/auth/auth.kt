@@ -3,6 +3,7 @@ package dev.teamhub.firebase.auth
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
+import kotlinx.coroutines.flow.Flow
 
 actual val Firebase.auth: FirebaseAuth
     get() = kotlin.TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
@@ -14,7 +15,7 @@ actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth {
 actual class FirebaseAuth {
     actual val currentUser: FirebaseUser?
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    actual val authStateChanged: kotlinx.coroutines.flow.Flow<FirebaseUser?>
+    actual val authStateChanged: Flow<FirebaseUser?>
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     actual suspend fun signInWithCustomToken(token: String): AuthResult {

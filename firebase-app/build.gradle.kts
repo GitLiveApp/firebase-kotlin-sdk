@@ -34,23 +34,23 @@ kotlin {
             }
         }
     }
-//    js("reactnative") {
-//        val main by compilations.getting {
-//            kotlinOptions {
-//                moduleKind = "commonjs"
-//            }
-//        }
-//    }
+    // js("reactnative") {
+    //     val main by compilations.getting {
+    //         kotlinOptions {
+    //             moduleKind = "commonjs"
+    //         }
+    //     }
+    // }
     android {
         publishLibraryVariants("release", "debug")
     }
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    // jvm {
+    //     val main by compilations.getting {
+    //         kotlinOptions {
+    //             jvmTarget = "1.8"
+    //         }
+    //     }
+    // }
 
     val iosArm64 = iosArm64()
     val iosX64 = iosX64()
@@ -63,12 +63,12 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.2.0")
+                api("com.google.firebase:firebase-common:19.3.0")
             }
         }
-        val jvmMain by getting {
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
+        // val jvmMain by getting {
+        //     kotlin.srcDir("src/androidMain/kotlin")
+        // }
         val iosMain by creating {
             dependencies {
             }
@@ -81,7 +81,7 @@ kotlin {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
                     //includeDirs("$projectDir/../native/Avalon/Pods/FirebaseCore/Firebase/Core/Public")
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseCore-6.0.2")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseCore-6.0.4")
                 }
             }
         }

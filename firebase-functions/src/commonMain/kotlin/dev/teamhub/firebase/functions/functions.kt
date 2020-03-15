@@ -5,8 +5,10 @@ import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
+@InternalSerializationApi
 expect class FirebaseFunctions {
     fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
 }
@@ -25,15 +27,19 @@ expect class HttpsCallableResult {
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */
+@InternalSerializationApi
 expect val Firebase.functions: FirebaseFunctions
 
 /** Returns the [FirebaseFunctions] instance of a given [region]. */
+@InternalSerializationApi
 expect fun Firebase.functions(region: String): FirebaseFunctions
 
 /** Returns the [FirebaseFunctions] instance of a given [FirebaseApp]. */
+@InternalSerializationApi
 expect fun Firebase.functions(app: FirebaseApp): FirebaseFunctions
 
 /** Returns the [FirebaseFunctions] instance of a given [FirebaseApp] and [region]. */
+@InternalSerializationApi
 expect fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions
 
 expect class FirebaseFunctionsException: FirebaseException

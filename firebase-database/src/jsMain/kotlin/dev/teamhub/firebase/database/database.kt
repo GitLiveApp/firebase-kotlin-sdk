@@ -5,11 +5,14 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
+@InternalSerializationApi
 fun encode(value: Any?) =
     encode(value, firebase.database.ServerValue.TIMESTAMP)
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+@InternalSerializationApi
+fun <T> encode(strategy: SerializationStrategy<T>, value: T): Any? =
     encode(strategy, value, firebase.database.ServerValue.TIMESTAMP)
 
 
@@ -88,15 +91,18 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
 
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
+    @InternalSerializationApi
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         rethrow { js.update(encode(update)).await() }
 
     actual suspend fun removeValue() = rethrow { js.remove().await() }
 
+    @InternalSerializationApi
     actual suspend fun setValue(value: Any?) = rethrow {
         js.set(encode(value)).await()
     }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
 }
@@ -126,12 +132,15 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
     actual suspend fun removeValue() = rethrow { js.remove().await() }
     actual suspend fun cancel() =  rethrow { js.cancel().await() }
 
+    @InternalSerializationApi
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         rethrow { js.update(encode(update)).await() }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T : Any> setValue(value: T) =
         rethrow { js.set(encode(value)).await() }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
 }

@@ -35,13 +35,14 @@ kotlin {
     }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64()
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+
+    // jvm {
+    //     val main by compilations.getting {
+    //         kotlinOptions {
+    //             jvmTarget = "1.8"
+    //         }
+    //     }
+    // }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -60,23 +61,26 @@ kotlin {
             }
         }
         val androidMain by getting {
+            dependsOn(commonMain)
             dependencies {
-                api("com.google.firebase:firebase-functions:19.0.1")
+                api("com.google.firebase:firebase-functions:19.0.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
         val iosMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-            }
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
+        // val jvmMain by getting {
+        //     dependencies {
+        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+        //     }
+        //     kotlin.srcDir("src/androidMain/kotlin")
+        // }
         val jsMain by getting {
+            dependsOn(commonMain)
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
@@ -88,7 +92,7 @@ kotlin {
                 val firebasefunctions by cinterops.creating {
                     packageName("cocoapods.FirebaseFunctions")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseFunctions-6.17.0")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseFunctions-2.5.1")
                 }
             }
         }

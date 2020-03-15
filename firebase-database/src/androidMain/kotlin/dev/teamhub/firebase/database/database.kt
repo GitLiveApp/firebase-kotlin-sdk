@@ -18,13 +18,17 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
+@InternalSerializationApi
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, ServerValue.TIMESTAMP)
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+@InternalSerializationApi
+fun <T> encode(strategy: SerializationStrategy<T>, value: T): Any? =
     dev.teamhub.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
@@ -79,7 +83,7 @@ actual open class Query internal constructor(
 
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual val valueEvents get() = callbackFlow {
+    actual val valueEvents get() = callbackFlow<DataSnapshot> {
         println("adding value event listener to query ${this@Query}")
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
@@ -94,7 +98,7 @@ actual open class Query internal constructor(
         awaitClose { android.removeEventListener(listener) }
     }
 
-    actual fun childEvents(vararg types: Type) = callbackFlow {
+    actual fun childEvents(vararg types: Type) = callbackFlow<ChildEvent> {
         println("adding child event listener to query ${this@Query}")
         val listener = object : ChildEventListener {
 
@@ -141,15 +145,18 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
+    @InternalSerializationApi
     actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
+    @InternalSerializationApi
     @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         android.updateChildren(encode(update) as Map<String, Any?>)
@@ -191,16 +198,19 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T : Any> setValue(value: T) =
         android.setValue(encode(value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
+    @InternalSerializationApi
     actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}
 
+    @InternalSerializationApi
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         android.updateChildren(update.mapValues { (_, it) -> encode(it) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
