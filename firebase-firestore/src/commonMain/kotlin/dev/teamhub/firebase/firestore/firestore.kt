@@ -174,11 +174,9 @@ expect class FieldPath
 expect fun FieldPath(vararg fieldNames: String): FieldPath
 
 expect object FieldValue {
-    fun delete(): FieldValueImpl
-    fun arrayUnion(vararg elements: Any): FieldValueImpl
-    fun arrayRemove(vararg elements: Any): FieldValueImpl
+    fun delete(): Any
+    fun arrayUnion(vararg elements: Any): Any
+    fun arrayRemove(vararg elements: Any): Any
 }
-
-expect abstract class FieldValueImpl
 
 

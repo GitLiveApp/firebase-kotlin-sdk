@@ -34,7 +34,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
     jvm {
         val main by compilations.getting {
             kotlinOptions {
@@ -63,11 +63,7 @@ kotlin {
                 api("com.google.firebase:firebase-auth:19.1.0")
             }
         }
-        val iosMain by creating {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3")
-            }
-        }
+//        val iosMain by creating
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
         }

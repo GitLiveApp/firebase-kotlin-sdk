@@ -39,7 +39,7 @@ kotlin {
     }
 
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
 
     jvm {
         val main by compilations.getting {
@@ -87,7 +87,7 @@ kotlin {
             }
             kotlin.srcDir("src/androidTest/kotlin")
         }
-        val iosMain by creating {
+        val iosMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 plugins {
     kotlin("multiplatform") version "1.3.70" apply false
 }
@@ -48,6 +46,8 @@ subprojects {
             "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
             "jvmMainApi"("app.teamhub:firebase-java:0.3.1")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
         }
     }
 }
