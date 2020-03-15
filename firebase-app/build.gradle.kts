@@ -53,7 +53,7 @@ kotlin {
     // }
 
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
 
     sourceSets {
         val commonMain by getting {
@@ -66,13 +66,10 @@ kotlin {
                 api("com.google.firebase:firebase-common:19.3.0")
             }
         }
+
         // val jvmMain by getting {
         //     kotlin.srcDir("src/androidMain/kotlin")
         // }
-        val iosMain by creating {
-            dependencies {
-            }
-        }
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {

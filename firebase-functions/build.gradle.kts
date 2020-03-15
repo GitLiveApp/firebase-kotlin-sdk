@@ -34,7 +34,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64()
+    val iosX64 = iosX64("ios")
 
     // jvm {
     //     val main by compilations.getting {
@@ -65,12 +65,6 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-functions:19.0.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-            }
-        }
-        val iosMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
         // val jvmMain by getting {
