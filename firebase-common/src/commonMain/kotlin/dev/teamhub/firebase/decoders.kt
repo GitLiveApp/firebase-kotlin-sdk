@@ -1,7 +1,6 @@
 package dev.teamhub.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.CompositeDecoder.Companion.READ_ALL
 import kotlinx.serialization.CompositeDecoder.Companion.READ_DONE
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.internal.UnitDescriptor
@@ -78,7 +77,9 @@ open class FirebaseCompositeDecoder constructor(
     override val context = EmptyModule
     override val updateMode = UpdateMode.OVERWRITE
 
-    override fun decodeElementIndex(desc: SerialDescriptor) = READ_ALL
+    override fun decodeSequentially() = true
+
+    override fun decodeElementIndex(desc: SerialDescriptor): Int = throw NotImplementedError()
 
     override fun decodeCollectionSize(desc: SerialDescriptor) = size
 

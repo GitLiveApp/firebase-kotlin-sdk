@@ -1,6 +1,6 @@
 {
   "name": "@teamhubapp/firebase-common",
-  "version": "0.1.0-beta14",
+  "version": "0.1.0-beta",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-common.js",
   "scripts": {

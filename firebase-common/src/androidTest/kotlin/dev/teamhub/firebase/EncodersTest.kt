@@ -12,6 +12,11 @@ class EncodersTest {
     @Test
     fun `encode a map`() {
         val encoded = encode<TestData>(TestData::class.serializer(), TestData(mapOf("key" to "value")))
-        assertEquals(mapOf("key" to "value"), (encoded as Map<String, Any>)["map"])
+        assertEquals(mapOf("map" to mapOf("key" to "value")), encoded)
     }
-}
+
+    @Test
+    fun `decode a map`() {
+        val decoded = decode<TestData>(TestData::class.serializer(), mapOf("map" to mapOf("key" to "value")))
+        assertEquals(TestData(mapOf("key" to "value")), decoded)
+    }}
