@@ -29,7 +29,8 @@ actual class FirebaseApp internal constructor(val ios: FIRApp) {
         get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 }
 
-actual fun Firebase.apps(context: Any?) = FIRApp.allApps()!!
+actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
+    .orEmpty()
     .values
     .map { FirebaseApp(it as FIRApp) }
 
