@@ -10,7 +10,13 @@ actual fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeP
     StructureKind.LIST -> Array<Any?>(desc.elementsCount) { null }
         .also { value = it }
         .let { FirebaseCompositeEncoder(positiveInfinity) { _, index, value -> it[index] = value } }
-    StructureKind.MAP, StructureKind.CLASS, StructureKind.OBJECT -> json()
+    StructureKind.MAP -> {
+        val map = json()
+        var lastKey: String = ""
+        value = map
+        FirebaseCompositeEncoder(positiveInfinity) { _, index, value -> if(index % 2 == 0) lastKey = value as String else map[lastKey] = value }
+    }
+    StructureKind.CLASS,  StructureKind.OBJECT -> json()
         .also { value = it }
         .let { FirebaseCompositeEncoder(positiveInfinity) { _, index, value -> it[desc.getElementName(index)] = value } }
 }

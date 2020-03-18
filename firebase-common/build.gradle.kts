@@ -124,7 +124,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
-                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhubapp/kotlinx-serialization-runtime')")
             )
         }
     }

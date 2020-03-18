@@ -6,17 +6,21 @@ import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.database.ChildEvent.Type
 import dev.teamhub.firebase.database.ChildEvent.Type.*
+import dev.teamhub.firebase.decode
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.cinterop.*
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
 import platform.Foundation.*
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.coroutineScope
-import dev.teamhub.firebase.decode
-import kotlinx.coroutines.selects.select
+import kotlin.collections.Iterable
+import kotlin.collections.Map
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.map
+import kotlin.collections.mapValues
 
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, FIRServerValue.timestamp())
@@ -108,7 +112,7 @@ actual class DatabaseReference internal constructor(
         ios.await(persistenceEnabled) { setValue(encode(value), it) }
     }
 
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) {
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) {
         ios.await(persistenceEnabled) { setValue(encode(strategy, value), it) }
     }
 
@@ -132,7 +136,7 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 
-    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+    actual fun <T> value(strategy: DeserializationStrategy<T>) =
         decode(strategy, ios.value)
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
@@ -151,11 +155,11 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend inline fun <reified T : Any> setValue(value: T) {
+    actual suspend fun setValue(value: Any) {
         ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value), it) }
     }
 
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) {
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) {
         ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value), it) }
     }
 

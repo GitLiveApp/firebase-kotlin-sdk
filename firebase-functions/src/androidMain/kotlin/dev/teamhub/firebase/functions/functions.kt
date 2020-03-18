@@ -29,10 +29,10 @@ actual class FirebaseFunctions internal constructor(val android: com.google.fire
 actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) {
     actual suspend fun call() = HttpsCallableResult(android.call().await())
 
-    actual suspend inline fun <reified T> call(data: T) =
+    actual suspend fun call(data: Any) =
         HttpsCallableResult(android.call(encode(data)).await())
 
-    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend fun <T> call(strategy: SerializationStrategy<T>, data: T) =
         HttpsCallableResult(android.call(encode(strategy, data)).await())
 }
 
@@ -41,7 +41,7 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual inline fun <reified T> data() =
         decode<T>(value = android.data)
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+    actual fun <T> data(strategy: DeserializationStrategy<T>) =
         decode(strategy, android.data)
 }
 

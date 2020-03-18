@@ -1,7 +1,6 @@
 package dev.teamhub.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
-import dev.teamhub.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -10,7 +9,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
-import kotlinx.coroutines.runBlocking
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -35,30 +33,30 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
 actual class WriteBatch(val ios: FIRWriteBatch) {
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+    actual fun update(documentRef: DocumentReference, data: Any) =
         ios.updateData(encode(data) as Map<Any?, *>, documentRef.ios).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         ios.updateData(encode(strategy, data) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
@@ -76,30 +74,30 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
 
 actual class Transaction(val ios: FIRTransaction) {
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) =
+    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         ios.setData(encode(data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, mergeFieldsPaths.asList()).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+    actual fun update(documentRef: DocumentReference, data: Any) =
         ios.updateData(encode(data) as Map<Any?, *>, documentRef.ios).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         ios.updateData(encode(strategy, data) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
@@ -124,30 +122,30 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual val path: String
         get() = ios.path
 
-    actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) =
+    actual suspend fun set(data: Any, merge: Boolean) =
         await { ios.setData(encode(data)!! as Map<Any?, *>, merge, it) }
 
-    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String) =
+    actual suspend fun set(data: Any, vararg mergeFields: String) =
         await { ios.setData(encode(data)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
-    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath) =
         await { ios.setData(encode(data)!! as Map<Any?, *>, mergeFieldsPaths.asList(), it) }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, merge, it) }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         await { ios.setData(encode(strategy, data)!! as Map<Any?, *>, mergeFieldsPaths.asList(), it) }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend inline fun <reified T: Any> update(data: T) =
+    actual suspend fun update(data: Any) =
         await { ios.updateData(encode(data) as Map<Any?, *>, it) }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T) =
         await { ios.updateData(encode(strategy, data) as Map<Any?, *>, it) }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
@@ -208,10 +206,10 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
     actual val path: String
         get() = ios.path
 
-    actual suspend inline fun <reified T : Any> add(data: T) =
+    actual suspend fun add(data: Any) =
         DocumentReference(await { ios.addDocumentWithData(encode(data) as Map<Any?, *>, it) })
 
-    actual suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>) =
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>) =
         DocumentReference(await { ios.addDocumentWithData(encode(strategy, data) as Map<Any?, *>) })
 }
 
@@ -277,11 +275,11 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual inline fun <reified T: Any> data() = decode<T>(value = ios.data())
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
+    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
 
     actual inline fun <reified T> get(field: String) = decode<T>(value = ios.valueForField(field))
 
-    actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
         decode(strategy, ios.valueForField(field))
 
     actual fun contains(field: String) = ios.valueForField(field) != null

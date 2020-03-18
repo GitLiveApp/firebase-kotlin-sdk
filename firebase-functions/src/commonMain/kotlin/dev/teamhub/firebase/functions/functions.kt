@@ -13,15 +13,15 @@ expect class FirebaseFunctions {
 
 expect class HttpsCallableReference {
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T> call(data: T): HttpsCallableResult
-    suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
+    suspend fun call(data: Any): HttpsCallableResult
+    suspend fun <T> call(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
     suspend fun call(): HttpsCallableResult
 }
 
 expect class HttpsCallableResult {
     @ImplicitReflectionSerializer
     inline fun <reified T> data(): T
-    inline fun <reified T> data(strategy: DeserializationStrategy<T>): T
+    fun <T> data(strategy: DeserializationStrategy<T>): T
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

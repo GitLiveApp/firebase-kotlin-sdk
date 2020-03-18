@@ -3,15 +3,16 @@ package dev.teamhub.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.UnitSerializer
 import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 
-@ImplicitReflectionSerializer
+@OptIn(ImplicitReflectionSerializer::class)
 @Suppress("UNCHECKED_CAST")
-fun Any.firebaseSerializer() = this::class.serializerOrNull() ?: when(this) {
+fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(this) {
     is Map<*, *> -> FirebaseMapSerializer()
     is List<*> -> FirebaseListSerializer()
     is Set<*> -> FirebaseListSerializer()
     else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
-} as KSerializer<Any>
+}) as SerializationStrategy<T>
 
 class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
@@ -38,18 +39,22 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
         keys.forEachIndexed { index, key ->
             val value = map.getValue(key)
             val serializer = (value?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any?>
+            String.serializer().let {
+                collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
+            }
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index, serializer, value
+                serializer.descriptor, index * 2 + 1, serializer, value
             )
         }
+        collectionEncoder.endStructure(descriptor)
     }
 
     override fun deserialize(decoder: Decoder): Map<String, Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
         val map = mutableMapOf<String, Any?>()
         for(index in 0 until collectionDecoder.decodeCollectionSize(descriptor) * 2 step 2) {
-            map[collectionDecoder.decodeNullableSerializableElement(index) as String] =
-                collectionDecoder.decodeNullableSerializableElement(index + 1)
+//            map[collectionDecoder.decodeNullableSerializableElement(index) as String] =
+//                collectionDecoder.decodeNullableSerializableElement(index + 1)
         }
         return map
     }
@@ -81,14 +86,15 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
                 serializer.descriptor, index, serializer, value
             )
         }
+        collectionEncoder.endStructure(descriptor)
     }
 
     override fun deserialize(decoder: Decoder): List<Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
         val list = mutableListOf<Any?>()
-        list.forEachIndexed { index, _ ->
-            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
-        }
+//        list.forEachIndexed { index, _ ->
+//            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
+//        }
         return list
     }
 }

@@ -84,25 +84,25 @@ abstract class TimestampEncoder(internal val positiveInfinity: Any) {
 
 open class FirebaseCompositeEncoder constructor(
     positiveInfinity: Any,
+    private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
 ): TimestampEncoder(positiveInfinity), CompositeEncoder {
 
     override val context = EmptyModule
 
-    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(this.descriptor.kind) {
-        StructureKind.MAP -> FirebaseMapSerializer() as SerializationStrategy<T>
-        StructureKind.LIST -> FirebaseListSerializer() as SerializationStrategy<T>
-        else -> this
-    }
+//    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(descriptor.kind) {
+//        StructureKind.MAP -> FirebaseMapSerializer<Any>(descriptor.getElementDescriptor(1)) as SerializationStrategy<T>
+//        StructureKind.LIST -> FirebaseListSerializer<Any>(descriptor.getElementDescriptor(0)) as SerializationStrategy<T>
+//        else -> this
+//    }
 
-    override fun endStructure(descriptor: SerialDescriptor) {
-    }
+    override fun endStructure(descriptor: SerialDescriptor) = end()
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
-        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer.toFirebase(), value) }.value })
+        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value })
 
     override fun <T> encodeSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
-        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer.toFirebase(), value) }.value)
+        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value)
 
     override fun encodeNonSerializableElement(desc: SerialDescriptor, index: Int, value: Any) = set(desc, index, value)
 

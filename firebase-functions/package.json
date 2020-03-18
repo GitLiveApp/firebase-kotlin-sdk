@@ -1,6 +1,6 @@
 {
   "name": "@teamhubapp/firebase-functions",
-  "version": "0.1.0-beta",
+  "version": "0.1.0-beta4",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-functions.js",
   "scripts": {
@@ -19,11 +19,11 @@
   "author": "teamhub.dev",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk/issues"
+    "url": "https://github.com/TeamHubApp/firebase-kotlin-sdk/issues"
   },
-  "homepage": "https://github.com/TeamHubApp/firebase-kotlin-multiplatform-sdk",
+  "homepage": "https://github.com/TeamHubApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@teamhubapp/firebase-app": "0.1.0-beta",
+    "@teamhubapp/firebase-app": "0.1.0-beta4",
     "firebase": "6.2.3",
     "kotlin": "1.3.70",
     "kotlinx-coroutines-core": "1.3.4"
