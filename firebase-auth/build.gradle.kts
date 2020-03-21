@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-version = "0.1.0-dev"
+version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -99,8 +99,8 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
-                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
-            )
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhub/kotlinx-serialization-runtime')")
+)
         }
     }
 

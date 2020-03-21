@@ -26,19 +26,19 @@ expect class FirebaseFirestore {
 expect class Transaction {
 
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean = false): Transaction
+    fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): Transaction
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String): Transaction
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): Transaction
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): Transaction
 
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): Transaction
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): Transaction
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): Transaction
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): Transaction
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
 
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> update(documentRef: DocumentReference, data: T): Transaction
-    inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): Transaction
+    fun update(documentRef: DocumentReference, data: Any): Transaction
+    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): Transaction
 
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): Transaction
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): Transaction
@@ -68,19 +68,19 @@ fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null
 
 expect class WriteBatch {
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean = false): WriteBatch
+    fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): WriteBatch
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String): WriteBatch
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): WriteBatch
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
+    fun  set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): WriteBatch
 
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): WriteBatch
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): WriteBatch
-    inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): WriteBatch
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): WriteBatch
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
 
     @ImplicitReflectionSerializer
-    inline fun <reified T: Any> update(documentRef: DocumentReference, data: T): WriteBatch
-    inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): WriteBatch
+    fun  update(documentRef: DocumentReference, data: Any): WriteBatch
+    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T): WriteBatch
 
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): WriteBatch
@@ -97,19 +97,19 @@ expect class DocumentReference {
     suspend fun get(): DocumentSnapshot
 
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> set(data: T, merge: Boolean = false)
+    suspend fun set(data: Any, merge: Boolean = false)
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String)
+    suspend fun  set(data: Any, vararg mergeFields: String)
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath)
+    suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath)
 
-    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean = false)
-    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String)
-    suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath)
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean = false)
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String)
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath)
 
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> update(data: T)
-    suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T)
+    suspend fun update(data: Any)
+    suspend fun <T> update(strategy: SerializationStrategy<T>, data: T)
 
     suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
     suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
@@ -120,8 +120,8 @@ expect class DocumentReference {
 expect class CollectionReference : Query {
     val path: String
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> add(data: T): DocumentReference
-    suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>): DocumentReference
+    suspend fun add(data: Any): DocumentReference
+    suspend fun <T> add(data: T, strategy: SerializationStrategy<T>): DocumentReference
 }
 
 expect class FirebaseFirestoreException : FirebaseException
@@ -156,13 +156,13 @@ expect class DocumentSnapshot {
 
     @ImplicitReflectionSerializer
     inline fun <reified T> get(field: String): T
-    inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>): T
+    fun <T> get(field: String, strategy: DeserializationStrategy<T>): T
 
     fun contains(field: String): Boolean
 
     @ImplicitReflectionSerializer
     inline fun <reified T: Any> data(): T
-    inline fun <reified T> data(strategy: DeserializationStrategy<T>): T
+    fun <T> data(strategy: DeserializationStrategy<T>): T
 
     val exists: Boolean
     val id: String
