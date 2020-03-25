@@ -62,7 +62,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(commonMain)
             dependencies {
-                api("com.google.firebase:firebase-auth:19.2.0")
+                api("com.google.firebase:firebase-auth:19.3.0")
             }
         }
 
