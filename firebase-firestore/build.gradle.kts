@@ -99,7 +99,7 @@ tasks {
             val into = File("$buildDir/node_module/${project.name}.js")
             into.createNewFile()
             into.writeText(from.readText()
-                .replace("require('firebase-", "require('@teamhubapp/firebase-")
+                .replace("require('firebase-", "require('@gitlive/firebase-")
 //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
 )
         }
