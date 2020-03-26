@@ -4,7 +4,7 @@
 /.idea/
 local.properties
 /**/*.iml
-
+*.iml
 firebase-app/src/iosMain/c_interop/modules/
 firebase-functions/src/iosMain/c_interop/modules/
 firebase-auth/src/iosMain/c_interop/modules/
