@@ -17,7 +17,7 @@ val minSdkVersion by extra(14)
 
 subprojects {
 
-    group = "dev.gitlive.firebase"
+    group = "dev.gitlive"
 
     repositories {
         mavenLocal()
