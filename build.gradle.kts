@@ -26,6 +26,54 @@ subprojects {
         jcenter()
     }
 
+
+    tasks {
+
+        val copyReadMe by registering(Copy::class) {
+            from(rootProject.file("README.md"))
+            into(file("$buildDir/node_module"))
+        }
+
+        val copyPackageJson by registering(Copy::class) {
+            from(file("package.json"))
+            into(file("$buildDir/node_module"))
+        }
+
+        val copyJS by registering {
+            doLast {
+                val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
+                val into = File("$buildDir/node_module/${project.name}.js")
+                into.createNewFile()
+                into.writeText(from.readText()
+                    .replace("require('firebase-", "require('@gitlive/firebase-")
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+                )
+            }
+        }
+
+        val copySourceMap by registering(Copy::class) {
+            from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
+            into(file("$buildDir/node_module"))
+        }
+
+        val publishToNpm by registering(Exec::class) {
+            doFirst {
+                if(!File("$buildDir/node_module").exists()) {
+                    mkdir("$buildDir/node_module")
+                }
+            }
+
+            val buildTask = project.tasks.names.find{
+              it.equals("build")
+            }
+
+            dependsOn(buildTask, copyPackageJson, copyJS, copySourceMap, copyReadMe)
+            workingDir("$buildDir/node_module")
+            //commandLine("npm", "publish")
+            commandLine("ls")
+        }
+    }
+
 //    tasks.withType<KotlinCompile<*>> {
 //        kotlinOptions.freeCompilerArgs += listOf(
 //            "-Xuse-experimental=kotlin.Experimental",
@@ -50,5 +98,6 @@ subprojects {
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
         }
     }
+
 }
 

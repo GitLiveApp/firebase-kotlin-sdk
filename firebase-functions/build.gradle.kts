@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id("com.android.library")
@@ -83,44 +82,6 @@ kotlin {
         cocoapods {
             summary = ""
             homepage = ""
-        }
-    }
-}
-
-tasks {
-    val copyPackageJson by registering(Copy::class) {
-        from(file("package.json"))
-        into(file("$buildDir/node_module"))
-    }
-
-    val copyJS by registering {
-        doLast {
-            val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
-            val into = File("$buildDir/node_module/${project.name}.js")
-            into.createNewFile()
-            into.writeText(from.readText()
-                .replace("require('firebase-", "require('@gitlive/firebase-")
-//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
-)
-        }
-    }
-
-    val copySourceMap by registering(Copy::class) {
-        from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
-        into(file("$buildDir/node_module"))
-    }
-
-    val publishToNpm by registering(Exec::class) {
-        doFirst {
-            mkdir("$buildDir/node_module")
-        }
-
-        dependsOn(copyPackageJson, copyJS, copySourceMap)
-        workingDir("$buildDir/node_module")
-        if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
-        } else {
-            commandLine("npm", "publish", "--registry  http://localhost:4873")
         }
     }
 }
