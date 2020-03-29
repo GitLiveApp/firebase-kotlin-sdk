@@ -17,6 +17,8 @@ Asynchronous operations that return a single or no value are represented by susp
 
 `suspend fun signInWithCustomToken(token: String): AuthResult`
 
+Note in the case of functions which do not return a value the use of suspending functions means the default behavior when calling these functions is to wait for them to complete
+
 <h4><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h4>
 
 Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly Invoked callbacks or listeners, for example:
