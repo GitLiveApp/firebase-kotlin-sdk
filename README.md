@@ -90,10 +90,24 @@ To improve readability functions such as the Cloud Firestore query operators use
 ```kotlin
 citiesRef.whereEqualTo("state", "CA")
 citiesRef.whereArrayContains("regions", "west_coast")
-
 //...becomes...
 citiesRef.where("state", equalTo = "CA")
 citiesRef.where("regions", arrayContains = "west_coast")
 ````
 
-<h2><a href="https://kotlinlang.org/docs/reference/multiplatform.html">Multiplatform</a></h2>
+## Multiplatform
+
+The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
+
+In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` properties which holds the  equivalent object of the underlying official Firebase SDK. 
+
+These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
+
+```kotlin
+  Firebase.firestore.android.firestoreSettings = FirebaseFirestoreSettings.Builder(Firebase.firestore.android.firestoreSettings)
+          .setPersistenceEnabled(false)
+          .build()
+```
+
+
+
