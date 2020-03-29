@@ -122,7 +122,7 @@ If you are building a Kotlin multiplatform library which will be consumed from J
   "@gitlive/firebase-firestore": "0.1.0",
   "@gitlive/firebase-functions": "0.1.0",
   "@gitlive/firebase-storage": "0.1.0",
-  "@gitlive/firebase-messaging": "0.1.0",
+  "@gitlive/firebase-messaging": "0.1.0"
 }
 ```
 
