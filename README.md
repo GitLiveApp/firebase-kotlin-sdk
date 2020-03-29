@@ -26,7 +26,7 @@ Is the Firebase library or API you need missing? [Create an issue](https://githu
 
 Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get the full power of Kotlin including coroutines and serialization!
 
-<h4><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h4>
+<h3><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h3>
 
 Asynchronous operations that return a single or no value are represented by suspending functions in the SDK instead of callbacks, listeners or OS specific types such as [Task](https://developer.android.com/reference/com/google/android/play/core/tasks/Task), for example:
 
@@ -43,7 +43,7 @@ GlobalScope.launch {
 }
 ```
 
-<h4><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h4>
+<h3><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h3>
 
 Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly invoked callbacks or listeners, for example:
 
@@ -55,7 +55,7 @@ The flows are cold, which means a new listener is added every time a terminal op
 
 The listener is removed once the flow [completes](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-completion) or is [cancelled](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-cancellation).
 
-<h4><a href="https://github.com/Kotlin/kotlinx.serialization">Serialization</a></h4>
+<h3><a href="https://github.com/Kotlin/kotlinx.serialization">Serialization</a></h3>
 
 The official Firebase SDKs use different platform-specific ways to support writing data with and without custom classes in [Cloud Firestore](https://firebase.google.com/docs/firestore/manage-data/add-data#custom_objects), [Realtime Database](https://firebase.google.com/docs/database/android/read-and-write#basic_write) and [Functions](https://firebase.google.com/docs/functions/callable).
 
@@ -83,6 +83,17 @@ db.collection("cities").document("LA").set(City.serializer(), city)
 
 You can also omit the serializer for classes that does not have generic type arguments, these functions are marked [`@ImplicitReflectionSerializer`](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#implicit-reflection-serializers) and their usage is discouraged in general because it is implicit and uses reflection (and therefore not working on Kotlin/Native), but may be useful shorthand in some cases.
 
-<h4><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h4>
+<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
 
-<h3><a href="https://kotlinlang.org/docs/reference/multiplatform.html">Multiplatform</a></h3>
+To improve readability functions such as the Cloud Firestore query operators use named arguments:
+
+```kotlin
+citiesRef.whereEqualTo("state", "CA")
+citiesRef.whereArrayContains("regions", "west_coast")
+
+//...becomes...
+citiesRef.where("state", equalTo = "CA")
+citiesRef.where("regions", arrayContains = "west_coast")
+````
+
+<h2><a href="https://kotlinlang.org/docs/reference/multiplatform.html">Multiplatform</a></h2>
