@@ -51,13 +51,37 @@ Asynchronous streams of values are represented by Flows in the SDK instead of r
 val snapshots: Flow<DocumentSnapshot>
 ```
 
-The flows are cold, which means a new listener is added every time a terminal operator is applied to the resulting flow. A buffer with the [default size](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-channel/-b-u-f-f-e-r-e-d.html) is used to buffer values received from the listener, use the [`buffer` operator](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/buffer.html) on the flow to specify a user-defined value and to control what happens when data is produced faster than consumed, i.e. to control the back-pressure behavior. 
+The flows are cold, which means a new listener is added every time a terminal operator is applied to the resulting flow. A buffer with the [default size](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-channel/-b-u-f-f-e-r-e-d.html) is used to buffer values received from the listener, use the [`buffer` operator](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/buffer.html) on the flow to specify a user-defined value and to control what happens when data is produced faster than consumed, i.e. to control the back-pressure behavior. Often you are only interested in the latest value received, in this case you can use the [`conflate` operator](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/conflate.html) to disable buffering.
 
-Often you are only interested in the latest value received, in this case you can use the [`conflate` operator](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/conflate.html) to disable buffering.
-
-The listner is removed once the flow [completes](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-completion) or is [cancelled](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-cancellation).
+The listener is removed once the flow [completes](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-completion) or is [cancelled](https://kotlinlang.org/docs/reference/coroutines/flow.html#flow-cancellation).
 
 <h4><a href="https://github.com/Kotlin/kotlinx.serialization">Serialization</a></h4>
+
+The official Firebase SDKs use different platform-specific ways to support writing data with and without custom classes in [Cloud Firestore](https://firebase.google.com/docs/firestore/manage-data/add-data#custom_objects), [Realtime Database](https://firebase.google.com/docs/database/android/read-and-write#basic_write) and [Functions](https://firebase.google.com/docs/functions/callable).
+
+The Firebase Kotlin SDK uses Kotlin serialization to read and write custom classes to Firebase. To use Kotlin serialization in your project add the plugin to your gradle file:
+
+```groovy
+plugins {
+    kotlin("multiplatform") // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.3.70"
+}
+```
+
+Then mark you custom classes `@Serializable`:
+
+```kotlin
+@Serializable
+data class City(val name: String)
+```
+
+Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#obtaining-serializers) to the SDK:
+
+```kotlin
+db.collection("cities").document("LA").set(City.serializer(), city)
+```
+
+You can also omit the serializer for classes that does not have generic type arguments, these functions are marked [`@ImplicitReflectionSerializer`](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#implicit-reflection-serializers) and their usage is discouraged in general because it is implicit and uses reflection (and therefore not working on Kotlin/Native), but may be useful shorthand in some cases.
 
 <h4><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h4>
 
