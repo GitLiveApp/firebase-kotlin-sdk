@@ -9,6 +9,25 @@ The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar 
 
 ## Kotlin-first design
 
+Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get to use the full power of Kotlin.
+
+<h4><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h4>
+
+Asynchronous operations that return a single or no value are represented by suspending functions in the SDK instead of callbacks, listeners or OS specific types such as [Task](https://developer.android.com/reference/com/google/android/play/core/tasks/Task), for example:
+
+`suspend fun signInWithCustomToken(token: String): AuthResult`
+
+<h4><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h4>
+
+Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly Invoked callbacks or listeners, for example:
+
+`val snapshots: Flow<DocumentSnapshot>`
+
+<h4><a href="https://github.com/Kotlin/kotlinx.serialization">Serialization</a></h4>
+
+<h4><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h4>
+
+<h3><a href="https://kotlinlang.org/docs/reference/multiplatform.html">Multiplatform</a></h3>
 
 ## Available libraries
 
@@ -16,10 +35,10 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                                 | Gradle Dependency                                                                                                                   | API Coverage                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | :-----------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.teamhub.firebase:firebase-auth:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-auth/0.1.0)           | [![0-50%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/teamhub/firebase/auth/auth.kt) [![Android: 50%](https://img.shields.io/badge/Android-50%25-green?style=flat-square)](/firebase-auth/src/androidMain/kotlin/dev/teamhub/firebase/auth/auth.kt) [![JS: 50%](https://img.shields.io/badge/Web-50%25-red?style=flat-square)](/firebase-auth/src/jsMain/kotlin/dev/teamhub/firebase/auth/auth.kt) [![iOS: 0%](https://img.shields.io/badge/iOS-0%25-blue?style=flat-square)](/firebase-auth/src/iosMain/kotlin/dev/teamhub/firebase/auth/auth.kt) |
-| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.teamhub.firebase:firebase-database:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-database/0.1.0)   | [![0-50%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/teamhub/firebase/auth/database.kt) [![Android: 50%](https://img.shields.io/badge/Android-50%25-green?style=flat-square)](/firebase-database/src/androidMain/kotlin/dev/teamhub/firebase/database/database.kt) [![JS: 50%](https://img.shields.io/badge/Web-50%25-red?style=flat-square)](/firebase-database/src/jsMain/kotlin/dev/teamhub/firebase/database/database.kt) [![iOS: 0%](https://img.shields.io/badge/iOS-0%25-blue?style=flat-square)](/firebase-database/src/iosMain/kotlin/dev/teamhub/firebase/database/database.kt) |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.teamhub.firebase:firebase-firestore:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-firestore/0.1.0) | [![0-50%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) [![Android: 50%](https://img.shields.io/badge/Android-50%25-green?style=flat-square)](/firebase-auth/src/androidMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) [![JS: 50%](https://img.shields.io/badge/Web-50%25-red?style=flat-square)](/firebase-firestore/src/jsMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) [![iOS: 0%](https://img.shields.io/badge/iOS-0%25-blue?style=flat-square)](/firebase-firestore/src/iosMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) |
-| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.teamhub.firebase:firebase-functions:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-functions/0.1.0) | [![0-50%](https://img.shields.io/badge/-0--50%25-orange?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/teamhub/firebase/functions/functions.kt) [![Android: 50%](https://img.shields.io/badge/Android-50%25-green?style=flat-square)](/firebase-functions/src/androidMain/kotlin/dev/teamhub/firebase/functions/functions.kt) [![JS: 50%](https://img.shields.io/badge/Web-50%25-red?style=flat-square)](/firebase-functions/src/jsMain/kotlin/dev/teamhub/firebase/functions/functions.kt) [![iOS: 0%](https://img.shields.io/badge/iOS-0%25-blue?style=flat-square)](/firebase-functions/src/iosMain/kotlin/dev/teamhub/firebase/functions/functions.kt) |
+| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.teamhub.firebase:firebase-auth:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-auth/0.1.0)           | [![40%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/teamhub/firebase/auth/auth.kt) |
+| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.teamhub.firebase:firebase-database:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-database/0.1.0)   | [![70%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/teamhub/firebase/auth/database.kt) |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.teamhub.firebase:firebase-firestore:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-firestore/0.1.0) | [![60%](https://img.shields.io/badge/-0--50%25-red?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) |
+| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.teamhub.firebase:firebase-functions:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-functions/0.1.0) | [![80%](https://img.shields.io/badge/-0--50%25-orange?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/teamhub/firebase/functions/functions.kt) |
 | [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.teamhub.firebase:firebase-messaging:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-messaging/0.1.0) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
 | [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.teamhub.firebase:firebase-storage:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-storage/0.1.0)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
 
