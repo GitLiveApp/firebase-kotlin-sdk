@@ -5,25 +5,36 @@
   🔓 <a href="https://teamhub.typeform.com/to/uSS8cv">Request Early Access</a>
 <h4></h4>
 
-The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the [Firebase Android SDK Kotlin Extensions](https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/) but it also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting *iOS*, *Android* or *JS*.
+The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the [Firebase Android SDK Kotlin Extensions](https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/) but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting *iOS*, *Android* or *JS*.
 
 ## Kotlin-first design
 
-Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get to use the full power of Kotlin.
+Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get the full power of Kotlin including coroutines and serialization!
 
 <h4><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h4>
 
 Asynchronous operations that return a single or no value are represented by suspending functions in the SDK instead of callbacks, listeners or OS specific types such as [Task](https://developer.android.com/reference/com/google/android/play/core/tasks/Task), for example:
 
-`suspend fun signInWithCustomToken(token: String): AuthResult`
+```kotlin
+suspend fun signInWithCustomToken(token: String): AuthResult
+```
 
-Note in the case of functions which do not return a value the use of suspending functions means the default behavior when calling these functions is to wait for them to complete
+It is important to remember that unlike a callback based API, wating for suspending functions to complete is implicit and so if you don't want to wait for the result you can `launch` a new coroutine:
+
+```kotlin
+//TODO don't use GlobalScope
+GlobalScope.launch {
+  Firebase.auth.signOut()
+}
+```
 
 <h4><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h4>
 
-Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly Invoked callbacks or listeners, for example:
+Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly invoked callbacks or listeners, for example:
 
 `val snapshots: Flow<DocumentSnapshot>`
+
+
 
 <h4><a href="https://github.com/Kotlin/kotlinx.serialization">Serialization</a></h4>
 
