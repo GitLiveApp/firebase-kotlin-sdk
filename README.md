@@ -1,4 +1,4 @@
-<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"></h1>
+<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://teamhub.dev"><img alt="GitHub last commit" src="https://img.shields.io/badge/collaborate-on%20gitlive-blueviolet?style=flat-square"></a></h1>
 <img align="left" width="75px" src="https://avatars2.githubusercontent.com/u/42865805?s=200&v=4"> 
   <b>Built and maintained with 🧡 by <a href="https://teamhub.dev">TeamHub</a></b><br/>
   <i>Real-time code collaboration inside any IDE</i><br/>
