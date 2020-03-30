@@ -95,7 +95,7 @@ citiesRef.where("state", equalTo = "CA")
 citiesRef.where("regions", arrayContains = "west_coast")
 ```
 
-<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Operator overloading</a></h3>
+<h3><a href="https://kotlinlang.org/docs/reference/operator-overloading.html">Operator overloading</a></h3>
 
 In cases where it makes sense, such as Firebase Functions HTTPS Callable, operator overloading is used:
 
