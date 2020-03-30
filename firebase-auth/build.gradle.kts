@@ -30,9 +30,12 @@ kotlin {
             }
         }
     }
+
     android {
         publishLibraryVariants("release", "debug")
     }
+
+    val iosArm32 = iosArm32()
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
 
@@ -70,7 +73,7 @@ kotlin {
         //     kotlin.srcDir("src/androidMain/kotlin")
         // }
 
-        configure(listOf(iosArm64, iosX64)) {
+        configure(listOf(iosArm32, iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))
                 val firebaseAuth by cinterops.creating {

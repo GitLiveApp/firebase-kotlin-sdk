@@ -38,6 +38,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
 
+    val iosArm32 = iosArm32()
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
 
@@ -102,7 +103,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
-        configure(listOf(iosArm64, iosX64)) {
+        configure(listOf(iosArm32, iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))
             }
