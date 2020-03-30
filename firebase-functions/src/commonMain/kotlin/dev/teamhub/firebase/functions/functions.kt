@@ -17,9 +17,9 @@ expect class FirebaseFunctions {
 
 expect class HttpsCallableReference {
     @ImplicitReflectionSerializer
-    suspend fun call(data: Any): HttpsCallableResult
-    suspend fun <T> call(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
-    suspend fun call(): HttpsCallableResult
+    suspend operator fun invoke(data: Any): HttpsCallableResult
+    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T): HttpsCallableResult
+    suspend operator fun invoke(): HttpsCallableResult
 }
 
 expect class HttpsCallableResult {
