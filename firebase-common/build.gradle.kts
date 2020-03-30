@@ -1,17 +1,21 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.61"
+    kotlin("plugin.serialization") version "1.3.70"
     `maven-publish`
 }
 repositories {
     mavenCentral()
     google()
 }
-version = "0.1.0-dev"
+version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -47,6 +51,11 @@ kotlin {
                 jvmTarget = "1.8"
             }
         }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
@@ -60,24 +69,24 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.14.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
         val jsMain by getting {
             dependencies {
 //                implementation(npm("firebase", "6.2.3"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.14.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }
@@ -89,7 +98,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.14.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
         configure(listOf(iosArm64, iosX64)) {
@@ -119,7 +128,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
-                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhubapp/kotlinx-serialization-runtime')")
             )
         }
     }

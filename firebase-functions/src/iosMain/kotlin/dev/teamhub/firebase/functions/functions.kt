@@ -1,16 +1,19 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.functions
 
 import cocoapods.FirebaseFunctions.*
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.ImplicitReflectionSerializer
 import dev.teamhub.firebase.decode
 import dev.teamhub.firebase.encode
-import platform.Foundation.*
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
+import platform.Foundation.*
 
 actual val Firebase.functions
     get() = FirebaseFunctions(FIRFunctions.functions())
@@ -30,12 +33,12 @@ actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
 }
 
 actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {
-    actual suspend fun call() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
+    actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 
-    actual suspend inline fun <reified T> call(data: T) =
+    actual suspend operator fun invoke(data: Any) =
         HttpsCallableResult(ios.awaitResult { callWithObject(encode(data), it) })
 
-    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T) =
         HttpsCallableResult(ios.awaitResult { callWithObject(encode(strategy, data), it) })
 }
 
@@ -44,7 +47,7 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
     actual inline fun <reified T> data() =
         decode<T>(value = ios.data)
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+    actual fun <T> data(strategy: DeserializationStrategy<T>) =
         decode(strategy, ios.data)
 }
 

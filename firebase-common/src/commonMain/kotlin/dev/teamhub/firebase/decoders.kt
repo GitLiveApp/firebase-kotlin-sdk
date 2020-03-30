@@ -1,18 +1,26 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.CompositeDecoder.Companion.READ_ALL
 import kotlinx.serialization.CompositeDecoder.Companion.READ_DONE
-import kotlinx.serialization.internal.UnitDescriptor
-import kotlinx.serialization.internal.nullable
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.modules.EmptyModule
 import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.getContextualOrDefault
 import kotlin.reflect.KClass
 
+@ImplicitReflectionSerializer
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T> decode(strategy: DeserializationStrategy<T> = EmptyModule.getContextualOrDefault(T::class as KClass<Any>).run { if(null is T) nullable else this } as DeserializationStrategy<T>, value: Any?): T {
-    require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${T::class}" }
+inline fun <reified T> decode(value: Any?): T {
+    val strategy = EmptyModule.getContextualOrDefault(T::class as KClass<*>).run { if (null is T) nullable else this }
+    return decode(strategy as DeserializationStrategy<T>, value)
+}
+
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
+    require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value).decode(strategy)
 }
 
@@ -63,6 +71,8 @@ class FirebaseClassDecoder(
 ) : FirebaseCompositeDecoder(size, get) {
     private var index: Int = 0
 
+    override fun decodeSequentially() = false
+
     override fun decodeElementIndex(desc: SerialDescriptor): Int =
         (index until desc.elementsCount)
             .firstOrNull { !desc.isElementOptional(it) || containsKey(desc.getElementName(it)) }
@@ -78,7 +88,9 @@ open class FirebaseCompositeDecoder constructor(
     override val context = EmptyModule
     override val updateMode = UpdateMode.OVERWRITE
 
-    override fun decodeElementIndex(desc: SerialDescriptor) = READ_ALL
+    override fun decodeSequentially() = true
+
+    override fun decodeElementIndex(desc: SerialDescriptor): Int = throw NotImplementedError()
 
     override fun decodeCollectionSize(desc: SerialDescriptor) = size
 
@@ -88,9 +100,9 @@ open class FirebaseCompositeDecoder constructor(
     override fun <T : Any> decodeNullableSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T?>): T? =
         if(decodeNotNullMark(get(desc, index))) decodeSerializableElement(desc, index, deserializer) else decodeNull(get(desc, index))
 
-    fun decodeNullableSerializableElement(index: Int): Any? = get(UnitDescriptor, index)?.let { value ->
-        value.firebaseSerializer().let { decodeSerializableElement(it.descriptor, index, it) }
-    }
+//    fun decodeNullableSerializableElement(index: Int): Any? = get(UnitDescriptor, index)?.let { value ->
+//        value.firebaseSerializer().let {  decodeSerializableElement<Any>(it.descriptor, index, it) }
+//    }
 
     override fun <T> updateSerializableElement(desc: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>, old: T): T =
         deserializer.deserialize(FirebaseDecoder(get(desc, index)))
@@ -118,6 +130,8 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeUnitElement(desc: SerialDescriptor, index: Int) = decodeUnit(get(desc, index))
 
+    override fun endStructure(descriptor: SerialDescriptor) {
+    }
 }
 
 private fun decodeString(value: Any?) = value.toString()

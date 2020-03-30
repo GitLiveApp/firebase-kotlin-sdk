@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.database
 
 import com.google.android.gms.tasks.Task
@@ -12,8 +16,6 @@ import dev.teamhub.firebase.decode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
@@ -22,6 +24,7 @@ import kotlinx.serialization.SerializationStrategy
 
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, ServerValue.TIMESTAMP)
+
 fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
     dev.teamhub.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
 
@@ -145,7 +148,7 @@ actual class DatabaseReference internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
@@ -171,7 +174,7 @@ actual class DataSnapshot internal constructor(val android: com.google.firebase.
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)
 
-    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+    actual fun <T> value(strategy: DeserializationStrategy<T>) =
         decode(strategy, android.value)
 
     actual fun child(path: String) = DataSnapshot(android.child(path))
@@ -191,12 +194,12 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend inline fun <reified T : Any> setValue(value: T) =
+    actual suspend fun setValue(value: Any) =
         android.setValue(encode(value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}

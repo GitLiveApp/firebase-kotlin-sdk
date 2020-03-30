@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.database
 
 import dev.teamhub.firebase.Firebase
@@ -56,7 +60,7 @@ expect class DatabaseReference : Query {
     fun onDisconnect(): OnDisconnect
     @ImplicitReflectionSerializer
     suspend fun setValue(value: Any?)
-    suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T)
     @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
     suspend fun removeValue()
@@ -67,7 +71,7 @@ expect class DataSnapshot {
     val key: String?
     @ImplicitReflectionSerializer
     inline fun <reified T> value(): T
-    inline fun <reified T> value(strategy: DeserializationStrategy<T>): T
+    fun <T> value(strategy: DeserializationStrategy<T>): T
     fun child(path: String): DataSnapshot
     val children: Iterable<DataSnapshot>
 }
@@ -82,8 +86,8 @@ expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
     @ImplicitReflectionSerializer
-    suspend inline fun <reified T: Any> setValue(value: T)
-    suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T)
+    suspend fun setValue(value: Any)
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T)
     @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase
 
 import kotlinx.serialization.CompositeDecoder
@@ -8,7 +12,7 @@ import kotlin.js.Json
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 actual fun FirebaseDecoder.structureDecoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(desc.kind as StructureKind) {
-    StructureKind.CLASS -> (value as Json).let { json ->
+    StructureKind.CLASS, StructureKind.OBJECT -> (value as Json).let { json ->
         FirebaseClassDecoder(js("Object").keys(value).length as Int, { json[it] != undefined }) {
                 desc, index -> json[desc.getElementName(index)]
         }

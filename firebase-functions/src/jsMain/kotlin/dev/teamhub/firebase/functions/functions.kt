@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.functions
 
 import dev.teamhub.firebase.*
@@ -26,13 +30,13 @@ actual class FirebaseFunctions internal constructor(val js: firebase.functions.F
 @Suppress("UNCHECKED_CAST")
 actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) {
 
-    actual suspend fun call() =
+    actual suspend operator fun invoke() =
         rethrow { HttpsCallableResult(js().await()) }
 
-    actual suspend inline fun <reified T> call(data: T) =
+    actual suspend operator fun invoke(data: Any) =
         rethrow { HttpsCallableResult(js(encode(data)).await()) }
 
-    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T) =
         rethrow { HttpsCallableResult(js(encode(strategy, data)).await()) }
 }
 
@@ -41,7 +45,7 @@ actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCal
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+    actual fun <T> data(strategy: DeserializationStrategy<T>) =
         rethrow { decode(strategy, js.data) }
 
 }
