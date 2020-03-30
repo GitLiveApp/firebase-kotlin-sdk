@@ -1,7 +1,10 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
-import dev.teamhub.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
