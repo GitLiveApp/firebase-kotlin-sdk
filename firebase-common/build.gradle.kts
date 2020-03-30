@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
@@ -11,6 +15,7 @@ repositories {
     mavenCentral()
     google()
 }
+
 version = "0.1.1-dev"
 
 android {
@@ -48,6 +53,11 @@ kotlin {
     //             jvmTarget = "1.8"
     //         }
     //     }
+    //     val test by compilations.getting {
+    //         kotlinOptions {
+    //             jvmTarget = "1.8"
+    //         }
+    //     }
     // }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
@@ -61,7 +71,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             }
         }
         val androidMain by getting {
@@ -70,37 +80,30 @@ kotlin {
                 api("com.google.firebase:firebase-common:19.3.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
-            kotlin.srcDir("src/androidMain/kotlin")
         }
         val androidTest by getting {
             dependencies {
-                implementation(kotlin("test"))
                 implementation(kotlin("test-junit"))
             }
         }
-        val jsMain by getting {
-            dependsOn(commonMain)
-            dependencies {
-                // implementation(npm("firebase", "6.2.3"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
-            }
-        }
+
         // val jvmMain by getting {
         //     dependencies {
-        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+        //         api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
         //     }
         // }
-        // val jvmTest by getting {
-        //     dependencies {
-        //         implementation(kotlin("test"))
-        //         implementation(kotlin("test-junit"))
-        //     }
-        //     kotlin.srcDir("src/androidTest/kotlin")
-        // }
+
+        val jsMain by getting {
+            dependencies {
+//                implementation(npm("firebase", "6.2.3"))
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+            }
+        }
+
         val iosMain by getting {
             dependsOn(commonMain)
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
         configure(listOf(iosArm32, iosArm64, iosX64)) {
@@ -130,7 +133,7 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
-                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhubapp/kotlinx-serialization-runtime')")
             )
         }
     }

@@ -1,6 +1,6 @@
 {
   "name": "@teamhubapp/firebase-common",
-  "version": "0.1.0-dev14",
+  "version": "0.1.0-beta6",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-common.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "firebase": "6.2.3",
     "kotlin": "1.3.70",
     "kotlinx-coroutines-core": "1.3.4",
-    "@cachet/kotlinx-serialization-runtime": "0.20.0"
+    "kotlinx-serialization-kotlinx-serialization-runtime": "0.20.0"
   }
 }
 

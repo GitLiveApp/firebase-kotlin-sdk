@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.functions
 
 import dev.teamhub.firebase.Firebase
@@ -34,12 +38,12 @@ actual class FirebaseFunctions internal constructor(val android: com.google.fire
 
 @InternalSerializationApi
 actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) {
-    actual suspend fun call() = HttpsCallableResult(android.call().await())
+    actual suspend operator fun invoke() = HttpsCallableResult(android.call().await())
 
-    actual suspend inline fun <reified T> call(data: T) =
+    actual suspend operator fun invoke(data: Any) =
         HttpsCallableResult(android.call(encode(data)).await())
 
-    actual suspend inline fun <reified T> call(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T) =
         HttpsCallableResult(android.call(encode(strategy, data)).await())
 }
 
@@ -48,7 +52,7 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual inline fun <reified T> data() =
         decode<T>(value = android.data)
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) =
+    actual fun <T> data(strategy: DeserializationStrategy<T>) =
         decode(strategy, android.data)
 }
 

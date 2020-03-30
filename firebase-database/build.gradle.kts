@@ -56,7 +56,7 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
             }
         }
         val androidMain by getting {
@@ -67,15 +67,13 @@ kotlin {
             }
         }
         // val jvmMain by getting {
-        //     dependencies {
-        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-        //     }
         //     kotlin.srcDir("src/androidMain/kotlin")
         // }
-        val jsMain by getting {
+        val jsMain by getting {}
+        val iosMain by getting {
             dependsOn(commonMain)
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
 
@@ -110,8 +108,8 @@ tasks {
             into.createNewFile()
             into.writeText(from.readText()
                 .replace("require('firebase-", "require('@teamhubapp/firebase-")
-                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@cachet/kotlinx-serialization-runtime')")
-            )
+//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhub/kotlinx-serialization-runtime')")
+)
         }
     }
 

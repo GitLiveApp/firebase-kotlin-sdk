@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase
 
 import kotlinx.serialization.CompositeDecoder
@@ -6,7 +10,7 @@ import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.StructureKind
 
 actual fun FirebaseDecoder.structureDecoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(desc.kind as StructureKind) {
-        StructureKind.CLASS -> (value as Map<*, *>).let { map ->
+        StructureKind.CLASS, StructureKind.OBJECT -> (value as Map<*, *>).let { map ->
             FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
         }
         StructureKind.LIST -> (value as List<*>).let {

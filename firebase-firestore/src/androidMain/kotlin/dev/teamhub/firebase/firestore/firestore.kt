@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 @file:JvmName("android")
 package dev.teamhub.firebase.firestore
 
@@ -47,38 +51,38 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 @InternalSerializationApi
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) = when(merge) {
+    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
         true -> android.set(documentRef.android, encode(data)!!, SetOptions.merge())
         false -> android.set(documentRef.android, encode(data)!!)
     }.let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) = when(merge) {
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) = when(merge) {
         true -> android.set(documentRef.android, encode(strategy, data)!!, SetOptions.merge())
         false -> android.set(documentRef.android, encode(strategy, data)!!)
     }.let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         android.set(documentRef.android, encode(strategy, data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(strategy, data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+    actual fun update(documentRef: DocumentReference, data: Any) =
         android.update(documentRef.android, encode(data) as Map<String, Any>).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         android.update(documentRef.android, encode(strategy, data) as Map<String, Any>).let { this }
 
     @JvmName("updateFields")
@@ -115,20 +119,20 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 @InternalSerializationApi
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, merge: Boolean) = when(merge) {
+    actual inline fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
         true -> android.set(documentRef.android, encode(data)!!, SetOptions.merge())
         false -> android.set(documentRef.android, encode(data)!!)
     }.let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFields: String) =
+    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun <reified T: Any> set(documentRef: DocumentReference, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
-    actual inline fun <reified T> set(
+    actual fun <T> set(
         documentRef: DocumentReference,
         strategy: SerializationStrategy<T>,
         data: T,
@@ -138,20 +142,20 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         false -> android.set(documentRef.android, encode(strategy, data)!!)
     }.let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         android.set(documentRef.android, encode(strategy, data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(strategy, data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T: Any> update(documentRef: DocumentReference, data: T) =
+    actual fun update(documentRef: DocumentReference, data: Any) =
         android.update(documentRef.android, encode(data) as Map<String, Any>).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
         android.update(documentRef.android, encode(strategy, data) as Map<String, Any>).let { this }
 
     @JvmName("updateFields")
@@ -194,38 +198,38 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
-    actual suspend inline fun <reified T: Any> set(data: T, merge: Boolean) = when(merge) {
+    actual suspend fun set(data: Any, merge: Boolean) = when(merge) {
         true -> android.set(encode(data)!!, SetOptions.merge())
         false -> android.set(encode(data)!!)
     }.await().run { Unit }
 
-    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFields: String) =
+    actual suspend fun set(data: Any, vararg mergeFields: String) =
         android.set(encode(data)!!, SetOptions.mergeFields(*mergeFields))
             .await().run { Unit }
 
-    actual suspend inline fun <reified T: Any> set(data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath) =
         android.set(encode(data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .await().run { Unit }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) = when(merge) {
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) = when(merge) {
         true -> android.set(encode(strategy, data)!!, SetOptions.merge())
         false -> android.set(encode(strategy, data)!!)
     }.await().run { Unit }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         android.set(encode(strategy, data)!!, SetOptions.mergeFields(*mergeFields))
             .await().run { Unit }
 
-    actual suspend inline fun <reified T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
         android.set(encode(strategy, data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .await().run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend inline fun <reified T: Any> update(data: T) =
+    actual suspend fun update(data: Any) =
         android.update(encode(data) as Map<String, Any>).await().run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend inline fun <reified T> update(strategy: SerializationStrategy<T>, data: T) =
+    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T) =
         android.update(encode(strategy, data) as Map<String, Any>).await().run { Unit }
 
     @JvmName("updateFields")
@@ -309,10 +313,10 @@ actual class CollectionReference(override val android: com.google.firebase.fires
     actual val path: String
         get() = android.path
 
-    actual suspend inline fun <reified T : Any> add(data: T) =
+    actual suspend fun add(data: Any) =
         DocumentReference(android.add(encode(data)!!).await())
 
-    actual suspend inline fun <reified T> add(data: T, strategy: SerializationStrategy<T>) =
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>) =
         DocumentReference(android.add(encode(strategy, data)!!).await())
 }
 
@@ -337,11 +341,11 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
     actual inline fun <reified T: Any> data() = decode<T>(value = android.data)
 
-    actual inline fun <reified T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual inline fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
 
     actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
 
-    actual inline fun <reified T> get(field: String, strategy: DeserializationStrategy<T>) =
+    actual inline fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
         decode(strategy, android.get(field))
 
     actual fun contains(field: String) = android.contains(field)

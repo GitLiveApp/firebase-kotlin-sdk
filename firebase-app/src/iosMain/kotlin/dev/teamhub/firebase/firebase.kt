@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase
 
 import cocoapods.FirebaseCore.*
@@ -29,7 +33,8 @@ actual class FirebaseApp internal constructor(val ios: FIRApp) {
         get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 }
 
-actual fun Firebase.apps(context: Any?) = FIRApp.allApps()!!
+actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
+    .orEmpty()
     .values
     .map { FirebaseApp(it as FIRApp) }
 

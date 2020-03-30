@@ -1,17 +1,22 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase
 
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.UnitSerializer
 import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 
-@ImplicitReflectionSerializer
+@OptIn(ImplicitReflectionSerializer::class)
 @Suppress("UNCHECKED_CAST")
-fun Any.firebaseSerializer() = (this::class.serializerOrNull() ?: this::class.serializerOrNull() ?: when(this) {
+fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(this) {
     is Map<*, *> -> FirebaseMapSerializer()
     is List<*> -> FirebaseListSerializer()
     is Set<*> -> FirebaseListSerializer()
     else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
-}) as KSerializer<Any>
+}) as SerializationStrategy<T>
 
 @ImplicitReflectionSerializer
 class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
@@ -21,36 +26,40 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
     override val descriptor = object : SerialDescriptor {
         override val kind = StructureKind.MAP
-        override val serialName: String = "kotlin.Map<String, Any>"
-        override fun getElementAnnotations(index: Int) = throw NotImplementedError()
-        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
+        override val serialName = "kotlin.Map<String, Any>"
+        override val elementsCount get() = map.size
         override fun getElementIndex(name: String) = keys.indexOf(name)
         override fun getElementName(index: Int) = keys[index]
-        override fun isElementOptional(index: Int) = keys.getOrNull(index).isNullOrEmpty()
-
-        override val elementsCount get() = map.size
+        override fun getElementAnnotations(index: Int) = emptyList<Annotation>()
+        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
+        override fun isElementOptional(index: Int) = false
     }
 
     @Suppress("UNCHECKED_CAST")
+    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
         map = value
         keys = value.keys.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, value.size)
         keys.forEachIndexed { index, key ->
-            val itemValue = map.getValue(key)
-            val serializer = itemValue?.firebaseSerializer() ?: UnitSerializer().nullable as KSerializer<Any>
+            val item = map.getValue(key)
+            val serializer = (item?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any?>
+            String.serializer().let {
+                collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
+            }
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index, serializer, itemValue
+                serializer.descriptor, index * 2 + 1, serializer, item
             )
         }
+        collectionEncoder.endStructure(descriptor)
     }
 
     override fun deserialize(decoder: Decoder): Map<String, Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
         val map = mutableMapOf<String, Any?>()
         for(index in 0 until collectionDecoder.decodeCollectionSize(descriptor) * 2 step 2) {
-            map[collectionDecoder.decodeNullableSerializableElement(index) as String] =
-                collectionDecoder.decodeNullableSerializableElement(index + 1)
+//            map[collectionDecoder.decodeNullableSerializableElement(index) as String] =
+//                collectionDecoder.decodeNullableSerializableElement(index + 1)
         }
         return map
     }
@@ -61,36 +70,37 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     lateinit var list: List<Any?>
 
-    override val descriptor= object : SerialDescriptor {
+    override val descriptor = object : SerialDescriptor {
         override val kind = StructureKind.LIST
         override val serialName = "kotlin.List<Any>"
-        override fun getElementAnnotations(index: Int) = throw NotImplementedError()
-        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
+        override val elementsCount get() = list.size
         override fun getElementIndex(name: String) = throw NotImplementedError()
         override fun getElementName(index: Int) = throw NotImplementedError()
-        override fun isElementOptional(index: Int) = throw NotImplementedError()
-
-        override val elementsCount get() = list.size
+        override fun getElementAnnotations(index: Int) = emptyList<Annotation>()
+        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
+        override fun isElementOptional(index: Int) = false
     }
 
     @Suppress("UNCHECKED_CAST")
+    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Iterable<Any?>) {
         list = value.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, list.size)
         list.forEachIndexed { index, item ->
-            val serializer = item?.firebaseSerializer() ?: UnitSerializer().nullable as KSerializer<Any>
+            val serializer = (item?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any>
             collectionEncoder.encodeNullableSerializableElement(
                 serializer.descriptor, index, serializer, item
             )
         }
+        collectionEncoder.endStructure(descriptor)
     }
 
     override fun deserialize(decoder: Decoder): List<Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
         val list = mutableListOf<Any?>()
-        list.forEachIndexed { index, _ ->
-            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
-        }
+//        list.forEachIndexed { index, _ ->
+//            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
+//        }
         return list
     }
 }

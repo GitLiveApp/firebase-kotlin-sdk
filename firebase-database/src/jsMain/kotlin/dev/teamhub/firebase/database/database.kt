@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.database
 
 import dev.teamhub.firebase.*
@@ -103,7 +107,7 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
     }
 
     @InternalSerializationApi
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
 }
 
@@ -112,7 +116,7 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
     actual inline fun <reified T> value() =
         rethrow { decode<T>(value = js.`val`()) }
 
-    actual inline fun <reified T> value(strategy: DeserializationStrategy<T>) =
+    actual inline fun <T> value(strategy: DeserializationStrategy<T>) =
         rethrow { decode(strategy, js.`val`()) }
 
     actual val exists get() = rethrow { js.exists() }
@@ -137,11 +141,11 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
         rethrow { js.update(encode(update)).await() }
 
     @InternalSerializationApi
-    actual suspend inline fun <reified T : Any> setValue(value: T) =
+    actual suspend fun setValue(value: Any) =
         rethrow { js.set(encode(value)).await() }
 
     @InternalSerializationApi
-    actual suspend inline fun <reified T> setValue(strategy: SerializationStrategy<T>, value: T) =
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         rethrow { js.set(encode(strategy, value)).await() }
 }
 
