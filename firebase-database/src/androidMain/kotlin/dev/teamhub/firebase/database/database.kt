@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.database
 
 import com.google.android.gms.tasks.Task
@@ -11,10 +15,7 @@ import dev.teamhub.firebase.database.ChildEvent.Type
 import dev.teamhub.firebase.decode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await

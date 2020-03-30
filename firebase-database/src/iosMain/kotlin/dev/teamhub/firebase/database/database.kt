@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.database
 
 import cocoapods.FirebaseDatabase.*
@@ -11,18 +15,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
-import kotlin.collections.Iterable
-import kotlin.collections.Map
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.map
-import kotlin.collections.mapValues
 
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, FIRServerValue.timestamp())

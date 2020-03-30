@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.teamhub.firebase.auth
 
 import cocoapods.FirebaseAuth.*
@@ -5,10 +9,10 @@ import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.FirebaseException
 import kotlinx.cinterop.*
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
-import platform.Foundation.*
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import platform.Foundation.*
 
 
 actual val Firebase.auth
