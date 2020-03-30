@@ -14,7 +14,7 @@ The following libraries are available for the various Firebase products.
 | Service or Product	                                                                 | Gradle Dependency                                                                                                                   | API Coverage                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | :-----------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive.firebase:firebase-auth:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-auth/0.1.0)           | [![40%](https://img.shields.io/badge/-40%25-red?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/teamhub/firebase/auth/auth.kt) |
-| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive.firebase:firebase-database:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-database/0.1.0)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/teamhub/firebase/auth/database.kt) |
+| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive.firebase:firebase-database:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-database/0.1.0)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/teamhub/firebase/database/database.kt) |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive.firebase:firebase-firestore:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-firestore/0.1.0) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/teamhub/firebase/firestore/firestore.kt) |
 | [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive.firebase:firebase-functions:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-functions/0.1.0) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/teamhub/firebase/functions/functions.kt) |
 | [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive.firebase:firebase-messaging:0.1.0`](https://mvnrepository.com/artifact/dev.teamhub.firebase/firebase-messaging/0.1.0) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
@@ -93,7 +93,17 @@ citiesRef.whereArrayContains("regions", "west_coast")
 //...becomes...
 citiesRef.where("state", equalTo = "CA")
 citiesRef.where("regions", arrayContains = "west_coast")
-````
+```
+
+<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Operator overloading</a></h3>
+
+In cases where it makes sense, such as Firebase Functions HTTPS Callable, operator overloading is used:
+
+```kotlin
+    val addMessage = functions.getHttpsCallable("addMessage")
+    //In the official android Firebase SDK this would be addMessage.call(...)
+    addMessage(mapOf("text" to text, "push" to true))
+```
 
 ## Multiplatform
 
