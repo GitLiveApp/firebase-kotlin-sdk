@@ -7,20 +7,18 @@ package dev.teamhub.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 
-@InternalSerializationApi
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
     FirebaseEncoder(positiveInfinity).apply { encode(strategy, value) }.value//.also { println("encoded $it") }
 
-@InternalSerializationApi
+@OptIn(ImplicitReflectionSerializer::class)
 @ImplicitReflectionSerializer
 fun encode(value: Any?, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
     FirebaseEncoder(positiveInfinity).apply { encode(it.firebaseSerializer(), it) }.value
 }
 
-@InternalSerializationApi
+@OptIn(ImplicitReflectionSerializer::class)
 expect fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
 
-@InternalSerializationApi
 class FirebaseEncoder(positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
 
     var value: Any? = null
@@ -90,8 +88,6 @@ abstract class TimestampEncoder(internal val positiveInfinity: Any) {
     }
 }
 
-@InternalSerializationApi
-@ImplicitReflectionSerializer
 open class FirebaseCompositeEncoder constructor(
     positiveInfinity: Any,
     private val end: () -> Unit = {},

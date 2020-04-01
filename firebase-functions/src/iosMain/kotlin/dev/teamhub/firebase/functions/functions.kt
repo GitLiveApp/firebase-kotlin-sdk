@@ -11,34 +11,27 @@ import dev.teamhub.firebase.FirebaseException
 import dev.teamhub.firebase.decode
 import dev.teamhub.firebase.encode
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 
-@InternalSerializationApi
 actual val Firebase.functions
     get() = FirebaseFunctions(FIRFunctions.functions())
 
-@InternalSerializationApi
 actual fun Firebase.functions(region: String) =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
-@InternalSerializationApi
 actual fun Firebase.functions(app: FirebaseApp) =
     FirebaseFunctions(FIRFunctions.functionsForApp(app.ios))
 
-@InternalSerializationApi
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region))
 
-@InternalSerializationApi
 actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
 }
 
-@InternalSerializationApi
 actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {
     actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 

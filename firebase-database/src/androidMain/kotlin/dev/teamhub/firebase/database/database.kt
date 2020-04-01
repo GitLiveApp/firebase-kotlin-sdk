@@ -22,14 +22,12 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
-@InternalSerializationApi
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, ServerValue.TIMESTAMP)
-@InternalSerializationApi
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
+
+fun <T> encode(strategy: SerializationStrategy<T>, value: T): Any? =
     dev.teamhub.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -149,18 +147,15 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
-    @InternalSerializationApi
     actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    @InternalSerializationApi
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    @InternalSerializationApi
     @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         android.updateChildren(encode(update) as Map<String, Any?>)
@@ -202,19 +197,16 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    @InternalSerializationApi
     actual suspend fun setValue(value: Any) =
         android.setValue(encode(value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    @InternalSerializationApi
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
         android.setValue(encode(strategy, value))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}
 
-    @InternalSerializationApi
     actual suspend fun updateChildren(update: Map<String, Any?>) =
         android.updateChildren(update.mapValues { (_, it) -> encode(it) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }

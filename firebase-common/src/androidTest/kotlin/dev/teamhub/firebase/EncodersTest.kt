@@ -4,7 +4,6 @@
 
 package dev.teamhub.firebase
 
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
@@ -15,7 +14,6 @@ import kotlin.test.assertEquals
 data class TestData(val map: Map<String, String>, val bool: Boolean = false)
 
 @Suppress("UNCHECKED_CAST")
-@InternalSerializationApi
 class EncodersTest {
     @Test
     fun `encode a map`() {

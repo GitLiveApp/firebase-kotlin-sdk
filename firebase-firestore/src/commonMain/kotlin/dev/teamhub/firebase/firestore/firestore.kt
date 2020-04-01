@@ -10,18 +10,14 @@ import dev.teamhub.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
-@InternalSerializationApi
 expect val Firebase.firestore: FirebaseFirestore
 
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
-@InternalSerializationApi
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
-@InternalSerializationApi
 expect class FirebaseFirestore {
 //    var settings: FirebaseFirestoreSettings
     fun collection(collectionPath: String): CollectionReference
@@ -31,7 +27,6 @@ expect class FirebaseFirestore {
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
 }
 
-@InternalSerializationApi
 expect class Transaction {
 
     @ImplicitReflectionSerializer
@@ -60,7 +55,6 @@ expect class Transaction {
 //    val persistenceEnabled: Boolean = true
 //)
 
-@InternalSerializationApi
 expect open class Query {
     internal fun _where(field: String, equalTo: Any?): Query
     internal fun _where(path: FieldPath, equalTo: Any?): Query
@@ -70,16 +64,11 @@ expect open class Query {
     suspend fun get(): QuerySnapshot
 }
 
-@InternalSerializationApi
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
-@InternalSerializationApi
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
-@InternalSerializationApi
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
-@InternalSerializationApi
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 
-@InternalSerializationApi
 expect class WriteBatch {
     @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false): WriteBatch
@@ -103,7 +92,6 @@ expect class WriteBatch {
     suspend fun commit()
 }
 
-@InternalSerializationApi
 expect class DocumentReference {
 
     val id: String
@@ -132,7 +120,6 @@ expect class DocumentReference {
     suspend fun delete()
 }
 
-@InternalSerializationApi
 expect class CollectionReference : Query {
     val path: String
     @ImplicitReflectionSerializer
@@ -164,12 +151,10 @@ expect enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
-@InternalSerializationApi
 expect class QuerySnapshot {
     val documents: List<DocumentSnapshot>
 }
 
-@InternalSerializationApi
 expect class DocumentSnapshot {
 
     @ImplicitReflectionSerializer
@@ -196,5 +181,3 @@ expect object FieldValue {
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
 }
-
-

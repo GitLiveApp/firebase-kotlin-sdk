@@ -20,7 +20,6 @@ actual val Firebase.auth
 actual fun Firebase.auth(app: FirebaseApp) =
     FirebaseAuth(FIRAuth.authWithApp(app.ios))
 
-
 actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual val currentUser: FirebaseUser?
@@ -39,6 +38,7 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 }
+
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
     actual val user: FirebaseUser?
         get() = ios.user?.let { FirebaseUser(it) }

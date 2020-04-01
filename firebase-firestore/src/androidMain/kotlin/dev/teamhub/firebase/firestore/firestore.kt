@@ -15,18 +15,14 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
-@InternalSerializationApi
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
 
-@InternalSerializationApi
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
-@InternalSerializationApi
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
 //    actual var settings: FirebaseFirestoreSettings
@@ -48,7 +44,6 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 }
 
-@InternalSerializationApi
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
     actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
@@ -116,7 +111,6 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
 }
 
-@InternalSerializationApi
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
 
     actual inline fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
@@ -189,7 +183,6 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         DocumentSnapshot(android.get(documentRef.android))
 }
 
-@InternalSerializationApi
 actual class DocumentReference(val android: com.google.firebase.firestore.DocumentReference) {
 
     actual val id: String
@@ -274,7 +267,6 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     }
 }
 
-@InternalSerializationApi
 actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
@@ -307,7 +299,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 }
-@InternalSerializationApi
+
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
 
     actual val path: String
@@ -326,13 +318,11 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual typealias FirestoreExceptionCode = com.google.firebase.firestore.FirebaseFirestoreException.Code
 
-@InternalSerializationApi
 actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = android.documents.map { DocumentSnapshot(it) }
 }
 
-@InternalSerializationApi
 @Suppress("UNCHECKED_CAST")
 actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) {
 
@@ -362,4 +352,3 @@ actual object FieldValue {
     actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
     actual fun arrayRemove(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayRemove(*elements)
 }
-

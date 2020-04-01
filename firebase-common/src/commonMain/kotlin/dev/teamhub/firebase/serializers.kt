@@ -18,7 +18,6 @@ fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(th
     else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
 }) as SerializationStrategy<T>
 
-@ImplicitReflectionSerializer
 class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
     lateinit var keys: List<String>
@@ -36,7 +35,6 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
         map = value
         keys = value.keys.toList()
@@ -65,7 +63,6 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 }
 
-@ImplicitReflectionSerializer
 class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     lateinit var list: List<Any?>

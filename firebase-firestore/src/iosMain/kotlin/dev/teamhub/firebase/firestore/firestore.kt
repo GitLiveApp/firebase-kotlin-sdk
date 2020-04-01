@@ -16,19 +16,15 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 
-@InternalSerializationApi
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-@InternalSerializationApi
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
 
-@InternalSerializationApi
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
@@ -44,7 +40,6 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, error -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
 }
 
-@InternalSerializationApi
 actual class WriteBatch(val ios: FIRWriteBatch) {
 
     @Suppress("UNCHECKED_CAST")
@@ -92,7 +87,6 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
 
 }
 
-@InternalSerializationApi
 actual class Transaction(val ios: FIRTransaction) {
 
     @Suppress("UNCHECKED_CAST")
@@ -141,7 +135,6 @@ actual class Transaction(val ios: FIRTransaction) {
 
 }
 
-@InternalSerializationApi
 actual class DocumentReference(val ios: FIRDocumentReference) {
 
     actual val id: String
@@ -203,7 +196,6 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     }
 }
 
-@InternalSerializationApi
 actual open class Query(open val ios: FIRQuery) {
 
     actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
@@ -236,7 +228,7 @@ actual open class Query(open val ios: FIRQuery) {
         }
     )
 }
-@InternalSerializationApi
+
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
     actual val path: String
@@ -299,13 +291,11 @@ private fun NSError.toException() = when(domain) {
     else -> FirestoreExceptionCode.UNKNOWN
 }.let { FirebaseFirestoreException(description!!, it) }
 
-@InternalSerializationApi
 actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents
         get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
 }
 
-@InternalSerializationApi
 @Suppress("UNCHECKED_CAST")
 actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 

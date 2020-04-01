@@ -19,43 +19,30 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-@InternalSerializationApi
 fun encode(value: Any?) =
     dev.teamhub.firebase.encode(value, FIRServerValue.timestamp())
 
-@InternalSerializationApi
 fun <T> encode(strategy: SerializationStrategy<T>, value: T): Any? =
     dev.teamhub.firebase.encode(strategy, value, FIRServerValue.timestamp())
 
-@FlowPreview
-@InternalSerializationApi
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }
 
-@FlowPreview
-@InternalSerializationApi
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-@FlowPreview
-@InternalSerializationApi
 actual fun Firebase.database(app: FirebaseApp) =
     FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
 
-@FlowPreview
-@InternalSerializationApi
 actual fun Firebase.database(app: FirebaseApp, url: String) =
     FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
 
-@FlowPreview
-@InternalSerializationApi
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun reference(path: String) =
@@ -113,8 +100,6 @@ actual open class Query internal constructor(
     override fun toString() = ios.toString()
 }
 
-@FlowPreview
-@InternalSerializationApi
 actual class DatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
     persistenceEnabled: Boolean
@@ -162,8 +147,6 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
     actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
 }
 
-@FlowPreview
-@InternalSerializationApi
 actual class OnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
     val persistenceEnabled: Boolean
@@ -192,8 +175,6 @@ actual class OnDisconnect internal constructor(
 
 actual class DatabaseException(message: String) : RuntimeException(message)
 
-@FlowPreview
-@InternalSerializationApi
 private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R>()
     function { error, result ->
@@ -206,8 +187,6 @@ private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(call
     return job.run { if(whileOnline) awaitWhileOnline() else await() }
 }
 
-@FlowPreview
-@InternalSerializationApi
 suspend fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
@@ -220,8 +199,7 @@ suspend fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, 
     job.run { if(whileOnline) awaitWhileOnline() else await() }
 }
 
-@FlowPreview
-@InternalSerializationApi
+@OptIn(FlowPreview::class)
 private suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database

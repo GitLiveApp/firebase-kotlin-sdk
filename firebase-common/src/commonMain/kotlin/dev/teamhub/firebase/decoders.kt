@@ -12,7 +12,7 @@ import kotlinx.serialization.modules.SerialModule
 import kotlinx.serialization.modules.getContextualOrDefault
 import kotlin.reflect.KClass
 
-@ImplicitReflectionSerializer
+@OptIn(ImplicitReflectionSerializer::class)
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> decode(value: Any?): T {
     val strategy = EmptyModule.getContextualOrDefault(T::class as KClass<*>).run { if (null is T) nullable else this }
@@ -64,7 +64,7 @@ class FirebaseDecoder(internal val value: Any?) : Decoder {
 
 }
 
-@ImplicitReflectionSerializer
+
 class FirebaseClassDecoder(
     size: Int,
     private val containsKey: (name: String) -> Boolean,
@@ -85,7 +85,6 @@ class FirebaseClassDecoder(
     }
 }
 
-@ImplicitReflectionSerializer
 open class FirebaseCompositeDecoder constructor(
     private val size: Int,
     private val get: (desc: SerialDescriptor, index: Int) -> Any?
@@ -197,4 +196,3 @@ private fun decodeNotNullMark(value: Any?) = value != null
 private fun decodeNull(value: Any?) = value as Nothing?
 
 private fun decodeUnit(value: Any?) = value as Unit
-

@@ -11,19 +11,15 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 
-@InternalSerializationApi
 actual val Firebase.firestore get() =
     rethrow { dev.teamhub.firebase.firestore; FirebaseFirestore(firebase.firestore()) }
 
-@InternalSerializationApi
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { dev.teamhub.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
 
-@InternalSerializationApi
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
 //    actual var settings: FirebaseFirestoreSettings
@@ -45,7 +41,6 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
         rethrow { js.runTransaction { GlobalScope.promise { Transaction(it).func() } }.await() }
 }
 
-@InternalSerializationApi
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
     actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
@@ -112,7 +107,6 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
 }
 
-@InternalSerializationApi
 actual class Transaction(val js: firebase.firestore.Transaction) {
 
     actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
@@ -179,7 +173,6 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-@InternalSerializationApi
 actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 
     actual val id: String
@@ -249,7 +242,6 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     }
 }
 
-@InternalSerializationApi
 actual open class Query(open val js: firebase.firestore.Query) {
 
     actual suspend fun get() =  rethrow { QuerySnapshot(js.get().await()) }
@@ -288,7 +280,6 @@ actual open class Query(open val js: firebase.firestore.Query) {
     }
 }
 
-@InternalSerializationApi
 actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {
 
     actual val path: String
@@ -305,13 +296,11 @@ actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExc
 
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-@InternalSerializationApi
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = js.docs.map { DocumentSnapshot(it) }
 }
 
-@InternalSerializationApi
 actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
 
     actual val id get() = rethrow { js.id }

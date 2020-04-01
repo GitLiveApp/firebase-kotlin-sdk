@@ -7,35 +7,23 @@ package dev.teamhub.firebase.database
 import dev.teamhub.firebase.Firebase
 import dev.teamhub.firebase.FirebaseApp
 import dev.teamhub.firebase.database.ChildEvent.Type.*
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
-@FlowPreview
-@InternalSerializationApi
 expect val Firebase.database: FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance for the specified [url]. */
-@FlowPreview
-@InternalSerializationApi
 expect fun Firebase.database(url: String): FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance of the given [FirebaseApp]. */
-@FlowPreview
-@InternalSerializationApi
 expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance of the given [FirebaseApp] and [url]. */
-@FlowPreview
-@InternalSerializationApi
 expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
-@FlowPreview
-@InternalSerializationApi
 expect class FirebaseDatabase {
     fun reference(path: String): DatabaseReference
     fun setPersistenceEnabled(enabled: Boolean)
@@ -55,7 +43,6 @@ data class ChildEvent internal constructor(
     }
 }
 
-@FlowPreview
 expect open class Query {
     val valueEvents: Flow<DataSnapshot>
     fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
@@ -66,8 +53,6 @@ expect open class Query {
     fun startAt(value: Boolean, key: String? = null): Query
 }
 
-@FlowPreview
-@InternalSerializationApi
 expect class DatabaseReference : Query {
     val key: String?
     fun push(): DatabaseReference
@@ -97,7 +82,6 @@ object ServerValue {
 
 expect class DatabaseException : RuntimeException
 
-@InternalSerializationApi
 expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
@@ -107,4 +91,3 @@ expect class OnDisconnect {
     @ImplicitReflectionSerializer
     suspend fun updateChildren(update: Map<String, Any?>)
 }
-
