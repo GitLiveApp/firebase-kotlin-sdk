@@ -73,7 +73,7 @@ kotlin {
                 val firebaseAuth by cinterops.creating {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseAuth-6.17.0")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules")
                 }
             }
         }

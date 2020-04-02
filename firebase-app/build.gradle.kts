@@ -80,7 +80,7 @@ kotlin {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
                     //includeDirs("$projectDir/../native/Avalon/Pods/FirebaseCore/Firebase/Core/Public")
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseCore-6.0.2")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules")
                 }
             }
         }

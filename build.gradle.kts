@@ -1,19 +1,73 @@
+import de.undercouch.gradle.tasks.download.Download
+
 plugins {
     kotlin("multiplatform") version "1.3.70" apply false
+    id("de.undercouch.download").version("3.4.3")
 }
 
 buildscript {
     repositories {
+        jcenter()
         google()
         gradlePluginPortal()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("de.undercouch:gradle-download-task:4.0.4")
     }
 }
 
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(14)
+
+
+
+tasks {
+    val downloadZipFile by creating(Download::class) {
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
+        dest(File(rootDir, "Firebase-6.17.0.zip"))
+        overwrite(true)
+    }
+
+    val unzipFirebase by creating(Copy::class) {
+        dependsOn(downloadZipFile)
+        from(zipTree(downloadZipFile.dest))
+        into(rootDir)
+    }
+
+    val copyFirebaseAuth by creating(Copy::class){
+        dependsOn(unzipFirebase)
+        from("$rootDir/Firebase/FirebaseAuth/FirebaseAuth.framework")
+        into("$rootDir/firebase-auth/src/iosMain/c_interop/modules/FirebaseAuth.framework")
+    }
+
+    val copyFirebaseDatabase by creating(Copy::class){
+        dependsOn(copyFirebaseAuth)
+        from("$rootDir/Firebase/FirebaseDatabase/FirebaseDatabase.framework")
+        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseDatabase.framework")
+    }
+
+    val copyFirebaseFirestore by creating(Copy::class){
+        dependsOn(copyFirebaseDatabase)
+        from("$rootDir/Firebase/FirebaseFirestore/FirebaseFirestore.framework")
+        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFirestore.framework")
+    }
+
+    val copyFirebaseFunctions by creating(Copy::class){
+        dependsOn(copyFirebaseFirestore)
+        from("$rootDir/Firebase/FirebaseFunctions/FirebaseFunctions.framework")
+        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFunctions.framework")
+    }
+
+    val copyAllFirebaseFrameworks by creating(Copy::class){
+        dependsOn(copyFirebaseFunctions)
+        from("$rootDir/Firebase/FirebaseAnalytics/FirebaseCore.framework")
+        into("$rootDir/firebase-app/src/iosMain/c_interop/modules/FirebaseCore.framework")
+    }
+
+}
+
+
 
 subprojects {
 
@@ -24,6 +78,14 @@ subprojects {
         mavenCentral()
         google()
         jcenter()
+        maven {
+            name = "github"
+            url = uri("https://maven.pkg.github.com/gitliveapp/firebase-java")
+            credentials {
+                username = project.property("gpr.user") as String
+                password = project.property("gpr.key") as String
+            }
+        }
     }
 
 
@@ -56,6 +118,7 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+
         val publishToNpm by registering(Exec::class) {
             doFirst {
                 if(!File("$buildDir/node_module").exists()) {
@@ -67,7 +130,25 @@ subprojects {
               it.equals("build")
             }
 
-            dependsOn(buildTask, copyPackageJson, copyJS, copySourceMap, copyReadMe)
+            if(!File(rootDir, "Firebase").exists()) {
+                dependsOn(
+                    rootProject.tasks.named("copyAllFirebaseFrameworks").get(),
+                    buildTask,
+                    copyPackageJson,
+                    copyJS,
+                    copySourceMap,
+                    copyReadMe
+                )
+            } else {
+                dependsOn(
+                    buildTask,
+                    copyPackageJson,
+                    copyJS,
+                    copySourceMap,
+                    copyReadMe
+                )
+
+            }
             workingDir("$buildDir/node_module")
             //commandLine("npm", "publish")
             commandLine("ls")
