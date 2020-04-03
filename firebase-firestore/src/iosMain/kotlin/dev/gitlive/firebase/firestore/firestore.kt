@@ -5,7 +5,7 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
-import dev.teamhub.firebase.*
+import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
