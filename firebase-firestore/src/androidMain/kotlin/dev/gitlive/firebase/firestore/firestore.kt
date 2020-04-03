@@ -112,16 +112,16 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
+    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
         true -> android.set(documentRef.android, encode(data)!!, SetOptions.merge())
         false -> android.set(documentRef.android, encode(data)!!)
     }.let { this }
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
@@ -296,6 +296,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 }
+
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
 
     actual val path: String
@@ -327,11 +328,11 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
     actual inline fun <reified T: Any> data() = decode<T>(value = android.data)
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
 
     actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
 
-    actual inline fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
         decode(strategy, android.get(field))
 
     actual fun contains(field: String) = android.contains(field)
