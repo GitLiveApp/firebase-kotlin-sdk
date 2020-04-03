@@ -119,12 +119,7 @@ subprojects {
         }
 
 
-        val publishToNpm by registering(Exec::class) {
-            doFirst {
-                if(!File("$buildDir/node_module").exists()) {
-                    mkdir("$buildDir/node_module")
-                }
-            }
+        val publishToNpm by creating(Exec::class) {
             
             if(!File(rootDir, "Firebase").exists()) {
                 dependsOn(
@@ -158,6 +153,11 @@ subprojects {
 //    }
 
     afterEvaluate  {
+        // create the projects node_modules if they don't exist
+        if(!File("$buildDir/node_module").exists()) {
+            mkdir("$buildDir/node_module")
+        }
+        
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
