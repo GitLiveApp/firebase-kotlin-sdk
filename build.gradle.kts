@@ -125,15 +125,10 @@ subprojects {
                     mkdir("$buildDir/node_module")
                 }
             }
-
-            val buildTask = project.tasks.names.find{
-              it.equals("build")
-            }
-
+            
             if(!File(rootDir, "Firebase").exists()) {
                 dependsOn(
                     rootProject.tasks.named("copyAllFirebaseFrameworks").get(),
-                    buildTask,
                     copyPackageJson,
                     copyJS,
                     copySourceMap,
@@ -141,7 +136,6 @@ subprojects {
                 )
             } else {
                 dependsOn(
-                    buildTask,
                     copyPackageJson,
                     copyJS,
                     copySourceMap,
@@ -171,10 +165,6 @@ subprojects {
             "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.4")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
-            "jvmMainImplementation"(kotlin("stdlib-jdk8"))
-            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
-            "jvmMainApi"("dev.gitlive:firebase-java:0.3.1")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
         }
