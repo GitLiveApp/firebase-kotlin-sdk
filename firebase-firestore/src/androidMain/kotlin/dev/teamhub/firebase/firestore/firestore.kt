@@ -113,16 +113,16 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
+    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) = when(merge) {
         true -> android.set(documentRef.android, encode(data)!!, SetOptions.merge())
         false -> android.set(documentRef.android, encode(data)!!)
     }.let { this }
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFields(*mergeFields))
             .let { this }
 
-    actual inline fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
         android.set(documentRef.android, encode(data)!!, SetOptions.mergeFieldPaths(mergeFieldsPaths.toList()))
             .let { this }
 
