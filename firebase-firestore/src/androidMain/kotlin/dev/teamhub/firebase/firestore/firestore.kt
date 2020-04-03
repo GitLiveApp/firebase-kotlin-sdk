@@ -297,6 +297,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 }
+
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
 
     actual val path: String
@@ -328,11 +329,11 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
     actual inline fun <reified T: Any> data() = decode<T>(value = android.data)
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
 
     actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
 
-    actual inline fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
         decode(strategy, android.get(field))
 
     actual fun contains(field: String) = android.contains(field)
