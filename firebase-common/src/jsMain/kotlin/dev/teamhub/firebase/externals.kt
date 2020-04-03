@@ -90,7 +90,6 @@ external object firebase {
             val data: Any?
         }
         interface HttpsCallable {
-            operator fun invoke(data: Any? = definedExternally): Promise<HttpsCallableResult>
         }
 
     }
@@ -228,3 +227,7 @@ external object firebase {
         }
     }
 }
+
+operator fun firebase.functions.HttpsCallable.invoke() = asDynamic()() as Promise<firebase.functions.HttpsCallableResult>
+operator fun firebase.functions.HttpsCallable.invoke(data: Any?) = asDynamic()(data) as Promise<firebase.functions.HttpsCallableResult>
+
