@@ -23,44 +23,44 @@ val minSdkVersion by extra(14)
 
 
 tasks {
-    val downloadZipFile by creating(Download::class) {
+    val downloadFirebaseZipFile by creating(Download::class) {
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
         dest(File(rootDir, "Firebase-6.17.0.zip"))
         overwrite(true)
     }
 
     val unzipFirebase by creating(Copy::class) {
-        dependsOn(downloadZipFile)
-        from(zipTree(downloadZipFile.dest))
+        dependsOn(downloadFirebaseZipFile)
+        from(zipTree(downloadFirebaseZipFile.dest))
         into(rootDir)
     }
 
-    val copyFirebaseAuth by creating(Copy::class){
+    val copyIOSFirebaseAuth by creating(Copy::class){
         dependsOn(unzipFirebase)
         from("$rootDir/Firebase/FirebaseAuth/FirebaseAuth.framework")
         into("$rootDir/firebase-auth/src/iosMain/c_interop/modules/FirebaseAuth.framework")
     }
 
-    val copyFirebaseDatabase by creating(Copy::class){
-        dependsOn(copyFirebaseAuth)
+    val copyIOSFirebaseDatabase by creating(Copy::class){
+        dependsOn(copyIOSFirebaseAuth)
         from("$rootDir/Firebase/FirebaseDatabase/FirebaseDatabase.framework")
         into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseDatabase.framework")
     }
 
-    val copyFirebaseFirestore by creating(Copy::class){
-        dependsOn(copyFirebaseDatabase)
+    val copyIOSFirebaseFirestore by creating(Copy::class){
+        dependsOn(copyIOSFirebaseDatabase)
         from("$rootDir/Firebase/FirebaseFirestore/FirebaseFirestore.framework")
         into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFirestore.framework")
     }
 
-    val copyFirebaseFunctions by creating(Copy::class){
-        dependsOn(copyFirebaseFirestore)
+    val copyIOSFirebaseFunctions by creating(Copy::class){
+        dependsOn(copyIOSFirebaseFirestore)
         from("$rootDir/Firebase/FirebaseFunctions/FirebaseFunctions.framework")
         into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFunctions.framework")
     }
 
-    val copyAllFirebaseFrameworks by creating(Copy::class){
-        dependsOn(copyFirebaseFunctions)
+    val copyAllIOSFirebaseFrameworks by creating(Copy::class){
+        dependsOn(copyIOSFirebaseFunctions)
         from("$rootDir/Firebase/FirebaseAnalytics/FirebaseCore.framework")
         into("$rootDir/firebase-app/src/iosMain/c_interop/modules/FirebaseCore.framework")
     }
@@ -125,7 +125,7 @@ subprojects {
             
             if(!File(rootDir, "Firebase").exists()) {
                 dependsOn(
-                    rootProject.tasks.named("copyAllFirebaseFrameworks").get(),
+                    rootProject.tasks.named("copyAllIOSFirebaseFrameworks").get(),
                     copyPackageJson,
                     copyJS,
                     copySourceMap,
