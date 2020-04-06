@@ -1,12 +1,8 @@
-
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    `maven-publish`
 }
-
-version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -72,5 +68,24 @@ kotlin {
             summary = ""
             homepage = ""
         }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.property("gpr.user") as String
+                password = project.property("gpr.key") as String
+            }
+        }
+    }
+    publications {
+        register("gpr", MavenPublication::class) {
+            from(components["kotlin"])
+        }
+
     }
 }

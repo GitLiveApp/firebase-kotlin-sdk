@@ -6,14 +6,12 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    `maven-publish`
 }
+
 repositories {
     mavenCentral()
     google()
 }
-
-version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -80,5 +78,24 @@ kotlin {
             homepage = ""
             //pod("FirebaseCore", "~> 6.3.1")
         }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.property("gpr.user") as String
+                password = project.property("gpr.key") as String
+            }
+        }
+    }
+    publications {
+        register("gpr", MavenPublication::class) {
+            from(components["kotlin"])
+        }
+
     }
 }

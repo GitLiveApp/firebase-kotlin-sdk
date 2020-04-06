@@ -8,13 +8,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     kotlin("plugin.serialization") version "1.3.70"
-    `maven-publish`
 }
-repositories {
-    mavenCentral()
-    google()
-}
-version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -86,5 +80,24 @@ kotlin {
             homepage = "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk"
             //pod("FirebaseCore", "~> 6.3.1")
         }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.property("gpr.user") as String
+                password = project.property("gpr.key") as String
+            }
+        }
+    }
+    publications {
+        register("gpr", MavenPublication::class) {
+            from(components["kotlin"])
+        }
+
     }
 }

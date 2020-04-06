@@ -71,7 +71,10 @@ tasks {
 
 subprojects {
 
+    apply(plugin="maven-publish")
+
     group = "dev.gitlive"
+    version = "0.1.0-beta"
 
     repositories {
         mavenLocal()
