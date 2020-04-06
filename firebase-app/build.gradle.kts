@@ -81,21 +81,7 @@ kotlin {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
-            credentials {
-                username = project.property("gpr.user") as String
-                password = project.property("gpr.key") as String
-            }
-        }
-    }
-    publications {
-        register("gpr", MavenPublication::class) {
-            from(components["kotlin"])
-        }
-
-    }
+configure<SigningExtension> {
+    sign(publishing.publications)
 }
+

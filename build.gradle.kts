@@ -71,7 +71,6 @@ tasks {
 
 subprojects {
 
-    apply(plugin="maven-publish")
 
     group = "dev.gitlive"
     version = "0.1.0-beta"
@@ -173,5 +172,44 @@ subprojects {
         }
     }
 
+    apply(plugin="maven-publish")
+    apply(plugin="signing")
+    
+    configure<PublishingExtension> {
+        
+        repositories {
+            maven {
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                credentials {
+                    username = project.property("sonatypeUsername") as String
+                    password = project.property("sonatypePassword") as String
+                }
+            }
+        }
+
+        publications.all {
+            this as MavenPublication
+
+            pom {
+
+                url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+
+                scm {
+                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+                    connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                    developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                    tag.set("HEAD")
+                }
+
+                issueManagement {
+                    system.set("GitHub Issues")
+                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
+                }
+
+            }
+
+        }
+
+    }
 }
 
