@@ -1,3 +1,5 @@
+version = "0.1.0-beta"
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
