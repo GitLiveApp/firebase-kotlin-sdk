@@ -63,7 +63,7 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules")
+                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseFirestore")
                 }
             }
         }
@@ -79,3 +79,4 @@ configure<SigningExtension> {
     sign(publishing.publications)
 }
 
+tasks.getByPath("build").dependsOn(rootProject.tasks.named("unzipFirebase"))

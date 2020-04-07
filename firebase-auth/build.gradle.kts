@@ -61,7 +61,7 @@ kotlin {
                 val firebaseAuth by cinterops.creating {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules")
+                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseAuth")
                 }
             }
         }
@@ -76,3 +76,5 @@ kotlin {
 configure<SigningExtension> {
     sign(publishing.publications)
 }
+
+tasks.getByPath("build").dependsOn(rootProject.tasks.named("unzipFirebase"))

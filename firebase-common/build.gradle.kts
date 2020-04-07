@@ -87,4 +87,3 @@ kotlin {
 configure<SigningExtension> {
     sign(publishing.publications)
 }
-

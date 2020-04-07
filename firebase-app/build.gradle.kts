@@ -69,8 +69,7 @@ kotlin {
                 val firebasecore by cinterops.creating {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    //includeDirs("$projectDir/../native/Avalon/Pods/FirebaseCore/Firebase/Core/Public")
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules")
+                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseAnalytics")
                 }
             }
         }
@@ -87,3 +86,4 @@ configure<SigningExtension> {
     sign(publishing.publications)
 }
 
+tasks.getByPath("build").dependsOn(rootProject.tasks.named("unzipFirebase"))

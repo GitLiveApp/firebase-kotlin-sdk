@@ -36,56 +36,9 @@ tasks {
         dependsOn(downloadFirebaseZipFile)
         from(zipTree(downloadFirebaseZipFile.dest))
         into("$buildDir")
-        outputs.upToDateWhen { File("$buildDir").exists() }
+        outputs.upToDateWhen { !Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_MAC) && File("$buildDir").exists() }
     }
-
-    val copyIOSFirebaseAuthFramework by creating(Copy::class){
-        doFirst {
-            project.delete(files("$rootDir/firebase-auth/src/iosMain/c_interop/modules/"))
-        }
-        dependsOn(unzipFirebase)
-        from("$rootDir/$buildDir/Firebase/FirebaseAuth/FirebaseAuth.framework")
-        into("$rootDir/firebase-auth/src/iosMain/c_interop/modules/FirebaseAuth.framework")
-    }
-
-    val copyIOSFirebaseDatabaseFramework by creating(Copy::class){
-        doFirst {
-            project.delete(files("$rootDir/firebase-database/src/iosMain/c_interop/modules/"))
-        }
-        dependsOn(unzipFirebase)
-        from("$rootDir/$buildDir/Firebase/FirebaseDatabase/FirebaseDatabase.framework")
-        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseDatabase.framework")
-    }
-
-    val copyIOSFirebaseFirestoreFramework by creating(Copy::class){
-        doFirst {
-            project.delete(files("$rootDir/firebase-firestore/src/iosMain/c_interop/modules/"))
-        }
-        dependsOn(unzipFirebase)
-        from("$rootDir/$buildDir/Firebase/FirebaseFirestore/FirebaseFirestore.framework")
-        into("$rootDir/firebase-firestore/src/iosMain/c_interop/modules/FirebaseFirestore.framework")
-    }
-
-    val copyIOSFirebaseFunctionsFramework by creating(Copy::class){
-        doFirst {
-            project.delete(files("$rootDir/firebase-functions/src/iosMain/c_interop/modules/"))
-        }
-        dependsOn(unzipFirebase)
-        from("$rootDir/$buildDir/Firebase/FirebaseFunctions/FirebaseFunctions.framework")
-        into("$rootDir/firebase-functions/src/iosMain/c_interop/modules/FirebaseFunctions.framework")
-    }
-
-    val copyIOSFirebaseAppFramework by creating(Copy::class){
-        
-        doFirst {
-            project.delete(files("$rootDir/firebase-app/src/iosMain/c_interop/modules/"))
-        }
-        
-        dependsOn(unzipFirebase)
-        from("$rootDir/$buildDir/Firebase/FirebaseAnalytics/FirebaseCore.framework")
-        into("$rootDir/firebase-app/src/iosMain/c_interop/modules/FirebaseCore.framework")
-    }
-
+    
 }
 
 subprojects {
