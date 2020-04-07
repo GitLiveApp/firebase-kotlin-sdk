@@ -1,9 +1,9 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     kotlin("multiplatform") version "1.3.70" apply false
     id("de.undercouch.download").version("3.4.3")
+    id("base")
 }
 
 buildscript {
@@ -24,7 +24,7 @@ val minSdkVersion by extra(14)
 
 
 tasks {
-    val downloadFirebaseZipFile by creating(Download::class) {
+    val downloadIOSFirebaseZipFile by creating(Download::class) {
         onlyIfModified(true)
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
         dest(File("$buildDir", "Firebase-6.17.0.zip"))
@@ -32,11 +32,11 @@ tasks {
 
     }
 
-    val unzipFirebase by creating(Copy::class) {
-        dependsOn(downloadFirebaseZipFile)
-        from(zipTree(downloadFirebaseZipFile.dest))
+    val unzipIOSFirebase by creating(Copy::class) {
+        dependsOn(downloadIOSFirebaseZipFile)
+        from(zipTree(downloadIOSFirebaseZipFile.dest))
         into("$buildDir")
-        outputs.upToDateWhen { !Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_MAC) && File("$buildDir").exists() }
+        outputs.upToDateWhen { File("$rootDir/$buildDir/Firebase").isDirectory }
     }
     
 }
@@ -121,6 +121,9 @@ subprojects {
             mkdir("$buildDir/node_module")
         }
 
+        tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+        tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
@@ -136,6 +139,7 @@ subprojects {
     apply(plugin="maven-publish")
     apply(plugin="signing")
     
+
     configure<PublishingExtension> {
         
         repositories {
@@ -147,7 +151,7 @@ subprojects {
                 }
             }
         }
-
+        
         publications.all {
             this as MavenPublication
 
@@ -172,5 +176,6 @@ subprojects {
         }
 
     }
+
 }
 

@@ -74,9 +74,7 @@ kotlin {
     }
 }
 
-configure<SigningExtension> {
+signing {
     sign(publishing.publications)
 }
-
-tasks.getByPath("build").dependsOn(rootProject.tasks.named("unzipFirebase"))
 
