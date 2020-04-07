@@ -1,4 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     kotlin("multiplatform") version "1.3.70" apply false
@@ -24,50 +25,68 @@ val minSdkVersion by extra(14)
 
 tasks {
     val downloadFirebaseZipFile by creating(Download::class) {
+        onlyIfModified(true)
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File(rootDir, "Firebase-6.17.0.zip"))
+        dest(File("$buildDir", "Firebase-6.17.0.zip"))
         overwrite(true)
+
     }
 
     val unzipFirebase by creating(Copy::class) {
         dependsOn(downloadFirebaseZipFile)
         from(zipTree(downloadFirebaseZipFile.dest))
-        into(rootDir)
+        into("$buildDir")
+        outputs.upToDateWhen { File("$buildDir").exists() }
     }
 
-    val copyIOSFirebaseAuth by creating(Copy::class){
+    val copyIOSFirebaseAuthFramework by creating(Copy::class){
+        doFirst {
+            project.delete(files("$rootDir/firebase-auth/src/iosMain/c_interop/modules/"))
+        }
         dependsOn(unzipFirebase)
-        from("$rootDir/Firebase/FirebaseAuth/FirebaseAuth.framework")
+        from("$rootDir/$buildDir/Firebase/FirebaseAuth/FirebaseAuth.framework")
         into("$rootDir/firebase-auth/src/iosMain/c_interop/modules/FirebaseAuth.framework")
     }
 
-    val copyIOSFirebaseDatabase by creating(Copy::class){
-        dependsOn(copyIOSFirebaseAuth)
-        from("$rootDir/Firebase/FirebaseDatabase/FirebaseDatabase.framework")
+    val copyIOSFirebaseDatabaseFramework by creating(Copy::class){
+        doFirst {
+            project.delete(files("$rootDir/firebase-database/src/iosMain/c_interop/modules/"))
+        }
+        dependsOn(unzipFirebase)
+        from("$rootDir/$buildDir/Firebase/FirebaseDatabase/FirebaseDatabase.framework")
         into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseDatabase.framework")
     }
 
-    val copyIOSFirebaseFirestore by creating(Copy::class){
-        dependsOn(copyIOSFirebaseDatabase)
-        from("$rootDir/Firebase/FirebaseFirestore/FirebaseFirestore.framework")
-        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFirestore.framework")
+    val copyIOSFirebaseFirestoreFramework by creating(Copy::class){
+        doFirst {
+            project.delete(files("$rootDir/firebase-firestore/src/iosMain/c_interop/modules/"))
+        }
+        dependsOn(unzipFirebase)
+        from("$rootDir/$buildDir/Firebase/FirebaseFirestore/FirebaseFirestore.framework")
+        into("$rootDir/firebase-firestore/src/iosMain/c_interop/modules/FirebaseFirestore.framework")
     }
 
-    val copyIOSFirebaseFunctions by creating(Copy::class){
-        dependsOn(copyIOSFirebaseFirestore)
-        from("$rootDir/Firebase/FirebaseFunctions/FirebaseFunctions.framework")
-        into("$rootDir/firebase-database/src/iosMain/c_interop/modules/FirebaseFunctions.framework")
+    val copyIOSFirebaseFunctionsFramework by creating(Copy::class){
+        doFirst {
+            project.delete(files("$rootDir/firebase-functions/src/iosMain/c_interop/modules/"))
+        }
+        dependsOn(unzipFirebase)
+        from("$rootDir/$buildDir/Firebase/FirebaseFunctions/FirebaseFunctions.framework")
+        into("$rootDir/firebase-functions/src/iosMain/c_interop/modules/FirebaseFunctions.framework")
     }
 
-    val copyAllIOSFirebaseFrameworks by creating(Copy::class){
-        dependsOn(copyIOSFirebaseFunctions)
-        from("$rootDir/Firebase/FirebaseAnalytics/FirebaseCore.framework")
+    val copyIOSFirebaseAppFramework by creating(Copy::class){
+        
+        doFirst {
+            project.delete(files("$rootDir/firebase-app/src/iosMain/c_interop/modules/"))
+        }
+        
+        dependsOn(unzipFirebase)
+        from("$rootDir/$buildDir/Firebase/FirebaseAnalytics/FirebaseCore.framework")
         into("$rootDir/firebase-app/src/iosMain/c_interop/modules/FirebaseCore.framework")
     }
 
 }
-
-
 
 subprojects {
 
@@ -121,24 +140,14 @@ subprojects {
 
 
         val publishToNpm by creating(Exec::class) {
-            
-            if(!File(rootDir, "Firebase").exists()) {
-                dependsOn(
-                    rootProject.tasks.named("copyAllIOSFirebaseFrameworks").get(),
-                    copyPackageJson,
-                    copyJS,
-                    copySourceMap,
-                    copyReadMe
-                )
-            } else {
-                dependsOn(
-                    copyPackageJson,
-                    copyJS,
-                    copySourceMap,
-                    copyReadMe
-                )
 
-            }
+            dependsOn(
+                copyPackageJson,
+                copyJS,
+                copySourceMap,
+                copyReadMe
+            )
+            
             workingDir("$buildDir/node_module")
             //commandLine("npm", "publish")
             commandLine("ls")
@@ -158,7 +167,7 @@ subprojects {
         if(!File("$buildDir/node_module").exists()) {
             mkdir("$buildDir/node_module")
         }
-        
+
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
