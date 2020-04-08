@@ -51,14 +51,6 @@ subprojects {
         mavenCentral()
         google()
         jcenter()
-        maven {
-            name = "github"
-            url = uri("https://maven.pkg.github.com/gitliveapp/firebase-java")
-            credentials {
-                username = project.property("gpr.user") as String
-                password = project.property("gpr.key") as String
-            }
-        }
     }
 
 
@@ -159,7 +151,7 @@ subprojects {
                     name.set("firebase-kotlin-sdk")
                     description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
                     url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-                    inceptionYear.set("2009")
+                    inceptionYear.set("2019")
 
                     scm {
                         url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
