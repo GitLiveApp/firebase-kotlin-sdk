@@ -152,28 +152,46 @@ subprojects {
             }
         }
         
-        publications.all {
-            this as MavenPublication
-
-            pom {
-
-                url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-
-                scm {
+            publications.all {
+                this as MavenPublication
+                
+                pom {
+                    name.set("firebase-kotlin-sdk")
+                    description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
                     url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-                    connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
-                    developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
-                    tag.set("HEAD")
-                }
+                    inceptionYear.set("2009")
 
-                issueManagement {
-                    system.set("GitHub Issues")
-                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
-                }
+                    scm {
+                        url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+                        connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                        developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                        tag.set("HEAD")
+                    }
 
+                    issueManagement {
+                        system.set("GitHub Issues")
+                        url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
+                    }
+
+                    developers {
+                        developer {
+                            name.set("Nicholas Bransby-Williams")
+                            email.set("nbransby@gmail.com")
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name.set("The Apache Software License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                            distribution.set("repo")
+                            comments.set("A business-friendly OSS license")
+                        }
+                    }
+
+                }
             }
-
-        }
+        
 
     }
 
