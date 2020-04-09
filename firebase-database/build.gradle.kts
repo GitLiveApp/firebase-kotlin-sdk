@@ -1,13 +1,10 @@
-import org.apache.tools.ant.taskdefs.condition.Os
+version = "0.1.0-beta"
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    `maven-publish`
 }
-
-version = "0.1.0-beta"
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -33,13 +30,6 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
 
@@ -63,9 +53,6 @@ kotlin {
                 api("com.google.firebase:firebase-database:17.0.0")
             }
         }
-        val jvmMain by getting {
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
         val jsMain by getting {}
         val iosMain by getting {}
 
@@ -75,7 +62,7 @@ kotlin {
                 val firebaseDatabase by cinterops.creating {
                     packageName("cocoapods.FirebaseDatabase")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseDatabase.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/modules/FirebaseDatabase-6.17.0")
+                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseDatabase")
                 }
             }
         }
@@ -87,41 +74,7 @@ kotlin {
     }
 }
 
-tasks {
-    val copyPackageJson by registering(Copy::class) {
-        from(file("package.json"))
-        into(file("$buildDir/node_module"))
-    }
-
-    val copyJS by registering {
-        doLast {
-            val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
-            val into = File("$buildDir/node_module/${project.name}.js")
-            into.createNewFile()
-            into.writeText(from.readText()
-                .replace("require('firebase-", "require('@teamhubapp/firebase-")
-//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@teamhub/kotlinx-serialization-runtime')")
-)
-        }
-    }
-
-
-    val copySourceMap by registering(Copy::class) {
-        from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
-        into(file("$buildDir/node_module"))
-    }
-
-    val publishToNpm by registering(Exec::class) {
-        doFirst {
-            mkdir("$buildDir/node_module")
-        }
-
-        dependsOn(copyPackageJson, copyJS, copySourceMap)
-        workingDir("$buildDir/node_module")
-        if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-            commandLine("cmd", "/c", "npm publish --registry  http://localhost:4873")
-        } else {
-            commandLine("npm", "publish", "--registry  http://localhost:4873")
-        }
-    }
+signing {
+    sign(publishing.publications)
 }
+
