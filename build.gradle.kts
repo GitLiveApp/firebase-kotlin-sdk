@@ -51,6 +51,14 @@ subprojects {
         mavenCentral()
         google()
         jcenter()
+        maven {
+            name = "github"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("gpr.user")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("gpr.key")
+            }
+        }
     }
 
 
