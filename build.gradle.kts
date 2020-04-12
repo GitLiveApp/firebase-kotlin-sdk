@@ -1,4 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     kotlin("multiplatform") version "1.3.70" apply false
@@ -38,11 +39,10 @@ tasks {
         into("$buildDir")
         outputs.upToDateWhen { File("$rootDir/$buildDir/Firebase").isDirectory }
     }
-    
+
 }
 
 subprojects {
-
 
     group = "dev.gitlive"
 
@@ -92,10 +92,13 @@ subprojects {
                 copySourceMap,
                 copyReadMe
             )
-            
+
             workingDir("$buildDir/node_module")
-            //commandLine("npm", "publish")
-            commandLine("ls")
+            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine("cmd", "/c", "npm publish")
+            } else {
+                commandLine("npm", "publish")
+            }
         }
     }
 
@@ -130,10 +133,10 @@ subprojects {
 
     apply(plugin="maven-publish")
     apply(plugin="signing")
-    
+
 
     configure<PublishingExtension> {
-        
+
         repositories {
             maven {
                 url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
@@ -143,47 +146,46 @@ subprojects {
                 }
             }
         }
-        
+
             publications.all {
                 this as MavenPublication
-                
+
                 pom {
                     name.set("firebase-kotlin-sdk")
                     description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
                     url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
                     inceptionYear.set("2019")
 
-                    scm {
-                        url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-                        connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
-                        developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
-                        tag.set("HEAD")
-                    }
-
-                    issueManagement {
-                        system.set("GitHub Issues")
-                        url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
-                    }
-
-                    developers {
-                        developer {
-                            name.set("Nicholas Bransby-Williams")
-                            email.set("nbransby@gmail.com")
-                        }
-                    }
-
-                    licenses {
-                        license {
-                            name.set("The Apache Software License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                            distribution.set("repo")
-                            comments.set("A business-friendly OSS license")
-                        }
-                    }
-
+                scm {
+                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+                    connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                    developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+                    tag.set("HEAD")
                 }
+
+                issueManagement {
+                    system.set("GitHub Issues")
+                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
+                }
+
+                developers {
+                    developer {
+                        name.set("Nicholas Bransby-Williams")
+                        email.set("nbransby@gmail.com")
+                    }
+                }
+
+                licenses {
+                    license {
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        distribution.set("repo")
+                        comments.set("A business-friendly OSS license")
+                    }
+                }
+
             }
-        
+        }
 
     }
 
