@@ -46,6 +46,13 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
@@ -60,6 +67,9 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
             }
+        }
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 //        val iosMain by creating
 

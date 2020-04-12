@@ -32,6 +32,13 @@ kotlin {
     }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -53,7 +60,9 @@ kotlin {
                 api("com.google.firebase:firebase-firestore:19.0.2")
             }
         }
-
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
         val jsMain by getting {}
         val iosMain by getting {}
 
