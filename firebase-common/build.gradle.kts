@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = "0.1.0-beta"
+version = "0.1.0"
 
 plugins {
     id("com.android.library")
@@ -108,6 +108,7 @@ kotlin {
         }
     }
 }
+
 signing {
     sign(publishing.publications)
 }
