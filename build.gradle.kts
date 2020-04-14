@@ -23,7 +23,6 @@ val targetSdkVersion by extra(28)
 val minSdkVersion by extra(14)
 
 
-
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         onlyIfModified(true)
@@ -37,7 +36,7 @@ tasks {
         dependsOn(downloadIOSFirebaseZipFile)
         from(zipTree(downloadIOSFirebaseZipFile.dest))
         into("$buildDir")
-        outputs.upToDateWhen { File("$rootDir/$buildDir/Firebase").isDirectory }
+        outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
     }
 
 }
@@ -45,6 +44,7 @@ tasks {
 subprojects {
 
     group = "dev.gitlive"
+
 
     repositories {
         mavenLocal()
@@ -61,6 +61,12 @@ subprojects {
         }
     }
 
+    var shouldSign = true
+
+    tasks.withType<Sign>().configureEach {
+        onlyIf { shouldSign }
+    }
+    
 
     tasks {
 
@@ -126,6 +132,10 @@ subprojects {
 
         tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
         tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+
+        tasks.named("publishToMavenLocal").configure {
+            shouldSign = false
+        }
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))

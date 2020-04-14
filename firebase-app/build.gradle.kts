@@ -95,6 +95,3 @@ kotlin {
 signing {
     sign(publishing.publications)
 }
-
-tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
