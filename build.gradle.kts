@@ -169,7 +169,10 @@ subprojects {
     apply(plugin="maven-publish")
     apply(plugin="signing")
 
-
+    val javadocJar by tasks.creating(Jar::class) {
+        archiveClassifier.value("javadoc")
+    }
+    
     configure<PublishingExtension> {
 
         repositories {
@@ -184,7 +187,9 @@ subprojects {
 
             publications.all {
                 this as MavenPublication
-
+                
+                artifact(javadocJar)
+                
                 pom {
                     name.set("firebase-kotlin-sdk")
                     description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
