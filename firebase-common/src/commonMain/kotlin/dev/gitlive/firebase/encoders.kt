@@ -102,13 +102,15 @@ open class FirebaseCompositeEncoder constructor(
 
     override fun endStructure(descriptor: SerialDescriptor) = end()
 
+    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean {
+        return false
+    }
+
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
         set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value })
 
     override fun <T> encodeSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
         set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value)
-
-    override fun encodeNonSerializableElement(desc: SerialDescriptor, index: Int, value: Any) = set(desc, index, value)
 
     override fun encodeBooleanElement(desc: SerialDescriptor, index: Int, value: Boolean) = set(desc, index, value)
 
