@@ -57,6 +57,7 @@ external object firebase {
         open class Auth {
             val currentUser: user.User?
 
+            fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
