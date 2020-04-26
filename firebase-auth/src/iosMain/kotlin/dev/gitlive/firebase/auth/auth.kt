@@ -27,7 +27,7 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { signInWithEmailAndPassword(email, password, it) })
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
