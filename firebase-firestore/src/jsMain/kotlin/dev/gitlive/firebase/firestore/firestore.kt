@@ -322,9 +322,9 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val exists get() =  rethrow { js.exists }
 }
 
-actual typealias FieldPath = firebase.firestore.FieldPath
+actual typealias FieldPath = Any
 
-actual fun FieldPath(vararg fieldNames: String) = rethrow { FieldPath(fieldNames) }
+actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow { firebase.firestore.FieldPath(fieldNames) }
 
 
 actual object FieldValue {

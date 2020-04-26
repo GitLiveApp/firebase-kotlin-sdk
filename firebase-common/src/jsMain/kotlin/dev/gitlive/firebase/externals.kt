@@ -168,8 +168,7 @@ external object firebase {
 
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
-            fun where(field: String, opStr: String, value: Any?): Query
-            fun where(path: FieldPath, opStr: String, value: Any?): Query
+            fun where(field: Any, opStr: String, value: Any?): Query
             fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
         }
 
