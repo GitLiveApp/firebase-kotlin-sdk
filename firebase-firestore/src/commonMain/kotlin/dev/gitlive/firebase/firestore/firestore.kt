@@ -34,11 +34,11 @@ expect class Transaction {
     @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): Transaction
     @ImplicitReflectionSerializer
-    fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): Transaction
+    fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath): Transaction
 
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): Transaction
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): Transaction
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): Transaction
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath): Transaction
 
     @ImplicitReflectionSerializer
     fun update(documentRef: DocumentReference, data: Any): Transaction
@@ -76,11 +76,11 @@ expect class WriteBatch {
     @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String): WriteBatch
     @ImplicitReflectionSerializer
-    fun  set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath): WriteBatch
+    fun  set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath): WriteBatch
 
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean = false): WriteBatch
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String): WriteBatch
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath): WriteBatch
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath): WriteBatch
 
     @ImplicitReflectionSerializer
     fun  update(documentRef: DocumentReference, data: Any): WriteBatch
@@ -105,11 +105,11 @@ expect class DocumentReference {
     @ImplicitReflectionSerializer
     suspend fun  set(data: Any, vararg mergeFields: String)
     @ImplicitReflectionSerializer
-    suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath)
+    suspend fun set(data: Any, vararg mergeFieldPaths: FieldPath)
 
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean = false)
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String)
-    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath)
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath)
 
     @ImplicitReflectionSerializer
     suspend fun update(data: Any)
