@@ -1,0 +1,10 @@
+{
+    "name": "Firebase Kotlin SDK (unofficial)",
+    "platforms": [
+        "Android"
+    ],
+    "content": "README.md",
+    "related": [
+      "firebase/firebase-android-sdk"
+    ]
+}
