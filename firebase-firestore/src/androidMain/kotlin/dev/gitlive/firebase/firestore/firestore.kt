@@ -256,7 +256,6 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         DocumentSnapshot(android.get().await())
 
     actual val snapshots get() = callbackFlow {
-        println("adding snapshot listener to ${this@DocumentReference}: $path")
         val listener = android.addSnapshotListener { snapshot, exception ->
             snapshot?.let { offer(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
@@ -273,7 +272,6 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
 
     actual val snapshots get() = callbackFlow {
-        println("adding snapshot listener to query ${this@Query}")
         val listener = android.addSnapshotListener { snapshot, exception ->
             snapshot?.let { offer(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }

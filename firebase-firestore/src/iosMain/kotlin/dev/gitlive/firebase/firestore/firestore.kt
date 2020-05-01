@@ -182,7 +182,6 @@ actual open class Query(open val ios: FIRQuery) {
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(ios.queryWhereFieldPath(path, isEqualTo = equalTo!!))
 
     actual val snapshots get() = callbackFlow {
-        println("adding snapshot listener to query ${this@Query}")
         val listener = ios.addSnapshotListener { snapshot, error ->
             snapshot?.let { offer(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }

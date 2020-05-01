@@ -85,7 +85,6 @@ actual open class Query internal constructor(
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
     actual val valueEvents get() = callbackFlow {
-        println("adding value event listener to query ${this@Query}")
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 offer(DataSnapshot(snapshot))
@@ -100,7 +99,6 @@ actual open class Query internal constructor(
     }
 
     actual fun childEvents(vararg types: Type) = callbackFlow {
-        println("adding child event listener to query ${this@Query}")
         val listener = object : ChildEventListener {
 
             val moved by lazy { types.contains(Type.MOVED) }
