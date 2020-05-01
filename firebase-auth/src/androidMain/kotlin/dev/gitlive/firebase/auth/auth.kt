@@ -21,13 +21,15 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
+    actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
+        AuthResult(android.signInWithEmailAndPassword(email, password).await())
+
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(android.signInWithCustomToken(token).await())
 
     actual suspend fun signInAnonymously() = AuthResult(android.signInAnonymously().await())
 
     actual val authStateChanged get() = callbackFlow {
-        println("adding auth state changed listener to ${this@FirebaseAuth}")
         val listener = object : AuthStateListener {
             override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
                 offer(auth.currentUser?.let { FirebaseUser(it) })

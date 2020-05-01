@@ -51,8 +51,8 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
@@ -63,8 +63,8 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
     actual fun update(documentRef: DocumentReference, data: Any) =
@@ -117,8 +117,8 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
@@ -129,8 +129,8 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldsPaths)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
     actual fun update(documentRef: DocumentReference, data: Any) =
@@ -187,8 +187,8 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend fun set(data: Any, vararg mergeFields: String) =
         rethrow { js.set(encode(data)!!, json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun set(data: Any, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(encode(data)!!, json("mergeFields" to mergeFieldsPaths)).await() }
+    actual suspend fun set(data: Any, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(encode(data)!!, json("mergeFields" to mergeFieldPaths)).await() }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
         rethrow { js.set(encode(strategy, data)!!, json("merge" to merge)).await() }
@@ -196,8 +196,8 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
         rethrow { js.set(encode(strategy, data)!!, json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldsPaths: FieldPath) =
-        rethrow { js.set(encode(strategy, data)!!, json("mergeFields" to mergeFieldsPaths)).await() }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)).await() }
 
     actual suspend fun update(data: Any) =
         rethrow { js.update(encode(data)!!).await() }
@@ -322,9 +322,9 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val exists get() =  rethrow { js.exists }
 }
 
-actual typealias FieldPath = firebase.firestore.FieldPath
+actual typealias FieldPath = Any
 
-actual fun FieldPath(vararg fieldNames: String) = rethrow { FieldPath(fieldNames) }
+actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow { firebase.firestore.FieldPath(fieldNames) }
 
 
 actual object FieldValue {
