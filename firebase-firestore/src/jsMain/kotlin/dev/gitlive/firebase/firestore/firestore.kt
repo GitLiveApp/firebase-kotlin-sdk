@@ -43,36 +43,36 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("merge" to merge)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("merge" to merge)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFields)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldPaths)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("merge" to merge)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("merge" to merge)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFields)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Any) =
-        rethrow { js.update(documentRef.js, encode(data)!!) }
+    actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
+        rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
             .let { this }
 
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
-        rethrow { js.update(documentRef.js, encode(strategy, data)!!) }
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        rethrow { js.update(documentRef.js, encode(strategy, data, encodeDefaults)!!) }
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
@@ -82,7 +82,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value) })
+                    listOf(field, value?.let { encode(value, true) })
                 }.toTypedArray()
             )
     }.let { this }
@@ -94,7 +94,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value) })
+                    listOf(field, value?.let { encode(value, true) })
                 }.toTypedArray()
             )
     }.let { this }
@@ -109,36 +109,36 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
 
 actual class Transaction(val js: firebase.firestore.Transaction) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("merge" to merge)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("merge" to merge)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFields)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data)!!, json("mergeFields" to mergeFieldPaths)) }
+    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("merge" to merge)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("merge" to merge)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFields)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
             .let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)) }
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
             .let { this }
 
-    actual fun update(documentRef: DocumentReference, data: Any) =
-        rethrow { js.update(documentRef.js, encode(data)!!) }
+    actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
+        rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
             .let { this }
 
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T) =
-        rethrow { js.update(documentRef.js, encode(strategy, data)!!) }
+    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        rethrow { js.update(documentRef.js, encode(strategy, data, encodeDefaults)!!) }
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
@@ -148,7 +148,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it) })
+                    listOf(field, value?.let { encode(it, true) })
                 }.toTypedArray()
             )
     }.let { this }
@@ -160,7 +160,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it)!! })
+                    listOf(field, value?.let { encode(it, true)!! })
                 }.toTypedArray()
             )
     }.let { this }
@@ -181,29 +181,29 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val path: String
         get() = rethrow { js.path }
 
-    actual suspend fun set(data: Any, merge: Boolean) =
-        rethrow { js.set(encode(data)!!, json("merge" to merge)).await() }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(encode(data, encodeDefaults)!!, json("merge" to merge)).await() }
 
-    actual suspend fun set(data: Any, vararg mergeFields: String) =
-        rethrow { js.set(encode(data)!!, json("mergeFields" to mergeFields)).await() }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun set(data: Any, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(encode(data)!!, json("mergeFields" to mergeFieldPaths)).await() }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)).await() }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean) =
-        rethrow { js.set(encode(strategy, data)!!, json("merge" to merge)).await() }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
+        rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("merge" to merge)).await() }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String) =
-        rethrow { js.set(encode(strategy, data)!!, json("mergeFields" to mergeFields)).await() }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
+        rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(encode(strategy, data)!!, json("mergeFields" to mergeFieldPaths)).await() }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)).await() }
 
-    actual suspend fun update(data: Any) =
-        rethrow { js.update(encode(data)!!).await() }
+    actual suspend fun update(data: Any, encodeDefaults: Boolean) =
+        rethrow { js.update(encode(data, encodeDefaults)!!).await() }
 
-    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T) =
-        rethrow { js.update(encode(strategy, data)!!).await() }
+    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        rethrow { js.update(encode(strategy, data, encodeDefaults)!!).await() }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
         js.takeUnless { fieldsAndValues.isEmpty() }
@@ -211,7 +211,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it) })
+                    listOf(field, value?.let { encode(it, true) })
                 }.toTypedArray()
             )
             ?.await()
@@ -223,7 +223,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
                 fieldsAndValues[0].first,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it)!! })
+                    listOf(field, value?.let { encode(it, true)!! })
                 }.toTypedArray()
             )
             ?.await()
@@ -285,11 +285,11 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
     actual val path: String
         get() =  rethrow { js.path }
 
-    actual suspend fun add(data: Any) =
-        rethrow { DocumentReference(js.add(encode(data)!!).await()) }
+    actual suspend fun add(data: Any, encodeDefaults: Boolean) =
+        rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }
 
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>) =
-        rethrow { DocumentReference(js.add(encode(strategy, data)!!).await()) }
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
+        rethrow { DocumentReference(js.add(encode(strategy, data, encodeDefaults)!!).await()) }
 }
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)

@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-fun encode(value: Any?) =
-    encode(value, firebase.database.ServerValue.TIMESTAMP)
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
-    encode(strategy, value, firebase.database.ServerValue.TIMESTAMP)
+fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+    encode(value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
+    encode(strategy, value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
 
 
 actual val Firebase.database
@@ -92,17 +92,17 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
 
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        rethrow { js.update(encode(update)).await() }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        rethrow { js.update(encode(update, encodeDefaults)).await() }
 
     actual suspend fun removeValue() = rethrow { js.remove().await() }
 
-    actual suspend fun setValue(value: Any?) = rethrow {
-        js.set(encode(value)).await()
+    actual suspend fun setValue(value: Any?, encodeDefaults: Boolean) = rethrow {
+        js.set(encode(value, encodeDefaults)).await()
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        rethrow { js.set(encode(strategy, value)).await() }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        rethrow { js.set(encode(strategy, value, encodeDefaults)).await() }
 }
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
@@ -130,14 +130,14 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
     actual suspend fun removeValue() = rethrow { js.remove().await() }
     actual suspend fun cancel() =  rethrow { js.cancel().await() }
 
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        rethrow { js.update(encode(update)).await() }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        rethrow { js.update(encode(update, encodeDefaults)).await() }
 
-    actual suspend fun setValue(value: Any) =
-        rethrow { js.set(encode(value)).await() }
+    actual suspend fun setValue(value: Any, encodeDefaults: Boolean) =
+        rethrow { js.set(encode(value, encodeDefaults)).await() }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        rethrow { js.set(encode(strategy, value)).await() }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        rethrow { js.set(encode(strategy, value, encodeDefaults)).await() }
 }
 
 actual class DatabaseException(error: dynamic) :

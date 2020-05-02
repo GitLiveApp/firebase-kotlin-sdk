@@ -7,17 +7,17 @@ package dev.gitlive.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.modules.EmptyModule
 
-fun <T> encode(strategy: SerializationStrategy<T> , value: T, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(positiveInfinity).apply { encode(strategy, value) }.value//.also { println("encoded $it") }
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(strategy, value) }.value//.also { println("encoded $it") }
 
 @ImplicitReflectionSerializer
-fun encode(value: Any?, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
-    FirebaseEncoder(positiveInfinity).apply { encode(it.firebaseSerializer(), it) }.value
+fun encode(value: Any?, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(it.firebaseSerializer(), it) }.value
 }
 
 expect fun FirebaseEncoder.structureEncoder(desc: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
 
-class FirebaseEncoder(positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
+class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
 
     var value: Any? = null
 
@@ -87,6 +87,7 @@ abstract class TimestampEncoder(internal val positiveInfinity: Any) {
 }
 
 open class FirebaseCompositeEncoder constructor(
+    private val shouldEncodeElementDefault: Boolean,
     positiveInfinity: Any,
     private val end: () -> Unit = {},
     private val set: (desc: SerialDescriptor, index: Int, value: Any?) -> Unit
@@ -102,15 +103,13 @@ open class FirebaseCompositeEncoder constructor(
 
     override fun endStructure(descriptor: SerialDescriptor) = end()
 
-    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean {
-        return false
-    }
+    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int) = shouldEncodeElementDefault
 
     override fun <T : Any> encodeNullableSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
-        set(desc, index, value?.let { FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value })
+        set(desc, index, value?.let { FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(serializer, value) }.value })
 
     override fun <T> encodeSerializableElement(desc: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
-        set(desc, index, FirebaseEncoder(positiveInfinity).apply { encode(serializer, value) }.value)
+        set(desc, index, FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(serializer, value) }.value)
 
     override fun encodeBooleanElement(desc: SerialDescriptor, index: Int, value: Boolean) = set(desc, index, value)
 
