@@ -31,6 +31,7 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
     }
     android {
         publishLibraryVariants("release", "debug")
@@ -59,10 +60,20 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }
+        val androidTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
         val jsMain by getting {
             dependencies {
 //                implementation(npm("firebase", "6.2.3"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+            }
+        }
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
             }
         }
         val iosMain by getting {

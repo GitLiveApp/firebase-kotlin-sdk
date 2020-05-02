@@ -35,6 +35,8 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
+        browser()
     }
 //    js("reactnative") {
 //        val main by compilations.getting {
@@ -56,12 +58,27 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
             }
         }
-//        val iosMain by creating
+        val androidTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
+        }
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
