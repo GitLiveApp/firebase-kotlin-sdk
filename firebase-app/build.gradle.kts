@@ -69,16 +69,6 @@ kotlin {
                 api("com.google.firebase:firebase-common:19.2.0")
             }
         }
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {

@@ -138,6 +138,10 @@ subprojects {
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
+            "commonTestImplementation"(kotlin("test-common"))
+            "commonTestImplementation"(kotlin("test-annotations-common"))
+            "jsTestImplementation"(kotlin("test-js"))
+            "androidTestImplementation"(kotlin("test-junit"))
         }
     }
 
