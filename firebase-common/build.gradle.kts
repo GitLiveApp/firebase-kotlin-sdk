@@ -22,6 +22,14 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
     }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+    }
 }
 
 kotlin {
@@ -62,7 +70,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-//                implementation(npm("firebase", "6.2.3"))
+                api(npm("firebase", "7.14.0"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }

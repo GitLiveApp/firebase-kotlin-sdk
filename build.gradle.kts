@@ -20,7 +20,7 @@ buildscript {
 }
 
 val targetSdkVersion by extra(28)
-val minSdkVersion by extra(14)
+val minSdkVersion by extra(16)
 
 
 tasks {
@@ -140,8 +140,15 @@ subprojects {
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.4")
             "jsTestImplementation"(kotlin("test-js"))
-            "androidTestImplementation"(kotlin("test-junit"))
+            "androidAndroidTestImplementation"(kotlin("test-junit"))
+            "androidAndroidTestImplementation"("junit:junit:4.12")
+            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.1.0")
         }
     }
 

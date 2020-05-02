@@ -11,11 +11,21 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+    }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
     }
 }
 
@@ -26,6 +36,8 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
+        browser()
     }
     android {
         publishLibraryVariants("release", "debug")
@@ -53,8 +65,7 @@ kotlin {
                 api("com.google.firebase:firebase-auth:19.1.0")
             }
         }
-//        val iosMain by creating
-        
+
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))

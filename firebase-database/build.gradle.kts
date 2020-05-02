@@ -17,6 +17,14 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
     }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+    }
 }
 
 kotlin {
