@@ -45,7 +45,7 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
     actual val user: FirebaseUser?
-        get() = ios.user?.let { FirebaseUser(it) }
+        get() = FirebaseUser(ios.user)
 }
 
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
