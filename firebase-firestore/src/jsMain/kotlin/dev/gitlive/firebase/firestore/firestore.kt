@@ -269,6 +269,13 @@ actual open class Query(open val js: firebase.firestore.Query) {
         )
     }
 
+    internal actual fun _where(field: String, vararg arrayContainsAny: Any) = rethrow {
+        Query(js.where(field, "array-contains-any", arrayContainsAny))
+    }
+    internal actual fun _where(path: FieldPath, vararg arrayContainsAny: Any) = rethrow {
+        Query(js.where(path, "array-contains-any", arrayContainsAny))
+    }
+
     actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {
             js.onSnapshot(

@@ -26,8 +26,8 @@ val minSdkVersion by extra(14)
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         onlyIfModified(true)
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File("$buildDir", "Firebase-6.17.0.zip"))
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.23.0/Firebase-6.23.0.zip")
+        dest(File("$buildDir", "Firebase-6.23.0.zip"))
         overwrite(true)
 
     }
@@ -138,6 +138,10 @@ subprojects {
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.4")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.4")
+            "commonTestImplementation"(kotlin("test-common"))
+            "commonTestImplementation"(kotlin("test-annotations-common"))
+            "androidTestImplementation"(kotlin("test-junit"))
+            "androidTestImplementation"("junit:junit:4.12")
         }
     }
 
