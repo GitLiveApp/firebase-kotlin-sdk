@@ -60,8 +60,8 @@ expect open class Query {
     internal fun _where(path: FieldPath, equalTo: Any?): Query
     internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    internal fun _where(field: String, vararg arrayContainsAny: Any): Query
-    internal fun _where(path: FieldPath, vararg arrayContainsAny: Any): Query
+    internal fun _where(field: String, arrayContainsAny: List<Any>): Query
+    internal fun _where(path: FieldPath, arrayContainsAny: List<Any>): Query
     val snapshots: Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
 }
@@ -70,8 +70,8 @@ fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
-fun Query.where(field: String, vararg arrayContainsAny: Any) = _where(field, arrayContainsAny)
-fun Query.where(path: FieldPath, vararg arrayContainsAny: Any) = _where(path, arrayContainsAny)
+fun Query.where(field: String, arrayContainsAny: List<Any>) = _where(field, arrayContainsAny)
+fun Query.where(path: FieldPath, arrayContainsAny: List<Any>) = _where(path, arrayContainsAny)
 
 
 expect class WriteBatch {

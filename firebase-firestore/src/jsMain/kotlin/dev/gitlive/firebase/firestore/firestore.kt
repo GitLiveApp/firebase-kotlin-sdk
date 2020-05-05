@@ -269,10 +269,10 @@ actual open class Query(open val js: firebase.firestore.Query) {
         )
     }
 
-    internal actual fun _where(field: String, vararg arrayContainsAny: Any) = rethrow {
+    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = rethrow {
         Query(js.where(field, "array-contains-any", arrayContainsAny))
     }
-    internal actual fun _where(path: FieldPath, vararg arrayContainsAny: Any) = rethrow {
+    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = rethrow {
         Query(js.where(path, "array-contains-any", arrayContainsAny))
     }
 

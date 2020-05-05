@@ -205,11 +205,11 @@ actual open class Query(open val ios: FIRQuery) {
         }
     )
 
-    internal actual fun _where(field: String, vararg arrayContainsAny: Any) = Query(
-        ios.queryWhereField(field, arrayContainsAny = arrayContainsAny.toList())
+    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = Query(
+        ios.queryWhereField(field, arrayContainsAny = arrayContainsAny)
     )
-    internal actual fun _where(path: FieldPath, vararg arrayContainsAny: Any) = Query(
-        ios.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny.toList())
+    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = Query(
+        ios.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny)
     )
 }
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {

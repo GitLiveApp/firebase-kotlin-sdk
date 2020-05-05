@@ -295,11 +295,11 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 
-    internal actual fun _where(field: String, vararg arrayContainsAny: Any) = Query(
-        android.whereArrayContainsAny(field, arrayContainsAny.toList())
+    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = Query(
+        android.whereArrayContainsAny(field, arrayContainsAny)
     )
-    internal actual fun _where(path: FieldPath, vararg arrayContainsAny: Any) = Query(
-        android.whereArrayContainsAny(path, arrayContainsAny.toList())
+    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = Query(
+        android.whereArrayContainsAny(path, arrayContainsAny)
     )
 }
 
