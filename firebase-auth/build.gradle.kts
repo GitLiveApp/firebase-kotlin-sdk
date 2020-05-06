@@ -43,7 +43,17 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/GoogleSignIn")
+                linkerOpts("-ObjC")
+//                compilerOpts("-framework AppAuth")
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -73,6 +83,7 @@ kotlin {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
                     compilerOpts("-F$projectDir/../build/Firebase/FirebaseAuth")
+                    compilerOpts("-F$projectDir/../build/Firebase/GoogleSignIn")
                 }
             }
         }
@@ -81,6 +92,7 @@ kotlin {
             summary = ""
             homepage = ""
         }
+
     }
 }
 

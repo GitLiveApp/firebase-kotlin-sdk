@@ -11,19 +11,19 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import platform.Foundation.NSBundle
 
 class FirebaseAuthTest {
 
     @BeforeTest
     fun initializeFirebase() {
         Firebase.initialize(null, FirebaseOptions(
-            applicationId ="fir-kotlin-sdk",
-            apiKey = "AIzaSyDft_DSsVA7KPJj_GItUvMLjk6wbOdGBOs",
-            databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+            applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+            apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+            databaseUrl = "https://fir- kotlin-sdk.firebaseio.com",
             storageBucket = "fir-kotlin-sdk.appspot.com",
-            projectId ="fir-kotlin-sdk"
+            projectId = "fir-kotlin-sdk"
         ))
-
     }
 
     @Test

@@ -70,7 +70,7 @@ kotlin {
                 val firebasefunctions by cinterops.creating {
                     packageName("cocoapods.FirebaseFunctions")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseFunctions")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFunctions")
                 }
             }
         }

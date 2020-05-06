@@ -38,8 +38,7 @@ actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
     .values
     .map { FirebaseApp(it as FIRApp) }
 
-private fun FirebaseOptions.toIos() = FIROptions().apply {
-        bundleID = this@toIos.applicationId
+private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, "846484016111").apply {
         APIKey = this@toIos.apiKey
         databaseURL = this@toIos.databaseUrl
         trackingID = this@toIos.gaTrackingId

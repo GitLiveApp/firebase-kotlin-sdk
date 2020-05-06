@@ -71,7 +71,7 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseFirestore")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFirestore")
                 }
             }
         }
