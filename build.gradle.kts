@@ -26,8 +26,8 @@ val minSdkVersion by extra(14)
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         onlyIfModified(true)
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.23.0/Firebase-6.23.0.zip")
-        dest(File("$buildDir", "Firebase-6.23.0.zip"))
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
+        dest(File("$buildDir", "Firebase-6.17.0.zip"))
         overwrite(true)
 
     }
