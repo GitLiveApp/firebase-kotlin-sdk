@@ -294,6 +294,13 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
             }
         }
     )
+
+    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = Query(
+        android.whereArrayContainsAny(field, arrayContainsAny)
+    )
+    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = Query(
+        android.whereArrayContainsAny(path, arrayContainsAny)
+    )
 }
 
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
