@@ -59,10 +59,10 @@ expect class DatabaseReference : Query {
     fun child(path: String): DatabaseReference
     fun onDisconnect(): OnDisconnect
     @ImplicitReflectionSerializer
-    suspend fun setValue(value: Any?)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T)
+    suspend fun setValue(value: Any?, encodeDefaults: Boolean = true)
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
     @ImplicitReflectionSerializer
-    suspend fun updateChildren(update: Map<String, Any?>)
+    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
     suspend fun removeValue()
 }
 
@@ -86,9 +86,9 @@ expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
     @ImplicitReflectionSerializer
-    suspend fun setValue(value: Any)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T)
+    suspend fun setValue(value: Any, encodeDefaults: Boolean = true)
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
     @ImplicitReflectionSerializer
-    suspend fun updateChildren(update: Map<String, Any?>)
+    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
 }
 

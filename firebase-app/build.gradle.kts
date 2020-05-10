@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
-version = "0.1.0"
+version = "0.2.0"
 
 
 plugins {
@@ -26,6 +26,14 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
     }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+    }
 }
 
 kotlin {
@@ -35,6 +43,8 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
+        browser()
     }
 //    js("reactnative") {
 //        val main by compilations.getting {
@@ -56,12 +66,17 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.2.0")
             }
         }
-//        val iosMain by creating
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
@@ -69,7 +84,7 @@ kotlin {
                 val firebasecore by cinterops.creating {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseAnalytics")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
                 }
             }
         }

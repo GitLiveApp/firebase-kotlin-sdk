@@ -33,11 +33,11 @@ actual class HttpsCallableReference internal constructor(val js: firebase.functi
     actual suspend operator fun invoke() =
         rethrow { HttpsCallableResult(js().await()) }
 
-    actual suspend operator fun invoke(data: Any) =
-        rethrow { HttpsCallableResult(js(encode(data)).await()) }
+    actual suspend operator fun invoke(data: Any, encodeDefaults: Boolean) =
+        rethrow { HttpsCallableResult(js(encode(data, encodeDefaults)).await()) }
 
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T) =
-        rethrow { HttpsCallableResult(js(encode(strategy, data)).await()) }
+    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        rethrow { HttpsCallableResult(js(encode(strategy, data, encodeDefaults)).await()) }
 }
 
 actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCallableResult) {

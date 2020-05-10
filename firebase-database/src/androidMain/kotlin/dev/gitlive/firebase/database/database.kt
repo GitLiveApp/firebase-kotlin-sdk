@@ -16,19 +16,17 @@ import dev.gitlive.firebase.decode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-fun encode(value: Any?) =
-    dev.gitlive.firebase.encode(value, ServerValue.TIMESTAMP)
+fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+    dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
-    dev.gitlive.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
@@ -144,18 +142,18 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
-    actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
+    actual suspend fun setValue(value: Any?, encodeDefaults: Boolean) = android.setValue(encode(value, encodeDefaults))
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(encode(strategy, value))
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        android.setValue(encode(strategy, value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(encode(update) as Map<String, Any?>)
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        android.updateChildren(encode(update, encodeDefaults) as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
@@ -194,18 +192,18 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend fun setValue(value: Any) =
-        android.setValue(encode(value))
+    actual suspend fun setValue(value: Any, encodeDefaults: Boolean) =
+        android.setValue(encode(value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(encode(strategy, value))
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        android.setValue(encode(strategy, value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}
 
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(it) })
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        android.updateChildren(update.mapValues { (_, it) -> encode(it, encodeDefaults) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 }
