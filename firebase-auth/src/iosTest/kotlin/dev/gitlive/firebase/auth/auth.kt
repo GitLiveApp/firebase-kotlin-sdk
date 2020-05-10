@@ -7,11 +7,11 @@ package dev.gitlive.firebase.auth
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import platform.Foundation.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import platform.Foundation.NSBundle
 
 class FirebaseAuthTest {
 
@@ -27,8 +27,21 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSignInWithUsernameAndPassword() = runBlocking {
-        val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
+    fun testSignInWithUsernameAndPassword() {
+        val auth = Firebase.auth
+        var done = false
+        lateinit var result: AuthResult
+        //GlobalScope.launch(Dispatchers.Unconfined) {
+        MainScope().launch {
+            result = auth.signInWithEmailAndPassword("test@test.com", "test123")
+            println("Stop the run, cant stop the run")
+            done = true
+        }
+        while (!done) {
+            println("LoopStart")
+            NSRunLoop.mainRunLoop.runMode(NSDefaultRunLoopMode, beforeDate = NSDate.create(timeInterval = 1.0, sinceDate = NSDate()))
+            println("LoopEnd")
+        }
         assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
     }
 }

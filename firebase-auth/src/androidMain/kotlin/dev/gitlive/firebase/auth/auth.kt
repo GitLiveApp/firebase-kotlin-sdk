@@ -22,7 +22,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         get() = android.currentUser?.let { FirebaseUser(it) }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(android.signInWithEmailAndPassword(email, password).await())
+        AuthResult(android.signInWithCustomToken(email).await())
+        //AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(android.signInWithCustomToken(token).await())
