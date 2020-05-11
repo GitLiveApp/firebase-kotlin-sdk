@@ -7,10 +7,11 @@ package dev.gitlive.firebase.auth
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
-import kotlinx.coroutines.GlobalScope
+import kotlin.random.Random
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
@@ -35,5 +36,15 @@ class FirebaseAuthTest {
     fun testSignInWithUsernameAndPassword() = runTest {
         val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
         assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
+    }
+
+    @Test
+    fun testCreateUserWithEmailAndPassword() = runTest {
+        val email = "test+${Random.nextInt(100000)}@test.com"
+        val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
+        assertNotEquals(null, createResult.user?.uid)
+
+        val signInResult = Firebase.auth.signInWithEmailAndPassword(email, "test123")
+        assertEquals(createResult.user?.uid, signInResult.user?.uid)
     }
 }
