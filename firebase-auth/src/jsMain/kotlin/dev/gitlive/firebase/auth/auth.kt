@@ -23,6 +23,9 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
      rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
 
+    actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
+     rethrow { AuthResult(js.createUserWithEmailAndPassword(email, password).await()) }
+
     actual suspend fun signInWithCustomToken(token: String)
             = rethrow { AuthResult(js.signInWithCustomToken(token).await()) }
 
