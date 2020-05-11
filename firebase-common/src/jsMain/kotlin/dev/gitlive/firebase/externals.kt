@@ -76,6 +76,9 @@ external object firebase {
     object user {
         abstract class User {
             val uid: String
+            val displayName: String?
+            val email: String?
+            val phoneNumber: String?
             val isAnonymous: Boolean
 
             fun delete(): Promise<Unit>
