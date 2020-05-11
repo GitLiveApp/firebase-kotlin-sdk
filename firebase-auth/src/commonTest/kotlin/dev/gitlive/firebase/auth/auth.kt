@@ -46,5 +46,7 @@ class FirebaseAuthTest {
 
         val signInResult = Firebase.auth.signInWithEmailAndPassword(email, "test123")
         assertEquals(createResult.user?.uid, signInResult.user?.uid)
+
+        signInResult.user!!.delete()
     }
 }
