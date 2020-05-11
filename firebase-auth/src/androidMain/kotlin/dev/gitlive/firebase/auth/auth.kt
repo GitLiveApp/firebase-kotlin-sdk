@@ -21,6 +21,10 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
+    actual suspend fun sendPasswordResetEmail(email: String) {
+        android.sendPasswordResetEmail(email).await()
+    }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
