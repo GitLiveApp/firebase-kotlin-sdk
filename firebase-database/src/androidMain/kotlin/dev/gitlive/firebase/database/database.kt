@@ -13,8 +13,10 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.decode
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
@@ -24,12 +26,13 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-fun encode(value: Any?) =
-    dev.gitlive.firebase.encode(value, ServerValue.TIMESTAMP)
+fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+    dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
-    dev.gitlive.firebase.encode(strategy, value, ServerValue.TIMESTAMP)
+fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
+@OptIn(FlowPreview::class)
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
@@ -84,7 +87,8 @@ actual open class Query internal constructor(
 
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual val valueEvents get() = callbackFlow {
+    actual val valueEvents: Flow<DataSnapshot>
+        get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 offer(DataSnapshot(snapshot))
@@ -98,7 +102,7 @@ actual open class Query internal constructor(
         awaitClose { android.removeEventListener(listener) }
     }
 
-    actual fun childEvents(vararg types: Type) = callbackFlow {
+    actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
         val listener = object : ChildEventListener {
 
             val moved by lazy { types.contains(Type.MOVED) }
@@ -144,18 +148,18 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(android.onDisconnect(), persistenceEnabled)
 
-    actual suspend fun setValue(value: Any?) = android.setValue(encode(value))
+    actual suspend fun setValue(value: Any?, encodeDefaults: Boolean) = android.setValue(encode(value, encodeDefaults))
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(encode(strategy, value))
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        android.setValue(encode(strategy, value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(encode(update) as Map<String, Any?>)
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        android.updateChildren(encode(update, encodeDefaults) as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
@@ -194,18 +198,18 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    actual suspend fun setValue(value: Any) =
-        android.setValue(encode(value))
+    actual suspend fun setValue(value: Any, encodeDefaults: Boolean) =
+        android.setValue(encode(value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) =
-        android.setValue(encode(strategy, value))
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+        android.setValue(encode(strategy, value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}
 
-    actual suspend fun updateChildren(update: Map<String, Any?>) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(it) })
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
+        android.updateChildren(update.mapValues { (_, it) -> encode(it, encodeDefaults) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 }

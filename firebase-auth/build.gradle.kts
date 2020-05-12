@@ -11,11 +11,21 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+    }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
     }
 }
 
@@ -26,12 +36,24 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
+        browser()
     }
     android {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/GoogleSignIn")
+                linkerOpts("-ObjC")
+//                compilerOpts("-framework AppAuth")
+            }
+        }
+    }
     jvm {
         val main by compilations.getting {
             kotlinOptions {
@@ -39,7 +61,6 @@ kotlin {
             }
         }
     }
-
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
@@ -60,7 +81,6 @@ kotlin {
                 api("com.google.firebase:firebase-auth:19.1.0")
             }
         }
-//        val iosMain by creating
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
         }
@@ -72,6 +92,7 @@ kotlin {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
                     compilerOpts("-F$projectDir/../build/Firebase/FirebaseAuth")
+                    compilerOpts("-F$projectDir/../build/Firebase/GoogleSignIn")
                 }
             }
         }
@@ -80,6 +101,7 @@ kotlin {
             summary = ""
             homepage = ""
         }
+
     }
 }
 

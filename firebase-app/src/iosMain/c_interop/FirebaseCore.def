@@ -1,4 +1,4 @@
 language = Objective-C
 modules = FirebaseCore
 compilerOpts = -framework FirebaseCore
-linkerOpts = -framework FirebaseCore
+linkerOpts = -framework FirebaseCore -framework FIRAnalyticsConnector -framework FirebaseAnalytics -framework FirebaseCore -framework FirebaseCoreDiagnostics -framework FirebaseInstallations -framework FirebaseInstanceID -framework GoogleAppMeasurement -framework GoogleDataTransport -framework GoogleDataTransportCCTSupport -framework GoogleUtilities -framework PromisesObjC -framework nanopb -framework StoreKit -lsqlite3

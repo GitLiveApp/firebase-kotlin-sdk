@@ -36,18 +36,18 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
     @Suppress("UNCHECKED_CAST")
     @ImplicitReflectionSerializer
-    override fun serialize(encoder: Encoder, obj: Map<String, Any?>) {
-        map = obj
-        keys = obj.keys.toList()
-        val collectionEncoder = encoder.beginCollection(descriptor, obj.size)
+    override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
+        map = value
+        keys = value.keys.toList()
+        val collectionEncoder = encoder.beginCollection(descriptor, value.size)
         keys.forEachIndexed { index, key ->
-            val value = map.getValue(key)
-            val serializer = (value?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any?>
+            val listValue = map.getValue(key)
+            val serializer = (listValue?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any?>
             String.serializer().let {
                 collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
             }
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index * 2 + 1, serializer, value
+                serializer.descriptor, index * 2 + 1, serializer, listValue
             )
         }
         collectionEncoder.endStructure(descriptor)
@@ -81,25 +81,26 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     @Suppress("UNCHECKED_CAST")
     @ImplicitReflectionSerializer
-    override fun serialize(encoder: Encoder, obj: Iterable<Any?>) {
-        list = obj.toList()
+    override fun serialize(encoder: Encoder, value: Iterable<Any?>) {
+        list = value.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, list.size)
-        list.forEachIndexed { index, value ->
-            val serializer = (value?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any>
+        list.forEachIndexed { index, listValue ->
+            val serializer = (listValue?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any>
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index, serializer, value
+                serializer.descriptor, index, serializer, listValue
             )
         }
         collectionEncoder.endStructure(descriptor)
     }
 
     override fun deserialize(decoder: Decoder): List<Any?> {
-        val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
-        val list = mutableListOf<Any?>()
+        throw NotImplementedError()
+//        val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
+//        val list = mutableListOf<Any?>()
 //        list.forEachIndexed { index, _ ->
 //            list.add(index, collectionDecoder.decodeNullableSerializableElement(index))
 //        }
-        return list
+//        return list
     }
 }
 

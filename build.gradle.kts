@@ -20,14 +20,14 @@ buildscript {
 }
 
 val targetSdkVersion by extra(28)
-val minSdkVersion by extra(14)
+val minSdkVersion by extra(16)
 
 
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         onlyIfModified(true)
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.23.0/Firebase-6.23.0.zip")
-        dest(File("$buildDir", "Firebase-6.23.0.zip"))
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
+        dest(File("$buildDir", "Firebase-6.17.0.zip"))
         overwrite(true)
 
     }
@@ -138,20 +138,31 @@ subprojects {
         }
 
         dependencies {
-            "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.5")
-            "jsMainImplementation"(kotlin("stdlib-js"))
-            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.5")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5")
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
             "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
             "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.0")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5") {
                 exclude("com.google.android.gms")
             }
+            "commonMainImplementation"(kotlin("stdlib-common"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.5")
+            "jsMainImplementation"(kotlin("stdlib-js"))
+            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.5")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.5")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.5")
+            "commonTestImplementation"(kotlin("test-common"))
+            "commonTestImplementation"(kotlin("test-annotations-common"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.5")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.5")
+            "jsTestImplementation"(kotlin("test-js"))
+            "androidAndroidTestImplementation"(kotlin("test-junit"))
+            "androidAndroidTestImplementation"("junit:junit:4.12")
+            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.1.0")
         }
     }
 

@@ -2,13 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = "0.1.0"
+version = "0.2.0"
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.70"
+    kotlin("plugin.serialization") version "1.3.72"
 }
 
 android {
@@ -22,6 +22,14 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
     }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+    }
 }
 
 kotlin {
@@ -31,6 +39,7 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
     }
     android {
         publishLibraryVariants("release", "debug")
@@ -74,7 +83,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-//                implementation(npm("firebase", "6.2.3"))
+                api(npm("firebase", "7.14.0"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }

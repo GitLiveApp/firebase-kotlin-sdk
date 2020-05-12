@@ -1,4 +1,4 @@
-version = "0.1.0"
+version = "0.2.0"
 
 plugins {
     id("com.android.library")
@@ -16,6 +16,14 @@ android {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+    }
+    testOptions {
+        unitTests.apply {
+            isIncludeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
     }
 }
 
@@ -72,7 +80,7 @@ kotlin {
                 val firebaseDatabase by cinterops.creating {
                     packageName("cocoapods.FirebaseDatabase")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseDatabase.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseDatabase")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseDatabase")
                 }
             }
         }
