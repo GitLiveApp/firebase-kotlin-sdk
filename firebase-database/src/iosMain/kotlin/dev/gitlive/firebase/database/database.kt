@@ -24,10 +24,10 @@ import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-fun encode(value: Any?) =
-    dev.gitlive.firebase.encode(value, FIRServerValue.timestamp())
-fun <T> encode(strategy: SerializationStrategy<T> , value: T): Any? =
-    dev.gitlive.firebase.encode(strategy, value, FIRServerValue.timestamp())
+fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+    dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
+fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -110,17 +110,17 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
 
-    actual suspend fun setValue(value: Any?) {
-        ios.await(persistenceEnabled) { setValue(encode(value), it) }
+    actual suspend fun setValue(value: Any?, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { setValue(encode(value, encodeDefaults), it) }
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) {
-        ios.await(persistenceEnabled) { setValue(encode(strategy, value), it) }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeDefaults), it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update) as Map<Any?, *>, it) }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults) as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
@@ -157,16 +157,16 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend fun setValue(value: Any) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value), it) }
+    actual suspend fun setValue(value: Any, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeDefaults), it) }
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value), it) }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeDefaults), it) }
     }
 
-    actual suspend fun updateChildren(update: Map<String, Any?>) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it) } as Map<Any?, *>, it) }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults) } as Map<Any?, *>, it) }
     }
 }
 
