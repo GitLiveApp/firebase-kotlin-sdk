@@ -110,7 +110,7 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
     actual inline fun <reified T> value() =
         rethrow { decode<T>(value = js.`val`()) }
 
-    actual inline fun <T> value(strategy: DeserializationStrategy<T>) =
+    actual fun <T> value(strategy: DeserializationStrategy<T>) =
         rethrow { decode(strategy, js.`val`()) }
 
     actual val exists get() = rethrow { js.exists() }

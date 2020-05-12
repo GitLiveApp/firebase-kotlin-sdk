@@ -218,9 +218,11 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
             .await().run { Unit }
 
+    @Suppress("UNCHECKED_CAST")
     actual suspend fun update(data: Any, encodeDefaults: Boolean) =
         android.update(encode(data, encodeDefaults) as Map<String, Any>).await().run { Unit }
 
+    @Suppress("UNCHECKED_CAST")
     actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         android.update(encode(strategy, data, encodeDefaults) as Map<String, Any>).await().run { Unit }
 
@@ -281,17 +283,17 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     }
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android ->
-            (greaterThan?.let { android.whereGreaterThan(field, it) } ?: android).let { android ->
-                arrayContains?.let { android.whereArrayContains(field, it) } ?: android
+        (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
+            (greaterThan?.let { android2.whereGreaterThan(field, it) } ?: android2).let { android3 ->
+                arrayContains?.let { android3.whereArrayContains(field, it) } ?: android3
             }
         }
     )
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { android.whereLessThan(path, it) } ?: android).let { android ->
-            (greaterThan?.let { android.whereGreaterThan(path, it) } ?: android).let { android ->
-                arrayContains?.let { android.whereArrayContains(path, it) } ?: android
+        (lessThan?.let { android.whereLessThan(path, it) } ?: android).let { android2 ->
+            (greaterThan?.let { android2.whereGreaterThan(path, it) } ?: android2).let { android3 ->
+                arrayContains?.let { android3.whereArrayContains(path, it) } ?: android3
             }
         }
     )

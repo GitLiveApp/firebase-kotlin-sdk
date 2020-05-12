@@ -134,6 +134,7 @@ expect class CollectionReference : Query {
 
 expect class FirebaseFirestoreException : FirebaseException
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 expect val FirebaseFirestoreException.code: FirestoreExceptionCode
 
 expect enum class FirestoreExceptionCode {

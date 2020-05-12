@@ -13,9 +13,13 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.decode
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
@@ -28,6 +32,7 @@ fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
+@OptIn(FlowPreview::class)
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
@@ -82,7 +87,8 @@ actual open class Query internal constructor(
 
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual val valueEvents get() = callbackFlow {
+    actual val valueEvents: Flow<DataSnapshot>
+        get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
                 offer(DataSnapshot(snapshot))
@@ -96,7 +102,7 @@ actual open class Query internal constructor(
         awaitClose { android.removeEventListener(listener) }
     }
 
-    actual fun childEvents(vararg types: Type) = callbackFlow {
+    actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
         val listener = object : ChildEventListener {
 
             val moved by lazy { types.contains(Type.MOVED) }

@@ -251,9 +251,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
-            (lessThan?.let {js.where(field, "<", it) } ?: js).let { js ->
-                (greaterThan?.let { js.where(field, ">", it) } ?: js).let { js ->
-                    arrayContains?.let { js.where(field, "array-contains", it) } ?: js
+            (lessThan?.let {js.where(field, "<", it) } ?: js).let { js2 ->
+                (greaterThan?.let { js2.where(field, ">", it) } ?: js2).let { js3 ->
+                    arrayContains?.let { js3.where(field, "array-contains", it) } ?: js3
                 }
             }
         )
@@ -261,9 +261,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
-            (lessThan?.let {js.where(path, "<", it) } ?: js).let { js ->
-                (greaterThan?.let { js.where(path, ">", it) } ?: js).let { js ->
-                    arrayContains?.let { js.where(path, "array-contains", it) } ?: js
+            (lessThan?.let {js.where(path, "<", it) } ?: js).let { js2 ->
+                (greaterThan?.let { js2.where(path, ">", it) } ?: js2).let { js3 ->
+                    arrayContains?.let { js3.where(path, "array-contains", it) } ?: js3
                 }
             }
         )
@@ -301,6 +301,7 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
@@ -380,7 +381,7 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-fun errorToException(e: Throwable) = when(val code = e.asDynamic().code as String?) {
+fun errorToException(e: Throwable) = when(e.asDynamic().code as String?) {
     "cancelled" -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
     "invalid-argument" -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
     "deadline-exceeded" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
