@@ -13,6 +13,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.FirebaseException
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -28,7 +33,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun batch() = WriteBatch(ios.batch())
 
-    actual fun setLoggingEnabled(loggingEnabled: Boolean) =
+    actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =
         FIRFirestore.enableLogging(loggingEnabled)
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
@@ -47,7 +52,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        ios.setData(encode(strategy, data)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
+        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }

@@ -35,11 +35,11 @@ actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
 actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {
     actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 
-    actual suspend operator fun invoke(data: Any) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(data), it) })
+    actual suspend operator fun invoke(data: Any, encodeDefaults: Boolean) =
+        HttpsCallableResult(ios.awaitResult { callWithObject(encode(data, encodeDefaults), it) })
 
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(strategy, data), it) })
+    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        HttpsCallableResult(ios.awaitResult { callWithObject(encode(strategy, data, encodeDefaults), it) })
 }
 
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {

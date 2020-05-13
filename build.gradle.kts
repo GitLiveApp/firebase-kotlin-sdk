@@ -2,7 +2,7 @@ import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-    kotlin("multiplatform") version "1.3.70" apply false
+    kotlin("multiplatform") version "1.3.72" apply false
     id("de.undercouch.download").version("3.4.3")
     id("base")
 }
