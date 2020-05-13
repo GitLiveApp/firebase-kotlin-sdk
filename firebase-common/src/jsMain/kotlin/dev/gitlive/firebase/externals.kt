@@ -58,6 +58,7 @@ external object firebase {
             val currentUser: user.User?
 
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
+            fun createUserWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
