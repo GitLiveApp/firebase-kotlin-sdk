@@ -4,9 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.*
 import kotlin.random.Random
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -17,19 +15,20 @@ expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseAuthTest {
-
-    @BeforeTest
-    fun initializeFirebase() {
-        Firebase.initialize(
-            context,
-            FirebaseOptions(
-                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                storageBucket = "fir-kotlin-sdk.appspot.com",
-                projectId = "fir-kotlin-sdk"
+    companion object {
+        init {
+            // Firebase only wants to be initialized once.
+            Firebase.initialize(
+                context,
+                FirebaseOptions(
+                    applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                    apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                    databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                    storageBucket = "fir-kotlin-sdk.appspot.com",
+                    projectId = "fir-kotlin-sdk"
+                )
             )
-        )
+        }
     }
 
     @Test
