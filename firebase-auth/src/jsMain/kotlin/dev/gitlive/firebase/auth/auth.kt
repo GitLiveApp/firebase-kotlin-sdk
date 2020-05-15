@@ -57,6 +57,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
         get() = rethrow { js.isAnonymous }
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
+    actual suspend fun sendEmailVerification() = rethrow { js.sendEmailVerification().await() }
 }
 
 actual open class FirebaseAuthException(code: String?, cause: Throwable): FirebaseException(code, cause)

@@ -62,6 +62,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         get() = ios.isAnonymous()
     actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
     actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
+    actual suspend fun sendEmailVerification() = ios.await { sendEmailVerificationWithCompletion(it) }.run { Unit }
 }
 
 actual open class FirebaseAuthException(message: String): FirebaseException(message)

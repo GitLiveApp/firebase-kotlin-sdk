@@ -41,6 +41,8 @@ class FirebaseAuthTest {
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
 
+        createResult.user!!.sendEmailVerification()
+
         val signInResult = Firebase.auth.signInWithEmailAndPassword(email, "test123")
         assertEquals(createResult.user?.uid, signInResult.user?.uid)
 

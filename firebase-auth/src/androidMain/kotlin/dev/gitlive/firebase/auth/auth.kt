@@ -61,6 +61,7 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         get() = android.isAnonymous
     actual suspend fun delete() = android.delete().await().run { Unit }
     actual suspend fun reload() = android.reload().await().run { Unit }
+    actual suspend fun sendEmailVerification() = android.sendEmailVerification().await().run { Unit }
 }
 
 actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
