@@ -39,6 +39,9 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         rethrow { js.runTransaction { GlobalScope.promise { Transaction(it).func() } }.await() }
+
+    actual suspend fun clearPersistence() =
+        rethrow { js.clearPersistence().await() }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {

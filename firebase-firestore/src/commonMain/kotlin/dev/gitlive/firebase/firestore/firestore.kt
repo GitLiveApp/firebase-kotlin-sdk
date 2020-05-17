@@ -24,6 +24,7 @@ expect class FirebaseFirestore {
     fun document(documentPath: String): DocumentReference
     fun batch(): WriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
+    suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
 }
 

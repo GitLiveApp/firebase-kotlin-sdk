@@ -38,6 +38,9 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, error -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
+
+    actual suspend fun clearPersistence() =
+        await { ios.clearPersistenceWithCompletion { } }
 }
 
 actual class WriteBatch(val ios: FIRWriteBatch) {
