@@ -83,6 +83,7 @@ external object firebase {
 
             fun delete(): Promise<Unit>
             fun reload(): Promise<Unit>
+            fun sendEmailVerification(): Promise<Unit>
         }
     }
 

@@ -37,6 +37,7 @@ expect class FirebaseUser {
     val isAnonymous: Boolean
     suspend fun delete()
     suspend fun reload()
+    suspend fun sendEmailVerification()
 }
 
 expect open class FirebaseAuthException: FirebaseException
