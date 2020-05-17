@@ -58,6 +58,12 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual val uid: String
         get() = ios.uid
+    actual val displayName: String?
+        get() = ios.displayName
+    actual val email: String?
+        get() = ios.email
+    actual val phoneNumber: String?
+        get() = ios.phoneNumber
     actual val isAnonymous: Boolean
         get() = ios.isAnonymous()
     actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
