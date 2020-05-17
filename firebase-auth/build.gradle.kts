@@ -12,7 +12,6 @@ android {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
     sourceSets {
         getByName("main") {
@@ -21,7 +20,6 @@ android {
         getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
     }
     testOptions {
-        execution = "ANDROID_TEST_ORCHESTRATOR"
         unitTests.apply {
             isIncludeAndroidResources = true
         }

@@ -149,7 +149,6 @@ subprojects {
             "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
             "androidAndroidTestImplementation"("androidx.test:runner:1.1.0")
-            "androidAndroidTestUtil"("com.android.support.test:orchestrator:1.0.2")
         }
     }
 
