@@ -46,4 +46,15 @@ class FirebaseAuthTest {
 
         signInResult.user!!.delete()
     }
+
+    @Test
+    fun sendPasswordResetEmail() = runTest {
+        val email = "test+${Random.nextInt(100000)}@test.com"
+        val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
+        assertNotEquals(null, createResult.user?.uid)
+
+        Firebase.auth.sendPasswordResetEmail(email)
+
+        createResult.user!!.delete()
+    }
 }
