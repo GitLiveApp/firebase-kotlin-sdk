@@ -40,6 +40,9 @@ class FirebaseAuthTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
+        assertEquals(null, createResult.user?.displayName)
+        assertEquals(null, createResult.user?.phoneNumber)
+        assertEquals(email, createResult.user?.email)
 
         val signInResult = Firebase.auth.signInWithEmailAndPassword(email, "test123")
         assertEquals(createResult.user?.uid, signInResult.user?.uid)

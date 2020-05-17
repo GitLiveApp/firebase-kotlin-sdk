@@ -31,6 +31,9 @@ expect class AuthResult {
 
 expect class FirebaseUser {
     val uid: String
+    val displayName: String?
+    val email: String?
+    val phoneNumber: String?
     val isAnonymous: Boolean
     suspend fun delete()
     suspend fun reload()

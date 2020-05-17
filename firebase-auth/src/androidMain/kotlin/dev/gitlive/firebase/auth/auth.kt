@@ -57,6 +57,12 @@ actual class AuthResult internal constructor(val android: com.google.firebase.au
 actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
     actual val uid: String
         get() = android.uid
+    actual val displayName: String?
+        get() = android.displayName
+    actual val email: String?
+        get() = android.email
+    actual val phoneNumber: String?
+        get() = android.phoneNumber
     actual val isAnonymous: Boolean
         get() = android.isAnonymous
     actual suspend fun delete() = android.delete().await().run { Unit }
