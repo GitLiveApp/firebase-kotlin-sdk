@@ -6,19 +6,18 @@ package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.*
 import kotlin.random.Random
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseAuthTest {
-    companion object {
-        init {
-            // Firebase only wants to be initialized once.
-            Firebase.initialize(
+
+    @BeforeTest
+    fun initializeFirebase() {
+        Firebase
+            .takeIf { Firebase.apps(context).isEmpty() }
+            ?.initialize(
                 context,
                 FirebaseOptions(
                     applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -27,8 +26,7 @@ class FirebaseAuthTest {
                     storageBucket = "fir-kotlin-sdk.appspot.com",
                     projectId = "fir-kotlin-sdk"
                 )
-            )
-        }
+        )
     }
 
     @Test
