@@ -108,11 +108,7 @@ subprojects {
             )
 
             workingDir("$buildDir/node_module")
-            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine("cmd", "/c", "npm publish")
-            } else {
-                commandLine("npm", "publish")
-            }
+            commandLine("npm", "publish")
         }
     }
 
