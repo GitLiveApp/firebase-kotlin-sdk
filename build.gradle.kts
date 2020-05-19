@@ -122,8 +122,12 @@ subprojects {
             mkdir("$buildDir/node_module")
         }
 
-        tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-        tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+        if(Os.isFamily(Os.FAMILY_MAC)) {
+            tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+            tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
+        } else {
+            println("Skipping Firebase zip dowload")
+        }
 
         tasks.named("publishToMavenLocal").configure {
             shouldSign = false
