@@ -56,7 +56,6 @@ androidEmulator {
     }
 
     headless(true) // Defaults to false but should be set to true for most CI systems
-    logEmulatorOutput(true) // Defaults to false but can be enabled to have emulator output logged for debugging.
 }
 
 kotlin {
