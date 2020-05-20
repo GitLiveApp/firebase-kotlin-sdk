@@ -14,7 +14,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("com.android.tools.build:gradle:3.6.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
     }
 }
