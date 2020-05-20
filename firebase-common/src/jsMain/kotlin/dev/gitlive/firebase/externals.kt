@@ -57,7 +57,9 @@ external object firebase {
         open class Auth {
             val currentUser: user.User?
 
+            fun sendPasswordResetEmail(email: String): Promise<Unit>
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
+            fun createUserWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
@@ -74,10 +76,14 @@ external object firebase {
     object user {
         abstract class User {
             val uid: String
+            val displayName: String?
+            val email: String?
+            val phoneNumber: String?
             val isAnonymous: Boolean
 
             fun delete(): Promise<Unit>
             fun reload(): Promise<Unit>
+            fun sendEmailVerification(): Promise<Unit>
         }
     }
 

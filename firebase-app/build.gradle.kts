@@ -33,6 +33,8 @@ android {
     }
     packagingOptions {
         pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+        pickFirst("META-INF/AL2.0")
+        pickFirst("META-INF/LGPL2.1")
     }
 }
 
@@ -65,7 +67,14 @@ kotlin {
     }
 
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                linkerOpts("-ObjC")
+            }
+        }
+    }
 
     sourceSets {
         val commonMain by getting {

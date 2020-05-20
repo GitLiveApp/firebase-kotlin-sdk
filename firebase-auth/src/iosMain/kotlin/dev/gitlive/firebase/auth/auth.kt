@@ -26,8 +26,15 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
+    actual suspend fun sendPasswordResetEmail(email: String) {
+        ios.await { sendPasswordResetWithEmail(email = email, completion = it) }
+    }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
+
+    actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
+        AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
@@ -51,10 +58,17 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual val uid: String
         get() = ios.uid
+    actual val displayName: String?
+        get() = ios.displayName
+    actual val email: String?
+        get() = ios.email
+    actual val phoneNumber: String?
+        get() = ios.phoneNumber
     actual val isAnonymous: Boolean
         get() = ios.isAnonymous()
     actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
     actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
+    actual suspend fun sendEmailVerification() = ios.await { sendEmailVerificationWithCompletion(it) }.run { Unit }
 }
 
 actual open class FirebaseAuthException(message: String): FirebaseException(message)

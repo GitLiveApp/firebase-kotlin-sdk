@@ -17,7 +17,9 @@ expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
 expect class FirebaseAuth {
     val currentUser: FirebaseUser?
     val authStateChanged: Flow<FirebaseUser?>
+    suspend fun sendPasswordResetEmail(email: String)
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
+    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithCustomToken(token: String): AuthResult
     suspend fun signInAnonymously(): AuthResult
     suspend fun signOut()
@@ -29,9 +31,13 @@ expect class AuthResult {
 
 expect class FirebaseUser {
     val uid: String
+    val displayName: String?
+    val email: String?
+    val phoneNumber: String?
     val isAnonymous: Boolean
     suspend fun delete()
     suspend fun reload()
+    suspend fun sendEmailVerification()
 }
 
 expect open class FirebaseAuthException: FirebaseException

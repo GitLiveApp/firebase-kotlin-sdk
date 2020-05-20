@@ -21,8 +21,15 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
+    actual suspend fun sendPasswordResetEmail(email: String) {
+        android.sendPasswordResetEmail(email).await()
+    }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.signInWithEmailAndPassword(email, password).await())
+
+    actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
+        AuthResult(android.createUserWithEmailAndPassword(email, password).await())
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(android.signInWithCustomToken(token).await())
@@ -50,10 +57,17 @@ actual class AuthResult internal constructor(val android: com.google.firebase.au
 actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
     actual val uid: String
         get() = android.uid
+    actual val displayName: String?
+        get() = android.displayName
+    actual val email: String?
+        get() = android.email
+    actual val phoneNumber: String?
+        get() = android.phoneNumber
     actual val isAnonymous: Boolean
         get() = android.isAnonymous
     actual suspend fun delete() = android.delete().await().run { Unit }
     actual suspend fun reload() = android.reload().await().run { Unit }
+    actual suspend fun sendEmailVerification() = android.sendEmailVerification().await().run { Unit }
 }
 
 actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException

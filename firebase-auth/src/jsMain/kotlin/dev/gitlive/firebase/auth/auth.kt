@@ -20,8 +20,14 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual val currentUser: FirebaseUser?
         get() = rethrow { js.currentUser?.let { FirebaseUser(it) } }
 
+    actual suspend fun sendPasswordResetEmail(email: String) =
+     rethrow { js.sendPasswordResetEmail(email).await() }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
      rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
+
+    actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
+     rethrow { AuthResult(js.createUserWithEmailAndPassword(email, password).await()) }
 
     actual suspend fun signInWithCustomToken(token: String)
             = rethrow { AuthResult(js.signInWithCustomToken(token).await()) }
@@ -47,10 +53,17 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
 actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual val uid: String
         get() = rethrow { js.uid }
+    actual val displayName: String?
+        get() = rethrow { js.displayName }
+    actual val email: String?
+        get() = rethrow { js.email }
+    actual val phoneNumber: String?
+        get() = rethrow { js.phoneNumber }
     actual val isAnonymous: Boolean
         get() = rethrow { js.isAnonymous }
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
+    actual suspend fun sendEmailVerification() = rethrow { js.sendEmailVerification().await() }
 }
 
 actual open class FirebaseAuthException(code: String?, cause: Throwable): FirebaseException(code, cause)
