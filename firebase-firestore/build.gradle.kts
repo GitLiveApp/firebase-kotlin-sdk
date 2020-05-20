@@ -11,6 +11,7 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        setMultiDexEnabled(true)
     }
     sourceSets {
         getByName("main") {
@@ -26,6 +27,7 @@ android {
         pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
+        pickFirst("androidsupportmultidexversion.txt")
     }
 }
 
@@ -61,6 +63,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore:21.4.3")
+                implementation("com.android.support:multidex:1.0.3")
             }
         }
 
