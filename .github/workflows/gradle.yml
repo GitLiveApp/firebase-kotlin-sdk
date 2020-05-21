@@ -22,5 +22,13 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew allTests connectedAndroidTest --continue -x iosTest
+    - name: All tests excluding iosTes
+      run: ./gradlew allTests -x iosTest
+    - name: Run Android Instrumented Tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+          target: google-apis
+          arch: x86_64
+          profile: Nexus 6
+          script: ./gradlew :firebase-auth:connectedAndroidTests

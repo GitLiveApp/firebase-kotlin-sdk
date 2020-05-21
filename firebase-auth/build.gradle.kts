@@ -4,19 +4,19 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    id("com.quittle.android-emulator") version "0.2.0"
+    //id("com.quittle.android-emulator") version "0.2.0"
 }
 
-buildscript {
-    repositories {
-        jcenter()
-        google()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.6.1")
-    }
-}
+//buildscript {
+//    repositories {
+//        jcenter()
+//        google()
+//        gradlePluginPortal()
+//    }
+//    dependencies {
+//        classpath("com.android.tools.build:gradle:3.6.1")
+//    }
+//}
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -44,16 +44,17 @@ android {
 }
 
 // Optional configuration
-androidEmulator {
-    emulator {
-        name("givlive_emulator")
-        sdkVersion(28)
-        abi("x86_64")
-        includeGoogleApis(true) // Defaults to false
-    }
-
-    headless(true) // Defaults to false but should be set to true for most CI systems
-}
+//androidEmulator {
+//    emulator {
+//        name("givlive_emulator")
+//        sdkVersion(28)
+//        abi("x86_64")
+//        includeGoogleApis(true) // Defaults to false
+//
+//    }
+//    headless(false)
+//    logEmulatorOutput(false)
+//}
 
 kotlin {
     js {
