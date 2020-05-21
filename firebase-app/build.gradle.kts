@@ -8,16 +8,6 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    id("com.quittle.android-emulator") version "0.2.0"
-}
-
-buildscript {
-    repositories {
-        google()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.6.1")
-    }
 }
 
 repositories {
@@ -47,18 +37,6 @@ android {
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
     }
-}
-
-// Optional configuration
-androidEmulator {
-    emulator {
-        name("givlive_emulator") 
-        sdkVersion(28) 
-        abi("x86_64")
-        includeGoogleApis(true) // Defaults to false
-    }
-
-    headless(true) // Defaults to false but should be set to true for most CI systems
 }
 
 kotlin {
