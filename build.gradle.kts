@@ -12,10 +12,14 @@ buildscript {
         jcenter()
         google()
         gradlePluginPortal()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.6.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
 
@@ -43,12 +47,14 @@ subprojects {
 
     group = "dev.gitlive"
 
-
+    apply(plugin="com.adarshr.test-logger")
+    
     repositories {
         mavenLocal()
         mavenCentral()
         google()
         jcenter()
+        
     }
 
     var shouldSign = true
