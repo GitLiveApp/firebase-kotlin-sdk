@@ -13,6 +13,7 @@ import kotlinx.serialization.SerializationStrategy
 
 expect class FirebaseFunctions {
     fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+    fun useFunctionsEmulator(origin: String)
 }
 
 expect class HttpsCallableReference {
