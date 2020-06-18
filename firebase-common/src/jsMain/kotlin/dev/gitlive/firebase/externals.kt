@@ -92,6 +92,7 @@ external object firebase {
     object functions {
         class Functions {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
+            fun useFunctionsEmulator(origin: String)
         }
         interface HttpsCallableResult {
             val data: Any?
