@@ -25,6 +25,8 @@ actual fun Firebase.functions(app: FirebaseApp, region: String) =
 actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
+
+    actual fun useFunctionsEmulator(origin: String) = js.useFunctionsEmulator(origin)
 }
 
 @Suppress("UNCHECKED_CAST")
