@@ -12,10 +12,14 @@ buildscript {
         jcenter()
         google()
         gradlePluginPortal()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("com.android.tools.build:gradle:3.6.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
 
@@ -25,11 +29,9 @@ val minSdkVersion by extra(16)
 
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
-        onlyIfModified(true)
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File("$buildDir", "Firebase-6.17.0.zip"))
-        overwrite(true)
-
+        dest(File("$buildDir/", "Firebase-6.17.0.zip"))
+        overwrite(false)
     }
 
     val unzipIOSFirebase by creating(Copy::class) {
@@ -45,12 +47,14 @@ subprojects {
 
     group = "dev.gitlive"
 
-
+    apply(plugin="com.adarshr.test-logger")
+    
     repositories {
         mavenLocal()
         mavenCentral()
         google()
         jcenter()
+        
     }
 
     var shouldSign = true
@@ -172,14 +176,14 @@ subprojects {
             }
         }
 
-            publications.all {
-                this as MavenPublication
+        publications.all {
+            this as MavenPublication
 
-                pom {
-                    name.set("firebase-kotlin-sdk")
-                    description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
-                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-                    inceptionYear.set("2019")
+            pom {
+                name.set("firebase-kotlin-sdk")
+                description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
+                url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+                inceptionYear.set("2019")
 
                 scm {
                     url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
