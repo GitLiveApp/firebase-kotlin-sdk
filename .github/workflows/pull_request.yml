@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Tests
+name: Pull Request
 
 on:
   pull_request:
@@ -22,16 +22,6 @@ jobs:
       run: chmod +x gradlew
     - name: Run JS Tests
       run: ./gradlew cleanTest jsTest
-    - name: Firebase-App Unit tests results
-      uses: actions/upload-artifact@v1
-      with:
-        name: firebase-app-unit-tests-results
-        path: firebase-app/build/reports/tests/jsTest/index.html
-    - name: Firebase-Auth Unit tests results
-      uses: actions/upload-artifact@v1
-      with:
-        name: firebase-auth-unit-tests-results
-        path: firebase-auth/build/reports/tests/jsTest/index.html
     - name: Run Android Instrumented Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:

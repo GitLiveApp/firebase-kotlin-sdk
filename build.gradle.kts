@@ -1,5 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.3.71" apply false
@@ -115,6 +117,24 @@ subprojects {
                 commandLine("npm", "publish")
             }
         }
+
+        withType<Test> {
+            testLogging {
+                showExceptions = true
+                exceptionFormat = TestExceptionFormat.FULL
+                showStandardStreams = true
+                showCauses = true
+                showStackTraces = true
+                events = setOf(
+                    TestLogEvent.STARTED,
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR
+                )
+            }
+        }
     }
 
 //    tasks.withType<KotlinCompile<*>> {
@@ -134,7 +154,7 @@ subprojects {
         if(Os.isFamily(Os.FAMILY_MAC)) {
             tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
         } else {
-            println("Skipping Firebase zip dowload")
+            println("Skipping Firebase zip download")
         }
 
         tasks.named("publishToMavenLocal").configure {
