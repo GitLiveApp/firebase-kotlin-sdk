@@ -23,7 +23,7 @@ jobs:
     - name: Download Unzip Firebase
       run: ./gradlew unzipIOSFirebase
     - name: Check Zipper
-      run: cd build/ && ls -l
+      run: cd build/ && ls -l && pwd
     - name: Check Zipper part two
       run: cd build/Firebase/FirebaseAnalytics && ls -l
     - name: Publish
