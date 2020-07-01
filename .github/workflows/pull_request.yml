@@ -18,10 +18,18 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Download Firebase Zip
+      uses: i3h/download-release-asset@v1
+      with:
+        owner: firebase
+        repo: firebase-ios-sdk
+        tag: 6.17.0
+        file: Firebase-6.17.0.zip
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: publish --debug
+        arguments: publish
       env:
         sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
         sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
