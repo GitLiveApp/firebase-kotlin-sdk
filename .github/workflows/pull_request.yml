@@ -20,6 +20,8 @@ jobs:
         java-version: 1.8
     - name: Download Firebase Zip
       run: curl -O https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip
+    - name: Did it work
+      run: ls -l
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
