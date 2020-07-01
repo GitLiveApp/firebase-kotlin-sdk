@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Download Firebase Zip
-      uses: i3h/download-release-asset@v1
+      uses: i3h/download-release-asset@1.1.0
       with:
         owner: firebase
         repo: firebase-ios-sdk
