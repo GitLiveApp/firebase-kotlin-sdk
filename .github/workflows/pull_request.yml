@@ -21,6 +21,8 @@ jobs:
     - name: Import GPG key
       id: import_gpg
       uses: crazy-max/ghaction-import-gpg@v2
+      with:
+        git_user_signingkey: true
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         PASSPHRASE: ${{ secrets.PASSPHRASE }}
