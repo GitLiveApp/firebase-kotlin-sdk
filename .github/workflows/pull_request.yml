@@ -19,12 +19,12 @@ jobs:
       with:
         java-version: 1.8
     - name: Download Firebase Zip
-      uses: i3h/download-release-asset@v1.1.0
+      uses: fabriciobastian/download-release-asset-action@v1.0.6
       with:
-        owner: firebase
-        repo: firebase-ios-sdk
-        tag: 6.17.0
+        version: 6.17.0
+        repository: firebase/firebase-ios-sdk
         file: Firebase-6.17.0.zip
+        out: ./build/
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish
       uses: eskatos/gradle-command-action@v1
