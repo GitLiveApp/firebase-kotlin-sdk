@@ -25,6 +25,7 @@ jobs:
         repo: firebase-ios-sdk
         tag: 6.17.0
         file: Firebase-6.17.0.zip
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
