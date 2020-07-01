@@ -37,9 +37,9 @@ kotlin {
             }
         }
     }
-//    android {
-//        publishLibraryVariants("release", "debug")
-//    }
+    android {
+        publishLibraryVariants("release")
+    }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
 
