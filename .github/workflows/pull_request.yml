@@ -19,13 +19,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Download Firebase Zip
-      uses: Legion2/download-release-action@v2.1.0
-      with:
-        repository: firebase/firebase-ios-sdk
-        tag: '6.17.0'
-        path: build
-        file: Firebase-6.17.0.zip
-        token: ${{ secrets.GITHUB_TOKEN }}
+      run: curl -O https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
