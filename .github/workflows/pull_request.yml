@@ -21,7 +21,7 @@ jobs:
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: publish
+        arguments: publish --debug
       env:
         sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
         sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
