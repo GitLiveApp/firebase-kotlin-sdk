@@ -1,9 +1,9 @@
-name: Pull Request
+name: JVM
 
 on:
 #  push:
 #    branches: [ jvm-target ]
-  pull-request:
+  pull_request:
     branches: [ jvm-target ]
 
 jobs:
