@@ -31,6 +31,7 @@ val minSdkVersion by extra(16)
 
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
+        println("downloading firebase zip file")
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
         dest(File(buildDir, "Firebase-6.17.0.zip"))
         overwrite(false)
@@ -38,8 +39,10 @@ tasks {
 
     val unzipIOSFirebase by creating(Copy::class) {
         if (!File("$buildDir/Firebase").exists()) {
+            println("firebase folder does not exist")
             val zipFile = File(buildDir, "Firebase-6.17.0.zip")
             if (!zipFile.exists()) {
+                println("firebase zip does not exist")
                 dependsOn(downloadIOSFirebaseZipFile)
             }
             from(zipTree(zipFile))
