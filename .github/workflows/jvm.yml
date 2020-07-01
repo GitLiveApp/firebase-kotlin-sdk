@@ -1,7 +1,9 @@
 name: Pull Request
 
 on:
-  push:
+#  push:
+#    branches: [ jvm-target ]
+  pull-request:
     branches: [ jvm-target ]
 
 jobs:
