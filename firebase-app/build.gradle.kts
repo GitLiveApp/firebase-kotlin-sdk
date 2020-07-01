@@ -95,6 +95,9 @@ kotlin {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))
                 val firebasecore by cinterops.creating {
+                    println("Andrew------->")
+                    println("root -F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                    println("project $projectDir/src/iosMain/c_interop/FirebaseCore.def")
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
                     compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
