@@ -6,6 +6,12 @@ plugins {
     kotlin("native.cocoapods")
 }
 
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
     defaultConfig {
@@ -38,7 +44,7 @@ kotlin {
         }
     }
     android {
-        publishLibraryVariants("release")
+        publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
     val iosX64 = iosX64("ios")
