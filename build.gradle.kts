@@ -67,7 +67,6 @@ subprojects {
     var shouldSign = true
 
     tasks.withType<Sign>().configureEach {
-        println("Should sign? $shouldSign")
         onlyIf { shouldSign }
     }
     
