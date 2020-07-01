@@ -24,8 +24,8 @@ jobs:
       run: ./gradlew unzipIOSFirebase
     - name: Check Zipper
       run: cd build/ && ls -l
-    - name: CInterop
-      run: ./gradlew :firebase-app:cinteropFirebasecoreIos
+    - name: Check Zipper part two
+      run: cd build/Firebase/FirebaseAnalytics && ls -l
     - name: Publish
       uses: eskatos/gradle-command-action@v1
       with:
