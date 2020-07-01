@@ -111,6 +111,5 @@ kotlin {
 }
 
 signing {
-    useGpgCmd()
     sign(publishing.publications)
 }
