@@ -112,10 +112,9 @@ subprojects {
             group = "publishing"
             description = "Publishes all Maven publications to the github package Maven repository."
             dependsOn(withType<PublishToMavenRepository>().matching {
-                (it.name.contains("Js") || it.name.contains("Jvm")) &&
+                (!it.name.contains("ios") && it.name.contains("Android")) &&
                         it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"]
             })
-            setProperty("publication.publishableFiles", "")
         }
     }
 
