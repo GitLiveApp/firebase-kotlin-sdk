@@ -111,8 +111,9 @@ subprojects {
         val publishToGithub by creating(PublishToMavenRepository::class) {
             group = "publishing"
             description = "Publishes all Maven publications to the github package Maven repository."
-            println(repositories.map { it.name })
-            dependsOn(withType<PublishToMavenRepository>().matching { it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"] })
+            dependsOn(withType<PublishToMavenRepository>().matching {
+                it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"]
+            })
         }
     }
 
