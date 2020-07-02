@@ -20,7 +20,8 @@ jobs:
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
+#        arguments: build publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
+        arguments: build prepareForNpmPublish
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
