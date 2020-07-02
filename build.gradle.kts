@@ -115,6 +115,7 @@ subprojects {
                 (it.name.contains("Js") || it.name.contains("Jvm")) &&
                         it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"]
             })
+            setProperty("publication.publishableFiles", "")
         }
     }
 
