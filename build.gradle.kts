@@ -64,7 +64,6 @@ subprojects {
     tasks.withType<Sign>().configureEach {
         onlyIf { shouldSign }
     }
-    
 
     tasks {
 
@@ -107,6 +106,13 @@ subprojects {
 
             workingDir("$buildDir/node_module")
             commandLine("npm", "publish")
+        }
+
+        val publishToGithub by creating(PublishToMavenRepository::class) {
+            group = "publishing"
+            description = "Publishes all Maven publications to the github package Maven repository."
+            println(repositories.map { it.name })
+            dependsOn(withType<PublishToMavenRepository>().matching { it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"] })
         }
     }
 
@@ -179,6 +185,14 @@ subprojects {
                 credentials {
                     username = project.findProperty("sonatypeUsername") as String? ?: System.getenv("sonatypeUsername")
                     password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
+                }
+            }
+            maven {
+                name = "GitHubPackages"
+                url  = uri("https://maven.pkg.github.com/gitliveapp/packages")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
                 }
             }
         }
