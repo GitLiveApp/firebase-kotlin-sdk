@@ -20,9 +20,15 @@ jobs:
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository
+#        arguments: publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
+        arguments: prepareForNpmPublish
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - uses: JS-DevTools/npm-publish@v1
+      with:
+        registry: https://npm.pkg.github.com
+        package: build/node_module/package.json
+        token: ${{ secrets.NPM_TOKEN }}

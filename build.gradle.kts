@@ -94,6 +94,14 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+        val prepareForNpmPublish by creating(Exec::class) {
+            dependsOn(
+                copyPackageJson,
+                copyJS,
+                copySourceMap,
+                copyReadMe
+            )
+        }
 
         val publishToNpm by creating(Exec::class) {
 
@@ -106,15 +114,6 @@ subprojects {
 
             workingDir("$buildDir/node_module")
             commandLine("npm", "publish")
-        }
-
-        val publishToGithub by creating(PublishToMavenRepository::class) {
-            group = "publishing"
-            description = "Publishes all Maven publications to the github package Maven repository."
-            dependsOn(withType<PublishToMavenRepository>().matching {
-                (it.name.contains("Js") || it.name.contains("Jvm")) &&
-                        it.repository == project.the<PublishingExtension>().repositories["GitHubPackages"]
-            })
         }
     }
 
