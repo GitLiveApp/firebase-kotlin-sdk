@@ -20,7 +20,7 @@ jobs:
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-app:publishToGithub -x publishAndroidDebugPublicationToGitHubPackagesRepository
+        arguments: :firebase-app:publishToGithub -x publishAndroidDebugPublicationToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
