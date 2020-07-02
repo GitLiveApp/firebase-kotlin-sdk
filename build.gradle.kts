@@ -86,14 +86,14 @@ subprojects {
         }
 
         val unzipJar by registering(Copy::class) {
-            doFirst {
-                val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
-                from(this.project.zipTree(zipFile))
-                into("$buildDir/classes/kotlin/js/main/")
-            }
+            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
+            from(this.project.zipTree(zipFile))
+            println("$buildDir/classes/kotlin/js/main/")
+            into("$buildDir/classes/kotlin/js/main/")
         }
 
-        val copyJS by registering(Copy::class) {
+        val copyJS by registering {
+            mustRunAfter("unzipJar")
             doLast {
                 val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
                 val into = File("$buildDir/node_module/${project.name}.js")
@@ -112,6 +112,7 @@ subprojects {
 
         val prepareForNpmPublish by registering {
             dependsOn(
+                unzipJar,
                 copyPackageJson,
                 copySourceMap,
                 copyReadMe,
@@ -120,7 +121,9 @@ subprojects {
         }
 
         val publishToNpm by creating(Exec::class) {
+
             dependsOn(
+                unzipJar,
                 copyPackageJson,
                 copyJS,
                 copySourceMap,

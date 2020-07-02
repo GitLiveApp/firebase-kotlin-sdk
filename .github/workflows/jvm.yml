@@ -21,7 +21,7 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
 #        arguments: assemble publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
-        arguments: assemble unzipJar prepareForNpmPublish
+        arguments: assemble prepareForNpmPublish
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
