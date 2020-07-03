@@ -1,5 +1,6 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import kotlin.system.exitProcess
 
 plugins {
     kotlin("multiplatform") version "1.3.71" apply false
@@ -43,6 +44,25 @@ tasks {
             into(buildDir)
         }
         outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
+    }
+
+    val publishJvm by creating(Exec::class) {
+        var successfulRuns = 0
+        subprojects {
+            isIgnoreExitValue = true
+            commandLine("./gradlew", ":${this.name}:publishJvmPublicationToGitHubPackagesRepository")
+            doLast {
+                if(execResult.exitValue == 0) {
+                    successfulRuns += 1
+                }
+            }
+        }
+        doLast {
+            println("Total successful publications: $successfulRuns")
+            if (successfulRuns == 0) {
+                exitProcess(1)
+            }
+        }
     }
 
 }
@@ -122,16 +142,8 @@ subprojects {
         }
 
         val publishToNpm by creating(Exec::class) {
-
-            dependsOn(
-                unzipJar,
-                copyPackageJson,
-                copyJS,
-                copySourceMap,
-                copyReadMe
-            )
-
             workingDir("$buildDir/node_module")
+            isIgnoreExitValue = true
             commandLine("npm", "publish")
         }
     }

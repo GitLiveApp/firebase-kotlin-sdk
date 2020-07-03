@@ -18,8 +18,8 @@ jobs:
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
-#        arguments: assemble publishJvmPublicationToGitHubPackagesRepository publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
-        arguments: assemble prepareForNpmPublish
+#        arguments: assemble publishJvm publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
+        arguments: assemble publishJvm prepareForNpmPublish
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
@@ -29,33 +29,7 @@ jobs:
       run: npm config set //npm.pkg.github.com/:_authToken=$token
       env:
         token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Check Firebase-App
-      id: check-firebase-app
-      uses: EndBug/version-check@v1
+    - name: Publish
+      uses: eskatos/gradle-command-action@v1
       with:
-        file-name: firebase-app/build/node_module/package.json
-    - name: Publish Firebase-App
-      if: steps.check-firebase-app.outputs.changed == 'true'
-      run: |
-        cd firebase-app/build/node_module/
-        npm publish
-    - name: Publish Firebase-Auth
-      run: |
-        cd firebase-auth/build/node_module/
-        npm publish
-    - name: Publish Firebase-Common
-      run: |
-        cd firebase-common/build/node_module/
-        npm publish
-    - name: Publish Firebase-Database
-      run: |
-        cd firebase-database/build/node_module/
-        npm publish
-    - name: Publish Firebase-Firestore
-      run: |
-        cd firebase-firestore/build/node_module/
-        npm publish
-    - name: Publish Firebase-Functions
-      run: |
-        cd firebase-functions/build/node_module/
-        npm publish
+        arguments: publishToNpm
