@@ -50,7 +50,8 @@ tasks {
         var successfulRuns = 0
         subprojects {
             isIgnoreExitValue = true
-            commandLine("./gradlew", ":${this.name}:publishJvmPublicationToGitHubPackagesRepository")
+            println("Project: $name Version: $version")
+            commandLine("./gradlew", ":$name:publishJvmPublicationToGitHubPackagesRepository")
             doLast {
                 if(execResult.exitValue == 0) {
                     successfulRuns += 1
