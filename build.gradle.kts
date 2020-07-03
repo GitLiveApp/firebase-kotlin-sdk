@@ -1,6 +1,8 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
 import kotlin.system.exitProcess
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.3.71" apply false
@@ -13,10 +15,14 @@ buildscript {
         jcenter()
         google()
         gradlePluginPortal()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("com.android.tools.build:gradle:3.6.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
 
@@ -72,6 +78,7 @@ subprojects {
 
     group = "dev.gitlive"
 
+    apply(plugin="com.adarshr.test-logger")
 
     repositories {
         mavenLocal()
@@ -147,6 +154,24 @@ subprojects {
             isIgnoreExitValue = true
             commandLine("npm", "publish")
         }
+
+        withType<Test> {
+            testLogging {
+                showExceptions = true
+                exceptionFormat = TestExceptionFormat.FULL
+                showStandardStreams = true
+                showCauses = true
+                showStackTraces = true
+                events = setOf(
+                    TestLogEvent.STARTED,
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR
+                )
+            }
+        }
     }
 
 //    tasks.withType<KotlinCompile<*>> {
@@ -165,9 +190,8 @@ subprojects {
 
         if(Os.isFamily(Os.FAMILY_MAC)) {
             tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-            tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
         } else {
-            println("Skipping Firebase zip dowload")
+            println("Skipping Firebase zip download")
         }
 
         tasks.named("publishToMavenLocal").configure {

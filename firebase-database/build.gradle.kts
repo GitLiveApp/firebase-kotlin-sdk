@@ -6,6 +6,12 @@ plugins {
     kotlin("native.cocoapods")
 }
 
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
     defaultConfig {
@@ -24,6 +30,8 @@ android {
     }
     packagingOptions {
         pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+        pickFirst("META-INF/AL2.0")
+        pickFirst("META-INF/LGPL2.1")
     }
 }
 
