@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GitLiveApp/packages.git"
+    "url": "git+https://github.com/GitLiveApp/firebase-auth.git"
   },
   "publishConfig": {
     "registry":"https://npm.pkg.github.com/"

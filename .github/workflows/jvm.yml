@@ -29,6 +29,11 @@ jobs:
       run: npm config set //npm.pkg.github.com/:_authToken=$token
       env:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check Firebase-App
+      uses: EndBug/version-check@v1
+      with:
+        file-name: firebase-app/build/node_module/package.json
+        static-checking: localIsNew
     - name: Publish Firebase-App
       run: |
         cd firebase-app/build/node_module/
