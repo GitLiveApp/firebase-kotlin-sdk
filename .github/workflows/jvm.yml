@@ -30,5 +30,5 @@ jobs:
     - uses: JS-DevTools/npm-publish@v1
       with:
         registry: https://npm.pkg.github.com
-        package: firebase-app/build/node_module/package.json
         token: ${{ secrets.GITHUB_TOKEN }}
+      working-directory: firebase-app/build/node_module/
