@@ -1,5 +1,5 @@
 {
-  "name": "@gitlive/firebase-functions",
+  "name": "@gitliveapp/firebase-functions",
   "version": "0.2.0",
 "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-functions.js",
@@ -9,6 +9,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+  },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
   },
   "keywords": [
     "kotlin",
