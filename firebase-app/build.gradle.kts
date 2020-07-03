@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
-version = "0.2.0"
+version = "0.2.1"
 
 
 plugins {
@@ -35,6 +35,9 @@ android {
         pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
+    }
+    lintOptions {
+        isAbortOnError = false
     }
 }
 
