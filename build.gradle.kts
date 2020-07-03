@@ -1,5 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.3.71" apply false
@@ -30,14 +32,22 @@ val minSdkVersion by extra(16)
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File("$buildDir/", "Firebase-6.17.0.zip"))
+        dest(File(buildDir, "Firebase-6.17.0.zip"))
+        if (System.getenv("token") != null) {
+            username(System.getenv("token"))
+        }
         overwrite(false)
     }
 
     val unzipIOSFirebase by creating(Copy::class) {
-        dependsOn(downloadIOSFirebaseZipFile)
-        from(zipTree(downloadIOSFirebaseZipFile.dest))
-        into("$buildDir")
+        if (!File("$buildDir/Firebase").exists()) {
+            val zipFile = File(buildDir, "Firebase-6.17.0.zip")
+            if (!zipFile.exists()) {
+                dependsOn(downloadIOSFirebaseZipFile)
+            }
+            from(zipTree(zipFile))
+            into(buildDir)
+        }
         outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
     }
 
@@ -110,6 +120,24 @@ subprojects {
                 commandLine("npm", "publish")
             }
         }
+
+        withType<Test> {
+            testLogging {
+                showExceptions = true
+                exceptionFormat = TestExceptionFormat.FULL
+                showStandardStreams = true
+                showCauses = true
+                showStackTraces = true
+                events = setOf(
+                    TestLogEvent.STARTED,
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR
+                )
+            }
+        }
     }
 
 //    tasks.withType<KotlinCompile<*>> {
@@ -128,9 +156,8 @@ subprojects {
 
         if(Os.isFamily(Os.FAMILY_MAC)) {
             tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-            tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
         } else {
-            println("Skipping Firebase zip dowload")
+            println("Skipping Firebase zip download")
         }
 
         tasks.named("publishToMavenLocal").configure {
