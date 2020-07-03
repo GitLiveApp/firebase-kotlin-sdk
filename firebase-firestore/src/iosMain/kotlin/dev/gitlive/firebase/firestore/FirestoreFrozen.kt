@@ -37,7 +37,6 @@ actual suspend fun DocumentReference.snapshotsFrozen(scope: CoroutineScope): Flo
         listener = ios.addSnapshotListener(freezeObject { snap, error ->
             snap?.let { flow.get().value = DocumentSnapshot(snap).freeze() }
             error?.let { throw error.toException() }
-            // TODO improve this
             complete(Result.success(Unit))
         })
         ({})

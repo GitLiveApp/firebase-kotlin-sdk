@@ -26,23 +26,19 @@ actual suspend fun DocumentReference.setFrozen(data: Any, encodeDefaults: Boolea
 
 // TODO improve this
 actual suspend fun DocumentReference.setFrozen(data: Any, encodeDefaults: Boolean, vararg mergeFields: String): Unit =
-    android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-        .await().run { Unit }
+    this.set(data, encodeDefaults, *mergeFields)
 
 actual suspend fun DocumentReference.setFrozen(data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath): Unit =
-    android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
-        .await().run { Unit }
+    this.set(data, encodeDefaults, *mergeFieldPaths)
 
 actual suspend fun <T> DocumentReference.setFrozen(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
     this.set(strategy, data, encodeDefaults, merge)
 
 actual suspend fun <T> DocumentReference.setFrozen(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String): Unit =
-    android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-        .await().run { Unit }
+    this.set(strategy, data, encodeDefaults, *mergeFields)
 
 actual suspend fun <T> DocumentReference.setFrozen(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath): Unit =
-    android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
-        .await().run { Unit }
+    this.set(strategy, data, encodeDefaults, *mergeFieldPaths)
 
 actual suspend fun DocumentReference.updateFrozen(data: Any, encodeDefaults: Boolean) =
     this.update(data, encodeDefaults)
