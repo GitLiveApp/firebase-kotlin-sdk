@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+    "url": "git+https://github.com/GitLiveApp/packages.git"
   },
   "publishConfig": {
     "registry":"https://npm.pkg.github.com/"
