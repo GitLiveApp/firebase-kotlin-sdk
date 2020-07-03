@@ -30,11 +30,13 @@ jobs:
       env:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check Firebase-App
+      id: check-firebase-app
       uses: EndBug/version-check@v1
       with:
         file-name: firebase-app/build/node_module/package.json
         static-checking: localIsNew
     - name: Publish Firebase-App
+      if: steps.check-firebase-app.outputs.changed == 'true'
       run: |
         cd firebase-app/build/node_module/
         npm publish
