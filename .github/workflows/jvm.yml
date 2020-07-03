@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -27,8 +25,16 @@ jobs:
         USERNAME: ${{ secrets.AUTO_USERNAME }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: firebase-app/build/node_module/
+    needs: build
+    steps:
     - uses: JS-DevTools/npm-publish@v1
       with:
         registry: https://npm.pkg.github.com
         token: ${{ secrets.GITHUB_TOKEN }}
-      working-directory: firebase-app/build/node_module/
+
