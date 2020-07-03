@@ -25,10 +25,31 @@ jobs:
         USERNAME: ${{ secrets.AUTO_USERNAME }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
-    - name: Publish Firebase-App
-      run: |
-        npm config set //npm.pkg.github.com/:_authToken=$token
-        cd firebase-app/build/node_module/
-        npm publish
+    - name: Setup NPM
+      run: npm config set //npm.pkg.github.com/:_authToken=$token
       env:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Firebase-App
+      run: |
+        cd firebase-app/build/node_module/
+        npm publish
+    - name: Publish Firebase-Auth
+      run: |
+        cd firebase-auth/build/node_module/
+        npm publish
+    - name: Publish Firebase-Common
+      run: |
+        cd firebase-common/build/node_module/
+        npm publish
+    - name: Publish Firebase-Database
+      run: |
+        cd firebase-database/build/node_module/
+        npm publish
+    - name: Publish Firebase-Firestore
+      run: |
+        cd firebase-firestore/build/node_module/
+        npm publish
+    - name: Publish Firebase-Functions
+      run: |
+        cd firebase-functions/build/node_module/
+        npm publish
