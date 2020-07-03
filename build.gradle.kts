@@ -94,13 +94,16 @@ subprojects {
 
         val copyJS by registering {
             mustRunAfter("unzipJar", "copyPackageJson")
-            val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
-            val into = File("$buildDir/node_module/${project.name}.js")
-            into.createNewFile()
-            into.writeText(from.readText()
-                .replace("require('firebase-", "require('@gitlive/firebase-")
-//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
-            )
+            doLast {
+                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
+                val into = File("$buildDir/node_module/${project.name}.js")
+                into.createNewFile()
+                into.writeText(
+                    from.readText()
+                        .replace("require('firebase-", "require('@gitlive/firebase-")
+                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+                )
+            }
         }
 
         val copySourceMap by registering(Copy::class) {
