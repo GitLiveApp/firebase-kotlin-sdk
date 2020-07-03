@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
   },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
+  },
   "keywords": [
     "kotlin",
     "multiplatform",
