@@ -25,16 +25,10 @@ jobs:
         USERNAME: ${{ secrets.AUTO_USERNAME }}
         ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
-
-  publish:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: firebase-app/build/node_module/
-    needs: build
-    steps:
-    - uses: JS-DevTools/npm-publish@v1
-      with:
-        registry: https://npm.pkg.github.com
+    - name: Publish Firebase-App
+      run: |
+        npm config set //npm.pkg.github.com/:_authToken=$token
+        cd firebase-app/build/node_module/
+        npm publish
+      env:
         token: ${{ secrets.GITHUB_TOKEN }}
-
