@@ -1,10 +1,7 @@
 package dev.gitlive.firebase.firestore
 
-import com.google.firebase.firestore.SetOptions
-import dev.gitlive.firebase.encode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.SerializationStrategy
 
 actual suspend fun <T> FirebaseFirestore.runTransactionFrozen(func: suspend Transaction.() -> T) : T  =

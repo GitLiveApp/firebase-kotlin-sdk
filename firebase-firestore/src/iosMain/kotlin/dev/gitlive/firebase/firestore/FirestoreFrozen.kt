@@ -2,20 +2,18 @@ package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
 import dev.gitlive.firebase.encode
-import dev.gitlive.firebase.firestore.*
 import kotlinx.cinterop.StableRef
 import kotlinx.coroutines.*
-import kotlin.coroutines.ContinuationInterceptor
-import kotlin.coroutines.coroutineContext
-import kotlin.native.concurrent.AtomicInt
-import kotlin.native.concurrent.AtomicReference
-import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
-import platform.posix.free
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.coroutineContext
+import kotlin.native.concurrent.AtomicInt
+import kotlin.native.concurrent.AtomicReference
+import kotlin.native.concurrent.freeze
 
 actual suspend fun <T> FirebaseFirestore.runTransactionFrozen(func: suspend Transaction.() -> T) : T  =
     awaitResultFrozen<Any?> { ios.runTransactionWithBlock(freezeObject { transaction, error ->
