@@ -42,6 +42,8 @@ kotlin {
                 moduleKind = "commonjs"
             }
         }
+        nodejs()
+        browser()
     }
     android {
         publishLibraryVariants("release", "debug")

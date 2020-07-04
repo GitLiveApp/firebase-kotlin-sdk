@@ -93,14 +93,22 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+        val unzipJar by registering(Copy::class) {
+            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
+            from(this.project.zipTree(zipFile))
+            into("$buildDir/classes/kotlin/js/main/")
+        }
+
         val copyJS by registering {
+            mustRunAfter("unzipJar", "copyPackageJson")
             doLast {
-                val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
+                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
                 val into = File("$buildDir/node_module/${project.name}.js")
                 into.createNewFile()
-                into.writeText(from.readText()
-                    .replace("require('firebase-", "require('@gitlive/firebase-")
-//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+                into.writeText(
+                    from.readText()
+                        .replace("require('firebase-", "require('@gitlive/firebase-")
+                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
                 )
             }
         }
@@ -110,18 +118,24 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+        val prepareForNpmPublish by registering {
+            dependsOn(
+                unzipJar,
+                copyPackageJson,
+                copySourceMap,
+                copyReadMe,
+                copyJS
+            )
+        }
 
         val publishToNpm by creating(Exec::class) {
-
-            dependsOn(
-                copyPackageJson,
-                copyJS,
-                copySourceMap,
-                copyReadMe
-            )
-
             workingDir("$buildDir/node_module")
-            commandLine("npm", "publish")
+            isIgnoreExitValue = true
+            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine("cmd", "/c", "npm publish")
+            } else {
+                commandLine("npm", "publish")
+            }
         }
 
         withType<Test> {
