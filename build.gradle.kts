@@ -130,7 +130,11 @@ subprojects {
         val publishToNpm by creating(Exec::class) {
             workingDir("$buildDir/node_module")
             isIgnoreExitValue = true
-            commandLine("npm", "publish")
+            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine("cmd", "/c", "npm publish")
+            } else {
+                commandLine("npm", "publish")
+            }
         }
 
         withType<Test> {
