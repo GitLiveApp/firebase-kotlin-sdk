@@ -18,8 +18,12 @@ jobs:
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
-#        arguments: assemble publishJvm publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
-        arguments: assemble publishJvm prepareForNpmPublish
+        arguments: assemble
+    - name: Build
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: assemble publishJvm publishJsPublicationToGitHubPackagesRepository prepareForNpmPublish
+      continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
@@ -31,5 +35,6 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish
       uses: eskatos/gradle-command-action@v1
+      continue-on-error: true
       with:
         arguments: publishToNpm

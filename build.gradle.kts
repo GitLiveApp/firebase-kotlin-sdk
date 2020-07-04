@@ -52,28 +52,6 @@ tasks {
         outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
     }
 
-    val publishJvm by creating(Exec::class) {
-        var successfulRuns = 0
-        subprojects {
-            isIgnoreExitValue = true
-            setEnvironment(Pair("signingKey" , System.getenv("signingKey")))
-            setEnvironment(Pair("signingPassword" , System.getenv("signingPassword")))
-            commandLine("./gradlew", "--no-daemon", ":$name:publishJvmPublicationToGitHubPackagesRepository")
-            doLast {
-                println("Project: $name Version: $version exec result: ${execResult.exitValue}")
-                if(execResult.exitValue == 0) {
-                    successfulRuns += 1
-                }
-            }
-        }
-        doLast {
-            println("Total successful publications: $successfulRuns")
-            if (successfulRuns == 0) {
-                exitProcess(1)
-            }
-        }
-    }
-
 }
 
 subprojects {
