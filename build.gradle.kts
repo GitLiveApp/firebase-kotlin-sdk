@@ -1,6 +1,5 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
-import kotlin.system.exitProcess
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -96,7 +95,6 @@ subprojects {
         val unzipJar by registering(Copy::class) {
             val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
             from(this.project.zipTree(zipFile))
-            println("$buildDir/classes/kotlin/js/main/")
             into("$buildDir/classes/kotlin/js/main/")
         }
 
