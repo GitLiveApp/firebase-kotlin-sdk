@@ -54,6 +54,8 @@ tasks {
 
     val publishJvm by creating(Exec::class) {
         var successfulRuns = 0
+        setEnvironment(Pair("signingKey" , System.getenv("signingKey")))
+        setEnvironment(Pair("signingPassword" , System.getenv("signingPassword")))
         subprojects {
             isIgnoreExitValue = true
             commandLine("./gradlew", ":$name:publishJvmPublicationToGitHubPackagesRepository")
