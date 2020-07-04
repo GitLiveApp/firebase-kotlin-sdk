@@ -54,10 +54,10 @@ tasks {
 
     val publishJvm by creating(Exec::class) {
         var successfulRuns = 0
-        setEnvironment(Pair("signingKey" , System.getenv("signingKey")))
-        setEnvironment(Pair("signingPassword" , System.getenv("signingPassword")))
         subprojects {
             isIgnoreExitValue = true
+            setEnvironment(Pair("signingKey" , System.getenv("signingKey")))
+            setEnvironment(Pair("signingPassword" , System.getenv("signingPassword")))
             commandLine("./gradlew", "--no-daemon", ":$name:publishJvmPublicationToGitHubPackagesRepository")
             doLast {
                 println("Project: $name Version: $version exec result: ${execResult.exitValue}")
