@@ -58,7 +58,7 @@ tasks {
         setEnvironment(Pair("signingPassword" , System.getenv("signingPassword")))
         subprojects {
             isIgnoreExitValue = true
-            commandLine("./gradlew", ":$name:publishJvmPublicationToGitHubPackagesRepository")
+            commandLine("./gradlew", "--no-daemon", ":$name:publishJvmPublicationToGitHubPackagesRepository")
             doLast {
                 println("Project: $name Version: $version exec result: ${execResult.exitValue}")
                 if(execResult.exitValue == 0) {
