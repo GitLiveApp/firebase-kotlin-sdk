@@ -64,14 +64,6 @@ subprojects {
         mavenCentral()
         google()
         jcenter()
-        maven {
-            name = "github"
-            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-            }
-        }
     }
 
     var shouldSign = true
@@ -131,7 +123,11 @@ subprojects {
         val publishToNpm by creating(Exec::class) {
             workingDir("$buildDir/node_module")
             isIgnoreExitValue = true
-            commandLine("npm", "publish")
+            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine("cmd", "/c", "npm publish")
+            } else {
+                commandLine("npm", "publish")
+            }
         }
 
         withType<Test> {
