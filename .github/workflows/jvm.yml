@@ -21,10 +21,60 @@ jobs:
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
         USERNAME: ${{ secrets.AUTO_USERNAME }}
-    - name: Publish maven jvm
+    - name: Publish firebase-app
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository :firebase-auth:publishAllPublicationsToGitHubPackagesRepository :firebase-common:publishAllPublicationsToGitHubPackagesRepository :firebase-database:publishAllPublicationsToGitHubPackagesRepository :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository :firebase-functions:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository
+      continue-on-error: true
+      env:
+        TOKEN: ${{ secrets.AUTO_TOKEN }}
+        USERNAME: ${{ secrets.AUTO_USERNAME }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - name: Publish firebase-auth
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: :firebase-auth:publishAllPublicationsToGitHubPackagesRepository
+      continue-on-error: true
+      env:
+        TOKEN: ${{ secrets.AUTO_TOKEN }}
+        USERNAME: ${{ secrets.AUTO_USERNAME }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - name: Publish firebase-common
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: :firebase-common:publishAllPublicationsToGitHubPackagesRepository
+      continue-on-error: true
+      env:
+        TOKEN: ${{ secrets.AUTO_TOKEN }}
+        USERNAME: ${{ secrets.AUTO_USERNAME }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - name: Publish firebase-database
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: :firebase-database:publishAllPublicationsToGitHubPackagesRepository
+      continue-on-error: true
+      env:
+        TOKEN: ${{ secrets.AUTO_TOKEN }}
+        USERNAME: ${{ secrets.AUTO_USERNAME }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - name: Publish firebase-firestore
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository
+      continue-on-error: true
+      env:
+        TOKEN: ${{ secrets.AUTO_TOKEN }}
+        USERNAME: ${{ secrets.AUTO_USERNAME }}
+        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+    - name: Publish firebase-functions
+      uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: :firebase-functions:publishAllPublicationsToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
