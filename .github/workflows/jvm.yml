@@ -1,8 +1,7 @@
 name: JVM
 
 on:
-#  push:
-  pull_request:
+  push:
     branches: [ jvm-target ]
 
 jobs:
