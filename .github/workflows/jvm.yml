@@ -1,7 +1,8 @@
 name: JVM
 
 on:
-  push:
+#  push:
+  pull_request:
     branches: [ jvm-target ]
 
 jobs:
@@ -23,17 +24,7 @@ jobs:
     - name: Publish maven jvm
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-app:publishJvmPublicationToGitHubPackagesRepository :firebase-auth:publishJvmPublicationToGitHubPackagesRepository :firebase-common:publishJvmPublicationToGitHubPackagesRepository :firebase-database:publishJvmPublicationToGitHubPackagesRepository :firebase-firestore:publishJvmPublicationToGitHubPackagesRepository :firebase-functions:publishJvmPublicationToGitHubPackagesRepository
-      continue-on-error: true
-      env:
-        TOKEN: ${{ secrets.AUTO_TOKEN }}
-        USERNAME: ${{ secrets.AUTO_USERNAME }}
-        ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-        ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
-    - name: Publish maven js
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: :firebase-app:publishJsPublicationToGitHubPackagesRepository :firebase-auth:publishJsPublicationToGitHubPackagesRepository :firebase-common:publishJsPublicationToGitHubPackagesRepository :firebase-database:publishJsPublicationToGitHubPackagesRepository :firebase-firestore:publishJsPublicationToGitHubPackagesRepository :firebase-functions:publishJsPublicationToGitHubPackagesRepository
+        arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository :firebase-auth:publishAllPublicationsToGitHubPackagesRepository :firebase-common:publishAllPublicationsToGitHubPackagesRepository :firebase-database:publishAllPublicationsToGitHubPackagesRepository :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository :firebase-functions:publishAllPublicationsToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
