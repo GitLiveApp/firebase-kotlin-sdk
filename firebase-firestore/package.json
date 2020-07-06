@@ -1,6 +1,6 @@
 {
-  "name": "@gitlive/firebase-firestore",
-  "version": "0.2.0",
+  "name": "@gitliveapp/firebase-firestore",
+  "version": "0.2.2",
 "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-firestore.js",
   "scripts": {
@@ -9,6 +9,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+  },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
   },
   "keywords": [
     "kotlin",
