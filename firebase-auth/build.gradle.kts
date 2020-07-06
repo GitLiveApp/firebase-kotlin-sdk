@@ -4,7 +4,19 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
+    //id("com.quittle.android-emulator") version "0.2.0"
 }
+
+//buildscript {
+//    repositories {
+//        jcenter()
+//        google()
+//        gradlePluginPortal()
+//    }
+//    dependencies {
+//        classpath("com.android.tools.build:gradle:3.6.1")
+//    }
+//}
 
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
@@ -30,6 +42,19 @@ android {
         pickFirst("META-INF/LGPL2.1")
     }
 }
+
+// Optional configuration
+//androidEmulator {
+//    emulator {
+//        name("givlive_emulator")
+//        sdkVersion(28)
+//        abi("x86_64")
+//        includeGoogleApis(true) // Defaults to false
+//
+//    }
+//    headless(false)
+//    logEmulatorOutput(false)
+//}
 
 kotlin {
     js {
@@ -108,5 +133,8 @@ kotlin {
 }
 
 signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }

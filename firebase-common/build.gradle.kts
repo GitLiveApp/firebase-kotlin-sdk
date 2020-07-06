@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.71"
+    kotlin("plugin.serialization") version "1.3.72"
 }
 
 android {
@@ -29,6 +29,8 @@ android {
     }
     packagingOptions {
         pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+        pickFirst("META-INF/AL2.0")
+        pickFirst("META-INF/LGPL2.1")
     }
 }
 
@@ -119,6 +121,9 @@ kotlin {
 }
 
 signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
 

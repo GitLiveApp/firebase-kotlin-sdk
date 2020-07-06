@@ -13,12 +13,12 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                                 | Gradle Dependency                                                                                                                   | API Coverage                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | :-----------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive:firebase-auth:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/0.1.0/pom)           | [![40%](https://img.shields.io/badge/-40%25-red?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
-| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive:firebase-database:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/0.1.0/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive:firebase-firestore:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/0.1.0/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
-| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/0.1.0/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
-| [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/0.1.0/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
-| [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:0.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/0.1.0/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive:firebase-auth:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/0.2.0/pom)           | [![40%](https://img.shields.io/badge/-50%25-red?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
+| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive:firebase-database:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/0.2.0/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive:firebase-firestore:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/0.2.0/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
+| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/0.2.0/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
+| [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/0.2.0/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:0.2.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/0.2.0/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -78,8 +78,10 @@ data class City(val name: String)
 Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#obtaining-serializers) to the SDK:
 
 ```kotlin
-db.collection("cities").document("LA").set(City.serializer(), city)
+db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaults = true)
 ```
+
+The `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to theirs default values.
 
 You can also omit the serializer for classes that does not have generic type arguments, these functions are marked [`@ImplicitReflectionSerializer`](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#implicit-reflection-serializers) and their usage is discouraged in general because it is implicit and uses reflection (and therefore not working on Kotlin/Native), but may be useful shorthand in some cases.
 
@@ -127,12 +129,12 @@ If you are building a Kotlin multiplatform library which will be consumed from J
 
 ```json
 "dependencies": {
-  "@gitlive/firebase-auth": "0.1.0",
-  "@gitlive/firebase-database": "0.1.0",
-  "@gitlive/firebase-firestore": "0.1.0",
-  "@gitlive/firebase-functions": "0.1.0",
-  "@gitlive/firebase-storage": "0.1.0",
-  "@gitlive/firebase-messaging": "0.1.0"
+  "@gitlive/firebase-auth": "0.2.0",
+  "@gitlive/firebase-database": "0.2.0",
+  "@gitlive/firebase-firestore": "0.2.0",
+  "@gitlive/firebase-functions": "0.2.0",
+  "@gitlive/firebase-storage": "0.2.0",
+  "@gitlive/firebase-messaging": "0.2.0"
 }
 ```
 
