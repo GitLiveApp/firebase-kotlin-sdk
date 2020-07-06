@@ -1,6 +1,6 @@
 {
   "name": "@gitliveapp/firebase-auth",
-  "version": "0.2.2",
+  "version": "0.2.3",
 "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-auth.js",
   "scripts": {
