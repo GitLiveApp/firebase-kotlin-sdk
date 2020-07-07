@@ -1,5 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.3.71" apply false
@@ -12,10 +14,14 @@ buildscript {
         jcenter()
         google()
         gradlePluginPortal()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.2")
+        classpath("com.android.tools.build:gradle:3.6.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
 
@@ -26,14 +32,22 @@ val minSdkVersion by extra(16)
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
         src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File("$buildDir/", "Firebase-6.17.0.zip"))
+        dest(File(buildDir, "Firebase-6.17.0.zip"))
+        if (System.getenv("token") != null) {
+            username(System.getenv("token"))
+        }
         overwrite(false)
     }
 
     val unzipIOSFirebase by creating(Copy::class) {
-        dependsOn(downloadIOSFirebaseZipFile)
-        from(zipTree(downloadIOSFirebaseZipFile.dest))
-        into("$buildDir")
+        if (!File("$buildDir/Firebase").exists()) {
+            val zipFile = File(buildDir, "Firebase-6.17.0.zip")
+            if (!zipFile.exists()) {
+                dependsOn(downloadIOSFirebaseZipFile)
+            }
+            from(zipTree(zipFile))
+            into(buildDir)
+        }
         outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
     }
 
@@ -43,7 +57,8 @@ subprojects {
 
     group = "dev.gitlive"
 
-
+    apply(plugin="com.adarshr.test-logger")
+    
     repositories {
         mavenLocal()
         mavenCentral()
@@ -70,14 +85,22 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+        val unzipJar by registering(Copy::class) {
+            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
+            from(this.project.zipTree(zipFile))
+            into("$buildDir/classes/kotlin/js/main/")
+        }
+
         val copyJS by registering {
+            mustRunAfter("unzipJar", "copyPackageJson")
             doLast {
-                val from = File("$buildDir/classes/kotlin/js/main/${project.name}.js")
+                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
                 val into = File("$buildDir/node_module/${project.name}.js")
                 into.createNewFile()
-                into.writeText(from.readText()
-                    .replace("require('firebase-", "require('@gitlive/firebase-")
-//                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+                into.writeText(
+                    from.readText()
+                        .replace("require('firebase-", "require('@gitlive/firebase-")
+                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
                 )
             }
         }
@@ -87,21 +110,41 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
+        val prepareForNpmPublish by registering {
+            dependsOn(
+                unzipJar,
+                copyPackageJson,
+                copySourceMap,
+                copyReadMe,
+                copyJS
+            )
+        }
 
         val publishToNpm by creating(Exec::class) {
-
-            dependsOn(
-                copyPackageJson,
-                copyJS,
-                copySourceMap,
-                copyReadMe
-            )
-
             workingDir("$buildDir/node_module")
+            isIgnoreExitValue = true
             if(Os.isFamily(Os.FAMILY_WINDOWS)) {
                 commandLine("cmd", "/c", "npm publish")
             } else {
                 commandLine("npm", "publish")
+            }
+        }
+
+        withType<Test> {
+            testLogging {
+                showExceptions = true
+                exceptionFormat = TestExceptionFormat.FULL
+                showStandardStreams = true
+                showCauses = true
+                showStackTraces = true
+                events = setOf(
+                    TestLogEvent.STARTED,
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR
+                )
             }
         }
     }
@@ -122,9 +165,8 @@ subprojects {
 
         if(Os.isFamily(Os.FAMILY_MAC)) {
             tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-            tasks.getByPath("compileKotlinIosArm64").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
         } else {
-            println("Skipping Firebase zip dowload")
+            println("Skipping Firebase zip download")
         }
 
         tasks.named("publishToMavenLocal").configure {
