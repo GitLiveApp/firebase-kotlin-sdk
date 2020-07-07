@@ -39,7 +39,7 @@ private fun FirebaseOptions.toJson() = json(
     "storageBucket" to (storageBucket ?: undefined),
     "projectId" to (projectId ?: undefined),
     "gaTrackingId" to (gaTrackingId ?: undefined),
-    "messagingSenderId" to (gmcSenderId ?: undefined)
+    "messagingSenderId" to (gcmSenderId ?: undefined)
 )
 
 actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)
