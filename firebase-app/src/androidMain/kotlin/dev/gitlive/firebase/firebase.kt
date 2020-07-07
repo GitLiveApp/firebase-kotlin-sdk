@@ -46,4 +46,5 @@ private fun FirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Bu
     .setGaTrackingId(gaTrackingId)
     .setStorageBucket(storageBucket)
     .setProjectId(projectId)
+    .setGcmSenderId(gcmSenderId)
     .build()
