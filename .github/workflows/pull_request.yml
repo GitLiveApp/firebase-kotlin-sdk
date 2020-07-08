@@ -27,8 +27,9 @@ jobs:
         path: build/Firebase-6.17.0.zip
         key: key-Firebase-6.17.0
         restore-keys: key-Firebase-6.17.0
-    - name: Loggy McLoggerson
-      run: file build/Firebase-6.17.0.zip
+    - name: Expand Zip
+      if: steps.cache-key.outputs.cache-hit == 'true'
+      run: unzip build/Firebase-6.17.0.zip -d build/Firebase
     - name: Loggy McLoggerson
       run: cd /Users/runner/work/firebase-kotlin-sdk/firebase-kotlin-sdk/build/ && ls -l
     - name: Download Unzip Firebase
