@@ -13,13 +13,25 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-#    - name: Download Unzip Firebase
-#      run: ./gradlew unzipIOSFirebase
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#      - name: Retrieve cache key
+#        id: cache-key
+#        uses: actions/cache@v2
+#        with:
+#          path: build/Firebase-6.17.0.zip
+#          key: key-Firebase-6.17.0
+#          restore-keys: key-Firebase-6.17.0
+#      - name: Expand Zip
+#        if: steps.cache-key.outputs.cache-hit == 'true'
+#        run: unzip build/Firebase-6.17.0.zip -d build
+#      - name: Download Unzip Firebase
+#        run: ./gradlew unzipIOSFirebase
 #    - name: Publish
 #      uses: eskatos/gradle-command-action@v1
 #      with:
