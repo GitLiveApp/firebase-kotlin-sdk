@@ -42,6 +42,10 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
+
+    actual suspend fun clearPersistence() =
+        android.clearPersistence().await()
+            .run { Unit }
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
@@ -271,8 +275,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
 
-    internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
+    actual fun limit(limit: Number) = Query(android.limit(limit.toLong()))
 
     actual val snapshots get() = callbackFlow {
         val listener = android.addSnapshotListener { snapshot, exception ->
@@ -281,6 +284,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
         awaitClose { listener.remove() }
     }
+
+    internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
@@ -298,11 +304,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 
-    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = Query(
-        android.whereArrayContainsAny(field, arrayContainsAny)
+    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
+        (inArray?.let { android.whereIn(field, it) } ?: android).let { android2 ->
+            arrayContainsAny?.let { android2.whereArrayContainsAny(field, it) } ?: android2
+        }
     )
-    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = Query(
-        android.whereArrayContainsAny(path, arrayContainsAny)
+
+    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
+        (inArray?.let { android.whereIn(path, it) } ?: android).let { android2 ->
+            arrayContainsAny?.let { android2.whereArrayContainsAny(path, it) } ?: android2
+        }
     )
 }
 
