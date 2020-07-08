@@ -169,6 +169,7 @@ external object firebase {
             fun doc(documentPath: String): DocumentReference
             fun settings(settings: Json)
             fun enablePersistence(): Promise<Unit>
+            fun clearPersistence(): Promise<Unit>
         }
 
         open class FieldPath constructor(fieldNames: Array<out String>)
