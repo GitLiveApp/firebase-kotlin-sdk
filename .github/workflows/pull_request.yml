@@ -26,6 +26,7 @@ jobs:
       with:
         path: build/Firebase-6.17.0.zip
         key: key-Firebase-6.17.0
+        restore-keys: key-Firebase-6.17.0
     - name: Download Unzip Firebase
       run: ./gradlew unzipIOSFirebase
 #    - name: Assemble
