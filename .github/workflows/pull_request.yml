@@ -29,20 +29,18 @@ jobs:
         restore-keys: key-Firebase-6.17.0
     - name: Expand Zip
       if: steps.cache-key.outputs.cache-hit == 'true'
-      run: unzip build/Firebase-6.17.0.zip -d build/Firebase
-    - name: Loggy McLoggerson
-      run: cd /Users/runner/work/firebase-kotlin-sdk/firebase-kotlin-sdk/build/ && ls -l
+      run: unzip build/Firebase-6.17.0.zip -d build
     - name: Download Unzip Firebase
       run: ./gradlew unzipIOSFirebase
-#    - name: Assemble
-#      run: ./gradlew assemble
-#    - name: Run JS Tests
-#      run: ./gradlew cleanTest jsTest
-#    - name: Run Android Instrumented Tests
-#      uses: reactivecircus/android-emulator-runner@v2
-#      with:
-#        api-level: 29
-#        target: google_apis
-#        arch: x86_64
-#        profile: Nexus 6
-#        script: ./gradlew connectedAndroidTest
+    - name: Assemble
+      run: ./gradlew assemble
+    - name: Run JS Tests
+      run: ./gradlew cleanTest jsTest
+    - name: Run Android Instrumented Tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: google_apis
+        arch: x86_64
+        profile: Nexus 6
+        script: ./gradlew connectedAndroidTest

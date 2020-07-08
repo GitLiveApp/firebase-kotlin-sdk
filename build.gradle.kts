@@ -41,10 +41,8 @@ tasks {
 
     val unzipIOSFirebase by creating(Copy::class) {
         if (!File("$buildDir/Firebase").exists()) {
-            println("doesnt exist $buildDir/Firebase")
             val zipFile = File(buildDir, "Firebase-6.17.0.zip")
             if (!zipFile.exists()) {
-                println("doesnt exist $buildDir/Firebase-6.17.0.zip")
                 dependsOn(downloadIOSFirebaseZipFile)
             }
             from(zipTree(zipFile))
