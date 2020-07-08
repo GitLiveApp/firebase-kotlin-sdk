@@ -28,15 +28,15 @@ jobs:
         key: key-Firebase-6.17.0
     - name: Download Unzip Firebase
       run: ./gradlew unzipIOSFirebase
-    - name: Assemble
-      run: ./gradlew assemble
-    - name: Run JS Tests
-      run: ./gradlew cleanTest jsTest
-    - name: Run Android Instrumented Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 29
-        target: google_apis
-        arch: x86_64
-        profile: Nexus 6
-        script: ./gradlew connectedAndroidTest
+#    - name: Assemble
+#      run: ./gradlew assemble
+#    - name: Run JS Tests
+#      run: ./gradlew cleanTest jsTest
+#    - name: Run Android Instrumented Tests
+#      uses: reactivecircus/android-emulator-runner@v2
+#      with:
+#        api-level: 29
+#        target: google_apis
+#        arch: x86_64
+#        profile: Nexus 6
+#        script: ./gradlew connectedAndroidTest
