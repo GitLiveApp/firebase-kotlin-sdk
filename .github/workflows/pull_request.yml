@@ -27,6 +27,10 @@ jobs:
         path: build/Firebase-6.17.0.zip
         key: key-Firebase-6.17.0
         restore-keys: key-Firebase-6.17.0
+    - name: Loggy McLoggerson
+      run: ls -l
+    - name: Loggy McLoggerson
+      run: cd build/ && ls -l
     - name: Download Unzip Firebase
       run: ./gradlew unzipIOSFirebase
 #    - name: Assemble
