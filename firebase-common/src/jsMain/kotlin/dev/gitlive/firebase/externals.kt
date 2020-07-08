@@ -177,7 +177,8 @@ external object firebase {
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
             fun where(field: Any, opStr: String, value: Any?): Query
-            fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+            fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
+            fun limit(limit: Double): Query
         }
 
         open class CollectionReference : Query {
