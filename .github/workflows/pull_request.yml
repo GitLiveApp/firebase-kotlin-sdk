@@ -20,6 +20,10 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Download Unzip Firebase
+      run: ./gradlew unzipIOSFirebase
+    - name: Assemble
+      run: ./gradlew assemble
     - name: Run JS Tests
       run: ./gradlew cleanTest jsTest
     - name: Run Android Instrumented Tests
