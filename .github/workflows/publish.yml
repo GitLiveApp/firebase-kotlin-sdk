@@ -18,6 +18,42 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Read version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'version'
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-app/"
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-auth/"
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-common/"
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-database/"
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-firestore/"
+      - name: NPM-Version
+        uses: Reedyuk/NPM-Version@1.0.1
+        with:
+          version: ${{ steps.read_version.outputs.value }}
+          package: "firebase-functions/"
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Retrieve cache key
