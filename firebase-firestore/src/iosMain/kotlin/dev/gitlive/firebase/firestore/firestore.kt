@@ -185,7 +185,7 @@ actual open class Query(open val ios: FIRQuery) {
 
     actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
 
-    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toInt()))
+    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
 
     actual val snapshots get() = callbackFlow {
         val listener = ios.addSnapshotListener { snapshot, error ->
