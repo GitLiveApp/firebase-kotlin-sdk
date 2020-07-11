@@ -49,7 +49,8 @@ data class FirebaseOptions(
     val databaseUrl: String? = null,
     val gaTrackingId: String? = null,
     val storageBucket: String? = null,
-    val projectId: String? = null
+    val projectId: String? = null,
+    val gcmSenderId: String? = null
 )
 
 expect open class FirebaseException : Exception

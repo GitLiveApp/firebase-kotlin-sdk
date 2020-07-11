@@ -38,6 +38,9 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, error -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
+
+    actual suspend fun clearPersistence() =
+        await { ios.clearPersistenceWithCompletion(it) }
 }
 
 actual class WriteBatch(val ios: FIRWriteBatch) {
@@ -182,7 +185,7 @@ actual open class Query(open val ios: FIRQuery) {
 
     actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
 
-    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toInt()))
+    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
 
     actual val snapshots get() = callbackFlow {
         val listener = ios.addSnapshotListener { snapshot, error ->

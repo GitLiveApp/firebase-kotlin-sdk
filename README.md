@@ -85,6 +85,15 @@ The `encodeDefaults` parameter is optional and defaults to `true`, set this to f
 
 You can also omit the serializer for classes that does not have generic type arguments, these functions are marked [`@ImplicitReflectionSerializer`](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#implicit-reflection-serializers) and their usage is discouraged in general because it is implicit and uses reflection (and therefore not working on Kotlin/Native), but may be useful shorthand in some cases.
 
+<h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
+
+[Firestore](https://firebase.google.com/docs/reference/js/firebase.database.ServerValue#timestamp) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes they are of type `Double`:
+
+```kotlin
+@Serializable
+data class Post(val timestamp: Double = ServerValue.TIMESTAMP)
+```
+
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
 
 To improve readability functions such as the Cloud Firestore query operators use named arguments:

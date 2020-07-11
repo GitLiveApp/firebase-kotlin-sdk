@@ -42,6 +42,10 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
+
+    actual suspend fun clearPersistence() =
+        android.clearPersistence().await()
+            .run { Unit }
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
