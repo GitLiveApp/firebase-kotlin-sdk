@@ -32,12 +32,12 @@ jobs:
         run: unzip build/Firebase-6.17.0.zip -d build
       - name: Download Unzip Firebase
         run: ./gradlew unzipIOSFirebase
-#      - name: Publish
-#        uses: eskatos/gradle-command-action@v1
-#        with:
-#          arguments: publish
-#        env:
-#          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-#          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
