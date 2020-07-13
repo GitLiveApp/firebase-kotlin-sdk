@@ -31,7 +31,7 @@ jobs:
       if: steps.cache-key.outputs.cache-hit == 'true'
       run: unzip build/Firebase-6.17.0.zip -d build
     - name: Download Unzip Firebase
-      run: ./gradlew unzipIOSFirebase
+      run: ./gradlew unzipIOSFirebase --rerun-tasks
     - name: Assemble
       run: ./gradlew assemble
     - name: Run JS Tests
