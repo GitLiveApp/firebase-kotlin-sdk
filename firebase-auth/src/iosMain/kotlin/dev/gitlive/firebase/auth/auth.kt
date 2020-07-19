@@ -42,6 +42,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun signInAnonymously() =
         AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
 
+    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
+        AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
     actual val authStateChanged get() = callbackFlow {
@@ -54,6 +57,8 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
     actual val user: FirebaseUser?
         get() = FirebaseUser(ios.user)
 }
+
+actual class AuthCredential internal constructor(val ios: FIRAuthCredential)
 
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual val uid: String

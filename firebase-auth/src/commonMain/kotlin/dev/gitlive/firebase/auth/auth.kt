@@ -22,6 +22,7 @@ expect class FirebaseAuth {
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithCustomToken(token: String): AuthResult
     suspend fun signInAnonymously(): AuthResult
+    suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
     suspend fun signOut()
 }
 
@@ -48,4 +49,5 @@ expect class FirebaseAuthInvalidUserException: FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException: FirebaseAuthException
 expect class FirebaseAuthUserCollisionException: FirebaseAuthException
 expect class FirebaseAuthWebException: FirebaseAuthException
+expect class AuthCredential
 
