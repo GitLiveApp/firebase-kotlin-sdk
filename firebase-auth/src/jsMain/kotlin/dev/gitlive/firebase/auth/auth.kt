@@ -40,12 +40,12 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual val authStateChanged get() = callbackFlow {
         val unsubscribe = js.onAuthStateChanged {
             offer(it?.let { FirebaseUser(it) })
-    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
-        rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
-
         }
         awaitClose { unsubscribe() }
     }
+
+    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
+        rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
 }
 
 actual class AuthCredential internal constructor(val js: firebase.auth.AuthCredential)
