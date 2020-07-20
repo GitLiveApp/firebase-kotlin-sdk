@@ -48,7 +48,7 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
 }
 
-actual class AuthCredential internal constructor(val js: firebase.auth.AuthCredential)
+actual class AuthCredential(val js: firebase.auth.AuthCredential)
 
 actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
     actual val user: FirebaseUser?

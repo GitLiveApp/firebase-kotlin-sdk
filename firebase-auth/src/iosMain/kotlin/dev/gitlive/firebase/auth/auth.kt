@@ -58,7 +58,7 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
         get() = FirebaseUser(ios.user)
 }
 
-actual class AuthCredential internal constructor(val ios: FIRAuthCredential)
+actual class AuthCredential(val ios: FIRAuthCredential)
 
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual val uid: String

@@ -51,7 +51,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun signOut() = android.signOut()
 }
 
-actual class AuthCredential internal constructor(val android: com.google.firebase.auth.AuthCredential)
+actual class AuthCredential(val android: com.google.firebase.auth.AuthCredential)
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
