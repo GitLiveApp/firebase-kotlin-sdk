@@ -49,5 +49,6 @@ expect class FirebaseAuthInvalidUserException: FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException: FirebaseAuthException
 expect class FirebaseAuthUserCollisionException: FirebaseAuthException
 expect class FirebaseAuthWebException: FirebaseAuthException
+
 expect class AuthCredential
 

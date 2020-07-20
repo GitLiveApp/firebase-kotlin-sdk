@@ -70,7 +70,7 @@ external object firebase {
         interface AuthResult {
             val user: user.User?
         }
-        abstract class AuthCredential
+        interface AuthCredential
     }
 
     fun User(a: Any,b: Any,c: Any): user.User
