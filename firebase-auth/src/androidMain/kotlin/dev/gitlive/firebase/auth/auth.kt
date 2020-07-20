@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -83,3 +84,9 @@ actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.
 actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
 actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException
 
+actual object EmailAuthProvider {
+    actual fun withEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthCredential = AuthCredential(EmailAuthProvider.getCredential(email, password))
+}

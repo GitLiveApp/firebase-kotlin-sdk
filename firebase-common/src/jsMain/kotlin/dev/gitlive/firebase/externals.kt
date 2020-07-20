@@ -71,8 +71,9 @@ external object firebase {
             val user: user.User?
         }
         interface AuthCredential
-    }
 
+    }
+    fun createEmailCredential(email: String, password: String) : auth.AuthCredential
     fun User(a: Any,b: Any,c: Any): user.User
 
     object user {

@@ -108,3 +108,10 @@ private fun errorToException(cause: Throwable) = when(val code = cause.asDynamic
 //                "auth/unauthorized-domain" ->
     else -> FirebaseAuthException(code, cause)
 }
+
+actual object EmailAuthProvider {
+    actual fun withEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthCredential = AuthCredential(firebase.createEmailCredential(email, password))
+}

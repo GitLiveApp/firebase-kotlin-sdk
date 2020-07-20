@@ -21,9 +21,3 @@ actual fun runTest(test: suspend () -> Unit) = runBlocking {
     }
     testRun.await()
 }
-
-actual fun createEmailCredential(
-    email: String,
-    password: String
-): AuthCredential? =
-    AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))

@@ -58,8 +58,6 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
         get() = FirebaseUser(ios.user)
 }
 
-actual class AuthCredential(val ios: FIRAuthCredential)
-
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual val uid: String
         get() = ios.uid
@@ -84,6 +82,16 @@ actual open class FirebaseAuthInvalidUserException(message: String): FirebaseAut
 actual open class FirebaseAuthRecentLoginRequiredException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
+
+actual class AuthCredential(val ios: FIRAuthCredential)
+
+actual object EmailAuthProvider {
+    actual fun withEmailAndPassword(
+        email: String,
+        password: String
+    ): AuthCredential =
+        AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
+}
 
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
