@@ -70,4 +70,16 @@ class FirebaseAuthTest {
 
         createResult.user!!.delete()
     }
+
+    @Test
+    fun testSignInWithCredential() = runTest {
+        val credential = createEmailCredential("test@test.com", "test123")
+        credential?.let {
+            val result = Firebase.auth.signInWithCredential(it)
+            assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
+        }
+
+    }
 }
+
+expect fun createEmailCredential(email: String, password: String): AuthCredential?

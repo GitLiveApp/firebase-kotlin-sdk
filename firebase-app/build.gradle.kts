@@ -90,6 +90,11 @@ kotlin {
                 api("com.google.firebase:firebase-common:19.2.0")
             }
         }
+        val androidAndroidTest by getting {
+            dependencies {
+                api("com.google.firebase:firebase-common:19.2.0")
+            }
+        }
 
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {

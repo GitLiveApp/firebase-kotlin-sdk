@@ -10,3 +10,8 @@ import kotlinx.coroutines.promise
 actual val context: Any = Unit
 
 actual fun runTest(test: suspend () -> Unit) = GlobalScope.promise { test() }.unsafeCast<Unit>()
+
+actual fun createEmailCredential(
+    email: String,
+    password: String
+): AuthCredential? = null

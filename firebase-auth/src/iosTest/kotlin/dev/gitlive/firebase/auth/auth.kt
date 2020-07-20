@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
+import cocoapods.FirebaseAuth.FIREmailAuthProvider
 import kotlinx.coroutines.*
 import platform.Foundation.*
 
@@ -20,3 +21,9 @@ actual fun runTest(test: suspend () -> Unit) = runBlocking {
     }
     testRun.await()
 }
+
+actual fun createEmailCredential(
+    email: String,
+    password: String
+): AuthCredential? =
+    AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
