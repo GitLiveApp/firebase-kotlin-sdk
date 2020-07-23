@@ -29,6 +29,9 @@ android {
         pickFirst("META-INF/LGPL2.1")
         pickFirst("androidsupportmultidexversion.txt")
     }
+    lintOptions {
+        isAbortOnError = false
+    }
 }
 
 kotlin {
