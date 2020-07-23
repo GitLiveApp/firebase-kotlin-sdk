@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIREmailAuthProvider
 import kotlinx.coroutines.*
 import platform.Foundation.*
 

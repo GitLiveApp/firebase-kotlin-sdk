@@ -6,7 +6,6 @@
 package dev.gitlive.firebase.auth
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.firebase.auth.EmailAuthProvider
 import kotlinx.coroutines.runBlocking
 
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext

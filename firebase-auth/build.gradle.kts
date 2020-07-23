@@ -98,6 +98,12 @@ kotlin {
             }
         }
 
+        val androidMain by getting {
+            dependencies {
+                api("com.google.firebase:firebase-auth:19.1.0")
+            }
+        }
+
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))

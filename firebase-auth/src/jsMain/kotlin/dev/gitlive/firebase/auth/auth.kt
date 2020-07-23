@@ -110,8 +110,8 @@ private fun errorToException(cause: Throwable) = when(val code = cause.asDynamic
 }
 
 actual object EmailAuthProvider {
-    actual fun withEmailAndPassword(
+    actual fun credentialWithEmail(
         email: String,
         password: String
-    ): AuthCredential = AuthCredential(firebase.createEmailCredential(email, password))
+    ): AuthCredential = AuthCredential(firebase.auth.EmailAuthProvider.credential(email, password))
 }

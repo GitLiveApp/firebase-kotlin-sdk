@@ -86,7 +86,7 @@ actual open class FirebaseAuthWebException(message: String): FirebaseAuthExcepti
 actual class AuthCredential(val ios: FIRAuthCredential)
 
 actual object EmailAuthProvider {
-    actual fun withEmailAndPassword(
+    actual fun credentialWithEmail(
         email: String,
         password: String
     ): AuthCredential =

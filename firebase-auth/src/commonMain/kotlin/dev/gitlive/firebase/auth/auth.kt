@@ -54,6 +54,6 @@ expect class FirebaseAuthWebException : FirebaseAuthException
 expect class AuthCredential
 
 expect object EmailAuthProvider{
-    fun withEmailAndPassword(email: String, password: String): AuthCredential
+    fun credentialWithEmail(email: String, password: String): AuthCredential
 }
 

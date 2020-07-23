@@ -85,7 +85,7 @@ actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.F
 actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException
 
 actual object EmailAuthProvider {
-    actual fun withEmailAndPassword(
+    actual fun credentialWithEmail(
         email: String,
         password: String
     ): AuthCredential = AuthCredential(EmailAuthProvider.getCredential(email, password))

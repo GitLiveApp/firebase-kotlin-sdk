@@ -70,10 +70,17 @@ external object firebase {
         interface AuthResult {
             val user: user.User?
         }
+
         interface AuthCredential
 
+        abstract class EmailAuthProvider {
+            companion object {
+                fun credential(email :  String, password : String) : AuthCredential
+            }
+        }
+
     }
-    fun createEmailCredential(email: String, password: String) : auth.AuthCredential
+
     fun User(a: Any,b: Any,c: Any): user.User
 
     object user {
