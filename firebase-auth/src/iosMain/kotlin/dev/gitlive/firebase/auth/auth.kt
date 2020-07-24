@@ -42,6 +42,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun signInAnonymously() =
         AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
 
+    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
+        AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
     actual val authStateChanged get() = callbackFlow {
@@ -79,6 +82,16 @@ actual open class FirebaseAuthInvalidUserException(message: String): FirebaseAut
 actual open class FirebaseAuthRecentLoginRequiredException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
+
+actual class AuthCredential(val ios: FIRAuthCredential)
+
+actual object EmailAuthProvider {
+    actual fun credentialWithEmail(
+        email: String,
+        password: String
+    ): AuthCredential =
+        AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
+}
 
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
