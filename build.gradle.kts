@@ -74,10 +74,10 @@ subprojects {
         }
     }
 
-    var shouldSign = true
 
     tasks.withType<Sign>().configureEach {
-        onlyIf { shouldSign }
+        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal")
+            }
     }
 
     tasks {
@@ -176,9 +176,6 @@ subprojects {
             println("Skipping Firebase zip download")
         }
 
-        tasks.named("publishToMavenLocal").configure {
-            shouldSign = false
-        }
 
         dependencies {
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
