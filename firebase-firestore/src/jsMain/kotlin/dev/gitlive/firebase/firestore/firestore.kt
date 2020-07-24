@@ -39,6 +39,9 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         rethrow { js.runTransaction { GlobalScope.promise { Transaction(it).func() } }.await() }
+
+    actual suspend fun clearPersistence() =
+        rethrow { js.clearPersistence().await() }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
@@ -246,6 +249,8 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     actual suspend fun get() =  rethrow { QuerySnapshot(js.get().await()) }
 
+    actual fun limit(limit: Number) = Query(js.limit(limit.toDouble()))
+
     internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
     internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path, "==", equalTo)) }
 
@@ -269,12 +274,17 @@ actual open class Query(open val js: firebase.firestore.Query) {
         )
     }
 
-    internal actual fun _where(field: String, arrayContainsAny: List<Any>) = rethrow {
-        Query(js.where(field, "array-contains-any", arrayContainsAny))
-    }
-    internal actual fun _where(path: FieldPath, arrayContainsAny: List<Any>) = rethrow {
-        Query(js.where(path, "array-contains-any", arrayContainsAny))
-    }
+    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
+        (inArray?.let { js.where(field, "in", it) } ?: js).let { js2 ->
+            arrayContainsAny?.let { js2.where(field, "array-contains-any", it) } ?: js2
+        }
+    )
+
+    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
+        (inArray?.let { js.where(path, "in", it) } ?: js).let { js2 ->
+            arrayContainsAny?.let { js2.where(path, "array-contains-any", it) } ?: js2
+        }
+    )
 
     actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {
