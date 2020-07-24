@@ -175,7 +175,7 @@ subprojects {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.6")
             "jsMainImplementation"(kotlin("stdlib-js"))
             "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.6")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.6")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.6")
             "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.6")
@@ -187,7 +187,7 @@ subprojects {
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.12")
             "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
-            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6")
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
             "androidAndroidTestImplementation"("androidx.test:runner:1.1.0")
         }

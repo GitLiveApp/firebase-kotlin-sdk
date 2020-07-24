@@ -41,6 +41,9 @@ android {
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
     }
+    lintOptions {
+        isAbortOnError = false
+    }
 }
 
 // Optional configuration
