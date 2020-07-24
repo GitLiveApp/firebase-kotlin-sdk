@@ -27,11 +27,10 @@ jobs:
           path: build/Firebase-6.17.0.zip
           key: key-Firebase-6.17.0
           restore-keys: key-Firebase-6.17.0
+      - name: Download Firebase
+        run: ./gradlew downloadIOSFirebaseZipFile
       - name: Expand Zip
-        if: steps.cache-key.outputs.cache-hit == 'true'
         run: unzip build/Firebase-6.17.0.zip -d build
-      - name: Download Unzip Firebase
-        run: ./gradlew unzipIOSFirebase
       - name: Publish
         uses: eskatos/gradle-command-action@v1
         with:
