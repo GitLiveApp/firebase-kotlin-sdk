@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = "0.2.3"
+version = "0.2.4"
 
 plugins {
     id("com.android.library")
