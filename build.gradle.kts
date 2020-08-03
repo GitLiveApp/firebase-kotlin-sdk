@@ -106,7 +106,7 @@ subprojects {
                 into.createNewFile()
                 into.writeText(
                     from.readText()
-                        .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/firebase-")
+                        .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/")
                 )
             }
         }
