@@ -106,8 +106,7 @@ subprojects {
                 into.createNewFile()
                 into.writeText(
                     from.readText()
-                        .replace("require('firebase-", "require('@gitliveapp/firebase-")
-                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitliveapp/kotlinx-serialization-runtime')")
+                        .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/firebase-")
                 )
             }
         }
