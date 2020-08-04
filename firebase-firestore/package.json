@@ -1,6 +1,6 @@
 {
   "name": "@gitliveapp/firebase-firestore",
-  "version": "0.2.8",
+  "version": "0.2.9",
 "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-firestore.js",
   "scripts": {
