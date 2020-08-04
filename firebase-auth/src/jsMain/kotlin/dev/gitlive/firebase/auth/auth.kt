@@ -43,7 +43,12 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         }
         awaitClose { unsubscribe() }
     }
+
+    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
+        rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
 }
+
+actual class AuthCredential(val js: firebase.auth.AuthCredential)
 
 actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
@@ -102,4 +107,11 @@ private fun errorToException(cause: Throwable) = when(val code = cause.asDynamic
 //                "auth/too-many-arguments" ->
 //                "auth/unauthorized-domain" ->
     else -> FirebaseAuthException(code, cause)
+}
+
+actual object EmailAuthProvider {
+    actual fun credentialWithEmail(
+        email: String,
+        password: String
+    ): AuthCredential = AuthCredential(firebase.auth.EmailAuthProvider.credential(email, password))
 }

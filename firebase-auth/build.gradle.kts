@@ -41,6 +41,9 @@ android {
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
     }
+    lintOptions {
+        isAbortOnError = false
+    }
 }
 
 // Optional configuration
@@ -103,6 +106,7 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-auth:19.1.0")

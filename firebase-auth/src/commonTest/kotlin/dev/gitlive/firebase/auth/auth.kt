@@ -26,7 +26,7 @@ class FirebaseAuthTest {
                     storageBucket = "fir-kotlin-sdk.appspot.com",
                     projectId = "fir-kotlin-sdk"
                 )
-        )
+            )
     }
 
     @Test
@@ -69,5 +69,13 @@ class FirebaseAuthTest {
         Firebase.auth.sendPasswordResetEmail(email)
 
         createResult.user!!.delete()
+    }
+
+    @Test
+    fun testSignInWithCredential() = runTest {
+        val credential = EmailAuthProvider.credentialWithEmail("test@test.com", "test123")
+        val result = Firebase.auth.signInWithCredential(credential)
+        assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
+
     }
 }

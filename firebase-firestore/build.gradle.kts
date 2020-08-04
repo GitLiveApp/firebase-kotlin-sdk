@@ -1,4 +1,4 @@
-version = "0.2.7"
+version = "0.2.8"
 
 plugins {
     id("com.android.library")
@@ -28,6 +28,9 @@ android {
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
         pickFirst("androidsupportmultidexversion.txt")
+    }
+    lintOptions {
+        isAbortOnError = false
     }
 }
 

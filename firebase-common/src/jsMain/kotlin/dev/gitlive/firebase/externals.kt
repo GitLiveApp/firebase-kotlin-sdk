@@ -62,6 +62,7 @@ external object firebase {
             fun createUserWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
+            fun signInWithCredential(authCredential: AuthCredential): Promise<AuthResult>
             fun signOut(): Promise<Unit>
 
             fun onAuthStateChanged(nextOrObserver: (user.User?) -> Unit): () -> Unit
@@ -69,6 +70,15 @@ external object firebase {
         interface AuthResult {
             val user: user.User?
         }
+
+        interface AuthCredential
+
+        abstract class EmailAuthProvider {
+            companion object {
+                fun credential(email :  String, password : String) : AuthCredential
+            }
+        }
+
     }
 
     fun User(a: Any,b: Any,c: Any): user.User

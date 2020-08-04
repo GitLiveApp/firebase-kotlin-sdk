@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -45,9 +46,13 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         android.addAuthStateListener(listener)
         awaitClose { android.removeAuthStateListener(listener) }
     }
+    actual suspend fun signInWithCredential(authCredential: AuthCredential) =
+        AuthResult(android.signInWithCredential(authCredential.android).await())
 
     actual suspend fun signOut() = android.signOut()
 }
+
+actual class AuthCredential(val android: com.google.firebase.auth.AuthCredential)
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
@@ -79,3 +84,9 @@ actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.
 actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
 actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException
 
+actual object EmailAuthProvider {
+    actual fun credentialWithEmail(
+        email: String,
+        password: String
+    ): AuthCredential = AuthCredential(EmailAuthProvider.getCredential(email, password))
+}
