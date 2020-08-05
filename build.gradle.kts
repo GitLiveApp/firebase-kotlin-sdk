@@ -51,6 +51,17 @@ tasks {
         outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
     }
 
+    val updateVersions by registering {
+        dependsOn(
+            "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
+            "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
+            "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
+            "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
+            "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
+            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion"
+        )
+    }
+
 }
 
 subprojects {
@@ -74,6 +85,20 @@ subprojects {
     
 
     tasks {
+
+        val updateVersion by registering(Exec::class) {
+            commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
+        }
+
+        val updateDependencyVersion by registering(Copy::class) {
+            mustRunAfter("updateVersion")
+            val from = file("package.json")
+            from.writeText(
+                from.readText()
+                    .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
+                    .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
+            )
+        }
 
         val copyReadMe by registering(Copy::class) {
             from(rootProject.file("README.md"))

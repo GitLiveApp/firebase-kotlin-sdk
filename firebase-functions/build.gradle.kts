@@ -1,4 +1,4 @@
-version = "0.2.0"
+version = project.property("firebase-functions.version") as String
 
 plugins {
     id("com.android.library")
