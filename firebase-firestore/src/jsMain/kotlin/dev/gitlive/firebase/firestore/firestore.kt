@@ -342,8 +342,9 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
 
 actual typealias FieldPath = Any
 
-actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow { firebase.firestore.FieldPath(*fieldNames) }
-
+actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow {
+    js("Reflect").construct(firebase.firestore.asDynamic().FieldPath, fieldNames).unsafeCast<FieldPath>()
+}
 
 actual object FieldValue {
     actual fun delete(): Any = rethrow { firebase.firestore.FieldValue.delete() }
