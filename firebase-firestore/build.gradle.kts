@@ -1,4 +1,4 @@
-version = "0.2.9"
+version = project.property("firebase-firestore.version") as String
 
 plugins {
     id("com.android.library")

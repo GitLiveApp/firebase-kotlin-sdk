@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
-version = "0.2.7"
+version = project.property("firebase-app.version") as String
 
 
 plugins {
