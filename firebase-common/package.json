@@ -1,5 +1,5 @@
 {
-  "name": "@gitlive/firebase-common",
+  "name": "@gitliveapp/firebase-common",
   "version": "0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-common.js",
