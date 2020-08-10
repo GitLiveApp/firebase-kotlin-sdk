@@ -65,7 +65,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-functions:19.0.1")
+                api("com.google.firebase:firebase-functions:19.0.2")
             }
         }
         val iosMain by getting {}

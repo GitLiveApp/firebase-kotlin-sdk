@@ -67,7 +67,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:21.4.3")
+                api("com.google.firebase:firebase-firestore:21.5.0")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }

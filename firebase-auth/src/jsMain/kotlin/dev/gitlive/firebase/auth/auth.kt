@@ -66,6 +66,8 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
         get() = rethrow { js.phoneNumber }
     actual val isAnonymous: Boolean
         get() = rethrow { js.isAnonymous }
+    actual val isEmailVerified: Boolean
+        get() = dev.gitlive.firebase.auth.rethrow { js.emailVerified }
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
     actual suspend fun sendEmailVerification() = rethrow { js.sendEmailVerification().await() }

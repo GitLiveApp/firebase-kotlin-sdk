@@ -90,6 +90,7 @@ external object firebase {
             val email: String?
             val phoneNumber: String?
             val isAnonymous: Boolean
+            val emailVerified: Boolean
 
             fun delete(): Promise<Unit>
             fun reload(): Promise<Unit>
