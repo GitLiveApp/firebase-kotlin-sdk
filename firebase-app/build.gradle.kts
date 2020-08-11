@@ -67,7 +67,9 @@ kotlin {
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-armv7_arm64",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-x86_64-maccatalyst")
                 linkerOpts("-ObjC")
             }
         }
@@ -97,7 +99,9 @@ kotlin {
                 val firebasecore by cinterops.creating {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-armv7_arm64",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-x86_64-maccatalyst")
                 }
             }
         }

@@ -78,14 +78,9 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 actual open class AuthCredential(open val android: com.google.firebase.auth.AuthCredential) {
     actual val providerId: String
         get() = android.provider
-    actual val signInMethod: String
-        get() = android.signInMethod
 }
 
-actual class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android) {
-    actual val smsCode: String?
-        get() = android.smsCode
-}
+actual class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android)
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
@@ -150,11 +145,14 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         val request = actionCodeSettings?.android?.let { android.sendEmailVerification(it) } ?: android.sendEmailVerification()
         request.await().run { Unit }
     }
-    actual suspend fun unlink(provider: String): AuthResult = AuthResult(android.unlink(provider).await())
+    actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    actual suspend fun updateProfile(request: UserProfileChangeRequest) = android.updateProfile(request.android).await().run { Unit }
+    actual suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit) {
+        val request = UserProfileChangeRequest.Builder().apply { buildRequest(this) }.build()
+        android.updateProfile(request.android).await()
+    }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.android).await().run { Unit }
 }
 

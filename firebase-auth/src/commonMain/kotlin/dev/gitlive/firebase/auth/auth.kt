@@ -78,11 +78,8 @@ expect class FirebaseAuthWebException : FirebaseAuthException
 
 expect open class AuthCredential {
     val providerId: String
-    val signInMethod: String
 }
-expect class PhoneAuthCredential : AuthCredential {
-    val smsCode: String?
-}
+expect class PhoneAuthCredential : AuthCredential
 
 expect object EmailAuthProvider{
     fun credentialWithEmail(email: String, password: String): AuthCredential
@@ -107,11 +104,11 @@ expect class FirebaseUser {
     suspend fun reauthenticate(credential: AuthCredential)
     suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
     suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
-    suspend fun unlink(provider: String): AuthResult
+    suspend fun unlink(provider: String): FirebaseUser?
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(request: UserProfileChangeRequest)
+    suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 

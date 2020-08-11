@@ -76,8 +76,12 @@ kotlin {
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-armv7_arm64",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-x86_64-maccatalyst")
+                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-armv7_arm64",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-x86_64-maccatalyst")
                 linkerOpts("-F${rootProject.buildDir}/Firebase/GoogleSignIn")
                 linkerOpts("-ObjC")
 //                compilerOpts("-framework AppAuth")
@@ -103,7 +107,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:19.3.0")
+                api("com.google.firebase:firebase-auth:19.3.2")
             }
         }
 
@@ -113,7 +117,9 @@ kotlin {
                 val firebaseAuth by cinterops.creating {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseAuth")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-armv7_arm64",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAuth/FirebaseAuth.xcframework/ios-x86_64-maccatalyst")
                     compilerOpts("-F$projectDir/../build/Firebase/GoogleSignIn")
                 }
             }
