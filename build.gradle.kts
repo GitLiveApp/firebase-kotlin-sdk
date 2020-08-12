@@ -19,7 +19,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.6.1")
+        classpath("com.android.tools.build:gradle:4.0.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
@@ -31,8 +31,8 @@ val minSdkVersion by extra(16)
 
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/6.17.0/Firebase-6.17.0.zip")
-        dest(File(buildDir, "Firebase-6.17.0.zip"))
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/CocoaPods-6.30.0/Firebase.zip")
+        dest(File(buildDir, "Firebase-6.30.0.zip"))
         if (System.getenv("token") != null) {
             username(System.getenv("token"))
         }
@@ -41,7 +41,7 @@ tasks {
 
     val unzipIOSFirebase by creating(Copy::class) {
         if (!File("$buildDir/Firebase").exists()) {
-            val zipFile = File(buildDir, "Firebase-6.17.0.zip")
+            val zipFile = File(buildDir, "Firebase-6.30.0.zip")
             if (!zipFile.exists()) {
                 dependsOn(downloadIOSFirebaseZipFile)
             }
@@ -172,24 +172,24 @@ subprojects {
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.6")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.6")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6")
+            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.8")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.8")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.6")
-            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.6")
-            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.6")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.8")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.6")
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.6")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.8")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.12")
+            "androidAndroidTestImplementation"("junit:junit:4.13")
             "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
-            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6")
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.8")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.1.0")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
         }
     }
 

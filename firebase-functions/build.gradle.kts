@@ -65,7 +65,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-functions:19.0.1")
+                api("com.google.firebase:firebase-functions:19.0.2")
             }
         }
         val iosMain by getting {}
@@ -77,7 +77,9 @@ kotlin {
                 val firebasefunctions by cinterops.creating {
                     packageName("cocoapods.FirebaseFunctions")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFunctions")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-armv7_arm64",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-x86_64-maccatalyst")
                 }
             }
         }

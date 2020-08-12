@@ -71,7 +71,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:17.0.0")
+                api("com.google.firebase:firebase-database:19.3.1")
             }
         }
         val jsMain by getting {}
@@ -83,7 +83,9 @@ kotlin {
                 val firebaseDatabase by cinterops.creating {
                     packageName("cocoapods.FirebaseDatabase")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseDatabase.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseDatabase")
+                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseDatabase/FirebaseDatabase.xcframework/ios-armv7_arm64",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseDatabase/FirebaseDatabase.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseDatabase/FirebaseDatabase.xcframework/ios-x86_64-maccatalyst")
                 }
             }
         }
