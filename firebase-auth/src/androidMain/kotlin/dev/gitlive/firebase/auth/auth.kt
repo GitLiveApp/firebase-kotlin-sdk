@@ -4,10 +4,8 @@
 
 package dev.gitlive.firebase.auth
 
-import android.net.Uri
 import com.google.firebase.auth.ActionCodeEmailInfo
 import com.google.firebase.auth.ActionCodeMultiFactorInfo
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -75,13 +73,6 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun verifyPasswordResetCode(code: String): String = android.verifyPasswordResetCode(code).await()
 }
 
-actual open class AuthCredential(open val android: com.google.firebase.auth.AuthCredential) {
-    actual val providerId: String
-        get() = android.provider
-}
-
-actual class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android)
-
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
@@ -111,133 +102,6 @@ actual class SignInMethodQueryResult(val android: com.google.firebase.auth.SignI
     actual val signInMethods: List<String>
         get() = android.signInMethods ?: emptyList()
 }
-
-actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
-    actual val uid: String
-        get() = android.uid
-    actual val displayName: String?
-        get() = android.displayName
-    actual val email: String?
-        get() = android.email
-    actual val phoneNumber: String?
-        get() = android.phoneNumber
-    actual val photoURL: String?
-        get() = android.photoUrl?.toString()
-    actual val isAnonymous: Boolean
-        get() = android.isAnonymous
-    actual val isEmailVerified: Boolean
-        get() = android.isEmailVerified
-    actual val metaData: MetaData?
-        get() = android.metadata?.let{ MetaData(it) }
-    actual val multiFactor: MultiFactor
-        get() = MultiFactor(android.multiFactor)
-    actual val providerData: List<UserInfo>
-        get() = android.providerData.map { UserInfo(it) }
-    actual val providerId: String
-        get() = android.providerId
-    actual suspend fun delete() = android.delete().await().run { Unit }
-    actual suspend fun reload() = android.reload().await().run { Unit }
-    actual suspend fun getIdToken(forceRefresh: Boolean) = android.getIdToken(forceRefresh).await().run { Unit }
-    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = AuthResult(android.linkWithCredential(credential.android).await())
-    actual suspend fun reauthenticate(credential: AuthCredential) = android.reauthenticate(credential.android).await().run { Unit }
-    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(android.reauthenticateAndRetrieveData(credential.android).await())
-    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) {
-        val request = actionCodeSettings?.android?.let { android.sendEmailVerification(it) } ?: android.sendEmailVerification()
-        request.await().run { Unit }
-    }
-    actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
-    actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
-    actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    actual suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit) {
-        val request = UserProfileChangeRequest.Builder().apply { buildRequest(this) }.build()
-        android.updateProfile(request.android).await()
-    }
-    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.android).await().run { Unit }
-}
-
-actual class UserInfo(val android: com.google.firebase.auth.UserInfo) {
-    actual val displayName: String?
-        get() = android.displayName
-    actual val email: String?
-        get() = android.email
-    actual val phoneNumber: String?
-        get() = android.phoneNumber
-    actual val photoURL: String?
-        get() = android.photoUrl?.toString()
-    actual val providerId: String
-        get() = android.providerId
-    actual val uid: String
-        get() = android.uid
-}
-
-actual class MetaData(val android: com.google.firebase.auth.FirebaseUserMetadata) {
-    actual val creationTime: Long?
-        get() = android.creationTimestamp
-    actual val lastSignInTime: Long?
-        get() = android.lastSignInTimestamp
-}
-
-actual class UserProfileChangeRequest(val android: com.google.firebase.auth.UserProfileChangeRequest) {
-    actual class Builder(val android: com.google.firebase.auth.UserProfileChangeRequest.Builder = com.google.firebase.auth.UserProfileChangeRequest.Builder()) {
-        actual fun setDisplayName(displayName: String?): Builder = apply {
-            android.setDisplayName(displayName)
-        }
-        actual fun setPhotoURL(photoURL: String?): Builder = apply {
-            android.setPhotoUri(photoURL?.let { Uri.parse(it) })
-        }
-        actual fun build(): UserProfileChangeRequest = UserProfileChangeRequest(android.build())
-    }
-    actual val displayName: String?
-        get() = android.displayName
-    actual val photoURL: String?
-        get() = android.photoUri?.toString()
-}
-
-actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
-actual typealias FirebaseAuthActionCodeException = com.google.firebase.auth.FirebaseAuthActionCodeException
-actual typealias FirebaseAuthEmailException = com.google.firebase.auth.FirebaseAuthEmailException
-actual typealias FirebaseAuthInvalidCredentialsException = com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-actual typealias FirebaseAuthInvalidUserException = com.google.firebase.auth.FirebaseAuthInvalidUserException
-actual typealias FirebaseAuthMultiFactorException = com.google.firebase.auth.FirebaseAuthMultiFactorException
-actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
-actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
-actual typealias FirebaseAuthWeakPasswordException = com.google.firebase.auth.FirebaseAuthWeakPasswordException
-actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException
-
-actual object EmailAuthProvider {
-    actual fun credentialWithEmail(
-        email: String,
-        password: String
-    ): AuthCredential = AuthCredential(EmailAuthProvider.getCredential(email, password))
-}
-
-actual class MultiFactor(val android: com.google.firebase.auth.MultiFactor) {
-    actual val enrolledFactors: List<MultiFactorInfo>
-        get() = android.enrolledFactors.map { MultiFactorInfo(it) }
-    actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) = android.enroll(multiFactorAssertion.android, displayName).await().run { Unit }
-    actual suspend fun getSession(): MultiFactorSession = MultiFactorSession(android.session.await())
-    actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo) = android.unenroll(multiFactorInfo.android).await().run { Unit }
-    actual suspend fun unenroll(factorUid: String) = android.unenroll(factorUid).await().run { Unit }
-}
-
-actual class MultiFactorInfo(val android: com.google.firebase.auth.MultiFactorInfo) {
-    actual val displayName: String?
-        get() = android.displayName
-    actual val enrollmentTime: Long
-        get() = android.enrollmentTimestamp
-    actual val factorId: String
-        get() = android.factorId
-    actual val uid: String
-        get() = android.uid
-}
-
-actual class MultiFactorAssertion(val android: com.google.firebase.auth.MultiFactorAssertion) {
-    actual val factorId: String
-        get() = android.factorId
-}
-
-actual class MultiFactorSession(val android: com.google.firebase.auth.MultiFactorSession)
 
 actual class ActionCodeSettings private constructor(val android: com.google.firebase.auth.ActionCodeSettings) {
     actual class Builder(val android: com.google.firebase.auth.ActionCodeSettings.Builder = com.google.firebase.auth.ActionCodeSettings.newBuilder()) {
@@ -272,3 +136,14 @@ actual class ActionCodeSettings private constructor(val android: com.google.fire
     actual val url: String
         get() = android.url
 }
+
+actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
+actual typealias FirebaseAuthActionCodeException = com.google.firebase.auth.FirebaseAuthActionCodeException
+actual typealias FirebaseAuthEmailException = com.google.firebase.auth.FirebaseAuthEmailException
+actual typealias FirebaseAuthInvalidCredentialsException = com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+actual typealias FirebaseAuthInvalidUserException = com.google.firebase.auth.FirebaseAuthInvalidUserException
+actual typealias FirebaseAuthMultiFactorException = com.google.firebase.auth.FirebaseAuthMultiFactorException
+actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
+actual typealias FirebaseAuthWeakPasswordException = com.google.firebase.auth.FirebaseAuthWeakPasswordException
+actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException

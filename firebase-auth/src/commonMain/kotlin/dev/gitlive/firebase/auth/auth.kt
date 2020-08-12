@@ -65,98 +65,6 @@ sealed class ActionCodeDataType<T> {
     object MultiFactor : ActionCodeDataType<MultiFactorInfo>()
 }
 
-expect open class FirebaseAuthException : FirebaseException
-expect class FirebaseAuthActionCodeException : FirebaseAuthException
-expect class FirebaseAuthEmailException : FirebaseAuthException
-expect class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
-expect class FirebaseAuthInvalidUserException : FirebaseAuthException
-expect class FirebaseAuthMultiFactorException: FirebaseAuthException
-expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
-expect class FirebaseAuthUserCollisionException : FirebaseAuthException
-expect class FirebaseAuthWeakPasswordException : FirebaseAuthException
-expect class FirebaseAuthWebException : FirebaseAuthException
-
-expect open class AuthCredential {
-    val providerId: String
-}
-expect class PhoneAuthCredential : AuthCredential
-
-expect object EmailAuthProvider{
-    fun credentialWithEmail(email: String, password: String): AuthCredential
-}
-
-expect class FirebaseUser {
-    val uid: String
-    val displayName: String?
-    val email: String?
-    val phoneNumber: String?
-    val photoURL: String?
-    val isAnonymous: Boolean
-    val isEmailVerified: Boolean
-    val metaData: MetaData?
-    val multiFactor: MultiFactor
-    val providerData: List<UserInfo>
-    val providerId: String
-    suspend fun delete()
-    suspend fun reload()
-    suspend fun getIdToken(forceRefresh: Boolean)
-    suspend fun linkWithCredential(credential: AuthCredential): AuthResult
-    suspend fun reauthenticate(credential: AuthCredential)
-    suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
-    suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
-    suspend fun unlink(provider: String): FirebaseUser?
-    suspend fun updateEmail(email: String)
-    suspend fun updatePassword(password: String)
-    suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit)
-    suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
-}
-
-expect class UserInfo {
-    val displayName: String?
-    val email: String?
-    val phoneNumber: String?
-    val photoURL: String?
-    val providerId: String
-    val uid: String
-}
-
-expect class MetaData {
-    val creationTime: Long?
-    val lastSignInTime: Long?
-}
-
-expect class UserProfileChangeRequest {
-    class Builder {
-        fun setDisplayName(displayName: String?): Builder
-        fun setPhotoURL(photoURL: String?): Builder
-        fun build(): UserProfileChangeRequest
-    }
-    val displayName: String?
-    val photoURL: String?
-}
-
-expect class MultiFactor {
-    val enrolledFactors: List<MultiFactorInfo>
-    suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?)
-    suspend fun getSession(): MultiFactorSession
-    suspend fun unenroll(multiFactorInfo: MultiFactorInfo)
-    suspend fun unenroll(factorUid: String)
-}
-
-expect class MultiFactorInfo {
-    val displayName: String?
-    val enrollmentTime: Long
-    val factorId: String
-    val uid: String
-}
-
-expect class MultiFactorAssertion {
-    val factorId: String
-}
-
-expect class MultiFactorSession
-
 expect class ActionCodeSettings {
     class Builder {
         fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder
@@ -174,3 +82,14 @@ expect class ActionCodeSettings {
     val iOSBundle: String?
     val url: String
 }
+
+expect open class FirebaseAuthException : FirebaseException
+expect class FirebaseAuthActionCodeException : FirebaseAuthException
+expect class FirebaseAuthEmailException : FirebaseAuthException
+expect class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
+expect class FirebaseAuthInvalidUserException : FirebaseAuthException
+expect class FirebaseAuthMultiFactorException: FirebaseAuthException
+expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
+expect class FirebaseAuthUserCollisionException : FirebaseAuthException
+expect class FirebaseAuthWeakPasswordException : FirebaseAuthException
+expect class FirebaseAuthWebException : FirebaseAuthException
