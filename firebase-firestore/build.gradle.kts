@@ -1,4 +1,4 @@
-version = "0.2.1"
+version = "0.2.0"
 
 plugins {
     id("com.android.library")
@@ -81,9 +81,11 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-armv7_arm64",
+                    compilerOpts(
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-armv7_arm64",
                         "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-x86_64-maccatalyst")
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-x86_64-maccatalyst"
+                    )
                 }
             }
         }

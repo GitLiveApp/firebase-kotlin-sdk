@@ -31,8 +31,8 @@ val minSdkVersion by extra(16)
 
 tasks {
     val downloadIOSFirebaseZipFile by creating(Download::class) {
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/CocoaPods-6.29.0/Firebase.zip")
-        dest(File(buildDir, "Firebase-6.29.0.zip"))
+        src("https://github.com/firebase/firebase-ios-sdk/releases/download/CocoaPods-6.30.0/Firebase.zip")
+        dest(File(buildDir, "Firebase-6.30.0.zip"))
         if (System.getenv("token") != null) {
             username(System.getenv("token"))
         }
@@ -41,7 +41,7 @@ tasks {
 
     val unzipIOSFirebase by creating(Copy::class) {
         if (!File("$buildDir/Firebase").exists()) {
-            val zipFile = File(buildDir, "Firebase-6.29.0.zip")
+            val zipFile = File(buildDir, "Firebase-6.30.0.zip")
             if (!zipFile.exists()) {
                 dependsOn(downloadIOSFirebaseZipFile)
             }
