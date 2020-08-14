@@ -47,13 +47,12 @@ expect class OAuthProvider constructor(provider: String, auth: FirebaseAuth = Fi
 expect class SignInProvider
 
 expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
-    companion object {
-        fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential
-    }
+    fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential
+    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
 
 }
 
-expect class PhoneVerificationProvider
+expect interface PhoneVerificationProvider
 
 expect object TwitterAuthProvider {
     fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential

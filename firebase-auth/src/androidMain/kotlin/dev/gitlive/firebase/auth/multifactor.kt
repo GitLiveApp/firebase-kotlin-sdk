@@ -32,3 +32,11 @@ actual class MultiFactorAssertion(val android: com.google.firebase.auth.MultiFac
 }
 
 actual class MultiFactorSession(val android: com.google.firebase.auth.MultiFactorSession)
+
+actual class MultiFactorResolver(val android: com.google.firebase.auth.MultiFactorResolver) {
+    actual val auth: FirebaseAuth = FirebaseAuth(android.firebaseAuth)
+    actual val hints: List<MultiFactorInfo> = android.hints.map { MultiFactorInfo(it) }
+    actual val session: MultiFactorSession = MultiFactorSession(android.session)
+
+    actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(android.resolveSignIn(assertion.android).await())
+}

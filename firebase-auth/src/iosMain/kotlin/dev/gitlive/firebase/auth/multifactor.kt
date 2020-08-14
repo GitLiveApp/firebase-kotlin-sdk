@@ -4,10 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRMultiFactor
-import cocoapods.FirebaseAuth.FIRMultiFactorAssertion
-import cocoapods.FirebaseAuth.FIRMultiFactorInfo
-import cocoapods.FirebaseAuth.FIRMultiFactorSession
+import cocoapods.FirebaseAuth.*
 
 actual class MultiFactor(val ios: FIRMultiFactor) {
     actual val enrolledFactors: List<MultiFactorInfo>
@@ -35,3 +32,11 @@ actual class MultiFactorAssertion(val ios: FIRMultiFactorAssertion) {
 }
 
 actual class MultiFactorSession(val ios: FIRMultiFactorSession)
+
+actual class MultiFactorResolver(val ios: FIRMultiFactorResolver) {
+    actual val auth: FirebaseAuth = FirebaseAuth(ios.auth)
+    actual val hints: List<MultiFactorInfo> = ios.hints.mapNotNull { hint -> (hint as? FIRMultiFactorInfo)?.let { MultiFactorInfo(it) } }
+    actual val session: MultiFactorSession = MultiFactorSession(ios.session)
+
+    actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(ios.awaitResult { resolveSignInWithAssertion(assertion.ios, it) })
+}

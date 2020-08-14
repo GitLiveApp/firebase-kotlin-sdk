@@ -24,3 +24,11 @@ expect class MultiFactorAssertion {
 }
 
 expect class MultiFactorSession
+
+expect class MultiFactorResolver {
+    val auth: FirebaseAuth
+    val hints: List<MultiFactorInfo>
+    val session: MultiFactorSession
+
+    suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult
+}

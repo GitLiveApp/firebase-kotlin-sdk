@@ -5,7 +5,13 @@
 package dev.gitlive.firebase.auth
 
 import android.app.Activity
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.PhoneAuthProvider
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.concurrent.TimeUnit
 
 actual open class AuthCredential(open val android: com.google.firebase.auth.AuthCredential) {
     actual val providerId: String
@@ -79,16 +85,55 @@ actual typealias SignInProvider = Activity
 
 actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthProvider) {
 
-    actual companion object {
-        actual fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
-    }
 
     actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
 
-    fun test() {
+    actual fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
+        val response = CompletableDeferred<Result<AuthCredential>>()
+        val callback = object :
+            PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+            override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
+                verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
+            }
+
+            override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
+                launch {
+                    val code = verificationProvider.getVerificationCode()
+                    try {
+                        val credentials =
+                            credentialWithVerificationIdAndSmsCode(verificationId, code)
+                        response.complete(Result.success(credentials))
+                    } catch (e: Exception) {
+                        response.complete(Result.failure(e))
+                    }
+                }
+            }
+
+            override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
+                response.complete(Result.success(AuthCredential(credential)))
+            }
+
+            override fun onVerificationFailed(error: FirebaseException) {
+                response.complete(Result.failure(error))
+            }
+
+        }
+        android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, callback)
+
+        response.await().getOrThrow()
     }
 }
 
-expect object TwitterAuthProvider {
-    fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential
+actual interface PhoneVerificationProvider {
+    val activity: Activity
+    val timeout: Long
+    val unit: TimeUnit
+    fun codeSent(triggerResend: (Unit) -> Unit)
+    suspend fun getVerificationCode(): String
+}
+
+actual object TwitterAuthProvider {
+    actual fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
 }
