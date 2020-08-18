@@ -69,7 +69,7 @@ expect class ActionCodeSettings {
     class Builder {
         fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder
         fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder
-        fun setHandleCodeInApp(status: Boolean): Builder
+        fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder
         fun setIOSBundleId(iOSBundleId: String): Builder
         fun setUrl(url: String): Builder
         fun build(): ActionCodeSettings
@@ -91,5 +91,4 @@ expect class FirebaseAuthInvalidUserException : FirebaseAuthException
 expect class FirebaseAuthMultiFactorException: FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
 expect class FirebaseAuthUserCollisionException : FirebaseAuthException
-expect class FirebaseAuthWeakPasswordException : FirebaseAuthException
 expect class FirebaseAuthWebException : FirebaseAuthException

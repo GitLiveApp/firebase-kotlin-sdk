@@ -38,8 +38,7 @@ expect class OAuthProvider constructor(provider: String, auth: FirebaseAuth = Fi
     }
 
     fun addScope(vararg scope: String)
-    fun addCustomParameter(key: String, value: String)
-    fun addCustomParameters(parameters: Map<String, String>)
+    fun setCustomParameters(parameters: Map<String, String>)
 
     suspend fun signIn(signInProvider: SignInProvider): AuthResult
 }

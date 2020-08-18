@@ -48,11 +48,8 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
         val scopes = ios.scopes?.mapNotNull { it as? String } ?: emptyList()
         ios.setScopes(scopes + scope.asList())
     }
-    actual fun addCustomParameter(key: String, value: String) {
-        ios.setCustomParameters(getCustomParameters() + (key to value))
-    }
-    actual fun addCustomParameters(parameters: Map<String, String>) {
-        ios.setCustomParameters(getCustomParameters() + parameters)
+    actual fun setCustomParameters(parameters: Map<String, String>) {
+        ios.setCustomParameters(emptyMap<Any?, Any?>() + parameters)
     }
 
     private fun getCustomParameters(): Map<String, String> {

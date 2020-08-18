@@ -111,8 +111,8 @@ actual class ActionCodeSettings private constructor(val android: com.google.fire
         actual fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder = apply {
             android.setDynamicLinkDomain(dynamicLinkDomain)
         }
-        actual fun setHandleCodeInApp(status: Boolean): Builder = apply {
-            android.setHandleCodeInApp(status)
+        actual fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder = apply {
+            android.setHandleCodeInApp(canHandleCodeInApp)
         }
         actual fun setIOSBundleId(iOSBundleId: String): Builder = apply {
             android.setIOSBundleId(iOSBundleId)
@@ -145,5 +145,4 @@ actual typealias FirebaseAuthInvalidUserException = com.google.firebase.auth.Fir
 actual typealias FirebaseAuthMultiFactorException = com.google.firebase.auth.FirebaseAuthMultiFactorException
 actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
-actual typealias FirebaseAuthWeakPasswordException = com.google.firebase.auth.FirebaseAuthWeakPasswordException
 actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException

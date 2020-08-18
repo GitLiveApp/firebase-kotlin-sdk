@@ -111,8 +111,8 @@ actual class ActionCodeSettings private constructor(val ios: FIRActionCodeSettin
         actual fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder = apply {
             ios.setDynamicLinkDomain(dynamicLinkDomain)
         }
-        actual fun setHandleCodeInApp(status: Boolean): Builder = apply {
-            ios.setHandleCodeInApp(status)
+        actual fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder = apply {
+            ios.setHandleCodeInApp(canHandleCodeInApp)
         }
         actual fun setIOSBundleId(iOSBundleId: String): Builder = apply {
             ios.setIOSBundleID(iOSBundleId)
@@ -145,7 +145,6 @@ actual open class FirebaseAuthInvalidUserException(message: String): FirebaseAut
 actual open class FirebaseAuthMultiFactorException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthRecentLoginRequiredException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
-actual open class FirebaseAuthWeakPasswordException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
 
 internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
@@ -195,19 +194,25 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeCaptchaCheckFailed,
         FIRAuthErrorCodeInvalidPhoneNumber,
         FIRAuthErrorCodeMissingPhoneNumber,
+        FIRAuthErrorCodeInvalidVerificationID,
+        FIRAuthErrorCodeInvalidVerificationCode,
+        FIRAuthErrorCodeMissingVerificationID,
+        FIRAuthErrorCodeMissingVerificationCode,
+        FIRAuthErrorCodeWeakPassword,
         FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(toString())
 
         FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(toString())
 
         FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(toString())
 
+        FIRAuthErrorCodeSecondFactorAlreadyEnrolled,
+        FIRAuthErrorCodeSecondFactorRequired,
+        FIRAuthErrorCodeMaximumSecondFactorCountExceeded,
         FIRAuthErrorCodeMultiFactorInfoNotFound -> FirebaseAuthMultiFactorException(toString())
 
         FIRAuthErrorCodeEmailAlreadyInUse,
         FIRAuthErrorCodeAccountExistsWithDifferentCredential,
         FIRAuthErrorCodeCredentialAlreadyInUse -> FirebaseAuthUserCollisionException(toString())
-
-        FIRAuthErrorCodeWeakPassword -> FirebaseAuthWeakPasswordException(toString())
 
         FIRAuthErrorCodeWebContextAlreadyPresented,
         FIRAuthErrorCodeWebContextCancelled,

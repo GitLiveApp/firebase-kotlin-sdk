@@ -68,17 +68,16 @@ actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider.B
         }
     }
 
+    private var customParameters: Map<String, String> = emptyMap()
+
     actual fun addScope(vararg scope: String) {
         android.scopes = android.scopes + scope.asList()
     }
-    actual fun addCustomParameter(key: String, value: String) {
-        android.addCustomParameter(key, value)
-    }
-    actual fun addCustomParameters(parameters: Map<String, String>) {
-        android.addCustomParameters(parameters)
+    actual fun setCustomParameters(parameters: Map<String, String>) {
+        customParameters = parameters
     }
 
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(auth.android.startActivityForSignInWithProvider(signInProvider, android.build()).await())
+    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(auth.android.startActivityForSignInWithProvider(signInProvider, android.apply { addCustomParameters(customParameters) }.build()).await())
 }
 
 actual typealias SignInProvider = Activity
