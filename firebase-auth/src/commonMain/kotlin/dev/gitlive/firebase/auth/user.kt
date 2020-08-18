@@ -27,7 +27,7 @@ expect class FirebaseUser {
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit)
+    suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 

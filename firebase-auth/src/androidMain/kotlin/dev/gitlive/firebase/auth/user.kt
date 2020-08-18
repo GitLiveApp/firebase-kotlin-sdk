@@ -44,8 +44,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    actual suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit) {
-        val request = UserProfileChangeRequest.Builder().apply { buildRequest(this) }.build()
+    actual suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit) {
+        val request = UserProfileChangeRequest.Builder().apply(buildRequest).build()
         android.updateProfile(request.android).await()
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.android).await().run { Unit }

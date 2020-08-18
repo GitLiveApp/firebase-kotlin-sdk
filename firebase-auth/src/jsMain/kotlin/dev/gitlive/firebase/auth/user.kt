@@ -42,7 +42,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun updateEmail(email: String) = rethrow { js.updateEmail(email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { js.updatePassword(password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
-    actual suspend fun updateProfile(buildRequest: (UserProfileChangeRequest.Builder) -> Unit) = rethrow {
+    actual suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit) = rethrow {
         val request = UserProfileChangeRequest.Builder().apply(buildRequest).build()
         js.updateProfile(request.js).await()
     }
