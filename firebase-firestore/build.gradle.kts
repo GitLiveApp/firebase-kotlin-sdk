@@ -48,7 +48,29 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCoreDiagnostics.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseInstallations.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleDataTransport.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleUtilities.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/nanopb.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/PromisesObjC.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/abseil.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/BoringSSL-GRPC.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-C++.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-Core.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/leveldb-library.xcframework/ios-i386_x86_64-simulator"
+                )
+                linkerOpts("-ObjC")
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -82,9 +104,12 @@ kotlin {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
                     compilerOpts(
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-armv7_arm64",
                         "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-x86_64-maccatalyst"
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/abseil.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/BoringSSL-GRPC.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-C++.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-Core.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/leveldb-library.xcframework/ios-i386_x86_64-simulator"
                     )
                 }
             }

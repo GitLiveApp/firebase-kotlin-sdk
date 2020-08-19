@@ -67,9 +67,16 @@ kotlin {
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-armv7_arm64",
+                linkerOpts(
                     "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-x86_64-maccatalyst")
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCoreDiagnostics.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseInstallations.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleDataTransport.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleUtilities.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/nanopb.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/PromisesObjC.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics"
+                )
                 linkerOpts("-ObjC")
             }
         }
@@ -89,7 +96,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.3.0")
+                api("com.google.firebase:firebase-common:19.3.1")
             }
         }
 
@@ -99,9 +106,16 @@ kotlin {
                 val firebasecore by cinterops.creating {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-armv7_arm64",
+                    compilerOpts(
                         "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-x86_64-maccatalyst")
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCoreDiagnostics.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseInstallations.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleDataTransport.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleUtilities.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/nanopb.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/PromisesObjC.xcframework/ios-i386_x86_64-simulator",
+                        "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics"
+                    )
                 }
             }
         }

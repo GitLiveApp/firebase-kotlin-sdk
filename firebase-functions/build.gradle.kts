@@ -46,7 +46,25 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCoreDiagnostics.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseInstallations.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleDataTransport.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleUtilities.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/nanopb.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/PromisesObjC.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-i386_x86_64-simulator",
+                    "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/GTMSessionFetcher.xcframework/ios-i386_x86_64-simulator"
+                )
+                linkerOpts("-ObjC")
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -77,9 +95,9 @@ kotlin {
                 val firebasefunctions by cinterops.creating {
                     packageName("cocoapods.FirebaseFunctions")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-armv7_arm64",
+                    compilerOpts(
                         "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/FirebaseFunctions.xcframework/ios-x86_64-maccatalyst")
+                        "-F${rootProject.buildDir}/Firebase/FirebaseFunctions/GTMSessionFetcher.xcframework/ios-i386_x86_64-simulator")
                 }
             }
         }
