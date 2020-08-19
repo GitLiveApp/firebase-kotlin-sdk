@@ -51,6 +51,18 @@ class FirebaseAuthTest {
     }
 
     @Test
+    fun testFetchSignInMethods() = runTest {
+        val email = "test+${Random.nextInt(100000)}@test.com"
+        var signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
+        assertEquals(emptyList(), signInMethodResult.signInMethods)
+        Firebase.auth.createUserWithEmailAndPassword(email, "test123")
+        signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
+        assertEquals(listOf("password"), signInMethodResult.signInMethods)
+
+        Firebase.auth.signInWithEmailAndPassword(email, "test123").user!!.delete()
+    }
+
+    @Test
     fun testSendEmailVerification() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
