@@ -41,15 +41,15 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         set(value) { ios.setLanguageCode(value) }
 
     actual suspend fun applyActionCode(code: String) = ios.await { applyActionCode(code, it) }.run { Unit }
-    actual suspend fun checkActionCode(code: String): ActionCodeResult = ActionCodeResult(ios.awaitResult { checkActionCode(code, it) })
+    actual suspend fun checkActionCode(code: String): ActionCodeResult = ActionCodeResult(ios.awaitExpectedResult { checkActionCode(code, it) })
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
+        AuthResult(ios.awaitExpectedResult { createUserWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult {
-        val signInMethods: List<*> = ios.awaitResult { fetchSignInMethodsForEmail(email, it) }
-        return SignInMethodQueryResult(signInMethods.mapNotNull { it as String })
+        val signInMethods: List<*>? = ios.awaitResult { fetchSignInMethodsForEmail(email, it) }
+        return SignInMethodQueryResult(signInMethods?.mapNotNull { it as String } ?: emptyList())
     }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
@@ -59,21 +59,21 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.ios, it) }.run { Unit }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
+        AuthResult(ios.awaitExpectedResult { signInWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun signInWithCustomToken(token: String) =
-        AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
+        AuthResult(ios.awaitExpectedResult { signInWithCustomToken(token, it) })
 
     actual suspend fun signInAnonymously() =
-        AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
+        AuthResult(ios.awaitExpectedResult { signInAnonymouslyWithCompletion(it) })
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
-        AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+        AuthResult(ios.awaitExpectedResult { signInWithCredential(authCredential.ios, it) })
 
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) = ios.await { updateCurrentUser(user.ios, it) }.run { Unit }
-    actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitResult { verifyPasswordResetCode(code, it) }
+    actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitExpectedResult { verifyPasswordResetCode(code, it) }
 }
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
@@ -147,6 +147,10 @@ actual open class FirebaseAuthRecentLoginRequiredException(message: String): Fir
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
 
+class UnexpectedNullResultException : Exception() {
+    override val message: String? = "The API encountered an unexpected null result"
+}
+
 internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
         val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
@@ -159,13 +163,41 @@ internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<
     }
 }
 
-internal suspend fun <T, R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+internal suspend fun <T, R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R? {
+    val job = CompletableDeferred<R?>()
+    function { result, error ->
+        if(error != null) {
+            job.completeExceptionally(error.toException())
+        } else {
+            job.complete(result)
+        }
+    }
+    return job.await()
+}
+
+internal suspend fun <T, R> T.awaitResult(default: R, function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R>()
     function { result, error ->
         if(result != null) {
             job.complete(result)
         } else if(error != null) {
             job.completeExceptionally(error.toException())
+        } else {
+            job.complete(default)
+        }
+    }
+    return job.await()
+}
+
+internal suspend fun <T, R> T.awaitExpectedResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R>()
+    function { result, error ->
+        if(result != null) {
+            job.complete(result)
+        } else if(error != null) {
+            job.completeExceptionally(error.toException())
+        } else {
+            job.completeExceptionally(UnexpectedNullResultException())
         }
     }
     return job.await()
