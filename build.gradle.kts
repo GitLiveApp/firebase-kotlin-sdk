@@ -28,31 +28,6 @@ buildscript {
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
 
-
-tasks {
-    val downloadIOSFirebaseZipFile by creating(Download::class) {
-        src("https://github.com/firebase/firebase-ios-sdk/releases/download/CocoaPods-6.30.0/Firebase.zip")
-        dest(File(buildDir, "Firebase-6.30.0.zip"))
-        if (System.getenv("token") != null) {
-            username(System.getenv("token"))
-        }
-        overwrite(false)
-    }
-
-    val unzipIOSFirebase by creating(Copy::class) {
-        if (!File("$buildDir/Firebase").exists()) {
-            val zipFile = File(buildDir, "Firebase-6.30.0.zip")
-            if (!zipFile.exists()) {
-                dependsOn(downloadIOSFirebaseZipFile)
-            }
-            from(zipTree(zipFile))
-            into(buildDir)
-        }
-        outputs.upToDateWhen { File("$buildDir/Firebase").isDirectory }
-    }
-
-}
-
 subprojects {
 
     group = "dev.gitlive"
@@ -147,6 +122,29 @@ subprojects {
                 )
             }
         }
+
+        listOf("bootstrap", "update").forEach {
+            task<Exec>("carthage${it.capitalize()}") {
+                group = "carthage"
+                executable = "carthage"
+                args(
+                    it,
+                    "--project-directory", "src/iosMain/c_interop",
+                    "--platform", "iOS",
+                    "--cache-builds"
+                )
+            }
+        }
+
+        withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
+            dependsOn("carthageBootstrap")
+        }
+
+        create("carthageClean", Delete::class.java) {
+            group = "carthage"
+            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
+            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
+        }
     }
 
 //    tasks.withType<KotlinCompile<*>> {
@@ -163,12 +161,9 @@ subprojects {
             mkdir("$buildDir/node_module")
         }
 
-        if(Os.isFamily(Os.FAMILY_MAC)) {
-            tasks.getByPath("compileKotlinIos").dependsOn(rootProject.tasks.named("unzipIOSFirebase"))
-        } else {
-            println("Skipping Firebase zip download")
+        tasks.named<Delete>("clean") {
+            dependsOn("carthageClean")
         }
-
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
@@ -191,6 +186,8 @@ subprojects {
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
             "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
         }
+
+
     }
 
     apply(plugin="maven-publish")
