@@ -1,4 +1,4 @@
-version = "0.2.0"
+version = "0.2.1"
 
 plugins {
     id("com.android.library")
@@ -52,20 +52,8 @@ kotlin {
         binaries {
             getTest("DEBUG").apply {
                 linkerOpts(
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCore.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseCoreDiagnostics.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/FirebaseInstallations.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleDataTransport.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/GoogleUtilities.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/nanopb.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics/PromisesObjC.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseAnalytics",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/abseil.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/BoringSSL-GRPC.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-C++.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-Core.xcframework/ios-i386_x86_64-simulator",
-                    "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/leveldb-library.xcframework/ios-i386_x86_64-simulator"
+                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
+                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
                 )
                 linkerOpts("-ObjC")
             }
@@ -103,14 +91,7 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts(
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/FirebaseFirestore.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/abseil.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/BoringSSL-GRPC.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-C++.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/gRPC-Core.xcframework/ios-i386_x86_64-simulator",
-                        "-F${rootProject.buildDir}/Firebase/FirebaseFirestore/leveldb-library.xcframework/ios-i386_x86_64-simulator"
-                    )
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
         }
