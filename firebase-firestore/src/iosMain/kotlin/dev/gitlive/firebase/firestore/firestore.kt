@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseCore.FIRApp
 import cocoapods.FirebaseFirestore.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
@@ -24,18 +23,14 @@ actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    val firFirestore = FIRFirestore.firestoreForApp(app.ios)
-    return FirebaseFirestore(firFirestore)
+    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
 }
 
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
-    actual fun document(documentPath: String): DocumentReference {
-        val path = ios.documentWithPath(documentPath)
-        return DocumentReference(path)
-    }
+    actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
     actual fun batch() = WriteBatch(ios.batch())
 
@@ -140,28 +135,37 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual val path: String
         get() = ios.path
 
-    actual suspend fun set(data: Any, encodeDefaults: Boolean, merge: Boolean) = await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, merge: Boolean) =
+        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
 
-    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFields: String) = await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
+        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
-    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) = await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
+    actual suspend fun set(data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) = await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
+        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) = await {
-            ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
+        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) = await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
+    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
+        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun update(data: Any, encodeDefaults: Boolean) = await { ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
+    actual suspend fun update(data: Any, encodeDefaults: Boolean) =
+        await { ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) = await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
+    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
+        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
 
     actual suspend fun delete() =
         await { ios.deleteDocumentWithCompletion(it) }
