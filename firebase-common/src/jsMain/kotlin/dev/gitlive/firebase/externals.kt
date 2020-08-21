@@ -182,7 +182,7 @@ external object firebase {
             fun clearPersistence(): Promise<Unit>
         }
 
-        open class FieldPath constructor(fieldNames: Array<out String>)
+        open class FieldPath constructor(vararg fieldNames: String)
 
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
