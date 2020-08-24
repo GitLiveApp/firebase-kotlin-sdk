@@ -13,3 +13,7 @@ firebase-database/src/iosMain/c_interop/modules/
 Firebase*.zip
 /Firebase
 /.DS_Store
+
+
+/**/Cartfile.resolved
+/**/c_interop/Carthage/

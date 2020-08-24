@@ -67,7 +67,7 @@ kotlin {
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                linkerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 linkerOpts("-ObjC")
             }
         }
@@ -87,7 +87,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.2.0")
+                api("com.google.firebase:firebase-common:19.3.1")
             }
         }
 
@@ -97,7 +97,7 @@ kotlin {
                 val firebasecore by cinterops.creating {
                     packageName("cocoapods.FirebaseCore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
         }

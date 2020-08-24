@@ -46,7 +46,17 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(
+                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
+                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
+                )
+                linkerOpts("-ObjC")
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -65,7 +75,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-functions:19.0.1")
+                api("com.google.firebase:firebase-functions:19.0.2")
             }
         }
         val iosMain by getting {}
@@ -77,7 +87,7 @@ kotlin {
                 val firebasefunctions by cinterops.creating {
                     packageName("cocoapods.FirebaseFunctions")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFunctions.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFunctions")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
         }

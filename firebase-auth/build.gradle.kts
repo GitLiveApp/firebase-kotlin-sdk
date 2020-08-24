@@ -76,11 +76,10 @@ kotlin {
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAnalytics")
-                linkerOpts("-F${rootProject.buildDir}/Firebase/FirebaseAuth")
-                linkerOpts("-F${rootProject.buildDir}/Firebase/GoogleSignIn")
+                linkerOpts(
+                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
+                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 linkerOpts("-ObjC")
-//                compilerOpts("-framework AppAuth")
             }
         }
     }
@@ -103,7 +102,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:19.1.0")
+                api("com.google.firebase:firebase-auth:19.3.2")
             }
         }
 
@@ -113,8 +112,9 @@ kotlin {
                 val firebaseAuth by cinterops.creating {
                     packageName("cocoapods.FirebaseAuth")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
-                    compilerOpts("-F$projectDir/../build/Firebase/FirebaseAuth")
-                    compilerOpts("-F$projectDir/../build/Firebase/GoogleSignIn")
+                    compilerOpts(
+                        "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
+                    )
                 }
             }
         }

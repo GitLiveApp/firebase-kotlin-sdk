@@ -52,7 +52,17 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(
+                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
+                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
+                )
+                linkerOpts("-ObjC")
+            }
+        }
+    }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -71,7 +81,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:17.0.0")
+                api("com.google.firebase:firebase-database:19.3.1")
             }
         }
         val jsMain by getting {}
@@ -83,7 +93,7 @@ kotlin {
                 val firebaseDatabase by cinterops.creating {
                     packageName("cocoapods.FirebaseDatabase")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseDatabase.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseDatabase")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
         }
