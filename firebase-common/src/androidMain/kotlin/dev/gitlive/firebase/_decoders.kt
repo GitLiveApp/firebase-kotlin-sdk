@@ -4,10 +4,10 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.StructureKind
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.encoding.CompositeDecoder
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(descriptor.kind as StructureKind) {
         StructureKind.CLASS, StructureKind.OBJECT -> (value as Map<*, *>).let { map ->

@@ -8,8 +8,12 @@ import kotlinx.serialization.*
 import kotlinx.serialization.builtins.UnitSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
-@OptIn(ImplicitReflectionSerializer::class)
+@InternalSerializationApi
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(this) {
     is Map<*, *> -> FirebaseMapSerializer()
@@ -18,6 +22,7 @@ fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(th
     else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
 }) as SerializationStrategy<T>
 
+@InternalSerializationApi
 class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
     lateinit var keys: List<String>
@@ -35,14 +40,13 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
         map = value
         keys = value.keys.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, value.size)
         keys.forEachIndexed { index, key ->
             val listValue = map.getValue(key)
-            val serializer = (listValue?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any?>
+            val serializer = (listValue?.firebaseSerializer() ?: Unit.serializer().nullable) as KSerializer<Any?>
             String.serializer().let {
                 collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
             }
@@ -64,6 +68,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 }
 
+@InternalSerializationApi
 class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     lateinit var list: List<Any?>
@@ -80,12 +85,11 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    @ImplicitReflectionSerializer
     override fun serialize(encoder: Encoder, value: Iterable<Any?>) {
         list = value.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, list.size)
         list.forEachIndexed { index, listValue ->
-            val serializer = (listValue?.firebaseSerializer() ?: UnitSerializer().nullable) as KSerializer<Any>
+            val serializer = (listValue?.firebaseSerializer() ?: Unit.serializer().nullable) as KSerializer<Any>
             collectionEncoder.encodeNullableSerializableElement(
                 serializer.descriptor, index, serializer, listValue
             )

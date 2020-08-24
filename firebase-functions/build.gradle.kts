@@ -34,13 +34,17 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "commonjs"
+        useCommonJs()
+        nodejs()
+        browser {
+            testTask {
+                enabled = true
+                useKarma {
+                    useChromeHeadless()
+                    useFirefox()
+                }
             }
         }
-        nodejs()
-        browser()
     }
     android {
         publishLibraryVariants("release", "debug")

@@ -8,7 +8,19 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.71"
+    kotlin("plugin.serialization") version "1.4.0"
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        val kotlinVersion = "1.4.0"
+        classpath(kotlin("gradle-plugin", version = kotlinVersion))
+        classpath(kotlin("serialization", version = kotlinVersion))
+    }
 }
 
 android {
@@ -39,11 +51,7 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "commonjs"
-            }
-        }
+        useCommonJs()
         nodejs()
     }
     android {
@@ -57,36 +65,36 @@ kotlin {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+            "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
         )
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
             }
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.3.0")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+                api("com.google.firebase:firebase-common:19.3.1")
             }
         }
         val jsMain by getting {
             dependencies {
                 api(npm("firebase", "7.14.0"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }
         val iosMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
             }
         }
         configure(listOf(iosArm64, iosX64)) {
             compilations.getByName("main") {
                 source(sourceSets.get("iosMain"))
+            }
+            compilations.getByName("test") {
+                source(sourceSets.get("iosTest"))
             }
         }
 

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.backend.common.onlyIf
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -44,13 +46,16 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "commonjs"
+        useCommonJs()
+        nodejs()
+        browser {
+            testTask {
+                enabled = true
+                useKarma {
+                    useFirefox()
+                }
             }
         }
-        nodejs()
-        browser()
     }
 //    js("reactnative") {
 //        val main by compilations.getting {
@@ -63,7 +68,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
 
-    val iosArm64 = iosArm64()
+    val iosArm64 = iosArm64("ios")
     val iosX64 = iosX64("ios") {
         binaries {
             getTest("DEBUG").apply {
@@ -99,6 +104,9 @@ kotlin {
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
                     compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
+            }
+            compilations.getByName("test") {
+                source(sourceSets.get("iosTest"))
             }
         }
 
