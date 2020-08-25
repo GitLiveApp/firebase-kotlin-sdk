@@ -89,7 +89,6 @@ open class FirebaseCompositeDecoder constructor(
 ): CompositeDecoder {
 
     override val serializersModule: SerializersModule = EmptySerializersModule
-    override val updateMode = UpdateMode.OVERWRITE
 
     override fun decodeSequentially() = true
 

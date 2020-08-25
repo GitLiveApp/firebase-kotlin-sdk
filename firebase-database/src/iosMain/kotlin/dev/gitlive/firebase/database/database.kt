@@ -19,11 +19,13 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
+@InternalSerializationApi
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
     dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =

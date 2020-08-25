@@ -11,18 +11,6 @@ plugins {
     kotlin("plugin.serialization") version "1.4.0"
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        val kotlinVersion = "1.4.0"
-        classpath(kotlin("gradle-plugin", version = kotlinVersion))
-        classpath(kotlin("serialization", version = kotlinVersion))
-    }
-}
-
 android {
     compileSdkVersion(property("targetSdkVersion") as Int)
     defaultConfig {
@@ -58,50 +46,58 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
 
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    ios()
+    iosX64("ios") {
 
-    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
-        )
     }
 
     sourceSets {
         commonMain {
             dependencies {
+                api(("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+            }
+        }
+        commonTest {
+            dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+                api(kotlin("test-common"))
+                api(kotlin("test-annotations-common"))
+
             }
         }
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.3.1")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
+            }
+        }
+        val androidTest by getting {
+            dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
+            }
+        }
+        val androidAndroidTest by getting {
+            dependencies {
+                api(kotlin("test-junit"))
+                api("junit:junit:4.13")
+                api("androidx.test:core:1.2.0")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+                api("androidx.test.ext:junit:1.1.1")
+                api("androidx.test:runner:1.2.0")
             }
         }
         val jsMain by getting {
             dependencies {
                 api(npm("firebase", "7.14.0"))
+                api(kotlin("stdlib-js"))
             }
         }
-        val iosMain by getting {
+        val jsTest by getting {
             dependencies {
+                api(kotlin("test-js"))
             }
-        }
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-            }
-            compilations.getByName("test") {
-                source(sourceSets.get("iosTest"))
-            }
-        }
-
-        cocoapods {
-            summary = "Firebase Core for iOS (plus community support for macOS and tvOS)"
-            homepage = "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk"
-            //pod("FirebaseCore", "~> 6.3.1")
         }
     }
 }
@@ -112,4 +108,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
-

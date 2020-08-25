@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.backend.common.onlyIf
-
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -51,9 +49,7 @@ kotlin {
         browser {
             testTask {
                 enabled = true
-                useKarma {
-                    useFirefox()
-                }
+                useKarma()
             }
         }
     }
@@ -68,14 +64,14 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
 
-    val iosArm64 = iosArm64("ios")
-    val iosX64 = iosX64("ios") {
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                linkerOpts("-ObjC")
-            }
-        }
+    ios()
+    iosX64("ios")
+    cocoapods {
+        summary = "Firebase SDK For Kotlin"
+        homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
+        ios.deploymentTarget = "8.0"
+        frameworkName = "firebase-app"
+        pod("FirebaseCore", "~> 6.30.0")
     }
 
     sourceSets {
@@ -94,26 +90,6 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-common:19.3.1")
             }
-        }
-
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-                val firebasecore by cinterops.creating {
-                    packageName("cocoapods.FirebaseCore")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                }
-            }
-            compilations.getByName("test") {
-                source(sourceSets.get("iosTest"))
-            }
-        }
-
-        cocoapods {
-            summary = ""
-            homepage = ""
-            //pod("FirebaseCore", "~> 6.3.1")
         }
     }
 }

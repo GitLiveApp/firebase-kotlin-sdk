@@ -68,24 +68,15 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios") {
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts(
-                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
-                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                linkerOpts("-ObjC")
-            }
-        }
-    }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-        )
+    ios()
+    iosX64("ios")
+    cocoapods {
+        summary = "Firebase SDK For Kotlin"
+        homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
+        ios.deploymentTarget = "8.0"
+        frameworkName = "firebase-auth"
+        pod("FirebaseAuth", "~> 6.30.0")
     }
 
     sourceSets {
@@ -101,25 +92,6 @@ kotlin {
                 api("com.google.firebase:firebase-auth:19.3.2")
             }
         }
-
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-                val firebaseAuth by cinterops.creating {
-                    packageName("cocoapods.FirebaseAuth")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseAuth.def"))
-                    compilerOpts(
-                        "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
-                    )
-                }
-            }
-        }
-
-        cocoapods {
-            summary = ""
-            homepage = ""
-        }
-
     }
 }
 

@@ -1,10 +1,10 @@
-import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.4.0" apply false
+    kotlin("native.cocoapods") version "1.4.0"
     id("de.undercouch.download").version("3.4.3")
     id("base")
 }
@@ -17,6 +17,7 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        mavenCentral()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
@@ -149,68 +150,13 @@ subprojects {
                 )
             }
         }
-
-        listOf("bootstrap", "update").forEach {
-            task<Exec>("carthage${it.capitalize()}") {
-                group = "carthage"
-                executable = "carthage"
-                args(
-                    it,
-                    "--project-directory", "src/iosMain/c_interop",
-                    "--platform", "iOS",
-                    "--cache-builds"
-                )
-            }
-        }
-
-        withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-            dependsOn("carthageBootstrap")
-        }
-
-        create("carthageClean", Delete::class.java) {
-            group = "carthage"
-            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
-            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
-        }
     }
-
-//    tasks.withType<KotlinCompile<*>> {
-//        kotlinOptions.freeCompilerArgs += listOf(
-//            "-Xuse-experimental=kotlin.Experimental",
-//            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-//            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-//        )
-//    }
 
     afterEvaluate  {
         // create the projects node_modules if they don't exist
         if(!File("$buildDir/node_module").exists()) {
             mkdir("$buildDir/node_module")
         }
-
-        tasks.named<Delete>("clean") {
-            dependsOn("carthageClean")
-        }
-
-        dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-            "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-            "commonTestImplementation"(kotlin("test-common"))
-            "commonTestImplementation"(kotlin("test-annotations-common"))
-            "jsTestImplementation"(kotlin("test-js"))
-            "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13")
-            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
-            "androidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
-            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
-        }
-
-
     }
 
     apply(plugin="maven-publish")
