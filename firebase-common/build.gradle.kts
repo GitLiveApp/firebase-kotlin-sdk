@@ -47,14 +47,11 @@ kotlin {
     }
 
     ios()
-    iosX64("ios") {
-
-    }
 
     sourceSets {
         commonMain {
             dependencies {
-                api(("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
             }
         }

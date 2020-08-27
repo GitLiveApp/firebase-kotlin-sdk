@@ -65,7 +65,7 @@ kotlin {
     }
 
     ios()
-    iosX64("ios")
+
     cocoapods {
         summary = "Firebase SDK For Kotlin"
         homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
