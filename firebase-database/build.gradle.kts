@@ -53,13 +53,12 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     ios()
-    iosX64("ios")
     cocoapods {
         summary = "Firebase SDK For Kotlin"
         homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
         ios.deploymentTarget = "8.0"
         frameworkName = "firebase-database"
-        pod("FirebaseDatabase", "~> 6.30.0")
+        pod("FirebaseDatabase")
     }
 
     sourceSets {

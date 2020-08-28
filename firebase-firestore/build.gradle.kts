@@ -50,13 +50,12 @@ kotlin {
     }
 
     ios()
-    iosX64("ios")
     cocoapods {
         summary = "Firebase SDK For Kotlin"
         homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
         ios.deploymentTarget = "8.0"
         frameworkName = "firebase-firestore"
-        pod("FirebaseFirestore", "~> 6.30.0")
+        pod("FirebaseFirestore")
     }
 
     sourceSets {

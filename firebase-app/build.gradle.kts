@@ -71,7 +71,7 @@ kotlin {
         homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
         ios.deploymentTarget = "8.0"
         frameworkName = "firebase-app"
-        pod("FirebaseCore", "~> 6.30.0")
+        pod("FirebaseCore")
     }
 
     sourceSets {

@@ -12,9 +12,8 @@ Pod::Spec.new do |spec|
     spec.libraries                = "c++"
     spec.module_name              = "#{spec.name}_umbrella"
 
-    spec.ios.deployment_target = '13.5'
+    spec.ios.deployment_target = '8.0'
 
-    spec.dependency 'AFNetworking', '~> 4.0.0'
     spec.dependency 'FirebaseCore'
 
     spec.pod_target_xcconfig = {
