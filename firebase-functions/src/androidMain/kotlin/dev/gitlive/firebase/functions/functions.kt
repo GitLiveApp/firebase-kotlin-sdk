@@ -42,6 +42,8 @@ actual class HttpsCallableReference internal constructor(val android: com.google
         HttpsCallableResult(android.call(encode(strategy, data, encodeDefaults)).await())
 }
 
+actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException
+
 actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
 
     actual inline fun <reified T> data() =
@@ -50,5 +52,3 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual fun <T> data(strategy: DeserializationStrategy<T>) =
         decode(strategy, android.data)
 }
-
-actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

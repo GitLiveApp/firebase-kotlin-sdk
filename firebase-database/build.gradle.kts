@@ -39,6 +39,7 @@ android {
 }
 
 kotlin {
+
     js {
         useCommonJs()
         nodejs()
@@ -49,10 +50,26 @@ kotlin {
             }
         }
     }
-    android {
-        publishLibraryVariants("release", "debug")
+
+    android()
+    iosX64 {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts("-ObjC")
+                linkerOpts("-framework", "FirebaseDatabase")
+                linkerOpts("-framework", "FirebaseCore")
+                linkerOpts("-framework", "FirebaseCoreDiagnostics")
+                linkerOpts("-framework", "GoogleDataTransport")
+                linkerOpts("-framework", "GoogleUtilities")
+                linkerOpts("-framework", "leveldb")
+                linkerOpts("-framework", "nanopb")
+                linkerOpts("-framework", "FBLPromises")
+                linkerOpts("-F$buildDir/bin/iosX64/debugTest/Frameworks")
+            }
+        }
+
     }
-    ios()
+    iosArm64()
     cocoapods {
         summary = "Firebase SDK For Kotlin"
         homepage = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
@@ -62,6 +79,7 @@ kotlin {
     }
 
     sourceSets {
+
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-app"))
@@ -70,15 +88,9 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:19.3.1")
+                api("com.google.firebase:firebase-database:19.4.0")
             }
         }
-    }
-}
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+    }
 }

@@ -17,29 +17,6 @@ repositories {
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
-    defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
-    }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-    }
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
-    packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
-        pickFirst("META-INF/AL2.0")
-        pickFirst("META-INF/LGPL2.1")
-    }
-    lintOptions {
-        isAbortOnError = false
-    }
 }
 
 kotlin {
@@ -53,18 +30,27 @@ kotlin {
             }
         }
     }
-//    js("reactnative") {
-//        val main by compilations.getting {
-//            kotlinOptions {
-//                moduleKind = "commonjs"
-//            }
-//        }
-//    }
-    android {
-        publishLibraryVariants("release", "debug")
+
+    android()
+
+    iosArm64()
+
+    iosX64 {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts("-ObjC")
+                linkerOpts("-framework", "FirebaseCore")
+                linkerOpts("-framework", "FirebaseCoreDiagnostics")
+                linkerOpts("-framework", "GoogleUtilities")
+                linkerOpts("-framework", "GoogleDataTransport")
+                linkerOpts("-framework", "GoogleUtilities")
+                linkerOpts("-framework", "FBLPromises")
+                linkerOpts("-framework", "nanopb")
+                linkerOpts("-F$buildDir/bin/iosX64/debugTest/Frameworks")
+            }
+        }
     }
 
-    ios()
 
     cocoapods {
         summary = "Firebase SDK For Kotlin"
@@ -75,15 +61,10 @@ kotlin {
     }
 
     sourceSets {
+
         val commonMain by getting {
             dependencies {
                 implementation(project(":firebase-common"))
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
             }
         }
         val androidMain by getting {
@@ -91,12 +72,13 @@ kotlin {
                 api("com.google.firebase:firebase-common:19.3.1")
             }
         }
-    }
-}
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+        val androidTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(kotlin("test-annotations-common"))
+                implementation("androidx.test:core:1.3.0")
+            }
+        }
+    }
 }

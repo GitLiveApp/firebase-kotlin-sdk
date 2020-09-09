@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'firebase_database'
-    spec.version                  = '0.3.0'
+    spec.version                  = '0.4.0'
     spec.homepage                 = 'https://github.com/GitLiveApp/firebase-kotlin-sdk'
     spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
     spec.authors                  = ''
@@ -8,11 +8,11 @@ Pod::Spec.new do |spec|
     spec.summary                  = 'Firebase SDK For Kotlin'
 
     spec.static_framework         = true
-    spec.vendored_frameworks      = "build/cocoapods/framework/firebase_database.framework"
+    spec.vendored_frameworks      = "build/cocoapods/framework/firebase-database.framework"
     spec.libraries                = "c++"
     spec.module_name              = "#{spec.name}_umbrella"
 
-                
+    spec.ios.deployment_target = '8.0'
 
     spec.dependency 'FirebaseDatabase'
 

@@ -10,7 +10,7 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlin.js.json
 
-actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder = when(descriptor.kind as StructureKind) {
+actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, typeParams: Array<KSerializer<*>>): CompositeEncoder = when(descriptor.kind as StructureKind) {
     StructureKind.LIST -> Array<Any?>(descriptor.elementsCount) { null }
         .also { value = it }
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[index] = value } }

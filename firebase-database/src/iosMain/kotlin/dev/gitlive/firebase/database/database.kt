@@ -25,7 +25,7 @@ import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-@InternalSerializationApi
+
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
     dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =

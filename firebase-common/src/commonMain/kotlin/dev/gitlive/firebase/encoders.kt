@@ -14,13 +14,12 @@ import kotlinx.serialization.modules.SerializersModule
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
 
-@InternalSerializationApi
+
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
 }
 
-@ExperimentalSerializationApi
-expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
+expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, typeParams: Array<KSerializer<*>> = emptyArray()): CompositeEncoder
 
 class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positiveInfinity: Any) : TimestampEncoder(positiveInfinity),
     Encoder {

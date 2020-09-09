@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
-
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
@@ -13,23 +12,19 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KClass
 
-@ExperimentalSerializationApi
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> decode(value: Any?): T {
     val strategy = EmptySerializersModule.getContextual(T::class as KClass<*>)?.run { if (null is T) nullable else this }
     return decode(strategy as DeserializationStrategy<T>, value)
 }
 
-@ExperimentalSerializationApi
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value).decodeSerializableValue(strategy)
 }
 
-@ExperimentalSerializationApi
-expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder
+expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, typeParams: Array<KSerializer<*>> = emptyArray()): CompositeDecoder
 
-@ExperimentalSerializationApi
 class FirebaseDecoder(internal val value: Any?) : Decoder {
 
     override val serializersModule: SerializersModule
@@ -64,7 +59,6 @@ class FirebaseDecoder(internal val value: Any?) : Decoder {
 
 }
 
-@ExperimentalSerializationApi
 class FirebaseClassDecoder(
     size: Int,
     private val containsKey: (name: String) -> Boolean,
@@ -82,7 +76,6 @@ class FirebaseClassDecoder(
             ?: CompositeDecoder.DECODE_DONE
 }
 
-@ExperimentalSerializationApi
 open class FirebaseCompositeDecoder constructor(
     private val size: Int,
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?
@@ -178,7 +171,6 @@ private fun decodeChar(value: Any?) = when(value) {
     else -> throw SerializationException("Expected $value to be char")
 }
 
-@ExperimentalSerializationApi
 private fun decodeEnum(value: Any?, enumDescriptor: SerialDescriptor) = when(value) {
     is Number -> value.toInt()
     is String -> enumDescriptor.getElementIndex(value)

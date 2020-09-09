@@ -42,6 +42,7 @@ tasks {
     }
 }
 
+
 subprojects {
 
     group = "dev.gitlive"
@@ -54,13 +55,6 @@ subprojects {
         google()
         jcenter()
     }
-
-
-    tasks.withType<Sign>().configureEach {
-        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal")
-            }
-    }
-    
 
     tasks {
 
@@ -153,15 +147,112 @@ subprojects {
     }
 
     afterEvaluate  {
+
+        val copyFrameworksForX64Test by tasks.registering(Copy::class) {
+            val tree = fileTree("$buildDir/cocoapods/synthetic/iosX64/${project.name.replace('-','_')}/build/Release-iphonesimulator")
+
+            from(tree) {
+                include("**/*.framework/**")
+                include("**/*.framework.DSYM/**")
+                include("**/*.bundle")
+            }
+            eachFile {
+                path = path.substring(1).substringAfter("/", path)
+            }
+            into ("$buildDir/bin/iosX64/debugTest/Frameworks")
+        }
+
+        val linkDebugTestIosX64 by tasks.getting {
+            dependsOn(copyFrameworksForX64Test)
+        }
+
         // create the projects node_modules if they don't exist
         if(!File("$buildDir/node_module").exists()) {
             mkdir("$buildDir/node_module")
+        }
+
+        // android {
+        extensions.getByType(com.android.build.gradle.LibraryExtension::class).apply {
+            compileSdkVersion(property("targetSdkVersion") as Int)
+            defaultConfig {
+                minSdkVersion(property("minSdkVersion") as Int)
+                targetSdkVersion(property("targetSdkVersion") as Int)
+            }
+            sourceSets {
+                getByName("main") {
+                    manifest.srcFile("src/androidMain/AndroidManifest.xml")
+                }
+            }
+            testOptions {
+                unitTests.apply {
+                    isIncludeAndroidResources = true
+                }
+            }
+            packagingOptions {
+                pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+                pickFirst("META-INF/AL2.0")
+                pickFirst("META-INF/LGPL2.1")
+                pickFirst("androidsupportmultidexversion.txt")
+            }
+            lintOptions {
+                isAbortOnError = false
+            }
+
+            useLibrary("android.test.runner")
+            useLibrary("android.test.base")
+        }
+
+        // kotlin {
+        extensions.getByType(org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension::class).apply {
+
+            android {
+                publishLibraryVariants("release", "debug")
+            }
+
+            sourceSets {
+
+                all {
+                    languageSettings.useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                    languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+                    languageSettings.useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
+                    languageSettings.useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                    languageSettings.useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+                }
+
+                val iosX64Main by getting {
+                    kotlin.srcDir("src/iosMain/kotlin")
+                }
+
+                val iosX64Test by getting {
+                    kotlin.srcDir("src/iosTest/kotlin")
+                }
+                // no tests for Arm64 at the moment
+
+                val commonTest by getting {
+                    dependencies {
+                        implementation(kotlin("test"))
+                        implementation(kotlin("test-annotations-common"))
+                    }
+                }
+            }
+        }
+
+        tasks.withType<Sign>().configureEach {
+            onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal")
+            }
         }
     }
 
     apply(plugin="maven-publish")
     apply(plugin="signing")
 
+    configure<SigningExtension> {
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        val publishing = extensions.getByType(PublishingExtension::class)
+        sign(publishing.publications)
+    }
 
     configure<PublishingExtension> {
 

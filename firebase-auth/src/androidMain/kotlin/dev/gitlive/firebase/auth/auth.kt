@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
@@ -37,7 +38,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun signInAnonymously() = AuthResult(android.signInAnonymously().await())
 
-    actual val authStateChanged get() = callbackFlow {
+    actual val authStateChanged: Flow<FirebaseUser?>
+        get() = callbackFlow {
         val listener = object : AuthStateListener {
             override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
                 offer(auth.currentUser?.let { FirebaseUser(it) })

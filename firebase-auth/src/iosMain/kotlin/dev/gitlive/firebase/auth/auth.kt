@@ -130,8 +130,8 @@ private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Un
     job.await()
 }
 
-private fun NSError.toException() = when(domain) {
-    FIRAuthErrorDomain -> when(code) {
+private fun NSError.toException():Exception  { println("NSError: $this"); return when(domain) {
+    FIRAuthErrorDomain -> when (code) {
         FIRAuthErrorCodeInvalidActionCode,
         FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(toString())
 
@@ -144,7 +144,6 @@ private fun NSError.toException() = when(domain) {
 
         FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(toString())
 
-        FIRAuthErrorCodeEmailAlreadyInUse,
         FIRAuthErrorCodeAccountExistsWithDifferentCredential,
         FIRAuthErrorCodeCredentialAlreadyInUse -> FirebaseAuthUserCollisionException(toString())
 
@@ -155,4 +154,5 @@ private fun NSError.toException() = when(domain) {
         else -> FirebaseAuthException(toString())
     }
     else -> FirebaseAuthException(toString())
+}
 }

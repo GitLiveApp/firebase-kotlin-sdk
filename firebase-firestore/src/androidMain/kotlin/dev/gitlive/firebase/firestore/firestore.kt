@@ -187,7 +187,6 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
     actual suspend fun get(documentRef: DocumentReference) =
         DocumentSnapshot(android.get(documentRef.android))
 }
-
 actual class DocumentReference(val android: com.google.firebase.firestore.DocumentReference) {
 
     actual val id: String

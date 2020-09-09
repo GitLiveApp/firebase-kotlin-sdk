@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'firebase_common'
-    spec.version                  = '0.3.0'
+    spec.version                  = '0.4.0'
     spec.homepage                 = ''
     spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
     spec.authors                  = ''

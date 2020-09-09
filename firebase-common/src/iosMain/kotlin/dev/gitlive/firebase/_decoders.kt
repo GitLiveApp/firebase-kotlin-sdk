@@ -9,7 +9,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.CompositeDecoder
 
-actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(descriptor.kind as StructureKind) {
+actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, typeParams: Array<KSerializer<*>>): CompositeDecoder = when(descriptor.kind as StructureKind) {
     StructureKind.CLASS, StructureKind.OBJECT -> (value as Map<*, *>).let { map ->
         FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
     }

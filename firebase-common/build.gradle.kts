@@ -42,22 +42,26 @@ kotlin {
         useCommonJs()
         nodejs()
     }
-    android {
-        publishLibraryVariants("release", "debug")
-    }
 
-    ios()
+    android()
+
+    iosX64()
+    iosArm64()
 
     sourceSets {
         commonMain {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                    version {
+                        strictly ("1.3.9-native-mt")
+                    }
+                }
+
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
             }
         }
         commonTest {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
                 api(kotlin("test-common"))
                 api(kotlin("test-annotations-common"))
 
@@ -66,7 +70,6 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.3.1")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
             }
         }
@@ -97,11 +100,4 @@ kotlin {
             }
         }
     }
-}
-
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
 }

@@ -27,14 +27,12 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 
-@InternalSerializationApi
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
     dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
 fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
-@OptIn(FlowPreview::class)
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
@@ -159,7 +157,6 @@ actual class DatabaseReference internal constructor(
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit }
 
-    @InternalSerializationApi
     @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
         android.updateChildren(encode(update, encodeDefaults) as Map<String, Any?>)
@@ -201,7 +198,6 @@ actual class OnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
 
-    @InternalSerializationApi
     actual suspend fun setValue(value: Any, encodeDefaults: Boolean) =
         android.setValue(encode(value, encodeDefaults))
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
@@ -212,7 +208,6 @@ actual class OnDisconnect internal constructor(
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
             .run { Unit}
 
-    @InternalSerializationApi
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
         android.updateChildren(update.mapValues { (_, it) -> encode(it, encodeDefaults) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline() }
