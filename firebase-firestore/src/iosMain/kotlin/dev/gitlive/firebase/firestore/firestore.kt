@@ -22,8 +22,9 @@ import dev.gitlive.firebase.FirebaseException
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp) =
-    FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
+    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
+}
 
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 

@@ -87,12 +87,12 @@ private inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: Throwable) {
+    } catch(e: dynamic) {
         throw errorToException(e)
     }
 }
 
-private fun errorToException(cause: Throwable) = when(val code = cause.asDynamic().code as String?) {
+private fun errorToException(cause: dynamic) = when(val code = (cause.code as String?)?.toLowerCase()) {
     "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause)
     "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause)

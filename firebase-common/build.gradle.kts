@@ -82,7 +82,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.2.0")
+                api("com.google.firebase:firebase-common:19.3.0")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
         }

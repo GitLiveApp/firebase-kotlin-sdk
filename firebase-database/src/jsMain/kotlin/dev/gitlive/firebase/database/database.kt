@@ -150,7 +150,7 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: Throwable) {
+    } catch(e: dynamic) {
         throw DatabaseException(e)
     }
 }

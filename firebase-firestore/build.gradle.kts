@@ -48,7 +48,17 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    val iosX64 = iosX64("ios") {
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(
+                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
+                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
+                )
+                linkerOpts("-ObjC")
+            }
+        }
+    }
     jvm {
         val main by compilations.getting {
             kotlinOptions {
@@ -74,7 +84,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:21.4.3")
+                api("com.google.firebase:firebase-firestore:21.5.0")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }
@@ -90,7 +100,7 @@ kotlin {
                 val firebasefirestore by cinterops.creating {
                     packageName("cocoapods.FirebaseFirestore")
                     defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F${rootProject.buildDir}/Firebase/FirebaseFirestore")
+                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
         }
