@@ -70,6 +70,9 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         get() = android.phoneNumber
     actual val isAnonymous: Boolean
         get() = android.isAnonymous
+    actual val isEmailVerified: Boolean
+        get() = android.isEmailVerified
+
     actual suspend fun delete() = android.delete().await().run { Unit }
     actual suspend fun reload() = android.reload().await().run { Unit }
     actual suspend fun sendEmailVerification() = android.sendEmailVerification().await().run { Unit }

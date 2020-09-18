@@ -37,6 +37,7 @@ expect class FirebaseUser {
     val email: String?
     val phoneNumber: String?
     val isAnonymous: Boolean
+    val isEmailVerified: Boolean
     suspend fun delete()
     suspend fun reload()
     suspend fun sendEmailVerification()
