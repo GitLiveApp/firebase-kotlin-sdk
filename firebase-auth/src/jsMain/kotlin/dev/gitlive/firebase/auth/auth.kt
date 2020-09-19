@@ -67,7 +67,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual val isAnonymous: Boolean
         get() = rethrow { js.isAnonymous }
     actual val isEmailVerified: Boolean
-    get() = rethrow { js.emailVerified }
+        get() = rethrow { js.emailVerified }
 
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
