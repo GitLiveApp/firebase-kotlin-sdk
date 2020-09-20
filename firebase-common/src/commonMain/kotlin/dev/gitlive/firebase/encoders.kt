@@ -5,14 +5,16 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.modules.EmptyModule
+import kotlinx.serialization.encoding.*
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.modules.EmptySerializersModule
 
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(strategy, value) }.value//.also { println("encoded $it") }
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
 
-@ImplicitReflectionSerializer
+@InternalSerializationApi
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(it.firebaseSerializer(), it) }.value
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
 }
 
 expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
@@ -21,7 +23,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
 
     var value: Any? = null
 
-    override val context = EmptyModule
+    override val serializersModule = EmptySerializersModule
 
     override fun beginStructure(descriptor: SerialDescriptor, vararg typeSerializers: KSerializer<*>) = structureEncoder(descriptor, *typeSerializers)
 
@@ -72,11 +74,6 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     override fun encodeString(value: String) {
         this.value = value
     }
-
-    override fun encodeUnit() {
-        this.value = Unit
-    }
-
 }
 
 abstract class TimestampEncoder(internal val positiveInfinity: Any) {
@@ -93,7 +90,7 @@ open class FirebaseCompositeEncoder constructor(
     private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit
 ): TimestampEncoder(positiveInfinity), CompositeEncoder {
 
-    override val context = EmptyModule
+    override val serializersModule = EmptySerializersModule
 
 //    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(descriptor.kind) {
 //        StructureKind.MAP -> FirebaseMapSerializer<Any>(descriptor.getElementDescriptor(1)) as SerializationStrategy<T>
@@ -106,10 +103,10 @@ open class FirebaseCompositeEncoder constructor(
     override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int) = shouldEncodeElementDefault
 
     override fun <T : Any> encodeNullableSerializableElement(descriptor: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) =
-        set(descriptor, index, value?.let { FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(serializer, value) }.value })
+        set(descriptor, index, value?.let { FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(serializer, value) }.value })
 
     override fun <T> encodeSerializableElement(descriptor: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T)  =
-        set(descriptor, index, FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encode(serializer, value) }.value)
+        set(descriptor, index, FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(serializer, value) }.value)
 
     override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) = set(descriptor, index, value)
 
@@ -128,9 +125,6 @@ open class FirebaseCompositeEncoder constructor(
     override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short)  = set(descriptor, index, value)
 
     override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String)  = set(descriptor, index, value)
-
-    override fun encodeUnitElement(descriptor: SerialDescriptor, index: Int) = set(descriptor, index, Unit)
-
 }
 
 

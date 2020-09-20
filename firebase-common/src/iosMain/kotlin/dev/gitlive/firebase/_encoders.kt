@@ -4,10 +4,10 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.CompositeEncoder
+import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.StructureKind
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder = when(descriptor.kind as StructureKind) {
