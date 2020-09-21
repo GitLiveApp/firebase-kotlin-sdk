@@ -3,7 +3,6 @@ version = project.property("firebase-auth.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     //id("com.quittle.android-emulator") version "0.2.0"
 }
 
@@ -113,12 +112,6 @@ kotlin {
                 }
             }
         }
-
-        cocoapods {
-            summary = ""
-            homepage = ""
-        }
-
     }
 }
 

@@ -26,6 +26,7 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
     return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
@@ -44,6 +45,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         await { ios.clearPersistenceWithCompletion(it) }
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class WriteBatch(val ios: FIRWriteBatch) {
 
     actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
@@ -64,11 +66,9 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
 
-    @Suppress("UNCHECKED_CAST")
     actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
         ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
-    @Suppress("UNCHECKED_CAST")
     actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
@@ -85,6 +85,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
 
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class Transaction(val ios: FIRTransaction) {
 
     actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
@@ -105,11 +106,9 @@ actual class Transaction(val ios: FIRTransaction) {
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
 
-    @Suppress("UNCHECKED_CAST")
     actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
         ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
-    @Suppress("UNCHECKED_CAST")
     actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
@@ -127,6 +126,7 @@ actual class Transaction(val ios: FIRTransaction) {
 
 }
 
+@Suppress("UNCHECKED_CAST")
 actual class DocumentReference(val ios: FIRDocumentReference) {
 
     actual val id: String
@@ -153,11 +153,9 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
         await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
 
-    @Suppress("UNCHECKED_CAST")
     actual suspend fun update(data: Any, encodeDefaults: Boolean) =
         await { ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
 
-    @Suppress("UNCHECKED_CAST")
     actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
 
@@ -226,6 +224,7 @@ actual open class Query(open val ios: FIRQuery) {
             arrayContainsAny?.let { ios2.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny) } ?: ios2
         }
     )}
+@Suppress("UNCHECKED_CAST")
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
     actual val path: String

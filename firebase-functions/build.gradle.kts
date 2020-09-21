@@ -3,7 +3,6 @@ version = project.property("firebase-functions.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
 }
 
 android {
@@ -57,7 +56,8 @@ kotlin {
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.InternalSerializationApi"
         )
     }
 
@@ -85,11 +85,6 @@ kotlin {
                     compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
-        }
-
-        cocoapods {
-            summary = ""
-            homepage = ""
         }
     }
 }
