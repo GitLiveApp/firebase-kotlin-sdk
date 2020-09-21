@@ -195,11 +195,11 @@ subprojects {
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
             "jsTestImplementation"(kotlin("test-js"))
-            "androidTestImplementation"(kotlin("test-junit"))
-            "androidTestImplementation"("junit:junit:4.13")
-            "androidTestImplementation"("androidx.test:core:1.2.0")
-            "androidTestImplementation"("androidx.test.ext:junit:1.1.1")
-            "androidTestImplementation"("androidx.test:runner:1.2.0")
+            "androidAndroidTestImplementation"(kotlin("test-junit"))
+            "androidAndroidTestImplementation"("junit:junit:4.13")
+            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
         }
     }
 
