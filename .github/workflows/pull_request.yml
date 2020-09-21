@@ -23,7 +23,7 @@ jobs:
     - name: Install Homebrew
       run: ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     - name: Install Carthage
-      run: brew install carthage
+      run: brew list carthage || brew install carthage
     - name: Assemble
       run: ./gradlew assemble
     - name: Run JS Tests
