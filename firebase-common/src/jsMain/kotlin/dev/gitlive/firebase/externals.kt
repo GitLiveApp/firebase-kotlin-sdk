@@ -237,6 +237,14 @@ external object firebase {
             fun delete(documentReference: DocumentReference): Transaction
         }
 
+        open class Timestamp {
+            companion object {
+                fun now(): Timestamp
+            }
+            val seconds: Long
+            val nanoseconds: Int
+        }
+
         abstract class FieldValue {
             companion object {
                 fun delete(): FieldValue
