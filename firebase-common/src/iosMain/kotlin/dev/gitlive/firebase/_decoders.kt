@@ -8,10 +8,19 @@ import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.StructureKind
+import platform.Foundation.*
+import platform.darwin.NSObject
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeDecoder = when(descriptor.kind as StructureKind) {
-    StructureKind.CLASS, StructureKind.OBJECT -> (value as Map<*, *>).let { map ->
-        FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
+    StructureKind.CLASS, StructureKind.OBJECT -> when {
+        value is Map<*, *> ->
+            FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
+                value[desc.getElementName(index)]
+            }
+        value is NSObject && NSClassFromString("FIRTimestamp") == value.`class`() -> {
+            makeFIRTimestampDecoder(value)
+        }
+        else -> FirebaseEmptyCompositeDecoder()
     }
     StructureKind.LIST -> (value as List<*>).let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
@@ -19,4 +28,12 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg
     StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
     }
+}
+
+private val timestampKeys = setOf("seconds", "nanoseconds")
+private fun makeFIRTimestampDecoder(objcObj: NSObject) = FirebaseClassDecoder(
+    size = 2,
+    containsKey = { timestampKeys.contains(it) }
+) { descriptor, index ->
+    objcObj.valueForKeyPath(descriptor.getElementName(index))
 }

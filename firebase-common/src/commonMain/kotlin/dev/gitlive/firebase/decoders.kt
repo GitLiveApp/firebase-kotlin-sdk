@@ -80,6 +80,8 @@ class FirebaseClassDecoder(
             ?: READ_DONE
 }
 
+open class FirebaseEmptyCompositeDecoder(): FirebaseCompositeDecoder(0, { _, _ -> })
+
 open class FirebaseCompositeDecoder constructor(
     private val size: Int,
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?
