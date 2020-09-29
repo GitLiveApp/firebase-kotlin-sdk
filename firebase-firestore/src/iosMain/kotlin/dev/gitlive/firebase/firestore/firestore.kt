@@ -320,6 +320,7 @@ actual object FieldValue {
     actual fun delete(): Any = FIRFieldValue.fieldValueForDelete()
     actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
     actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
+    actual fun serverTimestamp(): Any = FIRFieldValue.fieldValueForServerTimestamp()
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

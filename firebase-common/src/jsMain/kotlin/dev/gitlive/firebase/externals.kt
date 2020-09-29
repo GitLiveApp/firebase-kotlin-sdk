@@ -250,6 +250,7 @@ external object firebase {
                 fun delete(): FieldValue
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
+                fun serverTimestamp(): FieldValue
             }
         }
     }

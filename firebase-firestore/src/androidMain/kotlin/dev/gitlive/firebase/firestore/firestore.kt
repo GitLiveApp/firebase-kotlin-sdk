@@ -368,5 +368,6 @@ actual object FieldValue {
     actual fun delete(): Any = com.google.firebase.firestore.FieldValue.delete()
     actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
     actual fun arrayRemove(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayRemove(*elements)
+    actual fun serverTimestamp(): Any = com.google.firebase.firestore.FieldValue.serverTimestamp()
 }
 
