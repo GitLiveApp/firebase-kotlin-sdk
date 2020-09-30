@@ -302,11 +302,11 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
     actual val path: String
         get() =  rethrow { js.path }
 
-    actual suspend fun add(data: Any, encodeDefaults: Boolean) =
-        rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }
+    actual suspend fun add(data: Any, encodeDefaults: Boolean, positiveInfinity: Any) =
+        rethrow { DocumentReference(js.add(encode(data, encodeDefaults, positiveInfinity)!!).await()) }
 
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
-        rethrow { DocumentReference(js.add(encode(strategy, data, encodeDefaults)!!).await()) }
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean, positiveInfinity: Any) =
+        rethrow { DocumentReference(js.add(encode(strategy, data, encodeDefaults, positiveInfinity)!!).await()) }
 }
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)

@@ -22,6 +22,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:4.0.1")
         classpath("de.undercouch:gradle-download-task:4.0.4")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:1.3.71")
     }
 }
 

@@ -322,11 +322,11 @@ actual class CollectionReference(override val android: com.google.firebase.fires
     actual val path: String
         get() = android.path
 
-    actual suspend fun add(data: Any, encodeDefaults: Boolean) =
-        DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
+    actual suspend fun add(data: Any, encodeDefaults: Boolean, positiveInfinity: Any) =
+        DocumentReference(android.add(encode(data, encodeDefaults, positiveInfinity)!!).await())
 
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
-        DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean, positiveInfinity: Any) =
+        DocumentReference(android.add(encode(strategy, data, encodeDefaults, positiveInfinity)!!).await())
 }
 
 actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException

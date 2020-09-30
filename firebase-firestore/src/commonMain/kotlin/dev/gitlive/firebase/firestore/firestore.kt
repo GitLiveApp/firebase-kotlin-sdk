@@ -130,8 +130,8 @@ expect class DocumentReference {
 expect class CollectionReference : Query {
     val path: String
     @ImplicitReflectionSerializer
-    suspend fun add(data: Any, encodeDefaults: Boolean = true): DocumentReference
-    suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
+    suspend fun add(data: Any, encodeDefaults: Boolean = true, positiveInfinity: Any = Double.POSITIVE_INFINITY): DocumentReference
+    suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true, positiveInfinity: Any = Double.POSITIVE_INFINITY): DocumentReference
 }
 
 expect class FirebaseFirestoreException : FirebaseException

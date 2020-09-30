@@ -231,11 +231,11 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
     actual val path: String
         get() = ios.path
 
-    actual suspend fun add(data: Any, encodeDefaults: Boolean) =
-        DocumentReference(await { ios.addDocumentWithData(encode(data, encodeDefaults) as Map<Any?, *>, it) })
+    actual suspend fun add(data: Any, encodeDefaults: Boolean, positiveInfinity: Any) =
+        DocumentReference(await { ios.addDocumentWithData(encode(data, encodeDefaults, positiveInfinity) as Map<Any?, *>, it) })
 
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
-        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeDefaults) as Map<Any?, *>) })
+    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean, positiveInfinity: Any) =
+        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeDefaults, positiveInfinity) as Map<Any?, *>) })
 }
 
 actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
