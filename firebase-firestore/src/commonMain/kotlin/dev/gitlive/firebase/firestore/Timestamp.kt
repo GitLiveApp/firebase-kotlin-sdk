@@ -1,8 +1,5 @@
 package dev.gitlive.firebase.firestore
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 expect class Timestamp
 
 expect fun timestampNow(): Timestamp
