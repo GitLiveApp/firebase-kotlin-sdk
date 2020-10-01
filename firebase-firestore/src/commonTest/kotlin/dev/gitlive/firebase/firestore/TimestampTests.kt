@@ -11,7 +11,9 @@ import kotlinx.serialization.Serializable
 data class TestData(
     val uid: String,
     @Serializable(with = FirebaseTimestampSerializer::class)
-    val createdAt: Any
+    val createdAt: Any,
+    @Serializable(with = FirebaseNullableTimestampSerializer::class)
+    var updatedAt: Any?
 )
 
 @ImplicitReflectionSerializer
@@ -21,7 +23,7 @@ class TimestampTests {
     @Test
     fun encodeTimestampObject() = runTest {
         val timestamp = timestampWith(123, 456)
-        val item = TestData("uid123", timestamp)
+        val item = TestData("uid123", timestamp, null)
         val encoded = encode(item, shouldEncodeElementDefault = false) as Map<String, Any?>
         assertEquals("uid123", encoded["uid"])
         assertEquals(timestamp, encoded["createdAt"])
@@ -30,7 +32,7 @@ class TimestampTests {
     @Test
     fun encodeServerTimestampObject() = runTest {
         val timestamp = FieldValue.serverTimestamp()
-        val item = TestData("uid123", timestamp)
+        val item = TestData("uid123", timestamp, null)
         val encoded = encode(item, shouldEncodeElementDefault = false) as Map<String, Any?>
         assertEquals("uid123", encoded["uid"])
         assertEquals(timestamp, encoded["createdAt"])
@@ -46,5 +48,13 @@ class TimestampTests {
         val createdAt: Timestamp = timestamp
         assertEquals(123, createdAt.seconds)
         assertEquals(345, createdAt.nanoseconds)
+    }
+
+    @Test
+    fun decodeEmptyTimestampObject() = runTest {
+        val obj = mapOf("uid" to "uid123", "createdAt" to timestampNow(), "updatedAt" to Unit)
+        val decoded: TestData = decode(obj)
+        assertEquals("uid123", decoded.uid)
+        assertEquals(null, decoded.updatedAt)
     }
 }
