@@ -32,6 +32,8 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
+    actual fun collectionGroup(collectionId: String) = rethrow { Query(js.collectionGroup(collectionId)) }
+
     actual fun batch() = rethrow { WriteBatch(js.batch()) }
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =

@@ -32,6 +32,8 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
+    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId))
+
     actual fun batch() = WriteBatch(ios.batch())
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =

@@ -176,6 +176,7 @@ external object firebase {
             fun <T> runTransaction(func: (transaction: Transaction) -> Promise<T>): Promise<T>
             fun batch(): WriteBatch
             fun collection(collectionPath: String): CollectionReference
+            fun collectionGroup(collectionId: String): Query
             fun doc(documentPath: String): DocumentReference
             fun settings(settings: Json)
             fun enablePersistence(): Promise<Unit>

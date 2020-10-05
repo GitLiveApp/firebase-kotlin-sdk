@@ -22,6 +22,7 @@ expect class FirebaseFirestore {
 //    var settings: FirebaseFirestoreSettings
     fun collection(collectionPath: String): CollectionReference
     fun document(documentPath: String): DocumentReference
+    fun collectionGroup(collectionId: String): Query
     fun batch(): WriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
