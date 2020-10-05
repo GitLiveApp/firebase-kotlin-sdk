@@ -61,7 +61,7 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: Throwable) {
-        throw FirebaseFunctionsException(e.asDynamic().code as String?, e)
+    } catch(e: dynamic) {
+        throw FirebaseFunctionsException(e.code as String?, e)
     }
 }
