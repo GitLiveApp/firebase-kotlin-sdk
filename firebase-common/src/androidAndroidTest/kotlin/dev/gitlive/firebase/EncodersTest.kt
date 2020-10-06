@@ -11,7 +11,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @Serializable
-data class TestData(val map: Map<String, String>, val bool: Boolean = false)
+data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
 
 class EncodersTest {
     @Test
@@ -24,6 +24,12 @@ class EncodersTest {
     fun encodeObject() {
         val encoded = encode<TestData>(TestData::class.serializer(), TestData(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
         assertEquals(mapOf("map" to mapOf("key" to "value"), "bool" to true), encoded)
+    }
+
+    @Test
+    fun encodeObjectNullableValue() {
+        val encoded = encode<TestData>(TestData::class.serializer(), TestData(mapOf("key" to "value"), true, nullableBool = true), shouldEncodeElementDefault = true)
+        assertEquals(mapOf("map" to mapOf("key" to "value"), "bool" to true, "nullableBool" to true), encoded)
     }
 
     @Test
