@@ -60,7 +60,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC2")
             }
         }
         val androidMain by getting {
