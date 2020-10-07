@@ -82,28 +82,28 @@ actual class AuthResult internal constructor(val android: com.google.firebase.au
 actual class ActionCodeResult(val android: com.google.firebase.auth.ActionCodeResult) {
     actual val operation: Operation
         get() = when (android.operation) {
-            com.google.firebase.auth.ActionCodeResult.PASSWORD_RESET -> Operation.PasswordReset
-            com.google.firebase.auth.ActionCodeResult.VERIFY_EMAIL -> Operation.VerifyEmail
-            com.google.firebase.auth.ActionCodeResult.RECOVER_EMAIL -> Operation.RecoverEmail
+            com.google.firebase.auth.ActionCodeResult.PASSWORD_RESET -> Operation.PasswordReset(this)
+            com.google.firebase.auth.ActionCodeResult.VERIFY_EMAIL -> Operation.VerifyEmail(this)
+            com.google.firebase.auth.ActionCodeResult.RECOVER_EMAIL -> Operation.RecoverEmail(this)
             com.google.firebase.auth.ActionCodeResult.ERROR -> Operation.Error
             com.google.firebase.auth.ActionCodeResult.SIGN_IN_WITH_EMAIL_LINK -> Operation.SignInWithEmailLink
-            com.google.firebase.auth.ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL -> Operation.VerifyBeforeChangeEmail
-            com.google.firebase.auth.ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> Operation.RevertSecondFactorAddition
+            com.google.firebase.auth.ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL -> Operation.VerifyBeforeChangeEmail(this)
+            com.google.firebase.auth.ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> Operation.RevertSecondFactorAddition(this)
             else -> Operation.Error
         }
 }
 
-actual sealed class ActionCodeDataType<out T> {
+internal actual sealed class ActionCodeDataType<out T> {
 
-    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+    actual abstract fun dataForResult(result: ActionCodeResult): T
 
     actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = result.android.info?.email
+        override fun dataForResult(result: ActionCodeResult): String = result.android.info!!.email
     }
     actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = (result.android.info as? ActionCodeEmailInfo)?.previousEmail
+        override fun dataForResult(result: ActionCodeResult): String = (result.android.info as ActionCodeEmailInfo).previousEmail
     }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
         override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = (result.android.info as? ActionCodeMultiFactorInfo)?.multiFactorInfo?.let { MultiFactorInfo(it) }
     }
 }

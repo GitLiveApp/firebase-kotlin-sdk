@@ -84,28 +84,28 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
 actual class ActionCodeResult(val ios: FIRActionCodeInfo) {
     actual val operation: Operation
         get() = when (ios.operation) {
-            FIRActionCodeOperationPasswordReset -> Operation.PasswordReset
-            FIRActionCodeOperationVerifyEmail -> Operation.VerifyEmail
-            FIRActionCodeOperationRecoverEmail -> Operation.RecoverEmail
+            FIRActionCodeOperationPasswordReset -> Operation.PasswordReset(this)
+            FIRActionCodeOperationVerifyEmail -> Operation.VerifyEmail(this)
+            FIRActionCodeOperationRecoverEmail -> Operation.RecoverEmail(this)
             FIRActionCodeOperationUnknown-> Operation.Error
             FIRActionCodeOperationEmailLink -> Operation.SignInWithEmailLink
-            FIRActionCodeOperationVerifyAndChangeEmail -> Operation.VerifyBeforeChangeEmail
-            FIRActionCodeOperationRevertSecondFactorAddition -> Operation.RevertSecondFactorAddition
+            FIRActionCodeOperationVerifyAndChangeEmail -> Operation.VerifyBeforeChangeEmail(this)
+            FIRActionCodeOperationRevertSecondFactorAddition -> Operation.RevertSecondFactorAddition(this)
             else -> Operation.Error
         }
 }
 
-actual sealed class ActionCodeDataType<out T> {
+internal actual sealed class ActionCodeDataType<out T> {
 
-    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+    actual abstract fun dataForResult(result: ActionCodeResult): T
 
     actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = result.ios.email
+        override fun dataForResult(result: ActionCodeResult): String = result.ios.email!!
     }
     actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = result.ios.previousEmail
+        override fun dataForResult(result: ActionCodeResult): String = result.ios.previousEmail!!
     }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
         override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = null
     }
 }

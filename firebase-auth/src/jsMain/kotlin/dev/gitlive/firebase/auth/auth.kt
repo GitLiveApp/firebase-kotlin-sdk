@@ -86,27 +86,27 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
 actual class ActionCodeResult(val js: firebase.auth.ActionCodeInfo) {
     actual val operation: Operation
         get() = when (js.operation) {
-            "PASSWORD_RESET" -> Operation.PasswordReset
-            "VERIFY_EMAIL" -> Operation.VerifyEmail
-            "RECOVER_EMAIL" -> Operation.RecoverEmail
+            "PASSWORD_RESET" -> Operation.PasswordReset(this)
+            "VERIFY_EMAIL" -> Operation.VerifyEmail(this)
+            "RECOVER_EMAIL" -> Operation.RecoverEmail(this)
             "EMAIL_SIGNIN" -> Operation.SignInWithEmailLink
-            "VERIFY_AND_CHANGE_EMAIL" -> Operation.VerifyBeforeChangeEmail
-            "REVERT_SECOND_FACTOR_ADDITION" -> Operation.RevertSecondFactorAddition
+            "VERIFY_AND_CHANGE_EMAIL" -> Operation.VerifyBeforeChangeEmail(this)
+            "REVERT_SECOND_FACTOR_ADDITION" -> Operation.RevertSecondFactorAddition(this)
             else -> Operation.Error
         }
 }
 
-actual sealed class ActionCodeDataType<out T> {
+internal actual sealed class ActionCodeDataType<out T> {
 
-    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+    actual abstract fun dataForResult(result: ActionCodeResult): T
 
     actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = result.js.data.email
+        override fun dataForResult(result: ActionCodeResult): String = result.js.data.email!!
     }
     actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String? = result.js.data.previousEmail
+        override fun dataForResult(result: ActionCodeResult): String = result.js.data.previousEmail!!
     }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
         override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = result.js.data.multiFactorInfo?.let { MultiFactorInfo(it) }
     }
 }

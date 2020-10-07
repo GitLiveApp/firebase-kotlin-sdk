@@ -52,23 +52,36 @@ expect class SignInMethodQueryResult {
     val signInMethods: List<String>
 }
 
-enum class Operation {
-    PasswordReset,
-    VerifyEmail,
-    RecoverEmail,
-    Error,
-    SignInWithEmailLink,
-    VerifyBeforeChangeEmail,
-    RevertSecondFactorAddition
+sealed class Operation {
+    class PasswordReset(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+    }
+    class VerifyEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+    }
+    class RecoverEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
+    }
+    object Error : Operation()
+    object SignInWithEmailLink : Operation()
+    class VerifyBeforeChangeEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
+    }
+    class RevertSecondFactorAddition(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val multiFactorInfo: MultiFactorInfo? = ActionCodeDataType.MultiFactor.dataForResult(result)
+    }
 }
 
-expect sealed class ActionCodeDataType<out T> {
+internal expect sealed class ActionCodeDataType<out T> {
 
-    internal abstract fun dataForResult(result: ActionCodeResult): T?
+    abstract fun dataForResult(result: ActionCodeResult): T
 
     object Email : ActionCodeDataType<String>
     object PreviousEmail : ActionCodeDataType<String>
-    object MultiFactor : ActionCodeDataType<MultiFactorInfo>
+    object MultiFactor : ActionCodeDataType<MultiFactorInfo?>
 }
 
 expect class ActionCodeSettings {
