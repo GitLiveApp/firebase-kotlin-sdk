@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.auth
 
 import android.net.Uri
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
 actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
@@ -22,8 +23,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         get() = android.isAnonymous
     actual val isEmailVerified: Boolean
         get() = android.isEmailVerified
-    actual val metaData: MetaData?
-        get() = android.metadata?.let{ MetaData(it) }
+    actual val metaData: UserMetaData?
+        get() = android.metadata?.let{ UserMetaData(it) }
     actual val multiFactor: MultiFactor
         get() = MultiFactor(android.multiFactor)
     actual val providerData: List<UserInfo>
@@ -44,9 +45,12 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    actual suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit) {
-        val request = UserProfileChangeRequest.Builder().apply(buildRequest).build()
-        android.updateProfile(request.android).await()
+    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
+        val request = UserProfileChangeRequest.Builder().apply {
+            this.displayName = displayName
+            photoUri = photoURL?.let { Uri.parse(it) }
+        }.build()
+        android.updateProfile(request).await()
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.android).await().run { Unit }
 }
@@ -66,25 +70,9 @@ actual class UserInfo(val android: com.google.firebase.auth.UserInfo) {
         get() = android.uid
 }
 
-actual class MetaData(val android: com.google.firebase.auth.FirebaseUserMetadata) {
-    actual val creationTime: Long?
-        get() = android.creationTimestamp
-    actual val lastSignInTime: Long?
-        get() = android.lastSignInTimestamp
-}
-
-actual class UserProfileChangeRequest(val android: com.google.firebase.auth.UserProfileChangeRequest) {
-    actual class Builder(val android: com.google.firebase.auth.UserProfileChangeRequest.Builder = com.google.firebase.auth.UserProfileChangeRequest.Builder()) {
-        actual fun setDisplayName(displayName: String?): Builder = apply {
-            android.setDisplayName(displayName)
-        }
-        actual fun setPhotoURL(photoURL: String?): Builder = apply {
-            android.setPhotoUri(photoURL?.let { Uri.parse(it) })
-        }
-        actual fun build(): UserProfileChangeRequest = UserProfileChangeRequest(android.build())
-    }
-    actual val displayName: String?
-        get() = android.displayName
-    actual val photoURL: String?
-        get() = android.photoUri?.toString()
+actual class UserMetaData(val android: com.google.firebase.auth.FirebaseUserMetadata) {
+    actual val creationTime: Double?
+        get() = android.creationTimestamp.toDouble()
+    actual val lastSignInTime: Double?
+        get() = android.lastSignInTimestamp.toDouble()
 }

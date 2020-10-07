@@ -12,7 +12,7 @@ expect class FirebaseUser {
     val photoURL: String?
     val isAnonymous: Boolean
     val isEmailVerified: Boolean
-    val metaData: MetaData?
+    val metaData: UserMetaData?
     val multiFactor: MultiFactor
     val providerData: List<UserInfo>
     val providerId: String
@@ -27,7 +27,7 @@ expect class FirebaseUser {
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit)
+    suspend fun updateProfile(displayName: String? = null, photoUrl: String? = null)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 
@@ -40,17 +40,7 @@ expect class UserInfo {
     val uid: String
 }
 
-expect class MetaData {
-    val creationTime: Long?
-    val lastSignInTime: Long?
-}
-
-expect class UserProfileChangeRequest {
-    class Builder {
-        fun setDisplayName(displayName: String?): Builder
-        fun setPhotoURL(photoURL: String?): Builder
-        fun build(): UserProfileChangeRequest
-    }
-    val displayName: String?
-    val photoURL: String?
+expect class UserMetaData {
+    val creationTime: Double?
+    val lastSignInTime: Double?
 }

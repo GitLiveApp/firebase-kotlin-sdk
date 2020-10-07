@@ -18,8 +18,8 @@ actual class MultiFactor(val android: com.google.firebase.auth.MultiFactor) {
 actual class MultiFactorInfo(val android: com.google.firebase.auth.MultiFactorInfo) {
     actual val displayName: String?
         get() = android.displayName
-    actual val enrollmentTime: Long
-        get() = android.enrollmentTimestamp
+    actual val enrollmentTime: Double
+        get() = android.enrollmentTimestamp.toDouble()
     actual val factorId: String
         get() = android.factorId
     actual val uid: String

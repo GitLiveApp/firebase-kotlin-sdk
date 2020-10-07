@@ -93,44 +93,48 @@ actual class ActionCodeResult(val ios: FIRActionCodeInfo) {
             FIRActionCodeOperationRevertSecondFactorAddition -> Operation.RevertSecondFactorAddition
             else -> Operation.Error
         }
-    actual fun <T, A: ActionCodeDataType<T>> getData(type: A): T? = when (type) {
-        is ActionCodeDataType.Email -> ios.email
-        is ActionCodeDataType.PreviousEmail -> ios.previousEmail
-        is ActionCodeDataType.MultiFactor -> null
-        else -> null
-    } as? T
+}
+
+actual sealed class ActionCodeDataType<out T> {
+
+    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+
+    actual object Email : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = result.ios.email
+    }
+    actual object PreviousEmail : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = result.ios.previousEmail
+    }
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = null
+    }
 }
 
 actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
 actual class ActionCodeSettings private constructor(val ios: FIRActionCodeSettings) {
-    actual class Builder(val ios: FIRActionCodeSettings = FIRActionCodeSettings()) {
-        actual fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder = apply {
-            ios.setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion)
+
+    actual constructor(url: String,
+                       androidPackageName: AndroidPackageName?,
+                       dynamicLinkDomain: String?,
+                       canHandleCodeInApp: Boolean,
+                       iOSBundleId: String?
+    ) : this(FIRActionCodeSettings().apply {
+        this.URL = NSURL.URLWithString(url)
+        androidPackageName?.let {
+            this.setAndroidPackageName(it.androidPackageName, it.installIfNotAvailable, it.minimumVersion)
         }
-        actual fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder = apply {
-            ios.setDynamicLinkDomain(dynamicLinkDomain)
-        }
-        actual fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder = apply {
-            ios.setHandleCodeInApp(canHandleCodeInApp)
-        }
-        actual fun setIOSBundleId(iOSBundleId: String): Builder = apply {
-            ios.setIOSBundleID(iOSBundleId)
-        }
-        actual fun setUrl(url: String): Builder = apply {
-            ios.setURL(NSURL.URLWithString(url))
-        }
-        actual fun build(): ActionCodeSettings = ActionCodeSettings(ios)
-    }
+        this.dynamicLinkDomain = dynamicLinkDomain
+        this.handleCodeInApp = canHandleCodeInApp
+        iOSBundleId?.let { setIOSBundleID(it) }
+    })
 
     actual val canHandleCodeInApp: Boolean
         get() = ios.handleCodeInApp()
-    actual val androidInstallApp: Boolean
-        get() = ios.androidInstallIfNotAvailable
-    actual val androidMinimumVersion: String?
-        get() = ios.androidMinimumVersion
-    actual val androidPackageName: String?
-        get() = ios.androidPackageName
+    actual val androidPackageName: AndroidPackageName?
+        get() = ios.androidPackageName?.let {
+            AndroidPackageName(it, ios.androidInstallIfNotAvailable, ios.androidMinimumVersion)
+        }
     actual val iOSBundle: String?
         get() = ios.iOSBundleID
     actual val url: String

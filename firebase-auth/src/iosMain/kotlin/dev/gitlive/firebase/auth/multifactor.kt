@@ -18,8 +18,8 @@ actual class MultiFactor(val ios: FIRMultiFactor) {
 actual class MultiFactorInfo(val ios: FIRMultiFactorInfo) {
     actual val displayName: String?
         get() = ios.displayName
-    actual val enrollmentTime: Long
-        get() = ios.enrollmentDate.timeIntervalSinceReferenceDate.toLong()
+    actual val enrollmentTime: Double
+        get() = ios.enrollmentDate.timeIntervalSinceReferenceDate.toDouble()
     actual val factorId: String
         get() = ios.factorID
     actual val uid: String

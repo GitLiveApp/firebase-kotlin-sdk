@@ -94,66 +94,54 @@ actual class ActionCodeResult(val js: firebase.auth.ActionCodeInfo) {
             "REVERT_SECOND_FACTOR_ADDITION" -> Operation.RevertSecondFactorAddition
             else -> Operation.Error
         }
-    actual fun <T, A: ActionCodeDataType<T>> getData(type: A): T? = when (type) {
-        is ActionCodeDataType.Email -> js.data.email
-        is ActionCodeDataType.PreviousEmail -> js.data.previousEmail
-        is ActionCodeDataType.MultiFactor -> js.data.multiFactorInfo
-        else -> null
-    } as? T
+}
+
+actual sealed class ActionCodeDataType<out T> {
+
+    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+
+    actual object Email : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = result.js.data.email
+    }
+    actual object PreviousEmail : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = result.js.data.previousEmail
+    }
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = result.js.data.multiFactorInfo?.let { MultiFactorInfo(it) }
+    }
 }
 
 actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
 actual class ActionCodeSettings private constructor(val js: firebase.auth.ActionCodeSettings) {
-    actual class Builder(private var url: String) {
 
-        private var androidSettings: firebase.auth.AndroidActionCodeSettings? = null
-        private var dynamicLinkDomain: String? = null
-        private var handleCodeInApp: Boolean? = null
-        private var iOS: firebase.auth.iOSActionCodeSettings? = null
+    actual constructor(url: String,
+                       androidPackageName: AndroidPackageName?,
+                       dynamicLinkDomain: String?,
+                       canHandleCodeInApp: Boolean,
+                       iOSBundleId: String?
+    ) : this(object : firebase.auth.ActionCodeSettings {
+        override val android: firebase.auth.AndroidActionCodeSettings? = androidPackageName?.let { androidPackageName -> object : firebase.auth.AndroidActionCodeSettings {
+            override val installApp: Boolean get() = androidPackageName.installIfNotAvailable
+            override val minimumVersion: String? get() = androidPackageName.minimumVersion
+            override val packageName: String get() = androidPackageName.androidPackageName
 
-        actual fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder = apply {
-            androidSettings = object : firebase.auth.AndroidActionCodeSettings {
-                override val installApp: Boolean get() = installIfNotAvailable
-                override val minimumVersion: String? get() = minimumVersion
-                override val packageName: String get() = androidPackageName
-
-            }
-        }
-        actual fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder = apply {
-            this.dynamicLinkDomain = dynamicLinkDomain
-        }
-        actual fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder = apply {
-            this.handleCodeInApp = canHandleCodeInApp
-        }
-        actual fun setIOSBundleId(iOSBundleId: String): Builder = apply {
-            iOS = object : firebase.auth.iOSActionCodeSettings {
+        } }
+        override val dynamicLinkDomain: String? = dynamicLinkDomain
+        override val handleCodeInApp: Boolean? = canHandleCodeInApp
+        override val iOS: firebase.auth.iOSActionCodeSettings? = iOSBundleId?.let { iOSBundleId ->
+            object : firebase.auth.iOSActionCodeSettings {
                 override val bundleId: String?
                     get() = iOSBundleId
             }
         }
-        actual fun setUrl(url: String): Builder = apply {
-            this.url = url
-        }
-        actual fun build(): ActionCodeSettings {
-            return ActionCodeSettings(object : firebase.auth.ActionCodeSettings {
-                override val android: firebase.auth.AndroidActionCodeSettings? = this@Builder.androidSettings
-                override val dynamicLinkDomain: String? = this@Builder.dynamicLinkDomain
-                override val handleCodeInApp: Boolean? = this@Builder.handleCodeInApp
-                override val iOS: firebase.auth.iOSActionCodeSettings? = this@Builder.iOS
-                override val url: String = this@Builder.url
-            })
-        }
-    }
+        override val url: String = url
+    })
 
     actual val canHandleCodeInApp: Boolean
         get() = js.handleCodeInApp ?: false
-    actual val androidInstallApp: Boolean
-        get() = js.android?.installApp ?: false
-    actual val androidMinimumVersion: String?
-        get() = js.android?.minimumVersion
-    actual val androidPackageName: String?
-        get() = js.android?.packageName
+    actual val androidPackageName: AndroidPackageName?
+        get() = js.android?.let { AndroidPackageName(it.packageName, it.installApp ?: false, it.minimumVersion) }
     actual val iOSBundle: String?
         get() = js.iOS?.bundleId
     actual val url: String

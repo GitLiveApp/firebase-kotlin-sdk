@@ -22,8 +22,8 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         get() = ios.anonymous
     actual val isEmailVerified: Boolean
         get() = ios.emailVerified
-    actual val metaData: MetaData?
-        get() = MetaData(ios.metadata)
+    actual val metaData: UserMetaData?
+        get() = UserMetaData(ios.metadata)
     actual val multiFactor: MultiFactor
         get() = MultiFactor(ios.multiFactor)
     actual val providerData: List<UserInfo>
@@ -51,9 +51,12 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun updateEmail(email: String) = ios.await { updateEmail(email, it) }.run { Unit }
     actual suspend fun updatePassword(password: String) = ios.await { updatePassword(password, it) }.run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
-    actual suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit) {
-        val request = UserProfileChangeRequest.Builder(this.ios).apply(buildRequest).build()
-        ios.await { request.ios.commitChangesWithCompletion(it) }
+    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
+        val request = ios.profileChangeRequest().apply {
+            this.displayName = displayName
+            this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }
+        }
+        ios.await { request.commitChangesWithCompletion(it) }
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = ios.await {
         actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.ios, it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
@@ -75,28 +78,9 @@ actual class UserInfo(val ios: FIRUserInfoProtocol) {
         get() = ios.uid
 }
 
-actual class MetaData(val ios: FIRUserMetadata) {
-    actual val creationTime: Long?
-        get() = ios.creationDate?.timeIntervalSinceReferenceDate?.toLong()
-    actual val lastSignInTime: Long?
-        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate?.toLong()
-}
-
-actual class UserProfileChangeRequest(val ios: FIRUserProfileChangeRequest) {
-    actual class Builder(private val user: FIRUser) {
-
-        private val request = user.profileChangeRequest()
-
-        actual fun setDisplayName(displayName: String?): Builder = apply {
-            request.setDisplayName(displayName)
-        }
-        actual fun setPhotoURL(photoURL: String?): Builder = apply {
-            request.setPhotoURL(photoURL?.let { NSURL.URLWithString(it) })
-        }
-        actual fun build(): UserProfileChangeRequest = UserProfileChangeRequest(request)
-    }
-    actual val displayName: String?
-        get() = ios.displayName
-    actual val photoURL: String?
-        get() = ios.photoURL?.absoluteString
+actual class UserMetaData(val ios: FIRUserMetadata) {
+    actual val creationTime: Double?
+        get() = ios.creationDate?.timeIntervalSinceReferenceDate?.toDouble()
+    actual val lastSignInTime: Double?
+        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate?.toDouble()
 }

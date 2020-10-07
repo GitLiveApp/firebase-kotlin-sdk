@@ -14,7 +14,7 @@ expect class MultiFactor {
 
 expect class MultiFactorInfo {
     val displayName: String?
-    val enrollmentTime: Long
+    val enrollmentTime: Double
     val factorId: String
     val uid: String
 }

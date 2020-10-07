@@ -20,8 +20,8 @@ actual class MultiFactor(val js: firebase.multifactor.MultiFactorUser) {
 actual class MultiFactorInfo(val js: firebase.multifactor.MultiFactorInfo) {
     actual val displayName: String?
         get() = rethrow { js.displayName }
-    actual val enrollmentTime: Long
-        get() = rethrow { (Date(js.enrollmentTime).getTime() / 1000.0).toLong() }
+    actual val enrollmentTime: Double
+        get() = rethrow { (Date(js.enrollmentTime).getTime() / 1000.0) }
     actual val factorId: String
         get() = rethrow { js.factorId }
     actual val uid: String

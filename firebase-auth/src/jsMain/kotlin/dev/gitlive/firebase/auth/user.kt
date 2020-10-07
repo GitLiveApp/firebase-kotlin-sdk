@@ -19,8 +19,8 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
         get() = rethrow { js.isAnonymous }
     actual val isEmailVerified: Boolean
         get() = rethrow { js.emailVerified }
-    actual val metaData: MetaData?
-        get() = rethrow { MetaData(js.metadata) }
+    actual val metaData: UserMetaData?
+        get() = rethrow { UserMetaData(js.metadata) }
     actual val multiFactor: MultiFactor
         get() = rethrow { MultiFactor(js.multiFactor) }
     actual val providerData: List<UserInfo>
@@ -42,9 +42,12 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun updateEmail(email: String) = rethrow { js.updateEmail(email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { js.updatePassword(password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
-    actual suspend fun updateProfile(buildRequest: UserProfileChangeRequest.Builder.() -> Unit) = rethrow {
-        val request = UserProfileChangeRequest.Builder().apply(buildRequest).build()
-        js.updateProfile(request.js).await()
+    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
+        val request = object : firebase.user.ProfileUpdateRequest {
+            override val displayName: String? = displayName
+            override val photoURL: String? = photoUrl
+        }
+        js.updateProfile(request).await()
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { js.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.js).await() }
 }
@@ -64,33 +67,9 @@ actual class UserInfo(val js: firebase.user.UserInfo) {
         get() = rethrow { js.uid }
 }
 
-actual class MetaData(val js: firebase.user.UserMetadata) {
-    actual val creationTime: Long?
-        get() = rethrow {js.creationTime?.let { (Date(it).getTime() / 1000.0).toLong() } }
-    actual val lastSignInTime: Long?
-        get() = rethrow {js.lastSignInTime?.let { (Date(it).getTime() / 1000.0).toLong() } }
-}
-
-actual class UserProfileChangeRequest(val js: firebase.user.ProfileUpdateRequest) {
-
-    actual class Builder {
-
-        private var displayName: String? = null
-        private var photoURL: String? = null
-
-        actual fun setDisplayName(displayName: String?): Builder = apply {
-            this.displayName = displayName
-        }
-        actual fun setPhotoURL(photoURL: String?): Builder = apply {
-            this.photoURL = photoURL
-        }
-        actual fun build(): UserProfileChangeRequest = UserProfileChangeRequest(object : firebase.user.ProfileUpdateRequest {
-            override val displayName: String? = this@Builder.displayName
-            override val photoURL: String? = this@Builder.photoURL
-        })
-    }
-    actual val displayName: String?
-        get() = rethrow { js.displayName }
-    actual val photoURL: String?
-        get() = rethrow { js.photoURL }
+actual class UserMetaData(val js: firebase.user.UserMetadata) {
+    actual val creationTime: Double?
+        get() = rethrow {js.creationTime?.let { (Date(it).getTime() / 1000.0) } }
+    actual val lastSignInTime: Double?
+        get() = rethrow {js.lastSignInTime?.let { (Date(it).getTime() / 1000.0) } }
 }

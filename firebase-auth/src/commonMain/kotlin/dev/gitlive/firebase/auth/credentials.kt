@@ -5,6 +5,8 @@
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.Firebase
+import kotlin.jvm.JvmName
+import kotlin.js.JsName
 
 expect open class AuthCredential {
     val providerId: String
@@ -14,27 +16,33 @@ expect class PhoneAuthCredential : AuthCredential
 expect class OAuthCredential : AuthCredential
 
 expect object EmailAuthProvider {
-    fun credentialWithEmail(email: String, password: String): AuthCredential
+    fun credential(email: String, password: String): AuthCredential
 }
 
 expect object FacebookAuthProvider {
-    fun credentialWithAccessToken(accessToken: String): AuthCredential
+    fun credential(accessToken: String): AuthCredential
 }
 
 expect object GithubAuthProvider {
-    fun credentialWithToken(token: String): AuthCredential
+    fun credential(token: String): AuthCredential
 }
 
 expect object GoogleAuthProvider {
-    fun credentialWithIDAndAccessToken(idToken: String, accessToken: String): AuthCredential
+    fun credential(idToken: String, accessToken: String): AuthCredential
+}
+
+sealed class OAuthCredentialsType {
+    abstract val providerId: String
+    data class AccessToken(val accessToken: String, override val providerId: String) : OAuthCredentialsType()
+    data class IdAndAccessToken(val idToken: String, val accessToken: String, override val providerId: String) : OAuthCredentialsType()
+    data class IdAndAccessTokenAndRawNonce(val idToken: String, val accessToken: String, val rawNonce: String, override val providerId: String) : OAuthCredentialsType()
+    data class IdTokenAndRawNonce(val idToken: String, val rawNonce: String, override val providerId: String) : OAuthCredentialsType()
+
 }
 
 expect class OAuthProvider constructor(provider: String, auth: FirebaseAuth = Firebase.auth) {
     companion object {
-        fun credentialsWithAccessToken(providerId: String, accessToken: String): AuthCredential
-        fun credentialsWithIDAndAccessToken(providerId: String, idToken: String, accessToken: String): AuthCredential
-        fun credentialsWithIDRawNonceAndAccessToken(providerId: String, idToken: String, rawNonce: String, accessToken: String): AuthCredential
-        fun credentialsWithIDAndRawNonce(providerId: String, idToken: String, rawNonce: String): AuthCredential
+        fun credentials(type: OAuthCredentialsType): AuthCredential
     }
 
     fun addScope(vararg scope: String)
@@ -46,7 +54,7 @@ expect class OAuthProvider constructor(provider: String, auth: FirebaseAuth = Fi
 expect class SignInProvider
 
 expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
-    fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential
+    fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
     suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
 
 }
@@ -54,5 +62,5 @@ expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
 expect interface PhoneVerificationProvider
 
 expect object TwitterAuthProvider {
-    fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential
+    fun credential(token: String, secret: String): AuthCredential
 }

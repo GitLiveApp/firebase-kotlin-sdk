@@ -42,7 +42,10 @@ expect class AuthResult {
 
 expect class ActionCodeResult {
     val operation: Operation
-    fun <T, A: ActionCodeDataType<T>> getData(type: A): T?
+}
+
+fun <T, A: ActionCodeDataType<T>> ActionCodeResult.getData(type: A): T? {
+    return type.dataForResult(this)
 }
 
 expect class SignInMethodQueryResult {
@@ -59,29 +62,31 @@ enum class Operation {
     RevertSecondFactorAddition
 }
 
-sealed class ActionCodeDataType<T> {
-    object Email : ActionCodeDataType<String>()
-    object PreviousEmail : ActionCodeDataType<String>()
-    object MultiFactor : ActionCodeDataType<MultiFactorInfo>()
+expect sealed class ActionCodeDataType<out T> {
+
+    internal abstract fun dataForResult(result: ActionCodeResult): T?
+
+    object Email : ActionCodeDataType<String>
+    object PreviousEmail : ActionCodeDataType<String>
+    object MultiFactor : ActionCodeDataType<MultiFactorInfo>
 }
 
 expect class ActionCodeSettings {
-    class Builder {
-        fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder
-        fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder
-        fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder
-        fun setIOSBundleId(iOSBundleId: String): Builder
-        fun setUrl(url: String): Builder
-        fun build(): ActionCodeSettings
-    }
+    constructor(
+        url: String,
+        androidPackageName: AndroidPackageName? = null,
+        dynamicLinkDomain: String? = null,
+        canHandleCodeInApp: Boolean = false,
+        iOSBundleId: String? = null
+    )
 
     val canHandleCodeInApp: Boolean
-    val androidInstallApp: Boolean
-    val androidMinimumVersion: String?
-    val androidPackageName: String?
+    val androidPackageName: AndroidPackageName?
     val iOSBundle: String?
     val url: String
 }
+
+data class AndroidPackageName(val androidPackageName: String, val installIfNotAvailable: Boolean, val minimumVersion: String?)
 
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException

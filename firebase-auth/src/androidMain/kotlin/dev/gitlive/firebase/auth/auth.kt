@@ -2,6 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("android")
 package dev.gitlive.firebase.auth
 
 import com.google.firebase.auth.ActionCodeEmailInfo
@@ -90,12 +91,21 @@ actual class ActionCodeResult(val android: com.google.firebase.auth.ActionCodeRe
             com.google.firebase.auth.ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> Operation.RevertSecondFactorAddition
             else -> Operation.Error
         }
-    actual fun <T, A: ActionCodeDataType<T>> getData(type: A): T? = when (type) {
-        is ActionCodeDataType.Email -> android.info?.email
-        is ActionCodeDataType.PreviousEmail -> (android.info as? ActionCodeEmailInfo)?.previousEmail
-        is ActionCodeDataType.MultiFactor -> (android.info as? ActionCodeMultiFactorInfo)?.multiFactorInfo?.let { MultiFactorInfo(it) }
-        else -> null
-    } as? T
+}
+
+actual sealed class ActionCodeDataType<out T> {
+
+    internal actual abstract fun dataForResult(result: ActionCodeResult): T?
+
+    actual object Email : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = result.android.info?.email
+    }
+    actual object PreviousEmail : ActionCodeDataType<String>() {
+        override fun dataForResult(result: ActionCodeResult): String? = (result.android.info as? ActionCodeEmailInfo)?.previousEmail
+    }
+    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo>() {
+        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = (result.android.info as? ActionCodeMultiFactorInfo)?.multiFactorInfo?.let { MultiFactorInfo(it) }
+    }
 }
 
 actual class SignInMethodQueryResult(val android: com.google.firebase.auth.SignInMethodQueryResult) {
@@ -104,33 +114,28 @@ actual class SignInMethodQueryResult(val android: com.google.firebase.auth.SignI
 }
 
 actual class ActionCodeSettings private constructor(val android: com.google.firebase.auth.ActionCodeSettings) {
-    actual class Builder(val android: com.google.firebase.auth.ActionCodeSettings.Builder = com.google.firebase.auth.ActionCodeSettings.newBuilder()) {
-        actual fun setAndroidPackageName(androidPackageName: String, installIfNotAvailable: Boolean, minimumVersion: String?): Builder = apply {
-            android.setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion)
+
+    actual constructor(url: String,
+                       androidPackageName: AndroidPackageName?,
+                       dynamicLinkDomain: String?,
+                       canHandleCodeInApp: Boolean,
+                       iOSBundleId: String?
+    ) : this(com.google.firebase.auth.ActionCodeSettings.newBuilder().apply {
+        this.url = url
+        androidPackageName?.let {
+            this.setAndroidPackageName(it.androidPackageName, it.installIfNotAvailable, it.minimumVersion)
         }
-        actual fun setDynamicLinkDomain(dynamicLinkDomain: String): Builder = apply {
-            android.setDynamicLinkDomain(dynamicLinkDomain)
-        }
-        actual fun setHandleCodeInApp(canHandleCodeInApp: Boolean): Builder = apply {
-            android.setHandleCodeInApp(canHandleCodeInApp)
-        }
-        actual fun setIOSBundleId(iOSBundleId: String): Builder = apply {
-            android.setIOSBundleId(iOSBundleId)
-        }
-        actual fun setUrl(url: String): Builder = apply {
-            android.setUrl(url)
-        }
-        actual fun build(): ActionCodeSettings = ActionCodeSettings(android.build())
-    }
+        this.dynamicLinkDomain = dynamicLinkDomain
+        this.handleCodeInApp = canHandleCodeInApp
+        this.iosBundleId = iosBundleId
+    }.build())
 
     actual val canHandleCodeInApp: Boolean
         get() = android.canHandleCodeInApp()
-    actual val androidInstallApp: Boolean
-        get() = android.androidInstallApp
-    actual val androidMinimumVersion: String?
-        get() = android.androidMinimumVersion
-    actual val androidPackageName: String?
-        get() = android.androidPackageName
+    actual val androidPackageName: AndroidPackageName?
+        get() = android.androidPackageName?.let {
+            AndroidPackageName(it, android.androidInstallApp, android.androidMinimumVersion)
+        }
     actual val iOSBundle: String?
         get() = android.iosBundle
     actual val url: String
