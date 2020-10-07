@@ -32,4 +32,9 @@ class FirebaseFirestoreTest {
     fun testClearPersistence() = runTest {
         Firebase.firestore.clearPersistence()
     }
+
+    @Test
+    fun testDefaultOptions() = runTest {
+        assertNull(FirebaseOptions.withContext(1))
+    }
 }
