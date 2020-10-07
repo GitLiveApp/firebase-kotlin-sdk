@@ -39,6 +39,15 @@ actual class FirebaseApp internal constructor(val android: com.google.firebase.F
 actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)
     .map { FirebaseApp(it) }
 
+actual fun FirebaseOptions.initialize(context: Any?): FirebaseOptions {
+    return when (context) {
+        is Context -> com.google.firebase.FirebaseOptions.fromResource(context)
+        else -> com.google.firebase.FirebaseOptions.Builder().build()
+    }.run {
+        FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId)
+    }
+}
+
 private fun FirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Builder()
     .setApplicationId(applicationId)
     .setApiKey(apiKey)

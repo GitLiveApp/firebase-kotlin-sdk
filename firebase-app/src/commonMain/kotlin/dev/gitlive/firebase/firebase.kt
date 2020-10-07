@@ -53,6 +53,8 @@ data class FirebaseOptions(
     val gcmSenderId: String? = null
 )
 
+expect fun FirebaseOptions.initialize(context: Any?): FirebaseOptions
+
 expect open class FirebaseException : Exception
 
 expect class FirebaseNetworkException : FirebaseException

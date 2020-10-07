@@ -32,6 +32,10 @@ actual class FirebaseApp internal constructor(val js: firebase.App) {
 
 actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
 
+actual fun FirebaseOptions.initialize(context: Any?): FirebaseOptions {
+    TODO("Not supported")
+}
+
 private fun FirebaseOptions.toJson() = json(
     "apiKey" to apiKey,
     "applicationId" to applicationId,

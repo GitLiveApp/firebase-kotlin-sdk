@@ -38,6 +38,15 @@ actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
     .values
     .map { FirebaseApp(it as FIRApp) }
 
+actual fun FirebaseOptions.initialize(context: Any?): FirebaseOptions {
+    return when (context) {
+        is String -> FIROptions(contentsOfFile = context)
+        else -> FIROptions.defaultOptions()
+    }.run {
+        FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId)
+    }
+}
+
 private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
         APIKey = this@toIos.apiKey
         databaseURL = this@toIos.databaseUrl
