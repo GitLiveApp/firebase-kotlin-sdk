@@ -17,15 +17,14 @@ fun encode(value: Any?, shouldEncodeElementDefault: Boolean, positiveInfinity: A
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
 }
 
-expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor, vararg typeParams: KSerializer<*>): CompositeEncoder
+expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder
 
 class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
 
     var value: Any? = null
 
     override val serializersModule = EmptySerializersModule
-
-    override fun beginStructure(descriptor: SerialDescriptor, vararg typeSerializers: KSerializer<*>) = structureEncoder(descriptor, *typeSerializers)
+    override fun beginStructure(descriptor: SerialDescriptor) = structureEncoder(descriptor)
 
     override fun encodeBoolean(value: Boolean) {
         this.value = value

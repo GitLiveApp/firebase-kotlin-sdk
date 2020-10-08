@@ -7,8 +7,6 @@ package dev.gitlive.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.builtins.UnitSerializer
-import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 @InternalSerializationApi

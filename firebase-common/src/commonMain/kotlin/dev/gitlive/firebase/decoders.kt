@@ -4,14 +4,16 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
-import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
-import kotlin.reflect.KClass
+import kotlinx.serialization.serializer
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> decode(value: Any?): T {
@@ -72,6 +74,13 @@ class FirebaseClassDecoder(
             .firstOrNull { !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it)) }
             ?.also { index = it + 1 }
             ?: DECODE_DONE
+
+    override fun <T : Any> decodeNullableSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T?>,
+        previousValue: T?
+    ) = decodeSerializableElement(descriptor, index, deserializer, previousValue)
 }
 
 open class FirebaseCompositeDecoder constructor(
@@ -105,6 +114,14 @@ open class FirebaseCompositeDecoder constructor(
     override fun decodeIntElement(descriptor: SerialDescriptor, index: Int) = decodeInt(get(descriptor, index))
 
     override fun decodeLongElement(descriptor: SerialDescriptor, index: Int) = decodeLong(get(descriptor, index))
+
+    @ExperimentalSerializationApi
+    override fun <T : Any> decodeNullableSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T?>,
+        previousValue: T?
+    ) = decodeSerializableElement(descriptor, index, deserializer, previousValue)
 
     override fun decodeShortElement(descriptor: SerialDescriptor, index: Int) = decodeShort(get(descriptor, index))
 
