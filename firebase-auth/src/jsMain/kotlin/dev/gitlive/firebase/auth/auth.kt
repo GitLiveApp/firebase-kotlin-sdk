@@ -92,7 +92,7 @@ private inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-private fun errorToException(cause: dynamic) = when(val code = (cause.code as String?)?.toLowerCase()) {
+private fun errorToException(cause: dynamic) = when(val code = cause.code?.toString()?.toLowerCase()) {
     "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause)
     "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause)
@@ -106,7 +106,10 @@ private fun errorToException(cause: dynamic) = when(val code = (cause.code as St
 //                "auth/operation-not-allowed" ->
 //                "auth/too-many-arguments" ->
 //                "auth/unauthorized-domain" ->
-    else -> FirebaseAuthException(code, cause)
+    else -> {
+        println("Unknown error code in ${JSON.stringify(cause)}")
+        FirebaseAuthException(code, cause)
+    }
 }
 
 actual object EmailAuthProvider {
