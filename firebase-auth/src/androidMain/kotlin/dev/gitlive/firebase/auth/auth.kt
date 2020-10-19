@@ -26,14 +26,14 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         get() = android.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow {
-        val listener = AuthStateListener { auth -> offer(auth.currentUser?.let { FirebaseUser(it) }) }
+        val listener = AuthStateListener { auth -> if (!isClosedForSend) offer(auth.currentUser?.let { FirebaseUser(it) }) }
         android.addAuthStateListener(listener)
         awaitClose { android.removeAuthStateListener(listener) }
     }
 
     actual val idTokenChanged: Flow<FirebaseUser?>
         get() = callbackFlow {
-            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> offer(auth.currentUser?.let { FirebaseUser(it) })}
+            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> if (!isClosedForSend) offer(auth.currentUser?.let { FirebaseUser(it) })}
             android.addIdTokenListener(listener)
             awaitClose { android.removeIdTokenListener(listener) }
         }

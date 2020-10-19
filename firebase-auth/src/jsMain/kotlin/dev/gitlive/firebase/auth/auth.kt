@@ -22,14 +22,16 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
 
     actual val authStateChanged get() = callbackFlow {
         val unsubscribe = js.onAuthStateChanged {
-            offer(it?.let { FirebaseUser(it) })
+            if (!isClosedForSend)
+                offer(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }
 
     actual val idTokenChanged get() = callbackFlow {
         val unsubscribe = js.onIdTokenChanged {
-            offer(it?.let { FirebaseUser(it) })
+            if (!isClosedForSend)
+                offer(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }

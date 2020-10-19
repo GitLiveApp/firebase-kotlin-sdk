@@ -78,7 +78,7 @@ actual open class Query internal constructor(
     actual val valueEvents get() = callbackFlow {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
-            withBlock = { offer(DataSnapshot(it!!)) }
+            withBlock = { if (!isClosedForSend) offer(DataSnapshot(it!!)) }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
