@@ -164,8 +164,10 @@ subprojects {
             }
         }
 
-        withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-            dependsOn("carthageBootstrap")
+        if (Os.isFamily(Os.FAMILY_MAC)) {
+            withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
+                dependsOn("carthageBootstrap")
+            }
         }
 
         create("carthageClean", Delete::class.java) {

@@ -390,12 +390,12 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: Throwable) {
+    } catch(e: dynamic) {
         throw errorToException(e)
     }
 }
 
-fun errorToException(e: Throwable) = when(e.asDynamic().code as String?) {
+fun errorToException(e: dynamic) = when(e?.code?.toLowerCase()) {
     "cancelled" -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
     "invalid-argument" -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
     "deadline-exceeded" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
