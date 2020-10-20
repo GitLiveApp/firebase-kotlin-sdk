@@ -52,10 +52,10 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult = SignInMethodQueryResult(android.fetchSignInMethodsForEmail(email).await())
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
-        android.sendPasswordResetEmail(email, actionCodeSettings?.android).await()
+        android.sendPasswordResetEmail(email, actionCodeSettings?.toAndroid()).await()
     }
 
-    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = android.sendSignInLinkToEmail(email, actionCodeSettings.android).await().run { Unit }
+    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = android.sendSignInLinkToEmail(email, actionCodeSettings.toAndroid()).await().run { Unit }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.signInWithEmailAndPassword(email, password).await())
@@ -113,34 +113,13 @@ actual class SignInMethodQueryResult(val android: com.google.firebase.auth.SignI
         get() = android.signInMethods ?: emptyList()
 }
 
-actual class ActionCodeSettings private constructor(val android: com.google.firebase.auth.ActionCodeSettings) {
-
-    actual constructor(url: String,
-                       androidPackageName: AndroidPackageName?,
-                       dynamicLinkDomain: String?,
-                       canHandleCodeInApp: Boolean,
-                       iOSBundleId: String?
-    ) : this(com.google.firebase.auth.ActionCodeSettings.newBuilder().apply {
-        this.url = url
-        androidPackageName?.let {
-            this.setAndroidPackageName(it.androidPackageName, it.installIfNotAvailable, it.minimumVersion)
-        }
-        this.dynamicLinkDomain = dynamicLinkDomain
-        this.handleCodeInApp = canHandleCodeInApp
-        this.iosBundleId = iosBundleId
-    }.build())
-
-    actual val canHandleCodeInApp: Boolean
-        get() = android.canHandleCodeInApp()
-    actual val androidPackageName: AndroidPackageName?
-        get() = android.androidPackageName?.let {
-            AndroidPackageName(it, android.androidInstallApp, android.androidMinimumVersion)
-        }
-    actual val iOSBundle: String?
-        get() = android.iosBundle
-    actual val url: String
-        get() = android.url
-}
+private fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()
+    .setUrl(url)
+    .also { androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) } }
+    .also { dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) } }
+    .setHandleCodeInApp(canHandleCodeInApp)
+    .also { iOSBundleId?.run { it.setIOSBundleId(this) } }
+    .build()
 
 actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
 actual typealias FirebaseAuthActionCodeException = com.google.firebase.auth.FirebaseAuthActionCodeException

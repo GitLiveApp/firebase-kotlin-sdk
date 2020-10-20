@@ -84,22 +84,15 @@ internal expect sealed class ActionCodeDataType<out T> {
     object MultiFactor : ActionCodeDataType<MultiFactorInfo?>
 }
 
-expect class ActionCodeSettings {
-    constructor(
-        url: String,
-        androidPackageName: AndroidPackageName? = null,
-        dynamicLinkDomain: String? = null,
-        canHandleCodeInApp: Boolean = false,
-        iOSBundleId: String? = null
-    )
+data class ActionCodeSettings(
+    val url: String,
+    val androidPackageName: AndroidPackageName? = null,
+    val dynamicLinkDomain: String? = null,
+    val canHandleCodeInApp: Boolean = false,
+    val iOSBundleId: String? = null
+)
 
-    val canHandleCodeInApp: Boolean
-    val androidPackageName: AndroidPackageName?
-    val iOSBundle: String?
-    val url: String
-}
-
-data class AndroidPackageName(val androidPackageName: String, val installIfNotAvailable: Boolean, val minimumVersion: String?)
+data class AndroidPackageName(val packageName: String, val installIfNotAvailable: Boolean, val minimumVersion: String?)
 
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException

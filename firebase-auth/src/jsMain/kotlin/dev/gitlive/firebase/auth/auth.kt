@@ -4,10 +4,9 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.*
-import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.js.json
 
 actual val Firebase.auth
     get() = rethrow { dev.gitlive.firebase.auth; FirebaseAuth(firebase.auth()) }
@@ -48,10 +47,10 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult = rethrow { SignInMethodQueryResult(js.fetchSignInMethodsForEmail(email).await().asList()) }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) =
-        rethrow { js.sendPasswordResetEmail(email, actionCodeSettings?.js).await() }
+        rethrow { js.sendPasswordResetEmail(email, actionCodeSettings?.toJson()).await() }
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) =
-        rethrow { js.sendSignInLinkToEmail(email, actionCodeSettings.js).await() }
+        rethrow { js.sendSignInLinkToEmail(email, actionCodeSettings.toJson()).await() }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
@@ -113,40 +112,12 @@ internal actual sealed class ActionCodeDataType<out T> {
 
 actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
-actual class ActionCodeSettings private constructor(val js: firebase.auth.ActionCodeSettings) {
-
-    actual constructor(url: String,
-                       androidPackageName: AndroidPackageName?,
-                       dynamicLinkDomain: String?,
-                       canHandleCodeInApp: Boolean,
-                       iOSBundleId: String?
-    ) : this(object : firebase.auth.ActionCodeSettings {
-        override val android: firebase.auth.AndroidActionCodeSettings? = androidPackageName?.let { androidPackageName -> object : firebase.auth.AndroidActionCodeSettings {
-            override val installApp: Boolean get() = androidPackageName.installIfNotAvailable
-            override val minimumVersion: String? get() = androidPackageName.minimumVersion
-            override val packageName: String get() = androidPackageName.androidPackageName
-
-        } }
-        override val dynamicLinkDomain: String? = dynamicLinkDomain
-        override val handleCodeInApp: Boolean? = canHandleCodeInApp
-        override val iOS: firebase.auth.iOSActionCodeSettings? = iOSBundleId?.let { iOSBundleId ->
-            object : firebase.auth.iOSActionCodeSettings {
-                override val bundleId: String?
-                    get() = iOSBundleId
-            }
-        }
-        override val url: String = url
-    })
-
-    actual val canHandleCodeInApp: Boolean
-        get() = js.handleCodeInApp ?: false
-    actual val androidPackageName: AndroidPackageName?
-        get() = js.android?.let { AndroidPackageName(it.packageName, it.installApp ?: false, it.minimumVersion) }
-    actual val iOSBundle: String?
-        get() = js.iOS?.bundleId
-    actual val url: String
-        get() = js.url
-}
+private fun ActionCodeSettings.toJson() = json(
+    "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
+    "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
+    "handleCodeInApp" to canHandleCodeInApp,
+    "ios" to (iOSBundleId?.run { json("bundleId" to iOSBundleId) } ?: undefined)
+)
 
 actual open class FirebaseAuthException(code: String?, cause: Throwable): FirebaseException(code, cause)
 actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)

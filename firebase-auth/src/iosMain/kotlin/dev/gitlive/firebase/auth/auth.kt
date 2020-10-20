@@ -53,10 +53,10 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
-        ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.ios, it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
+        ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
     }
 
-    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.ios, it) }.run { Unit }
+    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitExpectedResult { signInWithEmail(email = email, password = password, completion = it) })
@@ -112,33 +112,12 @@ internal actual sealed class ActionCodeDataType<out T> {
 
 actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
-actual class ActionCodeSettings private constructor(val ios: FIRActionCodeSettings) {
-
-    actual constructor(url: String,
-                       androidPackageName: AndroidPackageName?,
-                       dynamicLinkDomain: String?,
-                       canHandleCodeInApp: Boolean,
-                       iOSBundleId: String?
-    ) : this(FIRActionCodeSettings().apply {
-        this.URL = NSURL.URLWithString(url)
-        androidPackageName?.let {
-            this.setAndroidPackageName(it.androidPackageName, it.installIfNotAvailable, it.minimumVersion)
-        }
-        this.dynamicLinkDomain = dynamicLinkDomain
-        this.handleCodeInApp = canHandleCodeInApp
-        iOSBundleId?.let { setIOSBundleID(it) }
-    })
-
-    actual val canHandleCodeInApp: Boolean
-        get() = ios.handleCodeInApp()
-    actual val androidPackageName: AndroidPackageName?
-        get() = ios.androidPackageName?.let {
-            AndroidPackageName(it, ios.androidInstallIfNotAvailable, ios.androidMinimumVersion)
-        }
-    actual val iOSBundle: String?
-        get() = ios.iOSBundleID
-    actual val url: String
-        get() = ios.URL?.absoluteString ?: ""
+private fun ActionCodeSettings.toIos() = FIRActionCodeSettings().let {
+    it.URL =  NSURL.URLWithString(url)
+    androidPackageName?.run { it.setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion) }
+    it.dynamicLinkDomain = dynamicLinkDomain
+    it.handleCodeInApp = canHandleCodeInApp
+    iOSBundleId?.run { it.setIOSBundleID(this) }
 }
 
 actual open class FirebaseAuthException(message: String): FirebaseException(message)
