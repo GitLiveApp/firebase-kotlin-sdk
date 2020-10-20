@@ -78,7 +78,7 @@ actual open class Query internal constructor(
     actual val valueEvents get() = callbackFlow {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
-            withBlock = { offer(DataSnapshot(it!!)) }
+            withBlock = { if (!isClosedForSend) offer(DataSnapshot(it!!)) }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
@@ -87,7 +87,7 @@ actual open class Query internal constructor(
         val handles = types.map { type ->
             ios.observeEventType(
                 type.toEventType(),
-                andPreviousSiblingKeyWithBlock = { it, key -> offer(ChildEvent(DataSnapshot(it!!), type, key)) }
+                andPreviousSiblingKeyWithBlock = { it, key -> if (!isClosedForSend) offer(ChildEvent(DataSnapshot(it!!), type, key)) }
             ) { close(DatabaseException(it.toString())) }
         }
         awaitClose {

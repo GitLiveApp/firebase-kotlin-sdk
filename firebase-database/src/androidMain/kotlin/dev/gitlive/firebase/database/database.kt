@@ -91,7 +91,8 @@ actual open class Query internal constructor(
         get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                offer(DataSnapshot(snapshot))
+                if (!isClosedForSend)
+                    offer(DataSnapshot(snapshot))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -107,22 +108,22 @@ actual open class Query internal constructor(
 
             val moved by lazy { types.contains(Type.MOVED) }
             override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(moved) offer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
+                if(moved && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
             }
 
             val changed by lazy { types.contains(Type.CHANGED) }
             override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(changed) offer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
+                if(changed && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
             }
 
             val added by lazy { types.contains(Type.ADDED) }
             override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(added) offer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
+                if(added && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
             }
 
             val removed by lazy { types.contains(Type.REMOVED) }
             override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
-                if(removed) offer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
+                if(removed && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
