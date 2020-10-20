@@ -70,9 +70,9 @@ private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Un
 suspend fun <T, R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R>()
     function { result, error ->
-        if(result != null) {
+        if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(FirebaseFunctionsException(error.toString()))
         }
     }

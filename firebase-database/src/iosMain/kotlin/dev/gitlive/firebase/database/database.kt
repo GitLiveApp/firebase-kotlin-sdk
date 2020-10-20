@@ -175,9 +175,9 @@ actual class DatabaseException(message: String) : RuntimeException(message)
 private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R>()
     function { error, result ->
-        if(result != null) {
+        if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(DatabaseException(error.toString()))
         }
     }

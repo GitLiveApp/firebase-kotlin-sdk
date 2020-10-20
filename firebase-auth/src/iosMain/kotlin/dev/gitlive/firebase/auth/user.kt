@@ -39,18 +39,18 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
 
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult =
-        AuthResult(ios.awaitExpectedResult { linkWithCredential(credential.ios, it) })
+        AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })
 
     actual suspend fun reauthenticate(credential: AuthCredential) =
-        ios.awaitExpectedResult { reauthenticateWithCredential(credential.ios, it) }.run { Unit }
+        ios.await { reauthenticateWithCredential(credential.ios, it) }
 
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult =
-        AuthResult(ios.awaitExpectedResult { reauthenticateAndRetrieveDataWithCredential(credential.ios, it) })
+        AuthResult(ios.awaitResult { reauthenticateAndRetrieveDataWithCredential(credential.ios, it) })
 
     actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = ios.await {
         actionCodeSettings?.let { settings -> sendEmailVerificationWithActionCodeSettings(settings.toIos(), it) }
             ?: sendEmailVerificationWithCompletion(it)
-    }.run { Unit }
+    }
 
     actual suspend fun unlink(provider: String): FirebaseUser? {
         val user: FIRUser? = ios.awaitResult { unlinkFromProvider(provider, it) }

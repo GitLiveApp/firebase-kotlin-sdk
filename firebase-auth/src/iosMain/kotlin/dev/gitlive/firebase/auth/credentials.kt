@@ -69,7 +69,7 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
                 null}.toMap()
     }
 
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(ios.awaitExpectedResult { auth.ios.signInWithProvider(ios, signInProvider.delegate, it) })
+    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(ios.awaitResult { auth.ios.signInWithProvider(ios, signInProvider.delegate, it) })
 }
 
 actual class SignInProvider(val delegate: FIRAuthUIDelegateProtocol)
@@ -80,7 +80,7 @@ actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
-        val verificationId: String = ios.awaitExpectedResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
+        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
         val verificationCode = verificationProvider.getVerificationCode()
         return credential(verificationId, verificationCode)
     }
