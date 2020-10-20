@@ -15,7 +15,7 @@ actual class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : Aut
 actual class OAuthCredential(override val ios: FIROAuthCredential) : AuthCredential(ios)
 
 actual object EmailAuthProvider {
-    actual fun credentialWithEmail(
+    actual fun credential(
         email: String,
         password: String
     ): AuthCredential =
@@ -23,31 +23,37 @@ actual object EmailAuthProvider {
 }
 
 actual object FacebookAuthProvider {
-    actual fun credentialWithAccessToken(accessToken: String): AuthCredential = AuthCredential(FIRFacebookAuthProvider.credentialWithAccessToken(accessToken))
+    actual fun credential(accessToken: String): AuthCredential = AuthCredential(FIRFacebookAuthProvider.credentialWithAccessToken(accessToken))
 }
 
 actual object GithubAuthProvider {
-    actual fun credentialWithToken(token: String): AuthCredential = AuthCredential(FIRGitHubAuthProvider.credentialWithToken(token))
+    actual fun credential(token: String): AuthCredential = AuthCredential(FIRGitHubAuthProvider.credentialWithToken(token))
 }
 
 actual object GoogleAuthProvider {
-    actual fun credentialWithIDAndAccessToken(idToken: String, accessToken: String): AuthCredential = AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
+    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
 }
 
 actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: FirebaseAuth) {
     actual constructor(provider: String, auth: FirebaseAuth) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios), auth)
 
     actual companion object {
-        actual fun credentialsWithAccessToken(providerId: String, accessToken: String): AuthCredential = AuthCredential(FIROAuthProvider.credentialWithProviderID(providerId, accessToken))
-        actual fun credentialsWithIDAndAccessToken(providerId: String, idToken: String, accessToken: String): AuthCredential = AuthCredential(FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, accessToken = accessToken))
-        actual fun credentialsWithIDRawNonceAndAccessToken(providerId: String, idToken: String, rawNonce: String, accessToken: String): AuthCredential = AuthCredential(FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken))
-        actual fun credentialsWithIDAndRawNonce(providerId: String, idToken: String, rawNonce: String): AuthCredential =  AuthCredential(FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce))
+        actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
+            val credential = when {
+                idToken == null -> FIROAuthProvider.credentialWithProviderID(providerId = providerId, accessToken = accessToken!!)
+                accessToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce!!)
+                rawNonce == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, accessToken = accessToken)
+                else -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken)
+            }
+            return OAuthCredential(credential as FIROAuthCredential)
+        }
     }
 
     actual fun addScope(vararg scope: String) {
         val scopes = ios.scopes?.mapNotNull { it as? String } ?: emptyList()
         ios.setScopes(scopes + scope.asList())
     }
+
     actual fun setCustomParameters(parameters: Map<String, String>) {
         ios.setCustomParameters(emptyMap<Any?, Any?>() + parameters)
     }
@@ -72,11 +78,11 @@ actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
 
     actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
 
-    actual fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
+    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
         val verificationId: String = ios.awaitExpectedResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
         val verificationCode = verificationProvider.getVerificationCode()
-        return credentialWithVerificationIdAndSmsCode(verificationId, verificationCode)
+        return credential(verificationId, verificationCode)
     }
 }
 
@@ -86,5 +92,5 @@ actual interface PhoneVerificationProvider {
 }
 
 actual object TwitterAuthProvider {
-    actual fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential = AuthCredential(FIRTwitterAuthProvider.credentialWithToken(token, secret))
+    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(FIRTwitterAuthProvider.credentialWithToken(token, secret))
 }

@@ -6,6 +6,7 @@ package dev.gitlive.firebase.auth
 
 import android.app.Activity
 import com.google.firebase.FirebaseException
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
@@ -23,48 +24,34 @@ actual class PhoneAuthCredential(override val android: com.google.firebase.auth.
 actual class OAuthCredential(override val android: com.google.firebase.auth.OAuthCredential) : AuthCredential(android)
 
 actual object EmailAuthProvider {
-    actual fun credentialWithEmail(
+    actual fun credential(
         email: String,
         password: String
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
 }
 
 actual object FacebookAuthProvider {
-    actual fun credentialWithAccessToken(accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.FacebookAuthProvider.getCredential(accessToken))
+    actual fun credential(accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.FacebookAuthProvider.getCredential(accessToken))
 }
 
 actual object GithubAuthProvider {
-    actual fun credentialWithToken(token: String): AuthCredential = AuthCredential(com.google.firebase.auth.GithubAuthProvider.getCredential(token))
+    actual fun credential(token: String): AuthCredential = AuthCredential(com.google.firebase.auth.GithubAuthProvider.getCredential(token))
 }
 
 actual object GoogleAuthProvider {
-    actual fun credentialWithIDAndAccessToken(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
 }
 
 actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider.Builder, private val auth: FirebaseAuth) {
     actual constructor(provider: String, auth: FirebaseAuth) : this(com.google.firebase.auth.OAuthProvider.newBuilder(provider, auth.android), auth)
 
     actual companion object {
-        actual fun credentialsWithAccessToken(providerId: String, accessToken: String): AuthCredential = createCredentials(providerId) {
-            this.accessToken = accessToken
-        }
-        actual fun credentialsWithIDAndAccessToken(providerId: String, idToken: String, accessToken: String): AuthCredential = createCredentials(providerId) {
-            setIdToken(idToken)
-            this.accessToken = accessToken
-        }
-        actual fun credentialsWithIDRawNonceAndAccessToken(providerId: String, idToken: String, rawNonce: String, accessToken: String): AuthCredential = createCredentials(providerId) {
-            setIdTokenWithRawNonce(idToken, rawNonce)
-            this.accessToken = accessToken
-        }
-        actual fun credentialsWithIDAndRawNonce(providerId: String, idToken: String, rawNonce: String): AuthCredential = createCredentials(providerId) {
-            setIdTokenWithRawNonce(idToken, rawNonce)
-        }
-
-        private fun createCredentials(providerId: String, block: com.google.firebase.auth.OAuthProvider.CredentialBuilder.() -> Unit): AuthCredential {
-            val credential = com.google.firebase.auth.OAuthProvider.newCredentialBuilder(providerId).apply {
-                block()
-            }.build()
-            return (credential as? com.google.firebase.auth.OAuthCredential)?.let { OAuthCredential(it) } ?: AuthCredential(credential)
+        actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
+            val builder = OAuthProvider.newCredentialBuilder(providerId)
+            accessToken?.let { builder.accessToken = it }
+            idToken?.let { builder.idToken = it }
+            rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it)  }
+            return OAuthCredential(builder.build() as com.google.firebase.auth.OAuthCredential)
         }
     }
 
@@ -87,7 +74,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
 
     actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
 
-    actual fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
         val response = CompletableDeferred<Result<AuthCredential>>()
         val callback = object :
@@ -101,9 +88,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
                 launch {
                     val code = verificationProvider.getVerificationCode()
                     try {
-                        val credentials =
-                            credentialWithVerificationIdAndSmsCode(verificationId, code)
-                        response.complete(Result.success(credentials))
+                        response.complete(Result.success(credential(verificationId, code)))
                     } catch (e: Exception) {
                         response.complete(Result.failure(e))
                     }
@@ -134,5 +119,5 @@ actual interface PhoneVerificationProvider {
 }
 
 actual object TwitterAuthProvider {
-    actual fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
+    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
 }

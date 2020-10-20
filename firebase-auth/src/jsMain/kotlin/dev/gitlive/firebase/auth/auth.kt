@@ -4,6 +4,8 @@
 
 package dev.gitlive.firebase.auth
 
+import dev.gitlive.firebase.*
+import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
@@ -97,7 +99,7 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
 
-private fun ActionCodeSettings.toJson() = json(
+internal fun ActionCodeSettings.toJson() = json(
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
     "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
     "handleCodeInApp" to canHandleCodeInApp,

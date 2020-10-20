@@ -93,7 +93,7 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
         get() = FirebaseUser(ios.user)
 }
 
-private fun ActionCodeSettings.toIos() = FIRActionCodeSettings().let {
+internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().let {
     it.URL =  NSURL.URLWithString(url)
     androidPackageName?.run { it.setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion) }
     it.dynamicLinkDomain = dynamicLinkDomain

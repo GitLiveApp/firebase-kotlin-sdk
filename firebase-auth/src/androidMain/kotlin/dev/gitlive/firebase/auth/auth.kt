@@ -101,7 +101,7 @@ actual class AuthResult internal constructor(val android: com.google.firebase.au
         get() = android.user?.let { FirebaseUser(it) }
 }
 
-private fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()
+internal fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()
     .setUrl(url)
     .also { androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) } }
     .also { dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) } }
