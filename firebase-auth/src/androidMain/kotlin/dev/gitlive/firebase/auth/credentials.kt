@@ -23,44 +23,46 @@ actual class PhoneAuthCredential(override val android: com.google.firebase.auth.
 actual class OAuthCredential(override val android: com.google.firebase.auth.OAuthCredential) : AuthCredential(android)
 
 actual object EmailAuthProvider {
-    actual fun credential(
+    actual fun credentialWithEmail(
         email: String,
         password: String
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
 }
 
 actual object FacebookAuthProvider {
-    actual fun credential(accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.FacebookAuthProvider.getCredential(accessToken))
+    actual fun credentialWithAccessToken(accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.FacebookAuthProvider.getCredential(accessToken))
 }
 
 actual object GithubAuthProvider {
-    actual fun credential(token: String): AuthCredential = AuthCredential(com.google.firebase.auth.GithubAuthProvider.getCredential(token))
+    actual fun credentialWithToken(token: String): AuthCredential = AuthCredential(com.google.firebase.auth.GithubAuthProvider.getCredential(token))
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+    actual fun credentialWithIDAndAccessToken(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
 }
 
 actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider.Builder, private val auth: FirebaseAuth) {
     actual constructor(provider: String, auth: FirebaseAuth) : this(com.google.firebase.auth.OAuthProvider.newBuilder(provider, auth.android), auth)
 
     actual companion object {
-        actual fun credentials(type: OAuthCredentialsType): AuthCredential {
-            val credential = com.google.firebase.auth.OAuthProvider.newCredentialBuilder(type.providerId).apply {
-                when (type) {
-                    is OAuthCredentialsType.AccessToken -> accessToken = type.accessToken
-                    is OAuthCredentialsType.IdAndAccessToken -> {
-                        accessToken = type.accessToken
-                        setIdToken(type.idToken)
-                    }
-                    is OAuthCredentialsType.IdAndAccessTokenAndRawNonce -> {
-                        accessToken = type.accessToken
-                        setIdTokenWithRawNonce(type.idToken, type.rawNonce)
-                    }
-                    is OAuthCredentialsType.IdTokenAndRawNonce -> {
-                        setIdTokenWithRawNonce(type.idToken, type.rawNonce)
-                    }
-                }
+        actual fun credentialsWithAccessToken(providerId: String, accessToken: String): AuthCredential = createCredentials(providerId) {
+            this.accessToken = accessToken
+        }
+        actual fun credentialsWithIDAndAccessToken(providerId: String, idToken: String, accessToken: String): AuthCredential = createCredentials(providerId) {
+            setIdToken(idToken)
+            this.accessToken = accessToken
+        }
+        actual fun credentialsWithIDRawNonceAndAccessToken(providerId: String, idToken: String, rawNonce: String, accessToken: String): AuthCredential = createCredentials(providerId) {
+            setIdTokenWithRawNonce(idToken, rawNonce)
+            this.accessToken = accessToken
+        }
+        actual fun credentialsWithIDAndRawNonce(providerId: String, idToken: String, rawNonce: String): AuthCredential = createCredentials(providerId) {
+            setIdTokenWithRawNonce(idToken, rawNonce)
+        }
+
+        private fun createCredentials(providerId: String, block: com.google.firebase.auth.OAuthProvider.CredentialBuilder.() -> Unit): AuthCredential {
+            val credential = com.google.firebase.auth.OAuthProvider.newCredentialBuilder(providerId).apply {
+                block()
             }.build()
             return (credential as? com.google.firebase.auth.OAuthCredential)?.let { OAuthCredential(it) } ?: AuthCredential(credential)
         }
@@ -85,7 +87,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
 
     actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
 
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+    actual fun credentialWithVerificationIdAndSmsCode(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
         val response = CompletableDeferred<Result<AuthCredential>>()
         val callback = object :
@@ -100,7 +102,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
                     val code = verificationProvider.getVerificationCode()
                     try {
                         val credentials =
-                            credential(verificationId, code)
+                            credentialWithVerificationIdAndSmsCode(verificationId, code)
                         response.complete(Result.success(credentials))
                     } catch (e: Exception) {
                         response.complete(Result.failure(e))
@@ -132,5 +134,5 @@ actual interface PhoneVerificationProvider {
 }
 
 actual object TwitterAuthProvider {
-    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
+    actual fun credentialWithTokenAndSecret(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
 }
