@@ -8,6 +8,7 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -41,16 +42,12 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         set(value) { ios.setLanguageCode(value) }
 
     actual suspend fun applyActionCode(code: String) = ios.await { applyActionCode(code, it) }.run { Unit }
-    actual suspend fun checkActionCode(code: String): ActionCodeResult = ActionCodeResult(ios.awaitExpectedResult { checkActionCode(code, it) })
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitExpectedResult { createUserWithEmail(email = email, password = password, completion = it) })
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult {
-        val signInMethods: List<*>? = ios.awaitResult { fetchSignInMethodsForEmail(email, it) }
-        return SignInMethodQueryResult(signInMethods?.mapNotNull { it as String } ?: emptyList())
-    }
+    actual suspend fun fetchSignInMethodsForEmail(email: String) = ios.awaitResult { fetchSignInMethodsForEmail(email, it) }.orEmpty()
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
         ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
@@ -74,43 +71,27 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) = ios.await { updateCurrentUser(user.ios, it) }.run { Unit }
     actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitExpectedResult { verifyPasswordResetCode(code, it) }
+
+    actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
+        val result = ios.awaitExpectedResult { checkActionCode(code, it) }
+        @Suppress("UNCHECKED_CAST")
+        return when(result.operation) {
+            FIRActionCodeOperationUnknown -> Error
+            FIRActionCodeOperationEmailLink -> SignInWithEmailLink
+            FIRActionCodeOperationVerifyEmail -> VerifyEmail(result.email!!)
+            FIRActionCodeOperationPasswordReset -> PasswordReset(result.email!!)
+            FIRActionCodeOperationRecoverEmail -> RecoverEmail(result.email!!, result.previousEmail!!)
+            FIRActionCodeOperationVerifyAndChangeEmail -> VerifyBeforeChangeEmail(result.email!!, result.previousEmail!!)
+            FIRActionCodeOperationRevertSecondFactorAddition -> RevertSecondFactorAddition(result.email!!, null)
+            else -> throw UnsupportedOperationException(result.operation.toString())
+        } as T
+    }
 }
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
     actual val user: FirebaseUser?
         get() = FirebaseUser(ios.user)
 }
-
-actual class ActionCodeResult(val ios: FIRActionCodeInfo) {
-    actual val operation: Operation
-        get() = when (ios.operation) {
-            FIRActionCodeOperationPasswordReset -> Operation.PasswordReset(this)
-            FIRActionCodeOperationVerifyEmail -> Operation.VerifyEmail(this)
-            FIRActionCodeOperationRecoverEmail -> Operation.RecoverEmail(this)
-            FIRActionCodeOperationUnknown-> Operation.Error
-            FIRActionCodeOperationEmailLink -> Operation.SignInWithEmailLink
-            FIRActionCodeOperationVerifyAndChangeEmail -> Operation.VerifyBeforeChangeEmail(this)
-            FIRActionCodeOperationRevertSecondFactorAddition -> Operation.RevertSecondFactorAddition(this)
-            else -> Operation.Error
-        }
-}
-
-internal actual sealed class ActionCodeDataType<out T> {
-
-    actual abstract fun dataForResult(result: ActionCodeResult): T
-
-    actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = result.ios.email!!
-    }
-    actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = result.ios.previousEmail!!
-    }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
-        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = null
-    }
-}
-
-actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
 private fun ActionCodeSettings.toIos() = FIRActionCodeSettings().let {
     it.URL =  NSURL.URLWithString(url)

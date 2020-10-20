@@ -7,6 +7,7 @@ package dev.gitlive.firebase.auth
 
 import com.google.firebase.auth.ActionCodeEmailInfo
 import com.google.firebase.auth.ActionCodeMultiFactorInfo
+import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -43,13 +44,12 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         set(value) { android.setLanguageCode(value) }
 
     actual suspend fun applyActionCode(code: String) = android.applyActionCode(code).await().run { Unit }
-    actual suspend fun checkActionCode(code: String): ActionCodeResult = ActionCodeResult(android.checkActionCode(code).await())
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = android.confirmPasswordReset(code, newPassword).await().run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.createUserWithEmailAndPassword(email, password).await())
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult = SignInMethodQueryResult(android.fetchSignInMethodsForEmail(email).await())
+    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = android.fetchSignInMethodsForEmail(email).await().signInMethods.orEmpty()
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
         android.sendPasswordResetEmail(email, actionCodeSettings?.toAndroid()).await()
@@ -72,45 +72,33 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) = android.updateCurrentUser(user.android).await().run { Unit }
     actual suspend fun verifyPasswordResetCode(code: String): String = android.verifyPasswordResetCode(code).await()
+
+    actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
+        val result = android.checkActionCode(code).await()
+        @Suppress("UNCHECKED_CAST")
+        return when(result.operation) {
+            ERROR -> ActionCodeResult.Error
+            SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
+            VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
+            PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
+            RECOVER_EMAIL -> (result.info as ActionCodeEmailInfo).run {
+                ActionCodeResult.RecoverEmail(email, previousEmail)
+            }
+            VERIFY_BEFORE_CHANGE_EMAIL -> (result.info as ActionCodeEmailInfo).run {
+                ActionCodeResult.VerifyBeforeChangeEmail(email, previousEmail)
+            }
+            REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
+                ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
+            }
+            else -> throw UnsupportedOperationException(result.operation.toString())
+        } as T
+    }
+
 }
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
-}
-
-actual class ActionCodeResult(val android: com.google.firebase.auth.ActionCodeResult) {
-    actual val operation: Operation
-        get() = when (android.operation) {
-            com.google.firebase.auth.ActionCodeResult.PASSWORD_RESET -> Operation.PasswordReset(this)
-            com.google.firebase.auth.ActionCodeResult.VERIFY_EMAIL -> Operation.VerifyEmail(this)
-            com.google.firebase.auth.ActionCodeResult.RECOVER_EMAIL -> Operation.RecoverEmail(this)
-            com.google.firebase.auth.ActionCodeResult.ERROR -> Operation.Error
-            com.google.firebase.auth.ActionCodeResult.SIGN_IN_WITH_EMAIL_LINK -> Operation.SignInWithEmailLink
-            com.google.firebase.auth.ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL -> Operation.VerifyBeforeChangeEmail(this)
-            com.google.firebase.auth.ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> Operation.RevertSecondFactorAddition(this)
-            else -> Operation.Error
-        }
-}
-
-internal actual sealed class ActionCodeDataType<out T> {
-
-    actual abstract fun dataForResult(result: ActionCodeResult): T
-
-    actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = result.android.info!!.email
-    }
-    actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = (result.android.info as ActionCodeEmailInfo).previousEmail
-    }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
-        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = (result.android.info as? ActionCodeMultiFactorInfo)?.multiFactorInfo?.let { MultiFactorInfo(it) }
-    }
-}
-
-actual class SignInMethodQueryResult(val android: com.google.firebase.auth.SignInMethodQueryResult) {
-    actual val signInMethods: List<String>
-        get() = android.signInMethods ?: emptyList()
 }
 
 private fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()

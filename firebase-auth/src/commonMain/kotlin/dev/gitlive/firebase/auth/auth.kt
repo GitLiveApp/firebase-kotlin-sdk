@@ -21,10 +21,10 @@ expect class FirebaseAuth {
     val idTokenChanged: Flow<FirebaseUser?>
     var languageCode: String
     suspend fun applyActionCode(code: String)
-    suspend fun checkActionCode(code: String): ActionCodeResult
+    suspend fun <T: ActionCodeResult> checkActionCode(code: String): T
     suspend fun confirmPasswordReset(code: String, newPassword: String)
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
-    suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult
+    suspend fun fetchSignInMethodsForEmail(email: String): List<String>
     suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
     suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
@@ -40,48 +40,14 @@ expect class AuthResult {
     val user: FirebaseUser?
 }
 
-expect class ActionCodeResult {
-    val operation: Operation
-}
-
-fun <T, A: ActionCodeDataType<T>> ActionCodeResult.getData(type: A): T? {
-    return type.dataForResult(this)
-}
-
-expect class SignInMethodQueryResult {
-    val signInMethods: List<String>
-}
-
-sealed class Operation {
-    class PasswordReset(result: ActionCodeResult) : Operation() {
-        val email: String = ActionCodeDataType.Email.dataForResult(result)
-    }
-    class VerifyEmail(result: ActionCodeResult) : Operation() {
-        val email: String = ActionCodeDataType.Email.dataForResult(result)
-    }
-    class RecoverEmail(result: ActionCodeResult) : Operation() {
-        val email: String = ActionCodeDataType.Email.dataForResult(result)
-        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
-    }
-    object Error : Operation()
-    object SignInWithEmailLink : Operation()
-    class VerifyBeforeChangeEmail(result: ActionCodeResult) : Operation() {
-        val email: String = ActionCodeDataType.Email.dataForResult(result)
-        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
-    }
-    class RevertSecondFactorAddition(result: ActionCodeResult) : Operation() {
-        val email: String = ActionCodeDataType.Email.dataForResult(result)
-        val multiFactorInfo: MultiFactorInfo? = ActionCodeDataType.MultiFactor.dataForResult(result)
-    }
-}
-
-internal expect sealed class ActionCodeDataType<out T> {
-
-    abstract fun dataForResult(result: ActionCodeResult): T
-
-    object Email : ActionCodeDataType<String>
-    object PreviousEmail : ActionCodeDataType<String>
-    object MultiFactor : ActionCodeDataType<MultiFactorInfo?>
+sealed class ActionCodeResult {
+    object Error : ActionCodeResult()
+    object SignInWithEmailLink : ActionCodeResult()
+    class PasswordReset internal constructor(val email: String) : ActionCodeResult()
+    class VerifyEmail internal constructor(val email: String) : ActionCodeResult()
+    class RecoverEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
+    class VerifyBeforeChangeEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
+    class RevertSecondFactorAddition internal constructor(val email: String, val multiFactorInfo: MultiFactorInfo?) : ActionCodeResult()
 }
 
 data class ActionCodeSettings(

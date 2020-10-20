@@ -38,13 +38,12 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         set(value) { js.languageCode = value }
 
     actual suspend fun applyActionCode(code: String) = rethrow { js.applyActionCode(code).await() }
-    actual suspend fun checkActionCode(code: String): ActionCodeResult = rethrow { ActionCodeResult(js.checkActionCode(code).await()) }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow { js.confirmPasswordReset(code, newPassword).await() }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(js.createUserWithEmailAndPassword(email, password).await()) }
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult = rethrow { SignInMethodQueryResult(js.fetchSignInMethodsForEmail(email).await().asList()) }
+    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = rethrow { js.fetchSignInMethodsForEmail(email).await().asList() }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) =
         rethrow { js.sendPasswordResetEmail(email, actionCodeSettings?.toJson()).await() }
@@ -55,11 +54,11 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
 
-    actual suspend fun signInWithCustomToken(token: String)
-            = rethrow { AuthResult(js.signInWithCustomToken(token).await()) }
+    actual suspend fun signInWithCustomToken(token: String) =
+        rethrow { AuthResult(js.signInWithCustomToken(token).await()) }
 
-    actual suspend fun signInAnonymously()
-            = rethrow { AuthResult(js.signInAnonymously().await()) }
+    actual suspend fun signInAnonymously() =
+        rethrow { AuthResult(js.signInAnonymously().await()) }
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
@@ -67,50 +66,36 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun signOut() = rethrow { js.signOut().await() }
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) =
-        rethrow {
-            js.updateCurrentUser(user.js).await()
-        }
-    actual suspend fun verifyPasswordResetCode(code: String): String =
-        rethrow {
-            js.verifyPasswordResetCode(code).await()
-        }
+        rethrow { js.updateCurrentUser(user.js).await() }
 
+    actual suspend fun verifyPasswordResetCode(code: String): String =
+        rethrow { js.verifyPasswordResetCode(code).await() }
+
+    actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T = rethrow {
+        val result = js.checkActionCode(code).await()
+        @Suppress("UNCHECKED_CAST")
+        return when(result.operation) {
+            "EMAIL_SIGNIN" -> ActionCodeResult.SignInWithEmailLink
+            "VERIFY_EMAIL" -> ActionCodeResult.VerifyEmail(result.data.email!!)
+            "PASSWORD_RESET" -> ActionCodeResult.PasswordReset(result.data.email!!)
+            "RECOVER_EMAIL" -> ActionCodeResult.RecoverEmail(result.data.email!!, result.data.previousEmail!!)
+            "VERIFY_AND_CHANGE_EMAIL" -> ActionCodeResult.VerifyBeforeChangeEmail(
+                result.data.email!!,
+                result.data.previousEmail!!
+            )
+            "REVERT_SECOND_FACTOR_ADDITION" -> ActionCodeResult.RevertSecondFactorAddition(
+                result.data.email!!,
+                result.data.multiFactorInfo?.let { MultiFactorInfo(it) }
+            )
+            else -> throw UnsupportedOperationException(result.operation)
+        } as T
+    }
 }
 
 actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
-
-actual class ActionCodeResult(val js: firebase.auth.ActionCodeInfo) {
-    actual val operation: Operation
-        get() = when (js.operation) {
-            "PASSWORD_RESET" -> Operation.PasswordReset(this)
-            "VERIFY_EMAIL" -> Operation.VerifyEmail(this)
-            "RECOVER_EMAIL" -> Operation.RecoverEmail(this)
-            "EMAIL_SIGNIN" -> Operation.SignInWithEmailLink
-            "VERIFY_AND_CHANGE_EMAIL" -> Operation.VerifyBeforeChangeEmail(this)
-            "REVERT_SECOND_FACTOR_ADDITION" -> Operation.RevertSecondFactorAddition(this)
-            else -> Operation.Error
-        }
-}
-
-internal actual sealed class ActionCodeDataType<out T> {
-
-    actual abstract fun dataForResult(result: ActionCodeResult): T
-
-    actual object Email : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = result.js.data.email!!
-    }
-    actual object PreviousEmail : ActionCodeDataType<String>() {
-        override fun dataForResult(result: ActionCodeResult): String = result.js.data.previousEmail!!
-    }
-    actual object MultiFactor : ActionCodeDataType<MultiFactorInfo?>() {
-        override fun dataForResult(result: ActionCodeResult): MultiFactorInfo? = result.js.data.multiFactorInfo?.let { MultiFactorInfo(it) }
-    }
-}
-
-actual class SignInMethodQueryResult(actual val signInMethods: List<String>)
 
 private fun ActionCodeSettings.toJson() = json(
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
