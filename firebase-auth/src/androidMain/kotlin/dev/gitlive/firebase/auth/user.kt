@@ -38,8 +38,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun reauthenticate(credential: AuthCredential) = android.reauthenticate(credential.android).await().run { Unit }
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(android.reauthenticateAndRetrieveData(credential.android).await())
     actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) {
-        val request = actionCodeSettings?.android?.let { android.sendEmailVerification(it) } ?: android.sendEmailVerification()
-        request.await().run { Unit }
+        val request = actionCodeSettings?.let { android.sendEmailVerification(it.toAndroid()) } ?: android.sendEmailVerification()
+        request.await()
     }
     actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
@@ -52,7 +52,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         }.build()
         android.updateProfile(request).await()
     }
-    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.android).await().run { Unit }
+    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) =
+        android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.toAndroid()).await().run { Unit }
 }
 
 actual class UserInfo(val android: com.google.firebase.auth.UserInfo) {

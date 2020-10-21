@@ -330,19 +330,19 @@ private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<N
     }
 }
 
-suspend fun <T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
-    val job = CompletableDeferred<T>()
+internal suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
+    val job = CompletableDeferred<T?>()
     function { result, error ->
-        if(result != null) {
+         if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(error.toException())
         }
     }
-    return job.await()
+    return job.await() as T
 }
 
-suspend fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
+internal suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     val job = CompletableDeferred<Unit>()
     val result = function { error ->
         if(error == null) {
