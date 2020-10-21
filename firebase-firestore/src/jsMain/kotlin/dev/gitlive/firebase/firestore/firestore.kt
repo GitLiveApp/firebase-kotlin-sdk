@@ -236,9 +236,9 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 
     actual suspend fun get() = rethrow { DocumentSnapshot(js.get().await()) }
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val unsubscribe = js.onSnapshot(
-            { offer(DocumentSnapshot(it)) },
+            { safeOffer(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
@@ -286,10 +286,10 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
     )
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
-                { offer(QuerySnapshot(it)) },
+                { safeOffer(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
         }
@@ -392,7 +392,7 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-fun errorToException(e: dynamic) = when(e?.code?.toLowerCase()) {
+fun errorToException(e: dynamic) = when(e?.code?.toString()?.toLowerCase()) {
     "cancelled" -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
     "invalid-argument" -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
     "deadline-exceeded" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
@@ -408,6 +408,9 @@ fun errorToException(e: dynamic) = when(e?.code?.toLowerCase()) {
     "unavailable" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAVAILABLE)
     "data-loss" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DATA_LOSS)
     "unauthenticated" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAUTHENTICATED)
-//    "unknown" ->
-    else -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+    "unknown" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+    else -> {
+        println("Unknown error code in ${JSON.stringify(e)}")
+        FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+    }
 }

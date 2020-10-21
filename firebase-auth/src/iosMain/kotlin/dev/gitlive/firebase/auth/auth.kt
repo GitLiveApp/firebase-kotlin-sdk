@@ -8,6 +8,8 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.safeOffer
+import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -26,15 +28,38 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
-    actual suspend fun sendPasswordResetEmail(email: String) {
-        ios.await { sendPasswordResetWithEmail(email = email, completion = it) }
+    actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
+        val handle = ios.addAuthStateDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
-    actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
+    actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
+        val handle = ios.addIDTokenDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        awaitClose { ios.removeIDTokenDidChangeListener(handle) }
+    }
+
+    actual var languageCode: String
+        get() = ios.languageCode ?: ""
+        set(value) { ios.setLanguageCode(value) }
+
+    actual suspend fun applyActionCode(code: String) = ios.await { applyActionCode(code, it) }.run { Unit }
+    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
+
+    @Suppress("UNCHECKED_CAST")
+    actual suspend fun fetchSignInMethodsForEmail(email: String) =
+        ios.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
+
+    actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
+        ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
+    }
+
+    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
+
+    actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
@@ -47,9 +72,22 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
-    actual val authStateChanged get() = callbackFlow {
-        val handle = ios.addAuthStateDidChangeListener { _, user -> offer(user?.let { FirebaseUser(it) }) }
-        awaitClose { ios.removeAuthStateDidChangeListener(handle) }
+    actual suspend fun updateCurrentUser(user: FirebaseUser) = ios.await { updateCurrentUser(user.ios, it) }.run { Unit }
+    actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitResult { verifyPasswordResetCode(code, it) }
+
+    actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
+        val result: FIRActionCodeInfo = ios.awaitResult { checkActionCode(code, it) }
+        @Suppress("UNCHECKED_CAST")
+        return when(result.operation) {
+            FIRActionCodeOperationUnknown -> Error
+            FIRActionCodeOperationEmailLink -> SignInWithEmailLink
+            FIRActionCodeOperationVerifyEmail -> VerifyEmail(result.email!!)
+            FIRActionCodeOperationPasswordReset -> PasswordReset(result.email!!)
+            FIRActionCodeOperationRecoverEmail -> RecoverEmail(result.email!!, result.previousEmail!!)
+            FIRActionCodeOperationVerifyAndChangeEmail -> VerifyBeforeChangeEmail(result.email!!, result.previousEmail!!)
+            FIRActionCodeOperationRevertSecondFactorAddition -> RevertSecondFactorAddition(result.email!!, null)
+            else -> throw UnsupportedOperationException(result.operation.toString())
+        } as T
     }
 }
 
@@ -58,20 +96,12 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
         get() = FirebaseUser(ios.user)
 }
 
-actual class FirebaseUser internal constructor(val ios: FIRUser) {
-    actual val uid: String
-        get() = ios.uid
-    actual val displayName: String?
-        get() = ios.displayName
-    actual val email: String?
-        get() = ios.email
-    actual val phoneNumber: String?
-        get() = ios.phoneNumber
-    actual val isAnonymous: Boolean
-        get() = ios.isAnonymous()
-    actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
-    actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
-    actual suspend fun sendEmailVerification() = ios.await { sendEmailVerificationWithCompletion(it) }.run { Unit }
+internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
+    it.URL =  NSURL.URLWithString(url)
+    androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
+    it.dynamicLinkDomain = dynamicLinkDomain
+    it.handleCodeInApp = canHandleCodeInApp
+    iOSBundleId?.run { it.setIOSBundleID(this) }
 }
 
 actual open class FirebaseAuthException(message: String): FirebaseException(message)
@@ -79,22 +109,12 @@ actual open class FirebaseAuthActionCodeException(message: String): FirebaseAuth
 actual open class FirebaseAuthEmailException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthInvalidCredentialsException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthInvalidUserException(message: String): FirebaseAuthException(message)
+actual open class FirebaseAuthMultiFactorException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthRecentLoginRequiredException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
 
-actual class AuthCredential(val ios: FIRAuthCredential)
-
-actual object EmailAuthProvider {
-    actual fun credentialWithEmail(
-        email: String,
-        password: String
-    ): AuthCredential =
-        AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
-}
-
-
-private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
+internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
         val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
         val result = block(errorPointer)
@@ -106,19 +126,19 @@ private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<N
     }
 }
 
-private suspend fun <T, R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R>()
+internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(result != null) {
+        if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(error.toException())
         }
     }
-    return job.await()
+    return job.await() as R
 }
 
-private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
         if(error == null) {
@@ -138,11 +158,24 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidEmail,
         FIRAuthErrorCodeEmailAlreadyInUse -> FirebaseAuthEmailException(toString())
 
+        FIRAuthErrorCodeCaptchaCheckFailed,
+        FIRAuthErrorCodeInvalidPhoneNumber,
+        FIRAuthErrorCodeMissingPhoneNumber,
+        FIRAuthErrorCodeInvalidVerificationID,
+        FIRAuthErrorCodeInvalidVerificationCode,
+        FIRAuthErrorCodeMissingVerificationID,
+        FIRAuthErrorCodeMissingVerificationCode,
+        FIRAuthErrorCodeWeakPassword,
         FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(toString())
 
         FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(toString())
 
         FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(toString())
+
+        FIRAuthErrorCodeSecondFactorAlreadyEnrolled,
+        FIRAuthErrorCodeSecondFactorRequired,
+        FIRAuthErrorCodeMaximumSecondFactorCountExceeded,
+        FIRAuthErrorCodeMultiFactorInfoNotFound -> FirebaseAuthMultiFactorException(toString())
 
         FIRAuthErrorCodeEmailAlreadyInUse,
         FIRAuthErrorCodeAccountExistsWithDifferentCredential,

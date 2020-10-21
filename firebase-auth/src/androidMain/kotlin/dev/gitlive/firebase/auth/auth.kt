@@ -2,12 +2,16 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("android")
 package dev.gitlive.firebase.auth
 
-import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.ActionCodeEmailInfo
+import com.google.firebase.auth.ActionCodeMultiFactorInfo
+import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -23,71 +27,95 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
-    actual suspend fun sendPasswordResetEmail(email: String) {
-        android.sendPasswordResetEmail(email).await()
+    actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
+        val listener = AuthStateListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
+        android.addAuthStateListener(listener)
+        awaitClose { android.removeAuthStateListener(listener) }
     }
 
-    actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(android.signInWithEmailAndPassword(email, password).await())
+    actual val idTokenChanged: Flow<FirebaseUser?>
+        get() = callbackFlow {
+            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
+            android.addIdTokenListener(listener)
+            awaitClose { android.removeIdTokenListener(listener) }
+        }
+
+    actual var languageCode: String
+        get() = android.languageCode ?: ""
+        set(value) { android.setLanguageCode(value) }
+
+    actual suspend fun applyActionCode(code: String) = android.applyActionCode(code).await().run { Unit }
+    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = android.confirmPasswordReset(code, newPassword).await().run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.createUserWithEmailAndPassword(email, password).await())
+
+    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = android.fetchSignInMethodsForEmail(email).await().signInMethods.orEmpty()
+
+    actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
+        android.sendPasswordResetEmail(email, actionCodeSettings?.toAndroid()).await()
+    }
+
+    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = android.sendSignInLinkToEmail(email, actionCodeSettings.toAndroid()).await().run { Unit }
+
+    actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
+        AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
     actual suspend fun signInWithCustomToken(token: String) =
         AuthResult(android.signInWithCustomToken(token).await())
 
     actual suspend fun signInAnonymously() = AuthResult(android.signInAnonymously().await())
 
-    actual val authStateChanged get() : Flow<FirebaseUser?> = callbackFlow {
-        val listener = object : AuthStateListener {
-            override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
-                offer(auth.currentUser?.let { FirebaseUser(it) })
-            }
-        }
-        android.addAuthStateListener(listener)
-        awaitClose { android.removeAuthStateListener(listener) }
-    }
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(android.signInWithCredential(authCredential.android).await())
 
     actual suspend fun signOut() = android.signOut()
-}
 
-actual class AuthCredential(val android: com.google.firebase.auth.AuthCredential)
+    actual suspend fun updateCurrentUser(user: FirebaseUser) = android.updateCurrentUser(user.android).await().run { Unit }
+    actual suspend fun verifyPasswordResetCode(code: String): String = android.verifyPasswordResetCode(code).await()
+
+    actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
+        val result = android.checkActionCode(code).await()
+        @Suppress("UNCHECKED_CAST")
+        return when(result.operation) {
+            ERROR -> ActionCodeResult.Error
+            SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
+            VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
+            PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
+            RECOVER_EMAIL -> (result.info as ActionCodeEmailInfo).run {
+                ActionCodeResult.RecoverEmail(email, previousEmail)
+            }
+            VERIFY_BEFORE_CHANGE_EMAIL -> (result.info as ActionCodeEmailInfo).run {
+                ActionCodeResult.VerifyBeforeChangeEmail(email, previousEmail)
+            }
+            REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
+                ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
+            }
+            else -> throw UnsupportedOperationException(result.operation.toString())
+        } as T
+    }
+
+}
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
 }
 
-actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
-    actual val uid: String
-        get() = android.uid
-    actual val displayName: String?
-        get() = android.displayName
-    actual val email: String?
-        get() = android.email
-    actual val phoneNumber: String?
-        get() = android.phoneNumber
-    actual val isAnonymous: Boolean
-        get() = android.isAnonymous
-    actual suspend fun delete() = android.delete().await().run { Unit }
-    actual suspend fun reload() = android.reload().await().run { Unit }
-    actual suspend fun sendEmailVerification() = android.sendEmailVerification().await().run { Unit }
-}
+internal fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()
+    .setUrl(url)
+    .also { androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) } }
+    .also { dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) } }
+    .setHandleCodeInApp(canHandleCodeInApp)
+    .also { iOSBundleId?.run { it.setIOSBundleId(this) } }
+    .build()
 
 actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
 actual typealias FirebaseAuthActionCodeException = com.google.firebase.auth.FirebaseAuthActionCodeException
 actual typealias FirebaseAuthEmailException = com.google.firebase.auth.FirebaseAuthEmailException
 actual typealias FirebaseAuthInvalidCredentialsException = com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 actual typealias FirebaseAuthInvalidUserException = com.google.firebase.auth.FirebaseAuthInvalidUserException
+actual typealias FirebaseAuthMultiFactorException = com.google.firebase.auth.FirebaseAuthMultiFactorException
 actual typealias FirebaseAuthRecentLoginRequiredException = com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 actual typealias FirebaseAuthUserCollisionException = com.google.firebase.auth.FirebaseAuthUserCollisionException
 actual typealias FirebaseAuthWebException = com.google.firebase.auth.FirebaseAuthWebException
-
-actual object EmailAuthProvider {
-    actual fun credentialWithEmail(
-        email: String,
-        password: String
-    ): AuthCredential = AuthCredential(EmailAuthProvider.getCredential(email, password))
-}
