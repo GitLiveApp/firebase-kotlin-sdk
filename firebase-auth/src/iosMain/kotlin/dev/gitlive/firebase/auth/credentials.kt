@@ -38,13 +38,14 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
     actual constructor(provider: String, auth: FirebaseAuth) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios), auth)
 
     actual companion object {
-        actual fun credentials(type: OAuthCredentialsType): AuthCredential {
-            return AuthCredential(when (type) {
-                    is OAuthCredentialsType.AccessToken -> FIROAuthProvider.credentialWithProviderID(type.providerId, type.accessToken)
-                    is OAuthCredentialsType.IdAndAccessToken -> FIROAuthProvider.credentialWithProviderID(providerID = type.providerId, IDToken = type.idToken, accessToken = type.accessToken)
-                    is OAuthCredentialsType.IdAndAccessTokenAndRawNonce -> FIROAuthProvider.credentialWithProviderID(providerID = type.providerId, IDToken = type.idToken, rawNonce = type.rawNonce, accessToken = type.accessToken)
-                    is OAuthCredentialsType.IdTokenAndRawNonce -> FIROAuthProvider.credentialWithProviderID(providerID = type.providerId, IDToken = type.idToken, rawNonce = type.rawNonce)
-                })
+        actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
+            val credential = when {
+                idToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, accessToken = accessToken!!)
+                accessToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce!!)
+                rawNonce == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, accessToken = accessToken)
+                else -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken)
+            }
+            return OAuthCredential(credential)
         }
     }
 
@@ -52,6 +53,7 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
         val scopes = ios.scopes?.mapNotNull { it as? String } ?: emptyList()
         ios.setScopes(scopes + scope.asList())
     }
+
     actual fun setCustomParameters(parameters: Map<String, String>) {
         ios.setCustomParameters(emptyMap<Any?, Any?>() + parameters)
     }
@@ -67,7 +69,7 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
                 null}.toMap()
     }
 
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(ios.awaitExpectedResult { auth.ios.signInWithProvider(ios, signInProvider.delegate, it) })
+    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(ios.awaitResult { auth.ios.signInWithProvider(ios, signInProvider.delegate, it) })
 }
 
 actual class SignInProvider(val delegate: FIRAuthUIDelegateProtocol)
@@ -78,7 +80,7 @@ actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
-        val verificationId: String = ios.awaitExpectedResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
+        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
         val verificationCode = verificationProvider.getVerificationCode()
         return credential(verificationId, verificationCode)
     }
