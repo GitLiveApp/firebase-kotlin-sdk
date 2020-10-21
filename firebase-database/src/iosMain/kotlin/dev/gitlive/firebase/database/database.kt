@@ -11,7 +11,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.offerOrNull
+import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.awaitClose
@@ -81,7 +81,7 @@ actual open class Query internal constructor(
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                offerOrNull(DataSnapshot(snapShot!!))
+                safeOffer(DataSnapshot(snapShot!!))
             }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -92,7 +92,7 @@ actual open class Query internal constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    offerOrNull(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                    safeOffer(ChildEvent(DataSnapshot(snapShot!!), type, key))
                 }
             ) { close(DatabaseException(it.toString())) }
         }

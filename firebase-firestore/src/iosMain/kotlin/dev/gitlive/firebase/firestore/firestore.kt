@@ -171,7 +171,7 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { offerOrNull(DocumentSnapshot(snapshot)) }
+            snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
@@ -186,7 +186,7 @@ actual open class Query(open val ios: FIRQuery) {
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { offerOrNull(QuerySnapshot(snapshot)) }
+            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
