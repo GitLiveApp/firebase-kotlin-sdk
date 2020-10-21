@@ -11,7 +11,7 @@ import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.offerOrNull
+import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -28,14 +28,14 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         get() = android.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val listener = AuthStateListener { auth -> offerOrNull(auth.currentUser?.let { FirebaseUser(it) }) }
+        val listener = AuthStateListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
         android.addAuthStateListener(listener)
         awaitClose { android.removeAuthStateListener(listener) }
     }
 
     actual val idTokenChanged: Flow<FirebaseUser?>
         get() = callbackFlow {
-            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> offerOrNull(auth.currentUser?.let { FirebaseUser(it) }) }
+            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
             android.addIdTokenListener(listener)
             awaitClose { android.removeIdTokenListener(listener) }
         }

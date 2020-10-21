@@ -44,7 +44,7 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
         val listener = rethrow {
             js.on(
                 "value",
-                { it, _ -> offerOrNull(DataSnapshot(it)) },
+                { it, _ -> safeOffer(DataSnapshot(it)) },
                 { close(DatabaseException(it)).run { Unit } }
             )
         }
@@ -58,12 +58,11 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
                     eventType to js.on(
                         eventType,
                         { snapshot, previousChildName ->
-                            offerOrNull(
-                                    ChildEvent(
-                                        DataSnapshot(snapshot),
-                                        type,
-                                        previousChildName
-                                    )
+                            safeOffer(
+                                ChildEvent(
+                                    DataSnapshot(snapshot),
+                                    type,
+                                    previousChildName
                                 )
                             )
                         },
