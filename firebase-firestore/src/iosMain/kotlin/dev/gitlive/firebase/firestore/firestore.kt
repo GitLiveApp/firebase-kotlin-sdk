@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
+import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -13,11 +14,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
-import dev.gitlive.firebase.FirebaseException
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -173,9 +169,9 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual suspend fun get() =
         DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { offer(DocumentSnapshot(snapshot)) }
+            snapshot?.let { offerOrNull(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
@@ -188,9 +184,9 @@ actual open class Query(open val ios: FIRQuery) {
 
     actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { offer(QuerySnapshot(snapshot)) }
+            snapshot?.let { offerOrNull(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }

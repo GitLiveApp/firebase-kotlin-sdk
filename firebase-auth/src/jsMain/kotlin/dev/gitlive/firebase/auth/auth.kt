@@ -20,18 +20,16 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual val currentUser: FirebaseUser?
         get() = rethrow { js.currentUser?.let { FirebaseUser(it) } }
 
-    actual val authStateChanged get() = callbackFlow {
+    actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
         val unsubscribe = js.onAuthStateChanged {
-            if (!isClosedForSend)
-                offer(it?.let { FirebaseUser(it) })
+            offerOrNull(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }
 
-    actual val idTokenChanged get() = callbackFlow {
+    actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
         val unsubscribe = js.onIdTokenChanged {
-            if (!isClosedForSend)
-                offer(it?.let { FirebaseUser(it) })
+            offerOrNull(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }

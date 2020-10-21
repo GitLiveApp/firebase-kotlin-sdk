@@ -6,6 +6,8 @@
 @file:JvmName("CommonKt")
 package dev.gitlive.firebase
 
+import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.coroutines.channels.SendChannel
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -60,3 +62,9 @@ expect class FirebaseNetworkException : FirebaseException
 expect open class FirebaseTooManyRequestsException : FirebaseException
 
 expect open class FirebaseApiNotAvailableException : FirebaseException
+
+inline fun <E> SendChannel<E>.offerOrNull(element: E): Boolean? = try {
+    offer(element)
+} catch (e : ClosedSendChannelException) {
+    null
+}
