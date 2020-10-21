@@ -13,6 +13,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.offerOrNull
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -91,7 +92,7 @@ actual open class Query internal constructor(
         get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                offer(DataSnapshot(snapshot))
+                offerOrNull(DataSnapshot(snapshot))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -107,22 +108,22 @@ actual open class Query internal constructor(
 
             val moved by lazy { types.contains(Type.MOVED) }
             override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(moved && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
+                if(moved) offerOrNull(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
             }
 
             val changed by lazy { types.contains(Type.CHANGED) }
             override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(changed && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
+                if(changed) offerOrNull(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
             }
 
             val added by lazy { types.contains(Type.ADDED) }
             override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(added && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
+                if(added) offerOrNull(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
             }
 
             val removed by lazy { types.contains(Type.REMOVED) }
             override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
-                if(removed && !isClosedForSend) offer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
+                if(removed) offerOrNull(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {

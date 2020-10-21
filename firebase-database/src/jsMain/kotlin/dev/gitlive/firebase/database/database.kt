@@ -40,26 +40,25 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
     actual fun orderByKey() = Query(js.orderByKey())
     actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
-    actual val valueEvents get() = callbackFlow {
+    actual val valueEvents get() = callbackFlow<DataSnapshot> {
         val listener = rethrow {
             js.on(
                 "value",
-                { it, _ -> if (!isClosedForSend) offer(DataSnapshot(it)) },
+                { it, _ -> offerOrNull(DataSnapshot(it)) },
                 { close(DatabaseException(it)).run { Unit } }
             )
         }
         awaitClose { rethrow { js.off("value", listener) } }
     }
 
-    actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow {
+    actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow<ChildEvent> {
         val listeners = rethrow {
             types.map { type ->
                 "child_${type.name.toLowerCase()}".let { eventType ->
                     eventType to js.on(
                         eventType,
                         { snapshot, previousChildName ->
-                            if (!isClosedForSend)
-                                offer(
+                            offerOrNull(
                                     ChildEvent(
                                         DataSnapshot(snapshot),
                                         type,

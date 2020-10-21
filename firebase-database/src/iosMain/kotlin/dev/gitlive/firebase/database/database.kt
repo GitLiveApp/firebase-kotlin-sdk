@@ -11,7 +11,9 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.offerOrNull
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
@@ -75,19 +77,23 @@ actual open class Query internal constructor(
 
     actual fun startAt(value: Boolean, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    actual val valueEvents get() = callbackFlow {
+    actual val valueEvents get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
-            withBlock = { if (!isClosedForSend) offer(DataSnapshot(it!!)) }
+            withBlock = { snapShot ->
+                offerOrNull(DataSnapshot(snapShot!!))
+            }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
 
-    actual fun childEvents(vararg types: Type) = callbackFlow {
+    actual fun childEvents(vararg types: Type) = callbackFlow<ChildEvent> {
         val handles = types.map { type ->
             ios.observeEventType(
                 type.toEventType(),
-                andPreviousSiblingKeyWithBlock = { it, key -> offer(ChildEvent(DataSnapshot(it!!), type, key)) }
+                andPreviousSiblingKeyWithBlock = { snapShot, key ->
+                    offerOrNull(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                }
             ) { close(DatabaseException(it.toString())) }
         }
         awaitClose {
