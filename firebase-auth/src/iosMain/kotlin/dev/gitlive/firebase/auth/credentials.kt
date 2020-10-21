@@ -40,12 +40,12 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
     actual companion object {
         actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
             val credential = when {
-                idToken == null -> FIROAuthProvider.credentialWithProviderID(providerId = providerId, accessToken = accessToken!!)
+                idToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, accessToken = accessToken!!)
                 accessToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce!!)
                 rawNonce == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, accessToken = accessToken)
                 else -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken)
             }
-            return OAuthCredential(credential as FIROAuthCredential)
+            return OAuthCredential(credential)
         }
     }
 

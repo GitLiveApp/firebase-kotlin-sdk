@@ -42,7 +42,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })
 
     actual suspend fun reauthenticate(credential: AuthCredential) =
-        ios.await { reauthenticateWithCredential(credential.ios, it) }
+        ios.awaitResult<FIRUser, FIRAuthDataResult?> { reauthenticateWithCredential(credential.ios, it) }.run { Unit }
 
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult =
         AuthResult(ios.awaitResult { reauthenticateAndRetrieveDataWithCredential(credential.ios, it) })
@@ -69,7 +69,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         ios.await { request.commitChangesWithCompletion(it) }
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = ios.await {
-        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.ios, it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
+        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.toIos(), it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
     }.run { Unit }
 }
 

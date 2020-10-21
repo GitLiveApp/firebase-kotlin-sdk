@@ -47,7 +47,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String) = ios.awaitResult { fetchSignInMethodsForEmail(email, it) } as List<String>
+    @Suppress("UNCHECKED_CAST")
+    actual suspend fun fetchSignInMethodsForEmail(email: String) =
+        ios.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
         ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
@@ -73,7 +75,7 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitResult { verifyPasswordResetCode(code, it) }
 
     actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
-        val result = ios.awaitResult { checkActionCode(code, it) }
+        val result: FIRActionCodeInfo = ios.awaitResult { checkActionCode(code, it) }
         @Suppress("UNCHECKED_CAST")
         return when(result.operation) {
             FIRActionCodeOperationUnknown -> Error
@@ -95,7 +97,7 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
 
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     it.URL =  NSURL.URLWithString(url)
-    androidPackageName?.run { it.setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion) }
+    androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
     it.dynamicLinkDomain = dynamicLinkDomain
     it.handleCodeInApp = canHandleCodeInApp
     iOSBundleId?.run { it.setIOSBundleID(this) }
@@ -111,10 +113,6 @@ actual open class FirebaseAuthRecentLoginRequiredException(message: String): Fir
 actual open class FirebaseAuthUserCollisionException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthWebException(message: String): FirebaseAuthException(message)
 
-class UnexpectedNullResultException : Exception() {
-    override val message: String? = "The API encountered an unexpected null result"
-}
-
 internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
         val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
@@ -127,8 +125,8 @@ internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<
     }
 }
 
-internal suspend fun <T, R> T.awaitResult(function: T.(callback: (R, NSError?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R>()
+internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { result, error ->
         if(error == null) {
             job.complete(result)
@@ -136,10 +134,10 @@ internal suspend fun <T, R> T.awaitResult(function: T.(callback: (R, NSError?) -
             job.completeExceptionally(error.toException())
         }
     }
-    return job.await()
+    return job.await() as R
 }
 
-internal suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
         if(error == null) {

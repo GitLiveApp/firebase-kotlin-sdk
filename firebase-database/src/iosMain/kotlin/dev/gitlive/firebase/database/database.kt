@@ -172,8 +172,8 @@ actual class OnDisconnect internal constructor(
 
 actual class DatabaseException(message: String) : RuntimeException(message)
 
-private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R>()
+private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { error, result ->
         if(error == null) {
             job.complete(result)
@@ -181,10 +181,10 @@ private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(call
             job.completeExceptionally(DatabaseException(error.toString()))
         }
     }
-    return job.run { if(whileOnline) awaitWhileOnline() else await() }
+    return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
 }
 
-suspend fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
+private suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
         if(error == null) {
