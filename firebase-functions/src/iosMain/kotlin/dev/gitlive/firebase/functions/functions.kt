@@ -55,7 +55,7 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
 
 actual class FirebaseFunctionsException(message: String): FirebaseException(message)
 
-private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+private suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
         if(error == null) {
@@ -67,14 +67,14 @@ private suspend fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Un
     job.await()
 }
 
-suspend fun <T, R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R>()
+private suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(result != null) {
+        if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(FirebaseFunctionsException(error.toString()))
         }
     }
-    return job.await()
+    return job.await() as R
 }

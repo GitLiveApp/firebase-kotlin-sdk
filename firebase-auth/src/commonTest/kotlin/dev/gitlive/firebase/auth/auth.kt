@@ -54,10 +54,10 @@ class FirebaseAuthTest {
     fun testFetchSignInMethods() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
-        assertEquals(emptyList(), signInMethodResult.signInMethods)
+        assertEquals(emptyList(), signInMethodResult)
         Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
-        assertEquals(listOf("password"), signInMethodResult.signInMethods)
+        assertEquals(listOf("password"), signInMethodResult)
 
         Firebase.auth.signInWithEmailAndPassword(email, "test123").user!!.delete()
     }

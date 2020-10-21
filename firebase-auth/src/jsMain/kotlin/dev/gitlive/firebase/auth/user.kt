@@ -37,7 +37,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     }
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = rethrow { AuthResult(js.reauthenticateWithCredential(credential.js).await()) }
 
-    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = rethrow { js.sendEmailVerification(actionCodeSettings?.js).await() }
+    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = rethrow { js.sendEmailVerification(actionCodeSettings?.toJson()).await() }
     actual suspend fun unlink(provider: String): FirebaseUser? = rethrow { FirebaseUser(js.unlink(provider).await()) }
     actual suspend fun updateEmail(email: String) = rethrow { js.updateEmail(email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { js.updatePassword(password).await() }
@@ -49,7 +49,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
         }
         js.updateProfile(request).await()
     }
-    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { js.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.js).await() }
+    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { js.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.toJson()).await() }
 }
 
 actual class UserInfo(val js: firebase.user.UserInfo) {
