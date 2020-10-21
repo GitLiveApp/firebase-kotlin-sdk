@@ -236,9 +236,9 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 
     actual suspend fun get() = rethrow { DocumentSnapshot(js.get().await()) }
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val unsubscribe = js.onSnapshot(
-            { offer(DocumentSnapshot(it)) },
+            { safeOffer(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
@@ -286,10 +286,10 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
     )
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
-                { offer(QuerySnapshot(it)) },
+                { safeOffer(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
         }

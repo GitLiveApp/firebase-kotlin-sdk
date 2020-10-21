@@ -60,3 +60,4 @@ expect class FirebaseNetworkException : FirebaseException
 expect open class FirebaseTooManyRequestsException : FirebaseException
 
 expect open class FirebaseApiNotAvailableException : FirebaseException
+
