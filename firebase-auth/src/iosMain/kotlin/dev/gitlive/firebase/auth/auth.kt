@@ -8,6 +8,7 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.offerOrNull
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
@@ -27,13 +28,13 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
-    actual val authStateChanged get() = callbackFlow {
-        val handle = ios.addAuthStateDidChangeListener { _, user -> offer(user?.let { FirebaseUser(it) }) }
+    actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
+        val handle = ios.addAuthStateDidChangeListener { _, user -> offerOrNull(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
-    actual val idTokenChanged get() = callbackFlow {
-        val handle = ios.addIDTokenDidChangeListener { _, user -> offer(user?.let { FirebaseUser(it) }) }
+    actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
+        val handle = ios.addIDTokenDidChangeListener { _, user -> offerOrNull(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
 

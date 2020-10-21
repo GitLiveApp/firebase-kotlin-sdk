@@ -6,10 +6,7 @@
 package dev.gitlive.firebase.firestore
 
 import com.google.firebase.firestore.SetOptions
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
@@ -262,9 +259,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual suspend fun get() =
         DocumentSnapshot(android.get().await())
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { offer(DocumentSnapshot(snapshot)) }
+            snapshot?.let { offerOrNull(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -277,9 +274,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual fun limit(limit: Number) = Query(android.limit(limit.toLong()))
 
-    actual val snapshots get() = callbackFlow {
+    actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { offer(QuerySnapshot(snapshot)) }
+            snapshot?.let { offerOrNull(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
