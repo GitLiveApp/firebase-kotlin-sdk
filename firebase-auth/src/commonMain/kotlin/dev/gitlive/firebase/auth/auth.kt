@@ -18,42 +18,95 @@ expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
 expect class FirebaseAuth {
     val currentUser: FirebaseUser?
     val authStateChanged: Flow<FirebaseUser?>
-    suspend fun sendPasswordResetEmail(email: String)
-    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
+    val idTokenChanged: Flow<FirebaseUser?>
+    var languageCode: String
+    suspend fun applyActionCode(code: String)
+    suspend fun checkActionCode(code: String): ActionCodeResult
+    suspend fun confirmPasswordReset(code: String, newPassword: String)
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
+    suspend fun fetchSignInMethodsForEmail(email: String): SignInMethodQueryResult
+    suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
+    suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)
+    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithCustomToken(token: String): AuthResult
     suspend fun signInAnonymously(): AuthResult
     suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
     suspend fun signOut()
+    suspend fun updateCurrentUser(user: FirebaseUser)
+    suspend fun verifyPasswordResetCode(code: String): String
 }
 
 expect class AuthResult {
     val user: FirebaseUser?
 }
 
-expect class FirebaseUser {
-    val uid: String
-    val displayName: String?
-    val email: String?
-    val phoneNumber: String?
-    val isAnonymous: Boolean
-    suspend fun delete()
-    suspend fun reload()
-    suspend fun sendEmailVerification()
+expect class ActionCodeResult {
+    val operation: Operation
 }
+
+fun <T, A: ActionCodeDataType<T>> ActionCodeResult.getData(type: A): T? {
+    return type.dataForResult(this)
+}
+
+expect class SignInMethodQueryResult {
+    val signInMethods: List<String>
+}
+
+sealed class Operation {
+    class PasswordReset(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+    }
+    class VerifyEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+    }
+    class RecoverEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
+    }
+    object Error : Operation()
+    object SignInWithEmailLink : Operation()
+    class VerifyBeforeChangeEmail(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val previousEmail: String = ActionCodeDataType.PreviousEmail.dataForResult(result)
+    }
+    class RevertSecondFactorAddition(result: ActionCodeResult) : Operation() {
+        val email: String = ActionCodeDataType.Email.dataForResult(result)
+        val multiFactorInfo: MultiFactorInfo? = ActionCodeDataType.MultiFactor.dataForResult(result)
+    }
+}
+
+internal expect sealed class ActionCodeDataType<out T> {
+
+    abstract fun dataForResult(result: ActionCodeResult): T
+
+    object Email : ActionCodeDataType<String>
+    object PreviousEmail : ActionCodeDataType<String>
+    object MultiFactor : ActionCodeDataType<MultiFactorInfo?>
+}
+
+expect class ActionCodeSettings {
+    constructor(
+        url: String,
+        androidPackageName: AndroidPackageName? = null,
+        dynamicLinkDomain: String? = null,
+        canHandleCodeInApp: Boolean = false,
+        iOSBundleId: String? = null
+    )
+
+    val canHandleCodeInApp: Boolean
+    val androidPackageName: AndroidPackageName?
+    val iOSBundle: String?
+    val url: String
+}
+
+data class AndroidPackageName(val androidPackageName: String, val installIfNotAvailable: Boolean, val minimumVersion: String?)
 
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException
 expect class FirebaseAuthEmailException : FirebaseAuthException
 expect class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
 expect class FirebaseAuthInvalidUserException : FirebaseAuthException
+expect class FirebaseAuthMultiFactorException: FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
 expect class FirebaseAuthUserCollisionException : FirebaseAuthException
 expect class FirebaseAuthWebException : FirebaseAuthException
-
-expect class AuthCredential
-
-expect object EmailAuthProvider{
-    fun credentialWithEmail(email: String, password: String): AuthCredential
-}
-
