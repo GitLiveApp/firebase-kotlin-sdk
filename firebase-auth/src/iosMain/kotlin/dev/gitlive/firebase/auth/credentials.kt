@@ -43,7 +43,8 @@ actual class OAuthProvider(val ios: FIROAuthProvider) {
         auth: FirebaseAuth
     ) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios)) {
         ios.setScopes(scopes)
-        ios.setCustomParameters(customParameters)
+        @Suppress("UNCHECKED_CAST")
+        ios.setCustomParameters(customParameters as Map<Any?, *>)
     }
 
     actual companion object {
