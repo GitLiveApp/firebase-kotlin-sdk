@@ -41,7 +41,6 @@ expect class AuthResult {
 }
 
 sealed class ActionCodeResult {
-    object Error : ActionCodeResult()
     object SignInWithEmailLink : ActionCodeResult()
     class PasswordReset internal constructor(val email: String) : ActionCodeResult()
     class VerifyEmail internal constructor(val email: String) : ActionCodeResult()

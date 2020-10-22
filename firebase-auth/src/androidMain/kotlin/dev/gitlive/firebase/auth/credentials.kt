@@ -42,39 +42,38 @@ actual object GoogleAuthProvider {
     actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
 }
 
-actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider.Builder, private val auth: FirebaseAuth) {
-    actual constructor(provider: String, auth: FirebaseAuth) : this(com.google.firebase.auth.OAuthProvider.newBuilder(provider, auth.android), auth)
+actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) {
+
+    actual constructor(
+        provider: String,
+        scopes: List<String>,
+        customParameters: Map<String, String>,
+        auth: FirebaseAuth
+    ) : this(
+        com.google.firebase.auth.OAuthProvider
+            .newBuilder(provider, auth.android)
+            .setScopes(scopes)
+            .addCustomParameters(customParameters)
+            .build()
+    )
 
     actual companion object {
         actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
             val builder = OAuthProvider.newCredentialBuilder(providerId)
-            accessToken?.let { builder.accessToken = it }
-            idToken?.let { builder.idToken = it }
+            accessToken?.let { builder.setAccessToken(it) }
+            idToken?.let { builder.setIdToken(it) }
             rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it)  }
             return OAuthCredential(builder.build() as com.google.firebase.auth.OAuthCredential)
         }
     }
-
-    private var customParameters: Map<String, String> = emptyMap()
-
-    actual fun addScope(vararg scope: String) {
-        android.scopes = android.scopes + scope.asList()
-    }
-    actual fun setCustomParameters(parameters: Map<String, String>) {
-        customParameters = parameters
-    }
-
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(auth.android.startActivityForSignInWithProvider(signInProvider, android.apply { addCustomParameters(customParameters) }.build()).await())
 }
 
-actual typealias SignInProvider = Activity
-
 actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthProvider) {
-
 
     actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
         val response = CompletableDeferred<Result<AuthCredential>>()
         val callback = object :

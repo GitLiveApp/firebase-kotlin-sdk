@@ -79,13 +79,13 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         val result: FIRActionCodeInfo = ios.awaitResult { checkActionCode(code, it) }
         @Suppress("UNCHECKED_CAST")
         return when(result.operation) {
-            FIRActionCodeOperationUnknown -> Error
             FIRActionCodeOperationEmailLink -> SignInWithEmailLink
             FIRActionCodeOperationVerifyEmail -> VerifyEmail(result.email!!)
             FIRActionCodeOperationPasswordReset -> PasswordReset(result.email!!)
             FIRActionCodeOperationRecoverEmail -> RecoverEmail(result.email!!, result.previousEmail!!)
             FIRActionCodeOperationVerifyAndChangeEmail -> VerifyBeforeChangeEmail(result.email!!, result.previousEmail!!)
             FIRActionCodeOperationRevertSecondFactorAddition -> RevertSecondFactorAddition(result.email!!, null)
+            FIRActionCodeOperationUnknown -> throw UnsupportedOperationException(result.operation.toString())
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
