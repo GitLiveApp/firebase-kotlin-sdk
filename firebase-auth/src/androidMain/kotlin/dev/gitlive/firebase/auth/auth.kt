@@ -27,18 +27,25 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
-    actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val listener = AuthStateListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
+    actual val authStateChanged: Flow<FirebaseUser?> get() = callbackFlow {
+        val listener = object : AuthStateListener {
+            override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
+                safeOffer(auth.currentUser?.let { FirebaseUser(it) })
+            }
+        }
         android.addAuthStateListener(listener)
         awaitClose { android.removeAuthStateListener(listener) }
     }
 
-    actual val idTokenChanged: Flow<FirebaseUser?>
-        get() = callbackFlow {
-            val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> safeOffer(auth.currentUser?.let { FirebaseUser(it) }) }
-            android.addIdTokenListener(listener)
-            awaitClose { android.removeIdTokenListener(listener) }
+    actual val idTokenChanged get(): Flow<FirebaseUser?> = callbackFlow {
+        val listener = object : com.google.firebase.auth.FirebaseAuth.IdTokenListener {
+            override fun onIdTokenChanged(auth: com.google.firebase.auth.FirebaseAuth) {
+                safeOffer(auth.currentUser?.let { FirebaseUser(it) })
+            }
         }
+        android.addIdTokenListener(listener)
+        awaitClose { android.removeIdTokenListener(listener) }
+    }
 
     actual var languageCode: String
         get() = android.languageCode ?: ""
@@ -78,7 +85,6 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         val result = android.checkActionCode(code).await()
         @Suppress("UNCHECKED_CAST")
         return when(result.operation) {
-            ERROR -> ActionCodeResult.Error
             SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
             VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
             PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
@@ -91,6 +97,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
             REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
                 ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
             }
+            ERROR -> throw UnsupportedOperationException(result.operation.toString())
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }

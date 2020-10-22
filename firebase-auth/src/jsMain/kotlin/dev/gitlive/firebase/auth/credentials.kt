@@ -33,9 +33,19 @@ actual object GoogleAuthProvider {
         AuthCredential(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken))
 }
 
-actual class OAuthProvider(val js: firebase.auth.OAuthProvider, private val auth: FirebaseAuth) {
-    actual constructor(provider: String, auth: FirebaseAuth) : this(firebase.auth.OAuthProvider(provider), auth)
+actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {
 
+    actual constructor(
+        provider: String,
+        scopes: List<String>,
+        customParameters: Map<String, String>,
+        auth: FirebaseAuth
+    ) : this(firebase.auth.OAuthProvider(provider))  {
+        rethrow {
+            scopes.forEach { js.addScope(it) }
+            js.setCustomParameters(customParameters)
+        }
+    }
     actual companion object {
         actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential = rethrow {
             firebase.auth.OAuthProvider(providerId)
@@ -49,30 +59,6 @@ actual class OAuthProvider(val js: firebase.auth.OAuthProvider, private val auth
                 )
                 .let { OAuthCredential(it) }
         }
-    }
-
-    actual fun addScope(vararg scope: String) = rethrow { scope.forEach { js.addScope(it) } }
-    actual fun setCustomParameters(parameters: Map<String, String>) = rethrow {
-        js.setCustomParameters(parameters)
-    }
-
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = rethrow {
-        AuthResult(when (signInProvider.type) {
-            SignInProvider.SignInType.Popup -> {
-                auth.js.signInWithPopup(js).await()
-            }
-            SignInProvider.SignInType.Redirect -> {
-                auth.js.signInWithRedirect(js).await()
-                auth.js.getRedirectResult().await()
-            }
-        })
-    }
-}
-
-actual class SignInProvider(val type: SignInType) {
-    enum class SignInType {
-        Popup,
-        Redirect
     }
 }
 

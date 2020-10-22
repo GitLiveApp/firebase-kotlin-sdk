@@ -29,18 +29,16 @@ expect object GoogleAuthProvider {
     fun credential(idToken: String, accessToken: String): AuthCredential
 }
 
-expect class OAuthProvider constructor(provider: String, auth: FirebaseAuth = Firebase.auth) {
+expect class OAuthProvider constructor(
+    provider: String,
+    scopes: List<String> = emptyList(),
+    customParameters: Map<String, String> = emptyMap(),
+    auth: FirebaseAuth = Firebase.auth
+) {
     companion object {
         fun credential(providerId: String, accessToken: String? = null, idToken: String? = null, rawNonce: String? = null): OAuthCredential
     }
-
-    fun addScope(vararg scope: String)
-    fun setCustomParameters(parameters: Map<String, String>)
-
-    suspend fun signIn(signInProvider: SignInProvider): AuthResult
 }
-
-expect class SignInProvider
 
 expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
     fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
