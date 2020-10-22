@@ -34,8 +34,17 @@ actual object GoogleAuthProvider {
     actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
 }
 
-actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: FirebaseAuth) {
-    actual constructor(provider: String, auth: FirebaseAuth) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios), auth)
+actual class OAuthProvider(val ios: FIROAuthProvider) {
+
+    actual constructor(
+        provider: String,
+        scopes: List<String>,
+        customParameters: Map<String, String>,
+        auth: FirebaseAuth
+    ) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios)) {
+        ios.setScopes(scopes)
+        ios.setCustomParameters(customParameters)
+    }
 
     actual companion object {
         actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
@@ -48,37 +57,14 @@ actual class OAuthProvider(val ios: FIROAuthProvider, private val auth: Firebase
             return OAuthCredential(credential)
         }
     }
-
-    actual fun addScope(vararg scope: String) {
-        val scopes = ios.scopes?.mapNotNull { it as? String } ?: emptyList()
-        ios.setScopes(scopes + scope.asList())
-    }
-
-    actual fun setCustomParameters(parameters: Map<String, String>) {
-        ios.setCustomParameters(emptyMap<Any?, Any?>() + parameters)
-    }
-
-    private fun getCustomParameters(): Map<String, String> {
-        val customParameters = ios.customParameters ?: emptyMap<Any?, Any?>()
-        return customParameters.mapNotNull {
-            val key = it.key
-            val value = it.value
-            if (key is String && value is String)
-                key to value
-            else
-                null}.toMap()
-    }
-
-    actual suspend fun signIn(signInProvider: SignInProvider): AuthResult = AuthResult(ios.awaitResult { auth.ios.signInWithProvider(ios, signInProvider.delegate, it) })
 }
-
-actual class SignInProvider(val delegate: FIRAuthUIDelegateProtocol)
 
 actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
 
     actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
+
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
         val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
         val verificationCode = verificationProvider.getVerificationCode()
