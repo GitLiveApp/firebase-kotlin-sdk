@@ -30,18 +30,28 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         get() = ios.providerData.mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
     actual val providerId: String
         get() = ios.providerID
+
     actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
+
     actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
-    actual suspend fun getIdToken(forceRefresh: Boolean): String?  = ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
-    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = AuthResult(ios.awaitExpectedResult { linkWithCredential(credential.ios, it) })
-    actual suspend fun reauthenticate(credential: AuthCredential) {
-        val result: FIRAuthDataResult = ios.awaitExpectedResult { reauthenticateWithCredential(credential.ios, it) }
-    }
-    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(ios.awaitExpectedResult { reauthenticateWithCredential(credential.ios, it) })
+
+    actual suspend fun getIdToken(forceRefresh: Boolean): String? =
+        ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
+
+    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult =
+        AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })
+
+    actual suspend fun reauthenticate(credential: AuthCredential) =
+        ios.awaitResult<FIRUser, FIRAuthDataResult?> { reauthenticateWithCredential(credential.ios, it) }.run { Unit }
+
+    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult =
+        AuthResult(ios.awaitResult { reauthenticateAndRetrieveDataWithCredential(credential.ios, it) })
 
     actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = ios.await {
-        actionCodeSettings?.let { actionSettings -> sendEmailVerificationWithActionCodeSettings(actionSettings.ios, it) } ?: sendEmailVerificationWithCompletion(it)
-    }.run { Unit }
+        actionCodeSettings?.let { settings -> sendEmailVerificationWithActionCodeSettings(settings.toIos(), it) }
+            ?: sendEmailVerificationWithCompletion(it)
+    }
+
     actual suspend fun unlink(provider: String): FirebaseUser? {
         val user: FIRUser? = ios.awaitResult { unlinkFromProvider(provider, it) }
         return user?.let {
@@ -59,7 +69,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         ios.await { request.commitChangesWithCompletion(it) }
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = ios.await {
-        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.ios, it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
+        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.toIos(), it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
     }.run { Unit }
 }
 

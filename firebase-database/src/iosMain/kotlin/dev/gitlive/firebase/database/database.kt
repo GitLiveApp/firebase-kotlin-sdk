@@ -11,7 +11,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.offerOrNull
+import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.awaitClose
@@ -81,7 +81,7 @@ actual open class Query internal constructor(
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                offerOrNull(DataSnapshot(snapShot!!))
+                safeOffer(DataSnapshot(snapShot!!))
             }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -92,7 +92,7 @@ actual open class Query internal constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    offerOrNull(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                    safeOffer(ChildEvent(DataSnapshot(snapShot!!), type, key))
                 }
             ) { close(DatabaseException(it.toString())) }
         }
@@ -178,19 +178,19 @@ actual class OnDisconnect internal constructor(
 
 actual class DatabaseException(message: String) : RuntimeException(message)
 
-private suspend fun <T, R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R>()
+private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { error, result ->
-        if(result != null) {
+        if(error == null) {
             job.complete(result)
-        } else if(error != null) {
+        } else {
             job.completeExceptionally(DatabaseException(error.toString()))
         }
     }
-    return job.run { if(whileOnline) awaitWhileOnline() else await() }
+    return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
 }
 
-suspend fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
+private suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
         if(error == null) {

@@ -63,8 +63,8 @@ external object firebase {
             fun confirmPasswordReset(code: String, newPassword: String): Promise<Unit>
             fun createUserWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun fetchSignInMethodsForEmail(email: String): Promise<Array<String>>
-            fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?): Promise<Unit>
-            fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings?): Promise<Unit>
+            fun sendPasswordResetEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
+            fun sendSignInLinkToEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
@@ -147,7 +147,7 @@ external object firebase {
 
         open class OAuthProvider(providerId: String) : AuthProvider {
             val providerId: String
-            fun credential(optionsOrIdToken: OAuthCredentialOptions?, accessToken: String?): AuthCredential
+            fun credential(optionsOrIdToken: Any?, accessToken: String?): AuthCredential
 
             fun addScope(scope: String)
             fun setCustomParameters(customOAuthParameters: Map<String, String>)
@@ -201,13 +201,13 @@ external object firebase {
             fun linkWithCredential(credential: auth.AuthCredential): Promise<auth.AuthResult>
             fun reauthenticateWithCredential(credential: auth.AuthCredential): Promise<auth.AuthResult>
             fun reload(): Promise<Unit>
-            fun sendEmailVerification(actionCodeSettings: auth.ActionCodeSettings?): Promise<Unit>
+            fun sendEmailVerification(actionCodeSettings: Any?): Promise<Unit>
             fun unlink(providerId: String): Promise<User>
             fun updateEmail(newEmail: String): Promise<Unit>
             fun updatePassword(newPassword: String): Promise<Unit>
             fun updatePhoneNumber(phoneCredential: auth.AuthCredential): Promise<Unit>
             fun updateProfile(profile: ProfileUpdateRequest): Promise<Unit>
-            fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: auth.ActionCodeSettings?): Promise<Unit>
+            fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: Any?): Promise<Unit>
         }
 
         abstract class UserMetadata {

@@ -76,10 +76,3 @@ expect open class FirebaseTooManyRequestsException : FirebaseException
 
 expect open class FirebaseApiNotAvailableException : FirebaseException
 
-inline fun <E> SendChannel<E>.offerOrNull(element: E): Boolean? = try {
-    offer(element)
-} catch (e : ClosedSendChannelException) {
-    null
-} catch (e : CancellationException) {
-    null
-}
