@@ -15,11 +15,13 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
     }
     testOptions {
         unitTests.apply {
@@ -40,6 +42,7 @@ kotlin {
     js {
         useCommonJs()
         nodejs()
+        browser()
     }
     android {
         publishLibraryVariants("release", "debug")
