@@ -9,14 +9,16 @@ import kotlinx.serialization.encoding.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
 
-@InternalSerializationApi
 @Suppress("UNCHECKED_CAST")
-fun <T: Any> T.firebaseSerializer() = (this::class.serializerOrNull() ?: when(this) {
-    is Map<*, *> -> FirebaseMapSerializer()
-    is List<*> -> FirebaseListSerializer()
-    is Set<*> -> FirebaseListSerializer()
-    else -> throw SerializationException("Can't locate argument-less serializer for $this. For generic classes, such as lists, please provide serializer explicitly.")
-}) as SerializationStrategy<T>
+inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
+    .getOrElse {
+        when(this) {
+            is Map<*, *> -> FirebaseMapSerializer()
+            is List<*> -> FirebaseListSerializer()
+            is Set<*> -> FirebaseListSerializer()
+            else -> throw it
+        } as SerializationStrategy<T>
+    }
 
 class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 

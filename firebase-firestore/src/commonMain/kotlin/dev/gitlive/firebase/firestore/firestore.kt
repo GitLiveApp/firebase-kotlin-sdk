@@ -72,15 +72,15 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
 
 
 expect class WriteBatch {
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
-    fun  set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
 
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
 
-    fun  update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true): WriteBatch
+    inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true): WriteBatch
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): WriteBatch
 
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch
@@ -97,15 +97,15 @@ expect class DocumentReference {
     val snapshots: Flow<DocumentSnapshot>
     suspend fun get(): DocumentSnapshot
 
-    suspend fun set(data: Any, encodeDefaults: Boolean = true, merge: Boolean = false)
-    suspend fun  set(data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String)
-    suspend fun set(data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
 
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
 
-    suspend fun update(data: Any, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean = true)
     suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)
 
     suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
@@ -116,7 +116,7 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
-    suspend fun add(data: Any, encodeDefaults: Boolean = true): DocumentReference
+    suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
 }
 

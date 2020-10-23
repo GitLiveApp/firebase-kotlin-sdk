@@ -16,7 +16,7 @@ expect class FirebaseFunctions {
 }
 
 expect class HttpsCallableReference {
-    suspend operator fun invoke(data: Any, encodeDefaults: Boolean = true): HttpsCallableResult
+    suspend operator inline fun <reified T> invoke(data: T, encodeDefaults: Boolean = true): HttpsCallableResult
     suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): HttpsCallableResult
     suspend operator fun invoke(): HttpsCallableResult
 }

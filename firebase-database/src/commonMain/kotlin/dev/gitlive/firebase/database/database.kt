@@ -57,7 +57,7 @@ expect class DatabaseReference : Query {
     fun push(): DatabaseReference
     fun child(path: String): DatabaseReference
     fun onDisconnect(): OnDisconnect
-    suspend fun setValue(value: Any?, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean = true)
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
     suspend fun removeValue()
@@ -81,7 +81,7 @@ expect class DatabaseException : RuntimeException
 expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
-    suspend fun setValue(value: Any, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean = true)
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
 }
