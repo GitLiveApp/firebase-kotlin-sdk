@@ -45,7 +45,7 @@ GlobalScope.launch {
 
 <h3><a href="https://kotlinlang.org/docs/reference/coroutines/flow.html">Flows</a></h3>
 
-Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly invoked callbacks or listeners, for example:
+Asynchronous streams of values are represented by Flows in the SDK instead of repeatedly invoked callbacks or listeners, for example:
 
 ```kotlin
 val snapshots: Flow<DocumentSnapshot>
@@ -75,7 +75,7 @@ Then mark you custom classes `@Serializable`:
 data class City(val name: String)
 ```
 
-Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#obtaining-serializers) to the SDK:
+Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#introduction-to-serializers) to the SDK:
 
 ```kotlin
 db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaults = true)
@@ -83,7 +83,7 @@ db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaul
 
 The `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to theirs default values.
 
-You can also omit the serializer for classes that does not have generic type arguments, these functions are marked [`@ImplicitReflectionSerializer`](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/runtime_usage.md#implicit-reflection-serializers) and their usage is discouraged in general because it is implicit and uses reflection (and therefore not working on Kotlin/Native), but may be useful shorthand in some cases.
+You can also omit the serializer but this is discouraged due to a [current limitation on Kotlin/JS and Kotlin/Native](https://github.com/Kotlin/kotlinx.serialization/issues/1116#issuecomment-704342452)
 
 <h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
 
@@ -94,6 +94,30 @@ You can also omit the serializer for classes that does not have generic type arg
 data class Post(val timestamp: Double = ServerValue.TIMESTAMP)
 ```
 
+<h3><a href="https://kotlinlang.org/docs/reference/functions.html#default-arguments">Default arguments</a></h3>
+
+To reduce boilerplate, default arguments are used in the places where the Firebase Android SDK employs the builder pattern:
+```kotlin
+UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+        .setDisplayName("Jane Q. User")
+        .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
+        .build();
+
+user.updateProfile(profileUpdates)
+        .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User profile updated.");
+                }
+            }
+        });
+
+//...becomes...
+
+user.updateProfile(displayName = "state", photoURL = "CA")
+```
+
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
 
 To improve readability functions such as the Cloud Firestore query operators use named arguments:
@@ -101,7 +125,9 @@ To improve readability functions such as the Cloud Firestore query operators use
 ```kotlin
 citiesRef.whereEqualTo("state", "CA")
 citiesRef.whereArrayContains("regions", "west_coast")
+
 //...becomes...
+
 citiesRef.where("state", equalTo = "CA")
 citiesRef.where("regions", arrayContains = "west_coast")
 ```
