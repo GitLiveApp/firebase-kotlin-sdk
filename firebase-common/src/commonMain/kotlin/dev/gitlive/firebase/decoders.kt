@@ -28,10 +28,6 @@ expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, vararg
 
 class FirebaseDecoder(internal val value: Any?) : Decoder {
 
-    init {
-        print("FirebaseDecoder($value)")
-    }
-
     override val context: SerialModule
         get() = EmptyModule
 
