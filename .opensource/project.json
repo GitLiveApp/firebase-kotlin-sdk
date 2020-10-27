@@ -1,7 +1,9 @@
 {
     "name": "Firebase Kotlin SDK (unofficial)",
     "platforms": [
-        "Android"
+        "Android",
+        "iOS",
+        "Web"
     ],
     "content": "README.md",
     "related": [
