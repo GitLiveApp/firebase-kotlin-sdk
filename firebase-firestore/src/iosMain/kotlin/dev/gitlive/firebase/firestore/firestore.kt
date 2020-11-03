@@ -225,12 +225,12 @@ actual open class Query(open val ios: FIRQuery) {
         }
     )
 
-    internal actual fun _order(field: String, descending: Boolean) = Query(
-        ios.queryOrderedByField(field, descending)
+    internal actual fun _order(field: String, direction: QueryDirection) = Query(
+        ios.queryOrderedByField(field, direction == QueryDirection.DESCENDING)
     )
 
-    internal actual fun _order(path: FieldPath, descending: Boolean) = Query(
-        ios.queryOrderedByFieldPath(path, descending)
+    internal actual fun _order(path: FieldPath, direction: QueryDirection) = Query(
+        ios.queryOrderedByFieldPath(path, direction == QueryDirection.DESCENDING)
     )
 }
 

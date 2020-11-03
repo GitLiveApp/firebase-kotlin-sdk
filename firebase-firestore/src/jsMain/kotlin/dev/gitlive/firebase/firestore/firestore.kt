@@ -298,12 +298,12 @@ actual open class Query(open val js: firebase.firestore.Query) {
         awaitClose { rethrow { unsubscribe() } }
     }
 
-    internal actual fun _order(field: String, descending: Boolean) = Query(
-        js.order(field, descending)
+    internal actual fun _order(field: String, direction: QueryDirection) = Query(
+        js.order(field, direction == QueryDirection.DESCENDING)
     )
 
-    internal actual fun _order(path: FieldPath, descending: Boolean) = Query(
-        js.order(path, descending)
+    internal actual fun _order(path: FieldPath, direction: QueryDirection) = Query(
+        js.order(path, direction == QueryDirection.DESCENDING)
     )
 }
 
