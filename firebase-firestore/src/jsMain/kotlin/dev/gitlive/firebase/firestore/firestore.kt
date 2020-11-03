@@ -297,6 +297,14 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
         awaitClose { rethrow { unsubscribe() } }
     }
+
+    internal actual fun _order(field: String, descending: Boolean) = Query(
+        js.order(field, descending)
+    )
+
+    internal actual fun _order(path: FieldPath, descending: Boolean) = Query(
+        js.order(path, descending)
+    )
 }
 
 actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {

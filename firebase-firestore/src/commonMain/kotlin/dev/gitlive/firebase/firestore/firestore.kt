@@ -67,6 +67,8 @@ expect open class Query {
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
     internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
+    internal fun _order(field: String, descending: Boolean = false): Query
+    internal fun _order(path: FieldPath, descending: Boolean = false): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -75,7 +77,8 @@ fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, 
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
-
+fun Query.order(field: String, descending: Boolean = false) = _order(field, descending)
+fun Query.order(path: FieldPath, descending: Boolean = false) = _order(path, descending)
 
 expect class WriteBatch {
     @ImplicitReflectionSerializer

@@ -223,7 +223,17 @@ actual open class Query(open val ios: FIRQuery) {
         (inArray?.let { ios.queryWhereFieldPath(path, `in` = it) } ?: ios).let { ios2 ->
             arrayContainsAny?.let { ios2.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny) } ?: ios2
         }
-    )}
+    )
+
+    internal actual fun _order(field: String, descending: Boolean) = Query(
+        ios.queryOrderedByField(field, descending)
+    )
+
+    internal actual fun _order(path: FieldPath, descending: Boolean) = Query(
+        ios.queryOrderedByFieldPath(path, descending)
+    )
+}
+
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
     actual val path: String
