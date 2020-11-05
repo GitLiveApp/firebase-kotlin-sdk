@@ -219,7 +219,17 @@ actual open class Query(open val ios: FIRQuery) {
         (inArray?.let { ios.queryWhereFieldPath(path, `in` = it) } ?: ios).let { ios2 ->
             arrayContainsAny?.let { ios2.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny) } ?: ios2
         }
-    )}
+    )
+
+    internal actual fun _orderBy(field: String) = Query(ios.queryOrderedByField(field))
+
+    internal actual fun _orderBy(field: FieldPath) = Query(ios.queryOrderedByFieldPath(field))
+
+    internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
+
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field, direction == Direction.DESCENDING))
+
+}
 @Suppress("UNCHECKED_CAST")
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
@@ -255,6 +265,11 @@ actual enum class FirestoreExceptionCode {
     UNAVAILABLE,
     DATA_LOSS,
     UNAUTHENTICATED
+}
+
+actual enum class Direction {
+    ASCENDING,
+    DESCENDING
 }
 
 fun NSError.toException() = when(domain) {
