@@ -52,6 +52,11 @@ expect class Transaction {
 //    val persistenceEnabled: Boolean = true
 //)
 
+enum class QueryDirection {
+    ASCENDING,
+    DESCENDING
+}
+
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
@@ -62,6 +67,8 @@ expect open class Query {
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
     internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
+    internal fun _order(field: String, direction: QueryDirection): Query
+    internal fun _order(path: FieldPath, direction: QueryDirection): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -70,7 +77,8 @@ fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, 
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
-
+fun Query.order(field: String, direction: QueryDirection) = _order(field, direction)
+fun Query.order(path: FieldPath, direction: QueryDirection) = _order(path, direction)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch

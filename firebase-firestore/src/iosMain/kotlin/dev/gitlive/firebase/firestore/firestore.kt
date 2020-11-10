@@ -221,8 +221,19 @@ actual open class Query(open val ios: FIRQuery) {
         (inArray?.let { ios.queryWhereFieldPath(path, `in` = it) } ?: ios).let { ios2 ->
             arrayContainsAny?.let { ios2.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny) } ?: ios2
         }
-    )}
+    )
+
+    internal actual fun _order(field: String, direction: QueryDirection) = Query(
+        ios.queryOrderedByField(field, direction == QueryDirection.DESCENDING)
+    )
+
+    internal actual fun _order(path: FieldPath, direction: QueryDirection) = Query(
+        ios.queryOrderedByFieldPath(path, direction == QueryDirection.DESCENDING)
+    )
+}
+
 @Suppress("UNCHECKED_CAST")
+
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
     actual val path: String

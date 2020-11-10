@@ -314,6 +314,19 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
             arrayContainsAny?.let { android2.whereArrayContainsAny(path, it) } ?: android2
         }
     )
+
+    internal actual fun _order(field: String, direction: QueryDirection) = Query(
+        android.orderBy(field, direction.androidDirection)
+    )
+
+    internal actual fun _order(path: FieldPath, direction: QueryDirection) = Query(
+        android.orderBy(path, direction.androidDirection)
+    )
+}
+
+private val QueryDirection.androidDirection get() = when(this) {
+    QueryDirection.ASCENDING -> com.google.firebase.firestore.Query.Direction.ASCENDING
+    QueryDirection.DESCENDING -> com.google.firebase.firestore.Query.Direction.DESCENDING
 }
 
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
