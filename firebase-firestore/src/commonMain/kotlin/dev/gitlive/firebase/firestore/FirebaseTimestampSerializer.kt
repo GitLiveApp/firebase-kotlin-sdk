@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseCompositeDecoder
-import kotlinx.serialization.Decoder
+import kotlinx.serialization.encoding.Decoder
 
 class FirebaseTimestampSerializer : FirebaseBaseTimestampSerializer<Timestamp>() {
 

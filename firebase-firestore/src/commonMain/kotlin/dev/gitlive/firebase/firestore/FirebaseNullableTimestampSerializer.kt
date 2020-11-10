@@ -1,8 +1,8 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseCompositeDecoder
-import kotlinx.serialization.Decoder
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encoding.Decoder
 
 class FirebaseNullableTimestampSerializer :FirebaseBaseTimestampSerializer<Timestamp?>() {
 

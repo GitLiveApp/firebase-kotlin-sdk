@@ -1,10 +1,10 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+
 version = project.property("firebase-firestore.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
-    kotlin("plugin.serialization")
 }
 
 android {
@@ -25,7 +25,7 @@ android {
         }
     }
     packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
+        pickFirst("META-INF/kotlinx-serialization-core.kotlin_module")
         pickFirst("META-INF/AL2.0")
         pickFirst("META-INF/LGPL2.1")
         pickFirst("androidsupportmultidexversion.txt")
@@ -37,11 +37,7 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "commonjs"
-            }
-        }
+        useCommonJs()
         nodejs()
         browser()
     }
@@ -65,10 +61,18 @@ kotlin {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+            "-Xuse-experimental=kotlinx.serialization.InternalSerializationApi"
         )
     }
 
+    if (findProperty("firebase-kotlin-sdk.firestore.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
+        logger.info("Using IR compilation for firebase-firestore module")
+        targets.getByName<KotlinAndroidTarget>("android").compilations.all {
+            kotlinOptions {
+                useIR = true
+            }
+        }
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -95,11 +99,6 @@ kotlin {
                     compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
                 }
             }
-        }
-
-        cocoapods {
-            summary = ""
-            homepage = ""
         }
     }
 }

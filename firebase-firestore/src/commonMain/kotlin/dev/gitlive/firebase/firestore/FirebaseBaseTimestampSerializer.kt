@@ -1,11 +1,11 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseCompositeEncoder
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.StructureKind
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 abstract class FirebaseBaseTimestampSerializer<T> : KSerializer<T> {
 

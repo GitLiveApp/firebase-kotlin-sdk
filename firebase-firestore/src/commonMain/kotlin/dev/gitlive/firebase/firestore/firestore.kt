@@ -9,7 +9,6 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
@@ -31,18 +30,14 @@ expect class FirebaseFirestore {
 
 expect class Transaction {
 
-    @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, merge: Boolean = false): Transaction
-    @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
-    @ImplicitReflectionSerializer
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
 
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): Transaction
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
 
-    @ImplicitReflectionSerializer
     fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true): Transaction
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): Transaction
 
@@ -86,19 +81,15 @@ fun Query.order(field: String, direction: QueryDirection) = _order(field, direct
 fun Query.order(path: FieldPath, direction: QueryDirection) = _order(path, direction)
 
 expect class WriteBatch {
-    @ImplicitReflectionSerializer
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
-    @ImplicitReflectionSerializer
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
-    @ImplicitReflectionSerializer
-    fun  set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
 
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
     fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
 
-    @ImplicitReflectionSerializer
-    fun  update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true): WriteBatch
+    inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true): WriteBatch
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): WriteBatch
 
     fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch
@@ -115,19 +106,15 @@ expect class DocumentReference {
     val snapshots: Flow<DocumentSnapshot>
     suspend fun get(): DocumentSnapshot
 
-    @ImplicitReflectionSerializer
-    suspend fun set(data: Any, encodeDefaults: Boolean = true, merge: Boolean = false)
-    @ImplicitReflectionSerializer
-    suspend fun  set(data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String)
-    @ImplicitReflectionSerializer
-    suspend fun set(data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
+    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
 
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
     suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
 
-    @ImplicitReflectionSerializer
-    suspend fun update(data: Any, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean = true)
     suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)
 
     suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
@@ -138,8 +125,7 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
-    @ImplicitReflectionSerializer
-    suspend fun add(data: Any, encodeDefaults: Boolean = true): DocumentReference
+    suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
 }
 
@@ -174,13 +160,11 @@ expect class QuerySnapshot {
 
 expect class DocumentSnapshot {
 
-    @ImplicitReflectionSerializer
     inline fun <reified T> get(field: String): T
     fun <T> get(field: String, strategy: DeserializationStrategy<T>): T
 
     fun contains(field: String): Boolean
 
-    @ImplicitReflectionSerializer
     inline fun <reified T: Any> data(): T
     fun <T> data(strategy: DeserializationStrategy<T>): T
 
