@@ -63,8 +63,8 @@ kotlin {
         )
     }
 
-    if (findProperty("firebase-kotlin-sdk.firestore.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
-        logger.info("Using IR compilation for firebase-firestore module")
+    if (findProperty("firebase-kotlin-sdk.functions.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
+        logger.info("Using IR compilation for firebase-functions module")
         targets.getByName<KotlinAndroidTarget>("android").compilations.all {
             kotlinOptions {
                 useIR = true
