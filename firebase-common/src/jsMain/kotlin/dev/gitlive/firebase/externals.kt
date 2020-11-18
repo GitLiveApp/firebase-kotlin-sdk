@@ -366,14 +366,21 @@ external object firebase {
         open class QuerySnapshot {
             val docs: Array<DocumentSnapshot>
             val empty: Boolean
+            val metadata: SnapshotMetadata
         }
 
         open class DocumentSnapshot {
             val id: String
             val ref: DocumentReference
             val exists: Boolean
+            val metadata: SnapshotMetadata
             fun data(options: Any? = definedExternally): Any?
             fun get(fieldPath: Any, options: Any? = definedExternally): Any?
+        }
+
+        open class SnapshotMetadata {
+            val hasPendingWrites: Boolean
+            val fromCache: Boolean
         }
 
         open class DocumentReference {

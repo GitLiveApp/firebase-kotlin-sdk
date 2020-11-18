@@ -335,6 +335,7 @@ actual typealias FirestoreExceptionCode = com.google.firebase.firestore.Firebase
 actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = android.documents.map { DocumentSnapshot(it) }
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -355,6 +356,13 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual fun contains(field: String) = android.contains(field)
 
     actual val exists get() = android.exists()
+
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
+}
+
+actual class SnapshotMetadata(val android: com.google.firebase.firestore.SnapshotMetadata) {
+    actual val hasPendingWrites: Boolean get() = android.hasPendingWrites()
+    actual val isFromCache: Boolean get() = android.isFromCache()
 }
 
 actual typealias FieldPath = com.google.firebase.firestore.FieldPath

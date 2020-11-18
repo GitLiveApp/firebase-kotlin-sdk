@@ -317,6 +317,7 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = js.docs.map { DocumentSnapshot(it) }
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
 actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
@@ -324,7 +325,7 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T: Any> data(): T =
+    actual inline fun <reified T : Any> data(): T =
         rethrow { decode<T>(value = js.data()) }
 
     actual fun <T> data(strategy: DeserializationStrategy<T>): T =
@@ -337,7 +338,13 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
         rethrow { decode(strategy, js.get(field)) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
-    actual val exists get() =  rethrow { js.exists }
+    actual val exists get() = rethrow { js.exists }
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
+}
+
+actual class SnapshotMetadata(val js: firebase.firestore.SnapshotMetadata) {
+    actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
+    actual val isFromCache: Boolean get() = js.fromCache
 }
 
 actual typealias FieldPath = Any
