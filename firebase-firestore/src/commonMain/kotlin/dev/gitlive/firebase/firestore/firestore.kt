@@ -156,6 +156,7 @@ expect enum class FirestoreExceptionCode {
 
 expect class QuerySnapshot {
     val documents: List<DocumentSnapshot>
+    val metadata: SnapshotMetadata
 }
 
 expect class DocumentSnapshot {
@@ -171,6 +172,12 @@ expect class DocumentSnapshot {
     val exists: Boolean
     val id: String
     val reference: DocumentReference
+    val metadata: SnapshotMetadata
+}
+
+expect class SnapshotMetadata {
+    val hasPendingWrites: Boolean
+    val isFromCache: Boolean
 }
 
 expect class FieldPath

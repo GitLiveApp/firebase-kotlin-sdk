@@ -297,6 +297,7 @@ fun NSError.toException() = when(domain) {
 actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents
         get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -318,6 +319,13 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
     actual fun contains(field: String) = ios.valueForField(field) != null
 
     actual val exists get() = ios.exists
+
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
+}
+
+actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
+    actual val hasPendingWrites: Boolean get() = ios.pendingWrites
+    actual val isFromCache: Boolean get() = ios.fromCache
 }
 
 actual typealias FieldPath = FIRFieldPath
