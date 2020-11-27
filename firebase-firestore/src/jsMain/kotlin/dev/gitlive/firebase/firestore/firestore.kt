@@ -286,13 +286,17 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
     )
 
-    internal actual fun _orderBy(field: String) = Query(js.orderBy(field, Direction.ASCENDING))
+    internal actual fun _orderBy(field: String) = Query(js.orderBy(field, "asc"))
 
-    internal actual fun _orderBy(field: FieldPath) = Query(js.orderBy(field, Direction.ASCENDING))
+    internal actual fun _orderBy(field: FieldPath) = Query(js.orderBy(field, "asc"))
 
-    internal actual fun _orderBy(field: String, direction: Direction) = Query(js.orderBy(field, direction))
+    internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
+        Query(js.orderBy(field, if (direction == Direction.ASCENDING) "asc" else "desc"))
+    }
 
-    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(js.orderBy(field, direction))
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
+        Query(js.orderBy(field, if (direction == Direction.ASCENDING) "asc" else "desc"))
+    }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
