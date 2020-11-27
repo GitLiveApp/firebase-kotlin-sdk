@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
@@ -15,6 +16,13 @@ expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
 
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
+
+@Serializable
+sealed class SealedClass {
+    @Serializable
+    @SerialName("test")
+    data class Test(val value: String) : SealedClass()
+}
 
 class EncodersTest {
     @Test
@@ -46,5 +54,13 @@ class EncodersTest {
     fun decodeListOfObjects() {
         val decoded = decode(ListSerializer(TestData.serializer()), nativeListOf(nativeMapOf("map" to nativeMapOf("key" to "value"))))
         assertEquals(listOf(TestData(mapOf("key" to "value"), false)), decoded)
+    }
+
+    @Test
+    fun encodeSealedClass() {
+        val test = SealedClass.Test("Foo")
+        val encoded = encode(test, false)
+        val decoded = decode(encoded) as? SealedClass.Test
+        assertEquals(test, decoded)
     }
 }
