@@ -14,7 +14,7 @@ expect fun runTest(test: suspend () -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class TestData(val prop1: String)
+    data class FirestoreTest(val prop1: String)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -32,13 +32,10 @@ class FirebaseFirestoreTest {
             )
     }
 
-    @BeforeTest
-    fun setupFirestore() = runTest {
-        setupFirestoreData()
-    }
-
     @Test
     fun testStringOrderBy() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy("prop1").get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -48,6 +45,8 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testFieldOrderBy() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -57,6 +56,8 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testStringOrderByAscending() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -66,6 +67,8 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testFieldOrderByAscending() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -75,6 +78,8 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testStringOrderByDescending() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -84,6 +89,8 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testFieldOrderByDescending() = runTest {
+        setupFirestoreData()
+
         val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -92,8 +99,8 @@ class FirebaseFirestoreTest {
     }
 
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.document("test/one").set(TestData("aaa"))
-        Firebase.firestore.document("test/two").set(TestData("bbb"))
-        Firebase.firestore.document("test/three").set(TestData("ccc"))
+        Firebase.firestore.document("test/one").set(FirestoreTest.serializer(), FirestoreTest("aaa"))
+        Firebase.firestore.document("test/two").set(FirestoreTest.serializer(), FirestoreTest("bbb"))
+        Firebase.firestore.document("test/three").set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }
 }
