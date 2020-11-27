@@ -24,6 +24,11 @@ sealed class SealedClass {
     data class Test(val value: String) : SealedClass()
 }
 
+@Serializable
+data class GenericClass<T : SealedClass>(
+    val inner: T
+)
+
 class EncodersTest {
     @Test
     fun encodeMap() {
@@ -57,10 +62,19 @@ class EncodersTest {
     }
 
     @Test
-    fun encodeSealedClass() {
+    fun testEncodeDecodedSealedClass() {
         val test = SealedClass.Test("Foo")
         val encoded = encode(test, false)
         val decoded = decode(encoded) as? SealedClass.Test
         assertEquals(test, decoded)
+    }
+
+    @Test
+    fun testEncodeDecodeGenericClass() {
+        val test = SealedClass.Test("Foo")
+        val generic = GenericClass(test)
+        val encoded = encode(generic, false)
+        val decoded = decode(encoded) as? GenericClass<SealedClass.Test>
+        assertEquals(generic, decoded)
     }
 }
