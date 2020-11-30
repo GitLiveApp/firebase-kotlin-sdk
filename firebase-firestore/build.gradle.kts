@@ -11,6 +11,7 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         setMultiDexEnabled(true)
     }
     sourceSets {
