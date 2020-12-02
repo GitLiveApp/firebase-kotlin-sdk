@@ -62,8 +62,6 @@ expect open class Query {
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
     internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
 
-    internal fun _orderBy(field: String): Query
-    internal fun _orderBy(field: FieldPath): Query
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
 }
@@ -75,10 +73,8 @@ fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
 
-fun Query.orderBy(field: String) = _orderBy(field)
-fun Query.orderBy(field: FieldPath) = _orderBy(field)
-fun Query.orderBy(field: String, direction: Direction) = _orderBy(field, direction)
-fun Query.orderBy(field: FieldPath, direction: Direction) = _orderBy(field, direction)
+fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
+fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch

@@ -313,8 +313,6 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         }
     )
 
-    internal actual fun _orderBy(field: String) = Query(android.orderBy(field))
-    internal actual fun _orderBy(field: FieldPath) = Query(android.orderBy(field))
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field, direction))
 }

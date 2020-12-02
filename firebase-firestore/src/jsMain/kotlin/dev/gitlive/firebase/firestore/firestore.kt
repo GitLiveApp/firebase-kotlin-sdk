@@ -286,16 +286,12 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
     )
 
-    internal actual fun _orderBy(field: String) = Query(js.orderBy(field, "asc"))
-
-    internal actual fun _orderBy(field: FieldPath) = Query(js.orderBy(field, "asc"))
-
     internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
-        Query(js.orderBy(field, if (direction == Direction.ASCENDING) "asc" else "desc"))
+        Query(js.orderBy(field, direction.jsString))
     }
 
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
-        Query(js.orderBy(field, if (direction == Direction.ASCENDING) "asc" else "desc"))
+        Query(js.orderBy(field, direction.jsString))
     }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
@@ -392,9 +388,11 @@ actual enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
-actual enum class Direction {
-    ASCENDING,
-    DESCENDING
+actual enum class Direction(private val value: String) {
+    ASCENDING("asc"),
+    DESCENDING("desc");
+
+    internal val jsString = value
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
