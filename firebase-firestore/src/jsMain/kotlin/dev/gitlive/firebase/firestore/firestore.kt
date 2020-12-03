@@ -388,11 +388,9 @@ actual enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
-actual enum class Direction(private val value: String) {
+actual enum class Direction(internal val jsString : String) {
     ASCENDING("asc"),
     DESCENDING("desc");
-
-    internal val jsString = value
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
