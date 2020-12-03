@@ -356,6 +356,7 @@ external object firebase {
             fun where(field: Any, opStr: String, value: Any?): Query
             fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
             fun limit(limit: Double): Query
+            fun orderBy(field: Any, direction: Any): Query
         }
 
         open class CollectionReference : Query {

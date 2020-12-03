@@ -3,6 +3,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.serialization") version "1.4.10"
 }
 
 android {
@@ -10,12 +11,14 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         setMultiDexEnabled(true)
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
     }
     testOptions {
         unitTests.apply {

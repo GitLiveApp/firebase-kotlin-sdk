@@ -286,6 +286,14 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
     )
 
+    internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
+        Query(js.orderBy(field, direction.jsString))
+    }
+
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
+        Query(js.orderBy(field, direction.jsString))
+    }
+
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
@@ -385,6 +393,11 @@ actual enum class FirestoreExceptionCode {
     UNAVAILABLE,
     DATA_LOSS,
     UNAUTHENTICATED
+}
+
+actual enum class Direction(internal val jsString : String) {
+    ASCENDING("asc"),
+    DESCENDING("desc");
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
