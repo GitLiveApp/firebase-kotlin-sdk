@@ -122,7 +122,9 @@ expect class DocumentReference {
 expect class CollectionReference : Query {
     val path: String
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
+    @Deprecated
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
+    suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
 }
 
 expect class FirebaseFirestoreException : FirebaseException

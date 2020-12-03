@@ -329,6 +329,8 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
+    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
+        DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
 }
 
 actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException
