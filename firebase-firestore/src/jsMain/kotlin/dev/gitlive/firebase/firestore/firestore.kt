@@ -184,6 +184,8 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val path: String
         get() = rethrow { js.path }
 
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
+
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
         rethrow { js.set(encode(data, encodeDefaults)!!, json("merge" to merge)).await() }
 
@@ -309,6 +311,8 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
 
     actual val path: String
         get() =  rethrow { js.path }
+
+    actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }
