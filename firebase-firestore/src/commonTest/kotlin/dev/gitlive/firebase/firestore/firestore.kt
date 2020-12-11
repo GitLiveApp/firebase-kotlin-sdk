@@ -99,8 +99,8 @@ class FirebaseFirestoreTest {
     }
 
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.document("test/one").set(FirestoreTest.serializer(), FirestoreTest("aaa"))
-        Firebase.firestore.document("test/two").set(FirestoreTest.serializer(), FirestoreTest("bbb"))
-        Firebase.firestore.document("test/three").set(FirestoreTest.serializer(), FirestoreTest("ccc"))
+        Firebase.firestore.collection("test").document("one").set(FirestoreTest.serializer(), FirestoreTest("aaa"))
+        Firebase.firestore.collection("test").document("two").set(FirestoreTest.serializer(), FirestoreTest("bbb"))
+        Firebase.firestore.collection("test").document("three").set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }
 }

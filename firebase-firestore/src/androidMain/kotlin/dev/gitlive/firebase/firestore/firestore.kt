@@ -193,6 +193,8 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
+    actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
+
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
         true -> android.set(encode(data, encodeDefaults)!!, SetOptions.merge())
         false -> android.set(encode(data, encodeDefaults)!!)
@@ -324,10 +326,14 @@ actual class CollectionReference(override val android: com.google.firebase.fires
     actual val path: String
         get() = android.path
 
+    actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
+
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
 
     actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
+        DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
+    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
 }
 

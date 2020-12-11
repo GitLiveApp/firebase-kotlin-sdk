@@ -100,6 +100,8 @@ expect class DocumentReference {
     val id: String
     val path: String
     val snapshots: Flow<DocumentSnapshot>
+
+    fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
 
     suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
@@ -121,8 +123,12 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
+
+    fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
+    @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
+    suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
 }
 
 expect class FirebaseFirestoreException : FirebaseException
