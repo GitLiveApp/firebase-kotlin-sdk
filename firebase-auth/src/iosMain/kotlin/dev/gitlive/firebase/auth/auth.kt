@@ -155,8 +155,7 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidActionCode,
         FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(toString())
 
-        FIRAuthErrorCodeInvalidEmail,
-        FIRAuthErrorCodeEmailAlreadyInUse -> FirebaseAuthEmailException(toString())
+        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(toString())
 
         FIRAuthErrorCodeCaptchaCheckFailed,
         FIRAuthErrorCodeInvalidPhoneNumber,
