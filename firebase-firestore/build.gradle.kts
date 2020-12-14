@@ -3,7 +3,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.10"
+    kotlin("plugin.serialization") version "1.4.21"
 }
 
 android {
@@ -12,7 +12,7 @@ android {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        setMultiDexEnabled(true)
+        multiDexEnabled = true
     }
     sourceSets {
         getByName("main") {
@@ -75,7 +75,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:21.5.0")
+                api("com.google.firebase:firebase-firestore:22.0.0")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }
