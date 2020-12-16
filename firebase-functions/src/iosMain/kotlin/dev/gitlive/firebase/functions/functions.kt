@@ -25,7 +25,7 @@ actual fun Firebase.functions(app: FirebaseApp) =
     FirebaseFunctions(FIRFunctions.functionsForApp(app.ios))
 
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
-    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region))
+    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region = region))
 
 actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
