@@ -20,6 +20,7 @@ expect class FirebaseAuth {
     val authStateChanged: Flow<FirebaseUser?>
     val idTokenChanged: Flow<FirebaseUser?>
     var languageCode: String
+    fun useEmulator(host: String, port: Int)
     suspend fun applyActionCode(code: String)
     suspend fun <T: ActionCodeResult> checkActionCode(code: String): T
     suspend fun confirmPasswordReset(code: String, newPassword: String)

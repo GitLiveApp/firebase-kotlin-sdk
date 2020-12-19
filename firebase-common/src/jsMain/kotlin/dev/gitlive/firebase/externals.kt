@@ -46,6 +46,7 @@ external object firebase {
             val currentUser: user.User?
             var languageCode: String?
 
+            fun useEmulator(url: String)
             fun applyActionCode(code: String): Promise<Unit>
             fun checkActionCode(code: String): Promise<ActionCodeInfo>
             fun confirmPasswordReset(code: String, newPassword: String): Promise<Unit>

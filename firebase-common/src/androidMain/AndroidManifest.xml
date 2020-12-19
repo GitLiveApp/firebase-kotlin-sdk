@@ -1,1 +1,4 @@
-<manifest package="dev.gitlive.firebase.common"/>
+<manifest package="dev.gitlive.firebase.common"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:networkSecurityConfig="@xml/network_security_config"/>
+</manifest>

@@ -39,6 +39,10 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         get() = js.languageCode ?: ""
         set(value) { js.languageCode = value }
 
+    actual fun useEmulator(host: String, port: Int) {
+        js.useEmulator("http://$host:$port")
+    }
+
     actual suspend fun applyActionCode(code: String) = rethrow { js.applyActionCode(code).await() }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow { js.confirmPasswordReset(code, newPassword).await() }
 
