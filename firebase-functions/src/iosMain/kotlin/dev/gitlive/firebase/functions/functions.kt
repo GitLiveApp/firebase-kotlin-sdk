@@ -32,6 +32,8 @@ actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
 
     actual fun useFunctionsEmulator(origin: String) = ios.useFunctionsEmulatorOrigin(origin)
+
+    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
 actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {

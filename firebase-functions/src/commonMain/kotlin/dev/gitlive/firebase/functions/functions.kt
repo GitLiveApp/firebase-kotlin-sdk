@@ -12,6 +12,9 @@ import kotlinx.serialization.SerializationStrategy
 
 expect class FirebaseFunctions {
     fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+    fun useEmulator(host: String, port: Int)
+
+    @Deprecated("Use useEmulator(java.lang.String,int) to connect to the emulator.")
     fun useFunctionsEmulator(origin: String)
 }
 
