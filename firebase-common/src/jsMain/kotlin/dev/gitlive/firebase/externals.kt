@@ -275,6 +275,7 @@ external object firebase {
 
         open class Database {
             fun ref(path: String? = definedExternally): Reference
+            fun useEmulator(host: String, port: Int)
         }
         open class ThenableReference : Reference
 

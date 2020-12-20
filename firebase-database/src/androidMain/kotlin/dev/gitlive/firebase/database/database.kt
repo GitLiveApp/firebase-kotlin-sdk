@@ -72,6 +72,10 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
 
     actual fun setLoggingEnabled(enabled: Boolean) =
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)
+
+    actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+    }
 }
 
 actual open class Query internal constructor(
