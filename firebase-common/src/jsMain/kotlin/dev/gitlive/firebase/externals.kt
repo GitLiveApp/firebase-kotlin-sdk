@@ -336,6 +336,7 @@ external object firebase {
             fun settings(settings: Json)
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
+            fun useEmulator(host: String, port: Int)
         }
 
         open class FieldPath constructor(vararg fieldNames: String)

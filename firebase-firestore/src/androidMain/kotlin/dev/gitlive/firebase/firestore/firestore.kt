@@ -5,6 +5,7 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -27,6 +28,13 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 //        set(value) {
 //            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
 //        }
+
+    actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+    }
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
