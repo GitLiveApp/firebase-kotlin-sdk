@@ -25,14 +25,6 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
-    actual fun useEmulator(host: String, port: Int) {
-        ios.settings = ios.settings.apply {
-            this.host = "$host:$port"
-            persistenceEnabled = false
-            sslEnabled = false
-        }
-    }
-
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
@@ -47,6 +39,14 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual suspend fun clearPersistence() =
         await { ios.clearPersistenceWithCompletion(it) }
+
+    actual fun useEmulator(host: String, port: Int) {
+        ios.settings = ios.settings.apply {
+            this.host = "$host:$port"
+            persistenceEnabled = false
+            sslEnabled = false
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")

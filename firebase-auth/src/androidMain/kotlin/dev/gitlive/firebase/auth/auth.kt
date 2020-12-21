@@ -51,9 +51,6 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         get() = android.languageCode ?: ""
         set(value) { android.setLanguageCode(value) }
 
-    actual fun useEmulator(host: String, port: Int) {
-        android.useEmulator(host, port)
-    }
 
     actual suspend fun applyActionCode(code: String) = android.applyActionCode(code).await().run { Unit }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = android.confirmPasswordReset(code, newPassword).await().run { Unit }
@@ -106,6 +103,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         } as T
     }
 
+    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {

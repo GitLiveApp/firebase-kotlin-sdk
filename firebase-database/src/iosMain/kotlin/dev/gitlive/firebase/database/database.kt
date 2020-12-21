@@ -56,9 +56,8 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
     actual fun setLoggingEnabled(enabled: Boolean) =
         FIRDatabase.setLoggingEnabled(enabled)
 
-    actual fun useEmulator(host: String, port: Int) {
+    actual fun useEmulator(host: String, port: Int) =
         ios.useEmulatorWithHost(host, port.toLong())
-    }
 }
 
 fun Type.toEventType() = when(this) {

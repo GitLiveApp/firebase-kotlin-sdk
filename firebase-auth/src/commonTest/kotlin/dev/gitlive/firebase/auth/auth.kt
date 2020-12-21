@@ -12,24 +12,6 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
-suspend fun getTestUserId(email: String, password: String): String {
-    val uid = Firebase.auth.let {
-        val user = try {
-            it.createUserWithEmailAndPassword(email, password).user
-        } catch (e: FirebaseAuthUserCollisionException) {
-            // the user already exists, just sign in for getting user's ID
-            it.signInWithEmailAndPassword(email, password).user
-        }
-        user!!.uid
-    }
-
-    check(Firebase.auth.currentUser != null)
-    Firebase.auth.signOut()
-    check(Firebase.auth.currentUser == null)
-
-    return uid
-}
-
 class FirebaseAuthTest {
 
     @BeforeTest
@@ -53,9 +35,9 @@ class FirebaseAuthTest {
 
     @Test
     fun testSignInWithUsernameAndPassword() = runTest {
-        val userId = getTestUserId("test@test.com", "test123")
+        val uid = getTestUid("test@test.com", "test123")
         val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
-        assertEquals(userId, result.user!!.uid)
+        assertEquals(uid, result.user!!.uid)
     }
 
     @Test
@@ -108,9 +90,27 @@ class FirebaseAuthTest {
 
     @Test
     fun testSignInWithCredential() = runTest {
-        val userId = getTestUserId("test@test.com", "test123")
+        val uid = getTestUid("test@test.com", "test123")
         val credential = EmailAuthProvider.credential("test@test.com", "test123")
         val result = Firebase.auth.signInWithCredential(credential)
-        assertEquals(userId, result.user!!.uid)
+        assertEquals(uid, result.user!!.uid)
+    }
+
+    private suspend fun getTestUid(email: String, password: String): String {
+        val uid = Firebase.auth.let {
+            val user = try {
+                it.createUserWithEmailAndPassword(email, password).user
+            } catch (e: FirebaseAuthUserCollisionException) {
+                // the user already exists, just sign in for getting user's ID
+                it.signInWithEmailAndPassword(email, password).user
+            }
+            user!!.uid
+        }
+
+        check(Firebase.auth.currentUser != null)
+        Firebase.auth.signOut()
+        check(Firebase.auth.currentUser == null)
+
+        return uid
     }
 }

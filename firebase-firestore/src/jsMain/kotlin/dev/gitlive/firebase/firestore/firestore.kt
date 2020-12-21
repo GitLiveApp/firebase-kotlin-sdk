@@ -28,10 +28,6 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 //            js.settings() = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
 //        }
 
-    actual fun useEmulator(host: String, port: Int) {
-        js.useEmulator(host, port)
-    }
-
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
@@ -46,6 +42,8 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual suspend fun clearPersistence() =
         rethrow { js.clearPersistence().await() }
+
+    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {

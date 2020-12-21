@@ -42,10 +42,6 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         get() = ios.languageCode ?: ""
         set(value) { ios.setLanguageCode(value) }
 
-    actual fun useEmulator(host: String, port: Int) {
-        ios.useEmulatorWithHost(host, port.toLong())
-    }
-
     actual suspend fun applyActionCode(code: String) = ios.await { applyActionCode(code, it) }.run { Unit }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
 
@@ -93,6 +89,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
+
+    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {

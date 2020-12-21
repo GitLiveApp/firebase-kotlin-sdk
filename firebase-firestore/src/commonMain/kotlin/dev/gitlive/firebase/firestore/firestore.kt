@@ -19,13 +19,13 @@ expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class FirebaseFirestore {
 //    var settings: FirebaseFirestoreSettings
-    fun useEmulator(host: String, port: Int)
     fun collection(collectionPath: String): CollectionReference
     fun document(documentPath: String): DocumentReference
     fun batch(): WriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+    fun useEmulator(host: String, port: Int)
 }
 
 expect class Transaction {

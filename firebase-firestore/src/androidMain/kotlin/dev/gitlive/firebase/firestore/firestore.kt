@@ -29,13 +29,6 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 //            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
 //        }
 
-    actual fun useEmulator(host: String, port: Int) {
-        android.useEmulator(host, port)
-        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
-    }
-
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
@@ -51,6 +44,13 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual suspend fun clearPersistence() =
         android.clearPersistence().await()
             .run { Unit }
+
+    actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+    }
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
