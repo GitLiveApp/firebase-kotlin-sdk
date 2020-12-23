@@ -380,6 +380,8 @@ actual typealias FieldPath = com.google.firebase.firestore.FieldPath
 
 actual fun FieldPath(vararg fieldNames: String) = FieldPath.of(*fieldNames)
 
+actual fun FieldPath.documentId() = FieldPath.documentId()
+
 actual object FieldValue {
     actual fun delete(): Any = com.google.firebase.firestore.FieldValue.delete()
     actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
