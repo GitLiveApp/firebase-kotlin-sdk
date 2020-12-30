@@ -194,8 +194,8 @@ expect fun FieldPath(vararg fieldNames: String): FieldPath
 expect fun FieldPath.documentId(): FieldPath
 
 expect object FieldValue {
+    fun serverTimestamp(): Double
     fun delete(): Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
 }
-

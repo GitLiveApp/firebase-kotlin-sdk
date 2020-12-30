@@ -14,7 +14,7 @@ expect fun runTest(test: suspend () -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String)
+    data class FirestoreTest(val prop1: String, val time: Double = 0.0)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -36,7 +36,8 @@ class FirebaseFirestoreTest {
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy("prop1").get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy("prop1").get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
@@ -47,7 +48,8 @@ class FirebaseFirestoreTest {
     fun testFieldOrderBy() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1")).get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
@@ -58,7 +60,8 @@ class FirebaseFirestoreTest {
     fun testStringOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy("prop1", Direction.ASCENDING).get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
@@ -69,7 +72,8 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
@@ -80,7 +84,8 @@ class FirebaseFirestoreTest {
     fun testStringOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy("prop1", Direction.DESCENDING).get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
@@ -91,16 +96,36 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("test").orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
+        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+            .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
         assertEquals("aaa", resultDocs[2].get("prop1"))
     }
 
+    @Test
+    fun testServerTimestampFieldValue() = runTest {
+        val doc = Firebase.firestore
+            .collection("testServerTimestampFieldValue")
+            .document("test")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("ServerTimestamp", FieldValue.serverTimestamp()))
+
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time"))
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTest.serializer()).time)
+
+    }
+
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.collection("test").document("one").set(FirestoreTest.serializer(), FirestoreTest("aaa"))
-        Firebase.firestore.collection("test").document("two").set(FirestoreTest.serializer(), FirestoreTest("bbb"))
-        Firebase.firestore.collection("test").document("three").set(FirestoreTest.serializer(), FirestoreTest("ccc"))
+        Firebase.firestore.collection("FirebaseFirestoreTest")
+            .document("one")
+            .set(FirestoreTest.serializer(), FirestoreTest("aaa"))
+        Firebase.firestore.collection("FirebaseFirestoreTest")
+            .document("two")
+            .set(FirestoreTest.serializer(), FirestoreTest("bbb"))
+        Firebase.firestore.collection("FirebaseFirestoreTest")
+            .document("three")
+            .set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }
 }

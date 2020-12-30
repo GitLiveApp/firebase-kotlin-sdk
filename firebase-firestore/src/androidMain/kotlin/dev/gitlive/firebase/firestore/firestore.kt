@@ -5,14 +5,32 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.firestore.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
+
+@PublishedApi
+internal inline fun <reified T> decode(value: Any?): T =
+    decode(value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
+    decode(strategy, value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
+    encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
+
+private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    encode(strategy, value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -383,6 +401,7 @@ actual fun FieldPath(vararg fieldNames: String) = FieldPath.of(*fieldNames)
 actual fun FieldPath.documentId() = FieldPath.documentId()
 
 actual object FieldValue {
+    actual fun serverTimestamp() = Double.POSITIVE_INFINITY
     actual fun delete(): Any = com.google.firebase.firestore.FieldValue.delete()
     actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
     actual fun arrayRemove(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayRemove(*elements)

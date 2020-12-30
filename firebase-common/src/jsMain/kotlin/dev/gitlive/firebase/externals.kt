@@ -339,6 +339,12 @@ external object firebase {
 
         open class FieldPath constructor(vararg fieldNames: String)
 
+        open class Timestamp {
+            val seconds: Double
+            val nanoseconds: Double
+            fun toMillis(): Double
+        }
+
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
             fun where(field: Any, opStr: String, value: Any?): Query
@@ -404,6 +410,7 @@ external object firebase {
 
         abstract class FieldValue {
             companion object {
+                fun serverTimestamp(): FieldValue
                 fun delete(): FieldValue
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
