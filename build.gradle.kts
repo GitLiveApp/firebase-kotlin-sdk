@@ -19,7 +19,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.1")
+        classpath("com.android.tools.build:gradle:4.0.2")
         classpath("de.undercouch:gradle-download-task:4.1.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }

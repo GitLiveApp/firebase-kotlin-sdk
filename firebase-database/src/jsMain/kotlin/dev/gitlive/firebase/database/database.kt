@@ -11,9 +11,11 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
     encode(value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
+
+internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
     encode(strategy, value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
 
 
