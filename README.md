@@ -86,7 +86,7 @@ You can also omit the serializer but this is discouraged due to a [current limit
 
 <h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
 
-[Firestore](https://firebase.google.com/docs/reference/js/firebase.database.ServerValue#timestamp) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes they are of type `Double`:
+[Firestore](https://firebase.google.com/docs/reference/kotlin/com/google/firebase/firestore/FieldValue?hl=en#serverTimestamp()) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes they are of type `Double`:
 
 ```kotlin
 @Serializable

@@ -14,7 +14,7 @@ expect fun runTest(test: suspend () -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String)
+    data class FirestoreTest(val prop1: String, val time: Double = 0.0)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -96,6 +96,19 @@ class FirebaseFirestoreTest {
         assertEquals("ccc", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))
         assertEquals("aaa", resultDocs[2].get("prop1"))
+    }
+
+    @Test
+    fun testServerTimestampFieldValue() = runTest {
+        val doc = Firebase.firestore
+            .collection("test")
+            .document("ServerTimestamp")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("ServerTimestamp", FieldValue.serverTimestamp()))
+
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time"))
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTest.serializer()).time)
+
     }
 
     private suspend fun setupFirestoreData() {

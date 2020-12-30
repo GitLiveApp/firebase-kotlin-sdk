@@ -9,4 +9,4 @@ import kotlinx.coroutines.promise
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = GlobalScope.promise { test() }.unsafeCast<Unit>()
+actual fun runTest(test: suspend () -> Unit) = GlobalScope.promise { test() }.asDynamic()
