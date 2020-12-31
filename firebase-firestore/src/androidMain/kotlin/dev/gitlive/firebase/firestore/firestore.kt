@@ -338,6 +338,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
+actual typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
 
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
 
@@ -364,7 +365,20 @@ actual typealias FirestoreExceptionCode = com.google.firebase.firestore.Firebase
 actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = android.documents.map { DocumentSnapshot(it) }
+    actual val documentChanges
+        get() = android.documentChanges.map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
+}
+
+actual class DocumentChange(val android: com.google.firebase.firestore.DocumentChange) {
+    actual val document: DocumentSnapshot
+        get() = DocumentSnapshot(android.document)
+    actual val newIndex: Int
+        get() = android.newIndex
+    actual val oldIndex: Int
+        get() = android.oldIndex
+    actual val type: ChangeType
+        get() = android.type
 }
 
 @Suppress("UNCHECKED_CAST")
