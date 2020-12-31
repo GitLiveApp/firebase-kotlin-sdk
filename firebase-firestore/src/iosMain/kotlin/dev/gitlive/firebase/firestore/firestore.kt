@@ -348,7 +348,7 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
 
 actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
-    actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID)
+    actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
 }
 
 actual object FieldValue {
