@@ -72,6 +72,8 @@ actual open class Query internal constructor(
 ) {
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
+    actual fun orderByValue() = Query(ios.queryOrderedByValue(), persistenceEnabled)
+
     actual fun orderByChild(path: String) = Query(ios.queryOrderedByChild(path), persistenceEnabled)
 
     actual fun startAt(value: String, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
@@ -79,6 +81,22 @@ actual open class Query internal constructor(
     actual fun startAt(value: Double, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
 
     actual fun startAt(value: Boolean, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: String, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Double, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Boolean, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun limitToFirst(limit: Int) = Query(ios.queryLimitedToFirst(limit), persistenceEnabled)
+
+    actual fun limitToLast(limit: Int) = Query(ios.queryLimitedToLast(limit), persistenceEnabled)
+
+    actual fun equalTo(value: String, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Double, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
 
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
