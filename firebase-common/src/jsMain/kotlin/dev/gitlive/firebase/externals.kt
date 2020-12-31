@@ -296,7 +296,12 @@ external object firebase {
             fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
             fun orderByChild(path: String): Query
             fun orderByKey(): Query
+            fun orderByValue(): Query
             fun startAt(value: Any, key: String? = definedExternally): Query
+            fun endAt(value: Any, key: String? = definedExternally): Query
+            fun equalTo(value: Any, key: String? = definedExternally): Query
+            fun limitToFirst(limit: Int): Query
+            fun limitToLast (limit: Int): Query
         }
 
         open class Reference: Query {

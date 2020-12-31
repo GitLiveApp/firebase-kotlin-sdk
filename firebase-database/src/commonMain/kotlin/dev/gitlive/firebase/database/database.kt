@@ -47,10 +47,19 @@ expect open class Query {
     val valueEvents: Flow<DataSnapshot>
     fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
     fun orderByKey(): Query
+    fun orderByValue(): Query
     fun orderByChild(path: String): Query
     fun startAt(value: String, key: String? = null): Query
     fun startAt(value: Double, key: String? = null): Query
     fun startAt(value: Boolean, key: String? = null): Query
+    fun endAt(value: String, key: String? = null): Query
+    fun endAt(value: Double, key: String? = null): Query
+    fun endAt(value: Boolean, key: String? = null): Query
+    fun limitToFirst(limit: Int): Query
+    fun limitToLast(limit: Int): Query
+    fun equalTo(value: String, key: String? = null): Query
+    fun equalTo(value: Double, key: String? = null): Query
+    fun equalTo(value: Boolean, key: String? = null): Query
 }
 
 expect class DatabaseReference : Query {
