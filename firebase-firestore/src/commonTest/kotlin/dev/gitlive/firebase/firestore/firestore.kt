@@ -110,10 +110,10 @@ class FirebaseFirestoreTest {
             .collection("testServerTimestampFieldValue")
             .document("test")
 
-        doc.set(FirestoreTest.serializer(), FirestoreTest("ServerTimestamp", FieldValue.serverTimestamp()))
+        doc.set(FirestoreTest.serializer(), FirestoreTest("ServerTimestamp", FieldValue.serverTimestamp))
 
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time"))
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTest.serializer()).time)
+        assertNotEquals(FieldValue.serverTimestamp, doc.get().get("time"))
+        assertNotEquals(FieldValue.serverTimestamp, doc.get().data(FirestoreTest.serializer()).time)
 
     }
 

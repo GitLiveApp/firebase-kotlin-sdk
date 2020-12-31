@@ -68,7 +68,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
             .let { this }
 
     actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -80,7 +80,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
@@ -107,10 +107,10 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         js.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
                 documentRef.js,
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.js,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
+                    listOf(field.js, value?.let { encode(value, true) })
                 }.toTypedArray()
             )
     }.let { this }
@@ -134,7 +134,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
             .let { this }
 
     actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
+        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -146,7 +146,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)) }
+        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
     actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
@@ -173,10 +173,10 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         js.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
                 documentRef.js,
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.js,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it, true)!! })
+                    listOf(field.js, value?.let { encode(it, true)!! })
                 }.toTypedArray()
             )
     }.let { this }
@@ -206,7 +206,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         rethrow { js.set(encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)).await() }
+        rethrow { js.set(encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())).await() }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
         rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("merge" to merge)).await() }
@@ -215,7 +215,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths)).await() }
+        rethrow { js.set(encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())).await() }
 
     actual suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
         rethrow { js.update(encode(data, encodeDefaults)!!).await() }
@@ -238,10 +238,10 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         js.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.js,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it, true)!! })
+                    listOf(field.js, value?.let { encode(it, true)!! })
                 }.toTypedArray()
             )
             ?.await()
@@ -267,7 +267,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
     actual fun limit(limit: Number) = Query(js.limit(limit.toDouble()))
 
     internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path, "==", equalTo)) }
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path.js, "==", equalTo)) }
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
@@ -281,9 +281,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
-            (lessThan?.let {js.where(path, "<", it) } ?: js).let { js2 ->
-                (greaterThan?.let { js2.where(path, ">", it) } ?: js2).let { js3 ->
-                    arrayContains?.let { js3.where(path, "array-contains", it) } ?: js3
+            (lessThan?.let {js.where(path.js, "<", it) } ?: js).let { js2 ->
+                (greaterThan?.let { js2.where(path.js, ">", it) } ?: js2).let { js3 ->
+                    arrayContains?.let { js3.where(path.js, "array-contains", it) } ?: js3
                 }
             }
         )
@@ -296,8 +296,8 @@ actual open class Query(open val js: firebase.firestore.Query) {
     )
 
     internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { js.where(path, "in", it.toTypedArray()) } ?: js).let { js2 ->
-            arrayContainsAny?.let { js2.where(path, "array-contains-any", it.toTypedArray()) } ?: js2
+        (inArray?.let { js.where(path.js, "in", it.toTypedArray()) } ?: js).let { js2 ->
+            arrayContainsAny?.let { js2.where(path.js, "array-contains-any", it.toTypedArray()) } ?: js2
         }
     )
 
@@ -306,7 +306,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
     }
 
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
-        Query(js.orderBy(field, direction.jsString))
+        Query(js.orderBy(field.js, direction.jsString))
     }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
@@ -387,17 +387,20 @@ actual class SnapshotMetadata(val js: firebase.firestore.SnapshotMetadata) {
     actual val isFromCache: Boolean get() = js.fromCache
 }
 
-actual typealias FieldPath = Any
-
-actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow {
-    js("Reflect").construct(firebase.firestore.asDynamic().FieldPath, fieldNames).unsafeCast<FieldPath>()
+actual class FieldPath private constructor(val js: firebase.firestore.FieldPath) {
+    actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
+        js("Reflect").construct(firebase.firestore.FieldPath, fieldNames).unsafeCast<firebase.firestore.FieldPath>()
+    })
+    actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
 }
 
 actual object FieldValue {
-    actual fun serverTimestamp() = Double.POSITIVE_INFINITY
-    actual fun delete(): Any = rethrow { firebase.firestore.FieldValue.delete() }
+    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
     actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
     actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
+    @JsName("deprecatedDelete")
+    actual fun delete(): Any = delete
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(
