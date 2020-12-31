@@ -10,6 +10,7 @@ import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.JsName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -187,15 +188,16 @@ expect class SnapshotMetadata {
     val isFromCache: Boolean
 }
 
-expect class FieldPath
-
-expect fun FieldPath(vararg fieldNames: String): FieldPath
-
-expect fun FieldPath.documentId(): FieldPath
+expect class FieldPath(vararg fieldNames: String) {
+    val documentId: FieldPath
+}
 
 expect object FieldValue {
-    fun serverTimestamp(): Double
-    fun delete(): Any
+    val serverTimestamp: Double
+    val delete: Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
+    @Deprecated("Replaced with FieldValue.delete")
+    @JsName("deprecatedDelete")
+    fun delete(): Any
 }
