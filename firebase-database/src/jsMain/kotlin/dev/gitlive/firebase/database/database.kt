@@ -40,6 +40,7 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
 actual open class Query internal constructor(open val js: firebase.database.Query) {
 
     actual fun orderByKey() = Query(js.orderByKey())
+    actual fun orderByValue() = Query(js.orderByValue())
     actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
@@ -81,6 +82,22 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
     actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key ?: undefined))
 
     actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key ?: undefined))
+
+    actual fun endAt(value: String, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun endAt(value: Double, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun endAt(value: Boolean, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun limitToFirst(limit: Int) = Query(js.limitToFirst(limit))
+
+    actual fun limitToLast(limit: Int) = Query(js.limitToLast(limit))
+
+    actual fun equalTo(value: String, key: String?) = Query(js.equalTo(value, key ?: undefined))
+
+    actual fun equalTo(value: Double, key: String?) = Query(js.equalTo(value, key ?: undefined))
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(js.equalTo(value, key ?: undefined))
 
     override fun toString() = js.toString()
 

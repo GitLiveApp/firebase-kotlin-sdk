@@ -81,6 +81,8 @@ actual open class Query internal constructor(
 ) {
     actual fun orderByKey() = Query(android.orderByKey(), persistenceEnabled)
 
+    actual fun orderByValue() = Query(android.orderByValue(), persistenceEnabled)
+
     actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
 
     actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
@@ -88,6 +90,22 @@ actual open class Query internal constructor(
     actual fun startAt(value: Double, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: String, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Double, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Boolean, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun limitToFirst(limit: Int) = Query(android.limitToFirst(limit), persistenceEnabled)
+
+    actual fun limitToLast(limit: Int) = Query(android.limitToLast(limit), persistenceEnabled)
+
+    actual fun equalTo(value: String, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Double, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
 
     actual val valueEvents: Flow<DataSnapshot>
         get() = callbackFlow {
