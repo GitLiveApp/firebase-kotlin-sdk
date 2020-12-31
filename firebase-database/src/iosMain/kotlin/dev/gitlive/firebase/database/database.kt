@@ -88,9 +88,9 @@ actual open class Query internal constructor(
 
     actual fun endAt(value: Boolean, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    actual fun limitToFirst(limit: Int) = Query(ios.queryLimitedToFirst(limit), persistenceEnabled)
+    actual fun limitToFirst(limit: Int) = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
-    actual fun limitToLast(limit: Int) = Query(ios.queryLimitedToLast(limit), persistenceEnabled)
+    actual fun limitToLast(limit: Int) = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
 
     actual fun equalTo(value: String, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
 
