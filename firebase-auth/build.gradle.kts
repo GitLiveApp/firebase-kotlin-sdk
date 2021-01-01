@@ -31,7 +31,10 @@ android {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
-        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+        getByName("androidTest"){
+            java.srcDir(file("src/androidAndroidTest/kotlin"))
+            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+        }
     }
     testOptions {
         unitTests.apply {

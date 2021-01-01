@@ -7,6 +7,8 @@ package dev.gitlive.firebase.auth
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 
+actual val emulatorHost: String = "localhost"
+
 actual val context: Any = Unit
 
 actual fun runTest(test: suspend () -> Unit) = GlobalScope
@@ -14,7 +16,7 @@ actual fun runTest(test: suspend () -> Unit) = GlobalScope
         try {
             test()
         } catch (e: dynamic) {
-            e.log()
+            (e as? Throwable)?.log()
             throw e
         }
     }.asDynamic()

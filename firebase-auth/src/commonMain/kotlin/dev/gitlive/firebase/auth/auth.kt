@@ -34,6 +34,7 @@ expect class FirebaseAuth {
     suspend fun signOut()
     suspend fun updateCurrentUser(user: FirebaseUser)
     suspend fun verifyPasswordResetCode(code: String): String
+    fun useEmulator(host: String, port: Int)
 }
 
 expect class AuthResult {

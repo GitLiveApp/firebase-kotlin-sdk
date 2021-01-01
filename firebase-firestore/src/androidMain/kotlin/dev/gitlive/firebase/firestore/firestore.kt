@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import dev.gitlive.firebase.firestore.encode
@@ -61,6 +62,13 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual suspend fun clearPersistence() =
         android.clearPersistence().await()
             .run { Unit }
+
+    actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+    }
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {

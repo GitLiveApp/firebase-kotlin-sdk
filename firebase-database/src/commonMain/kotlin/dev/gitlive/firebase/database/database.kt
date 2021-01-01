@@ -27,6 +27,7 @@ expect class FirebaseDatabase {
     fun reference(path: String): DatabaseReference
     fun setPersistenceEnabled(enabled: Boolean)
     fun setLoggingEnabled(enabled: Boolean)
+    fun useEmulator(host: String, port: Int)
 }
 
 data class ChildEvent internal constructor(

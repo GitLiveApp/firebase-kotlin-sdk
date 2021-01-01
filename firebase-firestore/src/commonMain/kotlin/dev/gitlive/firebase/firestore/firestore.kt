@@ -26,6 +26,7 @@ expect class FirebaseFirestore {
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+    fun useEmulator(host: String, port: Int)
 }
 
 expect class Transaction {

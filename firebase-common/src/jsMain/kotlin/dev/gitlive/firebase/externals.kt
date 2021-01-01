@@ -46,6 +46,7 @@ external object firebase {
             val currentUser: user.User?
             var languageCode: String?
 
+            fun useEmulator(url: String)
             fun applyActionCode(code: String): Promise<Unit>
             fun checkActionCode(code: String): Promise<ActionCodeInfo>
             fun confirmPasswordReset(code: String, newPassword: String): Promise<Unit>
@@ -258,6 +259,7 @@ external object firebase {
         class Functions {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
             fun useFunctionsEmulator(origin: String)
+            fun useEmulator(host: String, port: Int)
         }
         interface HttpsCallableResult {
             val data: Any?
@@ -274,6 +276,7 @@ external object firebase {
 
         open class Database {
             fun ref(path: String? = definedExternally): Reference
+            fun useEmulator(host: String, port: Int)
         }
         open class ThenableReference : Reference
 
@@ -340,6 +343,7 @@ external object firebase {
             fun settings(settings: Json)
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
+            fun useEmulator(host: String, port: Int)
         }
 
         open class Timestamp {

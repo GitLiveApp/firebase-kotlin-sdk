@@ -55,6 +55,8 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual suspend fun clearPersistence() =
         rethrow { js.clearPersistence().await() }
+
+    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {

@@ -53,6 +53,14 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual suspend fun clearPersistence() =
         await { ios.clearPersistenceWithCompletion(it) }
+
+    actual fun useEmulator(host: String, port: Int) {
+        ios.settings = ios.settings.apply {
+            this.host = "$host:$port"
+            persistenceEnabled = false
+            sslEnabled = false
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
