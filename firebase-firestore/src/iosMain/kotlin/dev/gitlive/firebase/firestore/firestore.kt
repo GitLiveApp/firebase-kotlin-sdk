@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
+import cocoapods.FirebaseFirestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
@@ -330,9 +331,9 @@ actual class DocumentChange(val ios: FIRDocumentChange) {
     actual val document: DocumentSnapshot
         get() = DocumentSnapshot(ios.document)
     actual val newIndex: Int
-        get() = ios.newIndex
+        get() = ios.newIndex.toInt()
     actual val oldIndex: Int
-        get() = ios.oldIndex
+        get() = ios.oldIndex.toInt()
     actual val type: ChangeType
         get() = ChangeType.values().first { it.ios == ios.type }
 }
