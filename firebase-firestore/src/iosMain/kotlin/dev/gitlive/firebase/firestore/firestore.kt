@@ -323,7 +323,7 @@ actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents
         get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
     actual val documentChanges
-        get() = ios.documentChanges.map { DocumentChange(it) }
+        get() = ios.documentChanges.map { DocumentChange(it as FIRDocumentChange) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
 }
 
