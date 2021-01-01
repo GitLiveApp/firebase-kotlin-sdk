@@ -146,6 +146,7 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use" -> FirebaseAuthMultiFactorException(code, cause)
     "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
+    "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/invalid-email" -> FirebaseAuthEmailException(code, cause)
 
 //                "auth/app-deleted" ->
