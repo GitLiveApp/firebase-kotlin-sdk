@@ -15,6 +15,20 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 
+@PublishedApi
+internal inline fun <reified T> decode(value: Any?): T =
+    decode(value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
+    decode(strategy, value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
+    encode(value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
+
+private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    encode(strategy, value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
+
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
@@ -59,7 +73,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
     actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
+        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
@@ -68,7 +82,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
+        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
 
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
@@ -80,7 +94,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
             ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -99,7 +113,7 @@ actual class Transaction(val ios: FIRTransaction) {
         ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
     actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
+        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
@@ -108,7 +122,7 @@ actual class Transaction(val ios: FIRTransaction) {
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.asList()).let { this }
+        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
 
     actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
         ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
@@ -120,7 +134,7 @@ actual class Transaction(val ios: FIRTransaction) {
         ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -148,7 +162,7 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
+        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.map { it.ios }, it) }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
         await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
@@ -157,7 +171,7 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.asList(), it) }
+        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.map { it.ios }, it) }
 
     actual suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
         await { ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
@@ -169,7 +183,7 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+        await { block -> ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, block) }
 
     actual suspend fun delete() =
         await { ios.deleteDocumentWithCompletion(it) }
@@ -201,7 +215,7 @@ actual open class Query(open val ios: FIRQuery) {
     }
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(ios.queryWhereField(field, isEqualTo = equalTo!!))
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(ios.queryWhereFieldPath(path, isEqualTo = equalTo!!))
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(ios.queryWhereFieldPath(path.ios, isEqualTo = equalTo!!))
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { ios.queryWhereField(field, isLessThan = it) } ?: ios).let { ios2 ->
@@ -212,9 +226,9 @@ actual open class Query(open val ios: FIRQuery) {
     )
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { ios.queryWhereFieldPath(path, isLessThan = it) } ?: ios).let { ios2 ->
-            (greaterThan?.let { ios2.queryWhereFieldPath(path, isGreaterThan = it) } ?: ios2).let { ios3 ->
-                arrayContains?.let { ios3.queryWhereFieldPath(path, arrayContains = it) } ?: ios3
+        (lessThan?.let { ios.queryWhereFieldPath(path.ios, isLessThan = it) } ?: ios).let { ios2 ->
+            (greaterThan?.let { ios2.queryWhereFieldPath(path.ios, isGreaterThan = it) } ?: ios2).let { ios3 ->
+                arrayContains?.let { ios3.queryWhereFieldPath(path.ios, arrayContains = it) } ?: ios3
             }
         }
     )
@@ -226,14 +240,14 @@ actual open class Query(open val ios: FIRQuery) {
     )
 
     internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { ios.queryWhereFieldPath(path, `in` = it) } ?: ios).let { ios2 ->
-            arrayContainsAny?.let { ios2.queryWhereFieldPath(path, arrayContainsAny = arrayContainsAny) } ?: ios2
+        (inArray?.let { ios.queryWhereFieldPath(path.ios, `in` = it) } ?: ios).let { ios2 ->
+            arrayContainsAny?.let { ios2.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny) } ?: ios2
         }
     )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
 
-    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field, direction == Direction.DESCENDING))
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
 
 }
 @Suppress("UNCHECKED_CAST")
@@ -340,14 +354,17 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
     actual val isFromCache: Boolean get() = ios.fromCache
 }
 
-actual typealias FieldPath = FIRFieldPath
-
-actual fun FieldPath(vararg fieldNames: String) = FIRFieldPath(fieldNames.asList())
+actual class FieldPath private constructor(val ios: FIRFieldPath) {
+    actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
+    actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
+}
 
 actual object FieldValue {
-    actual fun delete(): Any = FIRFieldValue.fieldValueForDelete()
+    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val delete: Any get() = FIRFieldValue.fieldValueForDelete()
     actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
     actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
+    actual fun delete(): Any = delete
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

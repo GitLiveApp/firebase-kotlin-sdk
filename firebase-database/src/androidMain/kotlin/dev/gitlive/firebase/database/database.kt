@@ -27,10 +27,11 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
     dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
-fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+internal fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
 @OptIn(FlowPreview::class)
@@ -83,6 +84,8 @@ actual open class Query internal constructor(
 ) {
     actual fun orderByKey() = Query(android.orderByKey(), persistenceEnabled)
 
+    actual fun orderByValue() = Query(android.orderByValue(), persistenceEnabled)
+
     actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
 
     actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
@@ -90,6 +93,22 @@ actual open class Query internal constructor(
     actual fun startAt(value: Double, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
 
     actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: String, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Double, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Boolean, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+
+    actual fun limitToFirst(limit: Int) = Query(android.limitToFirst(limit), persistenceEnabled)
+
+    actual fun limitToLast(limit: Int) = Query(android.limitToLast(limit), persistenceEnabled)
+
+    actual fun equalTo(value: String, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Double, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
 
     actual val valueEvents: Flow<DataSnapshot>
         get() = callbackFlow {

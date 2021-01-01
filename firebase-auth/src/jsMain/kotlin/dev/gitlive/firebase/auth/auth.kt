@@ -121,7 +121,7 @@ actual open class FirebaseAuthWebException(code: String?, cause: Throwable): Fir
 
 internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.auth.rethrow { function() }
 
-internal inline fun <R> rethrow(function: () -> R): R {
+private inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {

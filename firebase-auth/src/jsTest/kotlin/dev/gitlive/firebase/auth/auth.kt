@@ -11,4 +11,20 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = GlobalScope.promise { test() }.unsafeCast<Unit>()
+actual fun runTest(test: suspend () -> Unit) = GlobalScope
+    .promise {
+        try {
+            test()
+        } catch (e: dynamic) {
+            e.log()
+            throw e
+        }
+    }.asDynamic()
+
+internal fun Throwable.log() {
+    console.error(this)
+    cause?.let {
+        console.error("Caused by:")
+        it.log()
+    }
+}
