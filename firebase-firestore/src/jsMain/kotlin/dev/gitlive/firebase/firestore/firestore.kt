@@ -346,7 +346,20 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = js.docs.map { DocumentSnapshot(it) }
+    actual val documentChanges
+        get() = js.docChanges().map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
+}
+
+actual class DocumentChange(val js: firebase.firestore.DocumentChange) {
+    actual val document: DocumentSnapshot
+        get() = DocumentSnapshot(js.doc)
+    actual val newIndex: Int
+        get() = js.newIndex
+    actual val oldIndex: Int
+        get() = js.oldIndex
+    actual val type: ChangeType
+        get() = ChangeType.values().first { it.jsString == js.type }
 }
 
 actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
@@ -423,6 +436,12 @@ actual enum class FirestoreExceptionCode {
 actual enum class Direction(internal val jsString : String) {
     ASCENDING("asc"),
     DESCENDING("desc");
+}
+
+actual enum class ChangeType(internal val jsString : String) {
+    ADDED("added"),
+    MODIFIED("modified"),
+    REMOVED("removed");
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }

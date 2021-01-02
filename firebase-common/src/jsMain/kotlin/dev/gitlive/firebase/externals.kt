@@ -370,8 +370,16 @@ external object firebase {
 
         open class QuerySnapshot {
             val docs: Array<DocumentSnapshot>
+            fun docChanges(): Array<DocumentChange>
             val empty: Boolean
             val metadata: SnapshotMetadata
+        }
+
+        open class DocumentChange {
+            val doc: DocumentSnapshot
+            val newIndex: Int
+            val oldIndex: Int
+            val type: String
         }
 
         open class DocumentSnapshot {

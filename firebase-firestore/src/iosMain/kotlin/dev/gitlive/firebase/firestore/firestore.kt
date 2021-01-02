@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.*
+import cocoapods.FirebaseFirestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
@@ -296,6 +297,12 @@ actual enum class Direction {
     DESCENDING
 }
 
+actual enum class ChangeType(internal val ios: FIRDocumentChangeType) {
+    ADDED(FIRDocumentChangeTypeAdded),
+    MODIFIED(FIRDocumentChangeTypeModified),
+    REMOVED(FIRDocumentChangeTypeRemoved)
+}
+
 fun NSError.toException() = when(domain) {
     FIRFirestoreErrorDomain -> when(code) {
         FIRFirestoreErrorCodeOK -> FirestoreExceptionCode.OK
@@ -323,7 +330,20 @@ fun NSError.toException() = when(domain) {
 actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents
         get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
+    actual val documentChanges
+        get() = ios.documentChanges.map { DocumentChange(it as FIRDocumentChange) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
+}
+
+actual class DocumentChange(val ios: FIRDocumentChange) {
+    actual val document: DocumentSnapshot
+        get() = DocumentSnapshot(ios.document)
+    actual val newIndex: Int
+        get() = ios.newIndex.toInt()
+    actual val oldIndex: Int
+        get() = ios.oldIndex.toInt()
+    actual val type: ChangeType
+        get() = ChangeType.values().first { it.ios == ios.type }
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -165,7 +165,21 @@ expect enum class Direction {
 
 expect class QuerySnapshot {
     val documents: List<DocumentSnapshot>
+    val documentChanges: List<DocumentChange>
     val metadata: SnapshotMetadata
+}
+
+expect enum class ChangeType {
+    ADDED ,
+    MODIFIED,
+    REMOVED
+}
+
+expect class DocumentChange {
+    val document: DocumentSnapshot
+    val newIndex: Int
+    val oldIndex: Int
+    val type: ChangeType
 }
 
 expect class DocumentSnapshot {
