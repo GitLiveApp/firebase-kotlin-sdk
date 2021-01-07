@@ -36,7 +36,7 @@ kotlin {
     js {
         val main by compilations.getting {
             kotlinOptions {
-                moduleKind = "commonjs"
+                moduleKind = "umd"
             }
         }
         nodejs()
