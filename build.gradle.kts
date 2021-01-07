@@ -187,12 +187,12 @@ subprojects {
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2")
             "jsMainImplementation"(kotlin("stdlib-js"))
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13")
