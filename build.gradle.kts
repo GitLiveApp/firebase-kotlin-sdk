@@ -108,10 +108,10 @@ subprojects {
                 into.writeText(
                     from.readText()
                         .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/")
-                        .replace("(function (root, factory) {", "(function (root, factory) {\n  var auth = firebase.auth")
-                        .replace("(function (root, factory) {", "(function (root, factory) {\n  var functions = firebase.functions")
-                        .replace("(function (root, factory) {", "(function (root, factory) {\n  var firestore = firebase.firestore")
-                        .replace("(function (root, factory) {", "(function (root, factory) {\n  var database = firebase.database")
+                        .replace("if (typeof kotlin === 'undefined') {", "var auth = firebase.auth;\nif (typeof kotlin === 'undefined') {")
+                        .replace("if (typeof kotlin === 'undefined') {", "var functions = firebase.functions;\nif (typeof kotlin === 'undefined') {")
+                        .replace("if (typeof kotlin === 'undefined') {", "var firestore = firebase.firestore;\nif (typeof kotlin === 'undefined') {")
+                        .replace("if (typeof kotlin === 'undefined') {", "var database = firebase.database;\nif (typeof kotlin === 'undefined') {")
                 )
             }
         }
