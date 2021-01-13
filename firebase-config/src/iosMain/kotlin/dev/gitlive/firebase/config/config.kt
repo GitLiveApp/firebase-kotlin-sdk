@@ -133,7 +133,7 @@ suspend inline fun <reified T> awaitResult(
     return job.await() as T
 }
 
-suspend inline fun <T> await(crossinline function: (callback: (NSError?) -> Unit) -> T): T {
+suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     val job = CompletableDeferred<Unit>()
     val result = function { error ->
             if(error == null) {
