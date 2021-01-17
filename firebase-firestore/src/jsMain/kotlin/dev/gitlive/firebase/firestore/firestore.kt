@@ -3,6 +3,7 @@
  */
 
 package dev.gitlive.firebase.firestore
+
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -35,12 +36,6 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
-//    actual var settings: FirebaseFirestoreSettings
-//        get() = js.settings().run { FirebaseFirestoreSettings(js.isPersistenceEnabled) }
-//        set(value) {
-//            js.settings() = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
-//        }
-
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
@@ -57,6 +52,28 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
         rethrow { js.clearPersistence().await() }
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
+
+    actual fun setSettings(value: FirebaseFirestoreSettings) {
+        value.run {
+            persistenceEnabled?.let { js.enablePersistence() }
+
+            val settingsJson = mutableListOf<Pair<String, Any>>()
+
+            sslEnabled?.let { settingsJson.add("ssl" to it) }
+            host?.let { settingsJson.add("host" to it) }
+            cacheSizeBytes?.let { settingsJson.add("cacheSizeBytes" to it) }
+
+            js.settings(json(*settingsJson.toTypedArray()))
+        }
+    }
+
+    actual suspend fun disableNetwork() {
+        rethrow { js.disableNetwork().await() }
+    }
+
+    actual suspend fun enableNetwork() {
+        rethrow { js.enableNetwork().await() }
+    }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {

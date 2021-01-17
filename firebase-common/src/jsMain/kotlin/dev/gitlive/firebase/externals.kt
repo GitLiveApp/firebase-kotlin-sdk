@@ -344,6 +344,14 @@ external object firebase {
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
             fun useEmulator(host: String, port: Int)
+            fun disableNetwork(): Promise<Unit>
+            fun enableNetwork(): Promise<Unit>
+        }
+
+        open class Settings {
+            val cacheSizeBytes: Long?
+            val host: String?
+            val ss: Boolean?
         }
 
         open class Timestamp {
