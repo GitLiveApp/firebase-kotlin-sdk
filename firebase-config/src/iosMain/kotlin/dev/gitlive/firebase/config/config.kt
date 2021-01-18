@@ -31,9 +31,9 @@ actual class FirebaseRemoteConfig internal constructor(private val ios: FIRRemot
         awaitResult<FIRRemoteConfigFetchStatus> { ios.fetchWithCompletionHandler(it) }
     }
 
-    actual suspend  fun fetch(expiration: Double) {
+    actual suspend  fun fetch(expiration: Long) {
         awaitResult<FIRRemoteConfigFetchStatus> {
-            ios.fetchWithExpirationDuration(expiration, it)
+            ios.fetchWithExpirationDuration(expiration.toDouble(), it)
         }
     }
 
@@ -139,7 +139,7 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
         if(error == null) {
             job.complete(Unit)
         } else {
-            job.completeExceptionally(Throwable(error.localizedDescription))
+            job.completeExceptionally(error.toException())
         }
     }
 
