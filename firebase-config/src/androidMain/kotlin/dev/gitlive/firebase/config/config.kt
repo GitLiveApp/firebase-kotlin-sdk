@@ -31,8 +31,8 @@ actual class FirebaseRemoteConfig internal constructor (
         android.fetch().await()
     }
 
-    actual suspend  fun fetch(expiration: Double) {
-        android.fetch(expiration.toLong()).await()
+    actual suspend  fun fetch(expiration: Long) {
+        android.fetch(expiration).await()
     }
 
     actual suspend  fun fetchAndActivate(): Boolean =
