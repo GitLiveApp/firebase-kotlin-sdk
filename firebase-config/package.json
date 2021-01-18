@@ -1,0 +1,32 @@
+{
+  "name": "@gitlive/firebase-config",
+  "version": "0",
+  "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
+  "main": "firebase-config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+  },
+  "keywords": [
+    "kotlin",
+    "multiplatform",
+    "kotlin-js",
+    "firebase",
+    "remote-config"
+  ],
+  "author": "dev.gitlive",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitLiveApp/firebase-kotlin-sdk/issues"
+  },
+  "homepage": "https://github.com/GitLiveApp/firebase-kotlin-sdk",
+  "dependencies": {
+    "@gitlive/firebase-app": "1.0.0",
+    "firebase": "7.14.0",
+    "kotlin": "1.4.10",
+    "kotlinx-coroutines-core": "1.3.9"
+  }
+}
