@@ -19,6 +19,9 @@ external object database
 @JsModule("firebase/firestore")
 external object firestore
 
+@JsModule("firebase/remote-config")
+external object remoteConfig
+
 typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
 
 @JsModule("firebase/app")
@@ -429,6 +432,36 @@ external object firebase {
                 fun serverTimestamp(): FieldValue
             }
         }
+    }
+
+    fun remoteConfig(app: App? = definedExternally): remoteConfig.RemoteConfig
+
+    object remoteConfig {
+        open class RemoteConfig {
+            var defaultConfig: Json
+            var fetchTimeMillis: Long
+            var lastFetchStatus: String
+            var settings: Json
+
+            fun activate(): Promise<Boolean>
+            fun ensureInitialized(): Promise<Unit>
+            fun fetch(): Promise <Unit>
+            fun fetchAndActivate(): Promise<Boolean>
+            fun getAll(): Json
+            fun getBoolean(): Boolean
+            fun getNumber(): Number
+            fun getString(): String
+            fun getValue(key: String): Value
+            fun setLogLevel(level: String): Unit
+        }
+
+        open class Value {
+            fun asBoolean(): Boolean
+            fun asNumber(): Number
+            fun asString(): String
+            fun getSource(): String
+        }
+
     }
 }
 
