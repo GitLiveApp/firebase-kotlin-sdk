@@ -1,0 +1,13 @@
+package dev.gitlive.firebase.config
+
+import com.google.firebase.FirebaseException
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
+
+actual typealias FirebaseRemoteConfigException = FirebaseRemoteConfigException
+actual typealias FirebaseRemoteConfigClientException = FirebaseRemoteConfigClientException
+actual typealias FirebaseRemoteConfigFetchThrottledException = FirebaseRemoteConfigFetchThrottledException
+actual typealias FirebaseRemoteConfigServerException = FirebaseRemoteConfigServerException
+
