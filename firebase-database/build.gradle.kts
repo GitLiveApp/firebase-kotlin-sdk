@@ -76,7 +76,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:19.3.1")
+                api("com.google.firebase:firebase-database:19.5.1")
             }
         }
         val jsMain by getting {}

@@ -2,26 +2,14 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JsModule("firebase/app")
+
 package dev.gitlive.firebase
 
 import kotlin.js.Json
 import kotlin.js.Promise
 
-@JsModule("firebase/functions")
-external object functions
-
-@JsModule("firebase/auth")
-external object auth
-
-@JsModule("firebase/database")
-external object database
-
-@JsModule("firebase/firestore")
-external object firestore
-
-typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
-
-@JsModule("firebase/app")
+@JsName("default")
 external object firebase {
 
     open class App {
@@ -58,6 +46,7 @@ external object firebase {
             val currentUser: user.User?
             var languageCode: String?
 
+            fun useEmulator(url: String)
             fun applyActionCode(code: String): Promise<Unit>
             fun checkActionCode(code: String): Promise<ActionCodeInfo>
             fun confirmPasswordReset(code: String, newPassword: String): Promise<Unit>
@@ -270,6 +259,7 @@ external object firebase {
         class Functions {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
             fun useFunctionsEmulator(origin: String)
+            fun useEmulator(host: String, port: Int)
         }
         interface HttpsCallableResult {
             val data: Any?
@@ -286,6 +276,7 @@ external object firebase {
 
         open class Database {
             fun ref(path: String? = definedExternally): Reference
+            fun useEmulator(host: String, port: Int)
         }
         open class ThenableReference : Reference
 
@@ -296,7 +287,12 @@ external object firebase {
             fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
             fun orderByChild(path: String): Query
             fun orderByKey(): Query
+            fun orderByValue(): Query
             fun startAt(value: Any, key: String? = definedExternally): Query
+            fun endAt(value: Any, key: String? = definedExternally): Query
+            fun equalTo(value: Any, key: String? = definedExternally): Query
+            fun limitToFirst(limit: Int): Query
+            fun limitToLast (limit: Int): Query
         }
 
         open class Reference: Query {
@@ -347,43 +343,70 @@ external object firebase {
             fun settings(settings: Json)
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
+            fun useEmulator(host: String, port: Int)
         }
 
-        open class FieldPath constructor(vararg fieldNames: String)
+        open class Timestamp {
+            val seconds: Double
+            val nanoseconds: Double
+            fun toMillis(): Double
+        }
 
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
-            fun where(field: Any, opStr: String, value: Any?): Query
+            fun where(field: String, opStr: String, value: Any?): Query
+            fun where(field: FieldPath, opStr: String, value: Any?): Query
             fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
             fun limit(limit: Double): Query
+            fun orderBy(field: String, direction: Any): Query
+            fun orderBy(field: FieldPath, direction: Any): Query
         }
 
         open class CollectionReference : Query {
             val path: String
+            fun doc(path: String): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 
         open class QuerySnapshot {
             val docs: Array<DocumentSnapshot>
+            fun docChanges(): Array<DocumentChange>
             val empty: Boolean
+            val metadata: SnapshotMetadata
+        }
+
+        open class DocumentChange {
+            val doc: DocumentSnapshot
+            val newIndex: Int
+            val oldIndex: Int
+            val type: String
         }
 
         open class DocumentSnapshot {
             val id: String
             val ref: DocumentReference
             val exists: Boolean
+            val metadata: SnapshotMetadata
             fun data(options: Any? = definedExternally): Any?
-            fun get(fieldPath: Any, options: Any? = definedExternally): Any?
+            fun get(fieldPath: String, options: Any? = definedExternally): Any?
+            fun get(fieldPath: FieldPath, options: Any? = definedExternally): Any?
+        }
+
+        open class SnapshotMetadata {
+            val hasPendingWrites: Boolean
+            val fromCache: Boolean
         }
 
         open class DocumentReference {
             val id: String
             val path: String
 
+            fun collection(path: String): CollectionReference
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
             fun set(data: Any, options: Any? = definedExternally): Promise<Unit>
             fun update(data: Any): Promise<Unit>
-            fun update(field: Any, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
+            fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
+            fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
             fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
         }
@@ -393,19 +416,28 @@ external object firebase {
             fun delete(documentReference: DocumentReference): WriteBatch
             fun set(documentReference: DocumentReference, data: Any, options: Any? = definedExternally): WriteBatch
             fun update(documentReference: DocumentReference, data: Any): WriteBatch
-            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch
+            fun update(documentReference: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch
+            fun update(documentReference: DocumentReference, field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch
         }
 
         open class Transaction {
             fun get(documentReference: DocumentReference): Promise<DocumentSnapshot>
             fun set(documentReference: DocumentReference, data: Any, options: Any? = definedExternally): Transaction
             fun update(documentReference: DocumentReference, data: Any): Transaction
-            fun update(documentReference: DocumentReference, field: Any, value: Any?, vararg moreFieldsAndValues: Any?): Transaction
+            fun update(documentReference: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): Transaction
+            fun update(documentReference: DocumentReference, field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Transaction
             fun delete(documentReference: DocumentReference): Transaction
+        }
+
+        open class FieldPath(vararg fieldNames: String) {
+            companion object {
+                val documentId: FieldPath
+            }
         }
 
         abstract class FieldValue {
             companion object {
+                fun serverTimestamp(): FieldValue
                 fun delete(): FieldValue
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
@@ -413,7 +445,3 @@ external object firebase {
         }
     }
 }
-
-operator fun firebase.functions.HttpsCallable.invoke() = asDynamic()() as Promise<firebase.functions.HttpsCallableResult>
-operator fun firebase.functions.HttpsCallable.invoke(data: Any?) = asDynamic()(data) as Promise<firebase.functions.HttpsCallableResult>
-

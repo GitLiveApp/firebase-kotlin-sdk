@@ -30,6 +30,8 @@ actual class FirebaseFunctions internal constructor(val android: com.google.fire
         HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } })
 
     actual fun useFunctionsEmulator(origin: String) = android.useFunctionsEmulator(origin)
+
+    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
 actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) {

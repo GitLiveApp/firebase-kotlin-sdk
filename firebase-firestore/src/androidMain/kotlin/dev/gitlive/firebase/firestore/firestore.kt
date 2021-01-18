@@ -5,14 +5,33 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.firestore.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
+
+@PublishedApi
+internal inline fun <reified T> decode(value: Any?): T =
+    decode(value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
+    decode(strategy, value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
+    encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
+
+private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    encode(strategy, value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -43,6 +62,13 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual suspend fun clearPersistence() =
         android.clearPersistence().await()
             .run { Unit }
+
+    actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
+    }
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
@@ -57,7 +83,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
             .let { this }
 
     actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
@@ -70,7 +96,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
     @Suppress("UNCHECKED_CAST")
@@ -98,10 +124,10 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         android.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
                 documentRef.android,
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.android,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
+                    listOf(field.android, value?.let { encode(value, true) })
                 }.toTypedArray()
             ).let { this }
 
@@ -124,7 +150,7 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
             .let { this }
 
     actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
     actual fun <T> set(
@@ -143,7 +169,7 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
             .let { this }
 
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
     @Suppress("UNCHECKED_CAST")
@@ -171,10 +197,10 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         android.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
                 documentRef.android,
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.android,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
+                    listOf(field.android, value?.let { encode(value, true) })
                 }.toTypedArray()
             ).let { this }
 
@@ -193,6 +219,8 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
+    actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
+
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
         true -> android.set(encode(data, encodeDefaults)!!, SetOptions.merge())
         false -> android.set(encode(data, encodeDefaults)!!)
@@ -203,7 +231,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
             .await().run { Unit }
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .await().run { Unit }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
@@ -216,7 +244,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
             .await().run { Unit }
 
     actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.toList()))
+        android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .await().run { Unit }
 
     @Suppress("UNCHECKED_CAST")
@@ -244,10 +272,10 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
         android.takeUnless { fieldsAndValues.isEmpty() }
             ?.update(
-                fieldsAndValues[0].first,
+                fieldsAndValues[0].first.android,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
+                    listOf(field.android, value?.let { encode(value, true) })
                 }.toTypedArray()
             )
             ?.await()
@@ -283,7 +311,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     }
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path, equalTo))
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
@@ -294,9 +322,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     )
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { android.whereLessThan(path, it) } ?: android).let { android2 ->
-            (greaterThan?.let { android2.whereGreaterThan(path, it) } ?: android2).let { android3 ->
-                arrayContains?.let { android3.whereArrayContains(path, it) } ?: android3
+        (lessThan?.let { android.whereLessThan(path.android, it) } ?: android).let { android2 ->
+            (greaterThan?.let { android2.whereGreaterThan(path.android, it) } ?: android2).let { android3 ->
+                arrayContains?.let { android3.whereArrayContains(path.android, it) } ?: android3
             }
         }
     )
@@ -308,21 +336,31 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     )
 
     internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { android.whereIn(path, it) } ?: android).let { android2 ->
-            arrayContainsAny?.let { android2.whereArrayContainsAny(path, it) } ?: android2
+        (inArray?.let { android.whereIn(path.android, it) } ?: android).let { android2 ->
+            arrayContainsAny?.let { android2.whereArrayContainsAny(path.android, it) } ?: android2
         }
     )
+
+    internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
 }
+
+actual typealias Direction = com.google.firebase.firestore.Query.Direction
+actual typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
 
 actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
 
     actual val path: String
         get() = android.path
 
+    actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
+
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
 
     actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
+        DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
+    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
 }
 
@@ -335,6 +373,20 @@ actual typealias FirestoreExceptionCode = com.google.firebase.firestore.Firebase
 actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnapshot) {
     actual val documents
         get() = android.documents.map { DocumentSnapshot(it) }
+    actual val documentChanges
+        get() = android.documentChanges.map { DocumentChange(it) }
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
+}
+
+actual class DocumentChange(val android: com.google.firebase.firestore.DocumentChange) {
+    actual val document: DocumentSnapshot
+        get() = DocumentSnapshot(android.document)
+    actual val newIndex: Int
+        get() = android.newIndex
+    actual val oldIndex: Int
+        get() = android.oldIndex
+    actual val type: ChangeType
+        get() = android.type
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -355,15 +407,25 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual fun contains(field: String) = android.contains(field)
 
     actual val exists get() = android.exists()
+
+    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
 }
 
-actual typealias FieldPath = com.google.firebase.firestore.FieldPath
+actual class SnapshotMetadata(val android: com.google.firebase.firestore.SnapshotMetadata) {
+    actual val hasPendingWrites: Boolean get() = android.hasPendingWrites()
+    actual val isFromCache: Boolean get() = android.isFromCache()
+}
 
-actual fun FieldPath(vararg fieldNames: String) = FieldPath.of(*fieldNames)
+actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
+    actual constructor(vararg fieldNames: String) : this(com.google.firebase.firestore.FieldPath.of(*fieldNames))
+    actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+}
 
 actual object FieldValue {
-    actual fun delete(): Any = com.google.firebase.firestore.FieldValue.delete()
-    actual fun arrayUnion(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayUnion(*elements)
-    actual fun arrayRemove(vararg elements: Any): Any = com.google.firebase.firestore.FieldValue.arrayRemove(*elements)
+    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val delete: Any get() = FieldValue.delete()
+    actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)
+    actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
+    actual fun delete(): Any = delete
 }
 

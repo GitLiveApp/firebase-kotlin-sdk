@@ -89,6 +89,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
+
+    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
@@ -155,8 +157,7 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidActionCode,
         FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(toString())
 
-        FIRAuthErrorCodeInvalidEmail,
-        FIRAuthErrorCodeEmailAlreadyInUse -> FirebaseAuthEmailException(toString())
+        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(toString())
 
         FIRAuthErrorCodeCaptchaCheckFailed,
         FIRAuthErrorCodeInvalidPhoneNumber,

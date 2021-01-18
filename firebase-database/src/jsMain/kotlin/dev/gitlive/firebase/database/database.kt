@@ -11,9 +11,11 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
     encode(value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
+
+internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
     encode(strategy, value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
 
 
@@ -33,11 +35,13 @@ actual class FirebaseDatabase internal constructor(val js: firebase.database.Dat
     actual fun reference(path: String) = rethrow { DatabaseReference(js.ref(path)) }
     actual fun setPersistenceEnabled(enabled: Boolean) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
+    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 }
 
 actual open class Query internal constructor(open val js: firebase.database.Query) {
 
     actual fun orderByKey() = Query(js.orderByKey())
+    actual fun orderByValue() = Query(js.orderByValue())
     actual fun orderByChild(path: String) = Query(js.orderByChild(path))
 
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
@@ -79,6 +83,22 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
     actual fun startAt(value: Double, key: String?) = Query(js.startAt(value, key ?: undefined))
 
     actual fun startAt(value: Boolean, key: String?) = Query(js.startAt(value, key ?: undefined))
+
+    actual fun endAt(value: String, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun endAt(value: Double, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun endAt(value: Boolean, key: String?) = Query(js.endAt(value, key ?: undefined))
+
+    actual fun limitToFirst(limit: Int) = Query(js.limitToFirst(limit))
+
+    actual fun limitToLast(limit: Int) = Query(js.limitToLast(limit))
+
+    actual fun equalTo(value: String, key: String?) = Query(js.equalTo(value, key ?: undefined))
+
+    actual fun equalTo(value: Double, key: String?) = Query(js.equalTo(value, key ?: undefined))
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(js.equalTo(value, key ?: undefined))
 
     override fun toString() = js.toString()
 
