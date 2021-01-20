@@ -54,11 +54,6 @@ expect class Transaction {
 //    val persistenceEnabled: Boolean = true
 //)
 
-enum class QueryDirection {
-    ASCENDING,
-    DESCENDING
-}
-
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
