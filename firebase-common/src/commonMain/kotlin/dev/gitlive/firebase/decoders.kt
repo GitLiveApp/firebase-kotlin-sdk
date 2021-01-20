@@ -198,4 +198,3 @@ private fun decodeNotNullMark(value: Any?) = value != null
 private fun decodeNull(value: Any?) = value as Nothing?
 
 private fun decodeUnit(value: Any?) = value as Unit
-

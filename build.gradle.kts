@@ -4,8 +4,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.4.10" apply false
-    id("de.undercouch.download").version("3.4.3")
+    kotlin("multiplatform") version "1.4.21" apply false
+    id("de.undercouch.download").version("4.1.1")
     id("base")
 }
 
@@ -19,8 +19,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.1")
-        classpath("de.undercouch:gradle-download-task:4.0.4")
+        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("de.undercouch:gradle-download-task:4.1.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
@@ -187,18 +187,18 @@ subprojects {
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.2")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13")
-            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
+            "androidAndroidTestImplementation"("androidx.test:core:1.3.0")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.2")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.3.0")
         }
     }
 

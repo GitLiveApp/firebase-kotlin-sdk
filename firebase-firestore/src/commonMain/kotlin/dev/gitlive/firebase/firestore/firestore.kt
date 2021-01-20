@@ -10,6 +10,7 @@ import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.JsName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -26,6 +27,7 @@ expect class FirebaseFirestore {
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+    fun useEmulator(host: String, port: Int)
 }
 
 expect class Transaction {
@@ -67,8 +69,8 @@ expect open class Query {
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
     internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
-    internal fun _order(field: String, direction: QueryDirection): Query
-    internal fun _order(path: FieldPath, direction: QueryDirection): Query
+    internal fun _orderBy(field: String, direction: Direction): Query
+    internal fun _orderBy(field: FieldPath, direction: Direction): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -77,8 +79,8 @@ fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, 
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
-fun Query.order(field: String, direction: QueryDirection) = _order(field, direction)
-fun Query.order(path: FieldPath, direction: QueryDirection) = _order(path, direction)
+fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
+fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
@@ -104,6 +106,8 @@ expect class DocumentReference {
     val id: String
     val path: String
     val snapshots: Flow<DocumentSnapshot>
+
+    fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
 
     suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
@@ -125,8 +129,12 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
+
+    fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
+    @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
+    suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
 }
 
 expect class FirebaseFirestoreException : FirebaseException
@@ -154,9 +162,27 @@ expect enum class FirestoreExceptionCode {
     UNAUTHENTICATED
 }
 
+expect enum class Direction {
+    ASCENDING,
+    DESCENDING
+}
+
 expect class QuerySnapshot {
-    val documents: List<DocumentSnapshot>
+    val documentChanges: List<DocumentChange>
     val metadata: SnapshotMetadata
+}
+
+expect enum class ChangeType {
+    ADDED ,
+    MODIFIED,
+    REMOVED
+}
+
+expect class DocumentChange {
+    val document: DocumentSnapshot
+    val newIndex: Int
+    val oldIndex: Int
+    val type: ChangeType
 }
 
 expect class DocumentSnapshot {
@@ -180,15 +206,17 @@ expect class SnapshotMetadata {
     val isFromCache: Boolean
 }
 
-expect class FieldPath
-
-expect fun FieldPath(vararg fieldNames: String): FieldPath
+expect class FieldPath(vararg fieldNames: String) {
+    val documentId: FieldPath
+}
 
 expect object FieldValue {
-    fun delete(): Any
+    val serverTimestamp: Double
+    val delete: Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
     fun serverTimestamp(): Any
+    @Deprecated("Replaced with FieldValue.delete")
+    @JsName("deprecatedDelete")
+    fun delete(): Any
 }
-
-

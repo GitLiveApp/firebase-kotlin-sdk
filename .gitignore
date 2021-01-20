@@ -12,7 +12,8 @@ firebase-firestore/src/iosMain/c_interop/modules/
 firebase-database/src/iosMain/c_interop/modules/
 Firebase*.zip
 /Firebase
-.DS_Store
+/.DS_Store
+*.log
 
 
 /**/Cartfile.resolved

@@ -2,7 +2,6 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.serialization.Serializable
@@ -16,7 +15,6 @@ data class TestData(
     var updatedAt: Any?
 )
 
-@ImplicitReflectionSerializer
 @Suppress("UNCHECKED_CAST")
 class TimestampTests {
 
