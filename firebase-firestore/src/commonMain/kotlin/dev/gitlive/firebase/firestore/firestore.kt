@@ -20,6 +20,7 @@ expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class FirebaseFirestore {
     fun collection(collectionPath: String): CollectionReference
+    fun collectionGroup(collectionId: String): Query
     fun document(documentPath: String): DocumentReference
     fun batch(): WriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
