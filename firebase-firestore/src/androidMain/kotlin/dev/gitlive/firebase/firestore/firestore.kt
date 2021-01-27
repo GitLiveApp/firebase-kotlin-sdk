@@ -51,8 +51,7 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
-        android.clearPersistence().await()
-            .run { Unit }
+        android.clearPersistence().await().run { Unit }
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
@@ -61,22 +60,20 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
             .build()
     }
 
-    actual fun setSettings(value: FirebaseFirestoreSettings) {
-        android.firestoreSettings = value.run {
-            com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
+    actual fun settings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
                 persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
                 sslEnabled?.let { builder.isSslEnabled = it }
                 host?.let { builder.host = it }
                 cacheSizeBytes?.let { builder.cacheSizeBytes = it }
             }.build()
         }
-    }
 
     actual suspend fun disableNetwork() {
-        android.disableNetwork().await().run {  }
+        android.disableNetwork().await().run { Unit }
     }
     actual suspend fun enableNetwork() {
-        android.enableNetwork().await().run {  }
+        android.enableNetwork().await().run { Unit }
     }
 }
 

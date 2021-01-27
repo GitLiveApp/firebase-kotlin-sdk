@@ -348,12 +348,6 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
-        open class Settings {
-            val cacheSizeBytes: Long?
-            val host: String?
-            val ss: Boolean?
-        }
-
         open class Timestamp {
             val seconds: Double
             val nanoseconds: Double

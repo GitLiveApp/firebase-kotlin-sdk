@@ -53,18 +53,14 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 
-    actual fun setSettings(value: FirebaseFirestoreSettings) {
-        value.run {
-            persistenceEnabled?.let { js.enablePersistence() }
+    actual fun settings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        persistenceEnabled?.takeIf { it }?.let { js.enablePersistence() }
 
-            val settingsJson = mutableListOf<Pair<String, Any>>()
-
-            sslEnabled?.let { settingsJson.add("ssl" to it) }
-            host?.let { settingsJson.add("host" to it) }
-            cacheSizeBytes?.let { settingsJson.add("cacheSizeBytes" to it) }
-
-            js.settings(json(*settingsJson.toTypedArray()))
-        }
+        js.settings(json().apply {
+            sslEnabled?.takeIf { it }?.let { set("ssl", it) }
+            host?.let { set("host", it) }
+            cacheSizeBytes?.let { set("cacheSizeBytes", it) }
+        })
     }
 
     actual suspend fun disableNetwork() {

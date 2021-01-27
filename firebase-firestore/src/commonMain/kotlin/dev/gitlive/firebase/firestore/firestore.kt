@@ -26,7 +26,7 @@ expect class FirebaseFirestore {
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
-    fun setSettings(value: FirebaseFirestoreSettings)
+    fun settings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }
@@ -50,13 +50,6 @@ expect class Transaction {
     fun delete(documentRef: DocumentReference): Transaction
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
-
-data class FirebaseFirestoreSettings(
-    val persistenceEnabled: Boolean? = null,
-    val sslEnabled: Boolean? = null,
-    val host: String? = null,
-    val cacheSizeBytes: Long? = null
-)
 
 expect open class Query {
     fun limit(limit: Number): Query
