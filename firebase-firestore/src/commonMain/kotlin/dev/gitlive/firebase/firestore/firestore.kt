@@ -26,7 +26,7 @@ expect class FirebaseFirestore {
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
-    fun settings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
+    fun setSettings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }

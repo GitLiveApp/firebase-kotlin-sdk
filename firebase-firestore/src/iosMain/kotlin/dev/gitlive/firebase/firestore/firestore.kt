@@ -63,7 +63,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         }
     }
 
-    actual fun settings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
         ios.settings = FIRFirestoreSettings().also { settings ->
             persistenceEnabled?.let { settings.persistenceEnabled = it }
             sslEnabled?.let { settings.sslEnabled = it }
