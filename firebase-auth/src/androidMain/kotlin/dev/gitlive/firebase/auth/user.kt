@@ -33,7 +33,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         get() = android.providerId
     actual suspend fun delete() = android.delete().await().run { Unit }
     actual suspend fun reload() = android.reload().await().run { Unit }
-    actual suspend fun getIdTokenResult(forceRefresh: Boolean) = android.getIdToken(forceRefresh).await().run { AuthTokenResult(this) }
+    actual suspend fun getIdToken(forceRefresh: Boolean): String? = android.getIdToken(forceRefresh).await().token
+    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = android.getIdToken(forceRefresh).await().run { AuthTokenResult(this) }
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = AuthResult(android.linkWithCredential(credential.android).await())
     actual suspend fun reauthenticate(credential: AuthCredential) = android.reauthenticate(credential.android).await().run { Unit }
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(android.reauthenticateAndRetrieveData(credential.android).await())

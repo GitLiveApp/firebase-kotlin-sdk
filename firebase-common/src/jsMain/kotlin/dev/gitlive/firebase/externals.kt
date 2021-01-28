@@ -71,7 +71,7 @@ external object firebase {
 
         abstract class IdTokenResult {
             val authTime: String
-            val claims: Map<String, Any>
+            val claims: Json
             val expirationTime: String
             val issuedAtTime: String
             val signInProvider: String?

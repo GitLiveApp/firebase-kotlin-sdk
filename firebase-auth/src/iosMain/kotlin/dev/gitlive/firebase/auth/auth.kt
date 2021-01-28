@@ -99,11 +99,11 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
 }
 
 actual class AuthTokenResult(val ios: FIRAuthTokenResult) {
-    //    actual val authTimestamp: Long
+//    actual val authTimestamp: Long
 //        get() = ios.authDate
     actual val claims: Map<String, Any>
         get() = ios.claims.map { it.key.toString() to it.value as Any }.toMap()
-    //    actual val expirationTimestamp: Long
+//    actual val expirationTimestamp: Long
 //        get() = ios.expirationDate
 //    actual val issuedAtTimestamp: Long
 //        get() = ios.issuedAtDate

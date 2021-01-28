@@ -18,6 +18,7 @@ expect class FirebaseUser {
     val providerId: String
     suspend fun delete()
     suspend fun reload()
+    suspend fun getIdToken(forceRefresh: Boolean): String?
     suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult
     suspend fun linkWithCredential(credential: AuthCredential): AuthResult
     suspend fun reauthenticate(credential: AuthCredential)

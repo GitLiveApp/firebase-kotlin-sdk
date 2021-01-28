@@ -112,11 +112,11 @@ actual class AuthResult internal constructor(val android: com.google.firebase.au
 }
 
 actual class AuthTokenResult(val android: com.google.firebase.auth.GetTokenResult) {
-    //    actual val authTimestamp: Long
+//    actual val authTimestamp: Long
 //        get() = android.authTimestamp
     actual val claims: Map<String, Any>
         get() = android.claims
-    //    actual val expirationTimestamp: Long
+//    actual val expirationTimestamp: Long
 //        get() = android.expirationTimestamp
 //    actual val issuedAtTimestamp: Long
 //        get() = android.issuedAtTimestamp

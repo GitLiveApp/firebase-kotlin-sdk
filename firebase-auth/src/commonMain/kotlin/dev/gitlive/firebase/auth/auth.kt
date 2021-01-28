@@ -42,9 +42,9 @@ expect class AuthResult {
 }
 
 expect class AuthTokenResult {
-    //    val authTimestamp: Long
+//    val authTimestamp: Long
     val claims: Map<String, Any>
-    //    val expirationTimestamp: Long
+//    val expirationTimestamp: Long
 //    val issuedAtTimestamp: Long
     val signInProvider: String?
     val token: String?

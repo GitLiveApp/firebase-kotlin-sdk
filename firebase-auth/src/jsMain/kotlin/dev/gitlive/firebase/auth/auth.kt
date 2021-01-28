@@ -102,11 +102,13 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
 }
 
 actual class AuthTokenResult(val js: firebase.auth.IdTokenResult) {
-    //    actual val authTimestamp: Long
+//    actual val authTimestamp: Long
 //        get() = js.authTime
     actual val claims: Map<String, Any>
-        get() = js.claims
-    //    actual val expirationTimestamp: Long
+        get() = (js("Object").keys(js.claims) as Array<String>).mapNotNull {
+                key -> js.claims[key]?.let { key to it }
+        }.toMap()
+//    actual val expirationTimestamp: Long
 //        get() = android.expirationTime
 //    actual val issuedAtTimestamp: Long
 //        get() = js.issuedAtTime
