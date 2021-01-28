@@ -35,8 +35,8 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
 
     actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
 
-    actual suspend fun getIdToken(forceRefresh: Boolean): String? =
-        ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
+    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult =
+        AuthTokenResult(ios.awaitResult { getIDTokenResultForcingRefresh(forceRefresh, it) })
 
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult =
         AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })

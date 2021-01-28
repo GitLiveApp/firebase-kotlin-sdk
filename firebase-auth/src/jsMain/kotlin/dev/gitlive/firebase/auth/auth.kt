@@ -101,6 +101,21 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
 
+actual class AuthTokenResult(val js: firebase.auth.IdTokenResult) {
+    //    actual val authTimestamp: Long
+//        get() = js.authTime
+    actual val claims: Map<String, Any>
+        get() = js.claims
+    //    actual val expirationTimestamp: Long
+//        get() = android.expirationTime
+//    actual val issuedAtTimestamp: Long
+//        get() = js.issuedAtTime
+    actual val signInProvider: String?
+        get() = js.signInProvider
+    actual val token: String?
+        get() = js.token
+}
+
 internal fun ActionCodeSettings.toJson() = json(
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
     "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
