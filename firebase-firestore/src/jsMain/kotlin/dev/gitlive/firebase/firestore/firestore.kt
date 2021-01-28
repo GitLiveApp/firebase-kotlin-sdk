@@ -54,10 +54,10 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 
     actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        persistenceEnabled?.takeIf { it }?.let { js.enablePersistence() }
+        if(persistenceEnabled == true) js.enablePersistence()
 
         js.settings(json().apply {
-            sslEnabled?.takeIf { it }?.let { set("ssl", it) }
+            sslEnabled?.let { set("ssl", it) }
             host?.let { set("host", it) }
             cacheSizeBytes?.let { set("cacheSizeBytes", it) }
         })
