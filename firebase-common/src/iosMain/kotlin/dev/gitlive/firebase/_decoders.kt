@@ -20,6 +20,9 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         value is NSObject && NSClassFromString("FIRTimestamp") == value.`class`() -> {
             makeFIRTimestampDecoder(value)
         }
+        value is NSObject && NSClassFromString("FIRGeoPoint") == value.`class`() -> {
+            makeFIRGeoPointDecoder(value)
+        }
         else -> FirebaseEmptyCompositeDecoder()
     }
     StructureKind.LIST, is PolymorphicKind -> (value as List<*>).let {
@@ -35,6 +38,14 @@ private val timestampKeys = setOf("seconds", "nanoseconds")
 private fun makeFIRTimestampDecoder(objcObj: NSObject) = FirebaseClassDecoder(
     size = 2,
     containsKey = { timestampKeys.contains(it) }
+) { descriptor, index ->
+    objcObj.valueForKeyPath(descriptor.getElementName(index))
+}
+
+private val geoPointKeys = setOf("latitude", "longitude")
+private fun makeFIRGeoPointDecoder(objcObj: NSObject) = FirebaseClassDecoder(
+    size = 2,
+    containsKey = { geoPointKeys.contains(it) }
 ) { descriptor, index ->
     objcObj.valueForKeyPath(descriptor.getElementName(index))
 }

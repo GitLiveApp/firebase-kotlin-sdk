@@ -16,7 +16,10 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
                 value[desc.getElementName(index)]
             }
         value != null && value::class.qualifiedName == "com.google.firebase.Timestamp" -> {
-            makeJavaReflectionDecoder(value)
+            makeTimestampJavaReflectionDecoder(value)
+        }
+        value != null && value::class.qualifiedName == "com.google.firebase.firestore.GeoPoint" -> {
+            makeGeoPointJavaReflectionDecoder(value)
         }
         else -> FirebaseEmptyCompositeDecoder()
     }
@@ -31,7 +34,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
 
 private val timestampKeys = setOf("seconds", "nanoseconds")
 
-private fun makeJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
+private fun makeTimestampJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
     val timestampClass = Class.forName("com.google.firebase.Timestamp")
     val getSeconds = timestampClass.getMethod("getSeconds")
     val getNanoseconds = timestampClass.getMethod("getNanoseconds")
@@ -43,6 +46,25 @@ private fun makeJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
         when (descriptor.getElementName(index)) {
             "seconds" -> getSeconds.invoke(jvmObj) as Long
             "nanoseconds" -> getNanoseconds.invoke(jvmObj) as Int
+            else -> null
+        }
+    }
+}
+
+private val geoPointKeys = setOf("latitude", "longitude")
+
+private fun makeGeoPointJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
+    val timestampClass = Class.forName("com.google.firebase.firestore.GeoPoint")
+    val getLatitude = timestampClass.getMethod("getLatitude")
+    val getLongitude = timestampClass.getMethod("getLongitude")
+
+    return FirebaseClassDecoder(
+        size = 2,
+        containsKey = { geoPointKeys.contains(it) }
+    ) { descriptor, index ->
+        when (descriptor.getElementName(index)) {
+            "latitude" -> getLatitude.invoke(jvmObj) as Double
+            "longitude" -> getLongitude.invoke(jvmObj) as Double
             else -> null
         }
     }

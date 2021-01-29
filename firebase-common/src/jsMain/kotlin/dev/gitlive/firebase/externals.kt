@@ -421,6 +421,11 @@ external object firebase {
             val nanoseconds: Int
         }
 
+        open class GeoPoint(latitude: Double, longitude: Double) {
+            val latitude: Double
+            val longitude: Double
+        }
+
         abstract class FieldValue {
             companion object {
                 fun delete(): FieldValue
