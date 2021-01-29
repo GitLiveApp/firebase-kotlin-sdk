@@ -405,7 +405,6 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
     actual fun serverTimestamp(): Any = com.google.firebase.firestore.FieldValue.serverTimestamp()
     actual val delete: Any get() = FieldValue.delete()
     actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)

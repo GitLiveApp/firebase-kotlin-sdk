@@ -384,7 +384,6 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
 
 actual object FieldValue {
     @JsName("_serverTimestamp")
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
     actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
     actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
     actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
