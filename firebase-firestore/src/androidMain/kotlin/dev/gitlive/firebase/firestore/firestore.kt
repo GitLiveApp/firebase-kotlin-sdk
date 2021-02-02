@@ -7,17 +7,14 @@ package dev.gitlive.firebase.firestore
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
-import dev.gitlive.firebase.firestore.encode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.serializer
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?): T =
@@ -41,12 +38,6 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
-//    actual var settings: FirebaseFirestoreSettings
-//        get() = android.firestoreSettings.run { FirebaseFirestoreSettings(isPersistenceEnabled) }
-//        set(value) {
-//            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
-//        }
-
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
@@ -60,15 +51,30 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
-        android.clearPersistence().await()
-            .run { Unit }
+        android.clearPersistence().await().run { }
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(false)
             .build()
     }
+
+    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
+                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
+                sslEnabled?.let { builder.isSslEnabled = it }
+                host?.let { builder.host = it }
+                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
+            }.build()
+        }
+
+    actual suspend fun disableNetwork() =
+        android.disableNetwork().await().run { }
+
+    actual suspend fun enableNetwork() =
+        android.enableNetwork().await().run { }
+
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {

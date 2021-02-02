@@ -68,7 +68,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.4.0")
+                api("com.google.firebase:firebase-common:19.5.0")
             }
         }
         val jsMain by getting {

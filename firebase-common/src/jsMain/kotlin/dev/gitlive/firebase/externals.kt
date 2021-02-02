@@ -344,6 +344,8 @@ external object firebase {
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
             fun useEmulator(host: String, port: Int)
+            fun disableNetwork(): Promise<Unit>
+            fun enableNetwork(): Promise<Unit>
         }
 
         open class Timestamp {
