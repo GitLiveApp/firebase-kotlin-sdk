@@ -19,7 +19,6 @@ expect val Firebase.firestore: FirebaseFirestore
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class FirebaseFirestore {
-//    var settings: FirebaseFirestoreSettings
     fun collection(collectionPath: String): CollectionReference
     fun document(documentPath: String): DocumentReference
     fun batch(): WriteBatch
@@ -27,6 +26,9 @@ expect class FirebaseFirestore {
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
+    fun setSettings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
+    suspend fun disableNetwork()
+    suspend fun enableNetwork()
 }
 
 expect class Transaction {
@@ -48,10 +50,6 @@ expect class Transaction {
     fun delete(documentRef: DocumentReference): Transaction
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
-
-//data class FirebaseFirestoreSettings(
-//    val persistenceEnabled: Boolean = true
-//)
 
 expect open class Query {
     fun limit(limit: Number): Query
