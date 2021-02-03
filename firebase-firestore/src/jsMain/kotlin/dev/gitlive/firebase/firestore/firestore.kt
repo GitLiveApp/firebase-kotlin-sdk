@@ -38,6 +38,8 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
+    actual fun collectionGroup(collectionId: String) = Query(js.collectionGroup(collectionId))
+
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
     actual fun batch() = rethrow { WriteBatch(js.batch()) }
