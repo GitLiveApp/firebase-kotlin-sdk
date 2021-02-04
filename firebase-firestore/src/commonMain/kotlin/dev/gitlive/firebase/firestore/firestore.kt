@@ -19,17 +19,15 @@ expect val Firebase.firestore: FirebaseFirestore
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class FirebaseFirestore {
+//    var settings: FirebaseFirestoreSettings
     fun collection(collectionPath: String): CollectionReference
-    fun collectionGroup(collectionId: String): Query
     fun document(documentPath: String): DocumentReference
+    fun collectionGroup(collectionId: String): Query
     fun batch(): WriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
-    fun setSettings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
-    suspend fun disableNetwork()
-    suspend fun enableNetwork()
 }
 
 expect class Transaction {
@@ -52,6 +50,10 @@ expect class Transaction {
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
 
+//data class FirebaseFirestoreSettings(
+//    val persistenceEnabled: Boolean = true
+//)
+
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
@@ -62,7 +64,6 @@ expect open class Query {
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
     internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
-
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
 }
@@ -73,7 +74,6 @@ fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, 
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
-
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
@@ -163,7 +163,6 @@ expect enum class Direction {
 }
 
 expect class QuerySnapshot {
-    val documents: List<DocumentSnapshot>
     val documentChanges: List<DocumentChange>
     val metadata: SnapshotMetadata
 }
@@ -207,10 +206,10 @@ expect class FieldPath(vararg fieldNames: String) {
 }
 
 expect object FieldValue {
-    val serverTimestamp: Double
     val delete: Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
+    fun serverTimestamp(): Any
     @Deprecated("Replaced with FieldValue.delete")
     @JsName("deprecatedDelete")
     fun delete(): Any

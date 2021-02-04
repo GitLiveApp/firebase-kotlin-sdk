@@ -3,7 +3,6 @@
  */
 
 package dev.gitlive.firebase.firestore
-
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -14,20 +13,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 
-@PublishedApi
-internal inline fun <reified T> decode(value: Any?): T =
-    decode(value) { it.takeIf { it.asDynamic().toMillis != undefined }?.asDynamic().toMillis() as? Double }
-
-internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
-    decode(strategy, value) { it.takeIf { it.asDynamic().toMillis != undefined }?.asDynamic().toMillis() as? Double }
-
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    encode(value, shouldEncodeElementDefault, firebase.firestore.FieldValue.serverTimestamp())
-
-private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    encode(strategy, value, shouldEncodeElementDefault, firebase.firestore.FieldValue.serverTimestamp())
-
 actual val Firebase.firestore get() =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.firestore()) }
 
@@ -36,11 +21,17 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
+//    actual var settings: FirebaseFirestoreSettings
+//        get() = js.settings().run { FirebaseFirestoreSettings(js.isPersistenceEnabled) }
+//        set(value) {
+//            js.settings() = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
+//        }
+
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
-    actual fun collectionGroup(collectionId: String) = Query(js.collectionGroup(collectionId))
-
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
+
+    actual fun collectionGroup(collectionId: String) = rethrow { Query(js.collectionGroup(collectionId)) }
 
     actual fun batch() = rethrow { WriteBatch(js.batch()) }
 
@@ -54,24 +45,6 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
         rethrow { js.clearPersistence().await() }
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
-
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        if(persistenceEnabled == true) js.enablePersistence()
-
-        js.settings(json().apply {
-            sslEnabled?.let { set("ssl", it) }
-            host?.let { set("host", it) }
-            cacheSizeBytes?.let { set("cacheSizeBytes", it) }
-        })
-    }
-
-    actual suspend fun disableNetwork() {
-        rethrow { js.disableNetwork().await() }
-    }
-
-    actual suspend fun enableNetwork() {
-        rethrow { js.enableNetwork().await() }
-    }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
@@ -359,8 +332,6 @@ actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExc
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
-    actual val documents
-        get() = js.docs.map { DocumentSnapshot(it) }
     actual val documentChanges
         get() = js.docChanges().map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
@@ -412,10 +383,11 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
 }
 
 actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    @JsName("_serverTimestamp")
     actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
     actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
     actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
+    actual fun serverTimestamp(): Any = rethrow { firebase.firestore.FieldValue.serverTimestamp() }
     @JsName("deprecatedDelete")
     actual fun delete(): Any = delete
 }
