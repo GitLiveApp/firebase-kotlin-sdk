@@ -1,11 +1,10 @@
-import de.undercouch.gradle.tasks.download.Download
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.4.21" apply false
-    id("de.undercouch.download").version("4.1.1")
     id("base")
 }
 
@@ -20,7 +19,6 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.1")
-        classpath("de.undercouch:gradle-download-task:4.1.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
@@ -42,6 +40,10 @@ tasks {
 }
 
 subprojects {
+
+    // temp fix for https://youtrack.jetbrains.com/issue/KT-35011
+    // add ideaActive=true for local development
+    val ideaActive by extra { gradleLocalProperties(rootDir)["idea.active"] == "true" }
 
     group = "dev.gitlive"
 
@@ -155,7 +157,7 @@ subprojects {
                 executable = "carthage"
                 args(
                     it,
-                    "--project-directory", "src/iosMain/c_interop",
+                    "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
                     "--platform", "iOS",
                     "--cache-builds"
                 )
@@ -170,8 +172,10 @@ subprojects {
 
         create("carthageClean", Delete::class.java) {
             group = "carthage"
-            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
-            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
+            delete(
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
+                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
+            )
         }
     }
 
