@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 version = project.property("firebase-common.version") as String
 
 plugins {
@@ -44,7 +46,15 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    ios()
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+
+    }
+
+    if (project.extra["ideaActive"] as Boolean) {
+        iosX64("ios", nativeTargetConfig())
+    } else {
+        ios(configure = nativeTargetConfig())
+    }
 
     js {
         useCommonJs()

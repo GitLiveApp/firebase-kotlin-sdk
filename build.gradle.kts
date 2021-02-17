@@ -26,6 +26,15 @@ buildscript {
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
 
+// TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
+// add idea.active=true for local development
+val _ideaActive = gradleLocalProperties(rootDir)["idea.active"] == "true"
+
+//if (!_ideaActive) {
+//    ext["kotlin.mpp.enableGranularSourceSetsMetadata"] = "true"
+//    ext["kotlin.native.enableDependencyPropagation"] = "false"
+//}
+
 tasks {
     val updateVersions by registering {
         dependsOn(
@@ -41,9 +50,7 @@ tasks {
 
 subprojects {
 
-    // temp fix for https://youtrack.jetbrains.com/issue/KT-35011
-    // add ideaActive=true for local development
-    val ideaActive by extra { gradleLocalProperties(rootDir)["idea.active"] == "true" }
+    val ideaActive by extra(_ideaActive)
 
     group = "dev.gitlive"
 
@@ -56,11 +63,9 @@ subprojects {
         jcenter()
     }
 
-
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }
-    
 
     tasks {
 
@@ -258,11 +263,7 @@ subprojects {
                         comments.set("A business-friendly OSS license")
                     }
                 }
-
             }
         }
-
     }
-
 }
-
