@@ -21,6 +21,9 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         value != null && value::class.qualifiedName == "com.google.firebase.firestore.GeoPoint" -> {
             makeGeoPointJavaReflectionDecoder(value)
         }
+        value != null && value::class.qualifiedName == "com.google.firebase.firestore.DocumentReference" -> {
+            makeDocumentReferenceJavaReflectionDecoder(value)
+        }
         else -> FirebaseEmptyCompositeDecoder()
     }
     StructureKind.LIST, is PolymorphicKind -> (value as List<*>).let {
@@ -65,6 +68,23 @@ private fun makeGeoPointJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
         when (descriptor.getElementName(index)) {
             "latitude" -> getLatitude.invoke(jvmObj) as Double
             "longitude" -> getLongitude.invoke(jvmObj) as Double
+            else -> null
+        }
+    }
+}
+
+private val documentKeys = setOf("path")
+
+private fun makeDocumentReferenceJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
+    val timestampClass = Class.forName("com.google.firebase.firestore.DocumentReference")
+    val getPath = timestampClass.getMethod("getPath")
+
+    return FirebaseClassDecoder(
+        size = 1,
+        containsKey = { documentKeys.contains(it) }
+    ) { descriptor, index ->
+        when (descriptor.getElementName(index)) {
+            "path" -> getPath.invoke(jvmObj) as Double
             else -> null
         }
     }
