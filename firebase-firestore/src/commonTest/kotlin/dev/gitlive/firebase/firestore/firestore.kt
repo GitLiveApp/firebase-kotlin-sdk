@@ -137,20 +137,4 @@ class FirebaseFirestoreTest {
     fun testDefaultOptions() = runTest {
         assertNull(FirebaseOptions.withContext(1))
     }
-
-    @Serializable
-    data class TestDataWithDocumentReference(
-        val uid: String,
-        @Serializable(with = DocumentReferenceSerializer::class)
-        val reference: DocumentReference
-    )
-
-    @Test
-    fun encodeDocumentReferenceObject() = runTest {
-        val doc = Firebase.firestore.document("a/b")
-        val item = TestDataWithDocumentReference("123", doc)
-        val encoded = encode(item, shouldEncodeElementDefault = false) as Map<String, Any?>
-        assertEquals("123", encoded["uid"])
-        assertEquals(doc, encoded["reference"])
-    }
 }
