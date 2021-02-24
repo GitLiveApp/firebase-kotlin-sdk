@@ -1,11 +1,10 @@
-import de.undercouch.gradle.tasks.download.Download
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.4.21" apply false
-    id("de.undercouch.download").version("4.1.1")
     id("base")
 }
 
@@ -20,13 +19,21 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.1")
-        classpath("de.undercouch:gradle-download-task:4.1.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
     }
 }
 
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
+
+// TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
+// add idea.active=true for local development
+val _ideaActive = gradleLocalProperties(rootDir)["idea.active"] == "true"
+
+//if (!_ideaActive) {
+//    ext["kotlin.mpp.enableGranularSourceSetsMetadata"] = "true"
+//    ext["kotlin.native.enableDependencyPropagation"] = "false"
+//}
 
 tasks {
     val updateVersions by registering {
@@ -43,6 +50,8 @@ tasks {
 
 subprojects {
 
+    val ideaActive by extra(_ideaActive)
+
     group = "dev.gitlive"
 
     apply(plugin="com.adarshr.test-logger")
@@ -54,11 +63,9 @@ subprojects {
         jcenter()
     }
 
-
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }
-    
 
     tasks {
 
@@ -155,7 +162,7 @@ subprojects {
                 executable = "carthage"
                 args(
                     it,
-                    "--project-directory", "src/iosMain/c_interop",
+                    "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
                     "--platform", "iOS",
                     "--cache-builds"
                 )
@@ -170,8 +177,10 @@ subprojects {
 
         create("carthageClean", Delete::class.java) {
             group = "carthage"
-            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
-            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
+            delete(
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
+                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
+            )
         }
     }
 
@@ -254,11 +263,7 @@ subprojects {
                         comments.set("A business-friendly OSS license")
                     }
                 }
-
             }
         }
-
     }
-
 }
-
