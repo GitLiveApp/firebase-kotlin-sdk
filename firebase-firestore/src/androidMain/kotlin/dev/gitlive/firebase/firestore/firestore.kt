@@ -359,6 +359,8 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 actual typealias FirestoreExceptionCode = com.google.firebase.firestore.FirebaseFirestoreException.Code
 
 actual class QuerySnapshot(val android: com.google.firebase.firestore.QuerySnapshot) {
+    actual val documents
+        get() = android.documents.map { DocumentSnapshot(it) }
     actual val documentChanges
         get() = android.documentChanges.map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)

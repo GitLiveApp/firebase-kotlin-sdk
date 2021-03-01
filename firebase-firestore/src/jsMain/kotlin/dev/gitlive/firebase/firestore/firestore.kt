@@ -335,6 +335,8 @@ actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExc
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
+    actual val documents
+        get() = js.docs.map { DocumentSnapshot(it) }
     actual val documentChanges
         get() = js.docChanges().map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)

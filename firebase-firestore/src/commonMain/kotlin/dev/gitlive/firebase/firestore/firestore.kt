@@ -167,6 +167,7 @@ expect enum class Direction {
 }
 
 expect class QuerySnapshot {
+    val documents: List<DocumentSnapshot>
     val documentChanges: List<DocumentChange>
     val metadata: SnapshotMetadata
 }
