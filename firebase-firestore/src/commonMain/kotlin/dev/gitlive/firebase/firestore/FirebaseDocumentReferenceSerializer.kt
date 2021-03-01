@@ -9,7 +9,11 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-class DocumentReferenceSerializer : KSerializer<DocumentReference> {
+expect class FirebaseDocumentReferenceEncoder() {
+    fun encode(value: DocumentReference): Any
+}
+
+class FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
 
     override val descriptor = object : SerialDescriptor {
         val keys = listOf("path")
@@ -25,7 +29,8 @@ class DocumentReferenceSerializer : KSerializer<DocumentReference> {
 
     override fun serialize(encoder: Encoder, value: DocumentReference) {
         val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
-        objectEncoder.encodeObject(descriptor, 0, value)
+        val documentReferenceEncoder = FirebaseDocumentReferenceEncoder()
+        objectEncoder.encodeObject(descriptor, 0, documentReferenceEncoder.encode(value))
         objectEncoder.endStructure(descriptor)
     }
 
