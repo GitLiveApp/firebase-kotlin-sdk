@@ -58,6 +58,10 @@ class FirebaseDecoder(internal val value: Any?, private val decodeDouble: (value
     override fun decodeNotNullMark() = decodeNotNullMark(value)
 
     override fun decodeNull() = decodeNull(value)
+
+    @ExperimentalSerializationApi
+    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder =
+        FirebaseDecoder(value, decodeDouble)
 }
 
 class FirebaseClassDecoder(
@@ -98,10 +102,12 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor) = size
 
-    override fun <T> decodeSerializableElement(descriptor: SerialDescriptor,
-                                               index: Int, deserializer: DeserializationStrategy<T>, previousValue: T? ): T {
-        return deserializer.deserialize(FirebaseDecoder(get(descriptor, index), decodeDouble))
-    }
+    override fun <T> decodeSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T>,
+        previousValue: T?
+    ) = deserializer.deserialize(FirebaseDecoder(get(descriptor, index), decodeDouble))
 
     override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) = decodeBoolean(get(descriptor, index))
 
@@ -129,8 +135,11 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeStringElement(descriptor: SerialDescriptor, index: Int) = decodeString(get(descriptor, index))
 
-    override fun endStructure(descriptor: SerialDescriptor) {
-    }
+    override fun endStructure(descriptor: SerialDescriptor) {}
+
+    @ExperimentalSerializationApi
+    override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder =
+        FirebaseDecoder(get(descriptor, index), decodeDouble)
 }
 
 private fun decodeString(value: Any?) = value.toString()
