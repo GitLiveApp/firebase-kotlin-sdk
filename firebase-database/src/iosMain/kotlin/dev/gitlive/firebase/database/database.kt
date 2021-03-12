@@ -65,7 +65,7 @@ fun Type.toEventType() = when(this) {
 
 actual open class Query internal constructor(
     open val ios: FIRDatabaseQuery,
-    val persistenceEnabled: Boolean
+    internal val persistenceEnabled: Boolean
 ) {
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
@@ -99,7 +99,7 @@ actual open class Query internal constructor(
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                safeOffer(DataSnapshot(snapShot!!))
+                safeOffer(DataSnapshot(snapShot!!, persistenceEnabled))
             }
         ) { close(DatabaseException(it.toString())) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -110,7 +110,7 @@ actual open class Query internal constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    safeOffer(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                    safeOffer(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
                 }
             ) { close(DatabaseException(it.toString())) }
         }
@@ -153,13 +153,16 @@ actual class DatabaseReference internal constructor(
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
+actual class DataSnapshot internal constructor(
+    val ios: FIRDataSnapshot,
+    private val persistenceEnabled: Boolean
+) {
 
     actual val exists get() = ios.exists()
 
     actual val key: String? get() = ios.key
 
-    actual val ref: DatabaseReference get() = ios.ref
+    actual val ref: DatabaseReference get() = DatabaseReference(ios.ref, persistenceEnabled)
 
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
@@ -167,8 +170,8 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
         decode(strategy, ios.value)
 
-    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
-    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
+    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
+    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
 }
 
 actual class OnDisconnect internal constructor(
