@@ -139,6 +139,8 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
             js.forEach { snapshot -> it.add(DataSnapshot(snapshot)) }
         }
     }
+    actual val ref: DatabaseReference
+        get() = DatabaseReference(js.ref)
 
 }
 

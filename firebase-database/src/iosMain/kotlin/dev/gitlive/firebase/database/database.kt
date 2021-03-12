@@ -159,6 +159,8 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
 
     actual val key: String? get() = ios.key
 
+    actual val ref: DatabaseReference get() = ios.ref
+
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 

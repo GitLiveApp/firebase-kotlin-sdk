@@ -110,7 +110,7 @@ actual open class Query internal constructor(
         get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                safeOffer(DataSnapshot(snapshot))
+                safeOffer(DataSnapshot(snapshot, persistenceEnabled))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -126,22 +126,22 @@ actual open class Query internal constructor(
 
             val moved by lazy { types.contains(Type.MOVED) }
             override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(moved) safeOffer(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
+                if(moved) safeOffer(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.MOVED, previousChildName))
             }
 
             val changed by lazy { types.contains(Type.CHANGED) }
             override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(changed) safeOffer(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
+                if(changed) safeOffer(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.CHANGED, previousChildName))
             }
 
             val added by lazy { types.contains(Type.ADDED) }
             override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(added) safeOffer(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
+                if(added) safeOffer(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.ADDED, previousChildName))
             }
 
             val removed by lazy { types.contains(Type.REMOVED) }
             override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
-                if(removed) safeOffer(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
+                if(removed) safeOffer(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.REMOVED, null))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -188,11 +188,16 @@ actual class DatabaseReference internal constructor(
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
+actual class DataSnapshot internal constructor(
+    val android: com.google.firebase.database.DataSnapshot,
+    private val persistenceEnabled: Boolean
+) {
 
     actual val exists get() = android.exists()
 
     actual val key get() = android.key
+
+    actual val ref: DatabaseReference get() = DatabaseReference(android.ref, persistenceEnabled)
 
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)
@@ -200,8 +205,8 @@ actual class DataSnapshot internal constructor(val android: com.google.firebase.
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
         decode(strategy, android.value)
 
-    actual fun child(path: String) = DataSnapshot(android.child(path))
-    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
+    actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
+    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
 }
 
 actual class OnDisconnect internal constructor(
@@ -234,4 +239,3 @@ actual class OnDisconnect internal constructor(
 }
 
 actual typealias DatabaseException = com.google.firebase.database.DatabaseException
-
