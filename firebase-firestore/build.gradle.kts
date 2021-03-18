@@ -47,11 +47,7 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "umd"
-            }
-        }
+        useCommonJs()
         nodejs()
         browser()
     }

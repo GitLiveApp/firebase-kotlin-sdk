@@ -6,6 +6,6 @@ package dev.gitlive.firebase
 
 import kotlin.js.json
 
-actual fun nativeMapOf(vararg pairs: Pair<String, Any>): Any = json(*pairs)
+actual fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any = json(*pairs)
 actual fun nativeListOf(vararg elements: Any): Any = elements
 actual fun nativeAssertEquals(expected: Any?, actual: Any?)  = kotlin.test.assertEquals(JSON.stringify(expected), JSON.stringify(actual))

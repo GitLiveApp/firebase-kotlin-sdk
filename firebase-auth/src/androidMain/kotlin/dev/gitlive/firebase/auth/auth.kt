@@ -103,7 +103,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         } as T
     }
 
-    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
+//    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
+    actual fun useEmulator(host: String, port: Int) = Unit
 }
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {

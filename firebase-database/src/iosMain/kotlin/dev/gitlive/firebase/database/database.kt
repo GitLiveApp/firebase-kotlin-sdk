@@ -71,7 +71,7 @@ fun Type.toEventType() = when(this) {
 
 actual open class Query internal constructor(
     open val ios: FIRDatabaseQuery,
-    internal val persistenceEnabled: Boolean
+    val persistenceEnabled: Boolean
 ) {
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 

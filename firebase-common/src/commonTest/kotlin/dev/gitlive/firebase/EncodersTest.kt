@@ -8,8 +8,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
-expect fun nativeMapOf(vararg pairs: Pair<String, Any>): Any
+expect fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any
 expect fun nativeListOf(vararg elements: Any): Any
 expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
 
@@ -46,5 +47,11 @@ class EncodersTest {
     fun decodeListOfObjects() {
         val decoded = decode(ListSerializer(TestData.serializer()), nativeListOf(nativeMapOf("map" to nativeMapOf("key" to "value"))))
         assertEquals(listOf(TestData(mapOf("key" to "value"), false)), decoded)
+    }
+
+    @Test
+    fun decodeObjectNullableValue() {
+        val decoded = decode<TestData>(TestData.serializer(), nativeMapOf("map" to nativeMapOf("key" to "value"), "nullableBool" to null))
+        assertNull(decoded.nullableBool)
     }
 }

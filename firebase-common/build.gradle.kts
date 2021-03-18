@@ -42,12 +42,9 @@ android {
 
 kotlin {
     js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "umd"
-            }
-        }
+        useCommonJs()
         nodejs()
+        browser()
     }
     android {
         publishAllLibraryVariants()
@@ -118,7 +115,6 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
             }
             kotlin.srcDir("src/androidMain/kotlin")
         }

@@ -9,26 +9,7 @@ package dev.gitlive.firebase
 import kotlin.js.Json
 import kotlin.js.Promise
 
-@JsModule("firebase/functions")
-@JsNonModule
-external object functions
-
-@JsModule("firebase/auth")
-@JsNonModule
-external object auth
-
-@JsModule("firebase/database")
-@JsNonModule
-external object database
-
-@JsModule("firebase/firestore")
-@JsNonModule
-external object firestore
-
-typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
-
-@JsModule("firebase/app")
-@JsNonModule
+@JsName("default")
 external object firebase {
 
     open class App {
