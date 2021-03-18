@@ -9,9 +9,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @Serializable
-data class TestData(val map: Map<String, String>, val bool: Boolean = false)
+data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
 
 class EncodersTest {
     @Test
@@ -22,7 +23,7 @@ class EncodersTest {
 
     @Test
     fun encodeObject() {
-        val encoded = encode<TestData>(TestData::class.serializer(), TestData(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
+        val encoded = encode<TestData>(TestData::class.serializer(), TestData(mapOf("key" to "value"), true), shouldEncodeElementDefault = false)
         assertEquals(mapOf("map" to mapOf("key" to "value"), "bool" to true), encoded)
     }
 
@@ -36,5 +37,11 @@ class EncodersTest {
     fun decodeListOfObjects() {
         val decoded = decode(ListSerializer(TestData::class.serializer()), listOf(mapOf("map" to mapOf("key" to "value"))))
         assertEquals(listOf(TestData(mapOf("key" to "value"), false)), decoded)
+    }
+
+    @Test
+    fun decodeObjectNullableValue() {
+        val decoded = decode<TestData>(TestData::class.serializer(), mapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
+        assertNull(decoded.nullableBool)
     }
 }
