@@ -84,7 +84,7 @@ private fun makeDocumentReferenceJavaReflectionDecoder(jvmObj: Any): CompositeDe
         containsKey = { documentKeys.contains(it) }
     ) { descriptor, index ->
         when (descriptor.getElementName(index)) {
-            "path" -> getPath.invoke(jvmObj) as Double
+            "path" -> getPath.invoke(jvmObj) as String
             else -> null
         }
     }
