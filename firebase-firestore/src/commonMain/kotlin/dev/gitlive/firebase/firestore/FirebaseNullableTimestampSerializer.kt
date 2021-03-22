@@ -4,7 +4,7 @@ import dev.gitlive.firebase.FirebaseCompositeDecoder
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encoding.Decoder
 
-class FirebaseNullableTimestampSerializer :FirebaseBaseTimestampSerializer<Timestamp?>() {
+class FirebaseNullableTimestampSerializer : FirebaseBaseTimestampSerializer<Timestamp?>() {
 
     override fun deserialize(decoder: Decoder): Timestamp? {
         val objectDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
