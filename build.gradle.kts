@@ -209,18 +209,18 @@ subprojects {
 
         dependencies {
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
-            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.property("coroutines.version")}")
             "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.0")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3") {
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${project.property("coroutines.version")}") {
                 exclude("com.google.android.gms")
             }
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.property("coroutines.version")}")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${project.property("coroutines.version")}")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.property("coroutines.version")}")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.1")
