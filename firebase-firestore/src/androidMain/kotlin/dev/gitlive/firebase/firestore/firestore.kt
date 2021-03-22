@@ -343,6 +343,8 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
+    actual fun document() = DocumentReference(android.document())
+
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
 

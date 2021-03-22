@@ -360,6 +360,7 @@ external object firebase {
         open class CollectionReference : Query {
             val path: String
             fun doc(path: String): DocumentReference
+            fun doc(): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 

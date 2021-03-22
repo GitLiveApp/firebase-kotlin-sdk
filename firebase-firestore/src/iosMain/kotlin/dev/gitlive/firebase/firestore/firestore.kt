@@ -249,6 +249,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
+    actual fun document() = DocumentReference(ios.documentWithAutoID())
+
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(await { ios.addDocumentWithData(encode(data, encodeDefaults) as Map<Any?, *>, it) })
 
