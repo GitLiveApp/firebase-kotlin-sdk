@@ -51,7 +51,7 @@ class EncodersTest {
 
     @Test
     fun decodeObjectNullableValue() {
-        val decoded = decode<TestData>(TestData.serializer(), nativeMapOf("map" to nativeMapOf("key" to "value"), "nullableBool" to null))
+        val decoded = decode(TestData.serializer(), mapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
         assertNull(decoded.nullableBool)
     }
 }
