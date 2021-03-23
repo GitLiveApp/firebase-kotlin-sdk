@@ -130,6 +130,7 @@ expect class CollectionReference : Query {
     val path: String
 
     fun document(documentPath: String): DocumentReference
+    fun document(): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
     @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference

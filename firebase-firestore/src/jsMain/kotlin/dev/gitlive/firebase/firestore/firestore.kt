@@ -320,6 +320,8 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
+    actual fun document() = rethrow { DocumentReference(js.doc()) }
+
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }
 
