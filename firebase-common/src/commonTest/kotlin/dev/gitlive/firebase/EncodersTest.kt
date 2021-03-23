@@ -10,7 +10,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-expect fun nativeMapOf(vararg pairs: Pair<String, Any>): Any
+expect fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any
 expect fun nativeListOf(vararg elements: Any): Any
 expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
 
@@ -20,9 +20,9 @@ data class TestData(val map: Map<String, String>, val bool: Boolean = false, val
 class EncodersTest {
     @Test
     fun encodeMap() {
-        val encoded = encode(mapOf("key" to "value"), shouldEncodeElementDefault = true)
+        val encoded = encode(mapOf("key" to "value", "key2" to 12, "key3" to null), shouldEncodeElementDefault = true)
 
-        nativeAssertEquals(nativeMapOf("key" to "value"), encoded)
+        nativeAssertEquals(nativeMapOf("key" to "value", "key2" to 12, "key3" to null), encoded)
     }
 
     @Test
