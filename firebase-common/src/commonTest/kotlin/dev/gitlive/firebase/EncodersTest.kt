@@ -20,9 +20,9 @@ data class TestData(val map: Map<String, String>, val bool: Boolean = false, val
 class EncodersTest {
     @Test
     fun encodeMap() {
-        val encoded = encode(mapOf("key" to "value"), shouldEncodeElementDefault = true)
+        val encoded = encode(mapOf("key" to "value", "key2" to 12, "key3" to null), shouldEncodeElementDefault = true)
 
-        nativeAssertEquals(nativeMapOf("key" to "value"), encoded)
+        nativeAssertEquals(nativeMapOf("key" to "value", "key2" to 12, "key3" to null), encoded)
     }
 
     @Test
