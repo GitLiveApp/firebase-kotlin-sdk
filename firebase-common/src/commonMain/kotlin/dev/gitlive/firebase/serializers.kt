@@ -16,7 +16,7 @@ inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>
             is Map<*, *> -> FirebaseMapSerializer()
             is List<*> -> FirebaseListSerializer()
             is Set<*> -> FirebaseListSerializer()
-            else -> throw it
+            else -> this::class.serializer()
         } as SerializationStrategy<T>
     }
 

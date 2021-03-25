@@ -1,6 +1,9 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
+
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 version = project.property("firebase-app.version") as String
 
 plugins {
@@ -41,47 +44,67 @@ android {
 }
 
 kotlin {
+
+    android {
+        publishAllLibraryVariants()
+    }
+
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+        val nativeFrameworkPaths = listOf(
+            projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+        )
+
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                linkerOpts("-ObjC")
+            }
+        }
+
+        compilations.getByName("main") {
+            cinterops.create("FirebaseCore") {
+                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                extraOpts("-verbose")
+            }
+        }
+    }
+
+    if (project.extra["ideaActive"] as Boolean) {
+        iosX64("ios", nativeTargetConfig())
+    } else {
+        ios(configure = nativeTargetConfig())
+    }
+
     js {
         useCommonJs()
         nodejs()
         browser()
     }
-    android {
-        publishLibraryVariants("release", "debug")
-    }
-
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios") {
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                linkerOpts("-ObjC")
-            }
-        }
-    }
 
     sourceSets {
+        all {
+            languageSettings.apply {
+                apiVersion = "1.4"
+                languageVersion = "1.4"
+                progressiveMode = true
+            }
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation(project(":firebase-common"))
             }
         }
+
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common:19.5.0")
             }
         }
 
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-                val firebasecore by cinterops.creating {
-                    packageName("cocoapods.FirebaseCore")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                }
-            }
-        }
+        val iosMain by getting
+
+        val jsMain by getting
     }
 }
 
