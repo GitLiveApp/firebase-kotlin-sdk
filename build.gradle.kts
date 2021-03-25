@@ -210,7 +210,7 @@ subprojects {
         dependencies {
             "jvmMainImplementation"(kotlin("stdlib-jdk8"))
             "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.property("coroutines.version")}")
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.0")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:${project.property("firebase-java.version")}")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${project.property("coroutines.version")}") {
                 exclude("com.google.android.gms")
             }
