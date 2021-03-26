@@ -89,12 +89,6 @@ kotlin {
         ios(configure = nativeTargetConfig())
     }
 
-    js {
-        useCommonJs()
-        nodejs()
-        browser()
-    }
-
     sourceSets {
         all {
             languageSettings.apply {
