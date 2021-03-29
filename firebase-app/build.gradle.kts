@@ -117,6 +117,12 @@ kotlin {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
+
         val iosMain by getting
 
         val jsMain by getting
