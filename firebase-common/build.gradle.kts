@@ -109,9 +109,6 @@ kotlin {
         val iosMain by getting
 
         val jsMain by getting {
-            dependencies {
-                api(npm("firebase", "8.2.0"))
-            }
         }
         val jvmMain by getting {
             dependencies {
