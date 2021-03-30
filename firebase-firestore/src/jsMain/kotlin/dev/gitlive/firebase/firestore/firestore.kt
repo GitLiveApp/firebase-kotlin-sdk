@@ -259,6 +259,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
     internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path.js, "==", equalTo)) }
 
+    internal actual fun _where(field: String, equalTo: DocumentReference) = rethrow { Query(js.where(field, "==", equalTo.js)) }
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = rethrow { Query(js.where(path.js, "==", equalTo.js)) }
+
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
         Query(
             (lessThan?.let {js.where(field, "<", it) } ?: js).let { js2 ->
@@ -316,6 +319,8 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
         get() =  rethrow { js.path }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
+
+    actual fun document() = rethrow { DocumentReference(js.doc()) }
 
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }

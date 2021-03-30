@@ -298,6 +298,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
 
+    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
+
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
             (greaterThan?.let { android2.whereGreaterThan(field, it) } ?: android2).let { android3 ->
@@ -339,6 +342,8 @@ actual class CollectionReference(override val android: com.google.firebase.fires
         get() = android.path
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
+
+    actual fun document() = DocumentReference(android.document())
 
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
