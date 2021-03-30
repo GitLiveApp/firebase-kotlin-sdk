@@ -360,6 +360,7 @@ external object firebase {
         open class CollectionReference : Query {
             val path: String
             fun doc(path: String): DocumentReference
+            fun doc(): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 
@@ -436,6 +437,11 @@ external object firebase {
             companion object {
                 val documentId: FieldPath
             }
+        }
+
+        open class GeoPoint(latitude: Double, longitude: Double) {
+            val latitude: Double
+            val longitude: Double
         }
 
         abstract class FieldValue {
