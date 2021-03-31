@@ -46,10 +46,14 @@ android {
 }
 
 kotlin {
-    js {
+    js("browser", IR) {
+        useCommonJs()
+        browser()
+    }
+    js("node", LEGACY) {
         useCommonJs()
         nodejs()
-        browser()
+        binaries.executable()
     }
     android {
         publishAllLibraryVariants()
@@ -119,7 +123,14 @@ kotlin {
 
         val iosMain by getting
 
-        val jsMain by getting
+        val jsMain by creating
+
+        val browserMain by getting {
+            dependsOn(jsMain)
+        }
+        val nodeMain by getting {
+            dependsOn(jsMain)
+        }
     }
 }
 signing {

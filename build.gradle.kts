@@ -221,7 +221,6 @@ subprojects {
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.property("coroutines.version")}")
-            "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.1")
             "androidAndroidTestImplementation"("androidx.test:core:1.3.0")

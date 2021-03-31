@@ -44,11 +44,16 @@ android {
 }
 
 kotlin {
-    js {
+    js("browser", IR) {
         useCommonJs()
-        nodejs()
         browser()
     }
+    js("node", LEGACY) {
+        useCommonJs()
+        nodejs()
+        binaries.executable()
+    }
+
 //    js("reactnative") {
 //        val main by compilations.getting {
 //            kotlinOptions {
@@ -125,7 +130,14 @@ kotlin {
 
         val iosMain by getting
 
-        val jsMain by getting
+        val jsMain by creating
+
+        val browserMain by getting {
+            dependsOn(jsMain)
+        }
+        val nodeMain by getting {
+            dependsOn(jsMain)
+        }
     }
 }
 
