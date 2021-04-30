@@ -88,7 +88,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "7.14.0"))
+                api(npm("firebase", "8.4.3"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
             }
         }
