@@ -3,6 +3,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 
 version = project.property("firebase-firestore.version") as String
 
@@ -74,6 +75,7 @@ kotlin {
 
     if (project.extra["ideaActive"] as Boolean) {
         iosX64("ios", nativeTargetConfig())
+        iosArm64("ios", nativeTargetConfig())
     } else {
         ios(configure = nativeTargetConfig())
     }
@@ -108,6 +110,7 @@ kotlin {
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
             }
+        }
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-app"))

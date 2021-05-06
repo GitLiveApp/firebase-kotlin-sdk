@@ -3,6 +3,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 
 version = project.property("firebase-functions.version") as String
 

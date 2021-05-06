@@ -39,8 +39,6 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
-    actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId))
-
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
     actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId))

@@ -1,4 +1,4 @@
-/*
+g/*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
@@ -27,8 +27,6 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
-
-    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId))
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
