@@ -83,7 +83,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":firebase-common"))
+                api(project(":firebase-common"))
             }
         }
         val commonTest by getting {
