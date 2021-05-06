@@ -5,11 +5,15 @@
 package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
-import kotlinx.coroutines.await
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.Promise
 
 fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
     encode(value, shouldEncodeElementDefault, firebase.database.ServerValue.TIMESTAMP)
@@ -110,16 +114,16 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
     actual fun onDisconnect() = rethrow { OnDisconnect(js.onDisconnect()) }
 
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
-        rethrow { js.update(encode(update, encodeDefaults)).await() }
+        rethrow { js.update(encode(update, encodeDefaults)).awaitWhileOnline() }
 
-    actual suspend fun removeValue() = rethrow { js.remove().await() }
+    actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline() }
 
     actual suspend fun setValue(value: Any?, encodeDefaults: Boolean) = rethrow {
-        js.set(encode(value, encodeDefaults)).await()
+        js.set(encode(value, encodeDefaults)).awaitWhileOnline()
     }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
-        rethrow { js.set(encode(strategy, value, encodeDefaults)).await() }
+        rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
 }
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
@@ -146,17 +150,17 @@ actual class DataSnapshot internal constructor(val js: firebase.database.DataSna
 
 actual class OnDisconnect internal constructor(val js: firebase.database.OnDisconnect) {
 
-    actual suspend fun removeValue() = rethrow { js.remove().await() }
-    actual suspend fun cancel() =  rethrow { js.cancel().await() }
+    actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline() }
+    actual suspend fun cancel() =  rethrow { js.cancel().awaitWhileOnline() }
 
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) =
-        rethrow { js.update(encode(update, encodeDefaults)).await() }
+        rethrow { js.update(encode(update, encodeDefaults)).awaitWhileOnline() }
 
     actual suspend fun setValue(value: Any, encodeDefaults: Boolean) =
-        rethrow { js.set(encode(value, encodeDefaults)).await() }
+        rethrow { js.set(encode(value, encodeDefaults)).awaitWhileOnline() }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
-        rethrow { js.set(encode(strategy, value, encodeDefaults)).await() }
+        rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
 }
 
 actual class DatabaseException(error: dynamic) :
@@ -172,4 +176,19 @@ inline fun <R> rethrow(function: () -> R): R {
     } catch(e: dynamic) {
         throw DatabaseException(e)
     }
+}
+
+suspend fun <T> Promise<T>.awaitWhileOnline(): T = coroutineScope {
+
+    val notConnected = Firebase.database
+        .reference(".info/connected")
+        .valueEvents
+        .filter { !it.value<Boolean>() }
+        .produceIn(this)
+
+    select<T> {
+        this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
+        notConnected.onReceive { throw DatabaseException("Database not connected") }
+    }
+
 }
