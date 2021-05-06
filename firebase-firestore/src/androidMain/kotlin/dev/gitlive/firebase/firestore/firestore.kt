@@ -6,7 +6,6 @@
 package dev.gitlive.firebase.firestore
 
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -16,6 +15,20 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
+@PublishedApi
+internal inline fun <reified T> decode(value: Any?): T =
+    decode(value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
+    decode(strategy, value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
+    encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
+
+private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+    encode(strategy, value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
+
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
 
@@ -24,13 +37,9 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
-//    actual var settings: FirebaseFirestoreSettings
-//        get() = android.firestoreSettings.run { FirebaseFirestoreSettings(isPersistenceEnabled) }
-//        set(value) {
-//            android.firestoreSettings = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
-//        }
-
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
+
+    actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId))
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
@@ -45,15 +54,30 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
-        android.clearPersistence().await()
-            .run { Unit }
+        android.clearPersistence().await().run { }
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = FirebaseFirestoreSettings.Builder()
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(false)
             .build()
     }
+
+    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
+                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
+                sslEnabled?.let { builder.isSslEnabled = it }
+                host?.let { builder.host = it }
+                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
+            }.build()
+        }
+
+    actual suspend fun disableNetwork() =
+        android.disableNetwork().await().run { }
+
+    actual suspend fun enableNetwork() =
+        android.enableNetwork().await().run { }
+
 }
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
