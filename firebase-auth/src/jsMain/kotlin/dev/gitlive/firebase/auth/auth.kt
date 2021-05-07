@@ -65,6 +65,9 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
 
+    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
+        rethrow { AuthResult(js.signInWithEmailLink(email, emailLink).await()) }
+
     actual suspend fun signOut() = rethrow { js.signOut().await() }
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) =
@@ -92,6 +95,8 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
             else -> throw UnsupportedOperationException(result.operation)
         } as T
     }
+
+    actual fun isSignInWithEmailLink(emailLink: String) = rethrow { js.isSignInWithEmailLink(emailLink) }
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator("http://$host:$port") }
 }
