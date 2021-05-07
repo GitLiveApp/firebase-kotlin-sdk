@@ -49,6 +49,9 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    dependencies {
+        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+    }
 }
 
 // Optional configuration
@@ -102,7 +105,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:20.0.4")
+                api("com.google.firebase:firebase-auth")
             }
         }
 

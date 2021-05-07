@@ -39,6 +39,9 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    dependencies {
+        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+    }
 }
 
 kotlin {
@@ -88,7 +91,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:22.1.2")
+                api("com.google.firebase:firebase-firestore")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }

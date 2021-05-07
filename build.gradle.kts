@@ -27,6 +27,7 @@ buildscript {
 
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
+val firebaseBoMVersion by extra("27.1.0")
 
 tasks {
     val updateVersions by registering {

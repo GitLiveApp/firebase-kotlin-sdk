@@ -35,6 +35,9 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    dependencies {
+        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+    }
 }
 
 kotlin {
@@ -76,7 +79,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:19.7.0")
+                api("com.google.firebase:firebase-database")
             }
         }
         val jsMain by getting {}
