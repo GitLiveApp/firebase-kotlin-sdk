@@ -6,6 +6,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     kotlin("multiplatform") version "1.4.31" apply false
     id("base")
+    id("dev.gitlive") version "1.0.0"
 }
 
 buildscript {
@@ -16,10 +17,12 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        mavenLocal()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.2")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
+        classpath("dev.gitlive:gitlive-gradle-plugin:1.0.0")
     }
 }
 

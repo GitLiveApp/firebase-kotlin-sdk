@@ -1,3 +1,12 @@
+pluginManagement {
+    repositories {
+        jcenter()
+        google()
+        gradlePluginPortal()
+        mavenLocal()
+    }
+}
+
 include(
     "firebase-common",
     "firebase-app",

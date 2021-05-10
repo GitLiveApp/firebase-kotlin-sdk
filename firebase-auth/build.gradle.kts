@@ -3,6 +3,8 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import dev.gitlive.jsBrowser
+import dev.gitlive.jsNode
 
 version = project.property("firebase-auth.version") as String
 
@@ -68,14 +70,16 @@ android {
 //}
 
 kotlin {
-    js("browser", IR) {
+    js("browser") {
         useCommonJs()
         browser()
+        jsBrowser()
     }
-    js("node", LEGACY) {
+    js("node") {
         useCommonJs()
         nodejs()
         binaries.executable()
+        jsNode()
     }
 
     android {

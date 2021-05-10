@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+import dev.gitlive.jsBrowser
+import dev.gitlive.jsNode
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 version = project.property("firebase-common.version") as String
@@ -41,14 +43,16 @@ android {
 }
 
 kotlin {
-    js("browser", IR) {
+    js("browser") {
         useCommonJs()
         browser()
+        jsBrowser()
     }
-    js("node", LEGACY) {
+    js("node") {
         useCommonJs()
         nodejs()
         binaries.executable()
+        jsNode()
     }
     android {
         publishAllLibraryVariants()
