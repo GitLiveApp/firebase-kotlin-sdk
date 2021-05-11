@@ -76,7 +76,7 @@ data class FirebaseRemoteConfigInfo (
     val lastFetchStatus: FirebaseRemoteConfigFetchStatus,
 )
 
-enum class FirebaseRemoteConfigFetchStatus(val value: Byte) {
+enum class FirebaseRemoteConfigFetchStatus(val value: Int) {
     NO_FETCH_YET(0),
     SUCCESS(-1),
     FAILURE(1),

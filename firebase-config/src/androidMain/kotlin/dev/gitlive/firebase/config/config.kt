@@ -47,7 +47,7 @@ actual class FirebaseRemoteConfig internal constructor (
                 this@FirebaseRemoteConfig.configSettings,
                 fetchTimeMillis,
                 FirebaseRemoteConfigFetchStatus.values()
-                    .first { it.value == lastFetchStatus.toByte() }
+                    .first { it.value == lastFetchStatus }
             )
         }
 
