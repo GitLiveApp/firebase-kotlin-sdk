@@ -32,7 +32,7 @@ class FirebaseFirestoreTest {
                         projectId = "fir-kotlin-sdk"
                     )
                 )
-                Firebase.firestore.useEmulator(emulatorHost, 8080)
+//                Firebase.firestore.useEmulator(emulatorHost, 8080)
             }
     }
 
