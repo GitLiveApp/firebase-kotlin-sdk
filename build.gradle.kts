@@ -25,6 +25,7 @@ buildscript {
 
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
+val firebaseBoMVersion by extra("27.1.0")
 
 // TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
 // add idea.active=true for local development

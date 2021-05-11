@@ -77,6 +77,9 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(android.signInWithCredential(authCredential.android).await())
 
+    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
+        AuthResult(android.signInWithEmailLink(email, emailLink).await())
+
     actual suspend fun signOut() = android.signOut()
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) = android.updateCurrentUser(user.android).await().run { Unit }
@@ -102,6 +105,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
+
+    actual fun isSignInWithEmailLink(emailLink: String) = android.isSignInWithEmailLink(emailLink)
 
     actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }

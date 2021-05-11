@@ -38,6 +38,9 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    dependencies {
+        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+    }
 }
 
 kotlin {

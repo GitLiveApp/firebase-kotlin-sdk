@@ -31,9 +31,11 @@ expect class FirebaseAuth {
     suspend fun signInWithCustomToken(token: String): AuthResult
     suspend fun signInAnonymously(): AuthResult
     suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
+    suspend fun signInWithEmailLink(email: String, emailLink: String): AuthResult
     suspend fun signOut()
     suspend fun updateCurrentUser(user: FirebaseUser)
     suspend fun verifyPasswordResetCode(code: String): String
+    fun isSignInWithEmailLink(emailLink: String): Boolean
     fun useEmulator(host: String, port: Int)
 }
 

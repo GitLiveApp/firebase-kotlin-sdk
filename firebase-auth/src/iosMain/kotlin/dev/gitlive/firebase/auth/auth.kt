@@ -70,6 +70,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
 
+    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = emailLink, completion = it) })
+
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) = ios.await { updateCurrentUser(user.ios, it) }.run { Unit }
@@ -89,6 +92,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
+
+    actual fun isSignInWithEmailLink(emailLink: String) = ios.isSignInWithEmailLink(emailLink)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }

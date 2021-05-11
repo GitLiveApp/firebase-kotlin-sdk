@@ -46,6 +46,7 @@ external object firebase {
             val currentUser: user.User?
             var languageCode: String?
 
+            fun isSignInWithEmailLink(emailLink: String): Boolean
             fun useEmulator(url: String)
             fun applyActionCode(code: String): Promise<Unit>
             fun checkActionCode(code: String): Promise<ActionCodeInfo>
@@ -58,6 +59,7 @@ external object firebase {
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signInWithCredential(authCredential: AuthCredential): Promise<AuthResult>
+            fun signInWithEmailLink(email: String, emailLink: String): Promise<AuthResult>
             fun signInWithPopup(provider: AuthProvider): Promise<AuthResult>
             fun signInWithRedirect(provider: AuthProvider): Promise<Unit>
             fun getRedirectResult(): Promise<AuthResult>
