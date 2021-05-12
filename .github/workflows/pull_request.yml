@@ -35,7 +35,7 @@ jobs:
       if: failure()
       with:
         name: "JSTest Report HTML"
-        path: "firebase-firestore/build/reports/tests/jsTest/index.html"
+        path: "firebase-firestore/build/reports/tests/jsTest/"
     - name: Run Android Instrumented Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
