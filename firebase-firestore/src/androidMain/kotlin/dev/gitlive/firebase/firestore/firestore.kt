@@ -321,6 +321,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
 
+    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
+
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
         (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
             (greaterThan?.let { android2.whereGreaterThan(field, it) } ?: android2).let { android3 ->

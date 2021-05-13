@@ -58,6 +58,8 @@ expect open class Query {
     suspend fun get(): QuerySnapshot
     internal fun _where(field: String, equalTo: Any?): Query
     internal fun _where(path: FieldPath, equalTo: Any?): Query
+    internal fun _where(field: String, equalTo: DocumentReference): Query
+    internal fun _where(path: FieldPath, equalTo: DocumentReference): Query
     internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
     internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
@@ -69,6 +71,8 @@ expect open class Query {
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
+fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo)
+fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo)
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
