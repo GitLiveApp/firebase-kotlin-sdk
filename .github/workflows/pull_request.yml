@@ -30,6 +30,12 @@ jobs:
       run: ./gradlew assemble
     - name: Run JS Tests
       run: ./gradlew cleanTest jsTest
+    - name: Upload test artifact
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: "JSTest Report HTML"
+        path: "firebase-firestore/build/reports/tests/jsTest/"
     - name: Run Android Instrumented Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:

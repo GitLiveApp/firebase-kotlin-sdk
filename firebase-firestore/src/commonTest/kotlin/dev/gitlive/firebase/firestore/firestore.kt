@@ -39,9 +39,11 @@ class FirebaseFirestoreTest {
     @Test
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
-
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy("prop1").get().documents
+        val resultDocs = Firebase.firestore
+            .collection("FirebaseFirestoreTest")
+            .orderBy("prop1")
+            .get()
+            .documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))

@@ -34,7 +34,6 @@ internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boo
 internal fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, ServerValue.TIMESTAMP)
 
-@OptIn(FlowPreview::class)
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database

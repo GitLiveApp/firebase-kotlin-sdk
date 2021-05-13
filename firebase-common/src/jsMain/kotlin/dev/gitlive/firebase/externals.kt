@@ -27,6 +27,8 @@ external object firebase {
         val gaTrackingId: String?
         val storageBucket: String?
         val projectId: String?
+        val messagingSenderId: String?
+        val authDomain: String?
     }
 
     val apps : Array<App>
