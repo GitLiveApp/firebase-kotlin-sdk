@@ -29,7 +29,8 @@ class FirebaseFirestoreTest {
                         apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                         databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                         storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk"
+                        projectId = "fir-kotlin-sdk",
+                        gcmSenderId = "846484016111"
                     )
                 )
                 Firebase.firestore.useEmulator(emulatorHost, 8080)
@@ -39,9 +40,11 @@ class FirebaseFirestoreTest {
     @Test
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
-
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy("prop1").get().documents
+        val resultDocs = Firebase.firestore
+            .collection("FirebaseFirestoreTest")
+            .orderBy("prop1")
+            .get()
+            .documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
         assertEquals("bbb", resultDocs[1].get("prop1"))

@@ -67,6 +67,16 @@ subprojects {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }
 
+    tasks.whenTaskAdded {
+        enabled = when(name) {
+            "compileDebugUnitTestKotlinAndroid" -> false
+            "compileReleaseUnitTestKotlinAndroid" -> false
+            "testDebugUnitTest" -> false
+            "testReleaseUnitTest" -> false
+            else -> enabled
+        }
+    }
+
     tasks {
 
         val updateVersion by registering(Exec::class) {

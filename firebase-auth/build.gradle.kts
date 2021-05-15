@@ -102,8 +102,20 @@ kotlin {
 
     js {
         useCommonJs()
-        nodejs()
-        browser()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
     }
 
     sourceSets {
