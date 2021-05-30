@@ -18,7 +18,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.0")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
@@ -55,7 +55,7 @@ subprojects {
     group = "dev.gitlive"
 
     apply(plugin="com.adarshr.test-logger")
-    
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -208,12 +208,12 @@ subprojects {
 
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0-RC")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
