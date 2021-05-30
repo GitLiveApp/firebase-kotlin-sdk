@@ -9,7 +9,7 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.31"
+    kotlin("plugin.serialization") version "1.5.0"
 }
 
 android {
@@ -77,8 +77,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 progressiveMode = true
                 useExperimentalAnnotation("kotlin.Experimental")
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
@@ -89,7 +89,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.0")
             }
         }
 

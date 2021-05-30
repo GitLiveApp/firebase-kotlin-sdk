@@ -121,8 +121,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 progressiveMode = true
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
@@ -137,7 +137,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:20.0.3")
+                api("com.google.firebase:firebase-auth:20.0.4")
             }
         }
 
