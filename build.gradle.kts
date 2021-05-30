@@ -214,12 +214,15 @@ subprojects {
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+            "commonTestImplementation"("io.ktor:ktor-client-core:1.6.0")
+            "commonTestImplementation"("io.ktor:ktor-client-serialization:1.6.0")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.3.0")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.2")
             "androidAndroidTestImplementation"("androidx.test:runner:1.3.0")
+            "androidAndroidTestImplementation"("io.ktor:ktor-client-android:1.6.0")
         }
     }
 
