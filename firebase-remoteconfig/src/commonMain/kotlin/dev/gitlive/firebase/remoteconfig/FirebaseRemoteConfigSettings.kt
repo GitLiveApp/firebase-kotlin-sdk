@@ -6,6 +6,6 @@ private const val CONNECTION_TIMEOUT_IN_SECONDS = 60L
 private const val DEFAULT_FETCH_INTERVAL_IN_SECONDS = 12 * 3600L
 
 data class FirebaseRemoteConfigSettings(
-    val fetchTimeoutInSeconds: Long = CONNECTION_TIMEOUT_IN_SECONDS,
-    val minimumFetchIntervalInSeconds: Long = DEFAULT_FETCH_INTERVAL_IN_SECONDS,
+    var fetchTimeoutInSeconds: Long = CONNECTION_TIMEOUT_IN_SECONDS,
+    var minimumFetchIntervalInSeconds: Long = DEFAULT_FETCH_INTERVAL_IN_SECONDS,
 )

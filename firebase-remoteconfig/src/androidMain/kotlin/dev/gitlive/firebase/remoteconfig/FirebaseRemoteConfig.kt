@@ -20,7 +20,14 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
     FirebaseRemoteConfig(AndroidFirebase.remoteConfig)
 
 actual class FirebaseRemoteConfig internal constructor(val android: AndroidFirebaseRemoteConfig) {
-    actual suspend fun setConfigSettings(settings: FirebaseRemoteConfigSettings) {
+    actual val all: Map<String, FirebaseRemoteConfigValue>
+        get() = android.all.mapValues { FirebaseRemoteConfigValue(it.value) }
+
+    actual val info: FirebaseRemoteConfigInfo
+        get() = android.info.asCommon()
+
+    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(build)
         val androidSettings = remoteConfigSettings {
             minimumFetchIntervalInSeconds = settings.minimumFetchIntervalInSeconds
             fetchTimeoutInSeconds = settings.fetchTimeoutInSeconds
@@ -28,12 +35,8 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
         android.setConfigSettingsAsync(androidSettings).await()
     }
 
-    actual suspend fun setDefaults(defaults: Map<String, Any?>) {
-        android.setDefaultsAsync(defaults).await()
-    }
-
-    actual fun getAll(): Map<String, FirebaseRemoteConfigValue> {
-        return android.all.mapValues { FirebaseRemoteConfigValue(it.value) }
+    actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
+        android.setDefaultsAsync(defaults.toMap()).await()
     }
 
     actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
@@ -47,7 +50,6 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     actual suspend fun fetchAndActivate(): Boolean = android.fetchAndActivate().await()
     actual fun getBoolean(key: String) = android.getBoolean(key)
     actual fun getDouble(key: String) = android.getDouble(key)
-    actual fun getInfo() = android.info.asCommon()
     actual fun getKeysByPrefix(prefix: String): Set<String> = android.getKeysByPrefix(prefix)
     actual fun getLong(key: String) = android.getLong(key)
     actual fun getString(key: String) = android.getString(key)
