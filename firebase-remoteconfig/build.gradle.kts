@@ -25,7 +25,6 @@ android {
         }
         getByName("androidTest"){
             java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
         }
     }
     testOptions {
