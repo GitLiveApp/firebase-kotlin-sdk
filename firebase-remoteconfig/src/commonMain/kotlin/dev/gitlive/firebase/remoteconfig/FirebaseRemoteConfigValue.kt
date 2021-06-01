@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.remoteconfig
 
-expect class RemoteConfigValue {
+expect class FirebaseRemoteConfigValue {
     fun asBoolean(): Boolean
     fun asByteArray(): ByteArray
     fun asDouble(): Double

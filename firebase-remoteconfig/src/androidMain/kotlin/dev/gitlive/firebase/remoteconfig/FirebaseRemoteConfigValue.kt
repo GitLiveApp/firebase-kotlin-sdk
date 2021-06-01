@@ -1,9 +1,11 @@
 package dev.gitlive.firebase.remoteconfig
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue as AndroidFirebaseRemoteConfigValue
 
-actual class RemoteConfigValue internal constructor(private val android: FirebaseRemoteConfigValue) {
+actual class FirebaseRemoteConfigValue internal constructor(
+    private val android: AndroidFirebaseRemoteConfigValue
+) {
     actual fun asBoolean(): Boolean = android.asBoolean()
     actual fun asByteArray(): ByteArray = android.asByteArray()
     actual fun asDouble(): Double = android.asDouble()
