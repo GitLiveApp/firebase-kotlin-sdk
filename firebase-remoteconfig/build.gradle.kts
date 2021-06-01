@@ -91,17 +91,10 @@ kotlin {
 
     js {
         useCommonJs()
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "5s"
-                }
-            }
-        }
         browser {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
