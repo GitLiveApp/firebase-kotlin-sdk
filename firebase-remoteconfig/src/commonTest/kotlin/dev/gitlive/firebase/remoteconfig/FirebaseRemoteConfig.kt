@@ -18,7 +18,7 @@ expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseRemoteConfigTest {
-    private val defaults = mapOf(
+    private val defaults = arrayOf(
         "test_default_boolean" to true,
         "test_default_double" to 42.0,
         "test_default_long" to 42L,
@@ -52,7 +52,7 @@ class FirebaseRemoteConfigTest {
     @Test
     fun testGettingValues() = runTest {
         val remoteConfig = Firebase.remoteConfig
-        remoteConfig.setDefaults(defaults)
+        remoteConfig.setDefaults(*defaults)
 
         assertEquals(true, remoteConfig.getBoolean("test_default_boolean"))
         assertEquals(42.0, remoteConfig.getDouble("test_default_double"))
@@ -68,8 +68,8 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testGetAll() = runTest {
-        Firebase.remoteConfig.setDefaults(defaults)
-        val all = Firebase.remoteConfig.getAll()
+        Firebase.remoteConfig.setDefaults(*defaults)
+        val all = Firebase.remoteConfig.all
         assertEquals(true, all["test_default_boolean"]?.asBoolean())
         assertEquals(42.0, all["test_default_double"]?.asDouble())
         assertEquals(42L, all["test_default_long"]?.asLong())
@@ -79,7 +79,7 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testGetKeysByPrefix() = runTest {
-        Firebase.remoteConfig.setDefaults(defaults)
+        Firebase.remoteConfig.setDefaults(*defaults)
         val keys = Firebase.remoteConfig.getKeysByPrefix("test_default")
         assertEquals(
             setOf(
@@ -94,26 +94,23 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testGetInfo() = runTest {
-        val info = Firebase.remoteConfig.getInfo()
         assertEquals(
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
                 fetchTimeMillis = -1,
                 lastFetchStatus = FetchStatus.NoFetchYet
             ).toString(),
-            info.toString()
+            Firebase.remoteConfig.info.toString()
         )
     }
 
     @Test
     fun testSetConfigSettings() = runTest {
-        Firebase.remoteConfig.setConfigSettings(
-            FirebaseRemoteConfigSettings(
-                fetchTimeoutInSeconds = 42,
-                minimumFetchIntervalInSeconds = 42
-            )
-        )
-        val info = Firebase.remoteConfig.getInfo()
+        Firebase.remoteConfig.settings {
+            fetchTimeoutInSeconds = 42
+            minimumFetchIntervalInSeconds = 42
+        }
+        val info = Firebase.remoteConfig.info
         assertEquals(42, info.configSettings.fetchTimeoutInSeconds)
         assertEquals(42, info.configSettings.minimumFetchIntervalInSeconds)
     }
@@ -125,8 +122,9 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetch() = runTest {
         val remoteConfig = Firebase.remoteConfig
-        val settings = FirebaseRemoteConfigSettings(minimumFetchIntervalInSeconds = 60)
-        remoteConfig.setConfigSettings(settings)
+        remoteConfig.settings {
+            minimumFetchIntervalInSeconds = 60
+        }
 
         remoteConfig.fetch()
         remoteConfig.activate()
@@ -140,8 +138,9 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetchAndActivate() = runTest {
         val remoteConfig = Firebase.remoteConfig
-        val settings = FirebaseRemoteConfigSettings(minimumFetchIntervalInSeconds = 60)
-        remoteConfig.setConfigSettings(settings)
+        remoteConfig.settings {
+            minimumFetchIntervalInSeconds = 60
+        }
 
         remoteConfig.fetchAndActivate()
 

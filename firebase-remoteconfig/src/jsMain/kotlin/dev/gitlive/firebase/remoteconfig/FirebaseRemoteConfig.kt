@@ -19,6 +19,17 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = rethr
 }
 
 actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteConfig.RemoteConfig) {
+    actual val all: Map<String, FirebaseRemoteConfigValue>
+        get() = rethrow { getAllKeys().map { it to getValue(it) }.toMap() }
+
+    actual val info: FirebaseRemoteConfigInfo
+        get() = rethrow {
+            FirebaseRemoteConfigInfo(
+                configSettings = js.settings.toSettings(),
+                fetchTimeMillis = js.fetchTimeMillis,
+                lastFetchStatus = js.lastFetchStatus.toFetchStatus()
+            )
+        }
 
     actual suspend fun activate(): Boolean = rethrow { js.activate().await() }
     actual suspend fun ensureInitialized(): Unit = rethrow { js.activate().await() }
@@ -27,11 +38,6 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         rethrow { js.fetch().await() }
 
     actual suspend fun fetchAndActivate(): Boolean = rethrow { js.fetchAndActivate().await() }
-
-    actual fun getAll(): Map<String, FirebaseRemoteConfigValue> = rethrow {
-        getAllKeys().map { it to getValue(it) }.toMap()
-    }
-
     actual fun getBoolean(key: String): Boolean = rethrow { js.getBoolean(key) }
     actual fun getDouble(key: String): Double = rethrow { js.getNumber(key).toDouble() }
     actual fun getLong(key: String): Long = rethrow { js.getNumber(key).toLong() }
@@ -39,14 +45,6 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
 
     actual fun getValue(key: String): FirebaseRemoteConfigValue = rethrow {
         FirebaseRemoteConfigValue(js.getValue(key))
-    }
-
-    actual fun getInfo(): FirebaseRemoteConfigInfo = rethrow {
-        FirebaseRemoteConfigInfo(
-            configSettings = js.settings.toSettings(),
-            fetchTimeMillis = js.fetchTimeMillis,
-            lastFetchStatus = js.lastFetchStatus.toFetchStatus()
-        )
     }
 
     actual fun getKeysByPrefix(prefix: String): Set<String> {
@@ -62,16 +60,16 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         // not implemented for JS target
     }
 
-    actual suspend fun setConfigSettings(settings: FirebaseRemoteConfigSettings) {
+    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(build)
         js.settings.apply {
             fetchTimeoutMillis = settings.fetchTimeoutInSeconds * 1000
             minimumFetchIntervalMillis = settings.minimumFetchIntervalInSeconds * 1000
         }
     }
 
-    actual suspend fun setDefaults(defaults: Map<String, Any?>) = rethrow {
-        val pairs = defaults.map { it.key to it.value }.toTypedArray()
-        js.defaultConfig = json(*pairs)
+    actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) = rethrow {
+        js.defaultConfig = json(*defaults)
     }
 
     private fun firebase.remoteConfig.Settings.toSettings(): FirebaseRemoteConfigSettings {

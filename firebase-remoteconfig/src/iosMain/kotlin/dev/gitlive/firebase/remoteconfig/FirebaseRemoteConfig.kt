@@ -23,6 +23,31 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
     FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios))
 
 actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
+    actual val all: Map<String, FirebaseRemoteConfigValue>
+        get() {
+            return listOf(
+                FIRRemoteConfigSource.FIRRemoteConfigSourceStatic,
+                FIRRemoteConfigSource.FIRRemoteConfigSourceRemote,
+                FIRRemoteConfigSource.FIRRemoteConfigSourceDefault,
+            ).map { source ->
+                val keys = ios.allKeysFromSource(source) as List<String>
+                keys.map { it to FirebaseRemoteConfigValue(ios.configValueForKey(it, source)) }
+            }.flatten().toMap()
+        }
+
+    actual val info: FirebaseRemoteConfigInfo
+        get() {
+            return FirebaseRemoteConfigInfo(
+                configSettings = ios.configSettings.asCommon(),
+                fetchTimeMillis = ios.lastFetchTime
+                    ?.timeIntervalSince1970
+                    ?.let { it.toLong() * 1000 }
+                    ?.takeIf { it > 0 }
+                    ?: -1L,
+                lastFetchStatus = ios.lastFetchStatus.asCommon()
+            )
+        }
+
     actual suspend fun activate(): Boolean = ios.awaitResult { activateWithCompletion(it) }
 
     actual suspend fun ensureInitialized() =
@@ -45,36 +70,13 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         return status == FIRRemoteConfigFetchAndActivateStatus.FIRRemoteConfigFetchAndActivateStatusSuccessFetchedFromRemote
     }
 
-    actual fun getAll(): Map<String, FirebaseRemoteConfigValue> {
-        return listOf(
-            FIRRemoteConfigSource.FIRRemoteConfigSourceStatic,
-            FIRRemoteConfigSource.FIRRemoteConfigSourceRemote,
-            FIRRemoteConfigSource.FIRRemoteConfigSourceDefault,
-        ).map { source ->
-            val keys = ios.allKeysFromSource(source) as List<String>
-            keys.map { it to FirebaseRemoteConfigValue(ios.configValueForKey(it, source)) }
-        }.flatten().toMap()
-    }
-
     actual fun getBoolean(key: String): Boolean = ios.configValueForKey(key).boolValue
     actual fun getDouble(key: String): Double = ios.configValueForKey(key).numberValue.doubleValue
     actual fun getLong(key: String): Long = ios.configValueForKey(key).numberValue.longValue
     actual fun getString(key: String): String = ios.configValueForKey(key).stringValue ?: ""
 
-    actual fun getInfo(): FirebaseRemoteConfigInfo {
-        return FirebaseRemoteConfigInfo(
-            configSettings = ios.configSettings.asCommon(),
-            fetchTimeMillis = ios.lastFetchTime
-                ?.timeIntervalSince1970
-                ?.let { it.toLong() * 1000 }
-                ?.takeIf { it > 0 }
-                ?: -1L,
-            lastFetchStatus = ios.lastFetchStatus.asCommon()
-        )
-    }
-
     actual fun getKeysByPrefix(prefix: String): Set<String> =
-        getAll().keys.filter { it.startsWith(prefix) }.toSet()
+        all.keys.filter { it.startsWith(prefix) }.toSet()
 
     actual fun getValue(key: String): FirebaseRemoteConfigValue =
         FirebaseRemoteConfigValue(ios.configValueForKey(key))
@@ -83,7 +85,8 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         // not implemented for iOS target
     }
 
-    actual suspend fun setConfigSettings(settings: FirebaseRemoteConfigSettings) {
+    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(build)
         val iosSettings = FIRRemoteConfigSettings().apply {
             minimumFetchInterval = settings.minimumFetchIntervalInSeconds.toDouble()
             fetchTimeout = settings.fetchTimeoutInSeconds.toDouble()
@@ -91,8 +94,8 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         ios.setConfigSettings(iosSettings)
     }
 
-    actual suspend fun setDefaults(defaults: Map<String, Any?>) {
-        ios.setDefaults(defaults as Map<Any?, Any?>)
+    actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
+        ios.setDefaults(defaults.toMap())
     }
 
     private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {
