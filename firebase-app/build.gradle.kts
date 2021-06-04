@@ -22,6 +22,7 @@ android {
     defaultConfig {
         minSdkVersion(property("minSdkVersion") as Int)
         targetSdkVersion(property("targetSdkVersion") as Int)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
@@ -96,8 +97,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 progressiveMode = true
             }
         }
