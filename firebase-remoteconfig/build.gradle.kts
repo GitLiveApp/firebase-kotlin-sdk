@@ -118,7 +118,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-config-ktx:20.0.3")
+                api("com.google.firebase:firebase-config-ktx:21.0.0")
             }
         }
 
