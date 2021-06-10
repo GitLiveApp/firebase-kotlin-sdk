@@ -128,6 +128,7 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
+    val document: DocumentReference
 
     fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
