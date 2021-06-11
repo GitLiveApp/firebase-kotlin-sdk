@@ -163,8 +163,9 @@ actual class OnDisconnect internal constructor(val js: firebase.database.OnDisco
         rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
 }
 
-actual class DatabaseException(error: dynamic) :
-    RuntimeException("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())
+actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause) {
+    constructor(error: dynamic) : this("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())
+}
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.database.rethrow { function() }
 
@@ -188,7 +189,7 @@ suspend fun <T> Promise<T>.awaitWhileOnline(): T = coroutineScope {
 
     select<T> {
         this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected") }
+        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
 
 }
