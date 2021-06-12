@@ -101,7 +101,7 @@ actual open class Query internal constructor(
             withBlock = { snapShot ->
                 safeOffer(DataSnapshot(snapShot!!, persistenceEnabled))
             }
-        ) { close(DatabaseException(it.toString())) }
+        ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
 
@@ -112,7 +112,7 @@ actual open class Query internal constructor(
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
                     safeOffer(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
                 }
-            ) { close(DatabaseException(it.toString())) }
+            ) { close(DatabaseException(it.toString(), null)) }
         }
         awaitClose {
             handles.forEach { ios.removeObserverWithHandle(it) }
@@ -199,7 +199,7 @@ actual class OnDisconnect internal constructor(
     }
 }
 
-actual class DatabaseException(message: String) : RuntimeException(message)
+actual class DatabaseException(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
 private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
@@ -207,7 +207,7 @@ private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, fu
         if(error == null) {
             job.complete(result)
         } else {
-            job.completeExceptionally(DatabaseException(error.toString()))
+            job.completeExceptionally(DatabaseException(error.toString(), null))
         }
     }
     return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
@@ -219,7 +219,7 @@ private suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callba
         if(error == null) {
             job.complete(Unit)
         } else {
-            job.completeExceptionally(DatabaseException(error.toString()))
+            job.completeExceptionally(DatabaseException(error.toString(), null))
         }
     }
     job.run { if(whileOnline) awaitWhileOnline() else await() }
@@ -235,6 +235,6 @@ private suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutine
 
     select<T> {
         onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected") }
+        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
 }
