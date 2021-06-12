@@ -199,7 +199,7 @@ actual class OnDisconnect internal constructor(
     }
 }
 
-actual class DatabaseException(message: String?, cause: Throwable?) : RuntimeException(message, cause)
+actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
 private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
