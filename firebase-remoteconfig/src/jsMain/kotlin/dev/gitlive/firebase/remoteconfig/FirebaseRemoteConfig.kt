@@ -20,7 +20,7 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = rethr
 
 actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteConfig.RemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
-        get() = rethrow { getAllKeys().map { it to getValue(it) }.toMap() }
+        get() = rethrow { getAllKeys().map { Pair(it, this[it]) }.toMap() }
 
     actual val info: FirebaseRemoteConfigInfo
         get() = rethrow {
@@ -43,7 +43,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
     actual fun getLong(key: String): Long = rethrow { js.getNumber(key).toLong() }
     actual fun getString(key: String): String = rethrow { js.getString(key) ?: "" }
 
-    actual fun getValue(key: String): FirebaseRemoteConfigValue = rethrow {
+    actual operator fun get(key: String): FirebaseRemoteConfigValue = rethrow {
         FirebaseRemoteConfigValue(js.getValue(key))
     }
 
@@ -60,8 +60,8 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         // not implemented for JS target
     }
 
-    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
-        val settings = FirebaseRemoteConfigSettings().apply(build)
+    actual suspend fun configSettings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(init)
         js.settings.apply {
             fetchTimeoutMillis = settings.fetchTimeoutInSeconds * 1000
             minimumFetchIntervalMillis = settings.minimumFetchIntervalInSeconds * 1000

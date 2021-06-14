@@ -53,7 +53,7 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     actual fun getKeysByPrefix(prefix: String): Set<String> = android.getKeysByPrefix(prefix)
     actual fun getLong(key: String) = android.getLong(key)
     actual fun getString(key: String) = android.getString(key)
-    actual fun getValue(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
+    actual operator fun get(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
     actual suspend fun reset() = android.reset().await().let { }
 
     private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {

@@ -78,7 +78,7 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
     actual fun getKeysByPrefix(prefix: String): Set<String> =
         all.keys.filter { it.startsWith(prefix) }.toSet()
 
-    actual fun getValue(key: String): FirebaseRemoteConfigValue =
+    actual operator fun get(key: String): FirebaseRemoteConfigValue =
         FirebaseRemoteConfigValue(ios.configValueForKey(key))
 
     actual suspend fun reset() {

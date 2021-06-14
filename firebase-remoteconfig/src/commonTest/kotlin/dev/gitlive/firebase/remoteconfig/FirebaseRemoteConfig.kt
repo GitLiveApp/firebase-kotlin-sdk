@@ -60,7 +60,7 @@ class FirebaseRemoteConfigTest {
         assertEquals("Hello World", remoteConfig.getString("test_default_string"))
         assertEquals("Hello World", remoteConfig.getString("test_default_string"))
 
-        val value = remoteConfig.getValue("test_default_string")
+        val value = remoteConfig["test_default_string"]
         assertEquals("Hello World", value.asString())
         assertEquals(ValueSource.Default, value.getSource())
         assertEquals("Hello World", value.asByteArray().decodeToString())
@@ -129,7 +129,7 @@ class FirebaseRemoteConfigTest {
         remoteConfig.fetch()
         remoteConfig.activate()
 
-        val value = remoteConfig.getValue("test_remote_string")
+        val value = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
     }
@@ -144,7 +144,7 @@ class FirebaseRemoteConfigTest {
 
         remoteConfig.fetchAndActivate()
 
-        val value = remoteConfig.getValue("test_remote_string")
+        val value = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
     }

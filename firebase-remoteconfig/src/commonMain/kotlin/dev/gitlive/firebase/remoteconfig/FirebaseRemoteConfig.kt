@@ -21,7 +21,7 @@ expect class FirebaseRemoteConfig {
     fun getKeysByPrefix(prefix: String): Set<String>
     fun getLong(key: String): Long
     fun getString(key: String): String
-    fun getValue(key: String): FirebaseRemoteConfigValue
+    operator fun get(key: String): FirebaseRemoteConfigValue
     suspend fun reset()
     suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit)
     suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
