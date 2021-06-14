@@ -124,6 +124,24 @@ class FirebaseFirestoreTest {
 
     }
 
+
+    @Test
+    fun testDocumentAutoId() = runTest {
+        val doc = Firebase.firestore
+            .collection("testDocumentAutoId")
+            .document
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("AutoId"))
+
+        val resultDoc = Firebase.firestore
+            .collection("testDocumentAutoId")
+            .document(doc.id)
+            .get()
+
+        assertEquals(true, resultDoc.exists)
+        assertEquals("AutoId", resultDoc.get("prop1"))
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("FirebaseFirestoreTest")
             .document("one")
