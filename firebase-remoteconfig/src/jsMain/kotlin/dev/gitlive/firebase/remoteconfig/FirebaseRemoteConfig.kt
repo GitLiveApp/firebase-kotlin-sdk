@@ -20,7 +20,7 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = rethr
 
 actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteConfig.RemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
-        get() = rethrow { getAllKeys().map { Pair(it, this[it]) }.toMap() }
+        get() = rethrow { getAllKeys().map { Pair(it, getValue(it)) }.toMap() }
 
     actual val info: FirebaseRemoteConfigInfo
         get() = rethrow {
@@ -38,12 +38,8 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         rethrow { js.fetch().await() }
 
     actual suspend fun fetchAndActivate(): Boolean = rethrow { js.fetchAndActivate().await() }
-    actual fun getBoolean(key: String): Boolean = rethrow { js.getBoolean(key) }
-    actual fun getDouble(key: String): Double = rethrow { js.getNumber(key).toDouble() }
-    actual fun getLong(key: String): Long = rethrow { js.getNumber(key).toLong() }
-    actual fun getString(key: String): String = rethrow { js.getString(key) ?: "" }
 
-    actual operator fun get(key: String): FirebaseRemoteConfigValue = rethrow {
+    actual fun getValue(key: String): FirebaseRemoteConfigValue = rethrow {
         FirebaseRemoteConfigValue(js.getValue(key))
     }
 

@@ -54,13 +54,13 @@ class FirebaseRemoteConfigTest {
         val remoteConfig = Firebase.remoteConfig
         remoteConfig.setDefaults(*defaults)
 
-        assertEquals(true, remoteConfig.getBoolean("test_default_boolean"))
-        assertEquals(42.0, remoteConfig.getDouble("test_default_double"))
-        assertEquals(42L, remoteConfig.getLong("test_default_long"))
-        assertEquals("Hello World", remoteConfig.getString("test_default_string"))
-        assertEquals("Hello World", remoteConfig.getString("test_default_string"))
+        assertEquals(true, remoteConfig["test_default_boolean"])
+        assertEquals(42.0, remoteConfig["test_default_double"])
+        assertEquals(42L, remoteConfig["test_default_long"])
+        assertEquals("Hello World", remoteConfig["test_default_string"])
+        assertEquals("Hello World", remoteConfig["test_default_string"])
 
-        val value = remoteConfig["test_default_string"]
+        val value: FirebaseRemoteConfigValue = remoteConfig["test_default_string"]
         assertEquals("Hello World", value.asString())
         assertEquals(ValueSource.Default, value.getSource())
         assertEquals("Hello World", value.asByteArray().decodeToString())
@@ -129,7 +129,7 @@ class FirebaseRemoteConfigTest {
         remoteConfig.fetch()
         remoteConfig.activate()
 
-        val value = remoteConfig["test_remote_string"]
+        val value: FirebaseRemoteConfigValue = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
     }
@@ -144,7 +144,7 @@ class FirebaseRemoteConfigTest {
 
         remoteConfig.fetchAndActivate()
 
-        val value = remoteConfig["test_remote_string"]
+        val value: FirebaseRemoteConfigValue = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
     }

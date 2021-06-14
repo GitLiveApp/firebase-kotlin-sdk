@@ -16,15 +16,23 @@ expect class FirebaseRemoteConfig {
     suspend fun ensureInitialized()
     suspend fun fetch(minimumFetchIntervalInSeconds: Long? = null)
     suspend fun fetchAndActivate(): Boolean
-    fun getBoolean(key: String): Boolean
-    fun getDouble(key: String): Double
     fun getKeysByPrefix(prefix: String): Set<String>
-    fun getLong(key: String): Long
-    fun getString(key: String): String
-    operator fun get(key: String): FirebaseRemoteConfigValue
+    fun getValue(key: String): FirebaseRemoteConfigValue
     suspend fun reset()
     suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit)
     suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
+}
+
+inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
+    val configValue = getValue(key)
+    return when(T::class) {
+        Boolean::class -> configValue.asBoolean() as T
+        Double::class -> configValue.asDouble() as T
+        Long::class -> configValue.asLong() as T
+        String::class -> configValue.asString() as T
+        FirebaseRemoteConfigValue::class -> configValue as T
+        else -> throw IllegalArgumentException()
+    }
 }
 
 expect open class FirebaseRemoteConfigException : FirebaseException

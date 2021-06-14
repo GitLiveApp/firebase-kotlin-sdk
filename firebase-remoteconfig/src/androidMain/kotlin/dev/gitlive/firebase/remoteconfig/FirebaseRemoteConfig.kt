@@ -1,3 +1,4 @@
+@file:JvmName("android")
 package dev.gitlive.firebase.remoteconfig
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
@@ -48,12 +49,8 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     actual suspend fun activate(): Boolean = android.activate().await()
     actual suspend fun ensureInitialized() = android.ensureInitialized().await().let { }
     actual suspend fun fetchAndActivate(): Boolean = android.fetchAndActivate().await()
-    actual fun getBoolean(key: String) = android.getBoolean(key)
-    actual fun getDouble(key: String) = android.getDouble(key)
     actual fun getKeysByPrefix(prefix: String): Set<String> = android.getKeysByPrefix(prefix)
-    actual fun getLong(key: String) = android.getLong(key)
-    actual fun getString(key: String) = android.getString(key)
-    actual operator fun get(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
+    actual fun getValue(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
     actual suspend fun reset() = android.reset().await().let { }
 
     private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {

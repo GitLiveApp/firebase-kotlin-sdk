@@ -70,15 +70,10 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         return status == FIRRemoteConfigFetchAndActivateStatus.FIRRemoteConfigFetchAndActivateStatusSuccessFetchedFromRemote
     }
 
-    actual fun getBoolean(key: String): Boolean = ios.configValueForKey(key).boolValue
-    actual fun getDouble(key: String): Double = ios.configValueForKey(key).numberValue.doubleValue
-    actual fun getLong(key: String): Long = ios.configValueForKey(key).numberValue.longValue
-    actual fun getString(key: String): String = ios.configValueForKey(key).stringValue ?: ""
-
     actual fun getKeysByPrefix(prefix: String): Set<String> =
         all.keys.filter { it.startsWith(prefix) }.toSet()
 
-    actual operator fun get(key: String): FirebaseRemoteConfigValue =
+    actual fun getValue(key: String): FirebaseRemoteConfigValue =
         FirebaseRemoteConfigValue(ios.configValueForKey(key))
 
     actual suspend fun reset() {
