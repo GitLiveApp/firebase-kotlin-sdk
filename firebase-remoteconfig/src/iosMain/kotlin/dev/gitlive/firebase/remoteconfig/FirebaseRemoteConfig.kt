@@ -85,8 +85,8 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         // not implemented for iOS target
     }
 
-    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
-        val settings = FirebaseRemoteConfigSettings().apply(build)
+    actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(init)
         val iosSettings = FIRRemoteConfigSettings().apply {
             minimumFetchInterval = settings.minimumFetchIntervalInSeconds.toDouble()
             fetchTimeout = settings.fetchTimeoutInSeconds.toDouble()

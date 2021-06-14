@@ -26,8 +26,8 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     actual val info: FirebaseRemoteConfigInfo
         get() = android.info.asCommon()
 
-    actual suspend fun settings(build: FirebaseRemoteConfigSettings.() -> Unit) {
-        val settings = FirebaseRemoteConfigSettings().apply(build)
+    actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(init)
         val androidSettings = remoteConfigSettings {
             minimumFetchIntervalInSeconds = settings.minimumFetchIntervalInSeconds
             fetchTimeoutInSeconds = settings.fetchTimeoutInSeconds

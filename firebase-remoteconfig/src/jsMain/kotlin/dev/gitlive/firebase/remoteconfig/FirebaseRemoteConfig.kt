@@ -60,7 +60,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         // not implemented for JS target
     }
 
-    actual suspend fun configSettings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+    actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         js.settings.apply {
             fetchTimeoutMillis = settings.fetchTimeoutInSeconds * 1000
