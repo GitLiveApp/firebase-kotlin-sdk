@@ -23,16 +23,17 @@ expect class FirebaseRemoteConfig {
     suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
 }
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
     val configValue = getValue(key)
     return when(T::class) {
-        Boolean::class -> configValue.asBoolean() as T
-        Double::class -> configValue.asDouble() as T
-        Long::class -> configValue.asLong() as T
-        String::class -> configValue.asString() as T
-        FirebaseRemoteConfigValue::class -> configValue as T
+        Boolean::class -> configValue.asBoolean()
+        Double::class -> configValue.asDouble()
+        Long::class -> configValue.asLong()
+        String::class -> configValue.asString()
+        FirebaseRemoteConfigValue::class -> configValue
         else -> throw IllegalArgumentException()
-    }
+    } as T
 }
 
 expect open class FirebaseRemoteConfigException : FirebaseException
