@@ -217,6 +217,7 @@ subprojects {
             "commonTestImplementation"("io.ktor:ktor-client-core:1.6.0")
             "commonTestImplementation"("io.ktor:ktor-client-serialization:1.6.0")
             "jsTestImplementation"(kotlin("test-js"))
+            "jsTestImplementation"("io.ktor:ktor-client-js:1.6.0")
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.3.0")
