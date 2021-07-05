@@ -11,7 +11,14 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = runBlocking {
+actual val currentPlatform: TargetPlatform = TargetPlatform.IOS
+
+actual fun runTest(skip: Boolean, test: suspend () -> Unit) = runBlocking {
+    if (skip) {
+        NSLog("Skip the test.")
+        return@runBlocking
+    }
+
     val testRun = MainScope().async { test() }
     while (testRun.isActive) {
         NSRunLoop.mainRunLoop.runMode(
