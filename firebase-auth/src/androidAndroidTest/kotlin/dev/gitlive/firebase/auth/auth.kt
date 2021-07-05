@@ -13,7 +13,7 @@ actual val emulatorHost: String = "10.0.2.2"
 
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
-actual val currentPlatform: TargetPlatform = TargetPlatform.Android
+actual val currentPlatform: Platform = Platform.Android
 
 actual fun runTest(skip: Boolean, test: suspend () -> Unit) = runBlocking {
     if (skip) {

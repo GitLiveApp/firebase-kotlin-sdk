@@ -11,7 +11,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual val currentPlatform: TargetPlatform = TargetPlatform.IOS
+actual val currentPlatform: Platform = Platform.IOS
 
 actual fun runTest(skip: Boolean, test: suspend () -> Unit) = runBlocking {
     if (skip) {

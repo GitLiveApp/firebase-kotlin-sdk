@@ -11,14 +11,14 @@ import kotlin.test.*
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(skip: Boolean = false, test: suspend () -> Unit)
-expect val currentPlatform: TargetPlatform
+expect val currentPlatform: Platform
 
-enum class TargetPlatform { Android, IOS, JS }
+enum class Platform { Android, IOS, JS }
 
 class FirebaseAuthTest {
 
     // Skip the tests on iOS simulator due keychain exceptions
-    private val skip = currentPlatform == TargetPlatform.IOS
+    private val skip = currentPlatform == Platform.IOS
 
     @BeforeTest
     fun initializeFirebase() {

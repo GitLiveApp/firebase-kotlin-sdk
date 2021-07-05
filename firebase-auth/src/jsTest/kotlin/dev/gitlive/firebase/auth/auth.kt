@@ -11,7 +11,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual val currentPlatform: TargetPlatform = TargetPlatform.JS
+actual val currentPlatform: Platform = Platform.JS
 
 actual fun runTest(skip: Boolean, test: suspend () -> Unit) = GlobalScope
     .promise {
