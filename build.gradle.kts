@@ -10,12 +10,13 @@ plugins {
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
         gradlePluginPortal()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        jcenter()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.2.1")
@@ -58,8 +59,8 @@ subprojects {
 
     repositories {
         mavenLocal()
-        mavenCentral()
         google()
+        mavenCentral()
         jcenter()
     }
 
