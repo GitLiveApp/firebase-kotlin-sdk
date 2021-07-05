@@ -37,7 +37,7 @@ jobs:
         name: "JS Test Report HTML"
         path: "firebase-firestore/build/reports/tests/jsTest/"
     - name: Run iOS Tests
-      run: ./gradlew cleanTest iosTest
+      run: ./gradlew cleanTest iosX64Test
     - name: Upload iOS test artifact
       uses: actions/upload-artifact@v2
       if: failure()
