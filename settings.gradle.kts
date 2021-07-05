@@ -5,7 +5,7 @@ include(
     "firebase-database",
     "firebase-auth",
     "firebase-functions",
-    "firebase-remoteconfig"
+    "firebase-config"
 )
 
 //enableFeaturePreview("GRADLE_METADATA")

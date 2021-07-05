@@ -1,8 +1,8 @@
 {
-  "name": "@gitlive/firebase-remoteconfig",
+  "name": "@gitlive/firebase-config",
   "version": "1.0.0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
-  "main": "firebase-remoteconfig.js",
+  "main": "firebase-config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

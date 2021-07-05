@@ -4,7 +4,7 @@
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
-version = project.property("firebase-remoteconfig.version") as String
+version = project.property("firebase-config.version") as String
 
 plugins {
     id("com.android.library")
@@ -63,8 +63,28 @@ kotlin {
 
     fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
         val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS"),
-            projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            "FirebaseCore",
+            "FirebaseCoreDiagnostics",
+            "FirebaseAnalytics",
+            "GoogleAppMeasurement",
+            "FirebaseInstallations",
+            "GoogleDataTransport",
+            "GoogleUtilities",
+            "PromisesObjC",
+            "nanopb"
+        ).map {
+            val archVariant =
+                if (konanTarget is org.jetbrains.kotlin.konan.target.KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
+            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
+        }.plus(
+            listOf(
+                "FirebaseABTesting",
+                "FirebaseRemoteConfig"
+            ).map {
+                val archVariant =
+                    if (konanTarget is org.jetbrains.kotlin.konan.target.KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
+            }
         )
 
         binaries {
