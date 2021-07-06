@@ -18,6 +18,9 @@ The following libraries are available for the various Firebase products.
 | [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:1.3.1`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.3.1/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
 | [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:1.3.1`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.3.1/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
 | [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:1.3.1`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.3.1/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Remote Config](https://firebase.google.com/docs/remote-config/get-started?platform=android)             | [`dev.gitlive:firebase-config:1.3.1`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.3.1/pom)     | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square) |
+
+
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -168,7 +171,8 @@ If you are building a Kotlin multiplatform library which will be consumed from J
   "@gitlive/firebase-firestore": "1.3.1",
   "@gitlive/firebase-functions": "1.3.1",
   "@gitlive/firebase-storage": "1.3.1",
-  "@gitlive/firebase-messaging": "1.3.1"
+  "@gitlive/firebase-messaging": "1.3.1",
+  "@gitlive/firebase-config": "1.3.1"
 }
 ```
 
