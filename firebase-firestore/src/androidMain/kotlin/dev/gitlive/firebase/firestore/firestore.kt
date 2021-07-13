@@ -301,39 +301,57 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
     internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
 
-    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        when {
-            lessThan != null -> android.whereLessThan(field, lessThan)
-            greaterThan != null -> android.whereGreaterThan(field, greaterThan)
-            arrayContains != null -> android.whereArrayContains(field, arrayContains)
-            else -> android
-        }
-    )
+    internal actual fun _where(
+        field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = Query(
+            when {
+                lessThan != null -> android.whereLessThan(field, lessThan)
+                greaterThan != null -> android.whereGreaterThan(field, greaterThan)
+                arrayContains != null -> android.whereArrayContains(field, arrayContains)
+                notEqualTo != null -> android.whereNotEqualTo(field, notEqualTo)
+                lessThanOrEqualTo != null -> android.whereLessThanOrEqualTo(field, lessThanOrEqualTo)
+                greaterThanOrEqualTo != null -> android.whereGreaterThanOrEqualTo(field, greaterThanOrEqualTo)
+                else -> android
+            }
+        )
 
-    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        when {
-            lessThan != null -> android.whereLessThan(path.android, lessThan)
-            greaterThan != null -> android.whereGreaterThan(path.android, greaterThan)
-            arrayContains != null -> android.whereArrayContains(path.android, arrayContains)
-            else -> android
-        }
-    )
+    internal actual fun _where(
+        path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = Query(
+            when {
+                lessThan != null -> android.whereLessThan(path.android, lessThan)
+                greaterThan != null -> android.whereGreaterThan(path.android, greaterThan)
+                arrayContains != null -> android.whereArrayContains(path.android, arrayContains)
+                notEqualTo != null -> android.whereNotEqualTo(path.android, notEqualTo)
+                lessThanOrEqualTo != null -> android.whereLessThanOrEqualTo(path.android, lessThanOrEqualTo)
+                greaterThanOrEqualTo != null -> android.whereGreaterThanOrEqualTo(path.android, greaterThanOrEqualTo)
+                else -> android
+            }
+        )
 
-    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        when {
-            inArray != null -> android.whereIn(field, inArray)
-            arrayContainsAny != null -> android.whereArrayContainsAny(field, arrayContainsAny)
-            else -> android
-        }
-    )
+    internal actual fun _where(
+        field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = Query(
+            when {
+                inArray != null -> android.whereIn(field, inArray)
+                arrayContainsAny != null -> android.whereArrayContainsAny(field, arrayContainsAny)
+                notInArray != null -> android.whereNotIn(field, notInArray)
+                else -> android
+            }
+        )
 
-    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        when {
-            inArray != null -> android.whereIn(path.android, inArray)
-            arrayContainsAny != null -> android.whereArrayContainsAny(path.android, arrayContainsAny)
-            else -> android
-        }
-    )
+    internal actual fun _where(
+        path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = Query(
+            when {
+                inArray != null -> android.whereIn(path.android, inArray)
+                arrayContainsAny != null -> android.whereArrayContainsAny(path.android, arrayContainsAny)
+                notInArray != null -> android.whereNotIn(path.android, notInArray)
+                else -> android
+            }
+        )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))

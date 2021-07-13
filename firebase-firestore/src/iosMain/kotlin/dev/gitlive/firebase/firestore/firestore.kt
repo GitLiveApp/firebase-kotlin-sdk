@@ -209,39 +209,57 @@ actual open class Query(open val ios: FIRQuery) {
     internal actual fun _where(field: String, equalTo: DocumentReference) = Query(ios.queryWhereField(field, isEqualTo = equalTo.ios))
     internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(ios.queryWhereFieldPath(path.ios, isEqualTo = equalTo.ios))
 
-    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
+    internal actual fun _where(
+        field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = Query(
         when {
             lessThan != null -> ios.queryWhereField(field, isLessThan = lessThan)
             greaterThan != null -> ios.queryWhereField(field, isGreaterThan = greaterThan)
             arrayContains != null -> ios.queryWhereField(field, arrayContains = arrayContains)
+            notEqualTo != null -> ios.queryWhereField(field, isNotEqualTo = notEqualTo)
+            lessThanOrEqualTo != null -> ios.queryWhereField(field, isLessThanOrEqualTo = lessThanOrEqualTo)
+            greaterThanOrEqualTo != null -> ios.queryWhereField(field, isGreaterThanOrEqualTo = greaterThanOrEqualTo)
             else -> ios
         }
     )
 
-    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        when {
-            lessThan != null -> ios.queryWhereFieldPath(path.ios, isLessThan = lessThan)
-            greaterThan != null -> ios.queryWhereFieldPath(path.ios, isGreaterThan = greaterThan)
-            arrayContains != null -> ios.queryWhereFieldPath(path.ios, arrayContains = arrayContains)
-            else -> ios
-        }
-    )
+    internal actual fun _where(
+        path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = Query(
+            when {
+                lessThan != null -> ios.queryWhereFieldPath(path.ios, isLessThan = lessThan)
+                greaterThan != null -> ios.queryWhereFieldPath(path.ios, isGreaterThan = greaterThan)
+                arrayContains != null -> ios.queryWhereFieldPath(path.ios, arrayContains = arrayContains)
+                notEqualTo != null -> ios.queryWhereFieldPath(path.ios, isNotEqualTo = notEqualTo)
+                lessThanOrEqualTo != null -> ios.queryWhereFieldPath(path.ios, isLessThanOrEqualTo = lessThanOrEqualTo)
+                greaterThanOrEqualTo != null -> ios.queryWhereFieldPath(path.ios, isGreaterThanOrEqualTo = greaterThanOrEqualTo)
+                else -> ios
+            }
+        )
 
-    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        when {
-            inArray != null -> ios.queryWhereField(field, `in` = inArray)
-            arrayContainsAny != null -> ios.queryWhereField(field, arrayContainsAny = arrayContainsAny)
-            else -> ios
-        }
-    )
+    internal actual fun _where(
+        field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = Query(
+            when {
+                inArray != null -> ios.queryWhereField(field, `in` = inArray)
+                arrayContainsAny != null -> ios.queryWhereField(field, arrayContainsAny = arrayContainsAny)
+                notInArray != null -> ios.queryWhereField(field, notIn = notInArray)
+                else -> ios
+            }
+        )
 
-    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        when {
-            inArray != null -> ios.queryWhereFieldPath(path.ios, `in` = inArray)
-            arrayContainsAny != null -> ios.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny)
-            else -> ios
-        }
-    )
+    internal actual fun _where(
+        path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = Query(
+            when {
+                inArray != null -> ios.queryWhereFieldPath(path.ios, `in` = inArray)
+                arrayContainsAny != null -> ios.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny)
+                notInArray != null -> ios.queryWhereFieldPath(path.ios, notIn = notInArray)
+                else -> ios
+            }
+        )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
