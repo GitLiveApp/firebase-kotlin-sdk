@@ -10,7 +10,6 @@ plugins {
 
 buildscript {
     repositories {
-        jcenter()
         google()
         gradlePluginPortal()
         maven {
@@ -61,7 +60,6 @@ subprojects {
         mavenLocal()
         mavenCentral()
         google()
-        jcenter()
     }
 
     tasks.withType<Sign>().configureEach {
@@ -197,14 +195,16 @@ subprojects {
             dependsOn("carthageClean")
         }
 
+        val coroutinesVersion: String by project
+
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.3-native-mt")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.1")
