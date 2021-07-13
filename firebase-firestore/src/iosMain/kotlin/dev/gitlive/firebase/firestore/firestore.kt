@@ -38,7 +38,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         FIRFirestore.enableLogging(loggingEnabled)
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, error -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
+        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, _ -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
 
     actual suspend fun clearPersistence() =
         await { ios.clearPersistenceWithCompletion(it) }
@@ -49,6 +49,23 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
             persistenceEnabled = false
             sslEnabled = false
         }
+    }
+
+    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        ios.settings = FIRFirestoreSettings().also { settings ->
+            persistenceEnabled?.let { settings.persistenceEnabled = it }
+            sslEnabled?.let { settings.sslEnabled = it }
+            host?.let { settings.host = it }
+            cacheSizeBytes?.let { settings.cacheSizeBytes = it }
+        }
+    }
+
+    actual suspend fun disableNetwork() {
+        await { ios.disableNetworkWithCompletion(it) }
+    }
+
+    actual suspend fun enableNetwork() {
+        await { ios.enableNetworkWithCompletion(it) }
     }
 }
 

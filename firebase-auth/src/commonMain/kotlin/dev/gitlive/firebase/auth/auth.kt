@@ -43,6 +43,15 @@ expect class AuthResult {
     val user: FirebaseUser?
 }
 
+expect class AuthTokenResult {
+//    val authTimestamp: Long
+    val claims: Map<String, Any>
+//    val expirationTimestamp: Long
+//    val issuedAtTimestamp: Long
+    val signInProvider: String?
+    val token: String?
+}
+
 sealed class ActionCodeResult {
     object SignInWithEmailLink : ActionCodeResult()
     class PasswordReset internal constructor(val email: String) : ActionCodeResult()

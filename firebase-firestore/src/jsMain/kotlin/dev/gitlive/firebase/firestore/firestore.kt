@@ -3,6 +3,7 @@
  */
 
 package dev.gitlive.firebase.firestore
+
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -20,12 +21,6 @@ actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
 
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
-
-//    actual var settings: FirebaseFirestoreSettings
-//        get() = js.settings().run { FirebaseFirestoreSettings(js.isPersistenceEnabled) }
-//        set(value) {
-//            js.settings() = value.run { Builder().setPersistenceEnabled(persistenceEnabled).build() }
-//        }
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
@@ -45,6 +40,24 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
         rethrow { js.clearPersistence().await() }
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
+
+    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+        if(persistenceEnabled == true) js.enablePersistence()
+
+        js.settings(json().apply {
+            sslEnabled?.let { set("ssl", it) }
+            host?.let { set("host", it) }
+            cacheSizeBytes?.let { set("cacheSizeBytes", it) }
+        })
+    }
+
+    actual suspend fun disableNetwork() {
+        rethrow { js.disableNetwork().await() }
+    }
+
+    actual suspend fun enableNetwork() {
+        rethrow { js.enableNetwork().await() }
+    }
 }
 
 actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
@@ -450,25 +463,30 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-fun errorToException(e: dynamic) = when(e?.code?.toString()?.toLowerCase()) {
-    "cancelled" -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
-    "invalid-argument" -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
-    "deadline-exceeded" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
-    "not-found" -> FirebaseFirestoreException(e, FirestoreExceptionCode.NOT_FOUND)
-    "already-exists" -> FirebaseFirestoreException(e, FirestoreExceptionCode.ALREADY_EXISTS)
-    "permission-denied" -> FirebaseFirestoreException(e, FirestoreExceptionCode.PERMISSION_DENIED)
-    "resource-exhausted" -> FirebaseFirestoreException(e, FirestoreExceptionCode.RESOURCE_EXHAUSTED)
-    "failed-precondition" -> FirebaseFirestoreException(e, FirestoreExceptionCode.FAILED_PRECONDITION)
-    "aborted" -> FirebaseFirestoreException(e, FirestoreExceptionCode.ABORTED)
-    "out-of-range" -> FirebaseFirestoreException(e, FirestoreExceptionCode.OUT_OF_RANGE)
-    "unimplemented" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNIMPLEMENTED)
-    "internal" -> FirebaseFirestoreException(e, FirestoreExceptionCode.INTERNAL)
-    "unavailable" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAVAILABLE)
-    "data-loss" -> FirebaseFirestoreException(e, FirestoreExceptionCode.DATA_LOSS)
-    "unauthenticated" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAUTHENTICATED)
-    "unknown" -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
-    else -> {
-        println("Unknown error code in ${JSON.stringify(e)}")
-        FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
-    }
+fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
+    .toString()
+    .toLowerCase()
+    .let {
+        when {
+            "cancelled" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
+            "invalid-argument" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
+            "deadline-exceeded" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
+            "not-found" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.NOT_FOUND)
+            "already-exists" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ALREADY_EXISTS)
+            "permission-denied" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.PERMISSION_DENIED)
+            "resource-exhausted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.RESOURCE_EXHAUSTED)
+            "failed-precondition" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.FAILED_PRECONDITION)
+            "aborted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ABORTED)
+            "out-of-range" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.OUT_OF_RANGE)
+            "unimplemented" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNIMPLEMENTED)
+            "internal" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INTERNAL)
+            "unavailable" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAVAILABLE)
+            "data-loss" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DATA_LOSS)
+            "unauthenticated" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAUTHENTICATED)
+            "unknown" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+            else -> {
+                println("Unknown error code in ${JSON.stringify(e)}")
+                FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+            }
+        }
 }

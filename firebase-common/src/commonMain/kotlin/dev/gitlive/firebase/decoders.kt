@@ -16,12 +16,12 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T> decode(value: Any?): T {
+inline fun <reified T> decode(value: Any?, noinline decodeDouble: (value: Any?) -> Double? = { null }): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value)
+    return decode(strategy as DeserializationStrategy<T>, value, decodeDouble)
 }
 
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decodeDouble: (value: Any?) -> Double? = { null }): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value).decodeSerializableValue(strategy)
 }
@@ -58,6 +58,9 @@ class FirebaseDecoder(internal val value: Any?) : Decoder {
     override fun decodeNotNullMark() = decodeNotNullMark(value)
 
     override fun decodeNull() = decodeNull(value)
+
+    @ExperimentalSerializationApi
+    override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
 }
 
 class FirebaseClassDecoder(
@@ -74,13 +77,6 @@ class FirebaseClassDecoder(
             .firstOrNull { !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it)) }
             ?.also { index = it + 1 }
             ?: DECODE_DONE
-
-    override fun <T : Any> decodeNullableSerializableElement(
-        descriptor: SerialDescriptor,
-        index: Int,
-        deserializer: DeserializationStrategy<T?>,
-        previousValue: T?
-    ) = decodeSerializableElement(descriptor, index, deserializer, previousValue)
 }
 
 open class FirebaseEmptyCompositeDecoder(): FirebaseCompositeDecoder(0, { _, _ -> })
@@ -98,10 +94,12 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor) = size
 
-    override fun <T> decodeSerializableElement(descriptor: SerialDescriptor,
-                                               index: Int, deserializer: DeserializationStrategy<T>, previousValue: T? ): T {
-        return deserializer.deserialize(FirebaseDecoder(get(descriptor, index)))
-    }
+    override fun <T> decodeSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T>,
+        previousValue: T?
+    ) = deserializer.deserialize(FirebaseDecoder(get(descriptor, index)))
 
     override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) = decodeBoolean(get(descriptor, index))
 
@@ -117,20 +115,25 @@ open class FirebaseCompositeDecoder constructor(
 
     override fun decodeLongElement(descriptor: SerialDescriptor, index: Int) = decodeLong(get(descriptor, index))
 
-    @ExperimentalSerializationApi
     override fun <T : Any> decodeNullableSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T?>,
         previousValue: T?
-    ) = decodeSerializableElement(descriptor, index, deserializer, previousValue)
+    ): T? {
+        val isNullabilitySupported = deserializer.descriptor.isNullable
+        return if (isNullabilitySupported || decodeNotNullMark(get(descriptor, index))) decodeSerializableElement(descriptor, index, deserializer, previousValue) else decodeNull(get(descriptor, index))
+    }
 
     override fun decodeShortElement(descriptor: SerialDescriptor, index: Int) = decodeShort(get(descriptor, index))
 
     override fun decodeStringElement(descriptor: SerialDescriptor, index: Int) = decodeString(get(descriptor, index))
 
-    override fun endStructure(descriptor: SerialDescriptor) {
-    }
+    override fun endStructure(descriptor: SerialDescriptor) {}
+
+    @ExperimentalSerializationApi
+    override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder =
+        FirebaseDecoder(get(descriptor, index))
 }
 
 private fun decodeString(value: Any?) = value.toString()
@@ -196,5 +199,3 @@ internal fun SerialDescriptor.getElementIndexOrThrow(name: String): Int {
 private fun decodeNotNullMark(value: Any?) = value != null
 
 private fun decodeNull(value: Any?) = value as Nothing?
-
-private fun decodeUnit(value: Any?) = value as Unit

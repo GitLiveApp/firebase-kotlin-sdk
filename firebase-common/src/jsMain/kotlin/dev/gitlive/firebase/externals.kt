@@ -70,6 +70,17 @@ external object firebase {
             fun onAuthStateChanged(nextOrObserver: (user.User?) -> Unit): () -> Unit
             fun onIdTokenChanged(nextOrObserver: (user.User?) -> Unit): () -> Unit
         }
+
+        abstract class IdTokenResult {
+            val authTime: String
+            val claims: Json
+            val expirationTime: String
+            val issuedAtTime: String
+            val signInProvider: String?
+            val signInSecondFactor: String?
+            val token: String
+        }
+
         abstract class AuthResult {
             val credential: AuthCredential?
             val operationType: String?
@@ -189,6 +200,7 @@ external object firebase {
 
             fun delete(): Promise<Unit>
             fun getIdToken(forceRefresh: Boolean?): Promise<String>
+            fun getIdTokenResult(forceRefresh: Boolean?): Promise<auth.IdTokenResult>
             fun linkWithCredential(credential: auth.AuthCredential): Promise<auth.AuthResult>
             fun reauthenticateWithCredential(credential: auth.AuthCredential): Promise<auth.AuthResult>
             fun reload(): Promise<Unit>
@@ -347,6 +359,8 @@ external object firebase {
             fun enablePersistence(): Promise<Unit>
             fun clearPersistence(): Promise<Unit>
             fun useEmulator(host: String, port: Int)
+            fun disableNetwork(): Promise<Unit>
+            fun enableNetwork(): Promise<Unit>
         }
 
         open class Query {

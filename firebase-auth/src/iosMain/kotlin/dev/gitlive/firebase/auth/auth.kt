@@ -103,6 +103,21 @@ actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
         get() = FirebaseUser(ios.user)
 }
 
+actual class AuthTokenResult(val ios: FIRAuthTokenResult) {
+//    actual val authTimestamp: Long
+//        get() = ios.authDate
+    actual val claims: Map<String, Any>
+        get() = ios.claims.map { it.key.toString() to it.value as Any }.toMap()
+//    actual val expirationTimestamp: Long
+//        get() = ios.expirationDate
+//    actual val issuedAtTimestamp: Long
+//        get() = ios.issuedAtDate
+    actual val signInProvider: String?
+        get() = ios.signInProvider
+    actual val token: String?
+        get() = ios.token
+}
+
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     it.URL =  NSURL.URLWithString(url)
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }

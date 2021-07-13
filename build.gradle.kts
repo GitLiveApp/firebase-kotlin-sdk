@@ -1,17 +1,16 @@
-import de.undercouch.gradle.tasks.download.Download
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.4.21" apply false
-    id("de.undercouch.download").version("4.1.1")
+    kotlin("multiplatform") version "1.4.31" apply false
+    kotlin("plugin.serialization") version "1.4.31" apply false
     id("base")
 }
 
 buildscript {
     repositories {
-        jcenter()
         google()
         gradlePluginPortal()
         maven {
@@ -20,14 +19,24 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.2")
-        classpath("de.undercouch:gradle-download-task:4.1.1")
-        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
 val firebaseBoMVersion by extra("27.1.0")
+
+val cinteropDir: String by extra("src/nativeInterop/cinterop")
+
+// TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
+// add idea.active=true for local development
+val _ideaActive = gradleLocalProperties(rootDir)["idea.active"] == "true"
+
+//if (!_ideaActive) {
+//    ext["kotlin.mpp.enableGranularSourceSetsMetadata"] = "true"
+//    ext["kotlin.native.enableDependencyPropagation"] = "false"
+//}
 
 tasks {
     val updateVersions by registering {
@@ -44,6 +53,8 @@ tasks {
 
 subprojects {
 
+    val ideaActive by extra(_ideaActive)
+
     group = "dev.gitlive"
 
     apply(plugin="com.adarshr.test-logger")
@@ -52,14 +63,11 @@ subprojects {
         mavenLocal()
         mavenCentral()
         google()
-        jcenter()
     }
-
 
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }
-    
 
     tasks {
 
@@ -150,16 +158,18 @@ subprojects {
             }
         }
 
-        listOf("bootstrap", "update").forEach {
-            task<Exec>("carthage${it.capitalize()}") {
-                group = "carthage"
-                executable = "carthage"
-                args(
-                    it,
-                    "--project-directory", "src/iosMain/c_interop",
-                    "--platform", "iOS",
-                    "--cache-builds"
-                )
+        if (projectDir.resolve("$cinteropDir/Cartfile").exists()) { // skipping firebase-common module
+            listOf("bootstrap", "update").forEach {
+                task<Exec>("carthage${it.capitalize()}") {
+                    group = "carthage"
+                    executable = "carthage"
+                    args(
+                        it,
+                        "--project-directory", projectDir.resolve(cinteropDir),
+                        "--platform", "iOS",
+                        "--cache-builds"
+                    )
+                }
             }
         }
 
@@ -171,8 +181,10 @@ subprojects {
 
         create("carthageClean", Delete::class.java) {
             group = "carthage"
-            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
-            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
+            delete(
+                projectDir.resolve("$cinteropDir/Carthage"),
+                projectDir.resolve("$cinteropDir/Cartfile.resolved")
+            )
         }
     }
 
@@ -186,17 +198,19 @@ subprojects {
             dependsOn("carthageClean")
         }
 
+        val coroutinesVersion: String by project
+
         dependencies {
             "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2-native-mt")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "jsMainImplementation"(kotlin("stdlib-js"))
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.2-native-mt")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2-native-mt")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13")
+            "androidAndroidTestImplementation"("junit:junit:4.13.1")
             "androidAndroidTestImplementation"("androidx.test:core:1.3.0")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.2")
             "androidAndroidTestImplementation"("androidx.test:runner:1.3.0")
@@ -255,11 +269,7 @@ subprojects {
                         comments.set("A business-friendly OSS license")
                     }
                 }
-
             }
         }
-
     }
-
 }
-

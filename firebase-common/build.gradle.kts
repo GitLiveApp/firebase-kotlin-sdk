@@ -2,19 +2,24 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 version = project.property("firebase-common.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.21"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdkVersion(targetSdkVersion)
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdkVersion(minSdkVersion)
+        targetSdkVersion(targetSdkVersion)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
@@ -37,55 +42,63 @@ android {
         isAbortOnError = false
     }
     dependencies {
-        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+        val firebaseBoMVersion: String by project
+        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 
 kotlin {
+
+    android {
+        publishAllLibraryVariants()
+    }
+
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+
+    }
+
+    if (project.extra["ideaActive"] as Boolean) {
+        iosX64("ios", nativeTargetConfig())
+    } else {
+        ios(configure = nativeTargetConfig())
+    }
+
     js {
         useCommonJs()
         nodejs()
         browser()
     }
-    android {
-        publishLibraryVariants("release", "debug")
-    }
-
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
-
-    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xuse-experimental=kotlinx.serialization.InternalSerializationApi"
-        )
-    }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
+        all {
+            languageSettings.apply {
+                apiVersion = "1.4"
+                languageVersion = "1.4"
+                progressiveMode = true
+                useExperimentalAnnotation("kotlin.Experimental")
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
             }
         }
+
+        val commonMain by getting {
+            dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
+            }
+        }
+
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-common")
             }
         }
+
+        val iosMain by getting
+
         val jsMain by getting {
             dependencies {
                 api(npm("firebase", "8.2.0"))
-            }
-        }
-        val iosMain by getting {
-            dependencies {
-            }
-        }
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
             }
         }
     }
