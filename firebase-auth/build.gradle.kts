@@ -23,10 +23,13 @@ plugins {
 //}
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdkVersion(targetSdkVersion)
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdkVersion(minSdkVersion)
+        targetSdkVersion(targetSdkVersion)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
@@ -52,7 +55,8 @@ android {
         isAbortOnError = false
     }
     dependencies {
-        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+        val firebaseBoMVersion: String by project
+        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 
@@ -76,9 +80,10 @@ kotlin {
     }
 
     fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+        val cinteropDir: String by project
         val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS"),
-            projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+            projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
         )
 
         binaries {
@@ -127,7 +132,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-auth:20.0.3")
+                api("com.google.firebase:firebase-auth")
             }
         }
 

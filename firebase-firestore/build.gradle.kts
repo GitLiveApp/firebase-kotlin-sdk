@@ -10,14 +10,17 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.31"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdkVersion(targetSdkVersion)
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdkVersion(minSdkVersion)
+        targetSdkVersion(targetSdkVersion)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
     }
@@ -45,7 +48,8 @@ android {
         isAbortOnError = false
     }
     dependencies {
-        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+        val firebaseBoMVersion: String by project
+        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 
@@ -56,9 +60,10 @@ kotlin {
     }
 
     fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+        val cinteropDir: String by project
         val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS"),
-            projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+            projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
         )
 
         binaries {
@@ -124,7 +129,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:22.1.1")
+                api("com.google.firebase:firebase-firestore")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }

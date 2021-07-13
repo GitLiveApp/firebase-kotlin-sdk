@@ -9,14 +9,17 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.31"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdkVersion(targetSdkVersion)
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdkVersion(minSdkVersion)
+        targetSdkVersion(targetSdkVersion)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
@@ -39,7 +42,8 @@ android {
         isAbortOnError = false
     }
     dependencies {
-        implementation(platform("com.google.firebase:firebase-bom:${property("firebaseBoMVersion") as String}"))
+        val firebaseBoMVersion: String by project
+        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 
@@ -86,7 +90,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.5.0")
+                api("com.google.firebase:firebase-common")
             }
         }
 

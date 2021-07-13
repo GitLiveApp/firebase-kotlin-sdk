@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.4.31" apply false
+    kotlin("plugin.serialization") version "1.4.31" apply false
     id("base")
 }
 
@@ -25,6 +26,8 @@ buildscript {
 val targetSdkVersion by extra(28)
 val minSdkVersion by extra(16)
 val firebaseBoMVersion by extra("27.1.0")
+
+val cinteropDir: String by extra("src/nativeInterop/cinterop")
 
 // TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
 // add idea.active=true for local development
@@ -155,14 +158,14 @@ subprojects {
             }
         }
 
-        if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
+        if (projectDir.resolve("$cinteropDir/Cartfile").exists()) { // skipping firebase-common module
             listOf("bootstrap", "update").forEach {
                 task<Exec>("carthage${it.capitalize()}") {
                     group = "carthage"
                     executable = "carthage"
                     args(
                         it,
-                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
+                        "--project-directory", projectDir.resolve(cinteropDir),
                         "--platform", "iOS",
                         "--cache-builds"
                     )
@@ -179,8 +182,8 @@ subprojects {
         create("carthageClean", Delete::class.java) {
             group = "carthage"
             delete(
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
-                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
+                projectDir.resolve("$cinteropDir/Carthage"),
+                projectDir.resolve("$cinteropDir/Cartfile.resolved")
             )
         }
     }
