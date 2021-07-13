@@ -275,37 +275,65 @@ actual open class Query(open val js: firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: DocumentReference) = rethrow { Query(js.where(field, "==", equalTo.js)) }
     internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = rethrow { Query(js.where(path.js, "==", equalTo.js)) }
 
-    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+    internal actual fun _where(
+        field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = rethrow {
         Query(
-            (lessThan?.let {js.where(field, "<", it) } ?: js).let { js2 ->
-                (greaterThan?.let { js2.where(field, ">", it) } ?: js2).let { js3 ->
-                    arrayContains?.let { js3.where(field, "array-contains", it) } ?: js3
-                }
+            when {
+                lessThan != null -> js.where(field, "<", lessThan)
+                greaterThan != null -> js.where(field, ">", greaterThan)
+                arrayContains != null -> js.where(field, "array-contains", arrayContains)
+                notEqualTo != null -> js.where(field, "!=", notEqualTo)
+                lessThanOrEqualTo != null -> js.where(field, "<=", lessThanOrEqualTo)
+                greaterThanOrEqualTo != null -> js.where(field, ">=", greaterThanOrEqualTo)
+                else -> js
             }
         )
     }
 
-    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = rethrow {
+    internal actual fun _where(
+        path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
+        lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
+    ) = rethrow {
         Query(
-            (lessThan?.let {js.where(path.js, "<", it) } ?: js).let { js2 ->
-                (greaterThan?.let { js2.where(path.js, ">", it) } ?: js2).let { js3 ->
-                    arrayContains?.let { js3.where(path.js, "array-contains", it) } ?: js3
-                }
+            when {
+                lessThan != null -> js.where(path.js, "<", lessThan)
+                greaterThan != null -> js.where(path.js, ">", greaterThan)
+                arrayContains != null -> js.where(path.js, "array-contains", arrayContains)
+                notEqualTo != null -> js.where(path.js, "!=", notEqualTo)
+                lessThanOrEqualTo != null -> js.where(path.js, "<=", lessThanOrEqualTo)
+                greaterThanOrEqualTo != null -> js.where(path.js, ">=", greaterThanOrEqualTo)
+                else -> js
             }
         )
     }
 
-    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { js.where(field, "in", it.toTypedArray()) } ?: js).let { js2 ->
-            arrayContainsAny?.let { js2.where(field, "array-contains-any", it.toTypedArray()) } ?: js2
-        }
-    )
+    internal actual fun _where(
+        field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = rethrow {
+        Query(
+            when {
+                inArray != null -> js.where(field, "in", inArray.toTypedArray())
+                arrayContainsAny != null -> js.where(field, "array-contains-any", arrayContainsAny.toTypedArray())
+                notInArray != null -> js.where(field, "not-in", notInArray.toTypedArray())
+                else -> js
+            }
+        )
+    }
 
-    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { js.where(path.js, "in", it.toTypedArray()) } ?: js).let { js2 ->
-            arrayContainsAny?.let { js2.where(path.js, "array-contains-any", it.toTypedArray()) } ?: js2
-        }
-    )
+    internal actual fun _where(
+        path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?, notInArray: List<Any>?
+    ) = rethrow {
+        Query(
+            when {
+                inArray != null -> js.where(path.js, "in", inArray.toTypedArray())
+                arrayContainsAny != null -> js.where(path.js, "array-contains-any", arrayContainsAny.toTypedArray())
+                notInArray != null -> js.where(path.js, "not-in", notInArray.toTypedArray())
+                else -> js
+            }
+        )
+    }
 
     internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
         Query(js.orderBy(field, direction.jsString))
