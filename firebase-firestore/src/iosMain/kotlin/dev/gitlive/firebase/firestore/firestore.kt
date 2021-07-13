@@ -210,30 +210,36 @@ actual open class Query(open val ios: FIRQuery) {
     internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(ios.queryWhereFieldPath(path.ios, isEqualTo = equalTo.ios))
 
     internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { ios.queryWhereField(field, isLessThan = it) } ?: ios).let { ios2 ->
-            (greaterThan?.let { ios2.queryWhereField(field, isGreaterThan = it) } ?: ios2).let { ios3 ->
-                arrayContains?.let { ios3.queryWhereField(field, arrayContains = it) } ?: ios3
-            }
+        when {
+            lessThan != null -> ios.queryWhereField(field, isLessThan = lessThan)
+            greaterThan != null -> ios.queryWhereField(field, isGreaterThan = greaterThan)
+            arrayContains != null -> ios.queryWhereField(field, arrayContains = arrayContains)
+            else -> ios
         }
     )
 
     internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { ios.queryWhereFieldPath(path.ios, isLessThan = it) } ?: ios).let { ios2 ->
-            (greaterThan?.let { ios2.queryWhereFieldPath(path.ios, isGreaterThan = it) } ?: ios2).let { ios3 ->
-                arrayContains?.let { ios3.queryWhereFieldPath(path.ios, arrayContains = it) } ?: ios3
-            }
+        when {
+            lessThan != null -> ios.queryWhereFieldPath(path.ios, isLessThan = lessThan)
+            greaterThan != null -> ios.queryWhereFieldPath(path.ios, isGreaterThan = greaterThan)
+            arrayContains != null -> ios.queryWhereFieldPath(path.ios, arrayContains = arrayContains)
+            else -> ios
         }
     )
 
     internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { ios.queryWhereField(field, `in` = it) } ?: ios).let { ios2 ->
-            arrayContainsAny?.let { ios2.queryWhereField(field, arrayContainsAny = arrayContainsAny) } ?: ios2
+        when {
+            inArray != null -> ios.queryWhereField(field, `in` = inArray)
+            arrayContainsAny != null -> ios.queryWhereField(field, arrayContainsAny = arrayContainsAny)
+            else -> ios
         }
     )
 
     internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { ios.queryWhereFieldPath(path.ios, `in` = it) } ?: ios).let { ios2 ->
-            arrayContainsAny?.let { ios2.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny) } ?: ios2
+        when {
+            inArray != null -> ios.queryWhereFieldPath(path.ios, `in` = inArray)
+            arrayContainsAny != null -> ios.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny)
+            else -> ios
         }
     )
 
