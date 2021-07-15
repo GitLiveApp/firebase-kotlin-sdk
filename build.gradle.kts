@@ -10,12 +10,13 @@ plugins {
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
         gradlePluginPortal()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        jcenter()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.2.1")
@@ -43,7 +44,8 @@ tasks {
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
-            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion"
+            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
+            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
         )
     }
 }
@@ -58,8 +60,8 @@ subprojects {
 
     repositories {
         mavenLocal()
-        mavenCentral()
         google()
+        mavenCentral()
         jcenter()
     }
 
