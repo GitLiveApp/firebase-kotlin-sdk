@@ -10,7 +10,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.10"
+    kotlin("plugin.serialization") version "1.5.21"
 }
 
 android {
@@ -128,7 +128,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:23.0.1")
+                api("com.google.firebase:firebase-firestore-ktx")
             }
         }
 

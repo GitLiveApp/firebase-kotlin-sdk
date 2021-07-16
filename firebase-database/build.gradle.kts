@@ -123,7 +123,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-database:20.0.0")
+                api("com.google.firebase:firebase-database-ktx")
             }
         }
 

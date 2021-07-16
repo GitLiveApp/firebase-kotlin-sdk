@@ -117,7 +117,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-functions:20.0.0")
+                api("com.google.firebase:firebase-functions-ktx")
             }
         }
 
