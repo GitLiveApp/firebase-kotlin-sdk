@@ -15,7 +15,6 @@ plugins {
 
 //buildscript {
 //    repositories {
-//        jcenter()
 //        google()
 //        gradlePluginPortal()
 //    }
