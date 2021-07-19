@@ -166,7 +166,7 @@ actual class DatabaseReference internal constructor(
             },
             andCompletionBlock = { error, _, snapshot ->
                 if (error != null) {
-                    throw error
+                    throw DatabaseException(error.toString(), null)
                 } else {
                     deferred.complete(Result.success(DataSnapshot(snapshot!!)))
                 }
