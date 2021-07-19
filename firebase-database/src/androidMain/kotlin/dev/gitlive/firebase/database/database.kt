@@ -191,7 +191,7 @@ actual class DatabaseReference internal constructor(
         .run { Unit }
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        val deferred = CompletableDeferred<Result<DataSnapshot>>()
+        val deferred = CompletableDeferred<DataSnapshot>()
         android.runTransaction(object : Transaction.Handler {
 
             override fun doTransaction(currentData: MutableData) =
@@ -203,14 +203,14 @@ actual class DatabaseReference internal constructor(
                 snapshot: com.google.firebase.database.DataSnapshot?
             ) {
                 if(error != null) {
-                    throw error.toException()
+                    deferred.completeExceptionally(error.toException())
                 } else {
-                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
+                    deferred.complete(DataSnapshot(snapshot!!))
                 }
             }
 
         })
-        return deferred.await().getOrThrow()
+        return deferred.await()
     }
 }
 @Suppress("UNCHECKED_CAST")

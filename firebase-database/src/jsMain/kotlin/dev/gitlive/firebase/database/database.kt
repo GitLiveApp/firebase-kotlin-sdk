@@ -130,19 +130,19 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
         rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        val deferred = CompletableDeferred<Result<DataSnapshot>>()
+        val deferred = CompletableDeferred<DataSnapshot>()
         js.runTransaction(
             transactionUpdate,
             { error, _, snapshot ->
                 if (error != null) {
-                    throw error
+                    deferred.completeExceptionally(error)
                 } else {
-                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
+                    deferred.complete(DataSnapshot(snapshot!!))
                 }
             },
             applyLocally = false
         ).await()
-        return deferred.await().getOrThrow()
+        return deferred.await()
     }
 
 }
