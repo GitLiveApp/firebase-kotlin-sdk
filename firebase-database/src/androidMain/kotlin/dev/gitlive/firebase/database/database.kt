@@ -202,10 +202,10 @@ actual class DatabaseReference internal constructor(
                 committed: Boolean,
                 snapshot: com.google.firebase.database.DataSnapshot?
             ) {
-                if (error == null && snapshot != null) {
-                    deferred.complete(Result.success(DataSnapshot(snapshot)))
+                if(error != null) {
+                    throw error.toException()
                 } else {
-                    deferred.complete(Result.failure(Throwable(error?.message)))
+                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
                 }
             }
 

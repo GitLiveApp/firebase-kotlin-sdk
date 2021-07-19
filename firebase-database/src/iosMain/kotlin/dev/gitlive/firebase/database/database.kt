@@ -165,10 +165,10 @@ actual class DatabaseReference internal constructor(
                 FIRTransactionResult.successWithValue(transactionUpdate(decode(strategy, firMutableData)) as FIRMutableData)
             },
             andCompletionBlock = { error, _, snapshot ->
-                if (error == null) {
-                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
+                if (error != null) {
+                    throw error
                 } else {
-                    deferred.complete(Result.failure(Throwable(error.localizedDescription)))
+                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
                 }
             },
             withLocalEvents = false

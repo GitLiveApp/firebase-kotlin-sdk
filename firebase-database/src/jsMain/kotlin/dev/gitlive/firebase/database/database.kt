@@ -135,9 +135,9 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
             transactionUpdate,
             { error, _, snapshot ->
                 if (error != null) {
-                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
+                    throw error
                 } else {
-                    deferred.complete(Result.failure(Throwable(error?.message)))
+                    deferred.complete(Result.success(DataSnapshot(snapshot!!)))
                 }
             },
             applyLocally = false
