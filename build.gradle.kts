@@ -16,7 +16,6 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
-        jcenter()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.2.1")
@@ -62,7 +61,6 @@ subprojects {
         mavenLocal()
         google()
         mavenCentral()
-        jcenter()
     }
 
     tasks.withType<Sign>().configureEach {
