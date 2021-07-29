@@ -383,7 +383,7 @@ external object firebase {
 
         open class CollectionReference : Query {
             val path: String
-            fun doc(path: String): DocumentReference
+            fun doc(path: String = definedExternally): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 
@@ -461,6 +461,38 @@ external object firebase {
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
             }
+        }
+    }
+
+    fun remoteConfig(app: App? = definedExternally): remoteConfig.RemoteConfig
+
+    object remoteConfig {
+        interface RemoteConfig {
+            var defaultConfig: Any
+            var fetchTimeMillis: Long
+            var lastFetchStatus: String
+            val settings: Settings
+            fun activate(): Promise<Boolean>
+            fun ensureInitialized(): Promise<Unit>
+            fun fetch(): Promise<Unit>
+            fun fetchAndActivate(): Promise<Boolean>
+            fun getAll(): Json
+            fun getBoolean(key: String): Boolean
+            fun getNumber(key: String): Number
+            fun getString(key: String): String?
+            fun getValue(key: String): Value
+        }
+
+        interface Settings {
+            var fetchTimeoutMillis: Number
+            var minimumFetchIntervalMillis: Number
+        }
+
+        interface Value {
+            fun asBoolean(): Boolean
+            fun asNumber(): Number
+            fun asString(): String?
+            fun getSource(): String
         }
     }
 }
