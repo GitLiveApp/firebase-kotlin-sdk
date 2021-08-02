@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 
 version = project.property("firebase-firestore.version") as String
@@ -5,18 +10,27 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdkVersion(targetSdkVersion)
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
-        setMultiDexEnabled(true)
+        minSdkVersion(minSdkVersion)
+        targetSdkVersion(targetSdkVersion)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        }
+        getByName("androidTest"){
+            java.srcDir(file("src/androidAndroidTest/kotlin"))
+            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
         }
     }
     testOptions {
@@ -33,30 +47,52 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+    dependencies {
+        val firebaseBoMVersion: String by project
+        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
+    }
 }
 
 kotlin {
+
+    android {
+        publishAllLibraryVariants()
+    }
+
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+        val cinteropDir: String by project
+        val nativeFrameworkPaths = listOf(
+            rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+            projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
+        )
+
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                linkerOpts("-ObjC")
+            }
+        }
+
+        compilations.getByName("main") {
+            cinterops.create("FirebaseFirestore") {
+                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                extraOpts("-verbose")
+            }
+        }
+    }
+
+    if (project.extra["ideaActive"] as Boolean) {
+        iosX64("ios", nativeTargetConfig())
+        iosArm64("ios", nativeTargetConfig())
+    } else {
+        ios(configure = nativeTargetConfig())
+    }
+
     js {
         useCommonJs()
         nodejs()
         browser()
     }
-    android {
-        publishLibraryVariants("release", "debug")
-    }
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios") {
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts(
-                    "-F${rootProject.projectDir}/firebase-app/src/iosMain/c_interop/Carthage/Build/iOS/",
-                    "-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/"
-                )
-                linkerOpts("-ObjC")
-            }
-        }
-    }
-
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
@@ -74,32 +110,33 @@ kotlin {
         }
     }
     sourceSets {
+        all {
+            languageSettings.apply {
+                apiVersion = "1.4"
+                languageVersion = "1.4"
+                progressiveMode = true
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+            }
+        }
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
             }
         }
+
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore:21.5.0")
+                api("com.google.firebase:firebase-firestore")
                 implementation("com.android.support:multidex:1.0.3")
             }
         }
 
-        val jsMain by getting {}
-        val iosMain by getting {}
+        val iosMain by getting
 
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-                val firebasefirestore by cinterops.creating {
-                    packageName("cocoapods.FirebaseFirestore")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseFirestore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                }
-            }
-        }
+        val jsMain by getting
     }
 }
 signing {

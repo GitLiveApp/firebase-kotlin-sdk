@@ -27,9 +27,11 @@ import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-fun encode(value: Any?, shouldEncodeElementDefault: Boolean) =
+@PublishedApi
+internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
     dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
-fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
+
+internal fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 
 actual val Firebase.database
@@ -55,6 +57,9 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun setLoggingEnabled(enabled: Boolean) =
         FIRDatabase.setLoggingEnabled(enabled)
+
+    actual fun useEmulator(host: String, port: Int) =
+        ios.useEmulatorWithHost(host, port.toLong())
 }
 
 fun Type.toEventType() = when(this) {
@@ -70,6 +75,8 @@ actual open class Query internal constructor(
 ) {
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
+    actual fun orderByValue() = Query(ios.queryOrderedByValue(), persistenceEnabled)
+
     actual fun orderByChild(path: String) = Query(ios.queryOrderedByChild(path), persistenceEnabled)
 
     actual fun startAt(value: String, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
@@ -77,6 +84,22 @@ actual open class Query internal constructor(
     actual fun startAt(value: Double, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
 
     actual fun startAt(value: Boolean, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: String, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Double, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun endAt(value: Boolean, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+
+    actual fun limitToFirst(limit: Int) = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
+
+    actual fun limitToLast(limit: Int) = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
+
+    actual fun equalTo(value: String, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Double, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+
+    actual fun equalTo(value: Boolean, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
 
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(

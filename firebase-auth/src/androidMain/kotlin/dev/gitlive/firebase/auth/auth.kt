@@ -51,6 +51,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         get() = android.languageCode ?: ""
         set(value) { android.setLanguageCode(value) }
 
+
     actual suspend fun applyActionCode(code: String) = android.applyActionCode(code).await().run { Unit }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = android.confirmPasswordReset(code, newPassword).await().run { Unit }
 
@@ -75,6 +76,9 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(android.signInWithCredential(authCredential.android).await())
+
+    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
+        AuthResult(android.signInWithEmailLink(email, emailLink).await())
 
     actual suspend fun signOut() = android.signOut()
 
@@ -102,11 +106,29 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         } as T
     }
 
+    actual fun isSignInWithEmailLink(emailLink: String) = android.isSignInWithEmailLink(emailLink)
+
+    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
 actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
     actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
+}
+
+actual class AuthTokenResult(val android: com.google.firebase.auth.GetTokenResult) {
+//    actual val authTimestamp: Long
+//        get() = android.authTimestamp
+    actual val claims: Map<String, Any>
+        get() = android.claims
+//    actual val expirationTimestamp: Long
+//        get() = android.expirationTimestamp
+//    actual val issuedAtTimestamp: Long
+//        get() = android.issuedAtTimestamp
+    actual val signInProvider: String?
+        get() = android.signInProvider
+    actual val token: String?
+        get() = android.token
 }
 
 internal fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCodeSettings.newBuilder()
