@@ -4,8 +4,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.4.31" apply false
-    kotlin("plugin.serialization") version "1.4.31" apply false
+    kotlin("multiplatform") version "1.5.21" apply false
+    kotlin("plugin.serialization") version "1.5.21" apply false
     id("base")
 }
 
@@ -23,7 +23,7 @@ buildscript {
     }
 }
 
-val targetSdkVersion by extra(28)
+val targetSdkVersion by extra(30)
 val minSdkVersion by extra(16)
 val firebaseBoMVersion by extra("27.1.0")
 
@@ -211,9 +211,9 @@ subprojects {
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.1")
-            "androidAndroidTestImplementation"("androidx.test:core:1.3.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.2")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.3.0")
+            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
         }
     }
 
