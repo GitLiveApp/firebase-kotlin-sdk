@@ -5,6 +5,7 @@
 package dev.gitlive.firebase
 
 import cocoapods.FirebaseCore.*
+import kotlinx.coroutines.CompletableDeferred
 
 actual open class FirebaseException(message: String) : Exception(message)
 actual open class FirebaseNetworkException(message: String) : FirebaseException(message)
@@ -31,6 +32,19 @@ actual class FirebaseApp internal constructor(val ios: FIRApp) {
         get() = ios.name
     actual val options: FirebaseOptions
         get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
+
+    actual suspend fun delete() {
+        val job = CompletableDeferred<Unit>()
+        val result = ios.deleteApp { error ->
+            if(error == null) {
+                job.complete(Unit)
+            } else {
+                job.completeExceptionally(error.toException())
+            }
+        }
+        job.await()
+        return result
+    }
 }
 
 actual fun Firebase.apps(context: Any?) = FIRApp.allApps()

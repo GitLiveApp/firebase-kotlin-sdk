@@ -15,6 +15,7 @@ external object firebase {
     open class App {
         val name: String
         val options: Options
+        fun delete()
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
