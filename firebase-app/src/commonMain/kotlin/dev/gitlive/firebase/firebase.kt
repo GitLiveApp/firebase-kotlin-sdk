@@ -19,7 +19,7 @@ object Firebase
 expect class FirebaseApp {
     val name: String
     val options: FirebaseOptions
-    suspend fun delete()
+    fun delete()
 }
 
 /** Returns the default firebase app instance. */
