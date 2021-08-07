@@ -18,7 +18,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.2")
+        classpath("com.android.tools.build:gradle:7.0.0")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
@@ -207,9 +207,7 @@ subprojects {
         }
 
         dependencies {
-            "commonMainImplementation"(kotlin("stdlib-common"))
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-            "jsMainImplementation"(kotlin("stdlib-js"))
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.3.1"))
             "commonTestImplementation"(kotlin("test-common"))

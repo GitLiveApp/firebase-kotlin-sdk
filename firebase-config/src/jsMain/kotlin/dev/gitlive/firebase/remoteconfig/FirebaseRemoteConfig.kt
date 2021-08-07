@@ -111,7 +111,7 @@ internal inline fun <R> rethrow(function: () -> R): R {
 
 internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?: "")
     .toString()
-    .toLowerCase()
+    .lowercase()
     .let { code ->
         when {
             else -> {
