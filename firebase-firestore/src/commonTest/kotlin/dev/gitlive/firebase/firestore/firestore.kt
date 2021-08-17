@@ -124,7 +124,6 @@ class FirebaseFirestoreTest {
 
     }
 
-
     @Test
     fun testDocumentAutoId() = runTest {
         val doc = Firebase.firestore
@@ -140,6 +139,23 @@ class FirebaseFirestoreTest {
 
         assertEquals(true, resultDoc.exists)
         assertEquals("AutoId", resultDoc.get("prop1"))
+    }
+
+    @Test
+    fun testDataMap() = runTest {
+        val doc = Firebase.firestore
+            .collection("testDataMap")
+            .document
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("dataMap", 123.45))
+
+        val resultDoc = Firebase.firestore
+            .collection("testDataMap")
+            .document(doc.id)
+            .get()
+
+        assertEquals(true, resultDoc.exists)
+        assertEquals(mapOf("prop1" to "dataMap", "time" to 123.45), resultDoc.dataMap())
     }
 
     private suspend fun setupFirestoreData() {
