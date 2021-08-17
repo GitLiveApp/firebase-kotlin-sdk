@@ -393,6 +393,8 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual fun <T> data(strategy: DeserializationStrategy<T>): T =
         rethrow { decode(strategy, js.data()) }
 
+    actual fun dataMap(): Map<String, Any?> = rethrow { (js.data() as? Map<String, Any?>) ?: mapOf() }
+
     actual inline fun <reified T> get(field: String) =
         rethrow { decode<T>(value = js.get(field)) }
 
