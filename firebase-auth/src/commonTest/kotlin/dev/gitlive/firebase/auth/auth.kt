@@ -7,6 +7,7 @@ package dev.gitlive.firebase.auth
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.emulator.fetchOobCodes
 import dev.gitlive.firebase.initialize
 import kotlin.random.Random
 import kotlin.test.BeforeTest
@@ -25,6 +26,7 @@ expect val currentPlatform: Platform
 enum class Platform { Android, IOS, JS }
 
 private const val PROJECT_ID = "fir-kotlin-sdk"
+private const val EMULATOR_PORT = 9099
 
 class FirebaseAuthTest {
 
@@ -47,7 +49,7 @@ class FirebaseAuthTest {
                         gcmSenderId = "846484016111"
                     )
                 )
-                Firebase.auth.useEmulator(emulatorHost, 9099)
+                Firebase.auth.useEmulator(emulatorHost, EMULATOR_PORT)
             }
     }
 
@@ -93,7 +95,7 @@ class FirebaseAuthTest {
         assertNotEquals(null, createResult.user?.uid)
         createResult.user!!.sendEmailVerification()
 
-        val oobCodes = fetchOobCodes(PROJECT_ID)
+        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
         assertTrue(oobCodes.any { it.email == email && it.requestType == "VERIFY_EMAIL" })
 
         createResult.user!!.delete()
@@ -107,7 +109,7 @@ class FirebaseAuthTest {
 
         Firebase.auth.sendPasswordResetEmail(email)
 
-        val oobCodes = fetchOobCodes(PROJECT_ID)
+        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
         assertTrue(oobCodes.any { it.email == email && it.requestType == "PASSWORD_RESET" })
 
         createResult.user!!.delete()
@@ -126,16 +128,8 @@ class FirebaseAuthTest {
     fun testSendSignInEmailLink() = runTest {
         val email = getRandomEmail()
         sendSgnInLink(email)
-        val oobCodes = fetchOobCodes(PROJECT_ID)
+        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
         assertTrue(oobCodes.any { it.email == email && it.requestType == "EMAIL_SIGNIN" })
-    }
-
-    private suspend fun sendSgnInLink(email: String) {
-        val actionCodeSettings = ActionCodeSettings(
-            url = "https://example.com/signin",
-            canHandleCodeInApp = true,
-        )
-        Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings)
     }
 
     @Test
@@ -150,10 +144,18 @@ class FirebaseAuthTest {
     fun testSignInWithEmailLink() = runTest(skip) {
         val email = getRandomEmail()
         sendSgnInLink(email)
-        val oobCodes = fetchOobCodes(PROJECT_ID)
+        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
         val oobCode = oobCodes.first { it.email == email && it.requestType == "EMAIL_SIGNIN" }
         val authResult = Firebase.auth.signInWithEmailLink(oobCode.email, oobCode.oobLink)
         assertNotNull(authResult.user)
+    }
+
+    private suspend fun sendSgnInLink(email: String) {
+        val actionCodeSettings = ActionCodeSettings(
+            url = "https://example.com/signin",
+            canHandleCodeInApp = true,
+        )
+        Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings)
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
