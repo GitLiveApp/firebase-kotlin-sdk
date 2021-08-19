@@ -478,7 +478,7 @@ inline fun <R> rethrow(function: () -> R): R {
 
 fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .toString()
-    .toLowerCase()
+    .lowercase()
     .let {
         when {
             "cancelled" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
