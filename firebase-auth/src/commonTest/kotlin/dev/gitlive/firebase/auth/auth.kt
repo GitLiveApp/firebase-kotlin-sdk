@@ -147,7 +147,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSignInWithEmailLink() = runTest {
+    fun testSignInWithEmailLink() = runTest(skip) {
         val email = getRandomEmail()
         sendSgnInLink(email)
         val oobCodes = fetchOobCodes(PROJECT_ID)

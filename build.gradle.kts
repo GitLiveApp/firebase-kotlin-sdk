@@ -212,17 +212,12 @@ subprojects {
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.3.1"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-            "commonTestImplementation"("io.ktor:ktor-client-core:1.6.0")
-            "commonTestImplementation"("io.ktor:ktor-client-serialization:1.6.0")
             "jsTestImplementation"(kotlin("test-js"))
-            "jsTestImplementation"("io.ktor:ktor-client-js:1.6.0")
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
             "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
             "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
-            "androidAndroidTestImplementation"("io.ktor:ktor-client-android:1.6.0")
         }
     }
 
