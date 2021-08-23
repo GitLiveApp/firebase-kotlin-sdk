@@ -318,7 +318,7 @@ external object firebase {
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
             fun push(): ThenableReference
-            fun <T> runTransaction(
+            fun <T> transaction(
                 transactionUpdate: (currentData: T) -> T,
                 onComplete: (error: Error?, committed: Boolean, snapshot: DataSnapshot?) -> Unit,
                 applyLocally: Boolean?

@@ -131,7 +131,7 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
-        js.runTransaction(
+        js.transaction(
             transactionUpdate,
             { error, _, snapshot ->
                 if (error != null) {
