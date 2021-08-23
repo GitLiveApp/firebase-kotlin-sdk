@@ -21,6 +21,11 @@ jobs:
           java-version: '11'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Set environment variables for Firebase
+        run: |
+          echo "FIREBASE_AUTH_EMULATOR_HOST=localhost:9099" >> $GITHUB_ENV
+          echo "FIREBASE_DATABASE_EMULATOR_HOST=localhost:9000" >> $GITHUB_ENV
+          echo "FIRESTORE_EMULATOR_HOST=localhost:8080" >> $GITHUB_ENV
       - name: Install Carthage
         run: brew list carthage || brew install carthage
       - name: Install Firebase tools
@@ -31,10 +36,6 @@ jobs:
         run: ./gradlew assemble
       - name: Run JS Tests
         run: ./gradlew cleanTest jsTest
-        env:
-          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
-          FIREBASE_DATABASE_EMULATOR_HOST: "localhost:9000"
-          FIRESTORE_EMULATOR_HOST: "localhost:8080"
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v2
         if: failure()
@@ -43,10 +44,6 @@ jobs:
           path: "firebase-firestore/build/reports/tests/jsTest/"
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
-        env:
-          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
-          FIREBASE_DATABASE_EMULATOR_HOST: "localhost:9000"
-          FIRESTORE_EMULATOR_HOST: "localhost:8080"
       - name: Upload iOS test artifact
         uses: actions/upload-artifact@v2
         if: failure()
@@ -61,10 +58,6 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: ./gradlew connectedAndroidTest
-        env:
-          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
-          FIREBASE_DATABASE_EMULATOR_HOST: "localhost:9000"
-          FIRESTORE_EMULATOR_HOST: "localhost:8080"
       - name: Upload Android test artifact
         uses: actions/upload-artifact@v2
         if: failure()
