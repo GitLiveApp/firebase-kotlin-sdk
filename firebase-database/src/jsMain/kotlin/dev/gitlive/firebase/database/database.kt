@@ -63,7 +63,7 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
     actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow<ChildEvent> {
         val listeners = rethrow {
             types.map { type ->
-                "child_${type.name.toLowerCase()}".let { eventType ->
+                "child_${type.name.lowercase()}".let { eventType ->
                     eventType to js.on(
                         eventType,
                         { snapshot, previousChildName ->
