@@ -30,6 +30,10 @@ jobs:
       run: ./gradlew assemble
     - name: Run JS Tests
       run: ./gradlew cleanTest jsTest
+      env:
+        FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
+        FIREBASE_DATABASE_EMULATOR_HOST: "localhost:9000"
+        FIRESTORE_EMULATOR_HOST: "localhost:8080"
     - name: Upload test artifact
       uses: actions/upload-artifact@v2
       if: failure()
@@ -44,3 +48,7 @@ jobs:
         arch: x86_64
         profile: Nexus 6
         script: ./gradlew connectedAndroidTest
+      env:
+        FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
+        FIREBASE_DATABASE_EMULATOR_HOST: "localhost:9000"
+        FIRESTORE_EMULATOR_HOST: "localhost:8080"
