@@ -141,7 +141,7 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
                 }
             },
             applyLocally = false
-        ).await()
+        )
         return deferred.await()
     }
 
@@ -200,10 +200,13 @@ inline fun <R> rethrow(function: () -> R): R {
 
 suspend fun <T> Promise<T>.awaitWhileOnline(): T = coroutineScope {
 
+//    this@awaitWhileOnline.await()
     val notConnected = Firebase.database
         .reference(".info/connected")
         .valueEvents
-        .filter { !it.value<Boolean>() }
+        .filter {
+            !it.value<Boolean>()
+        }
         .produceIn(this)
 
     select<T> {
