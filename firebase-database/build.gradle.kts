@@ -106,14 +106,14 @@ kotlin {
         nodejs {
             testTask {
                 useMocha {
-                    timeout = "15s"
+                    timeout = "5s"
                 }
             }
         }
         browser {
             testTask {
                 useMocha {
-                    timeout = "15s"
+                    timeout = "5s"
                 }
             }
         }
