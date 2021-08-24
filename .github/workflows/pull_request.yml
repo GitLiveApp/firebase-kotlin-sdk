@@ -31,8 +31,6 @@ jobs:
         run: ./gradlew assemble
       - name: Run JS Tests
         run: ./gradlew cleanTest jsTest
-        env: 
-          FIREBASE_DATABASE_EMULATOR_HOST: localhost:9000
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v2
         if: failure()
