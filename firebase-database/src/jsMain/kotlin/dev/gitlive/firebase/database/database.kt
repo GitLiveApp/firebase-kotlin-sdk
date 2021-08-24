@@ -200,7 +200,6 @@ inline fun <R> rethrow(function: () -> R): R {
 
 suspend fun <T> Promise<T>.awaitWhileOnline(): T = coroutineScope {
 
-//    this@awaitWhileOnline.await()
     val notConnected = Firebase.database
         .reference(".info/connected")
         .valueEvents
