@@ -10,7 +10,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.21"
+    kotlin("plugin.serialization") version "1.5.30"
 }
 
 android {
@@ -131,8 +131,8 @@ kotlin {
                 apiVersion = "1.5"
                 languageVersion = "1.5"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 
