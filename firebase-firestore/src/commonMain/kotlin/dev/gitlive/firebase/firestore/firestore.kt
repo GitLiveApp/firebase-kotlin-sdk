@@ -196,6 +196,8 @@ expect class DocumentSnapshot {
     inline fun <reified T: Any> data(): T
     fun <T> data(strategy: DeserializationStrategy<T>): T
 
+    fun dataMap(): Map<String, Any?>
+
     val exists: Boolean
     val id: String
     val reference: DocumentReference
