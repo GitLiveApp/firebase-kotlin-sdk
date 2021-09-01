@@ -413,7 +413,7 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
     actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
 
-    actual fun dataMap(): Map<String, Any?> = android.data ?: mapOf()
+    actual fun dataMap(): Map<String, Any?> = android.data ?: emptyMap()
 
     actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
 
