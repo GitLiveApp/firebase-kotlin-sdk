@@ -393,6 +393,8 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual fun <T> data(strategy: DeserializationStrategy<T>): T =
         rethrow { decode(strategy, js.data()) }
 
+    actual fun dataMap(): Map<String, Any?> = rethrow { mapOf(js.data().asDynamic()) }
+
     actual inline fun <reified T> get(field: String) =
         rethrow { decode<T>(value = js.get(field)) }
 
@@ -503,3 +505,13 @@ fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
             }
         }
 }
+
+// from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
+fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
+    (js("Object.entries") as (dynamic) -> Array<Array<Any?>>)
+        .invoke(jsObject)
+        .map { entry -> entry[0] as String to entry[1] }
+
+// from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
+fun mapOf(jsObject: dynamic): Map<String, Any?> =
+    entriesOf(jsObject).toMap()
