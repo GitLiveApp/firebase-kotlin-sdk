@@ -377,6 +377,7 @@ external object firebase {
             fun limit(limit: Double): Query
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
+            fun startAfter(document: DocumentSnapshot): Query
         }
 
         open class CollectionReference : Query {
