@@ -2,25 +2,28 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 version = project.property("firebase-common.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
-    kotlin("plugin.serialization") version "1.3.72"
+    kotlin("plugin.serialization") version "1.5.30"
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    compileSdk = property("targetSdkVersion") as Int
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdk = property("minSdkVersion") as Int
+        targetSdk = property("targetSdkVersion") as Int
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
+        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
     }
     testOptions {
         unitTests.apply {
@@ -28,11 +31,11 @@ android {
         }
     }
     packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
-        pickFirst("META-INF/AL2.0")
-        pickFirst("META-INF/LGPL2.1")
+        resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
+        resources.pickFirsts.add("META-INF/AL2.0")
+        resources.pickFirsts.add("META-INF/LGPL2.1")
     }
-    lintOptions {
+    lint {
         isAbortOnError = false
     }
 }
@@ -47,11 +50,12 @@ kotlin {
         nodejs()
     }
     android {
-        publishLibraryVariants("release", "debug")
+        publishAllLibraryVariants()
     }
 
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios")
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+
+    }
 
     jvm {
         val main by compilations.getting {
@@ -66,6 +70,12 @@ kotlin {
         }
     }
 
+    if (project.extra["ideaActive"] as Boolean) {
+        iosX64("ios", nativeTargetConfig())
+    } else {
+        ios(configure = nativeTargetConfig())
+    }
+
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xuse-experimental=kotlin.Experimental",
@@ -75,21 +85,35 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings.apply {
+                apiVersion = "1.5"
+                languageVersion = "1.5"
+                progressiveMode = true
+                optIn("kotlin.Experimental")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
+            }
+        }
+
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2")
             }
         }
+
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.3.0")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+                api("com.google.firebase:firebase-common-ktx")
             }
         }
+
+        val iosMain by getting
+
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "8.4.3"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+                api(npm("firebase", "8.7.1"))
             }
         }
         val jvmMain by getting {
@@ -103,22 +127,6 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
             kotlin.srcDir("src/androidTest/kotlin")
-        }
-        val iosMain by getting {
-            dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:0.20.0")
-            }
-        }
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-            }
-        }
-
-        cocoapods {
-            summary = "Firebase Core for iOS (plus community support for macOS and tvOS)"
-            homepage = "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk"
-            //pod("FirebaseCore", "~> 6.3.1")
         }
     }
 }

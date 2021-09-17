@@ -8,35 +8,47 @@ import dev.gitlive.firebase.*
 import kotlin.random.Random
 import kotlin.test.*
 
+expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit)
+expect fun runTest(skip: Boolean = false, test: suspend () -> Unit)
+expect val currentPlatform: Platform
+
+enum class Platform { Android, IOS, JS }
 
 class FirebaseAuthTest {
+
+    // Skip the tests on iOS simulator due keychain exceptions
+    private val skip = currentPlatform == Platform.IOS
 
     @BeforeTest
     fun initializeFirebase() {
         Firebase
             .takeIf { Firebase.apps(context).isEmpty() }
-            ?.initialize(
-                context,
-                FirebaseOptions(
-                    applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                    apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                    databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                    storageBucket = "fir-kotlin-sdk.appspot.com",
-                    projectId = "fir-kotlin-sdk"
+            ?.apply {
+                initialize(
+                    context,
+                    FirebaseOptions(
+                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                        storageBucket = "fir-kotlin-sdk.appspot.com",
+                        projectId = "fir-kotlin-sdk",
+                        gcmSenderId = "846484016111"
+                    )
                 )
-            )
+                Firebase.auth.useEmulator(emulatorHost, 9099)
+            }
     }
 
     @Test
-    fun testSignInWithUsernameAndPassword() = runTest {
+    fun testSignInWithUsernameAndPassword() = runTest(skip) {
+        val uid = getTestUid("test@test.com", "test123")
         val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
-        assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
+        assertEquals(uid, result.user!!.uid)
     }
 
     @Test
-    fun testCreateUserWithEmailAndPassword() = runTest {
+    fun testCreateUserWithEmailAndPassword() = runTest(skip) {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -51,7 +63,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testFetchSignInMethods() = runTest {
+    fun testFetchSignInMethods() = runTest(skip) {
         val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
         assertEquals(emptyList(), signInMethodResult)
@@ -63,7 +75,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSendEmailVerification() = runTest {
+    fun testSendEmailVerification() = runTest(skip) {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -73,7 +85,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun sendPasswordResetEmail() = runTest {
+    fun sendPasswordResetEmail() = runTest(skip) {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -84,10 +96,28 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSignInWithCredential() = runTest {
+    fun testSignInWithCredential() = runTest(skip) {
+        val uid = getTestUid("test@test.com", "test123")
         val credential = EmailAuthProvider.credential("test@test.com", "test123")
         val result = Firebase.auth.signInWithCredential(credential)
-        assertEquals("mn8kgIFnxLO7il8GpTa5g0ObP6I2", result.user!!.uid)
+        assertEquals(uid, result.user!!.uid)
+    }
 
+    private suspend fun getTestUid(email: String, password: String): String {
+        val uid = Firebase.auth.let {
+            val user = try {
+                it.createUserWithEmailAndPassword(email, password).user
+            } catch (e: FirebaseAuthUserCollisionException) {
+                // the user already exists, just sign in for getting user's ID
+                it.signInWithEmailAndPassword(email, password).user
+            }
+            user!!.uid
+        }
+
+        check(Firebase.auth.currentUser != null)
+        Firebase.auth.signOut()
+        check(Firebase.auth.currentUser == null)
+
+        return uid
     }
 }

@@ -17,7 +17,8 @@ class FirebaseAppTest {
                 apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
-                projectId = "fir-kotlin-sdk"
+                projectId = "fir-kotlin-sdk",
+                gcmSenderId = "846484016111"
             )
         )
     }
