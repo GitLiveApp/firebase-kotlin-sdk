@@ -68,15 +68,6 @@ android {
 //}
 
 kotlin {
-    js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "umd"
-            }
-        }
-        nodejs()
-        browser()
-    }
     android {
         publishAllLibraryVariants()
     }
@@ -131,6 +122,25 @@ kotlin {
     } else {
         ios(configure = nativeTargetConfig())
     }
+
+    js {
+        useCommonJs()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+    }
+
     jvm {
         val main by compilations.getting {
             kotlinOptions {

@@ -77,7 +77,6 @@ expect class DataSnapshot {
     val exists: Boolean
     val key: String?
     val ref: DatabaseReference
-    @ImplicitReflectionSerializer
     inline fun <reified T> value(): T
     fun <T> value(strategy: DeserializationStrategy<T>): T
     fun child(path: String): DataSnapshot

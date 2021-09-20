@@ -41,14 +41,6 @@ android {
 }
 
 kotlin {
-    js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "umd"
-            }
-        }
-        nodejs()
-    }
     android {
         publishAllLibraryVariants()
     }
@@ -74,6 +66,24 @@ kotlin {
         iosX64("ios", nativeTargetConfig())
     } else {
         ios(configure = nativeTargetConfig())
+    }
+
+    js {
+        useCommonJs()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
@@ -117,9 +127,6 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-            }
             kotlin.srcDir("src/androidMain/kotlin")
         }
         val jvmTest by getting {

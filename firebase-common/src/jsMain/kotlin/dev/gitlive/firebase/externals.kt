@@ -306,7 +306,7 @@ external object firebase {
             fun endAt(value: Any, key: String? = definedExternally): Query
             fun equalTo(value: Any, key: String? = definedExternally): Query
             fun limitToFirst(limit: Int): Query
-            fun limitToLast (limit: Int): Query
+            fun limitToLast(limit: Int): Query
         }
 
         open class Reference: Query {
