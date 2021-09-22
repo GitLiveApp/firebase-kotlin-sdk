@@ -4,21 +4,18 @@ package dev.gitlive.firebase.remoteconfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
-import com.google.firebase.ktx.Firebase as AndroidFirebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
 
 actual val Firebase.remoteConfig: FirebaseRemoteConfig
-    get() = FirebaseRemoteConfig(AndroidFirebase.remoteConfig)
+    get() = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance())
 
 actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
-    FirebaseRemoteConfig(AndroidFirebase.remoteConfig)
+    FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
 
 actual class FirebaseRemoteConfig internal constructor(val android: AndroidFirebaseRemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
@@ -29,10 +26,10 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
 
     actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
-        val androidSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = settings.minimumFetchIntervalInSeconds
-            fetchTimeoutInSeconds = settings.fetchTimeoutInSeconds
-        }
+        val androidSettings = com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(settings.minimumFetchIntervalInSeconds)
+            .setFetchTimeoutInSeconds(settings.fetchTimeoutInSeconds)
+            .build()
         android.setConfigSettingsAsync(androidSettings).await()
     }
 
