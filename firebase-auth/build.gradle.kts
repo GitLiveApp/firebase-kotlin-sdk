@@ -95,7 +95,7 @@ kotlin {
                 "nanopb",
                 "PromisesObjC"
             ).map {
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$${konanTarget.archVariant}")
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
             }
         ).plus(
             listOf(
