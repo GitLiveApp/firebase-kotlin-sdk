@@ -109,7 +109,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0-RC")
             }
         }
 
