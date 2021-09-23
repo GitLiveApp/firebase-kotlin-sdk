@@ -144,7 +144,7 @@ kotlin {
     jvm {
         val main by compilations.getting {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "11"
             }
         }
     }
