@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -26,15 +25,6 @@ buildscript {
 val targetSdkVersion by extra(30)
 val minSdkVersion by extra(16)
 
-// TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
-// add idea.active=true for local development
-val _ideaActive = gradleLocalProperties(rootDir)["idea.active"] == "true"
-
-//if (!_ideaActive) {
-//    ext["kotlin.mpp.enableGranularSourceSetsMetadata"] = "true"
-//    ext["kotlin.native.enableDependencyPropagation"] = "false"
-//}
-
 tasks {
     val updateVersions by registering {
         dependsOn(
@@ -50,8 +40,6 @@ tasks {
 }
 
 subprojects {
-
-    val ideaActive by extra(_ideaActive)
 
     group = "dev.gitlive"
 
