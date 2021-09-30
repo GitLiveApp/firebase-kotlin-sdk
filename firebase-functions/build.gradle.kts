@@ -38,6 +38,13 @@ android {
     }
 }
 
+val KonanTarget.archVariant: String
+    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
+        "ios-arm64_i386_x86_64-simulator"
+    } else {
+        "ios-arm64_armv7"
+    }
+
 kotlin {
 
     android {
@@ -59,18 +66,14 @@ kotlin {
                 "nanopb",
                 "PromisesObjC"
             ).map {
-                val archVariant = if (konanTarget is KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
-
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
             }
         ).plus(
             listOf(
                 "FirebaseFunctions",
                 "GTMSessionFetcher"
             ).map {
-                val archVariant = if (konanTarget is KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
-
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
             }
         )
 
@@ -89,11 +92,8 @@ kotlin {
         }
     }
 
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-    } else {
-        ios(configure = nativeTargetConfig())
-    }
+    ios(configure = nativeTargetConfig())
+    iosSimulatorArm64(configure = nativeTargetConfig())
 
     js {
         useCommonJs()
@@ -119,8 +119,8 @@ kotlin {
                 apiVersion = "1.5"
                 languageVersion = "1.5"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 
@@ -138,6 +138,12 @@ kotlin {
         }
 
         val iosMain by getting
+        val iosSimulatorArm64Main by getting
+        iosSimulatorArm64Main.dependsOn(iosMain)
+
+        val iosTest by sourceSets.getting
+        val iosSimulatorArm64Test by sourceSets.getting
+        iosSimulatorArm64Test.dependsOn(iosTest)
 
         val jsMain by getting
     }

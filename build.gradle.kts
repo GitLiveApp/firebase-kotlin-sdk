@@ -1,10 +1,9 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.5.21" apply false
+    kotlin("multiplatform") version "1.5.30" apply false
     id("base")
 }
 
@@ -18,22 +17,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.0")
+        classpath("com.android.tools.build:gradle:7.0.1")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(30)
 val minSdkVersion by extra(16)
-
-// TODO: Hierarchical project structures are not fully supported in IDEA, enable only for a regular built (https://youtrack.jetbrains.com/issue/KT-35011)
-// add idea.active=true for local development
-val _ideaActive = gradleLocalProperties(rootDir)["idea.active"] == "true"
-
-//if (!_ideaActive) {
-//    ext["kotlin.mpp.enableGranularSourceSetsMetadata"] = "true"
-//    ext["kotlin.native.enableDependencyPropagation"] = "false"
-//}
 
 tasks {
     val updateVersions by registering {
@@ -50,8 +40,6 @@ tasks {
 }
 
 subprojects {
-
-    val ideaActive by extra(_ideaActive)
 
     group = "dev.gitlive"
 
@@ -207,11 +195,12 @@ subprojects {
         }
 
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.3.1"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")

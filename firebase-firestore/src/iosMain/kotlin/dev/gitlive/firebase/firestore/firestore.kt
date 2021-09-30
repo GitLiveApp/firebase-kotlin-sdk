@@ -381,6 +381,8 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
 
+    actual fun dataMap(): Map<String, Any?> = ios.data()?.map { it.key.toString() to it.value }?.toMap() ?: emptyMap()
+
     actual inline fun <reified T> get(field: String) = decode<T>(value = ios.valueForField(field))
 
     actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
