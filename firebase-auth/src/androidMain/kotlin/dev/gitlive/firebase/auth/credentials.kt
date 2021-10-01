@@ -39,7 +39,7 @@ actual object GithubAuthProvider {
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+    actual fun credential(idToken: String?, accessToken: String?): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
 }
 
 actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) {
