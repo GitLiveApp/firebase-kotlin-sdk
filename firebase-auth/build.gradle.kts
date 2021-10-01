@@ -10,7 +10,6 @@ version = project.property("firebase-auth.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.21"
     //id("com.quittle.android-emulator") version "0.2.0"
 }
 
@@ -160,23 +159,9 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
-            dependencies {
-                // use Ktor for fetching Firebase emulator REST API in tests
-                implementation("io.ktor:ktor-client-core:1.6.2")
-                implementation("io.ktor:ktor-client-serialization:1.6.2")
-            }
-        }
-
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-auth-ktx")
-            }
-        }
-
-        val androidAndroidTest by getting {
-            dependencies {
-                implementation("io.ktor:ktor-client-android:1.6.2")
             }
         }
 
@@ -188,23 +173,7 @@ kotlin {
         val iosSimulatorArm64Test by sourceSets.getting
         iosSimulatorArm64Test.dependsOn(iosTest)
 
-        val iosTest by getting {
-            dependencies {
-                // iOS Ktor HttpClient requires 'native-mt' coroutines
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
-                    isForce = true
-                }
-                implementation("io.ktor:ktor-client-ios:1.6.2")
-            }
-        }
-
         val jsMain by getting
-
-        val jsTest by getting {
-            dependencies {
-                implementation("io.ktor:ktor-client-js:1.6.2")
-            }
-        }
     }
 }
 

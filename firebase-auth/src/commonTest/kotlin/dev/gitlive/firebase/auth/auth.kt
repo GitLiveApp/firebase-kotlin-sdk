@@ -4,19 +4,9 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.emulator.fetchOobCodes
-import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.*
 import kotlin.random.Random
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
@@ -24,9 +14,6 @@ expect fun runTest(skip: Boolean = false, test: suspend () -> Unit)
 expect val currentPlatform: Platform
 
 enum class Platform { Android, IOS, JS }
-
-private const val PROJECT_ID = "fir-kotlin-sdk"
-private const val EMULATOR_PORT = 9099
 
 class FirebaseAuthTest {
 
@@ -45,25 +32,24 @@ class FirebaseAuthTest {
                         apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                         databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                         storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = PROJECT_ID,
+                        projectId = "fir-kotlin-sdk",
                         gcmSenderId = "846484016111"
                     )
                 )
-                Firebase.auth.useEmulator(emulatorHost, EMULATOR_PORT)
+                Firebase.auth.useEmulator(emulatorHost, 9099)
             }
     }
 
     @Test
     fun testSignInWithUsernameAndPassword() = runTest(skip) {
-        val email = getRandomEmail()
-        val uid = getTestUid(email, "test123")
-        val result = Firebase.auth.signInWithEmailAndPassword(email, "test123")
+        val uid = getTestUid("test@test.com", "test123")
+        val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
         assertEquals(uid, result.user!!.uid)
     }
 
     @Test
     fun testCreateUserWithEmailAndPassword() = runTest(skip) {
-        val email = getRandomEmail()
+        val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
         assertEquals(null, createResult.user?.displayName)
@@ -78,7 +64,7 @@ class FirebaseAuthTest {
 
     @Test
     fun testFetchSignInMethods() = runTest(skip) {
-        val email = getRandomEmail()
+        val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
         assertEquals(emptyList(), signInMethodResult)
         Firebase.auth.createUserWithEmailAndPassword(email, "test123")
@@ -90,46 +76,31 @@ class FirebaseAuthTest {
 
     @Test
     fun testSendEmailVerification() = runTest(skip) {
-        val email = getRandomEmail()
+        val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
         createResult.user!!.sendEmailVerification()
-
-        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
-        assertTrue(oobCodes.any { it.email == email && it.requestType == "VERIFY_EMAIL" })
 
         createResult.user!!.delete()
     }
 
     @Test
-    fun testSendPasswordResetEmail() = runTest(skip) {
-        val email = getRandomEmail()
+    fun sendPasswordResetEmail() = runTest(skip) {
+        val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
 
         Firebase.auth.sendPasswordResetEmail(email)
-
-        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
-        assertTrue(oobCodes.any { it.email == email && it.requestType == "PASSWORD_RESET" })
 
         createResult.user!!.delete()
     }
 
     @Test
     fun testSignInWithCredential() = runTest(skip) {
-        val email = getRandomEmail()
-        val uid = getTestUid(email, "test123")
-        val credential = EmailAuthProvider.credential(email, "test123")
+        val uid = getTestUid("test@test.com", "test123")
+        val credential = EmailAuthProvider.credential("test@test.com", "test123")
         val result = Firebase.auth.signInWithCredential(credential)
         assertEquals(uid, result.user!!.uid)
-    }
-
-    @Test
-    fun testSendSignInEmailLink() = runTest {
-        val email = getRandomEmail()
-        sendSgnInLink(email)
-        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
-        assertTrue(oobCodes.any { it.email == email && it.requestType == "EMAIL_SIGNIN" })
     }
 
     @Test
@@ -138,24 +109,6 @@ class FirebaseAuthTest {
         val invalidLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
         assertTrue(Firebase.auth.isSignInWithEmailLink(validLink))
         assertFalse(Firebase.auth.isSignInWithEmailLink(invalidLink))
-    }
-
-    @Test
-    fun testSignInWithEmailLink() = runTest(skip) {
-        val email = getRandomEmail()
-        sendSgnInLink(email)
-        val oobCodes = fetchOobCodes(PROJECT_ID, emulatorHost, EMULATOR_PORT)
-        val oobCode = oobCodes.first { it.email == email && it.requestType == "EMAIL_SIGNIN" }
-        val authResult = Firebase.auth.signInWithEmailLink(oobCode.email, oobCode.oobLink)
-        assertNotNull(authResult.user)
-    }
-
-    private suspend fun sendSgnInLink(email: String) {
-        val actionCodeSettings = ActionCodeSettings(
-            url = "https://example.com/signin",
-            canHandleCodeInApp = true,
-        )
-        Firebase.auth.sendSignInLinkToEmail(email, actionCodeSettings)
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
@@ -175,6 +128,4 @@ class FirebaseAuthTest {
 
         return uid
     }
-
-    private fun getRandomEmail(): String = "test+${Random.nextInt(100000)}@test.com"
 }
