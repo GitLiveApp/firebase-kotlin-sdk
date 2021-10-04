@@ -83,6 +83,7 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
     val runIosTests = project.property("firebase-auth.skipIosTests") != "true"
 
+    println("supportIosTarget: $supportIosTarget runIosTests $runIosTests")
     if (supportIosTarget) {
 
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
