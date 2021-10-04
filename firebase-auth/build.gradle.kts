@@ -80,49 +80,55 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-        val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-        ).plus(
-            listOf(
-                "FirebaseAnalytics",
-                "FirebaseCore",
-                "FirebaseCoreDiagnostics",
-                "FirebaseInstallations",
-                "GoogleAppMeasurement",
-                "GoogleDataTransport",
-                "GoogleUtilities",
-                "nanopb",
-                "PromisesObjC"
-            ).map {
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-            }
-        ).plus(
-            listOf(
-                "FirebaseAuth",
-                "GTMSessionFetcher"
-            ).map {
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-            }
-        )
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+    val runIosTests = project.property("skipIosTests") != "true"
 
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                linkerOpts("-ObjC")
+    if (supportIosTarget) {
+
+        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val nativeFrameworkPaths = listOf(
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAnalytics",
+                    "FirebaseCore",
+                    "FirebaseCoreDiagnostics",
+                    "FirebaseInstallations",
+                    "GoogleAppMeasurement",
+                    "GoogleDataTransport",
+                    "GoogleUtilities",
+                    "nanopb",
+                    "PromisesObjC"
+                ).map {
+                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            ).plus(
+                listOf(
+                    "FirebaseAuth",
+                    "GTMSessionFetcher"
+                ).map {
+                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            )
+
+            binaries {
+                getTest("DEBUG").apply {
+                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    linkerOpts("-ObjC")
+                }
+            }
+
+            compilations.getByName("main") {
+                cinterops.create("FirebaseAuth") {
+                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    extraOpts("-verbose")
+                }
             }
         }
 
-        compilations.getByName("main") {
-            cinterops.create("FirebaseAuth") {
-                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                extraOpts("-verbose")
-            }
-        }
+        ios(configure = nativeTargetConfig())
+        iosSimulatorArm64(configure = nativeTargetConfig())
     }
-
-    ios(configure = nativeTargetConfig())
-    iosSimulatorArm64(configure = nativeTargetConfig())
 
     js {
         useCommonJs()
@@ -165,13 +171,17 @@ kotlin {
             }
         }
 
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
-        iosSimulatorArm64Main.dependsOn(iosMain)
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
 
-        val iosTest by sourceSets.getting
-        val iosSimulatorArm64Test by sourceSets.getting
-        iosSimulatorArm64Test.dependsOn(iosTest)
+            if (runIosTests) {
+                val iosTest by sourceSets.getting
+                val iosSimulatorArm64Test by sourceSets.getting
+                iosSimulatorArm64Test.dependsOn(iosTest)
+            }
+        }
 
         val jsMain by getting
     }
