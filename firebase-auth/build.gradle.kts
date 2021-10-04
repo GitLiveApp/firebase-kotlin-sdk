@@ -111,7 +111,6 @@ kotlin {
                     projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
                 }
             )
-
             binaries {
                 getTest("DEBUG").apply {
                     linkerOpts(nativeFrameworkPaths.map { "-F$it" })
@@ -185,6 +184,14 @@ kotlin {
         }
 
         val jsMain by getting
+    }
+
+    if (!runIosTests) {
+        tasks.forEach {
+            if (it.name.contains("ios") && it.name.contains("test")) {
+                it.onlyIf { false }
+            }
+        }
     }
 }
 
