@@ -103,6 +103,14 @@ class FirebaseAuthTest {
         assertEquals(uid, result.user!!.uid)
     }
 
+    @Test
+    fun testIsSignInWithEmailLink() {
+        val validLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&oobCode=_vr0QcFcxcVeLZbrcU-GpTaZiuxlHquqdC8MSy0YM_vzWCTAQgV9Jq&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
+        val invalidLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
+        assertTrue(Firebase.auth.isSignInWithEmailLink(validLink))
+        assertFalse(Firebase.auth.isSignInWithEmailLink(invalidLink))
+    }
+
     private suspend fun getTestUid(email: String, password: String): String {
         val uid = Firebase.auth.let {
             val user = try {
