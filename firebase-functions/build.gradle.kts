@@ -52,7 +52,7 @@ kotlin {
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
-    val runIosTests = project.property("skipIosTests") != "true"
+    val runIosTests = project.property("firebase-functions.skipIosTests") != "true"
 
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {

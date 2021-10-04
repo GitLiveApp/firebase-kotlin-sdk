@@ -58,7 +58,7 @@ kotlin {
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
-    val runIosTests = project.property("skipIosTests") != "true"
+    val runIosTests = project.property("firebase-app.skipIosTests") != "true"
 
     if (supportIosTarget) {
 
