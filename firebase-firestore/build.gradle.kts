@@ -10,7 +10,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.5.31"
 }
 
 android {
@@ -71,6 +71,7 @@ kotlin {
                     "FirebaseCoreDiagnostics",
                     "FirebaseInstallations",
                     "GoogleAppMeasurement",
+                    "GoogleAppMeasurementIdentitySupport",
                     "GoogleDataTransport",
                     "GoogleUtilities",
                     "nanopb",
@@ -83,8 +84,8 @@ kotlin {
                     "abseil",
                     "BoringSSL-GRPC",
                     "FirebaseFirestore",
-                    "gRPC-Core",
                     "gRPC-C++",
+                    "gRPC-Core",
                     "leveldb-library"
                 ).map {
                     projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")

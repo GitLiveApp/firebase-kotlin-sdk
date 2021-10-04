@@ -70,6 +70,7 @@ kotlin {
                     "FirebaseCoreDiagnostics",
                     "FirebaseInstallations",
                     "GoogleAppMeasurement",
+                    "GoogleAppMeasurementIdentitySupport",
                     "GoogleDataTransport",
                     "GoogleUtilities",
                     "nanopb",

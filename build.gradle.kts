@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.5.30" apply false
+    kotlin("multiplatform") version "1.5.31" apply false
     id("base")
 }
 
@@ -197,7 +197,7 @@ subprojects {
         dependencies {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.1"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
