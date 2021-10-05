@@ -4,6 +4,8 @@
 name: Pull Request
 
 on:
+  push:
+    branches: [ GL-855-fix-upload-issue-with-firebase ]
   pull_request:
     branches: [ master ]
 
