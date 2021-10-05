@@ -81,9 +81,6 @@ kotlin {
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
-    val runIosTests = project.property("firebase-auth.skipIosTests") != "true"
-
-    println("supportIosTarget: $supportIosTarget runIosTests $runIosTests")
     if (supportIosTarget) {
 
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
@@ -183,10 +180,13 @@ kotlin {
 
         val jsMain by getting
     }
+}
 
-    if (!runIosTests) {
-        tasks.forEach {
-            if (it.name.contains("ios") && it.name.contains("test")) { it.enabled = false }
+if (project.property("firebase-auth.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios") && it.name.contains("test")) {
+            println("Skipping ${it.name}")
+            it.enabled = false
         }
     }
 }
