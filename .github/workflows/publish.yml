@@ -4,8 +4,6 @@
 name: Publish
 
 on:
-  push:
-    branches: [ GL-855-fix-upload-issue-with-firebase ]
   release:
     types: [prereleased, released]
 
