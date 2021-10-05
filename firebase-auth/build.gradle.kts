@@ -176,11 +176,9 @@ kotlin {
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
 
-            if (runIosTests) {
-                val iosTest by sourceSets.getting
-                val iosSimulatorArm64Test by sourceSets.getting
-                iosSimulatorArm64Test.dependsOn(iosTest)
-            }
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting
@@ -188,9 +186,7 @@ kotlin {
 
     if (!runIosTests) {
         tasks.forEach {
-            if (it.name.contains("ios") && it.name.contains("test")) {
-                it.onlyIf { false }
-            }
+            if (it.name.contains("ios") && it.name.contains("test")) { it.enabled = false }
         }
     }
 }
