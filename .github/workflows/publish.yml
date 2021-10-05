@@ -29,10 +29,64 @@ jobs:
         run: chmod +x gradlew
       - name: Install Carthage
         run: brew install carthage
-      - name: Publish
+      - name: Publish Firebase App
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: publish
+          arguments: :firebase-app:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Auth
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-auth:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Common
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-common:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Config
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-config:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Database
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-database:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Firestore
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-firestore:publish
+        env:
+          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+      - name: Publish Firebase Functions
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :firebase-functions:publish
         env:
           sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
           sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
