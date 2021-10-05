@@ -60,8 +60,6 @@ kotlin {
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
-    val runIosTests = project.property("firebase-firestore.skipIosTests") != "true"
-
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
             val nativeFrameworkPaths = listOf(
@@ -159,16 +157,21 @@ kotlin {
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
 
-            if (runIosTests) {
-                val iosTest by sourceSets.getting
-                val iosSimulatorArm64Test by sourceSets.getting
-                iosSimulatorArm64Test.dependsOn(iosTest)
-            }
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting
     }
 }
+
+if (project.property("firebase-firestore.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios") && it.name.contains("test")) { it.enabled = false }
+    }
+}
+
 signing {
     val signingKey: String? by project
     val signingPassword: String? by project

@@ -47,7 +47,6 @@ kotlin {
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
-    val runIosTests = project.property("firebase-common.skipIosTests") != "true"
 
     if (supportIosTarget) {
         ios()
@@ -102,11 +101,9 @@ kotlin {
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
 
-            if (runIosTests) {
-                val iosTest by sourceSets.getting
-                val iosSimulatorArm64Test by sourceSets.getting
-                iosSimulatorArm64Test.dependsOn(iosTest)
-            }
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting {
@@ -114,6 +111,12 @@ kotlin {
                 api(npm("firebase", "8.7.1"))
             }
         }
+    }
+}
+
+if (project.property("firebase-common.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios") && it.name.contains("test")) { it.enabled = false }
     }
 }
 
