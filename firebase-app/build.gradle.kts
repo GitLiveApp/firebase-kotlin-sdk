@@ -153,7 +153,7 @@ kotlin {
 
 if (project.property("firebase-app.skipIosTests") == "true") {
     tasks.forEach {
-        if (it.name.contains("ios") && it.name.contains("test")) { it.enabled = false }
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
