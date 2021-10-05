@@ -11,15 +11,8 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual val currentPlatform: Platform = Platform.JS
-
-actual fun runTest(skip: Boolean, test: suspend () -> Unit) = GlobalScope
+actual fun runTest(test: suspend () -> Unit) = GlobalScope
     .promise {
-        if (skip) {
-            console.log("Skip the test.")
-            return@promise
-        }
-
         try {
             test()
         } catch (e: dynamic) {
