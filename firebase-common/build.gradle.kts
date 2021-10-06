@@ -41,12 +41,9 @@ android {
 }
 
 kotlin {
+
     android {
         publishAllLibraryVariants()
-    }
-
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-
     }
 
     jvm {
@@ -62,10 +59,11 @@ kotlin {
         }
     }
 
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-    } else {
-        ios(configure = nativeTargetConfig())
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+
+    if (supportIosTarget) {
+        ios()
+        iosSimulatorArm64()
     }
 
     js {
@@ -84,14 +82,6 @@ kotlin {
                 }
             }
         }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-        )
     }
 
     sourceSets {
@@ -119,7 +109,15 @@ kotlin {
             }
         }
 
-        val iosMain by getting
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
+        }
 
         val jsMain by getting {
             dependencies {
@@ -135,6 +133,12 @@ kotlin {
             }
             kotlin.srcDir("src/androidTest/kotlin")
         }
+    }
+}
+
+if (project.property("firebase-common.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
