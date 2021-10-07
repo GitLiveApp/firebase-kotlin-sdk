@@ -1,6 +1,6 @@
 {
-  "name": "@gitlive/firebase-config",
-  "version": "1.0.0",
+  "name": "@gitliveapp/firebase-config",
+  "version": "0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-config.js",
   "scripts": {
@@ -9,6 +9,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+  },
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
   },
   "keywords": [
     "kotlin",
@@ -23,7 +26,7 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@gitlive/firebase-app": "1.5.5-beta",
+    "@gitliveapp/firebase-app": "1.5.5-beta",
     "firebase": "8.10.0",
     "kotlin": "1.5.30",
     "kotlinx-coroutines-core": "1.5.1"
