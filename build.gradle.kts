@@ -101,7 +101,8 @@ subprojects {
         }
 
         val unzipJar by registering(Copy::class) {
-            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
+            val version = project.property("${project.name}.version")
+            val zipFile = File("$buildDir/libs", "${project.name}-js-$version.jar")
             from(this.project.zipTree(zipFile))
             into("$buildDir/classes/kotlin/js/main/")
         }
