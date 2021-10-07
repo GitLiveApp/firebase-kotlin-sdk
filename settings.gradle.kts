@@ -8,5 +8,3 @@ include(
     "firebase-config"
 )
 
-//enableFeaturePreview("GRADLE_METADATA")
-
