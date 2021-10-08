@@ -29,7 +29,7 @@
     "firebase": "8.10.0",
     "kotlin": "1.5.30",
     "kotlinx-coroutines-core": "1.5.1",
-    "kotlinx-serialization-kotlinx-serialization-core-jslegacy": "1.4.2-RC1"
+    "@reedyuk/kotlinx-serialization-kotlinx-serialization-core-js-legacy": "1.3.0-RC"
   }
 }
 
