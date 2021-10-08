@@ -7,4 +7,3 @@ include(
     "firebase-functions",
     "firebase-config"
 )
-
