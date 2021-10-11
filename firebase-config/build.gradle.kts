@@ -77,6 +77,7 @@ kotlin {
                 "FirebaseCoreDiagnostics",
                 "FirebaseAnalytics",
                 "GoogleAppMeasurement",
+                "GoogleAppMeasurementIdentitySupport",
                 "FirebaseInstallations",
                 "GoogleDataTransport",
                 "GoogleUtilities",
