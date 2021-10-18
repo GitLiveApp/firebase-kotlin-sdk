@@ -45,8 +45,8 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
         val request = object : firebase.user.ProfileUpdateRequest {
-            override val displayName: String? = displayName
-            override val photoURL: String? = photoUrl
+            override val displayName: String? = displayName ?: this@FirebaseUser.displayName
+            override val photoURL: String? = photoUrl ?: this@FirebaseUser.photoURL
         }
         js.updateProfile(request).await()
     }

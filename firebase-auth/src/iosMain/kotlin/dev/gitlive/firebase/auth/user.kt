@@ -66,8 +66,8 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = ios.profileChangeRequest().apply {
-            this.displayName = displayName
-            this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }
+            this.displayName = displayName ?: this.displayName
+            this.photoURL = photoUrl?.let { NSURL.URLWithString(it) } ?: this.photoURL
         }
         ios.await { request.commitChangesWithCompletion(it) }
     }

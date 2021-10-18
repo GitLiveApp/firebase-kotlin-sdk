@@ -162,8 +162,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
@@ -172,7 +172,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-app"))
-                api(project(":firebase-common"))
             }
         }
 

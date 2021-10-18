@@ -48,8 +48,8 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = UserProfileChangeRequest.Builder()
-            .setDisplayName(displayName)
-            .setPhotoUri(photoUrl?.let { Uri.parse(it) })
+            .setDisplayName(displayName ?: this.displayName)
+            .setPhotoUri(photoUrl?.let { Uri.parse(it) } ?: this.photoURL)
             .build()
         android.updateProfile(request).await()
     }

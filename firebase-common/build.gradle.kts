@@ -9,7 +9,7 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.6.0-RC"
 }
 
 android {
@@ -87,8 +87,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 progressiveMode = true
                 optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")

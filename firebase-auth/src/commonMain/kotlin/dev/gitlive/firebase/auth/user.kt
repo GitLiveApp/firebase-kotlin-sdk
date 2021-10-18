@@ -28,7 +28,7 @@ expect class FirebaseUser {
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
+    suspend fun updateProfile(displayName: String?, photoUrl: String?)  // due to a bug in kotlin/js the default property had to be removed into the platform layer
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 
