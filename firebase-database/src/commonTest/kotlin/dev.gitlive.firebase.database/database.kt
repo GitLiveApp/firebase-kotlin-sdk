@@ -34,4 +34,19 @@ class database {
                 Firebase.database.useEmulator(emulatorHost, 8080)
             }
     }
+
+    @Test
+    fun testSetValue() = runTest {
+        val testValue = "test"
+        val testReference = Firebase.database.reference("testPath")
+
+        testReference.setValue(testValue)
+
+        val testReferenceValue = testReference
+            .valueEvents
+            .first()
+            .value<String>()
+
+        assertEquals(testValue, testReferenceValue)
+    }
 }
