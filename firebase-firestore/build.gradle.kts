@@ -56,7 +56,7 @@ val KonanTarget.archVariant: String
 kotlin {
 
     android {
-        publishAllLibraryVariants()
+        publishLibraryVariants("release")
     }
 
     jvm {

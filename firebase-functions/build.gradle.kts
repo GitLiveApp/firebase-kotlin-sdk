@@ -47,7 +47,7 @@ val KonanTarget.archVariant: String
 
 kotlin {
     android {
-        publishAllLibraryVariants()
+        publishLibraryVariants("release")
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
