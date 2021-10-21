@@ -85,8 +85,8 @@ subprojects {
             val from = file("package.json")
             from.writeText(
                 from.readText()
-                    .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
-                    .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
+                    .replace("firebase-common-js-legacy\": \"([^\"]+)".toRegex(), "firebase-common-js-legacy\": \"${project.property("firebase-common.version")}")
+                    .replace("firebase-app-js-legacy\": \"([^\"]+)".toRegex(), "firebase-app-js-legacy\": \"${project.property("firebase-app.version")}")
             )
         }
 
