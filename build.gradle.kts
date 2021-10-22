@@ -111,7 +111,7 @@ subprojects {
             mustRunAfter("unzipJar", "copyPackageJson")
             doLast {
                 val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}-js-legacy.js")
-                val into = File("$buildDir/node_module/${project.name}.js")
+                val into = File("$buildDir/node_module/${project.name}-js-legacy.js")
                 into.createNewFile()
                 into.writeText(
                     from.readText()
@@ -126,7 +126,7 @@ subprojects {
 
         val copySourceMap by registering(Copy::class) {
             from(file("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}-js-legacy.js.map"))
-            into(file("$buildDir/node_module//${project.name}.js.map"))
+            into(file("$buildDir/node_module//${project.name}-js-legacy.js.map"))
         }
 
         val prepareForNpmPublish by registering {

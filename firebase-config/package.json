@@ -2,7 +2,7 @@
   "name": "@gitliveapp/firebase-config-js-legacy",
   "version": "0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
-  "main": "firebase-config.js",
+  "main": "firebase-config-js-legacy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
