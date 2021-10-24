@@ -143,7 +143,7 @@ class FirebaseFirestoreTest {
     fun testServerTimestampBehaviorNone() = runTest {
         val doc = Firebase.firestore
             .collection("testServerTimestampBehaviorNone")
-            .document("test${Random.nextInt()}}")
+            .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
             withTimeout(5000) {
