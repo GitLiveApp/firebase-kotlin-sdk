@@ -13,8 +13,20 @@ fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElement
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
 
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
+        if (it is ValueWithSerializer<*> && it.value is T) {
+            @Suppress("UNCHECKED_CAST")
+            (it as ValueWithSerializer<T>).let {
+                encodeSerializableValue(it.serializer, it.value)
+            }
+        } else {
+            encodeSerializableValue(it.firebaseSerializer(), it)
+        }
+    }.value
 }
+
+fun <T> T.withSerializer(serializer: SerializationStrategy<T>) = ValueWithSerializer(this, serializer)
+data class ValueWithSerializer<T>(val value: T, val serializer: SerializationStrategy<T>)
 
 expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder
 
