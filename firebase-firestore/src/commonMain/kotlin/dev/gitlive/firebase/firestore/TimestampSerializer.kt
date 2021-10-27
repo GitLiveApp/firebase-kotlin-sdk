@@ -27,6 +27,10 @@ abstract class AbstractTimestampSerializer<T> : KSerializer<T> {
     abstract override fun deserialize(decoder: Decoder): T
 
     fun encode(encoder: Encoder, value: FirebaseTimestamp?) {
+        if (value == null) {
+            encoder.encodeNull()
+            return
+        }
         val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
         when (value) {
             is FirebaseTimestamp.Value -> {

@@ -97,10 +97,16 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-            ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+            ios.updateData(
+                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+                documentRef.ios
+            ).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -137,10 +143,16 @@ actual class Transaction(val ios: FIRTransaction) {
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -186,10 +198,20 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        await { block -> ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, block) }
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun delete() =
         await { ios.deleteDocumentWithCompletion(it) }
