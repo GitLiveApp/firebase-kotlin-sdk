@@ -57,12 +57,14 @@ external object firebase {
             fun fetchSignInMethodsForEmail(email: String): Promise<Array<String>>
             fun sendPasswordResetEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
             fun sendSignInLinkToEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
+            fun isSignInWithEmailLink(link: String): Boolean
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signInWithCredential(authCredential: AuthCredential): Promise<AuthResult>
             fun signInWithPopup(provider: AuthProvider): Promise<AuthResult>
             fun signInWithRedirect(provider: AuthProvider): Promise<Unit>
+            fun signInWithEmailLink(email: String, link: String): Promise<AuthResult>
             fun getRedirectResult(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
             fun updateCurrentUser(user: user.User?): Promise<Unit>

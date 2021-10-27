@@ -67,61 +67,65 @@ android {
 //    logEmulatorOutput(false)
 //}
 
+val KonanTarget.archVariant: String
+    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
+        "ios-arm64_i386_x86_64-simulator"
+    } else {
+        "ios-arm64_armv7"
+    }
+
 kotlin {
 
     android {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-        val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-        ).plus(
-            listOf(
-                "FirebaseAnalytics",
-                "FirebaseCore",
-                "FirebaseCoreDiagnostics",
-                "FirebaseInstallations",
-                "GoogleAppMeasurement",
-                "GoogleDataTransport",
-                "GoogleUtilities",
-                "nanopb",
-                "PromisesObjC"
-            ).map {
-                val archVariant = if (konanTarget is KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+    if (supportIosTarget) {
 
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
+        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val nativeFrameworkPaths = listOf(
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAnalytics",
+                    "FirebaseCore",
+                    "FirebaseCoreDiagnostics",
+                    "FirebaseInstallations",
+                    "GoogleAppMeasurement",
+                    "GoogleAppMeasurementIdentitySupport",
+                    "GoogleDataTransport",
+                    "GoogleUtilities",
+                    "nanopb",
+                    "PromisesObjC"
+                ).map {
+                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            ).plus(
+                listOf(
+                    "FirebaseAuth",
+                    "GTMSessionFetcher"
+                ).map {
+                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            )
+            binaries {
+                getTest("DEBUG").apply {
+                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    linkerOpts("-ObjC")
+                }
             }
-        ).plus(
-            listOf(
-                "FirebaseAuth",
-                "GTMSessionFetcher"
-            ).map {
-                val archVariant = if (konanTarget is KonanTarget.IOS_X64) "ios-arm64_i386_x86_64-simulator" else "ios-arm64_armv7"
 
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/$archVariant")
-            }
-        )
-
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                linkerOpts("-ObjC")
+            compilations.getByName("main") {
+                cinterops.create("FirebaseAuth") {
+                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    extraOpts("-verbose")
+                }
             }
         }
 
-        compilations.getByName("main") {
-            cinterops.create("FirebaseAuth") {
-                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                extraOpts("-verbose")
-            }
-        }
-    }
-
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-    } else {
         ios(configure = nativeTargetConfig())
+        iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
     js {
@@ -148,7 +152,7 @@ kotlin {
                 apiVersion = "1.5"
                 languageVersion = "1.5"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
@@ -165,9 +169,23 @@ kotlin {
             }
         }
 
-        val iosMain by getting
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
+        }
 
         val jsMain by getting
+    }
+}
+
+if (project.property("firebase-auth.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
