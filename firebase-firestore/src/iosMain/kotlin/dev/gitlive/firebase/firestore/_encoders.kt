@@ -1,5 +1,5 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestore.*
+import cocoapods.FirebaseFirestore.FIRFieldValue
 
-actual fun isSpecialValue(value: Any) : Boolean = value is FIRFieldValue
+actual fun isFieldValue(value: Any) : Boolean = value is FIRFieldValue

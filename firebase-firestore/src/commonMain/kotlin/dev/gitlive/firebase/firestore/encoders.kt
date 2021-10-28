@@ -2,11 +2,11 @@ package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.SerializationStrategy
 
-expect fun isSpecialValue(value: Any) : Boolean
+expect fun isFieldValue(value: Any) : Boolean
 
 @PublishedApi
 internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    if (value?.let(::isSpecialValue) == true) {
+    if (value?.let(::isFieldValue) == true) {
         value
     } else {
         dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
