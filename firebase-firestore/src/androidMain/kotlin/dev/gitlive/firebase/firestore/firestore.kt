@@ -22,13 +22,6 @@ internal inline fun <reified T> decode(value: Any?): T =
 internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
     decode(strategy, value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
 
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
-
-private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    encode(strategy, value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
-
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
 
@@ -116,27 +109,26 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
 
     @JvmName("updateFields")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.android,
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
-                }.toTypedArray()
-            ).let { this }
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field to encode(value, true) }
+            ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
+            .let { this }
 
     @JvmName("updateFieldPaths")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.android,
-                fieldsAndValues[0].first.android,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field.android, value?.let { encode(value, true) })
-                }.toTypedArray()
-            ).let { this }
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field.android to encode(value, true) }
+            ?.let { encoded ->
+                android.update(
+                    documentRef.android,
+                    encoded.first().first,
+                    encoded.first().second,
+                    *encoded.drop(1)
+                        .flatMap { (field, value) -> listOf(field, value) }
+                        .toTypedArray()
+                )
+            }
+            .let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -189,27 +181,25 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
 
     @JvmName("updateFields")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.android,
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
-                }.toTypedArray()
-            ).let { this }
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field to encode(value, true) }
+            ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
+            .let { this }
 
     @JvmName("updateFieldPaths")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.android,
-                fieldsAndValues[0].first.android,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field.android, value?.let { encode(value, true) })
-                }.toTypedArray()
-            ).let { this }
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field.android to encode(value, true) }
+            ?.let { encoded ->
+                android.update(
+                    documentRef.android,
+                    encoded.first().first,
+                    encoded.first().second,
+                    *encoded.drop(1)
+                        .flatMap { (field, value) -> listOf(field, value) }
+                        .toTypedArray()
+                )
+            }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -264,27 +254,25 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
 
     @JvmName("updateFields")
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
-                }.toTypedArray()
-            )
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field to encode(value, true) }
+            ?.let { encoded -> android.update(encoded.toMap()) }
             ?.await()
             .run { Unit }
 
     @JvmName("updateFieldPaths")
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        android.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                fieldsAndValues[0].first.android,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field.android, value?.let { encode(value, true) })
-                }.toTypedArray()
-            )
+        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field.android to encode(value, true) }
+            ?.let { encoded ->
+                android.update(
+                    encoded.first().first,
+                    encoded.first().second,
+                    *encoded.drop(1)
+                        .flatMap { (field, value) -> listOf(field, value) }
+                        .toTypedArray()
+                )
+            }
             ?.await()
             .run { Unit }
 
@@ -449,7 +437,7 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
 actual class SnapshotMetadata(val android: com.google.firebase.firestore.SnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = android.hasPendingWrites()
-    actual val isFromCache: Boolean get() = android.isFromCache()
+    actual val isFromCache: Boolean get() = android.isFromCache
 }
 
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
@@ -458,7 +446,7 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 actual object FieldValue {
-    actual fun serverTimestamp(): Any = com.google.firebase.firestore.FieldValue.serverTimestamp()
+    actual fun serverTimestamp(): Any = FieldValue.serverTimestamp()
     actual val delete: Any get() = FieldValue.delete()
     actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)
     actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)

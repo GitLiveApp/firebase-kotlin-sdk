@@ -13,8 +13,25 @@ fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElement
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
 
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
+        if (it is ValueWithSerializer<*> && it.value is T) {
+            @Suppress("UNCHECKED_CAST")
+            (it as ValueWithSerializer<T>).let {
+                encodeSerializableValue(it.serializer, it.value)
+            }
+        } else {
+            encodeSerializableValue(it.firebaseSerializer(), it)
+        }
+    }.value
 }
+
+/**
+ * An extension which which serializer to use for value. Handy in updating fields by name or path
+ * where using annotation is not possible
+ * @return a value with a custom serializer.
+ */
+fun <T> T.withSerializer(serializer: SerializationStrategy<T>): Any = ValueWithSerializer(this, serializer)
+data class ValueWithSerializer<T>(val value: T, val serializer: SerializationStrategy<T>)
 
 expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder
 
