@@ -57,6 +57,8 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm()
+
     val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
 
@@ -137,6 +139,32 @@ kotlin {
                 api("com.google.firebase:firebase-common-ktx")
             }
         }
+
+        val jvmMain by getting {
+            dependencies {
+                api("com.google.firebase:firebase-admin:8.1.0")
+                api("com.google.firebase:firebase-firestore-ktx:23.0.4")
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                //api(kotlin("test-annotations"))
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-test-junit")
+            }
+        }
+
+        /*val jvmTest by getting {
+            dependencies {
+                //api(kotlin("test-annotations"))
+                //api(kotlin("test"))
+            }
+        }*/
 
         if (supportIosTarget) {
             val iosMain by getting

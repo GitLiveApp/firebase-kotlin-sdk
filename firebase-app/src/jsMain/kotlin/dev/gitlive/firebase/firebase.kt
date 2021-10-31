@@ -16,23 +16,23 @@ actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
-    FirebaseApp(firebase.initializeApp(options.toJson(), name))
+    FirebaseApp(firebase.initializeApp((options as MobileFirebaseOptions).toJson(), name))
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
-    FirebaseApp(firebase.initializeApp(options.toJson()))
+    FirebaseApp(firebase.initializeApp((options as MobileFirebaseOptions).toJson()))
 
 actual class FirebaseApp internal constructor(val js: firebase.App) {
     actual val name: String
         get() = js.name
     actual val options: FirebaseOptions
         get() = js.options.run {
-            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
+            MobileFirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
 }
 
 actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
 
-private fun FirebaseOptions.toJson() = json(
+private fun MobileFirebaseOptions.toJson() = json(
     "apiKey" to apiKey,
     "appId" to applicationId,
     "databaseURL" to (databaseUrl ?: undefined),

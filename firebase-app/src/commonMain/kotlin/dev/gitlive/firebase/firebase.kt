@@ -43,7 +43,9 @@ expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, n
 val Firebase.options: FirebaseOptions
     get() = Firebase.app.options
 
-data class FirebaseOptions(
+open class FirebaseOptions
+
+data class MobileFirebaseOptions(
     val applicationId: String,
     val apiKey: String,
     val databaseUrl: String? = null,
@@ -52,7 +54,11 @@ data class FirebaseOptions(
     val projectId: String? = null,
     val gcmSenderId: String? = null,
     val authDomain: String? = null
-)
+): FirebaseOptions()
+
+data class AdminFirebaseOptions(
+    val serviceFileName: String
+): FirebaseOptions()
 
 expect open class FirebaseException : Exception
 
