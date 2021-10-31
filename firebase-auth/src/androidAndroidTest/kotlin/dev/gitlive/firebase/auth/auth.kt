@@ -7,9 +7,22 @@ package dev.gitlive.firebase.auth
 
 import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.MobileFirebaseOptions
 import kotlinx.coroutines.runBlocking
 
 actual val emulatorHost: String = "10.0.2.2"
+
+actual val firebaseOptions: FirebaseOptions
+    get() =
+        MobileFirebaseOptions(
+            applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+            apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+            databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+            storageBucket = "fir-kotlin-sdk.appspot.com",
+            projectId = "fir-kotlin-sdk",
+            gcmSenderId = "846484016111"
+        )
 
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 

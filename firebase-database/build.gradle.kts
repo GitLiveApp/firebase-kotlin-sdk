@@ -104,6 +104,8 @@ kotlin {
         iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
+    jvm()
+
     js {
         useCommonJs()
         nodejs {
@@ -144,6 +146,19 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-database-ktx")
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                api("com.google.firebase:firebase-admin:8.1.0")
+                api("com.google.firebase:firebase-database-ktx:23.0.4")
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-test-junit")
             }
         }
 

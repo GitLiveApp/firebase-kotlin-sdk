@@ -140,16 +140,16 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                api("com.google.firebase:firebase-admin:8.1.0")
-                api("com.google.firebase:firebase-firestore-ktx:23.0.4")
-            }
-        }
-
         val commonTest by getting {
             dependencies {
                 //api(kotlin("test-annotations"))
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                api("com.google.firebase:firebase-admin:8.1.0")
+                api("com.google.firebase:firebase-common-ktx:23.0.4")
             }
         }
 
@@ -158,13 +158,6 @@ kotlin {
                 implementation("org.jetbrains.kotlin:kotlin-test-junit")
             }
         }
-
-        /*val jvmTest by getting {
-            dependencies {
-                //api(kotlin("test-annotations"))
-                //api(kotlin("test"))
-            }
-        }*/
 
         if (supportIosTarget) {
             val iosMain by getting
