@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.firestore
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 
@@ -11,7 +12,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = GlobalScope
+actual fun runTest(test: suspend CoroutineScope.() -> Unit) = GlobalScope
     .promise {
         try {
             test()
@@ -28,4 +29,3 @@ internal fun Throwable.log() {
         it.log()
     }
 }
-
