@@ -415,9 +415,6 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(strategy, android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        android.getData(serverTimestampBehavior.toAndroid()) ?: emptyMap()
-
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(value = android.get(field, serverTimestampBehavior.toAndroid()))
 

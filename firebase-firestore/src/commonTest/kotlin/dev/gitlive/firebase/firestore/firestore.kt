@@ -160,7 +160,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.NONE))
-        assertNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.NONE)["time"])
     }
 
     @Test
@@ -181,7 +180,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.ESTIMATE))
-        assertNotNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.ESTIMATE)["time"])
         assertNotEquals(0.0, pendingWritesSnapshot.data(FirestoreTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
@@ -203,7 +201,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.PREVIOUS))
-        assertNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.PREVIOUS)["time"])
     }
 
     @Test
@@ -221,23 +218,6 @@ class FirebaseFirestoreTest {
 
         assertEquals(true, resultDoc.exists)
         assertEquals("AutoId", resultDoc.get("prop1"))
-    }
-
-    @Test
-    fun testDataMap() = runTest {
-        val doc = Firebase.firestore
-            .collection("testDataMap")
-            .document
-
-        doc.set(FirestoreTest.serializer(), FirestoreTest("dataMap", 123.45))
-
-        val resultDoc = Firebase.firestore
-            .collection("testDataMap")
-            .document(doc.id)
-            .get()
-
-        assertEquals(true, resultDoc.exists)
-        assertEquals(mapOf("prop1" to "dataMap", "time" to 123.45), resultDoc.dataMap())
     }
 
     private suspend fun setupFirestoreData() {

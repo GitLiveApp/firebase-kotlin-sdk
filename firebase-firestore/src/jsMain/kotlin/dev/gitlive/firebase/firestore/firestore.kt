@@ -393,9 +393,6 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
         rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        rethrow { mapOf(js.data(getTimestampsOptions(serverTimestampBehavior)).asDynamic()) }
-
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior) =
         rethrow { decode<T>(value = js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
 
