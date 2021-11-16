@@ -9,8 +9,8 @@ actual fun runTest(test: suspend () -> Unit) = GlobalScope
     .promise {
         try {
             test()
-        } catch (e: dynamic) {
-            (e as? Throwable)?.log()
+        } catch (e: Throwable) {
+            e.log()
             throw e
         }
     }.asDynamic()
