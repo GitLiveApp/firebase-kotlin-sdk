@@ -196,8 +196,6 @@ expect class DocumentSnapshot {
     inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
     fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
-    fun dataMap(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Map<String, Any?>
-
     val exists: Boolean
     val id: String
     val reference: DocumentReference

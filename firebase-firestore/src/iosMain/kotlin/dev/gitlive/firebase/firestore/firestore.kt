@@ -388,12 +388,6 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
         return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
     }
 
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-            ?.map { (key, value) -> key.toString() to value?.takeIf { it !is NSNull } }
-            ?.toMap()
-            ?: emptyMap()
-
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
         val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
         return decode(value)
