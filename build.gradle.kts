@@ -41,7 +41,7 @@ tasks {
 
 subprojects {
 
-    group = "dev.gitlive"
+    group = "dev.litclimbing"
 
     apply(plugin="com.adarshr.test-logger")
 

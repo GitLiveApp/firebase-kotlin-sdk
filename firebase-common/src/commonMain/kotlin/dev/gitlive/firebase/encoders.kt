@@ -4,13 +4,26 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.CompositeEncoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
+fun <T> encode(
+    strategy: SerializationStrategy<T>,
+    value: T,
+    shouldEncodeElementDefault: Boolean,
+    positiveInfinity: Any = Double.POSITIVE_INFINITY
+): Any? =
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
+        encodeSerializableValue(
+            strategy,
+            value
+        )
+    }.value//.also { println("encoded $it") }
 
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
@@ -79,9 +92,50 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
 }
 
 abstract class TimestampEncoder(internal val positiveInfinity: Any) {
-    fun encodeTimestamp(value: Double) = when(value) {
+    fun encodeTimestamp(value: Double) = when (value) {
         Double.POSITIVE_INFINITY -> positiveInfinity
         else -> value
+    }
+}
+
+class FirebaseTimestampCompositeEncoder(val onSet: (Any)->Unit) : CompositeEncoder {
+    var nanos: Int = 0
+    var seconds: Long = 0
+
+    override val serializersModule = EmptySerializersModule
+
+    override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) = throw IllegalStateException()
+    override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) = throw IllegalStateException()
+    override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) = throw IllegalStateException()
+    override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) = throw IllegalStateException()
+    override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) = throw IllegalStateException()
+    @ExperimentalSerializationApi
+    override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder = throw IllegalStateException()
+
+    override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {
+        nanos = value
+    }
+
+    override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) {
+        seconds = value
+    }
+
+    @ExperimentalSerializationApi
+    override fun <T : Any> encodeNullableSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        serializer: SerializationStrategy<T>,
+        value: T?
+    )  = throw IllegalStateException()
+
+    override fun <T> encodeSerializableElement(descriptor: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T) = throw IllegalStateException()
+
+    override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short)  = throw IllegalStateException()
+
+    override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String)  = throw IllegalStateException()
+
+    override fun endStructure(descriptor: SerialDescriptor) {
+        onSet(Timestamp(nanos, seconds).asNative())
     }
 }
 
@@ -90,7 +144,7 @@ open class FirebaseCompositeEncoder constructor(
     positiveInfinity: Any,
     private val end: () -> Unit = {},
     private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit
-): TimestampEncoder(positiveInfinity), CompositeEncoder {
+) : TimestampEncoder(positiveInfinity), CompositeEncoder {
 
     override val serializersModule = EmptySerializersModule
 
