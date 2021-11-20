@@ -9,18 +9,15 @@ import kotlinx.serialization.encoding.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
 
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
-    .getOrElse {
-        when(this) {
-            is Map<*, *> -> FirebaseMapSerializer()
-            is List<*> -> FirebaseListSerializer()
-            is Set<*> -> FirebaseListSerializer()
-            else -> this::class.serializer()
-        } as SerializationStrategy<T>
+fun firebaseSerializer(it: Any): SerializationStrategy<*> =
+    when(it) {
+        is Map<*, *> -> FirebaseMapSerializer(::firebaseSerializer)
+        is List<*> -> FirebaseListSerializer(::firebaseSerializer)
+        is Set<*> -> FirebaseListSerializer(::firebaseSerializer)
+        else -> it::class.serializer()
     }
 
-class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
+class FirebaseMapSerializer(val getSerializer: (Any)->SerializationStrategy<*>) : KSerializer<Map<String, Any?>> {
 
     lateinit var keys: List<String>
     lateinit var map: Map<String, Any?>
@@ -43,7 +40,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
         val collectionEncoder = encoder.beginCollection(descriptor, value.size)
         keys.forEachIndexed { index, key ->
             val listValue = map.getValue(key)
-            val serializer = (listValue?.firebaseSerializer() ?: Unit.serializer()) as KSerializer<Any?>
+            val serializer = (if (listValue!=null) getSerializer(listValue) else Unit.serializer()) as KSerializer<Any?>
             String.serializer().let {
                 collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
             }
@@ -65,7 +62,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 }
 
-class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
+class FirebaseListSerializer(val getSerializer: (Any)->SerializationStrategy<*>) : KSerializer<Iterable<Any?>> {
 
     lateinit var list: List<Any?>
 
@@ -85,7 +82,7 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
         list = value.toList()
         val collectionEncoder = encoder.beginCollection(descriptor, list.size)
         list.forEachIndexed { index, listValue ->
-            val serializer = (listValue?.firebaseSerializer() ?: Unit.serializer()) as KSerializer<Any>
+            val serializer = (if (listValue!=null) getSerializer(listValue) else Unit.serializer()) as KSerializer<Any?>
             collectionEncoder.encodeNullableSerializableElement(
                 serializer.descriptor, index, serializer, listValue
             )
@@ -104,3 +101,52 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
     }
 }
 
+/*** Used for built-in types that don't actually need a serializer. */
+object DummySerializer : KSerializer<Any> {
+    override fun deserialize(decoder: Decoder): Any {
+        throw NotImplementedError()
+    }
+
+    override val descriptor: SerialDescriptor = object : SerialDescriptor {
+        @ExperimentalSerializationApi
+        override val elementsCount: Int
+            get() = throw NotImplementedError()
+
+        @ExperimentalSerializationApi
+        override val kind: SerialKind
+            get() = throw NotImplementedError()
+
+        @ExperimentalSerializationApi
+        override val serialName: String
+            get() = throw NotImplementedError()
+
+        @ExperimentalSerializationApi
+        override fun getElementAnnotations(index: Int): List<Annotation> {
+            throw NotImplementedError()
+        }
+
+        @ExperimentalSerializationApi
+        override fun getElementDescriptor(index: Int): SerialDescriptor {
+            throw NotImplementedError()
+        }
+
+        @ExperimentalSerializationApi
+        override fun getElementIndex(name: String): Int {
+            throw NotImplementedError()
+        }
+
+        @ExperimentalSerializationApi
+        override fun getElementName(index: Int): String {
+            throw NotImplementedError()
+        }
+
+        @ExperimentalSerializationApi
+        override fun isElementOptional(index: Int): Boolean {
+            throw NotImplementedError()
+        }
+    }
+
+    override fun serialize(encoder: Encoder, value: Any) {
+        throw NotImplementedError()
+    }
+}

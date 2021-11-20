@@ -12,33 +12,22 @@ import kotlin.collections.set
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder = when (descriptor.kind as StructureKind) {
     StructureKind.LIST -> mutableListOf<Any?>()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it.add(index, value) } }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, {getEncoder(shouldEncodeElementDefault)}) { _, index, value -> it.add(index, value) } }
     StructureKind.MAP -> mutableListOf<Any?>()
         .let {
             FirebaseCompositeEncoder(
                 shouldEncodeElementDefault,
-                positiveInfinity,
+                {getEncoder(shouldEncodeElementDefault)},
                 { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) }
         }
-    StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
+    StructureKind.OBJECT, StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
         .also { value = it }
         .let {
-            FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value ->
-                it[descriptor.getElementName(index)] = value
+            FirebaseCompositeEncoder(shouldEncodeElementDefault, {getEncoder(shouldEncodeElementDefault)}) { _, index, value ->
+                it[descriptor.getElementName(
+                    index
+                )] = value
             }
         }
-    StructureKind.OBJECT -> {
-        when (descriptor.serialName) {
-            "firebaseTimestamp" -> FirebaseTimestampCompositeEncoder { value = it }
-            else -> mutableMapOf<Any?, Any?>()
-                .also { value = it }
-                .let {
-                    FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value ->
-                        it[descriptor.getElementName(
-                            index
-                        )] = value
-                    }
-                }
-        }
-    }
+
 }

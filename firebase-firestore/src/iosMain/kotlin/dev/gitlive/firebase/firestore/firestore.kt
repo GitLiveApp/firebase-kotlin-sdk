@@ -14,22 +14,47 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
 
-@PublishedApi
-internal inline fun <reified T> decode(value: Any?): T =
-    decode(value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
+    when (value) {
+        is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+        is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+        is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+        is FIRFieldValue, is Timestamp -> DummySerializer
+        else -> value::class.serializer()
+    }
 
-internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
-    decode(strategy, value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
+actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
+    when (value) {
+        is FIRTimestamp -> DummySerializer
+        null -> Unit::class.serializer()
+        else -> value::class.serializer()
+    }
 
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    encode(value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
+actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
+    override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
 
-private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    encode(strategy, value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
+    override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
+        when (value) {
+            is Timestamp -> this.value = value.ios
+            is FIRFieldValue -> this.value = value
+            else -> super.encodeSerializableValue(serializer, value)
+        }
+}
+
+@Suppress("UNCHECKED_CAST")
+actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDecoder(value) {
+    override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
+
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
+        when (value) {
+            is FIRTimestamp -> Timestamp(value.seconds, value.nanoseconds) as T
+            else -> super.decodeSerializableValue(deserializer)
+        }
+}
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -422,7 +447,7 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
 }
 
 actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val serverTimestamp: Any get() = FIRFieldValue.fieldValueForServerTimestamp()
     actual val delete: Any get() = FIRFieldValue.fieldValueForDelete()
     actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
     actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayRemove(elements.asList())
@@ -464,4 +489,10 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     }
     job.await()
     return result
+}
+
+actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) {
+    val ios: FIRTimestamp = FIRTimestamp(seconds, nanoseconds)
+    actual val seconds : Long get() = ios.seconds
+    actual val nanoseconds : Int get() = ios.nanoseconds
 }

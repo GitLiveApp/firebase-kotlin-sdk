@@ -6,12 +6,9 @@ package dev.gitlive.firebase.database
 
 import cocoapods.FirebaseDatabase.*
 import cocoapods.FirebaseDatabase.FIRDataEventType.*
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.*
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ClosedSendChannelException
@@ -26,13 +23,6 @@ import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
-
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
-
-internal fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }

@@ -12,21 +12,47 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import kotlin.js.json
 
-@PublishedApi
-internal inline fun <reified T> decode(value: Any?): T =
-    decode(value) { it.takeIf { it.asDynamic().toMillis != undefined }?.asDynamic().toMillis() as? Double }
+actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
+    when (value) {
+        is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+        is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+        is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+        is firebase.firestore.FieldValue, is Timestamp -> DummySerializer
+        else -> value::class.serializer()
+    }
 
-internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
-    decode(strategy, value) { it.takeIf { it.asDynamic().toMillis != undefined }?.asDynamic().toMillis() as? Double }
+actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
+    when (value) {
+        is firebase.firestore.Timestamp -> DummySerializer
+        null -> Unit::class.serializer()
+        else -> value::class.serializer()
+    }
 
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    encode(value, shouldEncodeElementDefault, firebase.firestore.FieldValue.serverTimestamp())
 
-private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    encode(strategy, value, shouldEncodeElementDefault, firebase.firestore.FieldValue.serverTimestamp())
+actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
+    override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
+
+    override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
+        when (value) {
+            is Timestamp -> this.value = value.js
+            is firebase.firestore.FieldValue -> this.value = value
+            else -> super.encodeSerializableValue(serializer, value)
+        }
+}
+
+@Suppress("UNCHECKED_CAST")
+actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDecoder(value) {
+    override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
+
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
+        when (value) {
+            is firebase.firestore.Timestamp -> Timestamp(value.seconds.toLong(), value.nanoseconds.toInt()) as T
+            else -> super.decodeSerializableValue(deserializer)
+        }
+}
 
 actual val Firebase.firestore get() =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.firestore()) }
@@ -420,12 +446,18 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
 }
 
 actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val serverTimestamp: Any get() = rethrow { firebase.firestore.FieldValue.serverTimestamp() }
     actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
     actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
     actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
     @JsName("deprecatedDelete")
     actual fun delete(): Any = delete
+}
+
+actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) {
+    val js: firebase.firestore.Timestamp = firebase.firestore.Timestamp() //TODO: Initialize this correctly
+    actual val seconds : Long get() = js.seconds.toLong()
+    actual val nanoseconds : Int get() = js.nanoseconds.toInt()
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(

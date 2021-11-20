@@ -4,13 +4,32 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import kotlin.js.JsName
+
+expect fun firestoreSerializer(value: Any): SerializationStrategy<*>
+expect fun firestoreDeserializer(value: Any?): DeserializationStrategy<*>
+expect class FirestoreEncoder(shouldEncodeElementDefault: Boolean) : FirebaseEncoder
+expect class FirestoreDecoder(value: Any?) : FirebaseDecoder
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = value?.let {
+    FirestoreEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(firestoreSerializer(it) as SerializationStrategy<T>, it) }.value
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> decode(value: Any?): T {
+    return decode(firestoreDeserializer(value) as DeserializationStrategy<T>, value)
+}
+
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
+    require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
+    return FirestoreDecoder(value).decodeSerializableValue(strategy)
+}
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -218,11 +237,16 @@ expect class FieldPath(vararg fieldNames: String) {
 }
 
 expect object FieldValue {
-    val serverTimestamp: Double
+    val serverTimestamp: Any
     val delete: Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
     @Deprecated("Replaced with FieldValue.delete")
     @JsName("deprecatedDelete")
     fun delete(): Any
+}
+
+expect class Timestamp(seconds: Long, nanoseconds: Int) {
+    val seconds: Long
+    val nanoseconds: Int
 }
