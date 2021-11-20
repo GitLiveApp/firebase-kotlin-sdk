@@ -413,7 +413,7 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T : Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
+    actual fun data(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
         rethrow { decode(value = js.data(getTimestampsOptions(serverTimestampBehavior))) }
 
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =

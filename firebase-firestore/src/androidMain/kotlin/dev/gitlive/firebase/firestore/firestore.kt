@@ -28,7 +28,7 @@ actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
 
 actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
     when (value) {
-        is com.google.firebase.Timestamp -> DummySerializer
+        is com.google.firebase.Timestamp, is ArrayList<*>, is HashMap<*, *> -> DummySerializer
         null -> Unit::class.serializer()
         else -> value::class.serializer()
     }
@@ -46,11 +46,13 @@ actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boo
 
 @Suppress("UNCHECKED_CAST")
 actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDecoder(value) {
-    override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
+    override fun getDecoder(value: Any?): FirebaseDecoder = FirestoreDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
         when (value) {
             is com.google.firebase.Timestamp -> Timestamp(value.seconds, value.nanoseconds) as T
+            is ArrayList<*> -> value.map { decode<Any?>(it) } as T
+            is HashMap<*, *> -> value.mapValues { entry -> decode<Any?>(entry.value) } as T
             else -> super.decodeSerializableValue(deserializer)
         }
 }
@@ -463,7 +465,7 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T : Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
+    actual fun data(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
         decode(value = android.getData(serverTimestampBehavior.toAndroid()))
 
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =

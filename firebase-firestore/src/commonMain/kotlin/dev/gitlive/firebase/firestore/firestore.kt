@@ -8,7 +8,6 @@ import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.serializer
 import kotlin.js.JsName
 
 expect fun firestoreSerializer(value: Any): SerializationStrategy<*>
@@ -206,13 +205,12 @@ expect class DocumentChange {
 }
 
 expect class DocumentSnapshot {
-
     inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
     fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     fun contains(field: String): Boolean
 
-    inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Map<String, Any?>
     fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     val exists: Boolean

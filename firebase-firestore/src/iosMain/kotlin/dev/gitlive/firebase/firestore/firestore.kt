@@ -403,7 +403,7 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual val reference get() = DocumentReference(ios.reference)
 
-    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T {
+    actual fun data(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> {
         val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
         return decode(value = data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
     }
