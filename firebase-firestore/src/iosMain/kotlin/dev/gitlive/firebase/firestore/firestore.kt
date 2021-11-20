@@ -29,7 +29,7 @@ actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
 
 actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
     when (value) {
-        is FIRTimestamp -> DummySerializer
+        is FIRTimestamp, is Map<*,*>, is List<*> -> DummySerializer
         null -> Unit::class.serializer()
         else -> value::class.serializer()
     }
@@ -52,6 +52,8 @@ actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDeco
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
         when (value) {
             is FIRTimestamp -> Timestamp(value.seconds, value.nanoseconds) as T
+            is Map<*,*> -> value.mapKeys{it.key.toString()}.mapValues { decode<Any?>(it.value) } as T
+            is List<*> -> value.map { decode<Any?>(it) } as T
             else -> super.decodeSerializableValue(deserializer)
         }
 }
