@@ -11,30 +11,28 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
 import kotlin.js.json
 
-actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
-    runCatching {value::class.serializer()}.getOrElse {
-        when (value) {
-            is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
-            is List<*> -> FirebaseListSerializer(::firestoreSerializer)
-            is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
-            is firebase.firestore.FieldValue, is Timestamp -> DummySerializer // TODO: Add GeoPoint
-            else -> throw it
-        }
-    }
+@Suppress("UNCHECKED_CAST")
+actual fun <T: Any> firestoreSerializer(value: T, onFailure:()->Nothing): KSerializer<T> =
+    when (value) {
+        is Map<*, *> -> FirebaseMapSerializer(::getSerializer)
+        is List<*> -> FirebaseListSerializer(::getSerializer)
+        is Set<*> -> FirebaseListSerializer(::getSerializer)
+        is firebase.firestore.FieldValue, is Timestamp -> DummySerializer // TODO: Add GeoPoint
+        else -> onFailure()
+    }  as KSerializer<T>
 
-actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
-    runCatching {value!!::class.serializer()}.getOrElse {
-        when (value) {
-            is firebase.firestore.Timestamp, is List<*>, is Map<*, *> -> DummySerializer // TODO: Add GeoPoint
-            null -> Unit::class.serializer()
-            else -> throw it
-        }
-    }
-
+@Suppress("UNCHECKED_CAST")
+actual inline fun <reified T> firestoreDeserializer(value: Any?, onFailure:()->Nothing): KSerializer<T> =
+    when (value) {
+        is firebase.firestore.Timestamp, is List<*>, is Map<*, *> -> DummySerializer // TODO: Add GeoPoint
+        null -> Unit::class.serializer()
+        else -> onFailure()
+    } as KSerializer<T>
 
 actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
     override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)

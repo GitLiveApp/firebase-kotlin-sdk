@@ -7,22 +7,40 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import kotlin.js.JsName
 
-expect fun firestoreSerializer(value: Any): SerializationStrategy<*>
-expect fun firestoreDeserializer(value: Any?): DeserializationStrategy<*>
+expect fun <T : Any> firestoreSerializer(value: T, onFailure: () -> Nothing): KSerializer<T>
+expect inline fun <reified T> firestoreDeserializer(value: Any?, onFailure: () -> Nothing): KSerializer<T>
 expect class FirestoreEncoder(shouldEncodeElementDefault: Boolean) : FirebaseEncoder
 expect class FirestoreDecoder(value: Any?) : FirebaseDecoder
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = value?.let {
-    FirestoreEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(firestoreSerializer(it) as SerializationStrategy<T>, it) }.value
-}
+fun <T : Any> getSerializer(value: T): KSerializer<T> =
+    runCatching { value::class.serializer() }.getOrElse {
+        firestoreSerializer(value) { throw it }
+    } as KSerializer<T>
 
 @Suppress("UNCHECKED_CAST")
+inline fun <reified T> getDeserializer(value: Any?): KSerializer<T> =
+    runCatching { serializer<T>() }.getOrElse { first ->
+        if (value is T) { // value may be extension of T and have it's own serializer
+            runCatching { value!!::class.serializer() }.getOrElse { second ->
+                firestoreDeserializer(value) { throw first }
+            }
+        } else {
+            firestoreDeserializer(value) { throw first }
+        }
+    } as KSerializer<T>
+
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = value?.let {
+    FirestoreEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(getSerializer(it), it) }.value
+}
+
 inline fun <reified T> decode(value: Any?): T {
-    return decode(firestoreDeserializer(value) as DeserializationStrategy<T>, value)
+    return decode(getDeserializer(value), value)
 }
 
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
@@ -56,9 +74,29 @@ expect class Transaction {
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
 
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): Transaction
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        merge: Boolean = false
+    ): Transaction
+
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        vararg mergeFields: String
+    ): Transaction
+
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        vararg mergeFieldPaths: FieldPath
+    ): Transaction
 
     fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true): Transaction
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): Transaction
@@ -91,8 +129,12 @@ fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
 fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo)
 fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo)
-fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
-fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) =
+    _where(field, lessThan, greaterThan, arrayContains)
+
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) =
+    _where(path, lessThan, greaterThan, arrayContains)
+
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
 
@@ -104,9 +146,29 @@ expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
 
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        merge: Boolean = false
+    ): WriteBatch
+
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        vararg mergeFields: String
+    ): WriteBatch
+
+    fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        vararg mergeFieldPaths: FieldPath
+    ): WriteBatch
 
     inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true): WriteBatch
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): WriteBatch
@@ -150,6 +212,7 @@ expect class CollectionReference : Query {
 
     fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
+
     @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
     suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
     suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
@@ -192,7 +255,7 @@ expect class QuerySnapshot {
 }
 
 expect enum class ChangeType {
-    ADDED ,
+    ADDED,
     MODIFIED,
     REMOVED
 }
@@ -206,12 +269,16 @@ expect class DocumentChange {
 
 expect class DocumentSnapshot {
     inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
-    fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> get(
+        field: String,
+        strategy: DeserializationStrategy<T>,
+        serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE
+    ): T
 
     fun contains(field: String): Boolean
 
     fun data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Map<String, Any?>
-    fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     val exists: Boolean
     val id: String
@@ -239,6 +306,7 @@ expect object FieldValue {
     val delete: Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
+
     @Deprecated("Replaced with FieldValue.delete")
     @JsName("deprecatedDelete")
     fun delete(): Any
