@@ -12,35 +12,17 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
 import kotlin.js.JsName
 
-expect fun <T : Any> firestoreSerializer(value: T, onFailure: () -> Nothing): KSerializer<T>
-expect inline fun <reified T> firestoreDeserializer(value: Any?, onFailure: () -> Nothing): KSerializer<T>
+expect fun <T : Any> firestoreSerializer(value: T): SerializationStrategy<T>
+expect inline fun <reified T> firestoreDeserializer(value: Any?): DeserializationStrategy<T>
 expect class FirestoreEncoder(shouldEncodeElementDefault: Boolean) : FirebaseEncoder
 expect class FirestoreDecoder(value: Any?) : FirebaseDecoder
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> getSerializer(value: T): KSerializer<T> =
-    runCatching { value::class.serializer() }.getOrElse {
-        firestoreSerializer(value) { throw it }
-    } as KSerializer<T>
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T> getDeserializer(value: Any?): KSerializer<T> =
-    runCatching { serializer<T>() }.getOrElse { first ->
-        if (value is T) { // value may be extension of T and have it's own serializer
-            runCatching { value!!::class.serializer() }.getOrElse { second ->
-                firestoreDeserializer(value) { throw first }
-            }
-        } else {
-            firestoreDeserializer(value) { throw first }
-        }
-    } as KSerializer<T>
-
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = value?.let {
-    FirestoreEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(getSerializer(it), it) }.value
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean = true): Any? = value?.let {
+    FirestoreEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(firestoreSerializer(it), it) }.value
 }
 
 inline fun <reified T> decode(value: Any?): T {
-    return decode(getDeserializer(value), value)
+    return decode(firestoreDeserializer(value), value)
 }
 
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
@@ -125,18 +107,18 @@ expect open class Query {
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
 }
 
-fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
-fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
+fun Query.where(field: String, equalTo: Any?) = _where(field, encode(equalTo))
+fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, encode(equalTo))
 fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo)
 fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo)
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) =
-    _where(field, lessThan, greaterThan, arrayContains)
+    _where(field, encode(lessThan), encode(greaterThan), encode(arrayContains))
 
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) =
-    _where(path, lessThan, greaterThan, arrayContains)
+    _where(path, encode(lessThan), encode(greaterThan), encode(arrayContains))
 
-fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
-fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
+fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, encode(inArray), encode(arrayContainsAny))
+fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, encode(inArray), encode(arrayContainsAny))
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)

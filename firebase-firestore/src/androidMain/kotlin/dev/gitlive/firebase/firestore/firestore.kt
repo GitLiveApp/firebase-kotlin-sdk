@@ -13,34 +13,38 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.serializer
+import kotlinx.serialization.*
 
 @Suppress("UNCHECKED_CAST")
-actual fun <T: Any> firestoreSerializer(value: T, onFailure:()->Nothing): KSerializer<T> =
-    when (value) {
-        is Map<*, *> -> FirebaseMapSerializer(::getSerializer)
-        is List<*> -> FirebaseListSerializer(::getSerializer)
-        is Set<*> -> FirebaseListSerializer(::getSerializer)
-        is FieldValue, is Timestamp, is GeoPoint -> DummySerializer
-        else -> onFailure()
-    }  as KSerializer<T>
+actual fun <T: Any> firestoreSerializer(value: T): SerializationStrategy<T> =
+    runCatching { value::class.serializer() }.getOrElse {
+        when (value) {
+            is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+            is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is FieldValue, is Timestamp, is GeoPoint -> DummySerializer
+            else -> throw it
+        }
+    }as SerializationStrategy<T>
 
 @Suppress("UNCHECKED_CAST")
-actual inline fun <reified T> firestoreDeserializer(value: Any?, onFailure:()->Nothing): KSerializer<T> =
-    when (value) {
-        is com.google.firebase.Timestamp, is com.google.firebase.firestore.GeoPoint, is ArrayList<*>, is HashMap<*, *> -> DummySerializer
-        null -> Unit::class.serializer()
-        else -> onFailure()
-    } as KSerializer<T>
+actual inline fun <reified T> firestoreDeserializer(value: Any?): DeserializationStrategy<T> =
+    runCatching { serializer<T>() }.getOrElse {
+        if (value != null && value is T) {
+            value::class.serializerOrNull()?.also { s -> return@getOrElse s }
+        }
+        when (value) {
+            is com.google.firebase.Timestamp, is com.google.firebase.firestore.GeoPoint, is ArrayList<*>, is HashMap<*, *> -> DummySerializer
+            null -> Unit::class.serializer()
+            else -> throw it
+        }
+    } as DeserializationStrategy<T>
 
 actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
     override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
 
     override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
-        if (serializer is DummySerializer) {
+        if (serializer === DummySerializer) {
             when (value) {
                 is Timestamp -> this.value = value.android
                 is GeoPoint -> this.value = value.android
@@ -57,7 +61,7 @@ actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDeco
     override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
-        if (deserializer is DummySerializer) {
+        if (deserializer === DummySerializer) {
             when (value) {
                 is com.google.firebase.Timestamp -> Timestamp(value.seconds, value.nanoseconds) as T
                 is com.google.firebase.firestore.GeoPoint -> GeoPoint(value.latitude, value.longitude) as T
