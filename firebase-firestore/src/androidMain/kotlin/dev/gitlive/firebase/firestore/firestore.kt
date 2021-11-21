@@ -18,42 +18,56 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
 
 actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
-    when (value) {
-        is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
-        is List<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is FieldValue, is Timestamp -> DummySerializer
-        else -> value::class.serializer()
+    runCatching {value::class.serializer()}.getOrElse {
+        when (value) {
+            is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+            is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is FieldValue, is Timestamp, is GeoPoint -> DummySerializer
+            else -> throw it
+        }
     }
 
 actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
-    when (value) {
-        is com.google.firebase.Timestamp, is ArrayList<*>, is HashMap<*, *> -> DummySerializer
-        null -> Unit::class.serializer()
-        else -> value::class.serializer()
+    runCatching {value!!::class.serializer()}.getOrElse {
+        when (value) {
+            is com.google.firebase.Timestamp, is com.google.firebase.firestore.GeoPoint, is ArrayList<*>, is HashMap<*, *> -> DummySerializer
+            null -> Unit::class.serializer()
+            else -> throw it
+        }
     }
 
 actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
     override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
 
     override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
-        when (value) {
-            is Timestamp -> this.value = value.android
-            is FieldValue -> this.value = value
-            else -> super.encodeSerializableValue(serializer, value)
+        if (serializer is DummySerializer) {
+            when (value) {
+                is Timestamp -> this.value = value.android
+                is GeoPoint -> this.value = value.android
+                is FieldValue -> this.value = value
+                else -> error("Unsupported encode type ${value?.let{it::class.qualifiedName}} with DummySerializer!")
+            }
+        } else {
+            super.encodeSerializableValue(serializer, value)
         }
 }
 
 @Suppress("UNCHECKED_CAST")
 actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDecoder(value) {
-    override fun getDecoder(value: Any?): FirebaseDecoder = FirestoreDecoder(value)
+    override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
-        when (value) {
-            is com.google.firebase.Timestamp -> Timestamp(value.seconds, value.nanoseconds) as T
-            is ArrayList<*> -> value.map { decode<Any?>(it) } as T
-            is HashMap<*, *> -> value.mapValues { entry -> decode<Any?>(entry.value) } as T
-            else -> super.decodeSerializableValue(deserializer)
+        if (deserializer is DummySerializer) {
+            when (value) {
+                is com.google.firebase.Timestamp -> Timestamp(value.seconds, value.nanoseconds) as T
+                is com.google.firebase.firestore.GeoPoint -> GeoPoint(value.latitude, value.longitude) as T
+                is ArrayList<*> -> value.map { decode<Any?>(it) } as T
+                is HashMap<*, *> -> value.mapValues { entry -> decode<Any?>(entry.value) } as T
+                else -> error("Unsupported decode type ${value?.let{it::class.qualifiedName}} with DummySerializer!")
+            }
+        } else {
+            super.decodeSerializableValue(deserializer)
         }
 }
 
@@ -510,8 +524,14 @@ actual object FieldValue {
 }
 
 actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) {
-    val android: com.google.firebase.Timestamp = com.google.firebase.Timestamp(seconds, nanoseconds)
+    val android = com.google.firebase.Timestamp(seconds, nanoseconds)
 
     actual val seconds = android.seconds
     actual val nanoseconds = android.nanoseconds
+}
+
+actual class GeoPoint actual constructor(latitude: Double, longitude: Double) {
+    val android = com.google.firebase.firestore.GeoPoint(latitude, longitude)
+    actual val latitude = android.latitude
+    actual val longitude = android.longitude
 }

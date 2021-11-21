@@ -16,19 +16,23 @@ import kotlinx.serialization.serializer
 import kotlin.js.json
 
 actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
-    when (value) {
-        is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
-        is List<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is firebase.firestore.FieldValue, is Timestamp -> DummySerializer
-        else -> value::class.serializer()
+    runCatching {value::class.serializer()}.getOrElse {
+        when (value) {
+            is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+            is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is firebase.firestore.FieldValue, is Timestamp -> DummySerializer // TODO: Add GeoPoint
+            else -> throw it
+        }
     }
 
 actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
-    when (value) {
-        is firebase.firestore.Timestamp -> DummySerializer
-        null -> Unit::class.serializer()
-        else -> value::class.serializer()
+    runCatching {value!!::class.serializer()}.getOrElse {
+        when (value) {
+            is firebase.firestore.Timestamp, is List<*>, is Map<*, *> -> DummySerializer // TODO: Add GeoPoint
+            null -> Unit::class.serializer()
+            else -> throw it
+        }
     }
 
 
@@ -36,10 +40,14 @@ actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boo
     override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
 
     override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
-        when (value) {
-            is Timestamp -> this.value = value.js
-            is firebase.firestore.FieldValue -> this.value = value
-            else -> super.encodeSerializableValue(serializer, value)
+        if (serializer is DummySerializer) {
+            when (value) {
+                is Timestamp -> TODO("Not sure how to properly intantiate for JS")
+                is firebase.firestore.FieldValue -> this.value = value
+                else -> error("Unsupported encode type with DummySerializer!")
+            }
+        } else {
+            super.encodeSerializableValue(serializer, value)
         }
 }
 
@@ -48,9 +56,13 @@ actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDeco
     override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
-        when (value) {
-            is firebase.firestore.Timestamp -> Timestamp(value.seconds.toLong(), value.nanoseconds.toInt()) as T
-            else -> super.decodeSerializableValue(deserializer)
+        if (deserializer is DummySerializer) {
+            when (value) {
+                is firebase.firestore.Timestamp -> Timestamp(value.seconds.toLong(), value.nanoseconds.toInt()) as T
+                else -> error("Unsupported decode type with DummySerializer!")
+            }
+        } else {
+            super.decodeSerializableValue(deserializer)
         }
 }
 
@@ -454,11 +466,8 @@ actual object FieldValue {
     actual fun delete(): Any = delete
 }
 
-actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) {
-    val js: firebase.firestore.Timestamp = firebase.firestore.Timestamp() //TODO: Initialize this correctly
-    actual val seconds : Long get() = js.seconds.toLong()
-    actual val nanoseconds : Int get() = js.nanoseconds.toInt()
-}
+actual class Timestamp actual constructor(actual val seconds: Long, actual val nanoseconds: Int)
+actual class GeoPoint actual constructor(actual val latitude: Double, actual val longitude: Double)
 
 //actual data class FirebaseFirestoreSettings internal constructor(
 //    val cacheSizeBytes: Number? = undefined,

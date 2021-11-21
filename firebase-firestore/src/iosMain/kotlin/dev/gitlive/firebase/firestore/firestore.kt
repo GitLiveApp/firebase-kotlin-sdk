@@ -19,29 +19,38 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNull
 
 actual fun firestoreSerializer(value: Any): SerializationStrategy<*> =
-    when (value) {
-        is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
-        is List<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
-        is FIRFieldValue, is Timestamp -> DummySerializer
-        else -> value::class.serializer()
+    runCatching {value::class.serializer()}.getOrElse {
+        when (value) {
+            is Map<*, *> -> FirebaseMapSerializer(::firestoreSerializer)
+            is List<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is Set<*> -> FirebaseListSerializer(::firestoreSerializer)
+            is FIRFieldValue, is GeoPoint, is Timestamp -> DummySerializer
+            else -> throw it
+        }
     }
 
 actual fun firestoreDeserializer(value: Any?): DeserializationStrategy<*> =
-    when (value) {
-        is FIRTimestamp, is Map<*,*>, is List<*> -> DummySerializer
-        null -> Unit::class.serializer()
-        else -> value::class.serializer()
+    runCatching {value!!::class.serializer()}.getOrElse {
+        when (value) {
+            is FIRTimestamp, is FIRGeoPoint, is Map<*,*>, is List<*> -> DummySerializer
+            null -> Unit::class.serializer()
+            else -> throw it
+        }
     }
 
 actual class FirestoreEncoder actual constructor(shouldEncodeElementDefault: Boolean) : FirebaseEncoder(shouldEncodeElementDefault) {
     override fun getEncoder(shouldEncodeElementDefault: Boolean): FirebaseEncoder = FirestoreEncoder(shouldEncodeElementDefault)
 
     override fun <T : Any?> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) =
-        when (value) {
-            is Timestamp -> this.value = value.ios
-            is FIRFieldValue -> this.value = value
-            else -> super.encodeSerializableValue(serializer, value)
+        if (serializer is DummySerializer) {
+            when (value) {
+                is Timestamp -> this.value = value.ios
+                is GeoPoint -> this.value = value.ios
+                is FIRFieldValue -> this.value = value
+                else -> error("Unsupported encode type ${value?.let{it::class.qualifiedName}} with DummySerializer!")
+            }
+        } else {
+            super.encodeSerializableValue(serializer, value)
         }
 }
 
@@ -50,11 +59,16 @@ actual class FirestoreDecoder actual constructor(val value: Any?) : FirebaseDeco
     override fun getDecoder(value: Any?) : FirebaseDecoder = FirestoreDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
-        when (value) {
-            is FIRTimestamp -> Timestamp(value.seconds, value.nanoseconds) as T
-            is Map<*,*> -> value.mapKeys{it.key.toString()}.mapValues { decode<Any?>(it.value) } as T
-            is List<*> -> value.map { decode<Any?>(it) } as T
-            else -> super.decodeSerializableValue(deserializer)
+        if (deserializer is DummySerializer) {
+            when (value) {
+                is FIRTimestamp -> Timestamp(value.seconds, value.nanoseconds) as T
+                is FIRGeoPoint -> GeoPoint(value.latitude, value.longitude) as T
+                is Map<*,*> -> value.mapValues { decode<Any?>(it.value) } as T
+                is List<*> -> value.map { decode<Any?>(it) } as T
+                else -> error("Unsupported decode type ${value?.let{it::class.qualifiedName}} with DummySerializer!")
+            }
+        } else {
+            super.decodeSerializableValue(deserializer)
         }
 }
 
@@ -494,7 +508,13 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
 }
 
 actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) {
-    val ios: FIRTimestamp = FIRTimestamp(seconds, nanoseconds)
+    val ios = FIRTimestamp(seconds, nanoseconds)
     actual val seconds : Long get() = ios.seconds
     actual val nanoseconds : Int get() = ios.nanoseconds
+}
+
+actual class GeoPoint actual constructor(latitude: Double, longitude: Double) {
+    val ios = FIRGeoPoint(latitude, longitude)
+    actual val latitude = ios.latitude
+    actual val longitude = ios.longitude
 }

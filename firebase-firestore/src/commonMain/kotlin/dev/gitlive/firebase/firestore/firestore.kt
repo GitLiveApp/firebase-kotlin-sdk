@@ -248,3 +248,8 @@ expect class Timestamp(seconds: Long, nanoseconds: Int) {
     val seconds: Long
     val nanoseconds: Int
 }
+
+expect class GeoPoint(latitude: Double, longitude: Double) {
+    val latitude: Double
+    val longitude: Double
+}
