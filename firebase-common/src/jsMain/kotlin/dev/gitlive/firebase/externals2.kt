@@ -6,10 +6,6 @@ package dev.gitlive.firebase
 
 import kotlin.js.Promise
 
-@JsModule("firebase/compat/functions")
-@JsName("default")
-external object functions
-
 @JsModule("firebase/compat/auth")
 @JsName("default")
 external object auth
@@ -21,6 +17,12 @@ external object database
 @JsModule("firebase/compat/firestore")
 @JsName("default")
 external object firestore
+
+@JsModule("firebase/compat/functions")
+@JsName("default")
+external object functions
+
+external object installations
 
 @JsModule("firebase/compat/remote-config")
 @JsName("default")

@@ -495,4 +495,14 @@ external object firebase {
             fun getSource(): String
         }
     }
+
+    fun installations(app: App? = definedExternally): installations.Installations
+
+    object installations {
+        interface Installations {
+            fun delete(): Promise<Unit>
+            fun getId(): Promise<String>
+            fun getToken(forceRefresh: Boolean): Promise<String>
+        }
+    }
 }
