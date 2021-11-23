@@ -108,7 +108,7 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "8.7.1"))
+                api(npm("firebase", "9.4.1"))
             }
         }
     }
