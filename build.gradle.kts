@@ -162,8 +162,7 @@ subprojects {
                     args(
                         it,
                         "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-                        "--platform", "iOS",
-                        "--cache-builds"
+                        "--platform", "iOS"
                     )
                 }
             }

@@ -90,7 +90,7 @@ kotlin {
             compilations.getByName("main") {
                 cinterops.create("FirebaseFunctions") {
                     compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    extraOpts("-verbose")
+                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
                 }
             }
         }
