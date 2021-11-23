@@ -143,7 +143,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-config-ktx")
+                api("com.google.firebase:firebase-config")
             }
         }
 
