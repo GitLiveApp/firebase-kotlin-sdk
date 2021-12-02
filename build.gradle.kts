@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.5.31" apply false
+    kotlin("multiplatform") version "1.6.10" apply false
     id("base")
 }
 
@@ -17,12 +17,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.3")
+        classpath("com.android.tools.build:gradle:7.1.0")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
-val targetSdkVersion by extra(30)
+val targetSdkVersion by extra(31)
 val minSdkVersion by extra(19)
 
 tasks {
@@ -44,7 +44,7 @@ subprojects {
 
     group = "dev.gitlive"
 
-    apply(plugin="com.adarshr.test-logger")
+    apply(plugin = "com.adarshr.test-logger")
 
     repositories {
         mavenLocal()
@@ -107,7 +107,7 @@ subprojects {
                 into.writeText(
                     from.readText()
                         .replace("require('firebase-kotlin-sdk-", "require('@gitlive/")
-                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+//                        .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
                 )
             }
         }
@@ -197,12 +197,12 @@ subprojects {
         }
 
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2-native-mt")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.0.1"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0-native-mt")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.3.0"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
