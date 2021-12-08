@@ -39,6 +39,9 @@ abstract class AbstractTimestampSerializer<T> : KSerializer<T> {
             is FirebaseTimestamp.ServerValue -> {
                 objectEncoder.encodeObject(descriptor, 0, FieldValue.serverTimestamp())
             }
+            is FirebaseTimestamp.ServerDelete -> {
+                objectEncoder.encodeObject(descriptor, 0, FieldValue.delete)
+            }
         }
         objectEncoder.endStructure(descriptor)
     }
