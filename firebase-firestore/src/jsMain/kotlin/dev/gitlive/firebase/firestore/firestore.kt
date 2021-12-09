@@ -254,6 +254,9 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val path: String
         get() = rethrow { js.path }
 
+    actual val parent: CollectionReference
+        get() = rethrow { CollectionReference(js.parent) }
+
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -386,6 +389,8 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
         get() =  rethrow { js.path }
 
     actual val document get() = rethrow { DocumentReference(js.doc()) }
+
+    actual val parent get() = rethrow { js.parent?.let{DocumentReference(it)} }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 

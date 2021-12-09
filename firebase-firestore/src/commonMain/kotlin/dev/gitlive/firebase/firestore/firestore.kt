@@ -167,6 +167,7 @@ expect class DocumentReference {
     val id: String
     val path: String
     val snapshots: Flow<DocumentSnapshot>
+    val parent: CollectionReference
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
@@ -191,6 +192,7 @@ expect class DocumentReference {
 expect class CollectionReference : Query {
     val path: String
     val document: DocumentReference
+    val parent: DocumentReference?
 
     fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference

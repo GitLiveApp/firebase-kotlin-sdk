@@ -297,6 +297,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(android.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when (merge) {
@@ -438,6 +441,9 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual val document: DocumentReference
         get() = DocumentReference(android.document())
+
+    actual val parent: DocumentReference?
+        get() = android.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
