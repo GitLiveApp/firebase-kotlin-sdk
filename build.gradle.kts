@@ -229,6 +229,8 @@ subprojects {
         publications.all {
             this as MavenPublication
 
+            println("Setting up publishing for $name")
+
             pom {
                 name.set("firebase-kotlin-sdk")
                 description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")

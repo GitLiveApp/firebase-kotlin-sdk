@@ -149,7 +149,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-admin:8.1.0")
-                api("com.google.firebase:firebase-common-ktx:23.0.4")
+                //api("com.google.firebase:firebase-ktx:23.0.4")
             }
         }
 

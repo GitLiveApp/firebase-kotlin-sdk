@@ -6,6 +6,7 @@ package dev.gitlive.firebase
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseException
+import java.io.File
 import java.io.FileInputStream
 
 actual typealias FirebaseException = FirebaseException
@@ -40,7 +41,7 @@ actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApp
     .map { FirebaseApp(it) }
 
 fun AdminFirebaseOptions.toJvm(): com.google.firebase.FirebaseOptions {
-    val serviceFile = FileInputStream(serviceFileName)
+    val serviceFile = if(File(serviceFileName).exists()) FileInputStream(serviceFileName) else javaClass.classLoader!!.getResourceAsStream(serviceFileName)
 
     return com.google.firebase.FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.fromStream(serviceFile))

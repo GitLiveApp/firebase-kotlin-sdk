@@ -429,25 +429,25 @@ actual class DocumentChange(val android: com.google.cloud.firestore.DocumentChan
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class DocumentSnapshot(val android: com.google.cloud.firestore.DocumentSnapshot) {
+actual class DocumentSnapshot(val jvm: com.google.cloud.firestore.DocumentSnapshot) {
 
-    actual val id get() = android.id
-    actual val reference get() = DocumentReference(android.reference)
+    actual val id get() = jvm.id
+    actual val reference get() = DocumentReference(jvm.reference)
 
-    actual inline fun <reified T: Any> data(): T = decode<T>(value = android.data)
+    actual inline fun <reified T: Any> data(): T = decode<T>(value = jvm.data)
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, jvm.data)
 
-    actual fun dataMap(): Map<String, Any?> = android.data ?: emptyMap()
+    actual fun dataMap(): Map<String, Any?> = jvm.data ?: emptyMap()
 
-    actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
+    actual inline fun <reified T> get(field: String) = decode<T>(value = jvm.get(field))
 
     actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        decode(strategy, android.get(field))
+        decode(strategy, jvm.get(field))
 
-    actual fun contains(field: String) = android.contains(field)
+    actual fun contains(field: String) = jvm.contains(field)
 
-    actual val exists get() = android.exists()
+    actual val exists get() = jvm.exists()
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata()
 }
