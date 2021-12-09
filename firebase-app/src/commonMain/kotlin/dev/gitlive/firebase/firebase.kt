@@ -18,7 +18,7 @@ object Firebase
 
 expect class FirebaseApp {
     val name: String
-    val options: FirebaseOptions
+    val options: CommonFirebaseOptions
 }
 
 /** Returns the default firebase app instance. */
@@ -34,18 +34,18 @@ expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
 expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
 
 /** Initializes and returns a FirebaseApp. */
-expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
+expect fun Firebase.initialize(context: Any? = null, options: CommonFirebaseOptions): FirebaseApp
 
 /** Initializes and returns a FirebaseApp. */
-expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+expect fun Firebase.initialize(context: Any? = null, options: CommonFirebaseOptions, name: String): FirebaseApp
 
 /** Returns options of default FirebaseApp */
-val Firebase.options: FirebaseOptions
+val Firebase.options: CommonFirebaseOptions
     get() = Firebase.app.options
 
-open class FirebaseOptions
+open class CommonFirebaseOptions
 
-data class MobileFirebaseOptions(
+data class FirebaseOptions(
     val applicationId: String,
     val apiKey: String,
     val databaseUrl: String? = null,
@@ -54,11 +54,20 @@ data class MobileFirebaseOptions(
     val projectId: String? = null,
     val gcmSenderId: String? = null,
     val authDomain: String? = null
-): FirebaseOptions()
+): CommonFirebaseOptions()
+
+data class OldAdminFirebaseOptions(
+    val serviceFileName: String
+): CommonFirebaseOptions()
 
 data class AdminFirebaseOptions(
-    val serviceFileName: String
-): FirebaseOptions()
+    val databaseUrl: String? = null,
+    val credentialFile: String,
+    val projectId: String? = null,
+    val serviceAccountId: String? = null,
+    val connectTimeout: Int? = null,
+    val readTimeout: Int? = null
+): CommonFirebaseOptions()
 
 expect open class FirebaseException : Exception
 

@@ -5,7 +5,7 @@
 package dev.gitlive.firebase.remoteconfig
 
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.CommonFirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import kotlin.test.AfterTest
@@ -32,7 +32,7 @@ class FirebaseRemoteConfigTest {
             ?.apply {
                 initialize(
                     context,
-                    FirebaseOptions(
+                    CommonFirebaseOptions(
                         applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
                         apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                         databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",

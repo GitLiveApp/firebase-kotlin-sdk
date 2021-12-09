@@ -10,7 +10,7 @@ import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
-expect val firebaseOptions: FirebaseOptions
+expect val firebaseOptions: CommonFirebaseOptions
 expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseFirestoreTest {

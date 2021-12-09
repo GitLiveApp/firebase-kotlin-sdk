@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 
 actual val context: Any = Unit
 
-actual val firebaseOptions: FirebaseOptions
+actual val firebaseOptions: CommonFirebaseOptions
     get() = AdminFirebaseOptions("kotlin-sdk-test-firebase-adminsdk-22xsa-d938f2f196.json")
 
 actual fun runTest(test: suspend () -> Unit) = runBlocking { test() }

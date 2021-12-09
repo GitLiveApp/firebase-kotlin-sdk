@@ -1,11 +1,9 @@
 package dev.gitlive.firebase
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.initialize
 import kotlin.test.Test
 
 expect val context: Any
-expect val firebaseOptions: FirebaseOptions
+expect val firebaseOptions: CommonFirebaseOptions
 expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseAppTest {

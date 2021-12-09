@@ -20,17 +20,17 @@ actual fun Firebase.app(name: String): FirebaseApp =
 actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     FIRApp.configure().let { app }
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
+actual fun Firebase.initialize(context: Any?, options: CommonFirebaseOptions, name: String): FirebaseApp =
     FIRApp.configureWithName(name, options.toIos()).let { app(name) }
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
+actual fun Firebase.initialize(context: Any?, options: CommonFirebaseOptions) =
     FIRApp.configureWithOptions(options.toIos()).let { app }
 
 actual class FirebaseApp internal constructor(val ios: FIRApp) {
     actual val name: String
         get() = ios.name
-    actual val options: FirebaseOptions
-        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
+    actual val options: CommonFirebaseOptions
+        get() = ios.options.run { CommonFirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 }
 
 actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
@@ -38,7 +38,7 @@ actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
     .values
     .map { FirebaseApp(it as FIRApp) }
 
-private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
+private fun CommonFirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
         APIKey = this@toIos.apiKey
         databaseURL = this@toIos.databaseUrl
         trackingID = this@toIos.gaTrackingId

@@ -4,16 +4,16 @@
 
 package dev.gitlive.firebase.auth
 
+import dev.gitlive.firebase.CommonFirebaseOptions
 import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.MobileFirebaseOptions
 import kotlinx.coroutines.*
 import platform.Foundation.*
 
 actual val emulatorHost: String = "localhost"
 
-actual val firebaseOptions: FirebaseOptions
+actual val firebaseOptions: CommonFirebaseOptions
     get() =
-        MobileFirebaseOptions(
+        FirebaseOptions(
             applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
             apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
             databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",

@@ -23,23 +23,23 @@ actual fun Firebase.app(name: String): FirebaseApp =
 actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     com.google.firebase.FirebaseApp.initializeApp(context as Context)?.let { FirebaseApp(it) }
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
-    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, (options as MobileFirebaseOptions).toAndroid(), name))
+actual fun Firebase.initialize(context: Any?, options: CommonFirebaseOptions, name: String): FirebaseApp =
+    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, (options as FirebaseOptions).toAndroid(), name))
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
-    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, (options as MobileFirebaseOptions).toAndroid()))
+actual fun Firebase.initialize(context: Any?, options: CommonFirebaseOptions) =
+    FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, (options as FirebaseOptions).toAndroid()))
 
 actual class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
     actual val name: String
         get() = android.name
-    actual val options: FirebaseOptions
-        get() = android.options.run { MobileFirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId) }
+    actual val options: CommonFirebaseOptions
+        get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId) }
 }
 
 actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)
     .map { FirebaseApp(it) }
 
-private fun MobileFirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Builder()
+private fun FirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Builder()
     .setApplicationId(applicationId)
     .setApiKey(apiKey)
     .setDatabaseUrl(databaseUrl)
