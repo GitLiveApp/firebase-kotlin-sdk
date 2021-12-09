@@ -14,9 +14,9 @@ Firebase*.zip
 /Firebase
 /.DS_Store
 *.log
-kotlin-sdk-test-firebase-adminsdk-22xsa-d938f2f196.json
+kotlin-sdk-test-firebase-adminsdk-*.json
 
-**/kotlin-sdk-test-firebase-adminsdk-22xsa-d938f2f196.json
+**/kotlin-sdk-test-firebase-adminsdk-*.json
 
 
 /**/nativeInterop/cinterop/Cartfile.resolved

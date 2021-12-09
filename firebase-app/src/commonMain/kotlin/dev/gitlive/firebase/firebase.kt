@@ -61,8 +61,8 @@ data class OldAdminFirebaseOptions(
 ): CommonFirebaseOptions()
 
 data class AdminFirebaseOptions(
-    val databaseUrl: String? = null,
     val credentialFile: String,
+    val databaseUrl: String? = null,
     val projectId: String? = null,
     val serviceAccountId: String? = null,
     val connectTimeout: Int? = null,

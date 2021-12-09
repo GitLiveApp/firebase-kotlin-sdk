@@ -13,6 +13,6 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual val firebaseOptions: CommonFirebaseOptions = AdminFirebaseOptions("kotlin-sdk-test-firebase-adminsdk-22xsa-d938f2f196.json")
+actual val firebaseOptions: CommonFirebaseOptions = AdminFirebaseOptions("kotlin-sdk-test-firebase-adminsdk-lxwn3-6bc474d4ab.json")
 
 actual fun runTest(test: suspend () -> Unit) = runBlocking { test() }
