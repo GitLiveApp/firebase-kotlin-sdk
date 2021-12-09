@@ -174,6 +174,9 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual val path: String
         get() = ios.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(ios.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -281,6 +284,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
         get() = ios.path
 
     actual val document get() = DocumentReference(ios.documentWithAutoID())
+
+    actual val parent get() = ios.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
