@@ -149,7 +149,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-firestore-ktx")
+                api("com.google.firebase:firebase-firestore")
             }
         }
 

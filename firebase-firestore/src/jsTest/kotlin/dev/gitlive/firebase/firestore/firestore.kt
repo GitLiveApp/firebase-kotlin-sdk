@@ -16,8 +16,8 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = GlobalScope
     .promise {
         try {
             test()
-        } catch (e: Throwable) {
-            e.log()
+        } catch (e: dynamic) {
+            (e as? Throwable)?.log()
             throw e
         }
     }.asDynamic()

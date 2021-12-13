@@ -17,13 +17,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.android.tools.build:gradle:7.0.3")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(30)
-val minSdkVersion by extra(16)
+val minSdkVersion by extra(19)
 
 tasks {
     val updateVersions by registering {
@@ -196,7 +196,7 @@ subprojects {
         dependencies {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.1"))
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.0.0"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
