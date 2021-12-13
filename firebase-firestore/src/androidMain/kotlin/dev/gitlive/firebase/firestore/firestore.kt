@@ -429,6 +429,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
+
+    internal actual fun _startAt(vararg fieldValues: Any?) = Query(android.startAt(*fieldValues))
+    internal actual fun _startAt(snapshot: DocumentSnapshot) = Query(android.startAt(snapshot.android))
+    internal actual fun _startAfter(vararg fieldValues: Any?) = Query(android.startAfter(*fieldValues))
+    internal actual fun _startAfter(snapshot: DocumentSnapshot) = Query(android.startAfter(snapshot.android))
+
+    internal actual fun _endAt(vararg fieldValues: Any?) = Query(android.endAt(*fieldValues))
+    internal actual fun _endAt(snapshot: DocumentSnapshot) = Query(android.endAt(snapshot.android))
+    internal actual fun _endBefore(vararg fieldValues: Any?) = Query(android.endBefore(*fieldValues))
+    internal actual fun _endBefore(snapshot: DocumentSnapshot) = Query(android.endBefore(snapshot.android))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction

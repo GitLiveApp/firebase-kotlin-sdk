@@ -317,8 +317,17 @@ actual open class Query(open val ios: FIRQuery) {
     )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
-
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
+
+    internal actual fun _startAt(vararg fieldValues: Any?) = Query(ios.queryStartingAtValues(fieldValues.toList()))
+    internal actual fun _startAt(snapshot: DocumentSnapshot) = Query(ios.queryStartingAtDocument(snapshot.ios))
+    internal actual fun _startAfter(vararg fieldValues: Any?) = Query(ios.queryStartingAfterValues(fieldValues.toList()))
+    internal actual fun _startAfter(snapshot: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(snapshot.ios))
+
+    internal actual fun _endAt(vararg fieldValues: Any?) = Query(ios.queryEndingAtValues(fieldValues.toList()))
+    internal actual fun _endAt(snapshot: DocumentSnapshot) = Query(ios.queryEndingAtDocument(snapshot.ios))
+    internal actual fun _endBefore(vararg fieldValues: Any?) = Query(ios.queryEndingBeforeValues(fieldValues.toList()))
+    internal actual fun _endBefore(snapshot: DocumentSnapshot) = Query(ios.queryEndingBeforeDocument(snapshot.ios))
 
 }
 @Suppress("UNCHECKED_CAST")

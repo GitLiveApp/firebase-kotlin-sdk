@@ -105,6 +105,16 @@ expect open class Query {
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
+
+    internal fun _startAt(vararg fieldValues: Any?): Query
+    internal fun _startAt(snapshot: DocumentSnapshot): Query
+    internal fun _startAfter(vararg fieldValues: Any?): Query
+    internal fun _startAfter(snapshot: DocumentSnapshot): Query
+
+    internal fun _endAt(vararg fieldValues: Any?): Query
+    internal fun _endAt(snapshot: DocumentSnapshot): Query
+    internal fun _endBefore(vararg fieldValues: Any?): Query
+    internal fun _endBefore(snapshot: DocumentSnapshot): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, encode(equalTo))
@@ -122,6 +132,16 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
+
+fun Query.startAt(vararg fieldValues: Any?) = _startAt(*fieldValues.map { encode(it) }.toTypedArray())
+fun Query.startAt(snapshot: DocumentSnapshot) = _startAt(snapshot)
+fun Query.startAfter(vararg fieldValues: Any?) = _startAfter(*fieldValues.map { encode(it) }.toTypedArray())
+fun Query.startAfter(snapshot: DocumentSnapshot) = _startAfter(snapshot)
+
+fun Query.endAt(vararg fieldValues: Any?) = _endAt(*fieldValues.map { encode(it) }.toTypedArray())
+fun Query.endAt(snapshot: DocumentSnapshot) = _endAt(snapshot)
+fun Query.endAfter(vararg fieldValues: Any?) = _endBefore(*fieldValues.map { encode(it) }.toTypedArray())
+fun Query.endAfter(snapshot: DocumentSnapshot) = _endBefore(snapshot)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
