@@ -119,7 +119,7 @@ kotlin {
                 apiVersion = "1.4"
                 languageVersion = "1.4"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 

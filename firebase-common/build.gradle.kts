@@ -75,10 +75,10 @@ kotlin {
                 apiVersion = "1.4"
                 languageVersion = "1.4"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlin.Experimental")
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlin.Experimental")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 

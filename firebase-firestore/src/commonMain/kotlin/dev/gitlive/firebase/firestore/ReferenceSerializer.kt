@@ -27,15 +27,19 @@ abstract class AbstractFirebaseReferenceSerializer<T> : KSerializer<T> {
     abstract override fun deserialize(decoder: Decoder): T
 
     fun encode(encoder: Encoder, value: FirebaseReference?) {
-        val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
-        val documentReferenceEncoder = FirebaseDocumentReferenceEncoder()
-        when (value) {
-            is FirebaseReference.Value ->
-                objectEncoder.encodeObject(descriptor, 0, documentReferenceEncoder.encode(value.value))
-            is FirebaseReference.ServerDelete ->
-                objectEncoder.encodeObject(descriptor, 0, FieldValue.delete)
+        if (value == null) {
+            encoder.encodeNull()
+        } else {
+            val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
+            val documentReferenceEncoder = FirebaseDocumentReferenceEncoder()
+            when (value) {
+                is FirebaseReference.Value ->
+                    objectEncoder.encodeObject(descriptor, 0, documentReferenceEncoder.encode(value.value))
+                is FirebaseReference.ServerDelete ->
+                    objectEncoder.encodeObject(descriptor, 0, FieldValue.delete)
+            }
+            objectEncoder.endStructure(descriptor)
         }
-        objectEncoder.endStructure(descriptor)
     }
 }
 

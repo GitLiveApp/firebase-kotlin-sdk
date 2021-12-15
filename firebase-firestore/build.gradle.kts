@@ -101,23 +101,15 @@ kotlin {
         )
     }
 
-    if (findProperty("firebase-kotlin-sdk.firestore.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
-        logger.info("Using IR compilation for firebase-firestore module")
-        targets.getByName<KotlinAndroidTarget>("android").compilations.all {
-            kotlinOptions {
-                useIR = true
-            }
-        }
-    }
     sourceSets {
         all {
             languageSettings.apply {
                 apiVersion = "1.4"
                 languageVersion = "1.4"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
         val commonMain by getting {

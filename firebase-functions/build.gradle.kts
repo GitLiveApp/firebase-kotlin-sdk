@@ -92,22 +92,14 @@ kotlin {
         )
     }
 
-    if (findProperty("firebase-kotlin-sdk.functions.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
-        logger.info("Using IR compilation for firebase-functions module")
-        targets.getByName<KotlinAndroidTarget>("android").compilations.all {
-            kotlinOptions {
-                useIR = true
-            }
-        }
-    }
     sourceSets {
         all {
             languageSettings.apply {
                 apiVersion = "1.4"
                 languageVersion = "1.4"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 
