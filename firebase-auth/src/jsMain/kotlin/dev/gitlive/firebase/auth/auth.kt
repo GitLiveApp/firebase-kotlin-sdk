@@ -53,6 +53,8 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) =
         rethrow { js.sendSignInLinkToEmail(email, actionCodeSettings.toJson()).await() }
 
+    actual fun isSignInWithEmailLink(link: String) = rethrow { js.isSignInWithEmailLink(link) }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
 
@@ -64,6 +66,9 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
+
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        rethrow { AuthResult(js.signInWithEmailLink(email, link).await()) }
 
     actual suspend fun signOut() = rethrow { js.signOut().await() }
 
@@ -119,6 +124,7 @@ actual class AuthTokenResult(val js: firebase.auth.IdTokenResult) {
 }
 
 internal fun ActionCodeSettings.toJson() = json(
+    "url" to url,
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
     "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
     "handleCodeInApp" to canHandleCodeInApp,
