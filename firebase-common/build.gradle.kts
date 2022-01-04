@@ -53,9 +53,7 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-
-    }
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = { }
 
     if (project.extra["ideaActive"] as Boolean) {
         iosX64("ios", nativeTargetConfig())
@@ -83,8 +81,10 @@ kotlin {
         }
 
         val commonMain by getting {
+            val serializationVersion: String by project
+
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.1.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
             }
         }
 

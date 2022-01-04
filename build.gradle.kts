@@ -3,9 +3,15 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+// TODO: To be removed once we will migrate to kotlin version 1.6.20
+// https://youtrack.jetbrains.com/issue/KT-49109#focus=Comments-27-5667134.0-0
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
 plugins {
-    kotlin("multiplatform") version "1.6.0" apply false
-    kotlin("plugin.serialization") version "1.6.0" apply false
+    kotlin("multiplatform") apply false
+    kotlin("plugin.serialization") apply false
     id("base")
 }
 
