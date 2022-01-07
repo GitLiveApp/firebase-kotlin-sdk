@@ -12,6 +12,7 @@ internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boo
         dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
     }
 
+@PublishedApi
 internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
     dev.gitlive.firebase.encode(
         strategy,

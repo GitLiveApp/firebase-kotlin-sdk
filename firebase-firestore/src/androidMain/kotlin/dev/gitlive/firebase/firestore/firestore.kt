@@ -99,6 +99,32 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
+    actual fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        merge: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, Any>?
+        val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
+
+        val result = serializedItem?.let { item ->
+            serializedFieldAndValues?.let { fieldsAndValues ->
+                item + fieldsAndValues
+            }
+        } as Any? ?: return this
+
+        if (merge) {
+            android.set(documentRef.android, result, SetOptions.merge())
+        } else {
+            android.set(documentRef.android, result)
+        }
+        return this
+    }
+
     @Suppress("UNCHECKED_CAST")
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         android.update(documentRef.android, encode(data, encodeDefaults) as Map<String, Any>).let { this }
@@ -113,6 +139,26 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
             ?.map { (field, value) -> field to encode(value, true) }
             ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
             .let { this }
+
+    actual inline fun <reified T> update(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encode(data, encodeDefaults) as Map<String, Any>
+
+        val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
+            ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
+
+        val result = (serializedFieldAndValues?.let {
+            serializedItem.plus(it)
+        } ?: serializedItem)
+
+        return android.update(documentRef.android, result).let { this }
+    }
+
 
     @JvmName("updateFieldPaths")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
