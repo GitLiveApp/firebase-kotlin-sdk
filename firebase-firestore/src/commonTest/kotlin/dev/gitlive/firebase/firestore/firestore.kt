@@ -51,7 +51,6 @@ class FirebaseFirestoreTest {
     @Test
     fun testFieldOrderBy() = runTest {
         setupFirestoreData()
-
         val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
             .orderBy(FieldPath("prop1")).get().documentChanges
         assertEquals(3, resultDocs.size)
