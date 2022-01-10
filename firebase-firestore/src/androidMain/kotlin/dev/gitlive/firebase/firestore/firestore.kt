@@ -140,6 +140,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
             ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
             .let { this }
 
+    @JvmName("updateFieldsExtended")
     actual inline fun <reified T> update(
         documentRef: DocumentReference,
         strategy: SerializationStrategy<T>,
