@@ -121,6 +121,60 @@ class FirebaseFirestoreTest {
 
     }
 
+    @Test
+    fun testExtendedSetBatch() = runTest {
+        val doc = Firebase.firestore
+            .collection("testServerTestSetBatch")
+            .document("test")
+        val batch = Firebase.firestore.batch()
+        batch.set(
+            documentRef = doc,
+            strategy = FirestoreTest.serializer(),
+            data = FirestoreTest(
+                prop1 = "prop1",
+                time = FieldValue.serverTimestamp().toString().toDouble()
+            ),
+            fieldsAndValues = arrayOf(
+                "time" to FieldValue.delete
+            )
+        )
+
+        assertNotEquals(FieldValue.delete, doc.get().get("time"))
+        assertNotEquals("prop1", doc.get().data(FirestoreTest.serializer()).prop1)
+
+    }
+
+    @Test
+    fun testExtendedUpdateBatch() = runTest {
+        val doc = Firebase.firestore
+            .collection("testServerTestSetBatch")
+            .document("test").apply {
+                set(
+                    FirestoreTest(
+                        prop1 = "prop1",
+                        time = FieldValue.serverTimestamp().toString().toDouble()
+                    )
+                )
+            }
+        val batch = Firebase.firestore.batch()
+        batch.update(
+            documentRef = doc,
+            strategy = FirestoreTest.serializer(),
+            data = FirestoreTest(
+                prop1 = "prop1-updated",
+                time = FieldValue.serverTimestamp().toString().toDouble()
+            ),
+            encodeDefaults = false,
+            fieldsAndValues = arrayOf(
+                "time" to FieldValue.delete
+            )
+        )
+
+        assertNotEquals(FieldValue.delete, doc.get().get("time"))
+        assertNotEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
+
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("FirebaseFirestoreTest")
             .document("one")
