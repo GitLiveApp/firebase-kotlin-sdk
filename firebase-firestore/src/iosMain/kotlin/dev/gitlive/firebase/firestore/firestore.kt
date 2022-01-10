@@ -101,7 +101,6 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, Any>?
         val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
             ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
-
         val result = (serializedFieldAndValues?.let {
             serializedItem?.plus(it)
         } ?: serializedItem) as Map<Any?, *>
