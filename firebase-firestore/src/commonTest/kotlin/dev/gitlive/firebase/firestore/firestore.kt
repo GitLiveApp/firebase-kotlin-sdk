@@ -138,6 +138,7 @@ class FirebaseFirestoreTest {
                 "time" to FieldValue.delete
             )
         )
+        batch.commit()
 
         assertNotEquals(FieldValue.delete, doc.get().get("time"))
         assertNotEquals("prop1", doc.get().data(FirestoreTest.serializer()).prop1)
@@ -169,6 +170,7 @@ class FirebaseFirestoreTest {
                 "time" to FieldValue.delete
             )
         )
+        batch.commit()
 
         assertNotEquals(FieldValue.delete, doc.get().get("time"))
         assertNotEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
