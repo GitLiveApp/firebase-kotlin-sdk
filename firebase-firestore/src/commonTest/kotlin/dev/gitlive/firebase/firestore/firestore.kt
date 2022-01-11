@@ -15,7 +15,7 @@ expect fun runTest(test: suspend () -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String, val time: Double = 0.0)
+    data class FirestoreTest(val prop1: String, val time: Double? = 0.0)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -111,11 +111,18 @@ class FirebaseFirestoreTest {
         val doc = Firebase.firestore
             .collection("testServerTimestampFieldValue")
             .document("test")
+        doc.set(
+            FirestoreTest.serializer(),
+            FirestoreTest("ServerTimestamp"),
+        )
+        assertEquals(0.0, doc.get().get("time"))
 
-        doc.set(FirestoreTest.serializer(), FirestoreTest("ServerTimestamp", FieldValue.serverTimestamp().toString().toDouble()))
-
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time"))
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTest.serializer()).time)
+        doc.update(
+            fieldsAndValues = arrayOf(
+                "time" to 123.0
+            )
+        )
+        assertEquals(123.0, doc.get().data(FirestoreTest.serializer()).time)
 
     }
 
@@ -130,16 +137,16 @@ class FirebaseFirestoreTest {
             strategy = FirestoreTest.serializer(),
             data = FirestoreTest(
                 prop1 = "prop1",
-                time = FieldValue.serverTimestamp().toString().toDouble()
+                time = 123.0
             ),
             fieldsAndValues = arrayOf(
-                "time" to FieldValue.delete
+                "time" to 124.0
             )
         )
         batch.commit()
 
-        assertNotEquals(FieldValue.delete, doc.get().get("time"))
-        assertNotEquals("prop1", doc.get().data(FirestoreTest.serializer()).prop1)
+        assertEquals(124.0, doc.get().get("time"))
+        assertEquals("prop1", doc.get().data(FirestoreTest.serializer()).prop1)
 
     }
 
@@ -151,7 +158,7 @@ class FirebaseFirestoreTest {
                 set(
                     FirestoreTest(
                         prop1 = "prop1",
-                        time = FieldValue.serverTimestamp().toString().toDouble()
+                        time = 123.0
                     )
                 )
             }
@@ -161,7 +168,7 @@ class FirebaseFirestoreTest {
             strategy = FirestoreTest.serializer(),
             data = FirestoreTest(
                 prop1 = "prop1-updated",
-                time = FieldValue.serverTimestamp().toString().toDouble()
+                time = 123.0
             ),
             encodeDefaults = false,
             fieldsAndValues = arrayOf(
@@ -170,9 +177,8 @@ class FirebaseFirestoreTest {
         )
         batch.commit()
 
-        assertNotEquals(FieldValue.delete, doc.get().get("time"))
-        assertNotEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
-
+        assertEquals(null, doc.get().get("time") as Double?)
+        assertEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
     }
 
     private suspend fun setupFirestoreData() {
