@@ -151,6 +151,27 @@ class FirebaseFirestoreTest {
     }
 
     @Test
+    fun testSetBatchDoesNotEncodeEmptyValues() = runTest {
+        val doc = Firebase.firestore
+            .collection("testServerTestSetBatch")
+            .document("test")
+        val batch = Firebase.firestore.batch()
+        batch.set(
+            documentRef = doc,
+            strategy = FirestoreTest.serializer(),
+            data = FirestoreTest(
+                prop1 = "prop1-set",
+                time = 125.0
+            ),
+            fieldsAndValues = arrayOf<Pair<String, Any>>()
+        )
+        batch.commit()
+
+        assertEquals(125.0, doc.get().get("time") as Double?)
+        assertEquals("prop1-set", doc.get().data(FirestoreTest.serializer()).prop1)
+    }
+
+    @Test
     fun testExtendedUpdateBatch() = runTest {
         val doc = Firebase.firestore
             .collection("testServerTestSetBatch")
@@ -179,6 +200,28 @@ class FirebaseFirestoreTest {
 
         assertEquals(null, doc.get().get("time") as Double?)
         assertEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
+    }
+
+    @Test
+    fun testUpdateBatchDoesNotEncodeEmptyValues() = runTest {
+        val doc = Firebase.firestore
+            .collection("testServerTestSetBatch")
+            .document("test")
+        val batch = Firebase.firestore.batch()
+        batch.update(
+            documentRef = doc,
+            strategy = FirestoreTest.serializer(),
+            data = FirestoreTest(
+                prop1 = "prop1-set",
+                time = 126.0
+            ),
+            encodeDefaults = false,
+            fieldsAndValues = arrayOf<Pair<String, Any>>()
+        )
+        batch.commit()
+
+        assertEquals(126.0, doc.get().get("time") as Double?)
+        assertEquals("prop1-set", doc.get().data(FirestoreTest.serializer()).prop1)
     }
 
     private suspend fun setupFirestoreData() {
