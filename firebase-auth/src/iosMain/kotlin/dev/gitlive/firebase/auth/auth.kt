@@ -175,9 +175,9 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
 private fun NSError.toException() = when(domain) {
     FIRAuthErrorDomain -> when(code) {
         FIRAuthErrorCodeInvalidActionCode,
-        FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(toString())
+        FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(localizedDescription)
 
-        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(toString())
+        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(localizedDescription)
 
         FIRAuthErrorCodeCaptchaCheckFailed,
         FIRAuthErrorCodeInvalidPhoneNumber,
@@ -187,26 +187,26 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeMissingVerificationID,
         FIRAuthErrorCodeMissingVerificationCode,
         FIRAuthErrorCodeWeakPassword,
-        FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(toString())
+        FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(localizedDescription)
 
-        FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(toString())
+        FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(localizedDescription)
 
-        FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(toString())
+        FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(localizedDescription)
 
         FIRAuthErrorCodeSecondFactorAlreadyEnrolled,
         FIRAuthErrorCodeSecondFactorRequired,
         FIRAuthErrorCodeMaximumSecondFactorCountExceeded,
-        FIRAuthErrorCodeMultiFactorInfoNotFound -> FirebaseAuthMultiFactorException(toString())
+        FIRAuthErrorCodeMultiFactorInfoNotFound -> FirebaseAuthMultiFactorException(localizedDescription)
 
         FIRAuthErrorCodeEmailAlreadyInUse,
         FIRAuthErrorCodeAccountExistsWithDifferentCredential,
-        FIRAuthErrorCodeCredentialAlreadyInUse -> FirebaseAuthUserCollisionException(toString())
+        FIRAuthErrorCodeCredentialAlreadyInUse -> FirebaseAuthUserCollisionException(localizedDescription)
 
         FIRAuthErrorCodeWebContextAlreadyPresented,
         FIRAuthErrorCodeWebContextCancelled,
-        FIRAuthErrorCodeWebInternalError -> FirebaseAuthWebException(toString())
+        FIRAuthErrorCodeWebInternalError -> FirebaseAuthWebException(localizedDescription)
 
-        else -> FirebaseAuthException(toString())
+        else -> FirebaseAuthException(localizedDescription)
     }
-    else -> FirebaseAuthException(toString())
+    else -> FirebaseAuthException(localizedDescription)
 }

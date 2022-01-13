@@ -312,7 +312,7 @@ actual open class Query(open val ios: FIRQuery) {
 
     internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
         (inArray?.let { ios.queryWhereFieldPath(path.ios, `in` = it) } ?: ios).let { ios2 ->
-            arrayContainsAny?.let { ios2.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny) } ?: ios2
+            arrayContainsAny?.let { ios2.queryWhereFieldPath(path.ios, arrayContainsAny = arrayContainsAny) } ?: ios
         }
     )
 
@@ -408,7 +408,7 @@ fun NSError.toException() = when(domain) {
         else -> FirestoreExceptionCode.UNKNOWN
     }
     else -> FirestoreExceptionCode.UNKNOWN
-}.let { FirebaseFirestoreException(description!!, it) }
+}.let { FirebaseFirestoreException(localizedDescription!!, it) }
 
 actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents

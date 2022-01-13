@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-config",
-  "version": "1.0.0",
+  "version": "1.4.3",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-config.js",
   "scripts": {
