@@ -86,6 +86,26 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
+    actual fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        merge: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        if (merge) {
+            js.set(documentRef.js, result, json("merge" to merge))
+        } else {
+            js.set(documentRef.js, result)
+        }
+        return this
+    }
+
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
             .let { this }
@@ -99,6 +119,20 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
             ?.map { (field, value) -> field to encode(value, true) }
             ?.let { encoded -> js.update(documentRef.js, encoded.toMap()) }
     }.let { this }
+
+    actual inline fun <reified T> update(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        return js.update(documentRef.js, result).let { this }
+    }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
