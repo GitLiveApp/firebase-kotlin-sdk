@@ -101,11 +101,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
         val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = if (serializedFieldAndValues != null)
-            serializedItem + serializedFieldAndValues
-        else
-            serializedItem
-
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
         ios.setData(result as Map<Any?, *>, documentRef.ios, merge)
         return this
     }
@@ -132,10 +128,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
         val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = if (serializedFieldAndValues != null)
-            serializedItem + serializedFieldAndValues
-        else
-            serializedItem
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
         return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
     }
 

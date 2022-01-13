@@ -97,11 +97,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
         val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = if (serializedFieldAndValues != null)
-            serializedItem + serializedFieldAndValues
-        else
-            serializedItem
-
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
         if (merge) {
             js.set(documentRef.js, result, json("merge" to merge))
         } else {
@@ -134,11 +130,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
         val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = if (serializedFieldAndValues != null)
-            serializedItem + serializedFieldAndValues
-        else
-            serializedItem
-
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
         return js.update(documentRef.js, result).let { this }
     }
 
