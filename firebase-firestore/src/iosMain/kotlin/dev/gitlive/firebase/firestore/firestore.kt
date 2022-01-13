@@ -98,14 +98,15 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         merge: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, Any>?
-        val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
-        val result = (serializedFieldAndValues?.let {
-            serializedItem?.plus(it)
-        } ?: serializedItem) as Map<Any?, *>
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        ios.setData(result, documentRef.ios, merge)
+        val result = if (serializedFieldAndValues != null)
+            serializedItem + serializedFieldAndValues
+        else
+            serializedItem
+
+        ios.setData(result as Map<Any?, *>, documentRef.ios, merge)
         return this
     }
 
@@ -128,13 +129,14 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<Any?, *>
-        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) -> field to encode(value, encodeDefaults) }
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = serializedFieldAndValues?.let {
-            serializedItem.plus(it)
-        } ?: serializedItem
-        return ios.updateData(result, documentRef.ios).let { this }
+        val result = if (serializedFieldAndValues != null)
+            serializedItem + serializedFieldAndValues
+        else
+            serializedItem
+        return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
     }
 
     actual inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =

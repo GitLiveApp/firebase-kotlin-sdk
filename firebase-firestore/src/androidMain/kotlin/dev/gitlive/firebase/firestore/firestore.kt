@@ -107,15 +107,13 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         merge: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, Any>?
-        val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val result = serializedItem?.let { item ->
-            serializedFieldAndValues?.let { fieldsAndValues ->
-                item + fieldsAndValues
-            }
-        } as Any? ?: return this
+        val result = if (serializedFieldAndValues != null)
+            serializedItem + serializedFieldAndValues
+        else
+            serializedItem
 
         if (merge) {
             android.set(documentRef.android, result, SetOptions.merge())
@@ -148,14 +146,13 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encode(data, encodeDefaults) as Map<String, Any>
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
 
-        val serializedFieldAndValues = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
-
-        val result = (serializedFieldAndValues?.let {
-            serializedItem.plus(it)
-        } ?: serializedItem)
+        val result = if (serializedFieldAndValues != null)
+            serializedItem + serializedFieldAndValues
+        else
+            serializedItem
 
         return android.update(documentRef.android, result).let { this }
     }
