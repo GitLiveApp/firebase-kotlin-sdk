@@ -166,8 +166,7 @@ subprojects {
                     args(
                         it,
                         "--project-directory", projectDir.resolve(cinteropDir),
-                        "--platform", "iOS",
-                        "--cache-builds"
+                        "--platform", "iOS"
                     )
                 }
             }
