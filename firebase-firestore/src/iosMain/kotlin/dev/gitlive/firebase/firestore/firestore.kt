@@ -15,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -340,6 +341,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
     actual val path: String
         get() = ios.path
 
+    actual val document get() = DocumentReference(ios.documentWithAutoID())
+
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
     actual fun document() = DocumentReference(ios.documentWithAutoID())
@@ -438,20 +441,37 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual val reference get() = DocumentReference(ios.reference)
 
-    actual inline fun <reified T: Any> data() = decode<T>(value = ios.data())
+    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T {
+        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+        return decode(value = data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
+    }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+        return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
+    }
 
-    actual inline fun <reified T> get(field: String) = decode<T>(value = ios.valueForField(field))
+    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
+        return decode(value)
+    }
 
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.valueForField(field))
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
+        return decode(strategy, value)
+    }
 
     actual fun contains(field: String) = ios.valueForField(field) != null
 
     actual val exists get() = ios.exists
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
+
+    fun ServerTimestampBehavior.toIos() : FIRServerTimestampBehavior = when (this) {
+        ServerTimestampBehavior.ESTIMATE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorEstimate
+        ServerTimestampBehavior.NONE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorNone
+        ServerTimestampBehavior.PREVIOUS -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorPrevious
+    }
 }
 
 actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {

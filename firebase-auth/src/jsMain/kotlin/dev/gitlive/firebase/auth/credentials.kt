@@ -29,8 +29,12 @@ actual object GithubAuthProvider {
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential =
-        AuthCredential(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken))
+    actual fun credential(idToken: String?, accessToken: String?): AuthCredential {
+        require(idToken != null || accessToken != null) {
+            "Both parameters are optional but at least one must be present."
+        }
+        return AuthCredential(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken))
+    }
 }
 
 actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {

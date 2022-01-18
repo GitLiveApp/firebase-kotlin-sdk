@@ -411,6 +411,9 @@ actual class CollectionReference(override val android: com.google.firebase.fires
     actual val path: String
         get() = android.path
 
+    actual val document: DocumentReference
+        get() = DocumentReference(android.document())
+
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
     actual fun document() = DocumentReference(android.document())
@@ -455,20 +458,29 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T: Any> data() = decode<T>(value = android.data)
+    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(value = android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
+    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(value = android.get(field, serverTimestampBehavior.toAndroid()))
 
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        decode(strategy, android.get(field))
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.get(field, serverTimestampBehavior.toAndroid()))
 
     actual fun contains(field: String) = android.contains(field)
 
     actual val exists get() = android.exists()
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
+
+    fun ServerTimestampBehavior.toAndroid(): com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior = when (this) {
+        ServerTimestampBehavior.ESTIMATE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+        ServerTimestampBehavior.NONE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.NONE
+        ServerTimestampBehavior.PREVIOUS -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.PREVIOUS
+    }
 }
 
 actual class SnapshotMetadata(val android: com.google.firebase.firestore.SnapshotMetadata) {
@@ -488,4 +500,3 @@ actual object FieldValue {
     actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
     actual fun delete(): Any = delete
 }
-

@@ -16,7 +16,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = runBlocking {
+actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     val testRun = MainScope().async { test() }
     while (testRun.isActive) {
         NSRunLoop.mainRunLoop.runMode(

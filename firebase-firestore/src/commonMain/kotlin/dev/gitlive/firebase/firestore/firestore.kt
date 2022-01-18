@@ -144,6 +144,7 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
+    val document: DocumentReference
 
     fun document(documentPath: String): DocumentReference
     fun document(): DocumentReference
@@ -204,18 +205,24 @@ expect class DocumentChange {
 
 expect class DocumentSnapshot {
 
-    inline fun <reified T> get(field: String): T
-    fun <T> get(field: String, strategy: DeserializationStrategy<T>): T
+    inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     fun contains(field: String): Boolean
 
-    inline fun <reified T: Any> data(): T
-    fun <T> data(strategy: DeserializationStrategy<T>): T
+    inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     val exists: Boolean
     val id: String
     val reference: DocumentReference
     val metadata: SnapshotMetadata
+}
+
+enum class ServerTimestampBehavior {
+    ESTIMATE,
+    NONE,
+    PREVIOUS
 }
 
 expect class SnapshotMetadata {

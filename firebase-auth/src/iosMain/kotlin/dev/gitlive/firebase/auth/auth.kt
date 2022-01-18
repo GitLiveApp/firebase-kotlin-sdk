@@ -58,6 +58,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
 
+    actual fun isSignInWithEmailLink(link: String) = ios.isSignInWithEmailLink(link)
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
@@ -70,8 +72,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
 
-    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = emailLink, completion = it) })
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
 
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 

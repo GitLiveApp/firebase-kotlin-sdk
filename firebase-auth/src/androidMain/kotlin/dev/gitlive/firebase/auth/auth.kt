@@ -66,6 +66,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = android.sendSignInLinkToEmail(email, actionCodeSettings.toAndroid()).await().run { Unit }
 
+    actual fun isSignInWithEmailLink(link: String) = android.isSignInWithEmailLink(link)
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
@@ -77,8 +79,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(android.signInWithCredential(authCredential.android).await())
 
-    actual suspend fun signInWithEmailLink(email: String, emailLink: String) =
-        AuthResult(android.signInWithEmailLink(email, emailLink).await())
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        AuthResult(android.signInWithEmailLink(email, link).await())
 
     actual suspend fun signOut() = android.signOut()
 

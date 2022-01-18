@@ -3,7 +3,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-firestore.version") as String
 
@@ -39,12 +39,12 @@ android {
         }
     }
     packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-core.kotlin_module")
-        pickFirst("META-INF/AL2.0")
-        pickFirst("META-INF/LGPL2.1")
-        pickFirst("androidsupportmultidexversion.txt")
+        resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
+        resources.pickFirsts.add("META-INF/AL2.0")
+        resources.pickFirsts.add("META-INF/LGPL2.1")
+        resources.pickFirsts.add("androidsupportmultidexversion.txt")
     }
-    lintOptions {
+    lint {
         isAbortOnError = false
     }
     dependencies {
@@ -53,45 +53,87 @@ android {
     }
 }
 
+val KonanTarget.archVariant: String
+    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
+        "ios-arm64_i386_x86_64-simulator"
+    } else {
+        "ios-arm64_armv7"
+    }
+
 kotlin {
 
     android {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-        val cinteropDir: String by project
-        val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
-            projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
-        )
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+    if (supportIosTarget) {
+        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val nativeFrameworkPaths = listOf(
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAnalytics",
+                    "FirebaseCore",
+                    "FirebaseCoreDiagnostics",
+                    "FirebaseInstallations",
+                    "GoogleAppMeasurement",
+                    "GoogleAppMeasurementIdentitySupport",
+                    "GoogleDataTransport",
+                    "GoogleUtilities",
+                    "nanopb",
+                    "PromisesObjC"
+                ).map {
+                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            ).plus(
+                listOf(
+                    "abseil",
+                    "BoringSSL-GRPC",
+                    "FirebaseFirestore",
+                    "gRPC-C++",
+                    "gRPC-Core",
+                    "leveldb-library"
+                ).map {
+                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            )
 
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                linkerOpts("-ObjC")
+            binaries {
+                getTest("DEBUG").apply {
+                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    linkerOpts("-ObjC")
+                }
+            }
+
+            compilations.getByName("main") {
+                cinterops.create("FirebaseFirestore") {
+                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
+                }
             }
         }
 
-        compilations.getByName("main") {
-            cinterops.create("FirebaseFirestore") {
-                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
-            }
-        }
-    }
-
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-        iosArm64("ios", nativeTargetConfig())
-    } else {
         ios(configure = nativeTargetConfig())
+        iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
     js {
         useCommonJs()
-        nodejs()
-        browser()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
     }
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
@@ -112,12 +154,11 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 progressiveMode = true
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
-                useExperimentalAnnotation("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
         val commonMain by getting {
@@ -130,15 +171,29 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore")
-                implementation("com.android.support:multidex:1.0.3")
             }
         }
 
-        val iosMain by getting
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
+        }
 
         val jsMain by getting
     }
 }
+
+if (project.property("firebase-firestore.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 signing {
     val signingKey: String? by project
     val signingPassword: String? by project

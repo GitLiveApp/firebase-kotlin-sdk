@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JsModule("firebase/app")
+@file:JsModule("firebase/compat/app")
 
 package dev.gitlive.firebase
 
@@ -27,6 +27,8 @@ external object firebase {
         val gaTrackingId: String?
         val storageBucket: String?
         val projectId: String?
+        val messagingSenderId: String?
+        val authDomain: String?
     }
 
     val apps : Array<App>
@@ -55,6 +57,7 @@ external object firebase {
             fun fetchSignInMethodsForEmail(email: String): Promise<Array<String>>
             fun sendPasswordResetEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
             fun sendSignInLinkToEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
+            fun isSignInWithEmailLink(link: String): Boolean
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
@@ -62,6 +65,7 @@ external object firebase {
             fun signInWithEmailLink(email: String, emailLink: String): Promise<AuthResult>
             fun signInWithPopup(provider: AuthProvider): Promise<AuthResult>
             fun signInWithRedirect(provider: AuthProvider): Promise<Unit>
+            fun signInWithEmailLink(email: String, link: String): Promise<AuthResult>
             fun getRedirectResult(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
             fun updateCurrentUser(user: user.User?): Promise<Unit>
@@ -375,8 +379,7 @@ external object firebase {
 
         open class CollectionReference : Query {
             val path: String
-            fun doc(path: String): DocumentReference
-            fun doc(): DocumentReference
+            fun doc(path: String = definedExternally): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 
@@ -467,6 +470,38 @@ external object firebase {
                 fun arrayUnion(vararg elements: Any): FieldValue
                 fun serverTimestamp(): FieldValue
             }
+        }
+    }
+
+    fun remoteConfig(app: App? = definedExternally): remoteConfig.RemoteConfig
+
+    object remoteConfig {
+        interface RemoteConfig {
+            var defaultConfig: Any
+            var fetchTimeMillis: Long
+            var lastFetchStatus: String
+            val settings: Settings
+            fun activate(): Promise<Boolean>
+            fun ensureInitialized(): Promise<Unit>
+            fun fetch(): Promise<Unit>
+            fun fetchAndActivate(): Promise<Boolean>
+            fun getAll(): Json
+            fun getBoolean(key: String): Boolean
+            fun getNumber(key: String): Number
+            fun getString(key: String): String?
+            fun getValue(key: String): Value
+        }
+
+        interface Settings {
+            var fetchTimeoutMillis: Number
+            var minimumFetchIntervalMillis: Number
+        }
+
+        interface Value {
+            fun asBoolean(): Boolean
+            fun asNumber(): Number
+            fun asString(): String?
+            fun getSource(): String
         }
     }
 }
