@@ -411,9 +411,6 @@ actual class CollectionReference(override val android: com.google.firebase.fires
     actual val path: String
         get() = android.path
 
-    actual val document: DocumentReference
-        get() = DocumentReference(android.document())
-
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
     actual fun document() = DocumentReference(android.document())

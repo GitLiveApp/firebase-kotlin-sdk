@@ -36,7 +36,6 @@ expect class FirebaseAuth {
     suspend fun signOut()
     suspend fun updateCurrentUser(user: FirebaseUser)
     suspend fun verifyPasswordResetCode(code: String): String
-    fun isSignInWithEmailLink(emailLink: String): Boolean
     fun useEmulator(host: String, port: Int)
 }
 

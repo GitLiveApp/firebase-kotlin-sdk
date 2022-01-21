@@ -98,8 +98,6 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         } as T
     }
 
-    actual fun isSignInWithEmailLink(emailLink: String) = rethrow { js.isSignInWithEmailLink(emailLink) }
-
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator("http://$host:$port") }
 }
 

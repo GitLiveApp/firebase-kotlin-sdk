@@ -14,10 +14,13 @@ plugins {
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val targetSdkVersion: Int by project
+
+    compileSdk = targetSdkVersion
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {

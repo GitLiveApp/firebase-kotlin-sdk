@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform") version "1.5.31" apply false
+    kotlin("plugin.serialization") version "1.5.31" apply false
     id("base")
 }
 
@@ -22,9 +23,9 @@ buildscript {
     }
 }
 
-val targetSdkVersion by extra(30)
+val targetSdkVersion by extra(31)
 val minSdkVersion by extra(16)
-val firebaseBoMVersion by extra("27.1.0")
+val firebaseBoMVersion by extra("29.0.0")
 
 val cinteropDir: String by extra("src/nativeInterop/cinterop")
 

@@ -385,8 +385,6 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
     actual val path: String
         get() =  rethrow { js.path }
 
-    actual val document get() = rethrow { DocumentReference(js.doc()) }
-
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
     actual fun document() = rethrow { DocumentReference(js.doc()) }

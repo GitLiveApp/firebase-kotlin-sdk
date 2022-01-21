@@ -341,8 +341,6 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
     actual val path: String
         get() = ios.path
 
-    actual val document get() = DocumentReference(ios.documentWithAutoID())
-
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
     actual fun document() = DocumentReference(ios.documentWithAutoID())

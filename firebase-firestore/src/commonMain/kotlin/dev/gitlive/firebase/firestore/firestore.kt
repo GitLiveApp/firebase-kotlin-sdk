@@ -144,7 +144,6 @@ expect class DocumentReference {
 
 expect class CollectionReference : Query {
     val path: String
-    val document: DocumentReference
 
     fun document(documentPath: String): DocumentReference
     fun document(): DocumentReference

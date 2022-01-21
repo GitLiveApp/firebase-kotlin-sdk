@@ -3,6 +3,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-functions.version") as String
@@ -15,10 +16,11 @@ plugins {
 android {
     val minSdkVersion: Int by project
     val targetSdkVersion: Int by project
-    compileSdkVersion(targetSdkVersion)
+
+    compileSdk = targetSdkVersion
     defaultConfig {
-        minSdkVersion(minSdkVersion)
-        targetSdkVersion(targetSdkVersion)
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
     }
     sourceSets {
         getByName("main") {
@@ -57,12 +59,14 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-        val cinteropDir: String by project
-        val nativeFrameworkPaths = listOf(
-            rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
-            projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
-        )
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+    if (supportIosTarget) {
+        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val cinteropDir: String by project
+            val nativeFrameworkPaths = listOf(
+                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+                projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
+            )
 
             binaries {
                 getTest("DEBUG").apply {
@@ -71,9 +75,9 @@ kotlin {
                 }
             }
 
-        compilations.getByName("main") {
-            cinterops.create("FirebaseFunctions") {
-                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+            compilations.getByName("main") {
+                cinterops.create("FirebaseFunctions") {
+                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
                     extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
                 }
             }

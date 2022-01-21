@@ -95,8 +95,6 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         } as T
     }
 
-    actual fun isSignInWithEmailLink(emailLink: String) = ios.isSignInWithEmailLink(emailLink)
-
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 

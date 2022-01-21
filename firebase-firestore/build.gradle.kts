@@ -3,6 +3,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-firestore.version") as String
@@ -17,10 +18,10 @@ android {
     val minSdkVersion: Int by project
     val targetSdkVersion: Int by project
 
-    compileSdkVersion(targetSdkVersion)
+    compileSdk = targetSdkVersion
     defaultConfig {
-        minSdkVersion(minSdkVersion)
-        targetSdkVersion(targetSdkVersion)
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
     }
@@ -69,34 +70,10 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val cinteropDir: String by project
             val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            ).plus(
-                listOf(
-                    "abseil",
-                    "BoringSSL-GRPC",
-                    "FirebaseFirestore",
-                    "gRPC-C++",
-                    "gRPC-Core",
-                    "leveldb-library"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
+                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+                projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
             )
 
             binaries {

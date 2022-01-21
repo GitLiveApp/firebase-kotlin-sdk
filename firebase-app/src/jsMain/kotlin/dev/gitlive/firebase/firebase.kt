@@ -39,7 +39,8 @@ actual class FirebaseOptions actual constructor(
     actual val gaTrackingId: String?,
     actual val storageBucket: String?,
     actual val projectId: String?,
-    actual val gcmSenderId: String?
+    actual val gcmSenderId: String?,
+    actual val authDomain: String?
 ) {
     actual companion object {
         actual fun withContext(context: Any): FirebaseOptions? = null

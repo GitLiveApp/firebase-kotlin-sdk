@@ -21,10 +21,10 @@ android {
     val minSdkVersion: Int by project
     val targetSdkVersion: Int by project
 
-    compileSdkVersion(targetSdkVersion)
+    compileSdk = targetSdkVersion
     defaultConfig {
-        minSdkVersion(minSdkVersion)
-        targetSdkVersion(targetSdkVersion)
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
     }
     sourceSets {
         getByName("main") {
@@ -66,30 +66,10 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val cinteropDir: String by project
             val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            ).plus(
-                listOf(
-                    "FirebaseDatabase",
-                    "leveldb-library"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
+                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
+                projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
             )
 
             binaries {

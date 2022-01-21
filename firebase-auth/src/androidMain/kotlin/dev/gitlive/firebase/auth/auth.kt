@@ -108,8 +108,6 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
         } as T
     }
 
-    actual fun isSignInWithEmailLink(emailLink: String) = android.isSignInWithEmailLink(emailLink)
-
     actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
