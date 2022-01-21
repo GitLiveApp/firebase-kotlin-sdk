@@ -99,6 +99,26 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
             .let { this }
 
+    actual fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        merge: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        if (merge) {
+            android.set(documentRef.android, result, SetOptions.merge())
+        } else {
+            android.set(documentRef.android, result)
+        }
+        return this
+    }
+
     @Suppress("UNCHECKED_CAST")
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         android.update(documentRef.android, encode(data, encodeDefaults) as Map<String, Any>).let { this }
@@ -113,6 +133,22 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
             ?.map { (field, value) -> field to encode(value, true) }
             ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
             .let { this }
+
+    @JvmName("updateFieldsExtended")
+    actual inline fun <reified T> update(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        return android.update(documentRef.android, result).let { this }
+    }
+
 
     @JvmName("updateFieldPaths")
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =

@@ -90,6 +90,22 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
     actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
         ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
 
+    actual fun <T> set(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        merge: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        ios.setData(result as Map<Any?, *>, documentRef.ios, merge)
+        return this
+    }
+
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
@@ -102,7 +118,21 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
                 documentRef.ios
             ).let { this }
 
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+    actual inline fun <reified T> update(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
+        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+
+        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
+    }
+
+    actual inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
         ios.updateData(
             fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
             documentRef.ios

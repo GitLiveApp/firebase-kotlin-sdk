@@ -62,4 +62,30 @@ class TimestampTests {
         assertEquals("uid123", decoded.uid)
         assertEquals(null, decoded.updatedAt)
     }
+
+    @Test
+    fun decodeDeletedTimestampObject() = runTest {
+        val timestamp = timestampWith(123, 345)
+        val obj = mapOf(
+            "uid" to "uid123",
+            "createdAt" to timestampNow(),
+            "updatedAt" to FieldValue.delete,
+            "deletedAt" to FirebaseTimestamp.ServerDelete
+        )
+        val decoded: TestData = decode(obj)
+
+        assertEquals("uid123", decoded.uid)
+        assertEquals(null, decoded.updatedAt)
+        assertEquals(null, decoded.deletedAt)
+    }
+
+    @Test
+    fun encodeDeletedTimestampObject() = runTest {
+        val timestamp = FieldValue.delete
+        val item = TestData("uid123", timestamp, null, FirebaseTimestamp.ServerDelete)
+        val encoded = encode(item, shouldEncodeElementDefault = false) as Map<String, Any?>
+        assertEquals("uid123", encoded["uid"])
+        assertEquals(timestamp, encoded["createdAt"])
+        assertEquals(FieldValue.delete, encoded["deletedAt"])
+    }
 }

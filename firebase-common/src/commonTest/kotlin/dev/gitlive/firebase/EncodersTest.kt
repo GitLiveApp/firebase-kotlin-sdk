@@ -67,7 +67,7 @@ class EncodersTest {
         val decoded = decode(TestData.serializer(), mapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
         assertNull(decoded.nullableBool)
     }
-}
+
     @Test
     fun testEncodeDecodedSealedClass() {
         val test = SealedClass.Test("Foo")
