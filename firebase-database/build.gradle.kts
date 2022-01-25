@@ -67,9 +67,10 @@ kotlin {
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
             val cinteropDir: String by project
+            val frameworkName = "FirebaseDatabase"
             val nativeFrameworkPaths = listOf(
                 rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
-                projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
+                projectDir.resolve("$cinteropDir/Carthage/Build/$frameworkName.xcframework/${konanTarget.archVariant}")
             )
 
             binaries {
@@ -80,7 +81,7 @@ kotlin {
             }
 
             compilations.getByName("main") {
-                cinterops.create("FirebaseDatabase") {
+                cinterops.create(frameworkName) {
                     compilerOpts(nativeFrameworkPaths.map { "-F$it" })
                     extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
                 }
