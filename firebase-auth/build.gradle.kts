@@ -93,8 +93,13 @@ kotlin {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
             val cinteropDir: String by project
             val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
-                projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
+                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAuth"
+                ).map {
+                    projectDir.resolve("$cinteropDir/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
             )
 
             binaries {
