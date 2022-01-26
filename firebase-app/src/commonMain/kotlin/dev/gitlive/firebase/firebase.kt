@@ -53,7 +53,8 @@ expect class FirebaseOptions(
     gaTrackingId: String? = null,
     storageBucket: String? = null,
     projectId: String? = null,
-    gcmSenderId: String? = null
+    gcmSenderId: String? = null,
+    authDomain: String? = null
 ) {
     val applicationId: String
     val apiKey: String
@@ -62,6 +63,7 @@ expect class FirebaseOptions(
     val storageBucket: String?
     val projectId: String?
     val gcmSenderId: String?
+    val authDomain: String?
 
     companion object {
         fun withContext(context: Any): FirebaseOptions?

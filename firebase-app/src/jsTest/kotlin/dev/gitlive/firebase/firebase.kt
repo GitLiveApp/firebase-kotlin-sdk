@@ -14,7 +14,7 @@ actual fun runTest(test: suspend () -> Unit) = GlobalScope
         try {
             test()
         } catch (e: dynamic) {
-            e.log()
+            (e as? Throwable)?.log()
             throw e
         }
     }.asDynamic()

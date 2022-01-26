@@ -86,7 +86,7 @@ object ServerValue {
     val TIMESTAMP = Double.POSITIVE_INFINITY
 }
 
-expect class DatabaseException : RuntimeException
+expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
 
 expect class OnDisconnect {
     suspend fun removeValue()
