@@ -192,8 +192,12 @@ actual class DatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         android.runTransaction(object : Transaction.Handler {
 
-            override fun doTransaction(currentData: MutableData) =
-                Transaction.success(transactionUpdate(decode(strategy, currentData)) as MutableData)
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.value = currentData.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                return Transaction.success(currentData)
+            }
 
             override fun onComplete(
                 error: DatabaseError?,
