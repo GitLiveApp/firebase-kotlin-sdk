@@ -66,6 +66,9 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
     actual fun reference(path: String) =
         DatabaseReference(android.getReference(path), persistenceEnabled)
 
+    actual fun reference() =
+        DatabaseReference(android.reference, persistenceEnabled)
+
     actual fun setPersistenceEnabled(enabled: Boolean) =
         android.setPersistenceEnabled(enabled).also { persistenceEnabled = enabled }
 
@@ -192,8 +195,12 @@ actual class DatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         android.runTransaction(object : Transaction.Handler {
 
-            override fun doTransaction(currentData: MutableData) =
-                Transaction.success(transactionUpdate(decode(strategy, currentData)) as MutableData)
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.value = currentData.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                return Transaction.success(currentData)
+            }
 
             override fun onComplete(
                 error: DatabaseError?,
