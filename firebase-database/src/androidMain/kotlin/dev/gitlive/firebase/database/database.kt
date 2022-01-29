@@ -66,6 +66,9 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
     actual fun reference(path: String) =
         DatabaseReference(android.getReference(path), persistenceEnabled)
 
+    actual fun reference() =
+        DatabaseReference(android.reference, persistenceEnabled)
+
     actual fun setPersistenceEnabled(enabled: Boolean) =
         android.setPersistenceEnabled(enabled).also { persistenceEnabled = enabled }
 
