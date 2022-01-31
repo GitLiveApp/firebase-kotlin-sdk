@@ -31,7 +31,11 @@ actual object GithubAuthProvider {
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
+    actual fun credential(idToken: String?, accessToken: String?): AuthCredential {
+        requireNotNull(idToken) { "idToken must not be null" }
+        requireNotNull(accessToken) { "accessToken must not be null" }
+        return AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
+    }
 }
 
 actual class OAuthProvider(val ios: FIROAuthProvider) {

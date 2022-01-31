@@ -6,17 +6,25 @@ package dev.gitlive.firebase
 
 import kotlin.js.Promise
 
-@JsModule("firebase/functions")
+@JsModule("firebase/compat/functions")
+@JsName("default")
 external object functions
 
-@JsModule("firebase/auth")
+@JsModule("firebase/compat/auth")
+@JsName("default")
 external object auth
 
-@JsModule("firebase/database")
+@JsModule("firebase/compat/database")
+@JsName("default")
 external object database
 
-@JsModule("firebase/firestore")
+@JsModule("firebase/compat/firestore")
+@JsName("default")
 external object firestore
+
+@JsModule("firebase/compat/remote-config")
+@JsName("default")
+external object remoteConfig
 
 typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
 

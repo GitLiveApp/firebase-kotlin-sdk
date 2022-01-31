@@ -44,7 +44,7 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
     select<T> {
         asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected") }
+        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
 }
 

@@ -2,8 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 version = project.property("firebase-common.version") as String
 
 plugins {
@@ -16,10 +14,10 @@ android {
     val minSdkVersion: Int by project
     val targetSdkVersion: Int by project
 
-    compileSdkVersion(targetSdkVersion)
+    compileSdk = targetSdkVersion
     defaultConfig {
-        minSdkVersion(minSdkVersion)
-        targetSdkVersion(targetSdkVersion)
+        minSdk = minSdkVersion
+        targetSdk = targetSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
@@ -34,11 +32,11 @@ android {
         }
     }
     packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-core.kotlin_module")
-        pickFirst("META-INF/AL2.0")
-        pickFirst("META-INF/LGPL2.1")
+        resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
+        resources.pickFirsts.add("META-INF/AL2.0")
+        resources.pickFirsts.add("META-INF/LGPL2.1")
     }
-    lintOptions {
+    lint {
         isAbortOnError = false
     }
     dependencies {
@@ -53,25 +51,36 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = { }
+    val supportIosTarget = project.property("skipIosTarget") != "true"
 
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-    } else {
-        ios(configure = nativeTargetConfig())
+    if (supportIosTarget) {
+        ios()
+        iosSimulatorArm64()
     }
 
     js {
         useCommonJs()
-        nodejs()
-        browser()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
     }
 
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 progressiveMode = true
                 optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
@@ -94,13 +103,27 @@ kotlin {
             }
         }
 
-        val iosMain by getting
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
+        }
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "8.2.0"))
+                api(npm("firebase", "9.4.1"))
             }
         }
+    }
+}
+
+if (project.property("firebase-common.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
