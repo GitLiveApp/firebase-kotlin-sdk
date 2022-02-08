@@ -36,6 +36,7 @@ abstract class AbstractFirebaseReferenceSerializer<T> : KSerializer<T> {
                 objectEncoder.encodeObject(descriptor, 0, FieldValue.delete)
             null -> {}
         }
+        objectEncoder.endStructure(descriptor)
     }
 }
 
