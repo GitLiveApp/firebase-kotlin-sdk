@@ -9,6 +9,7 @@ Firebase*.zip
 /Firebase
 /.DS_Store
 *.log
+/kotlin-js-store/
 
 /**/src/nativeInterop/cinterop/modules/
 /**/nativeInterop/cinterop/Cartfile.resolved

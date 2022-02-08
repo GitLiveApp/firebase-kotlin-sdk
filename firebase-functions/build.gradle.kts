@@ -107,20 +107,12 @@ kotlin {
     }
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
         kotlinOptions.freeCompilerArgs += listOf(
-            "-Xuse-experimental=kotlin.Experimental",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.serialization.InternalSerializationApi"
+            "-Xopt-in=kotlin.Experimental",
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
         )
     }
 
-    if (findProperty("firebase-kotlin-sdk.functions.useIR")?.toString()?.equals("true", ignoreCase = true) == true) {
-        logger.info("Using IR compilation for firebase-functions module")
-        targets.getByName<KotlinAndroidTarget>("android").compilations.all {
-            kotlinOptions {
-                useIR = true
-            }
-        }
-    }
     sourceSets {
         all {
             languageSettings.apply {

@@ -2,8 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 version = project.property("firebase-common.version") as String
 
 plugins {
@@ -92,8 +90,10 @@ kotlin {
         }
 
         val commonMain by getting {
+            val serializationVersion: String by project
+
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
             }
         }
 
