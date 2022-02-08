@@ -168,6 +168,8 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.NONE))
+    }
+
     @Test
     fun testExtendedSetBatch() = runTest {
         val doc = Firebase.firestore
