@@ -11,3 +11,9 @@ import kotlinx.coroutines.runBlocking
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
 actual fun runTest(test: suspend () -> Unit) = runBlocking { test() }
+
+object Firebase
+
+expect class FirebaseApp {
+    val name: String
+    val options: FirebaseOptions
