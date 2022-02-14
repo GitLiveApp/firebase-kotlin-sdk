@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JvmName("tests")
+@file:JvmName("test")
 package dev.gitlive.firebase
 
 import androidx.test.platform.app.InstrumentationRegistry

@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
-/** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
-expect val Firebase.database: FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance for the specified [url]. */
 expect fun Firebase.database(url: String): FirebaseDatabase
@@ -23,6 +21,9 @@ expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
 /** Returns the [FirebaseDatabase] instance of the given [FirebaseApp] and [url]. */
 expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
+object ServerValue {
+    val TIMESTAMP = Double.POSITIVE_INFINITY
+}
 expect class FirebaseDatabase {
     fun reference(path: String): DatabaseReference
     fun setPersistenceEnabled(enabled: Boolean)
@@ -32,6 +33,7 @@ expect class FirebaseDatabase {
 
 data class ChildEvent internal constructor(
     val snapshot: DataSnapshot,
+    val type:
     val type: Type,
     val previousChildName: String?
 ) {
@@ -83,7 +85,9 @@ expect class DataSnapshot {
 }
 
 object ServerValue {
-    val TIMESTAMP = Double.POSITIVE_INFINITY
+    expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
+
+
 }
 
 expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
