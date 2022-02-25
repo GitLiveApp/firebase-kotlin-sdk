@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.5.30" apply false
+    kotlin("multiplatform") version "1.6.10" apply false
     id("base")
 }
 
@@ -17,7 +17,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.android.tools.build:gradle:7.0.4")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
@@ -208,14 +208,14 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.6")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1") {
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.2.0")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
                 exclude("com.google.android.gms")
             }
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
