@@ -9,7 +9,7 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.5.31"
 }
 
 android {
@@ -46,14 +46,11 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+    val supportIosTarget = project.property("skipIosTarget") != "true"
 
-    }
-
-    if (project.extra["ideaActive"] as Boolean) {
-        iosX64("ios", nativeTargetConfig())
-    } else {
-        ios(configure = nativeTargetConfig())
+    if (supportIosTarget) {
+        ios()
+        iosSimulatorArm64()
     }
 
     js {
@@ -89,23 +86,37 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
             }
         }
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common-ktx")
+                api("com.google.firebase:firebase-common")
             }
         }
 
-        val iosMain by getting
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
+        }
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "8.7.1"))
+                api(npm("firebase", "9.4.1"))
             }
         }
+    }
+}
+
+if (project.property("firebase-common.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
