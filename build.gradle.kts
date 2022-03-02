@@ -3,7 +3,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
+
     kotlin("multiplatform") version "1.5.31" apply false
+
     id("base")
 }
 
@@ -12,18 +14,23 @@ buildscript {
         google()
         mavenCentral()
         gradlePluginPortal()
+        mavenCentral()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
     }
     dependencies {
+
         classpath("com.android.tools.build:gradle:7.0.3")
+
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(30)
+
 val minSdkVersion by extra(19)
+
 
 tasks {
     val updateVersions by registering {
@@ -48,7 +55,9 @@ subprojects {
     repositories {
         mavenLocal()
         google()
+
         mavenCentral()
+
     }
 
     tasks.withType<Sign>().configureEach {
@@ -194,18 +203,21 @@ subprojects {
         }
 
         dependencies {
+
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.0.0"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
+
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:${project.property("coroutines.version")}")
+
         }
     }
 

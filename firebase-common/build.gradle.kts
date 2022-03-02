@@ -9,7 +9,12 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+<<<<<<< ours
     kotlin("plugin.serialization") version "1.5.31"
+=======
+    kotlin("native.cocoapods")
+    kotlin("plugin.serialization") version "1.6.0"
+>>>>>>> theirs
 }
 
 android {
@@ -41,7 +46,18 @@ android {
 }
 
 kotlin {
+<<<<<<< ours
 
+=======
+    js {
+        compilations.all {
+            kotlinOptions {
+                moduleKind = "umd"
+            }
+        }
+        nodejs()
+    }
+>>>>>>> theirs
     android {
         publishAllLibraryVariants()
     }

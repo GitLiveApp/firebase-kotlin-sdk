@@ -16,9 +16,11 @@ plugins {
 android {
     compileSdk = property("targetSdkVersion") as Int
     defaultConfig {
+
         minSdk = property("minSdkVersion") as Int
         targetSdk = property("targetSdkVersion") as Int
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         multiDexEnabled = true
     }
     sourceSets {
@@ -46,12 +48,13 @@ android {
     }
 }
 
+
 val KonanTarget.archVariant: String
     get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
         "ios-arm64_i386_x86_64-simulator"
     } else {
         "ios-arm64_armv7"
-    }
+ }
 
 kotlin {
 

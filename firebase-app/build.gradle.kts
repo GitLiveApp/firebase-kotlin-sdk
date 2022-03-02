@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -14,8 +15,8 @@ plugins {
 
 repositories {
     google()
-    mavenCentral()
-}
+
+
 
 android {
     compileSdk = property("targetSdkVersion") as Int
@@ -44,14 +45,7 @@ android {
     }
 }
 
-val KonanTarget.archVariant: String
-    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
-    } else {
-        "ios-arm64_armv7"
-    }
 
-kotlin {
 
     android {
         publishAllLibraryVariants()
