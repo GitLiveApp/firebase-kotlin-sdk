@@ -28,7 +28,7 @@
   "dependencies": {
     "@gitliveapp/firebase-app-js-legacy": "1.0.0-beta-1610",
     "firebase": "8.4.3",
-    "kotlin": "1.5.30",
-    "kotlinx-coroutines-core": "1.5.1"
+    "kotlin": "1.6.10",
+    "kotlinx-coroutines-core": "1.6.0"
   }
 }
