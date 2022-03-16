@@ -387,21 +387,24 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T : Any> data(): T =
-        rethrow { decode<T>(value = js.data()) }
+    actual inline fun <reified T : Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
+        rethrow { decode(value = js.data(getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>): T =
-        rethrow { decode(strategy, js.data()) }
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
+        rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual inline fun <reified T> get(field: String) =
-        rethrow { decode<T>(value = js.get(field)) }
+    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior) =
+        rethrow { decode<T>(value = js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        rethrow { decode(strategy, js.get(field)) }
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior) =
+        rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
     actual val exists get() = rethrow { js.exists }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
+
+    fun getTimestampsOptions(serverTimestampBehavior: ServerTimestampBehavior) =
+        json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
 
 actual class SnapshotMetadata(val js: firebase.firestore.SnapshotMetadata) {
@@ -503,3 +506,13 @@ fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
             }
         }
 }
+
+// from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
+fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
+    (js("Object.entries") as (dynamic) -> Array<Array<Any?>>)
+        .invoke(jsObject)
+        .map { entry -> entry[0] as String to entry[1] }
+
+// from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
+fun mapOf(jsObject: dynamic): Map<String, Any?> =
+    entriesOf(jsObject).toMap()

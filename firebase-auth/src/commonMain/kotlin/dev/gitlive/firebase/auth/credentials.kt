@@ -26,7 +26,7 @@ expect object GithubAuthProvider {
 }
 
 expect object GoogleAuthProvider {
-    fun credential(idToken: String, accessToken: String): AuthCredential
+    fun credential(idToken: String?, accessToken: String?): AuthCredential
 }
 
 expect class OAuthProvider constructor(

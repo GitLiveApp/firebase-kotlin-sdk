@@ -10,15 +10,9 @@ import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(skip: Boolean = false, test: suspend () -> Unit)
-expect val currentPlatform: Platform
-
-enum class Platform { Android, IOS, JS }
+expect fun runTest(test: suspend () -> Unit)
 
 class FirebaseAuthTest {
-
-    // Skip the tests on iOS simulator due keychain exceptions
-    private val skip = currentPlatform == Platform.IOS
 
     @BeforeTest
     fun initializeFirebase() {
@@ -41,14 +35,14 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSignInWithUsernameAndPassword() = runTest(skip) {
+    fun testSignInWithUsernameAndPassword() = runTest {
         val uid = getTestUid("test@test.com", "test123")
         val result = Firebase.auth.signInWithEmailAndPassword("test@test.com", "test123")
         assertEquals(uid, result.user!!.uid)
     }
 
     @Test
-    fun testCreateUserWithEmailAndPassword() = runTest(skip) {
+    fun testCreateUserWithEmailAndPassword() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -63,7 +57,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testFetchSignInMethods() = runTest(skip) {
+    fun testFetchSignInMethods() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = Firebase.auth.fetchSignInMethodsForEmail(email)
         assertEquals(emptyList(), signInMethodResult)
@@ -75,7 +69,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSendEmailVerification() = runTest(skip) {
+    fun testSendEmailVerification() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -85,7 +79,7 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun sendPasswordResetEmail() = runTest(skip) {
+    fun sendPasswordResetEmail() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = Firebase.auth.createUserWithEmailAndPassword(email, "test123")
         assertNotEquals(null, createResult.user?.uid)
@@ -96,11 +90,19 @@ class FirebaseAuthTest {
     }
 
     @Test
-    fun testSignInWithCredential() = runTest(skip) {
+    fun testSignInWithCredential() = runTest {
         val uid = getTestUid("test@test.com", "test123")
         val credential = EmailAuthProvider.credential("test@test.com", "test123")
         val result = Firebase.auth.signInWithCredential(credential)
         assertEquals(uid, result.user!!.uid)
+    }
+
+    @Test
+    fun testIsSignInWithEmailLink() {
+        val validLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&oobCode=_vr0QcFcxcVeLZbrcU-GpTaZiuxlHquqdC8MSy0YM_vzWCTAQgV9Jq&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
+        val invalidLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
+        assertTrue(Firebase.auth.isSignInWithEmailLink(validLink))
+        assertFalse(Firebase.auth.isSignInWithEmailLink(invalidLink))
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
