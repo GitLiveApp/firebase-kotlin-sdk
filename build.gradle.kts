@@ -31,10 +31,11 @@ tasks {
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
+            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
+            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion"
         )
     }
 }
@@ -154,8 +155,8 @@ subprojects {
             }
         }
 
-        if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
-            listOf("bootstrap", "update").forEach {
+        val carthageTasks = if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
+            listOf("bootstrap", "update").map {
                 task<Exec>("carthage${it.capitalize()}") {
                     group = "carthage"
                     executable = "carthage"
@@ -166,11 +167,13 @@ subprojects {
                     )
                 }
             }
-        }
+        } else emptyList()
 
         if (Os.isFamily(Os.FAMILY_MAC)) {
             withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-                dependsOn("carthageBootstrap")
+                if (carthageTasks.isNotEmpty()) {
+                    dependsOn("carthageBootstrap")
+                }
             }
         }
 

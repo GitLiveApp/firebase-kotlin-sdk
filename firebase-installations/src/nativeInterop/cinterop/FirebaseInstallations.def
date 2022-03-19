@@ -1,0 +1,5 @@
+language = Objective-C
+package = cocoapods.FirebaseInstallations
+modules = FirebaseInstallations
+compilerOpts = -framework FirebaseInstallations
+linkerOpts = -framework FirebaseInstallations
