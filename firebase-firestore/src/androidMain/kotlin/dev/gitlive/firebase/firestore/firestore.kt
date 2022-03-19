@@ -354,6 +354,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction

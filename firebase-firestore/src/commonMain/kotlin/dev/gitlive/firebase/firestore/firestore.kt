@@ -67,6 +67,8 @@ expect open class Query {
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
+
+    internal fun _startAfter(document: DocumentSnapshot): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -80,6 +82,8 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
+
+fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
