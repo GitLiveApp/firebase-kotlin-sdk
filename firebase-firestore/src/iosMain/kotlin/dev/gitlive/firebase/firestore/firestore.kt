@@ -15,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?): T =
@@ -173,6 +174,9 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual val path: String
         get() = ios.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(ios.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -269,8 +273,9 @@ actual open class Query(open val ios: FIRQuery) {
     )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
-
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios))
 
 }
 @Suppress("UNCHECKED_CAST")
@@ -280,6 +285,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
         get() = ios.path
 
     actual val document get() = DocumentReference(ios.documentWithAutoID())
+
+    actual val parent get() = ios.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
@@ -377,22 +384,37 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual val reference get() = DocumentReference(ios.reference)
 
-    actual inline fun <reified T: Any> data() = decode<T>(value = ios.data())
+    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T {
+        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+        return decode(value = data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
+    }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, ios.data())
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+        return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
+    }
 
-    actual fun dataMap(): Map<String, Any?> = ios.data()?.map { it.key.toString() to it.value }?.toMap() ?: emptyMap()
+    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
+        return decode(value)
+    }
 
-    actual inline fun <reified T> get(field: String) = decode<T>(value = ios.valueForField(field))
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.valueForField(field))
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
+        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
+        return decode(strategy, value)
+    }
 
     actual fun contains(field: String) = ios.valueForField(field) != null
 
     actual val exists get() = ios.exists
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
+
+    fun ServerTimestampBehavior.toIos() : FIRServerTimestampBehavior = when (this) {
+        ServerTimestampBehavior.ESTIMATE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorEstimate
+        ServerTimestampBehavior.NONE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorNone
+        ServerTimestampBehavior.PREVIOUS -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorPrevious
+    }
 }
 
 actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {

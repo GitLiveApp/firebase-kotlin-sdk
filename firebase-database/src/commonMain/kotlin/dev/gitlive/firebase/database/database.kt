@@ -25,6 +25,7 @@ expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
 expect class FirebaseDatabase {
     fun reference(path: String): DatabaseReference
+    fun reference(): DatabaseReference
     fun setPersistenceEnabled(enabled: Boolean)
     fun setLoggingEnabled(enabled: Boolean)
     fun useEmulator(host: String, port: Int)
