@@ -93,7 +93,13 @@ You can also omit the serializer but this is discouraged due to a [current limit
 
 ```kotlin
 @Serializable
-data class Post(val timestamp: Double = ServerValue.TIMESTAMP)
+data class Post(
+    // In case using Realtime Database.
+    val timestamp: Double = ServerValue.TIMESTAMP,
+    // In case using Cloud Firestore.
+    val timestamp: Double = FieldValue.serverTimestamp,
+)
+
 ```
 
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#default-arguments">Default arguments</a></h3>
