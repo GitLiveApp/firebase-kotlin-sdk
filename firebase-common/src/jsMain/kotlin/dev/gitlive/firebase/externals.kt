@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JsModule("firebase/app")
+@file:JsModule("firebase/compat/app")
 
 package dev.gitlive.firebase
 
@@ -379,6 +379,7 @@ external object firebase {
             fun limit(limit: Double): Query
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
+            fun startAfter(document: DocumentSnapshot): Query
         }
 
         open class CollectionReference : Query {

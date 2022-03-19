@@ -220,6 +220,25 @@ class FirebaseFirestoreTest {
         assertEquals("AutoId", resultDoc.get("prop1"))
     }
 
+    @Test
+    fun testStartAfterDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("FirebaseFirestoreTest")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+        val secondPage = query.startAfter(lastDocumentSnapshot).limit(2).get().documents // Second 2 results (only one left)
+        assertEquals(1, secondPage.size)
+        assertEquals("ccc", secondPage[0].get("prop1"))
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("FirebaseFirestoreTest")
             .document("one")

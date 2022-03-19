@@ -17,13 +17,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.android.tools.build:gradle:7.0.3")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(30)
-val minSdkVersion by extra(16)
+val minSdkVersion by extra(19)
 
 tasks {
     val updateVersions by registering {
@@ -162,8 +162,7 @@ subprojects {
                     args(
                         it,
                         "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-                        "--platform", "iOS",
-                        "--cache-builds"
+                        "--platform", "iOS"
                     )
                 }
             }
