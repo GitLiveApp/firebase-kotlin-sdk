@@ -27,17 +27,29 @@ expect class FirebaseAuth {
     suspend fun fetchSignInMethodsForEmail(email: String): List<String>
     suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
     suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)
+    fun isSignInWithEmailLink(link: String): Boolean
     suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signInWithCustomToken(token: String): AuthResult
     suspend fun signInAnonymously(): AuthResult
     suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
+    suspend fun signInWithEmailLink(email: String, link: String): AuthResult
     suspend fun signOut()
     suspend fun updateCurrentUser(user: FirebaseUser)
     suspend fun verifyPasswordResetCode(code: String): String
+    fun useEmulator(host: String, port: Int)
 }
 
 expect class AuthResult {
     val user: FirebaseUser?
+}
+
+expect class AuthTokenResult {
+//    val authTimestamp: Long
+    val claims: Map<String, Any>
+//    val expirationTimestamp: Long
+//    val issuedAtTimestamp: Long
+    val signInProvider: String?
+    val token: String?
 }
 
 sealed class ActionCodeResult {
@@ -57,7 +69,11 @@ data class ActionCodeSettings(
     val iOSBundleId: String? = null
 )
 
-data class AndroidPackageName(val packageName: String, val installIfNotAvailable: Boolean, val minimumVersion: String?)
+data class AndroidPackageName(
+    val packageName: String,
+    val installIfNotAvailable: Boolean = true,
+    val minimumVersion: String? = null
+)
 
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException

@@ -9,10 +9,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
+    - name: Set up JDK
+      uses: actions/setup-java@v2
       with:
-        java-version: 1.8
+        distribution: 'zulu'
+        java-version: '11'
     - name: Setup versions
       uses: eskatos/gradle-command-action@v1
       with:
@@ -27,7 +28,7 @@ jobs:
     - name: Publish firebase-app
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
@@ -37,7 +38,7 @@ jobs:
     - name: Publish firebase-auth
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-auth:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-auth:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
@@ -47,7 +48,7 @@ jobs:
     - name: Publish firebase-common
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-common:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-common:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
@@ -57,7 +58,7 @@ jobs:
     - name: Publish firebase-database
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-database:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-database:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
@@ -67,7 +68,7 @@ jobs:
     - name: Publish firebase-firestore
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}
@@ -77,7 +78,7 @@ jobs:
     - name: Publish firebase-functions
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: :firebase-functions:publishAllPublicationsToGitHubPackagesRepository
+        arguments: :firebase-functions:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
       continue-on-error: true
       env:
         TOKEN: ${{ secrets.AUTO_TOKEN }}

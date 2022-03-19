@@ -30,6 +30,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
     actual suspend fun getIdToken(forceRefresh: Boolean): String? = rethrow { js.getIdToken(forceRefresh).await() }
+    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = rethrow { AuthTokenResult(js.getIdTokenResult(forceRefresh).await()) }
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow { AuthResult(js.linkWithCredential(credential.js).await()) }
     actual suspend fun reauthenticate(credential: AuthCredential) = rethrow {
         js.reauthenticateWithCredential(credential.js).await()
@@ -44,8 +45,8 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
         val request = object : firebase.user.ProfileUpdateRequest {
-            override val displayName: String? = displayName
-            override val photoURL: String? = photoUrl
+            override val displayName: String? = displayName ?: this@FirebaseUser.displayName
+            override val photoURL: String? = photoUrl ?: this@FirebaseUser.photoURL
         }
         js.updateProfile(request).await()
     }

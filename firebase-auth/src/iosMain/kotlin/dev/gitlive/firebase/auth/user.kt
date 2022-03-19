@@ -38,6 +38,9 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun getIdToken(forceRefresh: Boolean): String? =
         ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
 
+    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult =
+        AuthTokenResult(ios.awaitResult { getIDTokenResultForcingRefresh(forceRefresh, it) })
+
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult =
         AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })
 
@@ -63,8 +66,8 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = ios.profileChangeRequest().apply {
-            this.displayName = displayName
-            this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }
+            this.displayName = displayName ?: this.displayName
+            this.photoURL = (photoUrl ?: this.photoURL)?.let { NSURL.URLWithString(it) }
         }
         ios.await { request.commitChangesWithCompletion(it) }
     }

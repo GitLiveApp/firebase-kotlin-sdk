@@ -1,8 +1,8 @@
 {
-  "name": "@gitliveapp/firebase-firestore",
+  "name": "@gitliveapp/firebase-firestore-js-legacy",
   "version": "0",
 "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
-  "main": "firebase-firestore.js",
+  "main": "firebase-firestore-js-legacy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@gitliveapp/firebase-app": "0.5.4",
+    "@gitliveapp/firebase-app-js-legacy": "1.0.0",
     "firebase": "8.4.3",
-    "kotlin": "1.3.72",
-    "kotlinx-coroutines-core": "1.3.8"
+    "kotlin": "1.5.30",
+    "kotlinx-coroutines-core": "1.5.1"
   }
 }
 

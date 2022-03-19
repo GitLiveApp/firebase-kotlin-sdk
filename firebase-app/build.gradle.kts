@@ -1,26 +1,28 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
-version = project.property("firebase-app.version") as String
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.KonanTarget
+
+version = project.property("firebase-app.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
 }
 
 repositories {
-    mavenCentral()
     google()
-    jcenter()
+    mavenCentral()
 }
 
 android {
-    compileSdkVersion(property("targetSdkVersion") as Int)
+    compileSdk = property("targetSdkVersion") as Int
     defaultConfig {
-        minSdkVersion(property("minSdkVersion") as Int)
-        targetSdkVersion(property("targetSdkVersion") as Int)
+        minSdk = property("minSdkVersion") as Int
+        targetSdk = property("targetSdkVersion") as Int
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
@@ -33,90 +35,134 @@ android {
         }
     }
     packagingOptions {
-        pickFirst("META-INF/kotlinx-serialization-runtime.kotlin_module")
-        pickFirst("META-INF/AL2.0")
-        pickFirst("META-INF/LGPL2.1")
+        resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
+        resources.pickFirsts.add("META-INF/AL2.0")
+        resources.pickFirsts.add("META-INF/LGPL2.1")
     }
-    lintOptions {
+    lint {
         isAbortOnError = false
     }
 }
 
-kotlin {
-    js {
-        val main by compilations.getting {
-            kotlinOptions {
-                moduleKind = "umd"
-            }
-        }
-        nodejs()
-        browser()
+val KonanTarget.archVariant: String
+    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
+        "ios-arm64_i386_x86_64-simulator"
+    } else {
+        "ios-arm64_armv7"
     }
-//    js("reactnative") {
-//        val main by compilations.getting {
-//            kotlinOptions {
-//                moduleKind = "commonjs"
-//            }
-//        }
-//    }
+
+kotlin {
     android {
-        publishLibraryVariants("release", "debug")
+        publishLibraryVariants("release")
     }
     jvm {
         val main by compilations.getting {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "11"
             }
         }
     }
 
-    val iosArm64 = iosArm64()
-    val iosX64 = iosX64("ios") {
-        binaries {
-            getTest("DEBUG").apply {
-                linkerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                linkerOpts("-ObjC")
+    val supportIosTarget = project.property("skipIosTarget") != "true"
+    if (supportIosTarget) {
+
+        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+            val nativeFrameworkPaths = listOf(
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAnalytics",
+                    "FirebaseCore",
+                    "FirebaseCoreDiagnostics",
+                    "FirebaseInstallations",
+                    "GoogleAppMeasurement",
+                    "GoogleDataTransport",
+                    "GoogleUtilities",
+                    "nanopb",
+                    "PromisesObjC"
+                ).map {
+                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            )
+
+            binaries {
+                getTest("DEBUG").apply {
+                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    linkerOpts("-ObjC")
+                }
+            }
+
+            compilations.getByName("main") {
+                cinterops.create("FirebaseCore") {
+                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                    extraOpts("-verbose")
+                }
+            }
+        }
+
+        ios(configure = nativeTargetConfig())
+        iosSimulatorArm64(configure = nativeTargetConfig())
+    }
+
+    js {
+        useCommonJs()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
+            }
+        }
+        browser {
+            testTask {
+                useMocha {
+                    timeout = "5s"
+                }
             }
         }
     }
 
     sourceSets {
+        all {
+            languageSettings.apply {
+                apiVersion = "1.5"
+                languageVersion = "1.5"
+                progressiveMode = true
+            }
+        }
+
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-common"))
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
+
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common:19.3.1")
+                api("com.google.firebase:firebase-common-ktx")
             }
         }
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 
-        configure(listOf(iosArm64, iosX64)) {
-            compilations.getByName("main") {
-                source(sourceSets.get("iosMain"))
-                val firebasecore by cinterops.creating {
-                    packageName("cocoapods.FirebaseCore")
-                    defFile(file("$projectDir/src/iosMain/c_interop/FirebaseCore.def"))
-                    compilerOpts("-F$projectDir/src/iosMain/c_interop/Carthage/Build/iOS/")
-                }
-            }
+        if (supportIosTarget) {
+            val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
+
+            val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by sourceSets.getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        cocoapods {
-            summary = ""
-            homepage = ""
-            //pod("FirebaseCore", "~> 6.3.1")
-        }
+        val jsMain by getting
+    }
+}
+
+if (project.property("firebase-app.skipIosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

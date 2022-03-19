@@ -53,6 +53,8 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) =
         rethrow { js.sendSignInLinkToEmail(email, actionCodeSettings.toJson()).await() }
 
+    actual fun isSignInWithEmailLink(link: String) = rethrow { js.isSignInWithEmailLink(link) }
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
 
@@ -64,6 +66,9 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
+
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        rethrow { AuthResult(js.signInWithEmailLink(email, link).await()) }
 
     actual suspend fun signOut() = rethrow { js.signOut().await() }
 
@@ -92,6 +97,8 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
             else -> throw UnsupportedOperationException(result.operation)
         } as T
     }
+
+    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator("http://$host:$port") }
 }
 
 actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
@@ -99,7 +106,25 @@ actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
 
+actual class AuthTokenResult(val js: firebase.auth.IdTokenResult) {
+//    actual val authTimestamp: Long
+//        get() = js.authTime
+    actual val claims: Map<String, Any>
+        get() = (js("Object").keys(js.claims) as Array<String>).mapNotNull {
+                key -> js.claims[key]?.let { key to it }
+        }.toMap()
+//    actual val expirationTimestamp: Long
+//        get() = android.expirationTime
+//    actual val issuedAtTimestamp: Long
+//        get() = js.issuedAtTime
+    actual val signInProvider: String?
+        get() = js.signInProvider
+    actual val token: String?
+        get() = js.token
+}
+
 internal fun ActionCodeSettings.toJson() = json(
+    "url" to url,
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
     "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
     "handleCodeInApp" to canHandleCodeInApp,
@@ -119,7 +144,7 @@ actual open class FirebaseAuthWebException(code: String?, cause: Throwable): Fir
 
 internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.auth.rethrow { function() }
 
-internal inline fun <R> rethrow(function: () -> R): R {
+private inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
@@ -129,7 +154,7 @@ internal inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-private fun errorToException(cause: dynamic) = when(val code = cause.code?.toString()?.toLowerCase()) {
+private fun errorToException(cause: dynamic) = when(val code = cause.code?.toString()?.lowercase()) {
     "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause)
     "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause)
@@ -144,6 +169,7 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use" -> FirebaseAuthMultiFactorException(code, cause)
     "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
+    "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/invalid-email" -> FirebaseAuthEmailException(code, cause)
 
 //                "auth/app-deleted" ->

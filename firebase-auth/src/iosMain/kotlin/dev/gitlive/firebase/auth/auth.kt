@@ -58,6 +58,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
 
+    actual fun isSignInWithEmailLink(link: String) = ios.isSignInWithEmailLink(link)
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
@@ -69,6 +71,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
 
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
@@ -89,11 +94,28 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }
+
+    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
 actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
     actual val user: FirebaseUser?
         get() = FirebaseUser(ios.user)
+}
+
+actual class AuthTokenResult(val ios: FIRAuthTokenResult) {
+//    actual val authTimestamp: Long
+//        get() = ios.authDate
+    actual val claims: Map<String, Any>
+        get() = ios.claims.map { it.key.toString() to it.value as Any }.toMap()
+//    actual val expirationTimestamp: Long
+//        get() = ios.expirationDate
+//    actual val issuedAtTimestamp: Long
+//        get() = ios.issuedAtDate
+    actual val signInProvider: String?
+        get() = ios.signInProvider
+    actual val token: String?
+        get() = ios.token
 }
 
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
@@ -155,8 +177,7 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidActionCode,
         FIRAuthErrorCodeExpiredActionCode -> FirebaseAuthActionCodeException(toString())
 
-        FIRAuthErrorCodeInvalidEmail,
-        FIRAuthErrorCodeEmailAlreadyInUse -> FirebaseAuthEmailException(toString())
+        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(toString())
 
         FIRAuthErrorCodeCaptchaCheckFailed,
         FIRAuthErrorCodeInvalidPhoneNumber,

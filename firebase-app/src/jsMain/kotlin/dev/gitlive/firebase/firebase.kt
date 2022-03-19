@@ -26,7 +26,7 @@ actual class FirebaseApp internal constructor(val js: firebase.App) {
         get() = js.name
     actual val options: FirebaseOptions
         get() = js.options.run {
-            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId)
+            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
 }
 
@@ -34,12 +34,13 @@ actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
 
 private fun FirebaseOptions.toJson() = json(
     "apiKey" to apiKey,
-    "applicationId" to applicationId,
+    "appId" to applicationId,
     "databaseURL" to (databaseUrl ?: undefined),
     "storageBucket" to (storageBucket ?: undefined),
     "projectId" to (projectId ?: undefined),
     "gaTrackingId" to (gaTrackingId ?: undefined),
-    "messagingSenderId" to (gcmSenderId ?: undefined)
+    "messagingSenderId" to (gcmSenderId ?: undefined),
+    "authDomain" to (authDomain ?: undefined)
 )
 
 actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)

@@ -1,31 +1,28 @@
-import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.3.72" apply false
-    id("de.undercouch.download").version("3.4.3")
+    kotlin("multiplatform") version "1.5.30" apply false
     id("base")
 }
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
         gradlePluginPortal()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.1")
-        classpath("de.undercouch:gradle-download-task:4.0.4")
-        classpath("com.adarshr:gradle-test-logger-plugin:2.0.0")
+        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
-val targetSdkVersion by extra(28)
+val targetSdkVersion by extra(30)
 val minSdkVersion by extra(16)
 
 tasks {
@@ -36,7 +33,8 @@ tasks {
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
-            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion"
+            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
+            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
         )
     }
 }
@@ -49,8 +47,8 @@ subprojects {
 
     repositories {
         mavenLocal()
-        mavenCentral()
         google()
+        mavenCentral()
         jcenter()
         maven {
             name = "github"
@@ -62,9 +60,18 @@ subprojects {
         }
     }
 
-
     tasks.withType<Sign>().configureEach {
-        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
+        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") && !project.gradle.startParameter.taskNames.contains("publishToGitHubPackagesRepository") }
+    }
+
+    tasks.whenTaskAdded {
+        enabled = when(name) {
+            "compileDebugUnitTestKotlinAndroid" -> false
+            "compileReleaseUnitTestKotlinAndroid" -> false
+            "testDebugUnitTest" -> false
+            "testReleaseUnitTest" -> false
+            else -> enabled
+        }
     }
 
     tasks {
@@ -78,8 +85,8 @@ subprojects {
             val from = file("package.json")
             from.writeText(
                 from.readText()
-                    .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
-                    .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
+                    .replace("firebase-common-js-legacy\": \"([^\"]+)".toRegex(), "firebase-common-js-legacy\": \"${project.property("firebase-common.version")}")
+                    .replace("firebase-app-js-legacy\": \"([^\"]+)".toRegex(), "firebase-app-js-legacy\": \"${project.property("firebase-app.version")}")
             )
         }
 
@@ -94,7 +101,8 @@ subprojects {
         }
 
         val unzipJar by registering(Copy::class) {
-            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
+            val version = project.property("${project.name}.version")
+            val zipFile = File("$buildDir/libs", "${project.name}-jslegacy-$version.jar")
             from(this.project.zipTree(zipFile))
             into("$buildDir/classes/kotlin/js/main/")
         }
@@ -102,8 +110,8 @@ subprojects {
         val copyJS by registering {
             mustRunAfter("unzipJar", "copyPackageJson")
             doLast {
-                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
-                val into = File("$buildDir/node_module/${project.name}.js")
+                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}-js-legacy.js")
+                val into = File("$buildDir/node_module/${project.name}-js-legacy.js")
                 into.createNewFile()
                 into.writeText(
                     from.readText()
@@ -117,8 +125,8 @@ subprojects {
         }
 
         val copySourceMap by registering(Copy::class) {
-            from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
-            into(file("$buildDir/node_module"))
+            from(file("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}-js-legacy.js.map"))
+            into(file("$buildDir/node_module//${project.name}-js-legacy.js.map"))
         }
 
         val prepareForNpmPublish by registering {
@@ -159,16 +167,18 @@ subprojects {
             }
         }
 
-        listOf("bootstrap", "update").forEach {
-            task<Exec>("carthage${it.capitalize()}") {
-                group = "carthage"
-                executable = "carthage"
-                args(
-                    it,
-                    "--project-directory", "src/iosMain/c_interop",
-                    "--platform", "iOS",
-                    "--cache-builds"
-                )
+        if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
+            listOf("bootstrap", "update").forEach {
+                task<Exec>("carthage${it.capitalize()}") {
+                    group = "carthage"
+                    executable = "carthage"
+                    args(
+                        it,
+                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
+                        "--platform", "iOS",
+                        "--cache-builds"
+                    )
+                }
             }
         }
 
@@ -180,18 +190,12 @@ subprojects {
 
         create("carthageClean", Delete::class.java) {
             group = "carthage"
-            delete(File("$projectDir/src/iosMain/c_interop/Carthage"))
-            delete(File("$projectDir/src/iosMain/c_interop/Cartfile.resolved"))
+            delete(
+                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
+                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
+            )
         }
     }
-
-//    tasks.withType<KotlinCompile<*>> {
-//        kotlinOptions.freeCompilerArgs += listOf(
-//            "-Xuse-experimental=kotlin.Experimental",
-//            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-//            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-//        )
-//    }
 
     afterEvaluate  {
         // create the projects node_modules if they don't exist
@@ -204,34 +208,21 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainImplementation"(kotlin("stdlib-jdk8"))
-            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.2")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.8") {
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.6")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1") {
                 exclude("com.google.android.gms")
             }
-            "commonMainImplementation"(kotlin("stdlib-common"))
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
-            "jsMainImplementation"(kotlin("stdlib-js"))
-            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.8")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.8")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.8")
-            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
-            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.8")
-            "commonTestImplementation"(kotlin("test-common"))
-            "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.8")
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.8")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.1")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13")
-            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
-            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.8")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
+            "androidAndroidTestImplementation"("junit:junit:4.13.2")
+            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
         }
-
-
     }
 
     apply(plugin="maven-publish")
@@ -300,11 +291,7 @@ subprojects {
                         comments.set("A business-friendly OSS license")
                     }
                 }
-
             }
         }
-
     }
-
 }
-
