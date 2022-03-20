@@ -10,8 +10,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
-actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder =
-    when(descriptor.kind) {
+actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder = when(descriptor.kind) {
         StructureKind.LIST -> mutableListOf<Any?>()
             .also { value = it }
             .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it.add(index, value) } }
