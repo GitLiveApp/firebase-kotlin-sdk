@@ -15,7 +15,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, decode
         StructureKind.CLASS, StructureKind.OBJECT, PolymorphicKind.SEALED -> (value as Map<*, *>).let { map ->
             FirebaseClassDecoder(decodeDouble, map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
         }
-        StructureKind.LIST, PolymorphicKind.SEALED-> (value as List<*>).let {
+        StructureKind.LIST -> (value as List<*>).let {
             FirebaseCompositeDecoder(decodeDouble, it.size) { _, index -> it[index] }
         }
         StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
