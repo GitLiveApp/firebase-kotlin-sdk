@@ -48,7 +48,6 @@ class EncodersTest {
     @Test
     fun encodeSealedClass() {
         val encoded = encode<TestSealed>(TestSealed.serializer(), TestSealed.ChildClass(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
-        println(encoded.toString())
         nativeAssertEquals(nativeMapOf("type" to "child", "value" to nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true)), encoded)
     }
 
