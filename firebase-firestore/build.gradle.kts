@@ -10,7 +10,7 @@ version = project.property("firebase-firestore.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.5.32"
 }
 
 android {
