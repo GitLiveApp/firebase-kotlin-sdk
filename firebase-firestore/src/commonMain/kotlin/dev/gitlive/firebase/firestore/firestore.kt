@@ -67,6 +67,8 @@ expect open class Query {
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
+
+    internal fun _startAfter(document: DocumentSnapshot): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -80,6 +82,8 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
+
+fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
@@ -105,6 +109,7 @@ expect class DocumentReference {
     val id: String
     val path: String
     val snapshots: Flow<DocumentSnapshot>
+    val parent: CollectionReference
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
@@ -129,6 +134,7 @@ expect class DocumentReference {
 expect class CollectionReference : Query {
     val path: String
     val document: DocumentReference
+    val parent: DocumentReference?
 
     fun document(documentPath: String): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
@@ -195,8 +201,6 @@ expect class DocumentSnapshot {
 
     inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
     fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
-
-    fun dataMap(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Map<String, Any?>
 
     val exists: Boolean
     val id: String

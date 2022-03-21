@@ -214,6 +214,9 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual val path: String
         get() = rethrow { js.path }
 
+    actual val parent: CollectionReference
+        get() = rethrow { CollectionReference(js.parent) }
+
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -329,6 +332,10 @@ actual open class Query(open val js: firebase.firestore.Query) {
         Query(js.orderBy(field.js, direction.jsString))
     }
 
+    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow {
+        Query(js.startAfter(document.js))
+    }
+
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
@@ -346,6 +353,8 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
         get() =  rethrow { js.path }
 
     actual val document get() = rethrow { DocumentReference(js.doc()) }
+
+    actual val parent get() = rethrow { js.parent?.let{DocumentReference(it)} }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
@@ -392,9 +401,6 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
 
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
         rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior))) }
-
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        rethrow { mapOf(js.data(getTimestampsOptions(serverTimestampBehavior)).asDynamic()) }
 
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior) =
         rethrow { decode<T>(value = js.get(field, getTimestampsOptions(serverTimestampBehavior))) }

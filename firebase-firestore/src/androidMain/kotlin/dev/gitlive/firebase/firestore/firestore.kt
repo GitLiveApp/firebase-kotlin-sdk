@@ -227,6 +227,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(android.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
@@ -354,6 +357,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
@@ -366,6 +371,9 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual val document: DocumentReference
         get() = DocumentReference(android.document())
+
+    actual val parent: DocumentReference?
+        get() = android.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
@@ -414,9 +422,6 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
 
     actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(strategy, android.getData(serverTimestampBehavior.toAndroid()))
-
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        android.getData(serverTimestampBehavior.toAndroid()) ?: emptyMap()
 
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(value = android.get(field, serverTimestampBehavior.toAndroid()))

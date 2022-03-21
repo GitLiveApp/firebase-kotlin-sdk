@@ -160,7 +160,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.NONE))
-        assertNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.NONE)["time"])
     }
 
     @Test
@@ -181,7 +180,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.ESTIMATE))
-        assertNotNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.ESTIMATE)["time"])
         assertNotEquals(0.0, pendingWritesSnapshot.data(FirestoreTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
@@ -203,7 +201,6 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNull(pendingWritesSnapshot.get<Double?>("time", ServerTimestampBehavior.PREVIOUS))
-        assertNull(pendingWritesSnapshot.dataMap(ServerTimestampBehavior.PREVIOUS)["time"])
     }
 
     @Test
@@ -224,20 +221,22 @@ class FirebaseFirestoreTest {
     }
 
     @Test
-    fun testDataMap() = runTest {
-        val doc = Firebase.firestore
-            .collection("testDataMap")
-            .document
+    fun testStartAfterDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("FirebaseFirestoreTest")
+            .orderBy("prop1", Direction.ASCENDING)
 
-        doc.set(FirestoreTest.serializer(), FirestoreTest("dataMap", 123.45))
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
 
-        val resultDoc = Firebase.firestore
-            .collection("testDataMap")
-            .document(doc.id)
-            .get()
-
-        assertEquals(true, resultDoc.exists)
-        assertEquals(mapOf("prop1" to "dataMap", "time" to 123.45), resultDoc.dataMap())
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+        val secondPage = query.startAfter(lastDocumentSnapshot).limit(2).get().documents // Second 2 results (only one left)
+        assertEquals(1, secondPage.size)
+        assertEquals("ccc", secondPage[0].get("prop1"))
     }
 
     private suspend fun setupFirestoreData() {

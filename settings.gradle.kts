@@ -1,11 +1,12 @@
 include(
-    "firebase-common",
     "firebase-app",
-    "firebase-firestore",
-    "firebase-database",
     "firebase-auth",
+    "firebase-common",
+    "firebase-config",
+    "firebase-database",
+    "firebase-firestore",
     "firebase-functions",
-    "firebase-config"
+    "firebase-installations"
 )
 
 //enableFeaturePreview("GRADLE_METADATA")

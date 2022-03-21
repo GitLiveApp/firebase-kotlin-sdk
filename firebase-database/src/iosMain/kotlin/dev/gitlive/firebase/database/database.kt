@@ -51,6 +51,9 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
     actual fun reference(path: String) =
         DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
 
+    actual fun reference() =
+        DatabaseReference(ios.reference(), ios.persistenceEnabled)
+
     actual fun setPersistenceEnabled(enabled: Boolean) {
         ios.persistenceEnabled = enabled
     }

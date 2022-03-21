@@ -174,6 +174,9 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
     actual val path: String
         get() = ios.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(ios.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
@@ -270,8 +273,9 @@ actual open class Query(open val ios: FIRQuery) {
     )
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
-
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios))
 
 }
 @Suppress("UNCHECKED_CAST")
@@ -281,6 +285,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
         get() = ios.path
 
     actual val document get() = DocumentReference(ios.documentWithAutoID())
+
+    actual val parent get() = ios.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
@@ -387,12 +393,6 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
         val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
         return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
     }
-
-    actual fun dataMap(serverTimestampBehavior: ServerTimestampBehavior): Map<String, Any?> =
-        ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-            ?.map { (key, value) -> key.toString() to value?.takeIf { it !is NSNull } }
-            ?.toMap()
-            ?: emptyMap()
 
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
         val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
