@@ -26,6 +26,6 @@
     "@gitlive/firebase-common": "1.4.3",
     "firebase": "9.4.1",
     "kotlin": "1.5.31",
-    "kotlinx-coroutines-core": "1.5.2"
+    "kotlinx-coroutines-core": "1.5.2-native-mt"
   }
 }
