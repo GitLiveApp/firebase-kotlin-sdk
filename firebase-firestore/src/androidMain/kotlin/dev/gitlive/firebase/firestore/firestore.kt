@@ -300,7 +300,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
             snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
-        awaitClose { listener.remove() }
+        awaitClose { listener.remove(); close() }
     }
 }
 
@@ -315,7 +315,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
             snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
-        awaitClose { listener.remove() }
+        awaitClose { listener.remove(); close() }
     }
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))

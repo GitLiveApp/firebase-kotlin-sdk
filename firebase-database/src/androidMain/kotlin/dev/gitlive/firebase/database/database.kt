@@ -14,7 +14,6 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.safeOffer
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -121,7 +120,7 @@ actual open class Query internal constructor(
             }
         }
         android.addValueEventListener(listener)
-        awaitClose { android.removeEventListener(listener) }
+        awaitClose { android.removeEventListener(listener); close() }
     }
 
     actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
@@ -152,7 +151,7 @@ actual open class Query internal constructor(
             }
         }
         android.addChildEventListener(listener)
-        awaitClose { android.removeEventListener(listener) }
+        awaitClose { android.removeEventListener(listener); close() }
     }
 
     override fun toString() = android.toString()

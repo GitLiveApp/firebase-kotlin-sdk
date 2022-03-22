@@ -216,7 +216,7 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
             snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
-        awaitClose { listener.remove() }
+        awaitClose { listener.remove(); close() }
     }
 }
 
@@ -231,7 +231,7 @@ actual open class Query(open val ios: FIRQuery) {
             snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
-        awaitClose { listener.remove() }
+        awaitClose { listener.remove(); close() }
     }
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(ios.queryWhereField(field, isEqualTo = equalTo!!))

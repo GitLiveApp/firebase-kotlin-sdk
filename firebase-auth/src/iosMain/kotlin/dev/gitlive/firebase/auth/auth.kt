@@ -30,12 +30,12 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
         val handle = ios.addAuthStateDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
-        awaitClose { ios.removeAuthStateDidChangeListener(handle) }
+        awaitClose { ios.removeAuthStateDidChangeListener(handle); close() }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
         val handle = ios.addIDTokenDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
-        awaitClose { ios.removeIDTokenDidChangeListener(handle) }
+        awaitClose { ios.removeIDTokenDidChangeListener(handle); close() }
     }
 
     actual var languageCode: String

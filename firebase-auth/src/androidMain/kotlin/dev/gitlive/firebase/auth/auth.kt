@@ -34,7 +34,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
             }
         }
         android.addAuthStateListener(listener)
-        awaitClose { android.removeAuthStateListener(listener) }
+        awaitClose { android.removeAuthStateListener(listener); close() }
     }
 
     actual val idTokenChanged get(): Flow<FirebaseUser?> = callbackFlow {
@@ -44,7 +44,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
             }
         }
         android.addIdTokenListener(listener)
-        awaitClose { android.removeIdTokenListener(listener) }
+        awaitClose { android.removeIdTokenListener(listener); close() }
     }
 
     actual var languageCode: String

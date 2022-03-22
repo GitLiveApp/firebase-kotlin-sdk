@@ -108,7 +108,7 @@ actual open class Query internal constructor(
                 safeOffer(DataSnapshot(snapShot!!, persistenceEnabled))
             }
         ) { close(DatabaseException(it.toString(), null)) }
-        awaitClose { ios.removeObserverWithHandle(handle) }
+        awaitClose { ios.removeObserverWithHandle(handle); close() }
     }
 
     actual fun childEvents(vararg types: Type) = callbackFlow<ChildEvent> {
@@ -122,6 +122,7 @@ actual open class Query internal constructor(
         }
         awaitClose {
             handles.forEach { ios.removeObserverWithHandle(it) }
+            close()
         }
     }
 

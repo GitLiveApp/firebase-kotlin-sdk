@@ -273,7 +273,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
             { safeOffer(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
-        awaitClose { unsubscribe() }
+        awaitClose { unsubscribe(); close() }
     }
 }
 
@@ -336,7 +336,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
                 { close(errorToException(it)) }
             )
         }
-        awaitClose { rethrow { unsubscribe() } }
+        awaitClose { rethrow { unsubscribe() }; close() }
     }
 }
 
