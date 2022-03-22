@@ -10,8 +10,10 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
-    .getOrElse {
+inline fun <reified T: Any> T.firebaseSerializer() =
+    try {
+        serializer<T>()
+    } catch (err: Throwable) {
         when(this) {
             is Map<*, *> -> FirebaseMapSerializer()
             is List<*> -> FirebaseListSerializer()
