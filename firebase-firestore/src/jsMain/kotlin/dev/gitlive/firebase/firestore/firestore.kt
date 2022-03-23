@@ -270,7 +270,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val unsubscribe = js.onSnapshot(
-            { safeOffer(DocumentSnapshot(it)) },
+            { trySend(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
@@ -332,7 +332,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
-                { safeOffer(QuerySnapshot(it)) },
+                { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
         }
