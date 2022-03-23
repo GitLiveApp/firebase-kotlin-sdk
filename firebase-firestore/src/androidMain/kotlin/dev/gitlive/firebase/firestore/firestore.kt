@@ -297,7 +297,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -312,7 +312,7 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
