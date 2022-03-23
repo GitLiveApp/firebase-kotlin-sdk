@@ -34,7 +34,7 @@ class database {
                         gcmSenderId = "846484016111"
                     )
                 )
-                Firebase.database.useEmulator(emulatorHost, 8080)
+                Firebase.database.useEmulator(emulatorHost, 9000)
             }
     }
 
