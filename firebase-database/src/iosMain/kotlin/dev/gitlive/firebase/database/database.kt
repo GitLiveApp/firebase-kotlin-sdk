@@ -122,7 +122,6 @@ actual open class Query internal constructor(
         }
         awaitClose {
             handles.forEach { ios.removeObserverWithHandle(it) }
-            close()
         }
     }
 
