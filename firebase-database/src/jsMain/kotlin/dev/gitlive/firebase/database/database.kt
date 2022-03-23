@@ -56,7 +56,7 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
                 { close(DatabaseException(it)).run { Unit } }
             )
         }
-        awaitClose { rethrow { js.off("value", listener) }; close() }
+        awaitClose { rethrow { js.off("value", listener) } }
     }
 
     actual fun childEvents(vararg types: ChildEvent.Type) = callbackFlow<ChildEvent> {
@@ -79,7 +79,7 @@ actual open class Query internal constructor(open val js: firebase.database.Quer
                 }
             }
         }
-        awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } }; close() }
+        awaitClose { rethrow { listeners.forEach { (eventType, listener) -> js.off(eventType, listener) } } }
     }
 
     actual fun startAt(value: String, key: String?) = Query(js.startAt(value, key ?: undefined))

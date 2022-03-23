@@ -25,14 +25,14 @@ actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
         val unsubscribe = js.onAuthStateChanged {
             safeOffer(it?.let { FirebaseUser(it) })
         }
-        awaitClose { unsubscribe(); close() }
+        awaitClose { unsubscribe() }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
         val unsubscribe = js.onIdTokenChanged {
             safeOffer(it?.let { FirebaseUser(it) })
         }
-        awaitClose { unsubscribe(); close() }
+        awaitClose { unsubscribe() }
     }
 
     actual var languageCode: String

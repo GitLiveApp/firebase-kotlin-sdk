@@ -120,7 +120,7 @@ actual open class Query internal constructor(
             }
         }
         android.addValueEventListener(listener)
-        awaitClose { android.removeEventListener(listener); close() }
+        awaitClose { android.removeEventListener(listener) }
     }
 
     actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
@@ -151,7 +151,7 @@ actual open class Query internal constructor(
             }
         }
         android.addChildEventListener(listener)
-        awaitClose { android.removeEventListener(listener); close() }
+        awaitClose { android.removeEventListener(listener) }
     }
 
     override fun toString() = android.toString()
