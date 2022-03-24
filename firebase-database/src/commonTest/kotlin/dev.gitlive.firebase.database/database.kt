@@ -15,6 +15,9 @@ expect fun runTest(test: suspend () -> Unit)
 
 class database {
 
+    @Serializable
+    data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
+
     @BeforeTest
     fun initializeFirebase() {
         Firebase
@@ -31,7 +34,7 @@ class database {
                         gcmSenderId = "846484016111"
                     )
                 )
-                Firebase.database.useEmulator(emulatorHost, 8080)
+                Firebase.database.useEmulator(emulatorHost, 9000)
             }
     }
 
@@ -48,5 +51,30 @@ class database {
             .value<String>()
 
         assertEquals(testValue, testReferenceValue)
+    }
+    
+    @Test
+    fun testChildCount() = runTest {
+        setupRealtimeData()
+        val dataSnapshot = Firebase.database
+            .reference("FirebaseRealtimeDatabaseTest")
+            .valueEvents
+            .first()
+
+        val firebaseDatabaseChildCount = dataSnapshot.children.count()
+        assertEquals(3, firebaseDatabaseChildCount)
+    }
+
+    private suspend fun setupRealtimeData() {
+        val firebaseDatabaseTestReference = Firebase.database
+            .reference("FirebaseRealtimeDatabaseTest")
+
+        val firebaseDatabaseChildTest1 = FirebaseDatabaseChildTest("aaa")
+        val firebaseDatabaseChildTest2 = FirebaseDatabaseChildTest("bbb")
+        val firebaseDatabaseChildTest3 = FirebaseDatabaseChildTest("ccc")
+
+        firebaseDatabaseTestReference.child("1").setValue(firebaseDatabaseChildTest1)
+        firebaseDatabaseTestReference.child("2").setValue(firebaseDatabaseChildTest2)
+        firebaseDatabaseTestReference.child("3").setValue(firebaseDatabaseChildTest3)
     }
 }
