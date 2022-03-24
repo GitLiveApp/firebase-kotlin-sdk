@@ -10,7 +10,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.js.json
 
-actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder = when(descriptor.kind) {
+actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> Array<Any?>(descriptor.elementsCount) { null }
         .also { value = it }
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[index] = value } }
@@ -22,7 +22,14 @@ actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): Compo
     }
     StructureKind.CLASS,  StructureKind.OBJECT, PolymorphicKind.SEALED -> json()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[descriptor.getElementName(index)] = value } }
+        .let { FirebaseCompositeEncoder(
+            shouldEncodeElementDefault,
+            positiveInfinity,
+            setPolymorphicType = { discriminator, type ->
+                it[discriminator] = type
+            },
+            set = { _, index, value -> it[descriptor.getElementName(index)] = value }
+        ) }
     else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
 

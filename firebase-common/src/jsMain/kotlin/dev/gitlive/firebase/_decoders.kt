@@ -25,3 +25,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, decode
     }
     else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
+
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+actual fun getPolymorphicType(value: Any?, discriminator: String): String =
+    (value as Json)[discriminator] as String

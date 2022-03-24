@@ -7,6 +7,7 @@ package dev.gitlive.firebase
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -48,7 +49,7 @@ class EncodersTest {
     @Test
     fun encodeSealedClass() {
         val encoded = encode<TestSealed>(TestSealed.serializer(), TestSealed.ChildClass(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
-        nativeAssertEquals(nativeMapOf("type" to "child", "value" to nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true)), encoded)
+        nativeAssertEquals(nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
     }
 
     @Test
@@ -71,7 +72,7 @@ class EncodersTest {
 
     @Test
     fun decodeSealedClass() {
-        val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "value" to nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true)))
+        val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true))
         assertEquals(TestSealed.ChildClass(mapOf("key" to "value"), true), decoded)
     }
 }
