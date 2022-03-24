@@ -7,7 +7,6 @@ package dev.gitlive.firebase
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.JsonClassDiscriminator
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
