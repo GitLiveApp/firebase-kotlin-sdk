@@ -1,3 +1,4 @@
+<<<<<<< ours
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -6,6 +7,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-auth.version") as String
+=======
+version = "0.2.7"
+>>>>>>> theirs
 
 plugins {
     id("com.android.library")
@@ -130,6 +134,7 @@ kotlin {
         ios(configure = nativeTargetConfig())
         iosSimulatorArm64(configure = nativeTargetConfig())
     }
+<<<<<<< ours
 
     js {
         useCommonJs()
@@ -147,6 +152,21 @@ kotlin {
                 }
             }
         }
+=======
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+>>>>>>> theirs
     }
 
     sourceSets {
@@ -170,6 +190,9 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-auth")
             }
+        }
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

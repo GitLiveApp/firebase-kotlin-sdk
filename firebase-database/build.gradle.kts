@@ -1,3 +1,4 @@
+<<<<<<< ours
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -6,6 +7,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-database.version") as String
+=======
+version = "0.2.7"
+>>>>>>> theirs
 
 plugins {
     id("com.android.library")
@@ -106,6 +110,7 @@ kotlin {
         ios(configure = nativeTargetConfig())
         iosSimulatorArm64(configure = nativeTargetConfig())
     }
+<<<<<<< ours
 
     js {
         useCommonJs()
@@ -123,6 +128,24 @@ kotlin {
                 }
             }
         }
+=======
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+    val iosArm64 = iosArm64()
+    val iosX64 = iosX64("ios")
+
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+>>>>>>> theirs
     }
 
     sourceSets {
@@ -149,6 +172,14 @@ kotlin {
                 api("com.google.firebase:firebase-database")
             }
         }
+<<<<<<< ours
+=======
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val jsMain by getting {}
+        val iosMain by getting {}
+>>>>>>> theirs
 
         if (supportIosTarget) {
             val iosMain by getting

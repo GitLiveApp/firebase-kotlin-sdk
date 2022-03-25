@@ -2,6 +2,10 @@
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
+<<<<<<< ours
+=======
+version = "0.2.7"
+>>>>>>> theirs
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -92,6 +96,13 @@ android {
         ios(configure = nativeTargetConfig())
         iosSimulatorArm64(configure = nativeTargetConfig())
     }
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     js {
         useCommonJs()
@@ -130,6 +141,9 @@ android {
             dependencies {
                 api("com.google.firebase:firebase-common")
             }
+        }
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

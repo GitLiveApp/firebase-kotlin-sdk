@@ -3,9 +3,14 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
+<<<<<<< ours
 
     kotlin("multiplatform") version "1.5.31" apply false
 
+=======
+    kotlin("multiplatform") version "1.3.72" apply false
+    id("de.undercouch.download").version("3.4.3")
+>>>>>>> theirs
     id("base")
 }
 
@@ -55,6 +60,19 @@ subprojects {
     repositories {
         mavenLocal()
         google()
+<<<<<<< ours
+=======
+        jcenter()
+        maven {
+            name = "github"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+>>>>>>> theirs
 
         mavenCentral()
 
@@ -114,8 +132,7 @@ subprojects {
                 into.createNewFile()
                 into.writeText(
                     from.readText()
-                        .replace("require('firebase-kotlin-sdk-", "require('@gitlive/")
-                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+                        .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/")
                 )
             }
         }
@@ -203,6 +220,7 @@ subprojects {
         }
 
         dependencies {
+<<<<<<< ours
 
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
@@ -218,12 +236,42 @@ subprojects {
 
             "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:${project.property("coroutines.version")}")
 
+=======
+            "jvmMainImplementation"(kotlin("stdlib-jdk8"))
+            "jvmMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.3")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.7") {
+                exclude("com.google.android.gms")
+            }
+            "commonMainImplementation"(kotlin("stdlib-common"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.7")
+            "jsMainImplementation"(kotlin("stdlib-js"))
+            "jsMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.7")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.7")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.7")
+            "iosMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.7")
+            "commonTestImplementation"(kotlin("test-common"))
+            "commonTestImplementation"(kotlin("test-annotations-common"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.7")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7")
+            "jsTestImplementation"(kotlin("test-js"))
+            "androidAndroidTestImplementation"(kotlin("test-junit"))
+            "androidAndroidTestImplementation"("junit:junit:4.12")
+            "androidAndroidTestImplementation"("androidx.test:core:1.2.0")
+            "androidAndroidTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7")
+            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.1")
+            "androidAndroidTestImplementation"("androidx.test:runner:1.2.0")
+>>>>>>> theirs
         }
     }
 
     apply(plugin="maven-publish")
     apply(plugin="signing")
 
+    val javadocJar by tasks.creating(Jar::class) {
+        archiveClassifier.value("javadoc")
+    }
 
     configure<PublishingExtension> {
 
@@ -235,16 +283,26 @@ subprojects {
                     password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
                 }
             }
+            maven {
+                name = "GitHubPackages"
+                url  = uri("https://maven.pkg.github.com/gitliveapp/packages")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                }
+            }
         }
 
-        publications.all {
-            this as MavenPublication
+            publications.all {
+                this as MavenPublication
 
-            pom {
-                name.set("firebase-kotlin-sdk")
-                description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
-                url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
-                inceptionYear.set("2019")
+                artifact(javadocJar)
+
+                pom {
+                    name.set("firebase-kotlin-sdk")
+                    description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
+                    url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+                    inceptionYear.set("2019")
 
                 scm {
                     url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")

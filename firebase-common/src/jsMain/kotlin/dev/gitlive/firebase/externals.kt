@@ -365,11 +365,15 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
+<<<<<<< ours
         open class Timestamp {
             val seconds: Double
             val nanoseconds: Double
             fun toMillis(): Double
         }
+=======
+        open class FieldPath constructor(vararg fieldNames: String)
+>>>>>>> theirs
 
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>

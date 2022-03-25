@@ -2,9 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+<<<<<<< ours
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 version = project.property("firebase-common.version") as String
+=======
+version = "0.2.8"
+>>>>>>> theirs
 
 plugins {
     id("com.android.library")
@@ -13,7 +17,11 @@ plugins {
     kotlin("plugin.serialization") version "1.5.31"
 =======
     kotlin("native.cocoapods")
+<<<<<<< ours
     kotlin("plugin.serialization") version "1.6.0"
+>>>>>>> theirs
+=======
+    kotlin("plugin.serialization") version "1.3.72"
 >>>>>>> theirs
 }
 
@@ -64,6 +72,7 @@ kotlin {
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
+<<<<<<< ours
     if (supportIosTarget) {
         ios()
         iosSimulatorArm64()
@@ -85,6 +94,27 @@ kotlin {
                 }
             }
         }
+=======
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+        )
+>>>>>>> theirs
     }
 
     sourceSets {
@@ -121,8 +151,24 @@ kotlin {
             val iosSimulatorArm64Test by sourceSets.getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
+<<<<<<< ours
 
         val jsMain by getting {
+=======
+        val jvmMain by getting {
+            dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+            }
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidTest/kotlin")
+        }
+        val iosMain by getting {
+>>>>>>> theirs
             dependencies {
                 api(npm("firebase", "9.4.1"))
             }

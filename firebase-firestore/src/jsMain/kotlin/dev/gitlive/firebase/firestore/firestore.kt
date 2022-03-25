@@ -407,10 +407,14 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
         json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
 
+<<<<<<< ours
 actual class SnapshotMetadata(val js: firebase.firestore.SnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
     actual val isFromCache: Boolean get() = js.fromCache
 }
+=======
+actual fun FieldPath(vararg fieldNames: String): FieldPath = rethrow { firebase.firestore.FieldPath(*fieldNames) }
+>>>>>>> theirs
 
 actual class FieldPath private constructor(val js: firebase.firestore.FieldPath) {
     actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
