@@ -124,8 +124,8 @@ In combination with a `SerialName` specified for the child class, you have full 
 
 ```json
 {
-  class: "child",
-  property: true
+  "class": "child",
+  "property": true
 }
 ```
 
