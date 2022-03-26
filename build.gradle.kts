@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.6.10" apply false
     id("base")
 }
 
@@ -17,8 +16,9 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.1.0")
+        classpath("com.android.tools.build:gradle:7.1.2")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
+        classpath(kotlin("gradle-plugin", "1.6.10"))
     }
 }
 
@@ -162,8 +162,7 @@ subprojects {
                     executable = "carthage"
                     args(
                         it,
-                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-                        "--platform", "iOS"
+                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop")
                     )
                 }
             }
