@@ -2,8 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 version = project.property("firebase-common.version") as String
 
 plugins {
@@ -40,17 +38,29 @@ android {
     }
 }
 
+val skipIosTarget: Boolean = project.property("skipIosTarget") == "true"
+val skipMacOsTarget: Boolean = project.property("skipMacOsTarget") == "true"
+val skipTvOsTarget: Boolean = project.property("skipTvOsTarget") == "true"
+
 kotlin {
 
     android {
         publishAllLibraryVariants()
     }
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
-
-    if (supportIosTarget) {
+    if (!skipIosTarget) {
         ios()
         iosSimulatorArm64()
+    }
+
+    if (!skipMacOsTarget) {
+        macosArm64()
+        macosX64()
+    }
+
+    if (!skipTvOsTarget) {
+        tvos()
+        tvosSimulatorArm64()
     }
 
     js {
@@ -96,14 +106,40 @@ kotlin {
             }
         }
 
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
+        val iosMain by getting
+        val iosSimulatorArm64Main by getting
+        val macosArm64Main by getting
+        val macosX64Main by getting
+        val tvosMain by getting
+        val tvosSimulatorArm64Main by getting
 
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
+        val nativeMain by creating {
+            dependsOn(commonMain)
+
+            iosMain.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            macosArm64Main.dependsOn(this)
+            macosX64Main.dependsOn(this)
+            tvosMain.dependsOn(this)
+            tvosSimulatorArm64Main.dependsOn(this)
+        }
+
+        val iosTest by getting
+        val iosSimulatorArm64Test by getting
+        val macosArm64Test by getting
+        val macosX64Test by getting
+        val tvosTest by getting
+        val tvosSimulatorArm64Test by getting
+
+        val nativeTest by creating {
+            dependsOn(commonMain)
+
+            iosTest.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
+            macosArm64Test.dependsOn(this)
+            macosX64Test.dependsOn(this)
+            tvosTest.dependsOn(this)
+            tvosSimulatorArm64Test.dependsOn(this)
         }
 
         val jsMain by getting {
