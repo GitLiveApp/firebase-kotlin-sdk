@@ -3,7 +3,6 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-functions.version") as String
 
@@ -38,12 +37,9 @@ android {
     }
 }
 
-val KonanTarget.archVariant: String
-    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
-    } else {
-        "ios-arm64_armv7"
-    }
+val skipIosTarget: Boolean = project.property("skipIosTarget") == "true"
+val skipMacOsTarget: Boolean = project.property("skipMacOsTarget") == "true"
+val skipTvOsTarget: Boolean = project.property("skipTvOsTarget") == "true"
 
 kotlin {
 
@@ -51,52 +47,45 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
-    if (supportIosTarget) {
-        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-            val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            ).plus(
+    fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
+        val nativeFrameworkPaths = konanTarget.firebaseCoreFrameworksPaths(rootProject.project("firebase-app").projectDir).plus(
+            konanTarget.carthageXcFrameworksPaths(
+                projectDir,
                 listOf(
                     "FirebaseFunctions",
                     "GTMSessionFetcher"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
+                )
             )
+        )
 
-            binaries {
-                getTest("DEBUG").apply {
-                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    linkerOpts("-ObjC")
-                }
-            }
-
-            compilations.getByName("main") {
-                cinterops.create("FirebaseFunctions") {
-                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
-                }
+        binaries {
+            getTest("DEBUG").apply {
+                linkerOpts(nativeFrameworkPaths.map { "-F$it" })
+                linkerOpts("-ObjC")
             }
         }
 
+        compilations.getByName("main") {
+            cinterops.create("FirebaseFunctions") {
+                compilerOpts(nativeFrameworkPaths.map { "-F$it" })
+                extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
+            }
+        }
+    }
+
+    if (!skipIosTarget) {
         ios(configure = nativeTargetConfig())
         iosSimulatorArm64(configure = nativeTargetConfig())
+    }
+
+    if (!skipMacOsTarget) {
+        macosArm64(configure = nativeTargetConfig())
+        macosX64(configure = nativeTargetConfig())
+    }
+
+    if (!skipTvOsTarget) {
+        tvos(configure = nativeTargetConfig())
+        tvosSimulatorArm64(configure = nativeTargetConfig())
     }
 
     js {
@@ -141,14 +130,40 @@ kotlin {
             }
         }
 
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
+        val iosMain by getting
+        val iosSimulatorArm64Main by getting
+        val macosArm64Main by getting
+        val macosX64Main by getting
+        val tvosMain by getting
+        val tvosSimulatorArm64Main by getting
 
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
+        val nativeMain by creating {
+            dependsOn(commonMain)
+
+            iosMain.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            macosArm64Main.dependsOn(this)
+            macosX64Main.dependsOn(this)
+            tvosMain.dependsOn(this)
+            tvosSimulatorArm64Main.dependsOn(this)
+        }
+
+        val iosTest by getting
+        val iosSimulatorArm64Test by getting
+        val macosArm64Test by getting
+        val macosX64Test by getting
+        val tvosTest by getting
+        val tvosSimulatorArm64Test by getting
+
+        val nativeTest by creating {
+            dependsOn(commonMain)
+
+            iosTest.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
+            macosArm64Test.dependsOn(this)
+            macosX64Test.dependsOn(this)
+            tvosTest.dependsOn(this)
+            tvosSimulatorArm64Test.dependsOn(this)
         }
 
         val jsMain by getting
