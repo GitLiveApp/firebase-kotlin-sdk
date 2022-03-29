@@ -19,7 +19,7 @@ actual open class AuthCredential(open val android: com.google.firebase.auth.Auth
         get() = android.provider
 }
 
-actual class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android)
+class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android)
 
 actual class OAuthCredential(override val android: com.google.firebase.auth.OAuthCredential) : AuthCredential(android)
 
@@ -78,13 +78,13 @@ actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) 
     }
 }
 
-actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthProvider) {
+class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthProvider) {
 
-    actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
+    constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
 
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+    fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
 
-    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
+    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
         val response = CompletableDeferred<Result<AuthCredential>>()
         val callback = object :
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -119,7 +119,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
     }
 }
 
-actual interface PhoneVerificationProvider {
+interface PhoneVerificationProvider {
     val activity: Activity
     val timeout: Long
     val unit: TimeUnit

@@ -25,7 +25,7 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         get() = android.isEmailVerified
     actual val metaData: UserMetaData?
         get() = android.metadata?.let{ UserMetaData(it) }
-    actual val multiFactor: MultiFactor
+    val multiFactor: MultiFactor
         get() = MultiFactor(android.multiFactor)
     actual val providerData: List<UserInfo>
         get() = android.providerData.map { UserInfo(it) }
@@ -45,7 +45,7 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
+    suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = UserProfileChangeRequest.Builder()
             .setDisplayName(displayName)
