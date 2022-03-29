@@ -24,8 +24,8 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
         get() = ios.emailVerified
     actual val metaData: UserMetaData?
         get() = UserMetaData(ios.metadata)
-    actual val multiFactor: MultiFactor
-        get() = MultiFactor(ios.multiFactor)
+//    actual val multiFactor: MultiFactor
+//        get() = MultiFactor(ios.multiFactor)
     actual val providerData: List<UserInfo>
         get() = ios.providerData.mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
     actual val providerId: String
@@ -63,7 +63,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     }
     actual suspend fun updateEmail(email: String) = ios.await { updateEmail(email, it) }.run { Unit }
     actual suspend fun updatePassword(password: String) = ios.await { updatePassword(password, it) }.run { Unit }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
+//    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = ios.profileChangeRequest().apply {
             this.displayName = displayName

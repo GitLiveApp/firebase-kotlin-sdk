@@ -10,7 +10,7 @@ actual open class AuthCredential(val js: firebase.auth.AuthCredential) {
         get() = js.providerId
 }
 
-actual class PhoneAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(js)
+class PhoneAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(js)
 actual class OAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(js)
 
 actual object EmailAuthProvider {
@@ -66,19 +66,19 @@ actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {
     }
 }
 
-actual class PhoneAuthProvider(val js: firebase.auth.PhoneAuthProvider) {
+class PhoneAuthProvider(val js: firebase.auth.PhoneAuthProvider) {
 
-    actual constructor(auth: FirebaseAuth) : this(firebase.auth.PhoneAuthProvider(auth.js))
+    constructor(auth: FirebaseAuth) : this(firebase.auth.PhoneAuthProvider(auth.js))
 
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(firebase.auth.PhoneAuthProvider.credential(verificationId, smsCode))
-    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
+    fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(firebase.auth.PhoneAuthProvider.credential(verificationId, smsCode))
+    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
         val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)
         credential(verificationId, verificationCode)
     }
 }
 
-actual interface PhoneVerificationProvider {
+interface PhoneVerificationProvider {
     val verifier: firebase.auth.ApplicationVerifier
     suspend fun getVerificationCode(verificationId: String): String
 }

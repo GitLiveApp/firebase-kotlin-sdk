@@ -4,41 +4,41 @@ import dev.gitlive.firebase.firebase
 import kotlinx.coroutines.await
 import kotlin.js.Date
 
-actual class MultiFactor(val js: firebase.multifactor.MultiFactorUser) {
-    actual val enrolledFactors: List<MultiFactorInfo>
+class MultiFactor(val js: firebase.multifactor.MultiFactorUser) {
+    val enrolledFactors: List<MultiFactorInfo>
         get() = rethrow { js.enrolledFactors.map { MultiFactorInfo(it) } }
-    actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) =
+    suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) =
         rethrow { js.enroll(multiFactorAssertion.js, displayName).await() }
-    actual suspend fun getSession(): MultiFactorSession =
+    suspend fun getSession(): MultiFactorSession =
         rethrow { MultiFactorSession(js.getSession().await()) }
-    actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo) =
+    suspend fun unenroll(multiFactorInfo: MultiFactorInfo) =
         rethrow { js.unenroll(multiFactorInfo.js).await() }
-    actual suspend fun unenroll(factorUid: String) =
+    suspend fun unenroll(factorUid: String) =
         rethrow { js.unenroll(factorUid).await() }
 }
 
-actual class MultiFactorInfo(val js: firebase.multifactor.MultiFactorInfo) {
-    actual val displayName: String?
+class MultiFactorInfo(val js: firebase.multifactor.MultiFactorInfo) {
+    val displayName: String?
         get() = rethrow { js.displayName }
-    actual val enrollmentTime: Double
+    val enrollmentTime: Double
         get() = rethrow { (Date(js.enrollmentTime).getTime() / 1000.0) }
-    actual val factorId: String
+    val factorId: String
         get() = rethrow { js.factorId }
-    actual val uid: String
+    val uid: String
         get() = rethrow { js.uid }
 }
 
-actual class MultiFactorAssertion(val js: firebase.multifactor.MultiFactorAssertion) {
-    actual val factorId: String
+class MultiFactorAssertion(val js: firebase.multifactor.MultiFactorAssertion) {
+    val factorId: String
         get() = rethrow { js.factorId }
 }
 
-actual class MultiFactorSession(val js: firebase.multifactor.MultiFactorSession)
+class MultiFactorSession(val js: firebase.multifactor.MultiFactorSession)
 
-actual class MultiFactorResolver(val js: firebase.multifactor.MultifactorResolver) {
-    actual val auth: FirebaseAuth = rethrow { FirebaseAuth(js.auth) }
-    actual val hints: List<MultiFactorInfo> = rethrow { js.hints.map { MultiFactorInfo(it) } }
-    actual val session: MultiFactorSession = rethrow { MultiFactorSession(js.session) }
+class MultiFactorResolver(val js: firebase.multifactor.MultifactorResolver) {
+    val auth: FirebaseAuth = rethrow { FirebaseAuth(js.auth) }
+    val hints: List<MultiFactorInfo> = rethrow { js.hints.map { MultiFactorInfo(it) } }
+    val session: MultiFactorSession = rethrow { MultiFactorSession(js.session) }
 
-    actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = rethrow { AuthResult(js.resolveSignIn(assertion.js).await()) }
+    suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = rethrow { AuthResult(js.resolveSignIn(assertion.js).await()) }
 }
