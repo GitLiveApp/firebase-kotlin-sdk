@@ -58,7 +58,7 @@ sealed class ActionCodeResult {
     class VerifyEmail internal constructor(val email: String) : ActionCodeResult()
     class RecoverEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
     class VerifyBeforeChangeEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
-    class RevertSecondFactorAddition internal constructor(val email: String, val multiFactorInfo: MultiFactorInfo?) : ActionCodeResult()
+    class RevertSecondFactorAddition internal constructor(val email: String, val multiFactorInfo: Any?) : ActionCodeResult()
 }
 
 data class ActionCodeSettings(

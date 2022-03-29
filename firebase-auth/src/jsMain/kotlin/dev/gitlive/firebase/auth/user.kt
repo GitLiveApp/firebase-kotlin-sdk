@@ -21,7 +21,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
         get() = rethrow { js.emailVerified }
     actual val metaData: UserMetaData?
         get() = rethrow { UserMetaData(js.metadata) }
-    actual val multiFactor: MultiFactor
+    val multiFactor: MultiFactor
         get() = rethrow { MultiFactor(js.multiFactor) }
     actual val providerData: List<UserInfo>
         get() = rethrow { js.providerData.map { UserInfo(it) } }
@@ -42,7 +42,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun unlink(provider: String): FirebaseUser? = rethrow { FirebaseUser(js.unlink(provider).await()) }
     actual suspend fun updateEmail(email: String) = rethrow { js.updateEmail(email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { js.updatePassword(password).await() }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
+    suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
         val request = object : firebase.user.ProfileUpdateRequest {
             override val displayName: String? = displayName

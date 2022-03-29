@@ -11,7 +11,7 @@ actual open class AuthCredential(open val ios: FIRAuthCredential) {
         get() = ios.provider
 }
 
-actual class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : AuthCredential(ios)
+//actual class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : AuthCredential(ios)
 actual class OAuthCredential(override val ios: FIROAuthCredential) : AuthCredential(ios)
 
 actual object EmailAuthProvider {
@@ -70,23 +70,23 @@ actual class OAuthProvider(val ios: FIROAuthProvider) {
     }
 }
 
-actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
-
-    actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
-
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
-
-    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
-        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
-        val verificationCode = verificationProvider.getVerificationCode()
-        return credential(verificationId, verificationCode)
-    }
-}
-
-actual interface PhoneVerificationProvider {
-    val delegate: FIRAuthUIDelegateProtocol
-    suspend fun getVerificationCode(): String
-}
+//actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
+//
+//    actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
+//
+//    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
+//
+//    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
+//        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
+//        val verificationCode = verificationProvider.getVerificationCode()
+//        return credential(verificationId, verificationCode)
+//    }
+//}
+//
+//actual interface PhoneVerificationProvider {
+//    val delegate: FIRAuthUIDelegateProtocol
+//    suspend fun getVerificationCode(): String
+//}
 
 actual object TwitterAuthProvider {
     actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(FIRTwitterAuthProvider.credentialWithToken(token, secret))
