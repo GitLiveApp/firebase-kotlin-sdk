@@ -39,6 +39,21 @@ class FirebaseDatabaseTest {
     }
 
     @Test
+    fun testSetValue() = runTest {
+        val testValue = "test"
+        val testReference = Firebase.database.reference("testPath")
+
+        testReference.setValue(testValue)
+
+        val testReferenceValue = testReference
+            .valueEvents
+            .first()
+            .value<String>()
+
+        assertEquals(testValue, testReferenceValue)
+    }
+    
+    @Test
     fun testChildCount() = runTest {
         setupRealtimeData()
         val dataSnapshot = Firebase.database
