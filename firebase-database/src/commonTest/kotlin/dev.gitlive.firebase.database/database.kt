@@ -13,7 +13,7 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
-class database {
+class FirebaseDatabaseTest {
 
     @Serializable
     data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
