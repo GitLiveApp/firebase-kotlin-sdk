@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JsModule("firebase/app")
+@file:JsModule("firebase/compat/app")
 
 package dev.gitlive.firebase
 
@@ -385,10 +385,12 @@ external object firebase {
             fun limit(limit: Double): Query
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
+            fun startAfter(document: DocumentSnapshot): Query
         }
 
         open class CollectionReference : Query {
             val path: String
+            val parent: DocumentReference?
             fun doc(path: String = definedExternally): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
@@ -425,6 +427,7 @@ external object firebase {
         open class DocumentReference {
             val id: String
             val path: String
+            val parent: CollectionReference
 
             fun collection(path: String): CollectionReference
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
@@ -499,6 +502,16 @@ external object firebase {
             fun asNumber(): Number
             fun asString(): String?
             fun getSource(): String
+        }
+    }
+
+    fun installations(app: App? = definedExternally): installations.Installations
+
+    object installations {
+        interface Installations {
+            fun delete(): Promise<Unit>
+            fun getId(): Promise<String>
+            fun getToken(forceRefresh: Boolean): Promise<String>
         }
     }
 }

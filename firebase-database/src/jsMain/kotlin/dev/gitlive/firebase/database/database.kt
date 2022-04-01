@@ -38,6 +38,7 @@ actual fun Firebase.database(app: FirebaseApp, url: String) =
 
 actual class FirebaseDatabase internal constructor(val js: firebase.database.Database) {
     actual fun reference(path: String) = rethrow { DatabaseReference(js.ref(path)) }
+    actual fun reference() = rethrow { DatabaseReference(js.ref()) }
     actual fun setPersistenceEnabled(enabled: Boolean) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }

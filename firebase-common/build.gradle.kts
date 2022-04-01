@@ -92,7 +92,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-common-ktx")
+                api("com.google.firebase:firebase-common")
             }
         }
 
@@ -108,7 +108,7 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "8.7.1"))
+                api(npm("firebase", "9.4.1"))
             }
         }
     }

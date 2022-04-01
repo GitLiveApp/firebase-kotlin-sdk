@@ -227,6 +227,9 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual val path: String
         get() = android.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(android.parent)
+
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
@@ -354,6 +357,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
@@ -366,6 +371,9 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual val document: DocumentReference
         get() = DocumentReference(android.document())
+
+    actual val parent: DocumentReference?
+        get() = android.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
@@ -409,22 +417,29 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T: Any> data() = decode<T>(value = android.data)
+    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(value = android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) = decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual fun dataMap(): Map<String, Any?> = android.data ?: emptyMap()
+    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(value = android.get(field, serverTimestampBehavior.toAndroid()))
 
-    actual inline fun <reified T> get(field: String) = decode<T>(value = android.get(field))
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>) =
-        decode(strategy, android.get(field))
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.get(field, serverTimestampBehavior.toAndroid()))
 
     actual fun contains(field: String) = android.contains(field)
 
     actual val exists get() = android.exists()
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
+
+    fun ServerTimestampBehavior.toAndroid(): com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior = when (this) {
+        ServerTimestampBehavior.ESTIMATE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+        ServerTimestampBehavior.NONE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.NONE
+        ServerTimestampBehavior.PREVIOUS -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.PREVIOUS
+    }
 }
 
 actual class SnapshotMetadata(val android: com.google.firebase.firestore.SnapshotMetadata) {
@@ -444,4 +459,3 @@ actual object FieldValue {
     actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
     actual fun delete(): Any = delete
 }
-

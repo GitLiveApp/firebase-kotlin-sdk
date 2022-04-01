@@ -17,13 +17,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.android.tools.build:gradle:7.0.3")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
 
 val targetSdkVersion by extra(30)
-val minSdkVersion by extra(16)
+val minSdkVersion by extra(19)
 
 tasks {
     val updateVersions by registering {
@@ -31,10 +31,11 @@ tasks {
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
+            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
+            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion"
         )
     }
 }
@@ -154,24 +155,25 @@ subprojects {
             }
         }
 
-        if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
-            listOf("bootstrap", "update").forEach {
+        val carthageTasks = if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
+            listOf("bootstrap", "update").map {
                 task<Exec>("carthage${it.capitalize()}") {
                     group = "carthage"
                     executable = "carthage"
                     args(
                         it,
                         "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-                        "--platform", "iOS",
-                        "--cache-builds"
+                        "--platform", "iOS"
                     )
                 }
             }
-        }
+        } else emptyList()
 
         if (Os.isFamily(Os.FAMILY_MAC)) {
             withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-                dependsOn("carthageBootstrap")
+                if (carthageTasks.isNotEmpty()) {
+                    dependsOn("carthageBootstrap")
+                }
             }
         }
 
@@ -195,12 +197,12 @@ subprojects {
         }
 
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.1"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2-native-mt")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.0.1"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
