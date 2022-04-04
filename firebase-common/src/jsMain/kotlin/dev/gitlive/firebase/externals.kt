@@ -376,6 +376,7 @@ external object firebase {
             fun where(field: String, opStr: String, value: Any?): Query
             fun where(field: FieldPath, opStr: String, value: Any?): Query
             fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
+            fun onSnapshot(options: Json, next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
             fun limit(limit: Double): Query
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
