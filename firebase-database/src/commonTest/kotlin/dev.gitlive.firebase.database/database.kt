@@ -13,7 +13,7 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
 
-class database {
+class FirebaseDatabaseTest {
 
     @Serializable
     data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
@@ -38,6 +38,21 @@ class database {
             }
     }
 
+    @Test
+    fun testSetValue() = runTest {
+        val testValue = "test"
+        val testReference = Firebase.database.reference("testPath")
+
+        testReference.setValue(testValue)
+
+        val testReferenceValue = testReference
+            .valueEvents
+            .first()
+            .value<String>()
+
+        assertEquals(testValue, testReferenceValue)
+    }
+    
     @Test
     fun testChildCount() = runTest {
         setupRealtimeData()
