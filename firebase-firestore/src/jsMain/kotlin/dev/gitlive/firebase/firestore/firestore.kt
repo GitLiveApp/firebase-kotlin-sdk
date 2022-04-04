@@ -343,7 +343,7 @@ actual open class Query(open val js: firebase.firestore.Query) {
         val unsubscribe = rethrow {
             js.onSnapshot(
                 json("includeMetadataChanges" to includeMetadataChanges),
-                { safeOffer(QuerySnapshot(it)) },
+                { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
         }
