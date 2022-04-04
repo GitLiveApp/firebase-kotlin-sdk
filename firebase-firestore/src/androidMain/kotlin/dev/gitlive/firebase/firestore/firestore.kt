@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -313,6 +314,15 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            exception?.let { close(exception) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
+            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }

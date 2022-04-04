@@ -55,6 +55,7 @@ expect class Transaction {
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
+    fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
     internal fun _where(field: String, equalTo: Any?): Query
     internal fun _where(path: FieldPath, equalTo: Any?): Query
