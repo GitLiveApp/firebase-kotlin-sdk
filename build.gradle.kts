@@ -116,7 +116,7 @@ subprojects {
                 into.writeText(
                     from.readText()
                         .replace("require('firebase-kotlin-sdk-", "require('@gitliveapp/")
-                        .replace("'kotlinx-serialization-kotlinx-serialization-core-js-legacy'", "'@gitliveapp/kotlinx-serialization-kotlinx-serialization-core-js-legacy'")
+                        .replace("require('kotlinx-serialization-kotlinx-serialization-core-js-legacy'", "require('@gitliveapp/kotlinx-serialization-kotlinx-serialization-core-js-legacy'")
                         .replace("if (typeof kotlin === 'undefined') {", "var auth = firebase.auth;\nif (typeof kotlin === 'undefined') {")
                         .replace("if (typeof kotlin === 'undefined') {", "var functions = firebase.functions;\nif (typeof kotlin === 'undefined') {")
                         .replace("if (typeof kotlin === 'undefined') {", "var firestore = firebase.firestore;\nif (typeof kotlin === 'undefined') {")
