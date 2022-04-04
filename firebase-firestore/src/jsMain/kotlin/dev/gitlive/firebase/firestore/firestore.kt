@@ -338,6 +338,17 @@ actual open class Query(open val js: firebase.firestore.Query) {
         }
         awaitClose { rethrow { unsubscribe() } }
     }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val unsubscribe = rethrow {
+            js.onSnapshot(
+                json("includeMetadataChanges" to includeMetadataChanges),
+                { safeOffer(QuerySnapshot(it)) },
+                { close(errorToException(it)) }
+            )
+        }
+        awaitClose { rethrow { unsubscribe() } }
+    }
 }
 
 actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {
