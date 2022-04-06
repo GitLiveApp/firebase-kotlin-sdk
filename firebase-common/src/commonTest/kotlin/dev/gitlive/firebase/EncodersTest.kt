@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
@@ -16,6 +17,13 @@ expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
 
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
+
+@Serializable
+sealed class TestSealed {
+    @Serializable
+    @SerialName("child")
+    data class ChildClass(val map: Map<String, String>, val bool: Boolean = false): TestSealed()
+}
 
 class EncodersTest {
     @Test
@@ -38,6 +46,12 @@ class EncodersTest {
     }
 
     @Test
+    fun encodeSealedClass() {
+        val encoded = encode<TestSealed>(TestSealed.serializer(), TestSealed.ChildClass(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
+        nativeAssertEquals(nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
+    }
+
+    @Test
     fun decodeObject() {
         val decoded = decode<TestData>(TestData.serializer(), nativeMapOf("map" to nativeMapOf("key" to "value")))
         assertEquals(TestData(mapOf("key" to "value"), false), decoded)
@@ -53,5 +67,11 @@ class EncodersTest {
     fun decodeObjectNullableValue() {
         val decoded = decode(TestData.serializer(), nativeMapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
         assertNull(decoded.nullableBool)
+    }
+
+    @Test
+    fun decodeSealedClass() {
+        val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true))
+        assertEquals(TestSealed.ChildClass(mapOf("key" to "value"), true), decoded)
     }
 }

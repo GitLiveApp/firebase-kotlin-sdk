@@ -102,6 +102,33 @@ data class Post(
 
 ```
 
+<h4>Polymorphic serialization (sealed classes)</h4>
+
+This sdk will handle polymorphic serialization automatically if you have a sealed class and its children marked as `Serializable`. It will include a `type` property that will be used to discriminate which child class is the serialized.
+
+You can change this `type` property by using the `@FirebaseClassDiscrminator` annotation in the parent sealed class:
+
+```kotlin
+@Serializable
+@FirebaseClassDiscriminator("class")
+sealed class Parent {
+    @Serializable
+    @SerialName("child")
+    data class Child(
+        val property: Boolean
+    ) : Parent
+}
+```
+
+In combination with a `SerialName` specified for the child class, you have full control over the serialized data. In this case it will be:
+
+```json
+{
+  "class": "child",
+  "property": true
+}
+```
+
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#default-arguments">Default arguments</a></h3>
 
 To reduce boilerplate, default arguments are used in the places where the Firebase Android SDK employs the builder pattern:
