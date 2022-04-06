@@ -6,6 +6,10 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.findPolymorphicSerializer
 import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 
+/*
+ * This code was inspired on polymorphic json serialization of kotlinx.serialization.
+ * See https://github.com/Kotlin/kotlinx.serialization/blob/master/formats/json/commonMain/src/kotlinx/serialization/json/internal/Polymorphic.kt
+ */
 @Suppress("UNCHECKED_CAST")
 internal fun <T> FirebaseEncoder.encodePolymorphically(
     serializer: SerializationStrategy<T>,
