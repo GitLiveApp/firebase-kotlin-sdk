@@ -31,7 +31,7 @@ expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String, val time: Double = 0.0)
+    data class FirestoreTest(val prop1: String, val time: Double = 0.0, val count: Int = 0)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -237,6 +237,19 @@ class FirebaseFirestoreTest {
         val secondPage = query.startAfter(lastDocumentSnapshot).limit(2).get().documents // Second 2 results (only one left)
         assertEquals(1, secondPage.size)
         assertEquals("ccc", secondPage[0].get("prop1"))
+    }
+
+    @Test
+    fun testIncrementFieldValue() = runTest {
+        val doc = Firebase.firestore
+            .collection("FirebaseFirestoreTest")
+            .document("testIncrement1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", count = 0))
+        assertEquals(0, doc.get().get("count"))
+
+        doc.update(FirestoreTest.serializer(), FirestoreTest("increment1", count = FieldValue.increment(5) as Int))
+        assertEquals(5, doc.get().get("count"))
     }
 
     private suspend fun setupFirestoreData() {
