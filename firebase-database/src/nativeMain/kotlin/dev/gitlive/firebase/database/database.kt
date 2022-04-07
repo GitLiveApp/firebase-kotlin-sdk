@@ -40,28 +40,28 @@ actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
 actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
+    FirebaseDatabase(FIRDatabase.databaseForApp(app.native))
 
 actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+    FirebaseDatabase(FIRDatabase.databaseForApp(app.native, url))
 
-actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
+actual class FirebaseDatabase internal constructor(val native: FIRDatabase) {
 
     actual fun reference(path: String) =
-        DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
+        DatabaseReference(native.referenceWithPath(path), native.persistenceEnabled)
 
     actual fun reference() =
-        DatabaseReference(ios.reference(), ios.persistenceEnabled)
+        DatabaseReference(native.reference(), native.persistenceEnabled)
 
     actual fun setPersistenceEnabled(enabled: Boolean) {
-        ios.persistenceEnabled = enabled
+        native.persistenceEnabled = enabled
     }
 
     actual fun setLoggingEnabled(enabled: Boolean) =
         FIRDatabase.setLoggingEnabled(enabled)
 
     actual fun useEmulator(host: String, port: Int) =
-        ios.useEmulatorWithHost(host, port.toLong())
+        native.useEmulatorWithHost(host, port.toLong())
 }
 
 fun Type.toEventType() = when(this) {
@@ -72,50 +72,50 @@ fun Type.toEventType() = when(this) {
 }
 
 actual open class Query internal constructor(
-    open val ios: FIRDatabaseQuery,
+    open val native: FIRDatabaseQuery,
     val persistenceEnabled: Boolean
 ) {
-    actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
+    actual fun orderByKey() = Query(native.queryOrderedByKey(), persistenceEnabled)
 
-    actual fun orderByValue() = Query(ios.queryOrderedByValue(), persistenceEnabled)
+    actual fun orderByValue() = Query(native.queryOrderedByValue(), persistenceEnabled)
 
-    actual fun orderByChild(path: String) = Query(ios.queryOrderedByChild(path), persistenceEnabled)
+    actual fun orderByChild(path: String) = Query(native.queryOrderedByChild(path), persistenceEnabled)
 
-    actual fun startAt(value: String, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    actual fun startAt(value: String, key: String?) = Query(native.queryStartingAtValue(value, key), persistenceEnabled)
 
-    actual fun startAt(value: Double, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    actual fun startAt(value: Double, key: String?) = Query(native.queryStartingAtValue(value, key), persistenceEnabled)
 
-    actual fun startAt(value: Boolean, key: String?) = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    actual fun startAt(value: Boolean, key: String?) = Query(native.queryStartingAtValue(value, key), persistenceEnabled)
 
-    actual fun endAt(value: String, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    actual fun endAt(value: String, key: String?) = Query(native.queryEndingAtValue(value, key), persistenceEnabled)
 
-    actual fun endAt(value: Double, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    actual fun endAt(value: Double, key: String?) = Query(native.queryEndingAtValue(value, key), persistenceEnabled)
 
-    actual fun endAt(value: Boolean, key: String?) = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    actual fun endAt(value: Boolean, key: String?) = Query(native.queryEndingAtValue(value, key), persistenceEnabled)
 
-    actual fun limitToFirst(limit: Int) = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
+    actual fun limitToFirst(limit: Int) = Query(native.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
-    actual fun limitToLast(limit: Int) = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
+    actual fun limitToLast(limit: Int) = Query(native.queryLimitedToLast(limit.toULong()), persistenceEnabled)
 
-    actual fun equalTo(value: String, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    actual fun equalTo(value: String, key: String?) = Query(native.queryEqualToValue(value, key), persistenceEnabled)
 
-    actual fun equalTo(value: Double, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    actual fun equalTo(value: Double, key: String?) = Query(native.queryEqualToValue(value, key), persistenceEnabled)
 
-    actual fun equalTo(value: Boolean, key: String?) = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    actual fun equalTo(value: Boolean, key: String?) = Query(native.queryEqualToValue(value, key), persistenceEnabled)
 
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
-        val handle = ios.observeEventType(
+        val handle = native.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
                 trySend(DataSnapshot(snapShot!!))
             }
         ) { close(DatabaseException(it.toString(), null)) }
-        awaitClose { ios.removeObserverWithHandle(handle) }
+        awaitClose { native.removeObserverWithHandle(handle) }
     }
 
     actual fun childEvents(vararg types: Type) = callbackFlow<ChildEvent> {
         val handles = types.map { type ->
-            ios.observeEventType(
+            native.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
                     trySend(ChildEvent(DataSnapshot(snapShot!!), type, key))
@@ -123,83 +123,83 @@ actual open class Query internal constructor(
             ) { close(DatabaseException(it.toString(), null)) }
         }
         awaitClose {
-            handles.forEach { ios.removeObserverWithHandle(it) }
+            handles.forEach { native.removeObserverWithHandle(it) }
         }
     }
 
-    override fun toString() = ios.toString()
+    override fun toString() = native.toString()
 }
 
 actual class DatabaseReference internal constructor(
-    override val ios: FIRDatabaseReference,
+    override val native: FIRDatabaseReference,
     persistenceEnabled: Boolean
-): Query(ios, persistenceEnabled) {
+): Query(native, persistenceEnabled) {
 
-    actual val key get() = ios.key
+    actual val key get() = native.key
 
-    actual fun child(path: String) = DatabaseReference(ios.child(path), persistenceEnabled)
+    actual fun child(path: String) = DatabaseReference(native.child(path), persistenceEnabled)
 
-    actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
-    actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
+    actual fun push() = DatabaseReference(native.childByAutoId(), persistenceEnabled)
+    actual fun onDisconnect() = OnDisconnect(native, persistenceEnabled)
 
     actual suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(value, encodeDefaults), it) }
+        native.await(persistenceEnabled) { setValue(encode(value, encodeDefaults), it) }
     }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeDefaults), it) }
+        native.await(persistenceEnabled) { setValue(encode(strategy, value, encodeDefaults), it) }
     }
 
     @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults) as Map<Any?, *>, it) }
+        native.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults) as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
-        ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
+        native.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
     }
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
+actual class DataSnapshot internal constructor(val native: FIRDataSnapshot) {
 
-    actual val exists get() = ios.exists()
+    actual val exists get() = native.exists()
 
-    actual val key: String? get() = ios.key
+    actual val key: String? get() = native.key
 
     actual inline fun <reified T> value() =
-        decode<T>(value = ios.value)
+        decode<T>(value = native.value)
 
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.value)
+        decode(strategy, native.value)
 
-    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
-    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
+    actual fun child(path: String) = DataSnapshot(native.childSnapshotForPath(path))
+    actual val children: Iterable<DataSnapshot> get() = native.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
 }
 
 actual class OnDisconnect internal constructor(
-    val ios: FIRDatabaseReference,
+    val native: FIRDatabaseReference,
     val persistenceEnabled: Boolean
 ) {
     actual suspend fun removeValue() {
-        ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
+        native.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
     }
 
     actual suspend fun cancel() {
-        ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
+        native.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
     actual suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeDefaults), it) }
+        native.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeDefaults), it) }
     }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeDefaults), it) }
+        native.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeDefaults), it) }
     }
 
     @Suppress("UNCHECKED_CAST")
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults) } as Map<Any?, *>, it) }
+        native.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults) } as Map<Any?, *>, it) }
     }
 }
 

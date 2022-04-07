@@ -11,16 +11,16 @@ actual val Firebase.installations
     get() = FirebaseInstallations(FIRInstallations.installations())
 
 actual fun Firebase.installations(app: FirebaseApp)
-        = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios))
+        = FirebaseInstallations(FIRInstallations.installationsWithApp(app.native))
 
-actual class FirebaseInstallations internal constructor(val ios: FIRInstallations) {
+actual class FirebaseInstallations internal constructor(val native: FIRInstallations) {
 
-    actual suspend fun delete() = ios.await { deleteWithCompletion(completion = it) }
+    actual suspend fun delete() = native.await { deleteWithCompletion(completion = it) }
 
-    actual suspend fun getId(): String = ios.awaitResult { installationIDWithCompletion(completion = it) }
+    actual suspend fun getId(): String = native.awaitResult { installationIDWithCompletion(completion = it) }
 
     actual suspend fun getToken(forceRefresh: Boolean): String {
-        val result: FIRInstallationsAuthTokenResult = ios.awaitResult { authTokenForcingRefresh(forceRefresh = forceRefresh, completion = it) }
+        val result: FIRInstallationsAuthTokenResult = native.awaitResult { authTokenForcingRefresh(forceRefresh = forceRefresh, completion = it) }
 
         return result.authToken
     }

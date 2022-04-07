@@ -6,13 +6,12 @@ package dev.gitlive.firebase.auth
 
 import cocoapods.FirebaseAuth.*
 
-actual open class AuthCredential(open val ios: FIRAuthCredential) {
+actual open class AuthCredential(open val native: FIRAuthCredential) {
     actual val providerId: String
-        get() = ios.provider
+        get() = native.provider
 }
 
-//actual class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : AuthCredential(ios)
-actual class OAuthCredential(override val ios: FIROAuthCredential) : AuthCredential(ios)
+actual class OAuthCredential(override val native: FIROAuthCredential) : AuthCredential(native)
 
 actual object EmailAuthProvider {
     actual fun credential(
@@ -44,17 +43,17 @@ actual object GoogleAuthProvider {
     }
 }
 
-actual class OAuthProvider(val ios: FIROAuthProvider) {
+actual class OAuthProvider(val native: FIROAuthProvider) {
 
     actual constructor(
         provider: String,
         scopes: List<String>,
         customParameters: Map<String, String>,
         auth: FirebaseAuth
-    ) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios)) {
-        ios.setScopes(scopes)
+    ) : this(FIROAuthProvider.providerWithProviderID(provider, auth.native)) {
+        native.setScopes(scopes)
         @Suppress("UNCHECKED_CAST")
-        ios.setCustomParameters(customParameters as Map<Any?, *>)
+        native.setCustomParameters(customParameters as Map<Any?, *>)
     }
 
     actual companion object {
@@ -69,24 +68,6 @@ actual class OAuthProvider(val ios: FIROAuthProvider) {
         }
     }
 }
-
-//actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
-//
-//    actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
-//
-//    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
-//
-//    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
-//        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
-//        val verificationCode = verificationProvider.getVerificationCode()
-//        return credential(verificationId, verificationCode)
-//    }
-//}
-//
-//actual interface PhoneVerificationProvider {
-//    val delegate: FIRAuthUIDelegateProtocol
-//    suspend fun getVerificationCode(): String
-//}
 
 actual object TwitterAuthProvider {
     actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(FIRTwitterAuthProvider.credentialWithToken(token, secret))

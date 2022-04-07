@@ -21,16 +21,16 @@ actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     FIRApp.configure().let { app }
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
-    FIRApp.configureWithName(name, options.toIos()).let { app(name) }
+    FIRApp.configureWithName(name, options.toNative()).let { app(name) }
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
-    FIRApp.configureWithOptions(options.toIos()).let { app }
+    FIRApp.configureWithOptions(options.toNative()).let { app }
 
-actual class FirebaseApp internal constructor(val ios: FIRApp) {
+actual class FirebaseApp internal constructor(val native: FIRApp) {
     actual val name: String
-        get() = ios.name
+        get() = native.name
     actual val options: FirebaseOptions
-        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
+        get() = native.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 }
 
 actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
@@ -38,10 +38,10 @@ actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
     .values
     .map { FirebaseApp(it as FIRApp) }
 
-private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
-        APIKey = this@toIos.apiKey
-        databaseURL = this@toIos.databaseUrl
-        trackingID = this@toIos.gaTrackingId
-        storageBucket = this@toIos.storageBucket
-        projectID = this@toIos.projectId
+private fun FirebaseOptions.toNative() = FIROptions(this@toNative.applicationId, this@toNative.gcmSenderId ?: "").apply {
+        APIKey = this@toNative.apiKey
+        databaseURL = this@toNative.databaseUrl
+        trackingID = this@toNative.gaTrackingId
+        storageBucket = this@toNative.storageBucket
+        projectID = this@toNative.projectId
     }

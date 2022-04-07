@@ -7,93 +7,90 @@ package dev.gitlive.firebase.auth
 import cocoapods.FirebaseAuth.*
 import platform.Foundation.NSURL
 
-actual class FirebaseUser internal constructor(val ios: FIRUser) {
+actual class FirebaseUser internal constructor(val native: FIRUser) {
     actual val uid: String
-        get() = ios.uid
+        get() = native.uid
     actual val displayName: String?
-        get() = ios.displayName
+        get() = native.displayName
     actual val email: String?
-        get() = ios.email
+        get() = native.email
     actual val phoneNumber: String?
-        get() = ios.phoneNumber
+        get() = native.phoneNumber
     actual val photoURL: String?
-        get() = ios.photoURL?.absoluteString
+        get() = native.photoURL?.absoluteString
     actual val isAnonymous: Boolean
-        get() = ios.anonymous
+        get() = native.anonymous
     actual val isEmailVerified: Boolean
-        get() = ios.emailVerified
+        get() = native.emailVerified
     actual val metaData: UserMetaData?
-        get() = UserMetaData(ios.metadata)
-//    actual val multiFactor: MultiFactor
-//        get() = MultiFactor(ios.multiFactor)
+        get() = UserMetaData(native.metadata)
     actual val providerData: List<UserInfo>
-        get() = ios.providerData.mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
+        get() = native.providerData.mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
     actual val providerId: String
-        get() = ios.providerID
+        get() = native.providerID
 
-    actual suspend fun delete() = ios.await { deleteWithCompletion(it) }.run { Unit }
+    actual suspend fun delete() = native.await { deleteWithCompletion(it) }.run { Unit }
 
-    actual suspend fun reload() = ios.await { reloadWithCompletion(it) }.run { Unit }
+    actual suspend fun reload() = native.await { reloadWithCompletion(it) }.run { Unit }
 
     actual suspend fun getIdToken(forceRefresh: Boolean): String? =
-        ios.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
+        native.awaitResult { getIDTokenForcingRefresh(forceRefresh, it) }
 
     actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult =
-        AuthTokenResult(ios.awaitResult { getIDTokenResultForcingRefresh(forceRefresh, it) })
+        AuthTokenResult(native.awaitResult { getIDTokenResultForcingRefresh(forceRefresh, it) })
 
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult =
-        AuthResult(ios.awaitResult { linkWithCredential(credential.ios, it) })
+        AuthResult(native.awaitResult { linkWithCredential(credential.native, it) })
 
     actual suspend fun reauthenticate(credential: AuthCredential) =
-        ios.awaitResult<FIRUser, FIRAuthDataResult?> { reauthenticateWithCredential(credential.ios, it) }.run { Unit }
+        native.awaitResult<FIRUser, FIRAuthDataResult?> { reauthenticateWithCredential(credential.native, it) }.run { Unit }
 
     actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult =
-        AuthResult(ios.awaitResult { reauthenticateWithCredential(credential.ios, it) })
+        AuthResult(native.awaitResult { reauthenticateWithCredential(credential.native, it) })
 
-    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = ios.await {
-        actionCodeSettings?.let { settings -> sendEmailVerificationWithActionCodeSettings(settings.toIos(), it) }
+    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = native.await {
+        actionCodeSettings?.let { settings -> sendEmailVerificationWithActionCodeSettings(settings.toNative(), it) }
             ?: sendEmailVerificationWithCompletion(it)
     }
 
     actual suspend fun unlink(provider: String): FirebaseUser? {
-        val user: FIRUser? = ios.awaitResult { unlinkFromProvider(provider, it) }
+        val user: FIRUser? = native.awaitResult { unlinkFromProvider(provider, it) }
         return user?.let {
             FirebaseUser(it)
         }
     }
-    actual suspend fun updateEmail(email: String) = ios.await { updateEmail(email, it) }.run { Unit }
-    actual suspend fun updatePassword(password: String) = ios.await { updatePassword(password, it) }.run { Unit }
-//    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
+    actual suspend fun updateEmail(email: String) = native.await { updateEmail(email, it) }.run { Unit }
+    actual suspend fun updatePassword(password: String) = native.await { updatePassword(password, it) }.run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
-        val request = ios.profileChangeRequest().apply {
+        val request = native.profileChangeRequest().apply {
             this.displayName = displayName
             this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }
         }
-        ios.await { request.commitChangesWithCompletion(it) }
+        native.await { request.commitChangesWithCompletion(it) }
     }
-    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = ios.await {
-        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.toIos(), it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
+    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = native.await {
+        actionCodeSettings?.let { actionSettings -> sendEmailVerificationBeforeUpdatingEmail(newEmail, actionSettings.toNative(), it) } ?: sendEmailVerificationBeforeUpdatingEmail(newEmail, it)
     }.run { Unit }
 }
 
-actual class UserInfo(val ios: FIRUserInfoProtocol) {
+actual class UserInfo(val native: FIRUserInfoProtocol) {
     actual val displayName: String?
-        get() = ios.displayName
+        get() = native.displayName
     actual val email: String?
-        get() = ios.email
+        get() = native.email
     actual val phoneNumber: String?
-        get() = ios.phoneNumber
+        get() = native.phoneNumber
     actual val photoURL: String?
-        get() = ios.photoURL?.absoluteString
+        get() = native.photoURL?.absoluteString
     actual val providerId: String
-        get() = ios.providerID
+        get() = native.providerID
     actual val uid: String
-        get() = ios.uid
+        get() = native.uid
 }
 
-actual class UserMetaData(val ios: FIRUserMetadata) {
+actual class UserMetaData(val native: FIRUserMetadata) {
     actual val creationTime: Double?
-        get() = ios.creationDate?.timeIntervalSinceReferenceDate?.toDouble()
+        get() = native.creationDate?.timeIntervalSinceReferenceDate?.toDouble()
     actual val lastSignInTime: Double?
-        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate?.toDouble()
+        get() = native.lastSignInDate?.timeIntervalSinceReferenceDate?.toDouble()
 }
