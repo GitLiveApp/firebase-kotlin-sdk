@@ -227,6 +227,7 @@ expect class FieldPath(vararg fieldNames: String) {
 expect object FieldValue {
     val serverTimestamp: Double
     val delete: Any
+    fun increment(value: Int): Any
     fun arrayUnion(vararg elements: Any): Any
     fun arrayRemove(vararg elements: Any): Any
     @Deprecated("Replaced with FieldValue.delete")

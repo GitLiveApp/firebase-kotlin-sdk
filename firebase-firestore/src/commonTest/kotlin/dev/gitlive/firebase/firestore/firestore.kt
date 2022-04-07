@@ -31,7 +31,7 @@ expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String, val time: Double = 0.0)
+    data class FirestoreTest(val prop1: String, val time: Double = 0.0, val count: Int = 0)
 
     @BeforeTest
     fun initializeFirebase() {
@@ -57,7 +57,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
         val resultDocs = Firebase.firestore
-            .collection("FirebaseFirestoreTest")
+            .collection("testFirestoreQuerying")
             .orderBy("prop1")
             .get()
             .documents
@@ -71,7 +71,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderBy() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -83,7 +83,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -95,7 +95,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -107,7 +107,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -119,7 +119,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -224,7 +224,7 @@ class FirebaseFirestoreTest {
     fun testStartAfterDocumentSnapshot() = runTest {
         setupFirestoreData()
         val query = Firebase.firestore
-            .collection("FirebaseFirestoreTest")
+            .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
         val firstPage = query.limit(2).get().documents // First 2 results
@@ -239,14 +239,29 @@ class FirebaseFirestoreTest {
         assertEquals("ccc", secondPage[0].get("prop1"))
     }
 
+    @Test
+    fun testIncrementFieldValue() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreIncrementFieldValue")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", count = 0))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(0, dataBefore.count)
+
+        doc.update("count" to FieldValue.increment(5))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(5, dataAfter.count)
+    }
+
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")
             .set(FirestoreTest.serializer(), FirestoreTest("aaa"))
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("two")
             .set(FirestoreTest.serializer(), FirestoreTest("bbb"))
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("three")
             .set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }
