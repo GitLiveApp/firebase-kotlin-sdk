@@ -20,67 +20,67 @@ actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
 
 actual fun Firebase.auth(app: FirebaseApp) =
-    FirebaseAuth(FIRAuth.authWithApp(app.ios))
+    FirebaseAuth(FIRAuth.authWithApp(app.native))
 
-actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
+actual class FirebaseAuth internal constructor(val native: FIRAuth) {
 
     actual val currentUser: FirebaseUser?
-        get() = ios.currentUser?.let { FirebaseUser(it) }
+        get() = native.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
-        awaitClose { ios.removeAuthStateDidChangeListener(handle) }
+        val handle = native.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
+        awaitClose { native.removeAuthStateDidChangeListener(handle) }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
-        awaitClose { ios.removeIDTokenDidChangeListener(handle) }
+        val handle = native.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
+        awaitClose { native.removeIDTokenDidChangeListener(handle) }
     }
 
     actual var languageCode: String
-        get() = ios.languageCode ?: ""
-        set(value) { ios.setLanguageCode(value) }
+        get() = native.languageCode ?: ""
+        set(value) { native.setLanguageCode(value) }
 
-    actual suspend fun applyActionCode(code: String) = ios.await { applyActionCode(code, it) }.run { Unit }
-    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
+    actual suspend fun applyActionCode(code: String) = native.await { applyActionCode(code, it) }.run { Unit }
+    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = native.await { confirmPasswordResetWithCode(code, newPassword, it) }.run { Unit }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
+        AuthResult(native.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
 
     @Suppress("UNCHECKED_CAST")
     actual suspend fun fetchSignInMethodsForEmail(email: String) =
-        ios.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
+        native.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
-        ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
+        native.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toNative(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
     }
 
-    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
+    actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = native.await { sendSignInLinkToEmail(email, actionCodeSettings.toNative(), it) }.run { Unit }
 
-    actual fun isSignInWithEmailLink(link: String) = ios.isSignInWithEmailLink(link)
+    actual fun isSignInWithEmailLink(link: String) = native.isSignInWithEmailLink(link)
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
+        AuthResult(native.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
     actual suspend fun signInWithCustomToken(token: String) =
-        AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
+        AuthResult(native.awaitResult { signInWithCustomToken(token, it) })
 
     actual suspend fun signInAnonymously() =
-        AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
+        AuthResult(native.awaitResult { signInAnonymouslyWithCompletion(it) })
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
-        AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+        AuthResult(native.awaitResult { signInWithCredential(authCredential.native, it) })
 
     actual suspend fun signInWithEmailLink(email: String, link: String) =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
+        AuthResult(native.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
 
-    actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
+    actual suspend fun signOut() = native.throwError { signOut(it) }.run { Unit }
 
-    actual suspend fun updateCurrentUser(user: FirebaseUser) = ios.await { updateCurrentUser(user.ios, it) }.run { Unit }
-    actual suspend fun verifyPasswordResetCode(code: String): String = ios.awaitResult { verifyPasswordResetCode(code, it) }
+    actual suspend fun updateCurrentUser(user: FirebaseUser) = native.await { updateCurrentUser(user.native, it) }.run { Unit }
+    actual suspend fun verifyPasswordResetCode(code: String): String = native.awaitResult { verifyPasswordResetCode(code, it) }
 
     actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
-        val result: FIRActionCodeInfo = ios.awaitResult { checkActionCode(code, it) }
+        val result: FIRActionCodeInfo = native.awaitResult { checkActionCode(code, it) }
         @Suppress("UNCHECKED_CAST")
         return when(result.operation) {
             FIRActionCodeOperationEmailLink -> SignInWithEmailLink
@@ -94,30 +94,30 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         } as T
     }
 
-    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
+    actual fun useEmulator(host: String, port: Int) = native.useEmulatorWithHost(host, port.toLong())
 }
 
-actual class AuthResult internal constructor(val ios: FIRAuthDataResult) {
+actual class AuthResult internal constructor(val native: FIRAuthDataResult) {
     actual val user: FirebaseUser?
-        get() = FirebaseUser(ios.user)
+        get() = FirebaseUser(native.user)
 }
 
-actual class AuthTokenResult(val ios: FIRAuthTokenResult) {
+actual class AuthTokenResult(val native: FIRAuthTokenResult) {
 //    actual val authTimestamp: Long
-//        get() = ios.authDate
+//        get() = native.authDate
     actual val claims: Map<String, Any>
-        get() = ios.claims.map { it.key.toString() to it.value as Any }.toMap()
+        get() = native.claims.map { it.key.toString() to it.value as Any }.toMap()
 //    actual val expirationTimestamp: Long
-//        get() = ios.expirationDate
+//        get() = native.expirationDate
 //    actual val issuedAtTimestamp: Long
-//        get() = ios.issuedAtDate
+//        get() = native.issuedAtDate
     actual val signInProvider: String?
-        get() = ios.signInProvider
+        get() = native.signInProvider
     actual val token: String?
-        get() = ios.token
+        get() = native.token
 }
 
-internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
+internal fun ActionCodeSettings.toNative() = FIRActionCodeSettings().also {
     it.URL =  NSURL.URLWithString(url)
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
     it.dynamicLinkDomain = dynamicLinkDomain

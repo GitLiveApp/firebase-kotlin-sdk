@@ -13,7 +13,6 @@ expect class FirebaseUser {
     val isAnonymous: Boolean
     val isEmailVerified: Boolean
     val metaData: UserMetaData?
-//    val multiFactor: MultiFactor
     val providerData: List<UserInfo>
     val providerId: String
     suspend fun delete()
@@ -27,7 +26,6 @@ expect class FirebaseUser {
     suspend fun unlink(provider: String): FirebaseUser?
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
-//    suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
     suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
