@@ -6,11 +6,11 @@ package dev.gitlive.firebase.auth
 
 import cocoapods.FirebaseAuth.*
 
-class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : AuthCredential(ios)
+class PhoneAuthCredential(val ios: FIRPhoneAuthCredential) : AuthCredential(ios)
 
 class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
 
-    constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
+    constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.native))
 
     fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
 

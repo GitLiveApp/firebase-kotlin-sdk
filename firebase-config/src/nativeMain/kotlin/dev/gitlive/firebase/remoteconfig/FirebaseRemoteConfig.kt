@@ -20,9 +20,9 @@ actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
 actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
-    FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios))
+    FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.native))
 
-actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
+actual class FirebaseRemoteConfig internal constructor(val native: FIRRemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
         get() {
             return listOf(
@@ -30,41 +30,41 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
                 FIRRemoteConfigSource.FIRRemoteConfigSourceRemote,
                 FIRRemoteConfigSource.FIRRemoteConfigSourceDefault,
             ).map { source ->
-                val keys = ios.allKeysFromSource(source) as List<String>
-                keys.map { it to FirebaseRemoteConfigValue(ios.configValueForKey(it, source)) }
+                val keys = native.allKeysFromSource(source) as List<String>
+                keys.map { it to FirebaseRemoteConfigValue(native.configValueForKey(it, source)) }
             }.flatten().toMap()
         }
 
     actual val info: FirebaseRemoteConfigInfo
         get() {
             return FirebaseRemoteConfigInfo(
-                configSettings = ios.configSettings.asCommon(),
-                fetchTimeMillis = ios.lastFetchTime
+                configSettings = native.configSettings.asCommon(),
+                fetchTimeMillis = native.lastFetchTime
                     ?.timeIntervalSince1970
                     ?.let { it.toLong() * 1000 }
                     ?.takeIf { it > 0 }
                     ?: -1L,
-                lastFetchStatus = ios.lastFetchStatus.asCommon()
+                lastFetchStatus = native.lastFetchStatus.asCommon()
             )
         }
 
-    actual suspend fun activate(): Boolean = ios.awaitResult { activateWithCompletion(it) }
+    actual suspend fun activate(): Boolean = native.awaitResult { activateWithCompletion(it) }
 
     actual suspend fun ensureInitialized() =
-        ios.await { ensureInitializedWithCompletionHandler(it) }
+        native.await { ensureInitializedWithCompletionHandler(it) }
 
     actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
         val status: FIRRemoteConfigFetchStatus = if (minimumFetchIntervalInSeconds != null) {
-            ios.awaitResult {
+            native.awaitResult {
                 fetchWithExpirationDuration(minimumFetchIntervalInSeconds.toDouble(), it)
             }
         } else {
-            ios.awaitResult { fetchWithCompletionHandler(it) }
+            native.awaitResult { fetchWithCompletionHandler(it) }
         }
     }
 
     actual suspend fun fetchAndActivate(): Boolean {
-        val status: FIRRemoteConfigFetchAndActivateStatus = ios.awaitResult {
+        val status: FIRRemoteConfigFetchAndActivateStatus = native.awaitResult {
             fetchAndActivateWithCompletionHandler(it)
         }
         return status == FIRRemoteConfigFetchAndActivateStatus.FIRRemoteConfigFetchAndActivateStatusSuccessFetchedFromRemote
@@ -74,23 +74,23 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         all.keys.filter { it.startsWith(prefix) }.toSet()
 
     actual fun getValue(key: String): FirebaseRemoteConfigValue =
-        FirebaseRemoteConfigValue(ios.configValueForKey(key))
+        FirebaseRemoteConfigValue(native.configValueForKey(key))
 
     actual suspend fun reset() {
-        // not implemented for iOS target
+        // not implemented for native target
     }
 
     actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
-        val iosSettings = FIRRemoteConfigSettings().apply {
+        val nativeSettings = FIRRemoteConfigSettings().apply {
             minimumFetchInterval = settings.minimumFetchIntervalInSeconds.toDouble()
             fetchTimeout = settings.fetchTimeoutInSeconds.toDouble()
         }
-        ios.setConfigSettings(iosSettings)
+        native.setConfigSettings(nativeSettings)
     }
 
     actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
-        ios.setDefaults(defaults.toMap())
+        native.setDefaults(defaults.toMap())
     }
 
     private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {

@@ -7,6 +7,6 @@ package dev.gitlive.firebase.auth
 import cocoapods.FirebaseAuth.*
 
 val FirebaseUser.multiFactor: MultiFactor
-    get() = MultiFactor(ios.multiFactor)
+    get() = MultiFactor(native.multiFactor)
 
-suspend fun FirebaseUser.updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
+suspend fun FirebaseUser.updatePhoneNumber(credential: PhoneAuthCredential) = native.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
