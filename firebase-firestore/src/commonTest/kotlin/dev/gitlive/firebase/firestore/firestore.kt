@@ -246,10 +246,12 @@ class FirebaseFirestoreTest {
             .document("testIncrement1")
 
         doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", count = 0))
-        assertEquals(0, doc.get().get("count"))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(0, dataBefore.count)
 
-        doc.update(FirestoreTest.serializer(), FirestoreTest("increment1", count = FieldValue.increment(5) as Int))
-        assertEquals(5, doc.get().get("count"))
+        doc.update("count" to FieldValue.increment(5))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(5, dataAfter.count)
     }
 
     private suspend fun setupFirestoreData() {
