@@ -438,6 +438,7 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
 actual object FieldValue {
     actual val serverTimestamp = Double.POSITIVE_INFINITY
     actual val delete: Any get() = FIRFieldValue.fieldValueForDelete()
+    actual fun increment(value: Int): Any = FIRFieldValue.fieldValueForIntegerIncrement(value)
     actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
     actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayRemove(elements.asList())
     actual fun delete(): Any = delete

@@ -462,6 +462,7 @@ external object firebase {
             companion object {
                 fun serverTimestamp(): FieldValue
                 fun delete(): FieldValue
+                fun increment(value: Int): FieldValue
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
             }
