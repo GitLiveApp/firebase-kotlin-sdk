@@ -332,9 +332,21 @@ actual open class Query(open val js: firebase.firestore.Query) {
         Query(js.orderBy(field.js, direction.jsString))
     }
 
-    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow {
-        Query(js.startAfter(document.js))
-    }
+    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow { Query(js.startAfter(document.js)) }
+
+    internal actual fun _startAfter(vararg fieldValues: Any) = rethrow { Query(js.startAfter(*fieldValues)) }
+
+    internal actual fun _startAt(document: DocumentSnapshot) = rethrow { Query(js.startAt(document.js)) }
+
+    internal actual fun _startAt(vararg fieldValues: Any) = rethrow { Query(js.startAt(*fieldValues)) }
+
+    internal actual fun _endBefore(document: DocumentSnapshot) = rethrow { Query(js.endBefore(document.js)) }
+
+    internal actual fun _endBefore(vararg fieldValues: Any) = rethrow { Query(js.endBefore(*fieldValues)) }
+
+    internal actual fun _endAt(document: DocumentSnapshot) = rethrow { Query(js.endAt(document.js)) }
+
+    internal actual fun _endAt(vararg fieldValues: Any) = rethrow { Query(js.endAt(*fieldValues)) }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
