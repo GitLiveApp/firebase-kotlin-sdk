@@ -12,13 +12,13 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                                 | Gradle Dependency                                                                                                                   | API Coverage                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | :-----------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive:firebase-auth:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.4.3/pom)           | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
-| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive:firebase-database:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.4.3/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive:firebase-firestore:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.4.3/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
-| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.4.3/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
-| [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.4.3/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
-| [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.4.3/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
-| [Remote Config](https://firebase.google.com/docs/remote-config/get-started?platform=android)             | [`dev.gitlive:firebase-config:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.4.3/pom)     | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square) |
+| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive:firebase-auth:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.5.0/pom)           | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
+| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive:firebase-database:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.5.0/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive:firebase-firestore:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.5.0/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
+| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.5.0/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
+| [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.5.0/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.5.0/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Remote Config](https://firebase.google.com/docs/remote-config/get-started?platform=android)             | [`dev.gitlive:firebase-config:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.5.0/pom)     | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square) |
 
 
 
@@ -199,13 +199,13 @@ If you are building a Kotlin multiplatform library which will be consumed from J
 
 ```json
 "dependencies": {
-  "@gitlive/firebase-auth": "1.4.3",
-  "@gitlive/firebase-database": "1.4.3",
-  "@gitlive/firebase-firestore": "1.4.3",
-  "@gitlive/firebase-functions": "1.4.3",
-  "@gitlive/firebase-storage": "1.4.3",
-  "@gitlive/firebase-messaging": "1.4.3",
-  "@gitlive/firebase-config": "1.4.3"
+  "@gitlive/firebase-auth": "1.5.0",
+  "@gitlive/firebase-database": "1.5.0",
+  "@gitlive/firebase-firestore": "1.5.0",
+  "@gitlive/firebase-functions": "1.5.0",
+  "@gitlive/firebase-storage": "1.5.0",
+  "@gitlive/firebase-messaging": "1.5.0",
+  "@gitlive/firebase-config": "1.5.0"
 }
 ```
 
