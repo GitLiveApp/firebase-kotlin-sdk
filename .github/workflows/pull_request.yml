@@ -29,6 +29,8 @@ jobs:
         run: "firebase emulators:start --config=./test/firebase.json &"
       - name: Assemble
         run: ./gradlew assemble
+      - name: Compile Kotlin/JS IR
+        run: ./gradlew compileTestDevelopmentExecutableKotlinJsIr compileTestProductionExecutableKotlinJsIr
       - name: Run JS Tests
         run: ./gradlew cleanTest jsLegacyTest
       - name: Upload JS test artifact
