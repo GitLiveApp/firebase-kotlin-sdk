@@ -31,7 +31,12 @@ expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 class FirebaseFirestoreTest {
 
     @Serializable
-    data class FirestoreTest(val prop1: String, val time: Double = 0.0, val count: Int = 0)
+    data class FirestoreTest(
+        val prop1: String, 
+        val time: Double = 0.0,
+        val count: Int = 0, 
+        val list: List<String> = emptyList(),
+    )
 
     @BeforeTest
     fun initializeFirebase() {
@@ -252,6 +257,36 @@ class FirebaseFirestoreTest {
         doc.update("count" to FieldValue.increment(5))
         val dataAfter = doc.get().data(FirestoreTest.serializer())
         assertEquals(5, dataAfter.count)
+    }
+
+    @Test
+    fun testArrayUnion() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreArrayUnion")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first")))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first"), dataBefore.list)
+
+        doc.update("list" to FieldValue.arrayUnion("second"))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first", "second"), dataAfter.list)
+    }
+
+    @Test
+    fun testArrayRemove() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreArrayRemove")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first", "second")))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first", "second"), dataBefore.list)
+
+        doc.update("list" to FieldValue.arrayRemove("second"))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first"), dataAfter.list)
     }
 
     private suspend fun setupFirestoreData() {
