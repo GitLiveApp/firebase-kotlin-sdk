@@ -369,9 +369,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
 
     internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
-    internal actual fun _startAfter(vararg fieldValues: Any) = Query(android.startAfter(*fieldValues))
+    internal actual fun _startAfter(fieldValues: List<Any>) = Query(android.startAfter(*fieldValues.toTypedArray()))
     internal actual fun _startAt(document: DocumentSnapshot) = Query(android.startAt(document.android))
-    internal actual fun _startAt(vararg fieldValues: Any) = Query(android.startAt(*fieldValues))
+    internal actual fun _startAt(fieldValues: List<Any>) = Query(android.startAt(*fieldValues.toTypedArray()))
 
     internal actual fun _endBefore(document: DocumentSnapshot) = Query(android.endBefore(document.android))
     internal actual fun _endBefore(vararg fieldValues: Any) = Query(android.endBefore(*fieldValues))
