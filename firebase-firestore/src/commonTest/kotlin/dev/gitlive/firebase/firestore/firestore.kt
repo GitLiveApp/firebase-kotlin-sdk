@@ -247,15 +247,13 @@ class FirebaseFirestoreTest {
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
-        val firstPage = query.limit(2).get().documents // First 2 results
-        assertEquals(2, firstPage.size)
+        val firstPage = query.get().documents
+        assertEquals(3, firstPage.size)
         assertEquals("aaa", firstPage[0].get("prop1"))
         assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
 
-        val lastDocumentSnapshot = firstPage.lastOrNull()
-        assertNotNull(lastDocumentSnapshot)
-
-        val secondPage = query.startAfter("bbb").limit(2).get().documents
+        val secondPage = query.startAfter(listOf("bbb")).get().documents
         assertEquals(1, secondPage.size)
         assertEquals("ccc", secondPage[0].get("prop1"))
     }
@@ -268,7 +266,6 @@ class FirebaseFirestoreTest {
             .orderBy("prop1", Direction.ASCENDING)
 
         val firstPage = query.limit(2).get().documents // First 2 results
-        println("DEBUG: firstPage len ${firstPage.size}")
         assertEquals(2, firstPage.size)
         assertEquals("aaa", firstPage[0].get("prop1"))
         assertEquals("bbb", firstPage[1].get("prop1"))
@@ -289,14 +286,13 @@ class FirebaseFirestoreTest {
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
-        val firstPage = query.limit(2).get().documents // First 2 results
-        assertEquals(2, firstPage.size)
+        val firstPage = query.get().documents // First 2 results
+        assertEquals(3, firstPage.size)
         assertEquals("aaa", firstPage[0].get("prop1"))
         assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
 
-        val lastDocumentSnapshot = firstPage.lastOrNull()
-        assertNotNull(lastDocumentSnapshot)
-        val secondPage = query.startAfter("bbb").limit(2).get().documents
+        val secondPage = query.startAt(listOf("bbb")).get().documents
         assertEquals(2, secondPage.size)
         assertEquals("bbb", secondPage[0].get("prop1"))
         assertEquals("ccc", secondPage[1].get("prop1"))
