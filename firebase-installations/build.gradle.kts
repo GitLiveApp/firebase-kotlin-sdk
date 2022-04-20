@@ -114,6 +114,8 @@ kotlin {
             }
         }
 
+        val commonTest by getting
+
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-installations")
@@ -146,7 +148,7 @@ kotlin {
         val tvosSimulatorArm64Test by getting
 
         val nativeTest by creating {
-            dependsOn(commonMain)
+            dependsOn(commonTest)
 
             iosTest.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
