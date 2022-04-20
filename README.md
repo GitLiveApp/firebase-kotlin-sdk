@@ -4,7 +4,7 @@
   <i>Real-time code collaboration inside any IDE</i><br/>
 <br/>
 <br/>
-The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the <a href="https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/">Firebase Android SDK Kotlin Extensions</a> but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting <strong>iOS</strong>, <strong>Android</strong> or <strong>JS</strong>.
+The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the <a href="https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/">Firebase Android SDK Kotlin Extensions</a> but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting <strong>iOS</strong>, <strong>macOS</strong>, <strong>tvOS</strong>, <strong>Android</strong> or <strong>JS</strong>.
 
 ## Available libraries
 
@@ -181,11 +181,11 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 
 ## Multiplatform
 
-The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
+The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *macOS*, *tvOS*, *Android* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
 
 ### Accessing the underlying Firebase SDK
 
-In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` properties which holds the  equivalent object of the underlying official Firebase SDK. 
+In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios`, `macos`, `tvos` (`native` for shared native code), and `js` properties which holds the  equivalent object of the underlying official Firebase SDK.
 
 These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
 
