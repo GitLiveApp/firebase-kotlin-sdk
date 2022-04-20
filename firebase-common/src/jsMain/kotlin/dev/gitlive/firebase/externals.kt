@@ -381,6 +381,13 @@ external object firebase {
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
             fun startAfter(document: DocumentSnapshot): Query
+            fun startAfter(vararg fieldValues: Any): Query
+            fun startAt(document: DocumentSnapshot): Query
+            fun startAt(vararg fieldValues: Any): Query
+            fun endBefore(document: DocumentSnapshot): Query
+            fun endBefore(vararg fieldValues: Any): Query
+            fun endAt(document: DocumentSnapshot): Query
+            fun endAt(vararg fieldValues: Any): Query
         }
 
         open class CollectionReference : Query {
