@@ -45,6 +45,22 @@ jobs:
         with:
           name: "iOS Test Report HTML"
           path: "firebase-firestore/build/reports/tests/iosTest/"
+      - name: Run macOS Tests
+        run: ./gradlew cleanTest macosX64Test
+      - name: Upload macOS test artifact
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: "macOS Test Report HTML"
+          path: "firebase-firestore/build/reports/tests/macosTest/"
+      - name: Run tvOS Tests
+        run: ./gradlew cleanTest tvosX64Test
+      - name: Upload tvOS test artifact
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: "tvOS Test Report HTML"
+          path: "firebase-firestore/build/reports/tests/tvosTest/"
       - name: Run Android Instrumented Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
