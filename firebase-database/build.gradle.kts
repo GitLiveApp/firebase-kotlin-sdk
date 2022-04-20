@@ -46,7 +46,7 @@ android {
         resources.pickFirsts.add("META-INF/LGPL2.1")
     }
     lint {
-        isAbortOnError = false
+        abortOnError = false
     }
 }
 
@@ -132,8 +132,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.FlowPreview")
