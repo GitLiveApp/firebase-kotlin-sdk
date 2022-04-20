@@ -70,6 +70,14 @@ expect open class Query {
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
 
     internal fun _startAfter(document: DocumentSnapshot): Query
+    internal fun _startAfter(vararg fieldValues: Any): Query
+    internal fun _startAt(document: DocumentSnapshot): Query
+    internal fun _startAt(vararg fieldValues: Any): Query
+
+    internal fun _endBefore(document: DocumentSnapshot): Query
+    internal fun _endBefore(vararg fieldValues: Any): Query
+    internal fun _endAt(document: DocumentSnapshot): Query
+    internal fun _endAt(vararg fieldValues: Any): Query
 }
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
@@ -85,6 +93,14 @@ fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
+fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*fieldValues)
+fun Query.startAt(document: DocumentSnapshot) = _startAt(document)
+fun Query.startAt(vararg fieldValues: Any) = _startAt(*fieldValues)
+
+fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
+fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*fieldValues)
+fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
+fun Query.endAt(vararg fieldValues: Any) = _endAt(*fieldValues)
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
