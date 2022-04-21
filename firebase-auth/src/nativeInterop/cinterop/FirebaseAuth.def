@@ -2,4 +2,5 @@ language = Objective-C
 package = cocoapods.FirebaseAuth
 modules = FirebaseAuth
 compilerOpts = -framework FirebaseAuth
-linkerOpts = -framework FirebaseAuth -framework GTMSessionFetcher
+linkerOpts = -framework FirebaseAuth -framework GTMSessionFetcher -framework Security
+linkerOpts.ios = -framework SafariServices

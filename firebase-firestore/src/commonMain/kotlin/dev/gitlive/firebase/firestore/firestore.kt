@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.Firebase
