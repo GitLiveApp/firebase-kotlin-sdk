@@ -62,12 +62,7 @@ subprojects {
     }
 
     tasks.withType<Sign>().configureEach {
-        // disable signing when publishing any artifact to maven local
-        onlyIf {
-            project.gradle.startParameter.taskNames.none { name ->
-                name.matches(Regex("publish.*ToMavenLocal"))
-            }
-        }
+        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }
 
     tasks.whenTaskAdded {
