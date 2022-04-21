@@ -207,6 +207,18 @@ if (project.property("firebase-auth.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-auth.skipMacOsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("macos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-auth.skipTvOsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("tvos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 signing {
     val signingKey: String? by project
     val signingPassword: String? by project
