@@ -109,7 +109,7 @@ class FirebaseAuthTest {
     fun testGetCredentialWithLink() {
         val link = "http://localhost:9099/emulator/action?mode=signIn&lang=en&oobCode=_vr0QcFcxcVeLZbrcU-GpTaZiuxlHquqdC8MSy0YM_vzWCTAQgV9Jq&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
         val email = "test@test.com"
-        val credential = EmailAuthProvider.getCredentialWithLink(email, link)
+        val credential = EmailAuthProvider.credentialWithLink(email, link)
         assertEquals("password", credential.providerId)
     }
 

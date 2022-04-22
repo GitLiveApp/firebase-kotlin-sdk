@@ -21,7 +21,7 @@ actual object EmailAuthProvider {
     ): AuthCredential =
         AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
 
-    actual fun getCredentialWithLink(
+    actual fun credentialWithLink(
         email: String,
         emailLink: String
     ): AuthCredential =
