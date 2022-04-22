@@ -18,8 +18,11 @@ actual object EmailAuthProvider {
     actual fun credential(
         email: String,
         password: String
-    ): AuthCredential =
-        AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
+    ): AuthCredential = AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
+
+    actual fun getCredentialWithLink(email: String, emailLink: String): AuthCredential {
+        return AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, link = emailLink))
+    }
 }
 
 actual object FacebookAuthProvider {

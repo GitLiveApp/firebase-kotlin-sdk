@@ -28,6 +28,11 @@ actual object EmailAuthProvider {
         email: String,
         password: String
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
+
+    actual fun getCredentialWithLink(
+        email: String,
+        emailLink: String
+    ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredentialWithLink(email, emailLink))
 }
 
 actual object FacebookAuthProvider {

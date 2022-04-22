@@ -15,6 +15,7 @@ expect class OAuthCredential : AuthCredential
 
 expect object EmailAuthProvider {
     fun credential(email: String, password: String): AuthCredential
+    fun getCredentialWithLink(email: String, emailLink: String): AuthCredential
 }
 
 expect object FacebookAuthProvider {

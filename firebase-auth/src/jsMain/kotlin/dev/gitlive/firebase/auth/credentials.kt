@@ -16,6 +16,11 @@ actual class OAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(
 actual object EmailAuthProvider {
     actual fun credential(email: String, password: String): AuthCredential =
         AuthCredential(firebase.auth.EmailAuthProvider.credential(email, password))
+
+    actual fun getCredentialWithLink(
+        email: String,
+        emailLink: String
+    ): AuthCredential = AuthCredential(firebase.auth.EmailAuthProvider.credentialWithLink(email, emailLink))
 }
 
 actual object FacebookAuthProvider {
