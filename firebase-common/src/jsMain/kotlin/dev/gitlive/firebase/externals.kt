@@ -128,6 +128,7 @@ external object firebase {
         class EmailAuthProvider : AuthProvider {
             companion object {
                 fun credential(email :  String, password : String): AuthCredential
+                fun credentialWithLink(email: String, emailLink: String): AuthCredential
             }
         }
 
