@@ -70,11 +70,34 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-            val cinteropDir: String by project
-            val frameworkName = "FirebaseFirestore"
             val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("$cinteropDir/Carthage/Build/iOS"),
-                projectDir.resolve("$cinteropDir/Carthage/Build/$frameworkName.xcframework/${konanTarget.archVariant}")
+                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
+            ).plus(
+                listOf(
+                    "FirebaseAnalytics",
+                    "FirebaseCore",
+                    "FirebaseCoreDiagnostics",
+                    "FirebaseInstallations",
+                    "GoogleAppMeasurement",
+                    "GoogleAppMeasurementIdentitySupport",
+                    "GoogleDataTransport",
+                    "GoogleUtilities",
+                    "nanopb",
+                    "PromisesObjC"
+                ).map {
+                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
+            ).plus(
+                listOf(
+                    "abseil",
+                    "BoringSSL-GRPC",
+                    "FirebaseFirestore",
+                    "gRPC-C++",
+                    "gRPC-Core",
+                    "leveldb-library"
+                ).map {
+                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
+                }
             )
 
             binaries {
@@ -85,7 +108,7 @@ kotlin {
             }
 
             compilations.getByName("main") {
-                cinterops.create(frameworkName) {
+                cinterops.create("FirebaseFirestore") {
                     compilerOpts(nativeFrameworkPaths.map { "-F$it" })
                     extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
                 }
