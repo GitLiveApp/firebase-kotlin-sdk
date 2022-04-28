@@ -140,7 +140,8 @@ kotlin {
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xopt-in=kotlin.Experimental",
             "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
+            "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
         )
     }
 
@@ -152,6 +153,7 @@ kotlin {
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
             }
         }
         val commonMain by getting {
