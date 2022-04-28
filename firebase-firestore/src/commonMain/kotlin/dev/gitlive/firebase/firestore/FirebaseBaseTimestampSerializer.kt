@@ -7,13 +7,14 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-abstract class FirebaseBaseTimestampSerializer<T> : KSerializer<T> {
+abstract class FirebaseBaseTimestampSerializer<T>(isNullable: Boolean = false) : KSerializer<T> {
 
     override val descriptor = object : SerialDescriptor {
         val keys = listOf("seconds", "nanoseconds")
         override val kind = StructureKind.OBJECT
         override val serialName = "Timestamp"
         override val elementsCount get() = 2
+        override val isNullable: Boolean get() = isNullable
         override fun getElementIndex(name: String) = keys.indexOf(name)
         override fun getElementName(index: Int) = keys[index]
         override fun getElementAnnotations(index: Int) = emptyList<Annotation>()
