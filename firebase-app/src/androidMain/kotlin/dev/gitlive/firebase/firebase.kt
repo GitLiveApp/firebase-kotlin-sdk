@@ -53,7 +53,7 @@ actual class FirebaseOptions actual constructor(
         actual fun withContext(context: Any): FirebaseOptions? {
             return when (context) {
                 is Context -> com.google.firebase.FirebaseOptions.fromResource(context)
-                else -> com.google.firebase.FirebaseOptions.Builder().build()
+                else -> null
             }?.run {
                 FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId)
             }
