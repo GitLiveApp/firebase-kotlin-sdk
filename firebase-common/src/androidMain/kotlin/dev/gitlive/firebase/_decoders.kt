@@ -18,9 +18,6 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         value != null && value::class.qualifiedName == "com.google.firebase.Timestamp" -> {
             makeTimestampJavaReflectionDecoder(value)
         }
-        value != null && value::class.qualifiedName == "com.google.firebase.firestore.GeoPoint" -> {
-            makeGeoPointJavaReflectionDecoder(value)
-        }
         value != null && value::class.qualifiedName == "com.google.firebase.firestore.DocumentReference" -> {
             makeDocumentReferenceJavaReflectionDecoder(value)
         }

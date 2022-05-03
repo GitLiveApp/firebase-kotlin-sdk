@@ -13,17 +13,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+
+expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
 
 class FirebaseFirestoreTest {
 
@@ -349,5 +345,31 @@ class FirebaseFirestoreTest {
     @Test
     fun testDefaultOptions() = runTest {
         assertNull(FirebaseOptions.withContext(1))
+    }
+
+    @Serializable
+    data class DataWithGeoPoint(
+        @Serializable(with = FirebaseGeoPointSerializer::class)
+        val geoPoint: GeoPoint
+    )
+
+    @Test
+    fun testGeoPointSerialization() = runTest {
+        fun getDocument() = Firebase.firestore.collection("geoPointSerialization")
+            .document("geoPointSerialization")
+
+        val data = DataWithGeoPoint(geoPointWith(12.34, 56.78))
+        // store geo point
+        getDocument().set(data)
+        // restore data
+        val savedData = getDocument().get().data<DataWithGeoPoint>()
+        assertEquals(data, savedData)
+
+        // update data
+        val updatedData = DataWithGeoPoint(geoPointWith(87.65, 43.21))
+        getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
+        // verify update
+        val updatedSavedData = getDocument().get().data<DataWithGeoPoint>()
+        assertEquals(updatedData, updatedSavedData)
     }
 }

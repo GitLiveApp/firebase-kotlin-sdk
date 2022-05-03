@@ -10,7 +10,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.modules.EmptySerializersModule
 
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value
 
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
@@ -93,6 +93,15 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     @ExperimentalSerializationApi
     override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder =
         FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity)
+
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        if (serializer is FirebaseSpecialValueSerializer) {
+            // special case of serialization: Firestore encodes and decodes some classes without use of serializers
+            this.value = value
+        } else {
+            super.encodeSerializableValue(serializer, value)
+        }
+    }
 }
 
 abstract class TimestampEncoder(internal val positiveInfinity: Any) {

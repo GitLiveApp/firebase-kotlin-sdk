@@ -28,6 +28,8 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     testRun.await()
 }
 
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
+
 class FirebaseFirestoreIOSTest {
 
     @BeforeTest

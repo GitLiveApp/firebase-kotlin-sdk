@@ -28,7 +28,7 @@ fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decodeDouble: 
 
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder
 
-class FirebaseDecoder(internal val value: Any?) : Decoder {
+class FirebaseDecoder(val value: Any?) : Decoder {
 
     override val serializersModule: SerializersModule
         get() = EmptySerializersModule
@@ -61,6 +61,15 @@ class FirebaseDecoder(internal val value: Any?) : Decoder {
 
     @ExperimentalSerializationApi
     override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
+
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return if (deserializer is FirebaseSpecialValueSerializer) {
+            // special case of deserialization: Firestore encodes and decodes some classes without use of serializers
+            value as T
+        } else {
+            super.decodeSerializableValue(deserializer)
+        }
+    }
 }
 
 class FirebaseClassDecoder(
