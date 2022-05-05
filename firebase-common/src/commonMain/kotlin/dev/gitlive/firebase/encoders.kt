@@ -93,15 +93,6 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     @ExperimentalSerializationApi
     override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder =
         FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity)
-
-    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-        if (serializer is FirebaseSpecialValueSerializer) {
-            // special case of serialization: Firestore encodes and decodes some classes without use of serializers
-            this.value = value
-        } else {
-            super.encodeSerializableValue(serializer, value)
-        }
-    }
 }
 
 abstract class TimestampEncoder(internal val positiveInfinity: Any) {

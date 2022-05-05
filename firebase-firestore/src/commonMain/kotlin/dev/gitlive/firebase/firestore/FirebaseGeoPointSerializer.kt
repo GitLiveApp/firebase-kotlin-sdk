@@ -2,7 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
-import dev.gitlive.firebase.FirebaseSpecialValueSerializer
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
@@ -11,7 +11,7 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
 /** Serializer for [GeoPoint] */
-object FirebaseGeoPointSerializer : FirebaseSpecialValueSerializer<GeoPoint> {
+object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override val descriptor = buildClassSerialDescriptor("GeoPoint") {
         element<Double>("latitude")
         element<Double>("longitude")

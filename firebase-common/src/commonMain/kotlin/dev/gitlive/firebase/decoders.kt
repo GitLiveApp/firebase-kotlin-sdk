@@ -61,15 +61,6 @@ class FirebaseDecoder(val value: Any?) : Decoder {
 
     @ExperimentalSerializationApi
     override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
-
-    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return if (deserializer is FirebaseSpecialValueSerializer) {
-            // special case of deserialization: Firestore encodes and decodes some classes without use of serializers
-            value as T
-        } else {
-            super.decodeSerializableValue(deserializer)
-        }
-    }
 }
 
 class FirebaseClassDecoder(
