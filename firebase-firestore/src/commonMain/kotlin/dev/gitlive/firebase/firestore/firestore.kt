@@ -140,6 +140,8 @@ expect class DocumentReference {
     suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
 
     suspend fun delete()
+
+    companion object
 }
 
 expect class CollectionReference : Query {

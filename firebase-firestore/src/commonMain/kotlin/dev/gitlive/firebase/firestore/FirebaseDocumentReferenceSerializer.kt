@@ -1,43 +1,46 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseCompositeDecoder
-import dev.gitlive.firebase.FirebaseCompositeEncoder
+import dev.gitlive.firebase.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 
-expect class FirebaseDocumentReferenceEncoder() {
-    fun encode(value: DocumentReference): Any
-}
+/** Platform specific value of the document reference. */
+internal expect val DocumentReference.platformValue: Any
+internal expect fun DocumentReference.Companion.fromPlatformValue(platformValue: Any): DocumentReference
 
-class FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
+object FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
 
-    override val descriptor = object : SerialDescriptor {
-        val keys = listOf("path")
-        override val kind = StructureKind.OBJECT
-        override val serialName = "DocumentReference"
-        override val elementsCount get() = 1
-        override fun getElementIndex(name: String) = keys.indexOf(name)
-        override fun getElementName(index: Int) = keys[index]
-        override fun getElementAnnotations(index: Int) = emptyList<Annotation>()
-        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
-        override fun isElementOptional(index: Int) = false
+    override val descriptor = buildClassSerialDescriptor("DocumentReference") {
+        element<String>("path")
     }
 
     override fun serialize(encoder: Encoder, value: DocumentReference) {
-        val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
-        val documentReferenceEncoder = FirebaseDocumentReferenceEncoder()
-        objectEncoder.encodeObject(descriptor, 0, documentReferenceEncoder.encode(value))
-        objectEncoder.endStructure(descriptor)
+        if (encoder is FirebaseEncoder) {
+            // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
+            encoder.value = value.platformValue
+        } else {
+            encoder.encodeStructure(descriptor) {
+                encodeStringElement(descriptor, 0, value.path)
+            }
+        }
     }
 
     override fun deserialize(decoder: Decoder): DocumentReference {
-        val objectDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
-        val path = objectDecoder.decodeStringElement(descriptor, 0)
-        objectDecoder.endStructure(descriptor)
-        return Firebase.firestore.document(path)
+        return if (decoder is FirebaseDecoder) {
+            // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
+            DocumentReference.fromPlatformValue(requireNotNull(decoder.value))
+        } else {
+            decoder.decodeStructure(descriptor) {
+                val path = decodeStringElement(descriptor, 0)
+                Firebase.firestore.document(path)
+            }
+        }
     }
 }

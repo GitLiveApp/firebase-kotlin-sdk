@@ -347,14 +347,14 @@ class FirebaseFirestoreTest {
         assertNull(FirebaseOptions.withContext(1))
     }
 
-    @Serializable
-    data class DataWithGeoPoint(
-        @Serializable(with = FirebaseGeoPointSerializer::class)
-        val geoPoint: GeoPoint
-    )
-
     @Test
     fun testGeoPointSerialization() = runTest {
+        @Serializable
+        data class DataWithGeoPoint(
+            @Serializable(with = FirebaseGeoPointSerializer::class)
+            val geoPoint: GeoPoint
+        )
+
         fun getDocument() = Firebase.firestore.collection("geoPointSerialization")
             .document("geoPointSerialization")
 
@@ -371,5 +371,40 @@ class FirebaseFirestoreTest {
         // verify update
         val updatedSavedData = getDocument().get().data<DataWithGeoPoint>()
         assertEquals(updatedData, updatedSavedData)
+    }
+
+    @Test
+    fun testDocumentReferenceSerialization() = runTest {
+        @Serializable
+        data class DataWithDocumentReference(
+            @Serializable(with = FirebaseDocumentReferenceSerializer::class)
+            val documentReference: DocumentReference
+        )
+
+        fun getCollection() = Firebase.firestore.collection("documentReferenceSerialization")
+        fun getDocument() = Firebase.firestore.collection("documentReferenceSerialization")
+            .document("documentReferenceSerialization")
+        val documentRef1 = getCollection().document("refDoc1").apply {
+            set(mapOf("value" to 1))
+        }
+        val documentRef2 = getCollection().document("refDoc2").apply {
+            set(mapOf("value" to 2))
+        }
+
+        val data = DataWithDocumentReference(documentRef1)
+        // store geo point
+        getDocument().set(data)
+        // restore data
+        val savedData = getDocument().get().data<DataWithDocumentReference>()
+        assertEquals(data.documentReference.path, savedData.documentReference.path)
+
+        // update data
+        val updatedData = DataWithDocumentReference(documentRef2)
+        getDocument().update(
+            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(FirebaseDocumentReferenceSerializer)
+        )
+        // verify update
+        val updatedSavedData = getDocument().get().data<DataWithDocumentReference>()
+        assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
     }
 }
