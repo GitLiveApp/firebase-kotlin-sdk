@@ -1,8 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.descriptors.SerialDescriptor
 
 /** @return whether value is special and shouldn't be encoded. */
 @PublishedApi

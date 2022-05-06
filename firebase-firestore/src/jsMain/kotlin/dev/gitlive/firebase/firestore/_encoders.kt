@@ -2,4 +2,10 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.firebase
 
-actual fun isFieldValue(value: Any) : Boolean = value is firebase.firestore.FieldValue
+actual fun isSpecialValue(value: Any) = when(value) {
+    is firebase.firestore.FieldValue,
+    is firebase.firestore.GeoPoint,
+    is firebase.firestore.Timestamp,
+    is firebase.firestore.DocumentReference -> true
+    else -> false
+}

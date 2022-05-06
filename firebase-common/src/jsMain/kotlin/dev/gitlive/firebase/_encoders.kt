@@ -20,7 +20,7 @@ actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): Compo
         value = map
         FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> if(index % 2 == 0) lastKey = value as String else map[lastKey] = value }
     }
-    StructureKind.CLASS,  StructureKind.OBJECT -> json()
+    StructureKind.CLASS, StructureKind.OBJECT -> json()
         .also { value = it }
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[descriptor.getElementName(index)] = value } }
     else -> TODO("Not implemented ${descriptor.kind}")
