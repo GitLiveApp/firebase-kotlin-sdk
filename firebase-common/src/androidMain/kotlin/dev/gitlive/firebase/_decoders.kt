@@ -10,13 +10,9 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder = when(descriptor.kind) {
-    StructureKind.CLASS, StructureKind.OBJECT -> when {
-        value is Map<*, *> ->
-            FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
-                value[desc.getElementName(index)]
-            }
-        value != null && value::class.qualifiedName == "com.google.firebase.Timestamp" -> {
-            makeTimestampJavaReflectionDecoder(value)
+    StructureKind.CLASS, StructureKind.OBJECT -> when (value) {
+        is Map<*, *> -> FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
+            value[desc.getElementName(index)]
         }
         else -> FirebaseEmptyCompositeDecoder()
     }
@@ -27,23 +23,4 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         FirebaseCompositeDecoder(it.size) { _, index -> it[index / 2].run { if (index % 2 == 0) key else value } }
     }
     else -> TODO("Not implemented ${descriptor.kind}")
-}
-
-private val timestampKeys = setOf("seconds", "nanoseconds")
-
-private fun makeTimestampJavaReflectionDecoder(jvmObj: Any): CompositeDecoder {
-    val timestampClass = Class.forName("com.google.firebase.Timestamp")
-    val getSeconds = timestampClass.getMethod("getSeconds")
-    val getNanoseconds = timestampClass.getMethod("getNanoseconds")
-
-    return FirebaseClassDecoder(
-        size = 2,
-        containsKey = { timestampKeys.contains(it) }
-    ) { descriptor, index ->
-        when (descriptor.getElementName(index)) {
-            "seconds" -> getSeconds.invoke(jvmObj) as Long
-            "nanoseconds" -> getNanoseconds.invoke(jvmObj) as Int
-            else -> null
-        }
-    }
 }

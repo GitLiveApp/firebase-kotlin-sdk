@@ -137,17 +137,17 @@ class FirebaseFirestoreTest {
             FirestoreTimeTest.serializer(),
             FirestoreTimeTest("ServerTimestamp", timestampWith(0, 0)),
         )
-        assertEquals(timestampWith(0, 0), doc.get().get("time", FirebaseTimestampSerializer()))
+        assertEquals(timestampWith(0, 0), doc.get().get("time", FirebaseTimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
                 "time" to timestampWith(123, 0)
-                    .withSerializer(FirebaseTimestampSerializer())
+                    .withSerializer(FirebaseTimestampSerializer)
             )
         )
         assertEquals(timestampWith(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", FirebaseTimestampSerializer()))
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", FirebaseTimestampSerializer))
         assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
@@ -171,7 +171,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer(), ServerTimestampBehavior.NONE))
+        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer, ServerTimestampBehavior.NONE))
     }
 
     @Test
@@ -215,7 +215,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNotNull(pendingWritesSnapshot.get("time", FirebaseTimestampSerializer(), ServerTimestampBehavior.ESTIMATE))
+        assertNotNull(pendingWritesSnapshot.get("time", FirebaseTimestampSerializer, ServerTimestampBehavior.ESTIMATE))
         assertNotEquals(timestampWith(0, 0), pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
@@ -236,7 +236,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer(), ServerTimestampBehavior.PREVIOUS))
+        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer, ServerTimestampBehavior.PREVIOUS))
     }
 
     @Test

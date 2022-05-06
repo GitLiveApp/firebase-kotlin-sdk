@@ -2,7 +2,6 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -11,7 +10,7 @@ abstract class AbstractFirebaseReferenceSerializer<T>(
     private val isNullable: Boolean
 ) : KSerializer<T> {
 
-    override val descriptor = buildClassSerialDescriptor("DocumentReference") {
+    override val descriptor = buildClassSerialDescriptor("DocumentReference", isNullable = isNullable) {
         isNullable = this@AbstractFirebaseReferenceSerializer.isNullable
         element<String>("path")
     }
@@ -30,8 +29,8 @@ abstract class AbstractFirebaseReferenceSerializer<T>(
     }
 
     protected fun decode(decoder: Decoder): FirebaseReference? {
-        if (decoder is FirebaseDecoder) {
-            return decoder.value
+        return if (decoder is FirebaseDecoder) {
+            decoder.value
                 ?.let(DocumentReference::fromPlatformValue)
                 ?.let(FirebaseReference::Value)
         } else {
