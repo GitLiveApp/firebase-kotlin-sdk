@@ -19,10 +19,7 @@ expect val Firebase.firestore: FirebaseFirestore
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class FirebaseFirestore {
-    fun collection(collectionPath: String): CollectionReference
-    fun collectionGroup(collectionId: String): Query
-    fun document(documentPath: String): DocumentReference
-    fun batch(): WriteBatch
+
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
