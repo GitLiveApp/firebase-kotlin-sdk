@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore
 
+/** A class representing a Firebase Timestamp. */
 expect class Timestamp
 
 expect fun timestampNow(): Timestamp

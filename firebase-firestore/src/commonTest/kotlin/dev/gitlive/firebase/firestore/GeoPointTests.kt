@@ -21,12 +21,8 @@ class GeoPointTests {
         val geoPoint = geoPointWith(12.3, 45.6)
         val item = TestDataWithGeoPoint("123", geoPoint)
         val encoded = encode(item, shouldEncodeElementDefault = false)
-        println("===== encoded $encoded ${encoded?.let {encoded::class}}")
         val encodedMap = encodedAsMap(encoded)
-        println("===== uid ${encodedMap["uid"]} geo point ${encodedMap["location"]} ${encodedMap["location"]?.let{it::class}} original geo point $geoPoint")
         assertEquals("123", encodedMap["uid"])
-
-        // check that GeoPoint was not encoded
         assertEquals(geoPoint, encodedMap["location"])
     }
 

@@ -29,8 +29,6 @@ actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
     }
 }
 
-fun getValueFromEncoded(encoded: Any?, key: String) = (encoded as Json)[key]
-
 internal fun Throwable.log() {
     console.error(this)
     cause?.let {

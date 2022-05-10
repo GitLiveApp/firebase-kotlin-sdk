@@ -2,7 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.SerializationStrategy
 
-/** @return whether value is special and shouldn't be encoded. */
+/** @return whether value is special and shouldn't be encoded/decoded. */
 @PublishedApi
 internal expect fun isSpecialValue(value: Any): Boolean
 

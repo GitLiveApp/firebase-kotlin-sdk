@@ -20,7 +20,7 @@ fun buildClassSerialDescriptor(
     )
 
     return if (isNullable && !descriptor.isNullable) {
-        // bug https://youtrack.jetbrains.com/issue/KT-52300/Serialization-buildClassSerialDescriptor-ClassSerialDescriptorBu
+        // bug https://github.com/Kotlin/kotlinx.serialization/issues/1929
         descriptor.nullable
     } else {
         descriptor

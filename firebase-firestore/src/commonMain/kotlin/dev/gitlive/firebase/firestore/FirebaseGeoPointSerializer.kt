@@ -10,7 +10,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
-/** Serializer for [GeoPoint] */
+/** Serializer for [GeoPoint].If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override val descriptor = buildClassSerialDescriptor("GeoPoint") {
         element<Double>("latitude")

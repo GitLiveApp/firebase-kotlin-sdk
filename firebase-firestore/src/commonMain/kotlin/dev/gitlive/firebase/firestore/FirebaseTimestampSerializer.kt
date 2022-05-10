@@ -10,7 +10,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
-abstract class AbstractFirebaseTimestampSerializer<T>(
+sealed class AbstractFirebaseTimestampSerializer<T>(
     private val isNullable: Boolean
 ) : KSerializer<T> {
     override val descriptor = buildClassSerialDescriptor("Timestamp", isNullable = isNullable) {
@@ -76,6 +76,7 @@ abstract class AbstractFirebaseTimestampSerializer<T>(
     }
 }
 
+/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object FirebaseTimestampSerializer : AbstractFirebaseTimestampSerializer<Any>(
     isNullable = false
 ) {
@@ -83,6 +84,10 @@ object FirebaseTimestampSerializer : AbstractFirebaseTimestampSerializer<Any>(
     override fun deserialize(decoder: Decoder): Any = requireNotNull(decode(decoder))
 }
 
+/**
+ * A serializer for [Timestamp] which decodes `null` in case of deserialization errors.
+ * If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
+ */
 object FirebaseNullableTimestampSerializer : AbstractFirebaseTimestampSerializer<Any?>(
     isNullable = true
 ) {

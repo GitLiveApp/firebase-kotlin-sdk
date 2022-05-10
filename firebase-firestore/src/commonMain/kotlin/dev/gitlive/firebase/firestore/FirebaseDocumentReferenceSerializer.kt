@@ -11,8 +11,13 @@ import kotlinx.serialization.encoding.encodeStructure
 
 /** Platform specific value of the document reference. */
 internal expect val DocumentReference.platformValue: Any
+/** Constructs [DocumentReference] from a platform specific value. */
 internal expect fun DocumentReference.Companion.fromPlatformValue(platformValue: Any): DocumentReference
 
+/**
+ * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
+ *
+ */
 object FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
 
     override val descriptor = buildClassSerialDescriptor("DocumentReference") {

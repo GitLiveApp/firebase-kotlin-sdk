@@ -6,7 +6,7 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-abstract class AbstractFirebaseReferenceSerializer<T>(
+sealed class AbstractFirebaseReferenceSerializer<T>(
     private val isNullable: Boolean
 ) : KSerializer<T> {
 
@@ -34,11 +34,12 @@ abstract class AbstractFirebaseReferenceSerializer<T>(
                 ?.let(DocumentReference::fromPlatformValue)
                 ?.let(FirebaseReference::Value)
         } else {
-            throw IllegalArgumentException("This serializer shall be used with FirebaseEncoder")
+            throw IllegalArgumentException("This serializer shall be used with FirebaseDecoder")
         }
     }
 }
 
+/** A nullable serializer for [FirebaseReference]. */
 object FirebaseReferenceNullableSerializer : AbstractFirebaseReferenceSerializer<FirebaseReference?>(
     isNullable = true
 ) {
@@ -46,6 +47,7 @@ object FirebaseReferenceNullableSerializer : AbstractFirebaseReferenceSerializer
     override fun deserialize(decoder: Decoder): FirebaseReference? = decode(decoder)
 }
 
+/** A serializer for [FirebaseReference]. */
 object FirebaseReferenceSerializer : AbstractFirebaseReferenceSerializer<FirebaseReference>(
     isNullable = false
 ) {
