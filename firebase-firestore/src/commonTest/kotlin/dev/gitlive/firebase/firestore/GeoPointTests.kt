@@ -20,9 +20,10 @@ class GeoPointTests {
     fun encodeGeoPointObject() = runTest {
         val geoPoint = geoPointWith(12.3, 45.6)
         val item = TestDataWithGeoPoint("123", geoPoint)
-        val encoded = encode(item, shouldEncodeElementDefault = false) as Map<String, Any?>
-        assertEquals("123", encoded["uid"])
-        assertEquals(geoPoint, encoded["location"])
+        val encoded = encode(item, shouldEncodeElementDefault = false)
+        val encodedMap = encodedAsMap(encoded)
+        assertEquals("123", encodedMap["uid"])
+        assertEquals(geoPoint, encodedMap["location"])
     }
 
     @Test

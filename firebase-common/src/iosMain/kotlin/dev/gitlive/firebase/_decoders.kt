@@ -12,19 +12,9 @@ import platform.Foundation.*
 import platform.darwin.NSObject
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder = when(descriptor.kind) {
-    StructureKind.CLASS, StructureKind.OBJECT -> when {
-        value is Map<*, *> ->
-            FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
-                value[desc.getElementName(index)]
-            }
-        value is NSObject && NSClassFromString("FIRTimestamp") == value.`class`() -> {
-            makeFIRTimestampDecoder(value)
-        }
-        value is NSObject && NSClassFromString("FIRGeoPoint") == value.`class`() -> {
-            makeFIRGeoPointDecoder(value)
-        }
-        value is NSObject && NSClassFromString("FIRDocumentReference") == value.`class`() -> {
-            makeFIRDocumentReferenceDecoder(value)
+    StructureKind.CLASS, StructureKind.OBJECT -> when (value) {
+        is Map<*, *> -> FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
+            value[desc.getElementName(index)]
         }
         else -> FirebaseEmptyCompositeDecoder()
     }
@@ -35,28 +25,4 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
     }
     else -> TODO("Not implemented ${descriptor.kind}")
-}
-
-private val timestampKeys = setOf("seconds", "nanoseconds")
-private fun makeFIRTimestampDecoder(objcObj: NSObject) = FirebaseClassDecoder(
-    size = 2,
-    containsKey = { timestampKeys.contains(it) }
-) { descriptor, index ->
-    objcObj.valueForKeyPath(descriptor.getElementName(index))
-}
-
-private val geoPointKeys = setOf("latitude", "longitude")
-private fun makeFIRGeoPointDecoder(objcObj: NSObject) = FirebaseClassDecoder(
-    size = 2,
-    containsKey = { geoPointKeys.contains(it) }
-) { descriptor, index ->
-    objcObj.valueForKeyPath(descriptor.getElementName(index))
-}
-
-private val documentKeys = setOf("path")
-private fun makeFIRDocumentReferenceDecoder(objcObj: NSObject) = FirebaseClassDecoder(
-    size = 1,
-    containsKey = { documentKeys.contains(it) }
-) { descriptor, index ->
-    objcObj.valueForKeyPath(descriptor.getElementName(index))
 }

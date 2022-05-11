@@ -1,38 +1,45 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.FirebaseCompositeDecoder
-import dev.gitlive.firebase.FirebaseCompositeEncoder
+import dev.gitlive.firebase.FirebaseDecoder
+import dev.gitlive.firebase.FirebaseEncoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 
-class FirebaseGeoPointSerializer :  KSerializer<GeoPoint> {
-
-    override val descriptor = object : SerialDescriptor {
-        val keys = listOf("latitude", "longitude")
-        override val kind = StructureKind.OBJECT
-        override val serialName = "GeoPoint"
-        override val elementsCount get() = 2
-        override fun getElementIndex(name: String) = keys.indexOf(name)
-        override fun getElementName(index: Int) = keys[index]
-        override fun getElementAnnotations(index: Int) = emptyList<Annotation>()
-        override fun getElementDescriptor(index: Int) = throw NotImplementedError()
-        override fun isElementOptional(index: Int) = false
+/** Serializer for [GeoPoint].If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
+    override val descriptor = buildClassSerialDescriptor("GeoPoint") {
+        element<Double>("latitude")
+        element<Double>("longitude")
     }
 
     override fun serialize(encoder: Encoder, value: GeoPoint) {
-        val objectEncoder = encoder.beginStructure(descriptor) as FirebaseCompositeEncoder
-        objectEncoder.encodeObject(descriptor, 0, value)
-        objectEncoder.endStructure(descriptor)
+        if (encoder is FirebaseEncoder) {
+            // special case if encoding. Firestore encodes and decodes GeoPoints without use of serializers
+            encoder.value = value
+        } else {
+            encoder.encodeStructure(descriptor) {
+                encodeDoubleElement(descriptor, 0, value.latitude)
+                encodeDoubleElement(descriptor, 1, value.longitude)
+            }
+        }
     }
 
     override fun deserialize(decoder: Decoder): GeoPoint {
-        val objectDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
-        val latitude = objectDecoder.decodeDoubleElement(descriptor, 0)
-        val longitude = objectDecoder.decodeDoubleElement(descriptor, 1)
-        objectDecoder.endStructure(descriptor)
-        return geoPointWith(latitude, longitude)
+        return if (decoder is FirebaseDecoder) {
+            // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
+            decoder.value as GeoPoint
+        } else {
+            decoder.decodeStructure(descriptor) {
+                geoPointWith(
+                    latitude = decodeDoubleElement(descriptor, 0),
+                    longitude = decodeDoubleElement(descriptor, 1)
+                )
+            }
+        }
     }
 }

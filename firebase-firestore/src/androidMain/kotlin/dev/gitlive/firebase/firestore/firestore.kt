@@ -325,6 +325,8 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         }
         awaitClose { listener.remove() }
     }
+
+    actual companion object
 }
 
 actual open class Query(open val android: com.google.firebase.firestore.Query) {

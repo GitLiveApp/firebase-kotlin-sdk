@@ -5,7 +5,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, prerelease ]
 
 jobs:
   build:
@@ -30,6 +30,7 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
       - name: Run JS Tests
+        if: ${{ false }}
         run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v2

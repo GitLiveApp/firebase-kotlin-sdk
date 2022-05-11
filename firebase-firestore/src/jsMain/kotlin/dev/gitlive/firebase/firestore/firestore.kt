@@ -287,6 +287,7 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         )
         awaitClose { unsubscribe() }
     }
+    actual companion object
 }
 
 actual open class Query(open val js: firebase.firestore.Query) {

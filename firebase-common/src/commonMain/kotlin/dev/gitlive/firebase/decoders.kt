@@ -28,7 +28,7 @@ fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decodeDouble: 
 
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder
 
-class FirebaseDecoder(internal val value: Any?) : Decoder {
+class FirebaseDecoder(val value: Any?) : Decoder {
 
     override val serializersModule: SerializersModule
         get() = EmptySerializersModule

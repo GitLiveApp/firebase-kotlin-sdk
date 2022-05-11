@@ -10,7 +10,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.modules.EmptySerializersModule
 
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
+    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value
 
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
     FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {

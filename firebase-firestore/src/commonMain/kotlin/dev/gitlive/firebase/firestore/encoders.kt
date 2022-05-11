@@ -2,11 +2,13 @@ package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.SerializationStrategy
 
-expect fun isFieldValue(value: Any) : Boolean
+/** @return whether value is special and shouldn't be encoded/decoded. */
+@PublishedApi
+internal expect fun isSpecialValue(value: Any): Boolean
 
 @PublishedApi
 internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    if (value?.let(::isFieldValue) == true) {
+    if (value?.let(::isSpecialValue) == true) {
         value
     } else {
         dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FieldValue.serverTimestamp())
@@ -33,4 +35,4 @@ internal fun encodeAsMap(
     encodeDefaults: Boolean = false,
     vararg fieldsAndValues: Pair<String, Any?>
 ): Map<String, Any?>? = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-    ?.map { (field, value) -> field to encode(value, encodeDefaults) }?.toMap()
+    ?.associate { (field, value) -> field to encode(value, encodeDefaults) }

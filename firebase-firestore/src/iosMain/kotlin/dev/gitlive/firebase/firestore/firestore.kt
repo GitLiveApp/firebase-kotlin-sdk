@@ -257,6 +257,8 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         }
         awaitClose { listener.remove() }
     }
+
+    actual companion object
 }
 
 actual open class Query(open val ios: FIRQuery) {

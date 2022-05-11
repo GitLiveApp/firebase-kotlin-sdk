@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
+import kotlin.js.Json
 
 actual val emulatorHost: String = "localhost"
 
@@ -21,6 +22,12 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = GlobalScope
             throw e
         }
     }.asDynamic()
+
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
+    return (js("Object").entries(encoded) as Array<Array<Any>>).associate {
+        it[0] as String to it[1]
+    }
+}
 
 internal fun Throwable.log() {
     console.error(this)

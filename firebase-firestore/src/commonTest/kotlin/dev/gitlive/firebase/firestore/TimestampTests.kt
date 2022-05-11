@@ -57,7 +57,7 @@ class TimestampTests {
 
     @Test
     fun decodeEmptyTimestampObject() = runTest {
-        val obj = mapOf("uid" to "uid123", "createdAt" to timestampNow(), "updatedAt" to Unit)
+        val obj = mapOf("uid" to "uid123", "createdAt" to timestampNow(), "updatedAt" to null)
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         assertEquals(null, decoded.updatedAt)
