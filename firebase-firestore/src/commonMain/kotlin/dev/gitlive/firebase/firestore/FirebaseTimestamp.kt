@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 sealed class FirebaseTimestamp {
     data class Value(val value: Timestamp) : FirebaseTimestamp()
     object ServerValue : FirebaseTimestamp()
+    @Deprecated("Consider using DocumentReference.update with FieldValue.delete")
     object ServerDelete : FirebaseTimestamp()
 }
 

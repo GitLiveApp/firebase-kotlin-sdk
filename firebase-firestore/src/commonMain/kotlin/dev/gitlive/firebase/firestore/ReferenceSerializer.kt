@@ -40,6 +40,7 @@ sealed class AbstractFirebaseReferenceSerializer<T>(
 }
 
 /** A nullable serializer for [FirebaseReference]. */
+@Deprecated("Consider using DocumentReference and FirebaseDocumentReferenceSerializer instead")
 object FirebaseReferenceNullableSerializer : AbstractFirebaseReferenceSerializer<FirebaseReference?>(
     isNullable = true
 ) {
@@ -48,6 +49,7 @@ object FirebaseReferenceNullableSerializer : AbstractFirebaseReferenceSerializer
 }
 
 /** A serializer for [FirebaseReference]. */
+@Deprecated("Consider using DocumentReference and FirebaseDocumentReferenceSerializer instead")
 object FirebaseReferenceSerializer : AbstractFirebaseReferenceSerializer<FirebaseReference>(
     isNullable = false
 ) {
