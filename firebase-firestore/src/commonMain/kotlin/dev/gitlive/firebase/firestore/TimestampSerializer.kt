@@ -28,7 +28,7 @@ sealed class AbstractTimestampSerializer<T>(
                 }
             }
         } else {
-            throw IllegalArgumentException("This serializer shall be used with FirebaseEncoder")
+            throw IllegalArgumentException("This serializer must be used with FirebaseEncoder")
         }
     }
 
@@ -36,7 +36,7 @@ sealed class AbstractTimestampSerializer<T>(
         return if (decoder is FirebaseDecoder) {
             (decoder.value as? Timestamp)?.let(FirebaseTimestamp::Value)
         } else {
-            throw IllegalArgumentException("This serializer shall be used with FirebaseDecoder")
+            throw IllegalArgumentException("This serializer must be used with FirebaseDecoder")
         }
     }
 }

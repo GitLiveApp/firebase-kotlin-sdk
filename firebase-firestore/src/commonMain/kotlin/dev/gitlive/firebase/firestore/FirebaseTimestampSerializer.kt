@@ -37,7 +37,7 @@ sealed class AbstractFirebaseTimestampSerializer<T>(
         require(value != null || isNullable)
 
         if (encoder is FirebaseEncoder) {
-            // special case if encoding. Firestore encodes and decodes GeoPoints without use of serializers
+            // special case if encoding. Firestore encodes and decodes Timestamp without use of serializers
             encoder.value = value
         } else {
             if (value != null) {
@@ -53,7 +53,7 @@ sealed class AbstractFirebaseTimestampSerializer<T>(
 
     protected fun decode(decoder: Decoder): Timestamp? {
         return if (decoder is FirebaseDecoder) {
-            // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
+            // special case if decoding. Firestore encodes and decodes Timestamp without use of serializers
             when (val value = decoder.value) {
                 null -> null
                 is Timestamp -> value

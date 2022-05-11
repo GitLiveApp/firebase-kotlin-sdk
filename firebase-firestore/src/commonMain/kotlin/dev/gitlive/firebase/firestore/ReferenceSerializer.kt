@@ -24,7 +24,7 @@ sealed class AbstractFirebaseReferenceSerializer<T>(
                 }
             }
         } else {
-            throw IllegalArgumentException("This serializer shall be used with FirebaseEncoder")
+            throw IllegalArgumentException("This serializer must be used with FirebaseEncoder")
         }
     }
 
@@ -34,7 +34,7 @@ sealed class AbstractFirebaseReferenceSerializer<T>(
                 ?.let(DocumentReference::fromPlatformValue)
                 ?.let(FirebaseReference::Value)
         } else {
-            throw IllegalArgumentException("This serializer shall be used with FirebaseDecoder")
+            throw IllegalArgumentException("This serializer must be used with FirebaseDecoder")
         }
     }
 }
