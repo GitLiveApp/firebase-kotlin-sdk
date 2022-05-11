@@ -255,7 +255,15 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
         fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
             ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> js.update(encoded.toMap()) }
+            ?.let { encoded ->
+                js.update(
+                    encoded.first().first,
+                    encoded.first().second,
+                    *encoded.drop(1)
+                        .flatMap { (field, value) -> listOf(field, value) }
+                        .toTypedArray()
+                )
+            }
             ?.await()
     }.run { Unit }
 

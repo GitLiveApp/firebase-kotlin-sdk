@@ -26,12 +26,15 @@ fun assertGeoPointEquals(expected: GeoPoint, actual: GeoPoint) {
     assertTrue(expected.latitude == actual.latitude ||
             expected.longitude == actual.longitude, "Expected <$expected>, actual <$actual>.")
 }
-/** Special method due to JS implementation limitation. */
+
 fun assertTimestampEquals(expected: Timestamp, actual: Any?) {
     val casted = actual as? Timestamp
     assertTrue(expected.seconds == casted?.seconds ||
             expected.nanoseconds == casted?.nanoseconds, "Expected <$expected>, actual <$actual>.")
 }
+
+/** Special method due to JS implementation limitation. */
+expect fun customAssertEquals(expected: Any?, actual: Any?)
 
 // NOTE: there are several limitations caused by JS:
 // 1. serializer<T>() does not work in a legacy JS so serializers has to be provided explicitly

@@ -37,7 +37,7 @@ class TimestampTests {
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
         assertEquals("uid123", encoded["uid"])
         assertEquals(timestamp, encoded["createdAt"])
-        assertEquals(FieldValue.serverTimestamp(), encoded["deletedAt"])
+        customAssertEquals(FieldValue.serverTimestamp(), encoded["deletedAt"])
     }
 
     @Test
@@ -86,6 +86,6 @@ class TimestampTests {
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
         assertEquals("uid123", encoded["uid"])
         assertEquals(timestamp, encoded["createdAt"])
-        assertEquals(FieldValue.delete, encoded["deletedAt"])
+        customAssertEquals(FieldValue.delete, encoded["deletedAt"])
     }
 }
