@@ -20,7 +20,22 @@ expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
+expect fun mapAsEncoded(map: Map<String, Any?>): Any
+/** Special method due to JS implementation limitation. */
+fun assertGeoPointEquals(expected: GeoPoint, actual: GeoPoint) {
+    assertTrue(expected.latitude == actual.latitude ||
+            expected.longitude == actual.longitude, "Expected <$expected>, actual <$actual>.")
+}
+/** Special method due to JS implementation limitation. */
+fun assertTimestampEquals(expected: Timestamp, actual: Any?) {
+    val casted = actual as? Timestamp
+    assertTrue(expected.seconds == casted?.seconds ||
+            expected.nanoseconds == casted?.nanoseconds, "Expected <$expected>, actual <$actual>.")
+}
 
+// NOTE: there are several limitations caused by JS:
+// 1. serializer<T>() does not work in a legacy JS so serializers has to be provided explicitly
+// 2. equals doesn't work for JS GeoPoint and JS Timestamp
 class FirebaseFirestoreTest {
 
     @Serializable
@@ -137,7 +152,7 @@ class FirebaseFirestoreTest {
             FirestoreTimeTest.serializer(),
             FirestoreTimeTest("ServerTimestamp", timestampWith(0, 0)),
         )
-        assertEquals(timestampWith(0, 0), doc.get().get("time", FirebaseTimestampSerializer))
+        assertTimestampEquals(timestampWith(0, 0), doc.get().get("time", FirebaseTimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
@@ -145,7 +160,7 @@ class FirebaseFirestoreTest {
                     .withSerializer(FirebaseTimestampSerializer)
             )
         )
-        assertEquals(timestampWith(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertTimestampEquals(timestampWith(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
         assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", FirebaseTimestampSerializer))
         assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
@@ -360,17 +375,17 @@ class FirebaseFirestoreTest {
 
         val data = DataWithGeoPoint(geoPointWith(12.34, 56.78))
         // store geo point
-        getDocument().set(data)
+        getDocument().set(DataWithGeoPoint.serializer(), data)
         // restore data
-        val savedData = getDocument().get().data<DataWithGeoPoint>()
-        assertEquals(data, savedData)
+        val savedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        assertGeoPointEquals(data.geoPoint, savedData.geoPoint)
 
         // update data
         val updatedData = DataWithGeoPoint(geoPointWith(87.65, 43.21))
         getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
         // verify update
-        val updatedSavedData = getDocument().get().data<DataWithGeoPoint>()
-        assertEquals(updatedData, updatedSavedData)
+        val updatedSavedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        assertGeoPointEquals(updatedData.geoPoint, updatedSavedData.geoPoint)
     }
 
     @Test
@@ -393,9 +408,9 @@ class FirebaseFirestoreTest {
 
         val data = DataWithDocumentReference(documentRef1)
         // store geo point
-        getDocument().set(data)
+        getDocument().set(DataWithDocumentReference.serializer(), data)
         // restore data
-        val savedData = getDocument().get().data<DataWithDocumentReference>()
+        val savedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(data.documentReference.path, savedData.documentReference.path)
 
         // update data
@@ -404,7 +419,7 @@ class FirebaseFirestoreTest {
             FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(FirebaseDocumentReferenceSerializer)
         )
         // verify update
-        val updatedSavedData = getDocument().get().data<DataWithDocumentReference>()
+        val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
     }
 }

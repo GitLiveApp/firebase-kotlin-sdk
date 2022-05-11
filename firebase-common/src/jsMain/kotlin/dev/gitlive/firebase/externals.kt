@@ -449,6 +449,8 @@ external object firebase {
 
             val seconds: Long
             val nanoseconds: Int
+
+            fun isEqual(other: Timestamp): Boolean
         }
         open class FieldPath(vararg fieldNames: String) {
             companion object {
@@ -459,6 +461,8 @@ external object firebase {
         open class GeoPoint(latitude: Double, longitude: Double) {
             val latitude: Double
             val longitude: Double
+
+            fun isEqual(other: GeoPoint): Boolean
         }
 
         abstract class FieldValue {
@@ -468,6 +472,7 @@ external object firebase {
                 fun arrayUnion(vararg elements: Any): FieldValue
                 fun serverTimestamp(): FieldValue
             }
+            fun isEqual(other: FieldValue): Boolean
         }
     }
 

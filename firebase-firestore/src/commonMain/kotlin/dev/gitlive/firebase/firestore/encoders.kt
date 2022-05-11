@@ -22,17 +22,3 @@ internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEnco
         shouldEncodeElementDefault,
         FieldValue.serverTimestamp()
     )
-
-@PublishedApi
-internal fun <T> encodeAsMap(
-    strategy: SerializationStrategy<T>,
-    data: T,
-    encodeDefaults: Boolean = false
-): Map<String, Any?> = encode(strategy, data, encodeDefaults) as Map<String, Any?>
-
-@PublishedApi
-internal fun encodeAsMap(
-    encodeDefaults: Boolean = false,
-    vararg fieldsAndValues: Pair<String, Any?>
-): Map<String, Any?>? = fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-    ?.associate { (field, value) -> field to encode(value, encodeDefaults) }

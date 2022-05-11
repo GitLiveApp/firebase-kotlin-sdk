@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.Json
 import kotlin.js.json
 
 actual val Firebase.firestore get() =
@@ -86,25 +87,20 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
-    actual fun <T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        merge: Boolean,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean, vararg fieldsAndValues: Pair<String, Any?>) =
+        rethrow {
+            val serializedItem = encode(strategy, data, encodeDefaults) as Json
+            val serializedFieldAndValues = fieldsAndValues.map { (field, value) ->
+                field to encode(value, encodeDefaults)
+            }.let { json(*it.toTypedArray()) }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
-        if (merge) {
-            js.set(documentRef.js, result, json("merge" to merge))
-        } else {
-            js.set(documentRef.js, result)
-        }
-        return this
-    }
+            val result = serializedItem.add(serializedFieldAndValues)
+            if (merge) {
+                js.set(documentRef.js, result, json("merge" to merge))
+            } else {
+                js.set(documentRef.js, result)
+            }
+        }.let { this }
 
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
@@ -126,13 +122,15 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         data: T,
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+    ) = rethrow {
+        val serializedItem = encode(strategy, data, encodeDefaults) as Json
+        val serializedFieldAndValues = fieldsAndValues.map { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }.let { json(*it.toTypedArray()) }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
-        return js.update(documentRef.js, result).let { this }
-    }
+        val result = serializedItem.add(serializedFieldAndValues)
+        js.update(documentRef.js, result)
+    }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }

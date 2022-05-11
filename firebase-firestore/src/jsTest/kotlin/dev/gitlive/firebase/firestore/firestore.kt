@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 import kotlin.js.Json
+import kotlin.js.json
 
 actual val emulatorHost: String = "localhost"
 
@@ -28,6 +29,9 @@ actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
         it[0] as String to it[1]
     }
 }
+actual fun mapAsEncoded(map: Map<String, Any?>): Any = json(
+    *(map.map { (key, value) -> key to value}.toTypedArray())
+)
 
 internal fun Throwable.log() {
     console.error(this)

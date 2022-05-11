@@ -107,10 +107,12 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         merge: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
+        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        val result = serializedItem + serializedFieldAndValues
         if (merge) {
             android.set(documentRef.android, result, SetOptions.merge())
         } else {
@@ -142,10 +144,12 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
+        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        val result = serializedItem + serializedFieldAndValues
         return android.update(documentRef.android, result).let { this }
     }
 

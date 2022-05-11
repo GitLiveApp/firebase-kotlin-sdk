@@ -71,8 +71,9 @@ class EncodersTest {
     @Test
     fun testEncodeDecodedSealedClass() {
         val test = SealedClass.Test("Foo")
-        val encoded = encode(test, false)
-        val decoded = decode(encoded) as? SealedClass.Test
+        val serializer = SealedClass.Test.serializer() // has to be used because of JS issue
+        val encoded = encode(serializer, test, false)
+        val decoded = decode(serializer, encoded)
         assertEquals(test, decoded)
     }
 
@@ -80,8 +81,9 @@ class EncodersTest {
     fun testEncodeDecodeGenericClass() {
         val test = SealedClass.Test("Foo")
         val generic = GenericClass(test)
-        val encoded = encode(generic, false)
-        val decoded = decode(encoded) as? GenericClass<SealedClass.Test>
+        val serializer = GenericClass.serializer(SealedClass.Test.serializer())
+        val encoded = encode(serializer, generic, false)
+        val decoded = decode(serializer, encoded)
         assertEquals(generic, decoded)
     }
 }

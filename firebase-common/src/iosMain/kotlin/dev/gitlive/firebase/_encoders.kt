@@ -16,9 +16,8 @@ actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): Compo
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it.add(index, value) } }
     StructureKind.MAP -> mutableListOf<Any?>()
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
-    StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
+    StructureKind.CLASS, StructureKind.OBJECT -> mutableMapOf<Any?, Any?>()
         .also { value = it }
         .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[descriptor.getElementName(index)] = value } }
-    StructureKind.OBJECT -> FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, _, obj -> value = obj }
     else -> TODO("Not implemented ${descriptor.kind}")
 }
