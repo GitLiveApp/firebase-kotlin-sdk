@@ -156,17 +156,17 @@ class FirebaseFirestoreTest {
             FirestoreTimeTest.serializer(),
             FirestoreTimeTest("ServerTimestamp", Timestamp(0, 0)),
         )
-        assertTimestampEquals(Timestamp(0, 0), doc.get().get("time", FirebaseTimestampSerializer))
+        assertTimestampEquals(Timestamp(0, 0), doc.get().get("time", TimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
                 "time" to Timestamp(123, 0)
-                    .withSerializer(FirebaseTimestampSerializer)
+                    .withSerializer(TimestampSerializer)
             )
         )
         assertTimestampEquals(Timestamp(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", FirebaseTimestampSerializer))
+        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", TimestampSerializer))
         assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
@@ -234,7 +234,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNotNull(pendingWritesSnapshot.get("time", FirebaseTimestampSerializer, ServerTimestampBehavior.ESTIMATE))
+        assertNotNull(pendingWritesSnapshot.get("time", TimestampSerializer, ServerTimestampBehavior.ESTIMATE))
         assertNotEquals(Timestamp(0, 0), pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
@@ -416,7 +416,7 @@ class FirebaseFirestoreTest {
         // update data
         val updatedData = DataWithDocumentReference(documentRef2)
         getDocument().update(
-            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(FirebaseDocumentReferenceSerializer)
+            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(DocumentReferenceSerializer)
         )
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
@@ -460,4 +460,7 @@ class FirebaseFirestoreTest {
         assertEquals(doc.path, decoded.reference.path)
         assertEquals(doc.path, decoded.ref?.reference?.path)
     }
+
+    //TODO test delete
+    //TODO test field values
 }

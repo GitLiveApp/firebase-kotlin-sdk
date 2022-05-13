@@ -5,7 +5,6 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -252,7 +251,7 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias PlatformDocumentReference = com.google.firebase.firestore.DocumentReference
 
-@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+@Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
     val android: PlatformDocumentReference = platformValue
 
@@ -505,10 +504,23 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
 }
 
-actual object FieldValue {
-    actual fun serverTimestamp(): Any = FieldValue.serverTimestamp()
-    actual val delete: Any get() = FieldValue.delete()
-    actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)
-    actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
-    actual fun delete(): Any = delete
+/** A class representing a platform specific Firebase FieldValue. */
+actual typealias PlatformFieldValue = com.google.firebase.firestore.FieldValue
+
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val platformValue: PlatformFieldValue) {
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
+        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
+        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
+        actual fun delete(): FieldValue = delete
+    }
 }

@@ -12,7 +12,7 @@ import kotlinx.serialization.encoding.encodeStructure
 /**
  * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
  */
-object FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
+object DocumentReferenceSerializer : KSerializer<DocumentReference> {
 
     override val descriptor = buildClassSerialDescriptor("DocumentReference") {
         element<String>("path")

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 actual typealias PlatformGeoPoint = FIRGeoPoint
 
 /** A class representing a Firebase GeoPoint. */
-@Serializable(with = FirebaseGeoPointSerializer::class)
+@Serializable(with = GeoPointSerializer::class)
 actual class GeoPoint internal actual constructor(internal actual val platformValue: PlatformGeoPoint) {
     actual constructor(latitude: Double, longitude: Double) : this(PlatformGeoPoint(latitude, longitude))
     actual val latitude: Double = platformValue.latitude

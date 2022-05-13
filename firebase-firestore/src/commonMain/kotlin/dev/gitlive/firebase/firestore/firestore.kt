@@ -120,7 +120,7 @@ expect class WriteBatch {
 /** A class representing a platform specific Firebase DocumentReference. */
 expect class PlatformDocumentReference
 
-@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+@Serializable(with = DocumentReferenceSerializer::class)
 expect class DocumentReference internal constructor(platformValue: PlatformDocumentReference) {
     internal val platformValue: PlatformDocumentReference
 
@@ -239,12 +239,34 @@ expect class FieldPath(vararg fieldNames: String) {
     val documentId: FieldPath
 }
 
-expect object FieldValue {
-    val delete: Any
-    fun arrayUnion(vararg elements: Any): Any
-    fun arrayRemove(vararg elements: Any): Any
-    fun serverTimestamp(): Any
-    @Deprecated("Replaced with FieldValue.delete")
-    @JsName("deprecatedDelete")
-    fun delete(): Any
+/** A class representing a platform specific Firebase FieldValue. */
+expect class PlatformFieldValue
+
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+expect class FieldValue internal constructor(platformValue: PlatformFieldValue) {
+    internal val platformValue: PlatformFieldValue
+
+    companion object {
+        val delete: FieldValue
+        fun arrayUnion(vararg elements: Any): FieldValue
+        fun arrayRemove(vararg elements: Any): FieldValue
+        fun serverTimestamp(): FieldValue
+
+        @Deprecated("Replaced with FieldValue.delete")
+        @JsName("deprecatedDelete")
+        fun delete(): FieldValue
+    }
+}
+
+@Serializable
+internal sealed class FieldValueRepresentation(val isSerializable: Boolean) {
+    @Serializable
+    object Delete : FieldValueRepresentation(true)
+    @Serializable
+    object Union : FieldValueRepresentation(false) // TODO use json to serialize?
+    @Serializable
+    object Remove : FieldValueRepresentation(false)
+    @Serializable
+    object ServerTimestamp : FieldValueRepresentation(true)
 }

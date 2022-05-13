@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TestData(
     val uid: String,
-    @Serializable(with = FirebaseTimestampSerializer::class)
+    @Serializable(with = TimestampSerializer::class)
     val createdAt: Any,
     @Serializable(with = FirebaseNullableTimestampSerializer::class)
     var updatedAt: Any?,

@@ -202,7 +202,7 @@ actual class Transaction(val ios: FIRTransaction) {
 actual typealias PlatformDocumentReference = FIRDocumentReference
 
 @Suppress("UNCHECKED_CAST")
-@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+@Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
     val ios: PlatformDocumentReference = platformValue
 
@@ -497,12 +497,25 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
 }
 
-actual object FieldValue {
-    actual val delete: Any get() = FIRFieldValue.fieldValueForDelete()
-    actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
-    actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
-    actual fun serverTimestamp(): Any = FIRFieldValue.fieldValueForServerTimestamp()
-    actual fun delete(): Any = delete
+/** A class representing a platform specific Firebase FieldValue. */
+actual typealias PlatformFieldValue = FIRFieldValue
+
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val platformValue: PlatformFieldValue) {
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.fieldValueForDelete())
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.fieldValueForArrayUnion(elements.asList()))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.fieldValueForArrayRemove(elements.asList()))
+        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.fieldValueForServerTimestamp())
+        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
+        actual fun delete(): FieldValue = delete
+    }
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

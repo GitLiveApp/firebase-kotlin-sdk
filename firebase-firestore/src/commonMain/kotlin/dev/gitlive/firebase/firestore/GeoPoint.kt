@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 expect class PlatformGeoPoint
 
 /** A class representing a Firebase GeoPoint. */
-@Serializable(with = FirebaseGeoPointSerializer::class)
+@Serializable(with = GeoPointSerializer::class)
 expect class GeoPoint internal constructor(platformValue: PlatformGeoPoint) {
     constructor(latitude: Double, longitude: Double)
     val latitude: Double

@@ -222,7 +222,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias PlatformDocumentReference = firebase.firestore.DocumentReference
 
-@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+@Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
     val js: PlatformDocumentReference = platformValue
 
@@ -476,23 +476,36 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
 }
 
-actual object FieldValue {
-    @JsName("_serverTimestamp")
-    actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
-    actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
-    actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
-    actual fun serverTimestamp(): Any = rethrow { firebase.firestore.FieldValue.serverTimestamp() }
-    @JsName("deprecatedDelete")
-    actual fun delete(): Any = delete
-}
+//actual object FieldValue {
+//    @JsName("_serverTimestamp")
+//    actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
+//    actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
+//    actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
+//    actual fun serverTimestamp(): Any = rethrow { firebase.firestore.FieldValue.serverTimestamp() }
+//    @JsName("deprecatedDelete")
+//    actual fun delete(): Any = delete
+//}
+/** A class representing a platform specific Firebase FieldValue. */
+actual typealias PlatformFieldValue = firebase.firestore.FieldValue
 
-//actual data class FirebaseFirestoreSettings internal constructor(
-//    val cacheSizeBytes: Number? = undefined,
-//    val host: String? = undefined,
-//    val ssl: Boolean? = undefined,
-//    var timestampsInSnapshots: Boolean? = undefined,
-//    var enablePersistence: Boolean = false
-//)
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val platformValue: PlatformFieldValue) {
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && platformValue.isEqual(other.platformValue)
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
+        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
+        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
+        @JsName("deprecatedDelete")
+        actual fun delete(): FieldValue = delete
+    }
+}
 
 actual enum class FirestoreExceptionCode {
     OK,
