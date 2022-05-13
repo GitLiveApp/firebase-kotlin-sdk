@@ -20,7 +20,7 @@ object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override fun serialize(encoder: Encoder, value: GeoPoint) {
         if (encoder is FirebaseEncoder) {
             // special case if encoding. Firestore encodes and decodes GeoPoints without use of serializers
-            encoder.value = value
+            encoder.value = value.platformValue
         } else {
             encoder.encodeStructure(descriptor) {
                 encodeDoubleElement(descriptor, 0, value.latitude)
@@ -32,10 +32,10 @@ object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override fun deserialize(decoder: Decoder): GeoPoint {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
-            decoder.value as GeoPoint
+            GeoPoint(decoder.value as PlatformGeoPoint)
         } else {
             decoder.decodeStructure(descriptor) {
-                geoPointWith(
+                GeoPoint(
                     latitude = decodeDoubleElement(descriptor, 0),
                     longitude = decodeDoubleElement(descriptor, 1)
                 )

@@ -368,15 +368,12 @@ class FirebaseFirestoreTest {
     @Test
     fun testGeoPointSerialization() = runTest {
         @Serializable
-        data class DataWithGeoPoint(
-            @Serializable(with = FirebaseGeoPointSerializer::class)
-            val geoPoint: GeoPoint
-        )
+        data class DataWithGeoPoint(val geoPoint: GeoPoint)
 
         fun getDocument() = Firebase.firestore.collection("geoPointSerialization")
             .document("geoPointSerialization")
 
-        val data = DataWithGeoPoint(geoPointWith(12.34, 56.78))
+        val data = DataWithGeoPoint(GeoPoint(12.34, 56.78))
         // store geo point
         getDocument().set(DataWithGeoPoint.serializer(), data)
         // restore data
@@ -384,7 +381,7 @@ class FirebaseFirestoreTest {
         assertGeoPointEquals(data.geoPoint, savedData.geoPoint)
 
         // update data
-        val updatedData = DataWithGeoPoint(geoPointWith(87.65, 43.21))
+        val updatedData = DataWithGeoPoint(GeoPoint(87.65, 43.21))
         getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithGeoPoint.serializer())
