@@ -215,7 +215,7 @@ subprojects {
             }
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
