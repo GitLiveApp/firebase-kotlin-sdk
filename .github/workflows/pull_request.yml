@@ -30,8 +30,7 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
       - name: Run JS Tests
-        if: ${{ false }}
-        run: ./gradlew cleanTest jsTest
+        run: ./gradlew cleanTest jsLegacyTest
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v2
         if: failure()
