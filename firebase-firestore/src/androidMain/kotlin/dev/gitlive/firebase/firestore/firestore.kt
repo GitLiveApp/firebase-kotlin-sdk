@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 
 @PublishedApi
@@ -248,7 +249,12 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         DocumentSnapshot(android.get(documentRef.android))
 }
 
-actual class DocumentReference(val android: com.google.firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias PlatformDocumentReference = com.google.firebase.firestore.DocumentReference
+
+@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
+    val android: PlatformDocumentReference = platformValue
 
     actual val id: String
         get() = android.id
@@ -330,7 +336,10 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         awaitClose { listener.remove() }
     }
 
-    actual companion object
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
 }
 
 actual open class Query(open val android: com.google.firebase.firestore.Query) {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Json
 import kotlin.js.json
@@ -218,7 +219,12 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias PlatformDocumentReference = firebase.firestore.DocumentReference
+
+@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
+    val js: PlatformDocumentReference = platformValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -293,7 +299,11 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         )
         awaitClose { unsubscribe() }
     }
-    actual companion object
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && platformValue.isEqual(other.platformValue)
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = "DocumentReference(path=$path)"
 }
 
 actual open class Query(open val js: firebase.firestore.Query) {

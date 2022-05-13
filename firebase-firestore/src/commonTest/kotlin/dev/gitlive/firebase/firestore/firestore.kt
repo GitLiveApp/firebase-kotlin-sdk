@@ -21,6 +21,7 @@ expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
 expect fun mapAsEncoded(map: Map<String, Any?>): Any
+
 /** Special method due to JS implementation limitation. */
 fun assertGeoPointEquals(expected: GeoPoint, actual: GeoPoint) {
     assertTrue(expected.latitude == actual.latitude ||
@@ -392,7 +393,6 @@ class FirebaseFirestoreTest {
     fun testDocumentReferenceSerialization() = runTest {
         @Serializable
         data class DataWithDocumentReference(
-            @Serializable(with = FirebaseDocumentReferenceSerializer::class)
             val documentReference: DocumentReference
         )
 
@@ -407,7 +407,7 @@ class FirebaseFirestoreTest {
         }
 
         val data = DataWithDocumentReference(documentRef1)
-        // store geo point
+        // store reference
         getDocument().set(DataWithDocumentReference.serializer(), data)
         // restore data
         val savedData = getDocument().get().data(DataWithDocumentReference.serializer())
@@ -421,5 +421,43 @@ class FirebaseFirestoreTest {
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
+    }
+
+    @Serializable
+    data class TestDataWithDocumentReference(
+        val uid: String,
+        val reference: DocumentReference,
+        @Serializable(with = FirebaseReferenceNullableSerializer::class)
+        val ref: FirebaseReference?
+    )
+
+    @Test
+    fun encodeDocumentReferenceObject() = runTest {
+        val doc = Firebase.firestore.document("a/b")
+        val item = TestDataWithDocumentReference("123", doc, FirebaseReference.Value(doc))
+        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        assertEquals("123", encoded["uid"])
+        assertEquals(doc.platformValue, encoded["reference"])
+        assertEquals(doc.platformValue, encoded["ref"])
+    }
+
+    @Test
+    fun encodeDeleteDocumentReferenceObject() = runTest {
+        val doc = Firebase.firestore.document("a/b")
+        val item = TestDataWithDocumentReference("123", doc, FirebaseReference.ServerDelete)
+        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        assertEquals("123", encoded["uid"])
+        assertEquals(doc.platformValue, encoded["reference"])
+        customAssertEquals(FieldValue.delete, encoded["ref"])
+    }
+
+    @Test
+    fun decodeDocumentReferenceObject() = runTest {
+        val doc = Firebase.firestore.document("a/b")
+        val obj = mapAsEncoded(mapOf("uid" to "123", "reference" to doc.platformValue, "ref" to doc.platformValue))
+        val decoded: TestDataWithDocumentReference = decode(obj)
+        assertEquals("123", decoded.uid)
+        assertEquals(doc.path, decoded.reference.path)
+        assertEquals(doc.path, decoded.ref?.reference?.path)
     }
 }

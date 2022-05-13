@@ -7,6 +7,6 @@ actual fun isSpecialValue(value: Any) = when(value) {
     is FieldValue,
     is PlatformGeoPoint,
     is Timestamp,
-    is DocumentReference -> true
+    is PlatformDocumentReference -> true
     else -> false
 }

@@ -9,6 +9,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.JsName
 
@@ -116,7 +117,12 @@ expect class WriteBatch {
     suspend fun commit()
 }
 
-expect class DocumentReference {
+/** A class representing a platform specific Firebase DocumentReference. */
+expect class PlatformDocumentReference
+
+@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+expect class DocumentReference internal constructor(platformValue: PlatformDocumentReference){
+    internal val platformValue: PlatformDocumentReference
 
     val id: String
     val path: String
@@ -140,8 +146,6 @@ expect class DocumentReference {
     suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
 
     suspend fun delete()
-
-    companion object
 }
 
 expect class CollectionReference : Query {

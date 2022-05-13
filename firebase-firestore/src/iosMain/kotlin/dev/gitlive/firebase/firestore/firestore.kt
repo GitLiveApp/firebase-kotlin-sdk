@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
@@ -197,8 +198,13 @@ actual class Transaction(val ios: FIRTransaction) {
 
 }
 
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias PlatformDocumentReference = FIRDocumentReference
+
 @Suppress("UNCHECKED_CAST")
-actual class DocumentReference(val ios: FIRDocumentReference) {
+@Serializable(with = FirebaseDocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
+    val ios: PlatformDocumentReference = platformValue
 
     actual val id: String
         get() = ios.documentID
@@ -262,7 +268,10 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         awaitClose { listener.remove() }
     }
 
-    actual companion object
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
 }
 
 actual open class Query(open val ios: FIRQuery) {

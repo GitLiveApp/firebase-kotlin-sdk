@@ -422,6 +422,8 @@ external object firebase {
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
             fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+
+            fun isEqual(other: DocumentReference): Boolean
         }
 
         open class WriteBatch {

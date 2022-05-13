@@ -31,7 +31,7 @@ sealed class AbstractFirebaseReferenceSerializer<T>(
     protected fun decode(decoder: Decoder): FirebaseReference? {
         return if (decoder is FirebaseDecoder) {
             decoder.value
-                ?.let(DocumentReference::fromPlatformValue)
+                ?.let { DocumentReference(it as PlatformDocumentReference) }
                 ?.let(FirebaseReference::Value)
         } else {
             throw IllegalArgumentException("This serializer must be used with FirebaseDecoder")

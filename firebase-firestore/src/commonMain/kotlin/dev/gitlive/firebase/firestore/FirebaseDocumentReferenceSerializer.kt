@@ -9,14 +9,8 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
-/** Platform specific value of the document reference. */
-internal expect val DocumentReference.platformValue: Any
-/** Constructs [DocumentReference] from a platform specific value. */
-internal expect fun DocumentReference.Companion.fromPlatformValue(platformValue: Any): DocumentReference
-
 /**
  * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
- *
  */
 object FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
 
@@ -38,7 +32,7 @@ object FirebaseDocumentReferenceSerializer : KSerializer<DocumentReference> {
     override fun deserialize(decoder: Decoder): DocumentReference {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
-            DocumentReference.fromPlatformValue(requireNotNull(decoder.value))
+            DocumentReference(decoder.value as PlatformDocumentReference)
         } else {
             decoder.decodeStructure(descriptor) {
                 val path = decodeStringElement(descriptor, 0)

@@ -6,6 +6,6 @@ actual fun isSpecialValue(value: Any) = when(value) {
     is firebase.firestore.FieldValue,
     is PlatformGeoPoint,
     is firebase.firestore.Timestamp,
-    is firebase.firestore.DocumentReference -> true
+    is PlatformDocumentReference -> true
     else -> false
 }
