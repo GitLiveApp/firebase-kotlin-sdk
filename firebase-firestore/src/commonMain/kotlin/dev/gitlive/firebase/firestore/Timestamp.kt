@@ -1,9 +1,17 @@
 package dev.gitlive.firebase.firestore
 
-/** A class representing a Firebase Timestamp. */
-expect class Timestamp
+/** A class representing a platform specific Firebase Timestamp. */
+expect class PlatformTimestamp
 
-expect fun timestampNow(): Timestamp
-expect fun timestampWith(seconds: Long, nanoseconds: Int): Timestamp
-expect val Timestamp.seconds: Long
-expect val Timestamp.nanoseconds: Int
+/** A class representing a Firebase Timestamp. */
+expect class Timestamp internal constructor(platformValue: PlatformTimestamp) {
+    constructor(seconds: Long, nanoseconds: Int)
+    val seconds: Long
+    val nanoseconds: Int
+
+    internal val platformValue: PlatformTimestamp
+
+    companion object {
+        fun now(): Timestamp
+    }
+}
