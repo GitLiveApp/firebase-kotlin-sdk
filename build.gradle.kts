@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     id("base")
+    id("com.github.ben-manes.versions") version "0.42.0"
 }
 
 buildscript {
@@ -267,3 +268,23 @@ subprojects {
         }
     }
 }
+
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+
+    fun isNonStable(version: String): Boolean {
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+        val versionMatch = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
+
+        return (stableKeyword || versionMatch).not()
+    }
+
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+
+    checkForGradleUpdate = true
+    outputFormatter = "plain,html"
+    outputDir = "build/dependency-reports"
+    reportfileName = "dependency-updates"
+}
+// check for latest dependencies - ./gradlew dependencyUpdates -Drevision=release
