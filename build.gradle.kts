@@ -209,13 +209,13 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.6")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.8")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0") {
                 exclude("com.google.android.gms")
             }
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:28.4.0"))
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
