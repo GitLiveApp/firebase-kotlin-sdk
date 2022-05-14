@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk",
   "dependencies": {
-    "firebase": "9.7.0",
-    "kotlin": "1.6.10",
-    "kotlinx-coroutines-core": "1.6.1-native-mt",
-    "kotlinx-serialization-kotlinx-serialization-runtime": "1.3.2"
+    "firebase": "9.9.0",
+    "kotlin": "1.6.21",
+    "kotlinx-coroutines-core": "1.6.3-native-mt",
+    "kotlinx-serialization-kotlinx-serialization-runtime": "1.3.3"
   }
 }

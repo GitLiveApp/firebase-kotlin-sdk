@@ -1,3 +1,9 @@
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 include(
     "firebase-app",
     "firebase-auth",
@@ -8,6 +14,3 @@ include(
     "firebase-functions",
     "firebase-installations"
 )
-
-//enableFeaturePreview("GRADLE_METADATA")
-
