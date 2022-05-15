@@ -22,7 +22,7 @@ buildscript {
     }
 }
 
-val targetSdkVersion by extra(31)
+val targetSdkVersion by extra(32)
 val minSdkVersion by extra(19)
 
 tasks {
