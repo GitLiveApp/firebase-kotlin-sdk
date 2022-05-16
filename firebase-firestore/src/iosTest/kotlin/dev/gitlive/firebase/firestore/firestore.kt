@@ -30,6 +30,3 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
 
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
 actual fun mapAsEncoded(map: Map<String, Any?>): Any = map
-actual fun customAssertEquals(expected: Any?, actual: Any?) {
-    assertEquals(expected, actual)
-}

@@ -42,7 +42,7 @@ object TimestampSerializer : KSerializer<Timestamp> {
             when (val value = decoder.value) {
                 is PlatformTimestamp -> Timestamp(value)
                 FieldValue.serverTimestamp().platformValue -> Timestamp.serverTimestamp()
-                else -> throw SerializationException("Cannot serialize $value")
+                else -> throw SerializationException("Cannot deserialize $value")
             }
         } else {
             decoder.decodeStructure(descriptor) {

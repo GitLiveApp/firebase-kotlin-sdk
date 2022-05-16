@@ -505,11 +505,14 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 /** A class representing a platform specific Firebase FieldValue. */
-actual typealias PlatformFieldValue = com.google.firebase.firestore.FieldValue
+internal typealias PlatformFieldValue = com.google.firebase.firestore.FieldValue
 
 /** A class representing a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val platformValue: PlatformFieldValue) {
+actual class FieldValue internal actual constructor(internal actual val platformValue: Any) {
+    init {
+        require(platformValue is PlatformFieldValue)
+    }
     override fun equals(other: Any?): Boolean =
         this === other || other is FieldValue && platformValue == other.platformValue
     override fun hashCode(): Int = platformValue.hashCode()

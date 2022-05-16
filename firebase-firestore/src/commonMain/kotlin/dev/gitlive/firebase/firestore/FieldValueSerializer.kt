@@ -21,7 +21,7 @@ object FieldValueSerializer : KSerializer<FieldValue> {
 
     override fun deserialize(decoder: Decoder): FieldValue {
         return if (decoder is FirebaseDecoder) {
-            FieldValue(decoder.value as PlatformFieldValue)
+            FieldValue(decoder.value!!)
         } else {
             throw IllegalArgumentException("This serializer must be used with FirebaseDecoder")
         }

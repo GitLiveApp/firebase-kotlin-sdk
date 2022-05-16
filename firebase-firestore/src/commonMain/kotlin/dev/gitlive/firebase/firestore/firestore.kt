@@ -239,13 +239,12 @@ expect class FieldPath(vararg fieldNames: String) {
     val documentId: FieldPath
 }
 
-/** A class representing a platform specific Firebase FieldValue. */
-expect class PlatformFieldValue
-
 /** A class representing a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
-expect class FieldValue internal constructor(platformValue: PlatformFieldValue) {
-    internal val platformValue: PlatformFieldValue
+expect class FieldValue internal constructor(platformValue: Any) {
+    // implementation note. unfortunately declaring a common `expect PlatformFieldValue`
+    // is not possible due to different platform class signatures
+    internal val platformValue: Any
 
     companion object {
         val delete: FieldValue
