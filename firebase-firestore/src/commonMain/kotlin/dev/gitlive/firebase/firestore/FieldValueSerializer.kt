@@ -7,6 +7,7 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/** A serializer for [FieldValue]. Must be used in conjunction with [FirebaseEncoder]. */
 object FieldValueSerializer : KSerializer<FieldValue> {
     override val descriptor = buildClassSerialDescriptor("FieldValue") { }
 
@@ -14,7 +15,6 @@ object FieldValueSerializer : KSerializer<FieldValue> {
         if (encoder is FirebaseEncoder) {
             encoder.value = value.platformValue
         } else {
-            // TODO serialize what we can eg delete and server time stamp?
             throw IllegalArgumentException("This serializer must be used with FirebaseEncoder")
         }
     }

@@ -476,6 +476,14 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
 }
 
+//actual data class FirebaseFirestoreSettings internal constructor(
+//    val cacheSizeBytes: Number? = undefined,
+//    val host: String? = undefined,
+//    val ssl: Boolean? = undefined,
+//    var timestampsInSnapshots: Boolean? = undefined,
+//    var enablePersistence: Boolean = false
+//)
+
 /** A class representing a platform specific Firebase FieldValue. */
 private typealias PlatformFieldValue = firebase.firestore.FieldValue
 

@@ -120,6 +120,7 @@ expect class WriteBatch {
 /** A class representing a platform specific Firebase DocumentReference. */
 expect class PlatformDocumentReference
 
+/** A class representing a Firebase DocumentReference. */
 @Serializable(with = DocumentReferenceSerializer::class)
 expect class DocumentReference internal constructor(platformValue: PlatformDocumentReference) {
     internal val platformValue: PlatformDocumentReference

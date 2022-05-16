@@ -49,7 +49,11 @@ class TimestampTests {
     @Test
     fun decodeTimestampObject() = runTest {
         val timestamp = Timestamp(123, 345)
-        val obj = mapAsEncoded(mapOf("uid" to "uid123", "createdAt" to timestamp.platformValue, "updatedAt" to timestamp.platformValue))
+        val obj = rawEncoded(
+            "uid" to "uid123",
+            "createdAt" to timestamp.platformValue,
+            "updatedAt" to timestamp.platformValue
+        )
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         assertEquals(timestamp, decoded.createdAt)
@@ -61,7 +65,11 @@ class TimestampTests {
 
     @Test
     fun decodeEmptyTimestampObject() = runTest {
-        val obj = mapAsEncoded(mapOf("uid" to "uid123", "createdAt" to Timestamp.now().platformValue, "updatedAt" to null))
+        val obj = rawEncoded(
+            "uid" to "uid123",
+            "createdAt" to Timestamp.now().platformValue,
+            "updatedAt" to null
+        )
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         assertEquals(null, decoded.updatedAt)

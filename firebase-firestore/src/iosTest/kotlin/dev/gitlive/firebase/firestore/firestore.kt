@@ -29,4 +29,4 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
 }
 
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
-actual fun mapAsEncoded(map: Map<String, Any?>): Any = map
+actual fun rawEncoded(vararg pairs: Pair<String, Any?>): Any = pairs.toMap()

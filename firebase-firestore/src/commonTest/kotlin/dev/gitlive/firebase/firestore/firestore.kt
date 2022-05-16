@@ -22,8 +22,10 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
+/** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
-expect fun mapAsEncoded(map: Map<String, Any?>): Any
+/** @return paris as raw encoded data. */
+expect fun rawEncoded(vararg pairs: Pair<String, Any?>): Any
 
 /** Special method due to JS implementation limitation. */
 fun assertGeoPointEquals(expected: GeoPoint, actual: GeoPoint) {
@@ -37,9 +39,7 @@ fun assertTimestampEquals(expected: Timestamp, actual: Any?) {
             expected.nanoseconds == casted?.nanoseconds, "Expected <$expected>, actual <$actual>.")
 }
 
-// NOTE: there are several limitations caused by JS:
-// 1. serializer<T>() does not work in a legacy JS so serializers has to be provided explicitly
-// 2. equals doesn't work for JS GeoPoint and JS Timestamp
+// NOTE: serializer<T>() does not work in a legacy JS so serializers have to be provided explicitly
 class FirebaseFirestoreTest {
 
     @Serializable
@@ -449,7 +449,7 @@ class FirebaseFirestoreTest {
     @Test
     fun decodeDocumentReferenceObject() = runTest {
         val doc = Firebase.firestore.document("a/b")
-        val obj = mapAsEncoded(mapOf("uid" to "123", "reference" to doc.platformValue))
+        val obj = rawEncoded("uid" to "123", "reference" to doc.platformValue)
         val decoded: TestDataWithDocumentReference = decode(obj)
         assertEquals("123", decoded.uid)
         assertEquals(doc.path, decoded.reference.path)
