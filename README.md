@@ -66,7 +66,7 @@ The Firebase Kotlin SDK uses Kotlin serialization to read and write custom class
 ```groovy
 plugins {
     kotlin("multiplatform") // or kotlin("jvm") or any other kotlin plugin
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("plugin.serialization") version "1.6.10"
 }
 ```
 
@@ -94,6 +94,30 @@ You can also omit the serializer but this is discouraged due to a [current limit
 ```kotlin
 @Serializable
 data class Post(val timestamp: Double = ServerValue.TIMESTAMP)
+```
+
+Alternatively, `firebase-firestore` also provides a [Timestamp] class which could be used:
+```kotlin
+@Serializable
+data class Post(val timestamp: Timestamp = Timestamp.serverValue())
+```
+
+In addition `firebase-firestore` provides [GeoPoint] and [DocumentReference] classes which allow persisting
+geo points and document references in a native way:
+
+```kotlin
+@Serializable
+data class PointOfInterest(
+    val reference: DocumentReference, 
+    val location: GeoPoint, 
+    val timestamp: Timestamp
+)
+
+val document = PointOfInterest(
+    reference = Firebase.firestore.collection("foo").document("bar"),
+    location = GeoPoint(51.939, 4.506),
+    timestamp = Timestamp.now()
+)
 ```
 
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#default-arguments">Default arguments</a></h3>
