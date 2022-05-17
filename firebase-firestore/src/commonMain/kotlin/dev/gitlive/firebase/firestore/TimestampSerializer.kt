@@ -11,27 +11,80 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
-/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
-object TimestampSerializer : KSerializer<Timestamp> {
+
+/** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+object BaseTimestampSerializer : KSerializer<BaseTimestamp> {
     override val descriptor = buildClassSerialDescriptor("Timestamp") {
         element<Long>("seconds")
         element<Int>("nanoseconds")
         element<Boolean>("isServerTimestamp")
     }
 
+    override fun serialize(encoder: Encoder, value: BaseTimestamp) {
+        if (encoder is FirebaseEncoder) {
+            // special case if encoding. Firestore encodes and decodes Timestamp without use of serializers
+            encoder.value = when (value) {
+                Timestamp.ServerTimestamp -> FieldValue.serverTimestamp().platformValue
+                is Timestamp -> value.platformValue
+                else -> throw SerializationException("Cannot serialize $value")
+            }
+        } else {
+            encoder.encodeStructure(descriptor) {
+                when (value) {
+                    Timestamp.ServerTimestamp -> {
+                        encodeLongElement(descriptor, 0, 0)
+                        encodeIntElement(descriptor, 1, 0)
+                        encodeBooleanElement(descriptor, 2, true)
+                    }
+                    is Timestamp -> {
+                        encodeLongElement(descriptor, 0, value.seconds)
+                        encodeIntElement(descriptor, 1, value.nanoseconds)
+                        encodeBooleanElement(descriptor, 2, true)
+                    }
+                    else -> throw SerializationException("Cannot serialize $value")
+                }
+            }
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): BaseTimestamp {
+        return if (decoder is FirebaseDecoder) {
+            // special case if decoding. Firestore encodes and decodes Timestamp without use of serializers
+            when (val value = decoder.value) {
+                is PlatformTimestamp -> Timestamp(value)
+                FieldValue.serverTimestamp().platformValue -> Timestamp.ServerTimestamp
+                else -> throw SerializationException("Cannot deserialize $value")
+            }
+        } else {
+            decoder.decodeStructure(descriptor) {
+                if (decodeBooleanElement(descriptor, 2)) {
+                    Timestamp.ServerTimestamp
+                } else {
+                    Timestamp(
+                        seconds = decodeLongElement(descriptor, 0),
+                        nanoseconds = decodeIntElement(descriptor, 1)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+object TimestampSerializer : KSerializer<Timestamp> {
+    override val descriptor = buildClassSerialDescriptor("Timestamp") {
+        element<Long>("seconds")
+        element<Int>("nanoseconds")
+    }
+
     override fun serialize(encoder: Encoder, value: Timestamp) {
         if (encoder is FirebaseEncoder) {
             // special case if encoding. Firestore encodes and decodes Timestamp without use of serializers
-            encoder.value = if (value.isServerTimestamp) {
-                FieldValue.serverTimestamp().platformValue
-            } else {
-                value.platformValue
-            }
+            encoder.value = value.platformValue
         } else {
             encoder.encodeStructure(descriptor) {
                 encodeLongElement(descriptor, 0, value.seconds)
                 encodeIntElement(descriptor, 1, value.nanoseconds)
-                encodeBooleanElement(descriptor, 2, value.isServerTimestamp)
             }
         }
     }
@@ -41,19 +94,14 @@ object TimestampSerializer : KSerializer<Timestamp> {
             // special case if decoding. Firestore encodes and decodes Timestamp without use of serializers
             when (val value = decoder.value) {
                 is PlatformTimestamp -> Timestamp(value)
-                FieldValue.serverTimestamp().platformValue -> Timestamp.serverTimestamp()
                 else -> throw SerializationException("Cannot deserialize $value")
             }
         } else {
             decoder.decodeStructure(descriptor) {
-                if (decodeBooleanElement(descriptor, 2)) {
-                    Timestamp.serverTimestamp()
-                } else {
-                    Timestamp(
-                        seconds = decodeLongElement(descriptor, 0),
-                        nanoseconds = decodeIntElement(descriptor, 1)
-                    )
-                }
+                Timestamp(
+                    seconds = decodeLongElement(descriptor, 0),
+                    nanoseconds = decodeIntElement(descriptor, 1)
+                )
             }
         }
     }

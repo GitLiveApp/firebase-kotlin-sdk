@@ -39,7 +39,7 @@ class FirebaseFirestoreTest {
     @Serializable
     data class FirestoreTimeTest(
         val prop1: String,
-        val time: Timestamp?
+        val time: BaseTimestamp?
     )
 
     @BeforeTest
@@ -152,8 +152,8 @@ class FirebaseFirestoreTest {
         )
         assertEquals(Timestamp(321, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
-        assertNotEquals<Any>(Timestamp.serverTimestamp(), doc.get().get("time", TimestampSerializer))
-        assertNotEquals<Any?>(Timestamp.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertNotEquals<Any>(Timestamp.ServerTimestamp, doc.get().get("time", TimestampSerializer))
+        assertNotEquals<Any?>(Timestamp.ServerTimestamp, doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
     @Test
@@ -171,7 +171,7 @@ class FirebaseFirestoreTest {
 
         doc.set(
             FirestoreTimeTest.serializer(),
-            FirestoreTimeTest("ServerTimestampBehavior", Timestamp.serverTimestamp())
+            FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp)
         )
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
@@ -216,7 +216,7 @@ class FirebaseFirestoreTest {
         }
         delay(100) // makes possible to catch pending writes snapshot
 
-        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.serverTimestamp()))
+        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
@@ -237,7 +237,7 @@ class FirebaseFirestoreTest {
         }
         delay(100) // makes possible to catch pending writes snapshot
 
-        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.serverTimestamp()))
+        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
