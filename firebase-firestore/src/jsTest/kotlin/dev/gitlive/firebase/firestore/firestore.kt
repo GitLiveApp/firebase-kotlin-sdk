@@ -4,13 +4,10 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 import kotlin.js.json
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 actual val emulatorHost: String = "localhost"
 

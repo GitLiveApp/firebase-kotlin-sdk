@@ -27,18 +27,6 @@ expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
 /** @return paris as raw encoded data. */
 expect fun rawEncoded(vararg pairs: Pair<String, Any?>): Any
 
-/** Special method due to JS implementation limitation. */
-fun assertGeoPointEquals(expected: GeoPoint, actual: GeoPoint) {
-    assertTrue(expected.latitude == actual.latitude ||
-            expected.longitude == actual.longitude, "Expected <$expected>, actual <$actual>.")
-}
-
-fun assertTimestampEquals(expected: Timestamp, actual: Any?) {
-    val casted = actual as? Timestamp
-    assertTrue(expected.seconds == casted?.seconds ||
-            expected.nanoseconds == casted?.nanoseconds, "Expected <$expected>, actual <$actual>.")
-}
-
 // NOTE: serializer<T>() does not work in a legacy JS so serializers have to be provided explicitly
 class FirebaseFirestoreTest {
 
@@ -155,7 +143,7 @@ class FirebaseFirestoreTest {
             FirestoreTimeTest.serializer(),
             FirestoreTimeTest("ServerTimestamp", Timestamp(0, 0)),
         )
-        assertTimestampEquals(Timestamp(0, 0), doc.get().get("time", TimestampSerializer))
+        assertEquals(Timestamp(0, 0), doc.get().get("time", TimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
@@ -163,7 +151,7 @@ class FirebaseFirestoreTest {
                     .withSerializer(TimestampSerializer)
             )
         )
-        assertTimestampEquals(Timestamp(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertEquals(Timestamp(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
         assertNotEquals<Any>(FieldValue.serverTimestamp(), doc.get().get("time", TimestampSerializer))
         assertNotEquals<Any?>(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
@@ -378,14 +366,14 @@ class FirebaseFirestoreTest {
         getDocument().set(DataWithGeoPoint.serializer(), data)
         // restore data
         val savedData = getDocument().get().data(DataWithGeoPoint.serializer())
-        assertGeoPointEquals(data.geoPoint, savedData.geoPoint)
+        assertEquals(data.geoPoint, savedData.geoPoint)
 
         // update data
         val updatedData = DataWithGeoPoint(GeoPoint(87.65, 43.21))
         getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithGeoPoint.serializer())
-        assertGeoPointEquals(updatedData.geoPoint, updatedSavedData.geoPoint)
+        assertEquals(updatedData.geoPoint, updatedSavedData.geoPoint)
     }
 
     @Test
