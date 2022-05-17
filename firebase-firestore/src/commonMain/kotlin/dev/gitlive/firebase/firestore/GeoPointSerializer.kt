@@ -3,6 +3,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
@@ -32,6 +33,10 @@ object GeoPointSerializer : KSerializer<GeoPoint> {
     override fun deserialize(decoder: Decoder): GeoPoint {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
+            when (val value = decoder.value) {
+                is PlatformGeoPoint -> GeoPoint(value)
+                else -> throw SerializationException("Cannot deserialize $value")
+            }
             GeoPoint(decoder.value as PlatformGeoPoint)
         } else {
             decoder.decodeStructure(descriptor) {

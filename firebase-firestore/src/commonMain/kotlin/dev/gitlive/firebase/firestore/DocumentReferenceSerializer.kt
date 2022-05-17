@@ -2,6 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
@@ -32,7 +33,10 @@ object DocumentReferenceSerializer : KSerializer<DocumentReference> {
     override fun deserialize(decoder: Decoder): DocumentReference {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
-            DocumentReference(decoder.value as PlatformDocumentReference)
+            when (val value = decoder.value) {
+                is PlatformDocumentReference -> DocumentReference(value)
+                else -> throw SerializationException("Cannot deserialize $value")
+            }
         } else {
             decoder.decodeStructure(descriptor) {
                 val path = decodeStringElement(descriptor, 0)
