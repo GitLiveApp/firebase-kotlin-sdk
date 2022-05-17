@@ -141,20 +141,19 @@ class FirebaseFirestoreTest {
             .document("test")
         doc.set(
             FirestoreTimeTest.serializer(),
-            FirestoreTimeTest("ServerTimestamp", Timestamp(0, 0)),
+            FirestoreTimeTest("ServerTimestamp", Timestamp(123, 0)),
         )
-        assertEquals(Timestamp(0, 0), doc.get().get("time", TimestampSerializer))
+        assertEquals(Timestamp(123, 0), doc.get().get("time", TimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
-                "time" to Timestamp(123, 0)
-                    .withSerializer(TimestampSerializer)
+                "time" to Timestamp(321, 0)
             )
         )
-        assertEquals(Timestamp(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertEquals(Timestamp(321, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
-        assertNotEquals<Any>(FieldValue.serverTimestamp(), doc.get().get("time", TimestampSerializer))
-        assertNotEquals<Any?>(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertNotEquals<Any>(Timestamp.serverTimestamp(), doc.get().get("time", TimestampSerializer))
+        assertNotEquals<Any?>(Timestamp.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
     @Test

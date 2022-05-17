@@ -444,13 +444,13 @@ external object firebase {
             fun delete(documentReference: DocumentReference): Transaction
         }
 
-        open class Timestamp(seconds: Long, nanoseconds: Int) {
+        open class Timestamp(seconds: Double, nanoseconds: Double) {
             companion object {
                 fun now(): Timestamp
             }
 
-            val seconds: Long
-            val nanoseconds: Int
+            val seconds: Double
+            val nanoseconds: Double
 
             fun isEqual(other: Timestamp): Boolean
         }
