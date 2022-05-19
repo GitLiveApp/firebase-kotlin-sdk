@@ -10,7 +10,7 @@ version = project.property("firebase-database.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.32"
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 repositories {
@@ -40,7 +40,7 @@ android {
         resources.pickFirsts.add("META-INF/LGPL2.1")
     }
     lint {
-        isAbortOnError = false
+        abortOnError = false
     }
 }
 
@@ -126,8 +126,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 progressiveMode = true
 //                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
 //                optIn("kotlinx.coroutines.FlowPreview")

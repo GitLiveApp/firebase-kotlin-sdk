@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -300,7 +301,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -315,7 +316,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            exception?.let { close(exception) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -359,6 +369,14 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
 
     internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
+    internal actual fun _startAfter(vararg fieldValues: Any) = Query(android.startAfter(*fieldValues))
+    internal actual fun _startAt(document: DocumentSnapshot) = Query(android.startAt(document.android))
+    internal actual fun _startAt(vararg fieldValues: Any) = Query(android.startAt(*fieldValues))
+
+    internal actual fun _endBefore(document: DocumentSnapshot) = Query(android.endBefore(document.android))
+    internal actual fun _endBefore(vararg fieldValues: Any) = Query(android.endBefore(*fieldValues))
+    internal actual fun _endAt(document: DocumentSnapshot) = Query(android.endAt(document.android))
+    internal actual fun _endAt(vararg fieldValues: Any) = Query(android.endAt(*fieldValues))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
@@ -455,6 +473,7 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 actual object FieldValue {
     actual val serverTimestamp = Double.POSITIVE_INFINITY
     actual val delete: Any get() = FieldValue.delete()
+    actual fun increment(value: Int): Any = FieldValue.increment(value.toDouble())
     actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)
     actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
     actual fun delete(): Any = delete

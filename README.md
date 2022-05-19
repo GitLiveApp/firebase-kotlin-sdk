@@ -12,13 +12,15 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                                 | Gradle Dependency                                                                                                                   | API Coverage                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | :-----------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Authentication](https://firebase.google.com/docs/auth#kotlin-android)               | [`dev.gitlive:firebase-auth:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.4.3/pom)           | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
-| [Realtime Database](https://firebase.google.com/docs/database#kotlin-android)        | [`dev.gitlive:firebase-database:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.4.3/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore#kotlin-android)         | [`dev.gitlive:firebase-firestore:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.4.3/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
-| [Cloud Functions](https://firebase.google.com/docs/functions/callable#kotlin-android)| [`dev.gitlive:firebase-functions:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.4.3/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
-| [Cloud Messaging](https://firebase.google.com/docs/messaging#kotlin-android)         | [`dev.gitlive:firebase-messaging:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.4.3/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
-| [Cloud Storage](https://firebase.google.com/docs/storage#kotlin-android)             | [`dev.gitlive:firebase-storage:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.4.3/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
-| [Remote Config](https://firebase.google.com/docs/remote-config/get-started?platform=android)             | [`dev.gitlive:firebase-config:1.4.3`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.4.3/pom)     | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square) |
+| [Authentication](https://firebase.google.com/docs/auth)               | [`dev.gitlive:firebase-auth:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.6.1/pom)           | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt) |
+| [Realtime Database](https://firebase.google.com/docs/database)        | [`dev.gitlive:firebase-database:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.6.1/pom)   | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt) |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)         | [`dev.gitlive:firebase-firestore:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.6.1/pom) | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt) |
+| [Cloud Functions](https://firebase.google.com/docs/functions)| [`dev.gitlive:firebase-functions:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.6.1/pom) | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt) |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)         | [`dev.gitlive:firebase-messaging:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.6.1/pom) | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Cloud Storage](https://firebase.google.com/docs/storage)             | [`dev.gitlive:firebase-storage:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.6.1/pom)     | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square) |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations)             | [`dev.gitlive:firebase-installations:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.6.1/pom)     | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)             | [`dev.gitlive:firebase-config:1.6.1`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.6.1/pom)     | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square) |
+
 
 
 
@@ -65,8 +67,8 @@ The Firebase Kotlin SDK uses Kotlin serialization to read and write custom class
 
 ```groovy
 plugins {
-    kotlin("multiplatform") // or kotlin("jvm") or any other kotlin plugin
-    kotlin("plugin.serialization") version "1.5.30"
+    kotlin("multiplatform") version "1.6.10" // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.6.10"
 }
 ```
 
@@ -100,6 +102,33 @@ data class Post(
     val timestamp: Double = FieldValue.serverTimestamp,
 )
 
+```
+
+<h4>Polymorphic serialization (sealed classes)</h4>
+
+This sdk will handle polymorphic serialization automatically if you have a sealed class and its children marked as `Serializable`. It will include a `type` property that will be used to discriminate which child class is the serialized.
+
+You can change this `type` property by using the `@FirebaseClassDiscrminator` annotation in the parent sealed class:
+
+```kotlin
+@Serializable
+@FirebaseClassDiscriminator("class")
+sealed class Parent {
+    @Serializable
+    @SerialName("child")
+    data class Child(
+        val property: Boolean
+    ) : Parent
+}
+```
+
+In combination with a `SerialName` specified for the child class, you have full control over the serialized data. In this case it will be:
+
+```json
+{
+  "class": "child",
+  "property": true
+}
 ```
 
 <h3><a href="https://kotlinlang.org/docs/reference/functions.html#default-arguments">Default arguments</a></h3>
@@ -172,13 +201,14 @@ If you are building a Kotlin multiplatform library which will be consumed from J
 
 ```json
 "dependencies": {
-  "@gitlive/firebase-auth": "1.4.3",
-  "@gitlive/firebase-database": "1.4.3",
-  "@gitlive/firebase-firestore": "1.4.3",
-  "@gitlive/firebase-functions": "1.4.3",
-  "@gitlive/firebase-storage": "1.4.3",
-  "@gitlive/firebase-messaging": "1.4.3",
-  "@gitlive/firebase-config": "1.4.3"
+  "@gitlive/firebase-auth": "1.6.1",
+  "@gitlive/firebase-config": "1.6.1",
+  "@gitlive/firebase-database": "1.6.1",
+  "@gitlive/firebase-firestore": "1.6.1",
+  "@gitlive/firebase-functions": "1.6.1",
+  "@gitlive/firebase-installations": "1.6.1",
+  "@gitlive/firebase-messaging": "1.6.1",
+  "@gitlive/firebase-storage": "1.6.1"
 }
 ```
 
