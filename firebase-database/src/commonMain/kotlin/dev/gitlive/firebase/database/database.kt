@@ -6,9 +6,11 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.SpecialValueSerializer
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
@@ -81,10 +83,6 @@ expect class DataSnapshot {
     fun <T> value(strategy: DeserializationStrategy<T>): T
     fun child(path: String): DataSnapshot
     val children: Iterable<DataSnapshot>
-}
-
-object ServerValue {
-    val TIMESTAMP = Double.POSITIVE_INFINITY
 }
 
 expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException

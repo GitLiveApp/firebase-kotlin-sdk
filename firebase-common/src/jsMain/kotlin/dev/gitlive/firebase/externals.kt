@@ -340,6 +340,7 @@ external object firebase {
 
         object ServerValue {
             val TIMESTAMP: Any
+            fun increment (delta: Double): Any
         }
     }
 
