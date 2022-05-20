@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 
@@ -427,14 +428,28 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
 }
 
-actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
-    actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
-    actual fun increment(value: Int): Any = rethrow { firebase.firestore.FieldValue.increment(value) }
-    actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
-    actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
-    @JsName("deprecatedDelete")
-    actual fun delete(): Any = delete
+/** Represents a platform specific Firebase FieldValue. */
+private typealias NativeFieldValue = firebase.firestore.FieldValue
+
+/** Represents a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
+    init {
+        require(nativeValue is NativeFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue &&
+                (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
+
+    actual companion object {
+        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(NativeFieldValue.serverTimestamp()) }
+        actual val delete: FieldValue get() = rethrow { FieldValue(NativeFieldValue.delete()) }
+        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(firebase.firestore.FieldValue.increment(value)) }
+        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayUnion(*elements)) }
+        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayRemove(*elements)) }
+    }
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(
