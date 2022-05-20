@@ -91,9 +91,6 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
                 verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
-            }
-
-            override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
                 launch {
                     val code = verificationProvider.getVerificationCode()
                     try {
@@ -102,6 +99,9 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
                         response.complete(Result.failure(e))
                     }
                 }
+            }
+
+            override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
             }
 
             override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
