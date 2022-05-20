@@ -34,6 +34,18 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
 
+/** Helper method to perform an update operation. */
+private fun <R> performUpdate(
+    fieldsAndValues: Array<out Pair<String, Any?>>,
+    update: (String, Any?, Array<Any?>) -> R
+) = performUpdate(fieldsAndValues, { it }, { encode(it, true) }, update)
+
+/** Helper method to perform an update operation. */
+private fun <R> performUpdate(
+    fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
+    update: (firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
+) = performUpdate(fieldsAndValues, { it.js }, { encode(it, true) }, update)
+
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
@@ -109,27 +121,15 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.js,
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(value, true) })
-                }.toTypedArray()
-            )
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.js,
-                fieldsAndValues[0].first.js,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field.js, value?.let { encode(value, true) })
-                }.toTypedArray()
-            )
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
@@ -175,27 +175,15 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.js,
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it, true) })
-                }.toTypedArray()
-            )
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                documentRef.js,
-                fieldsAndValues[0].first.js,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field.js, value?.let { encode(it, true)!! })
-                }.toTypedArray()
-            )
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
@@ -244,27 +232,15 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         rethrow { js.update(encode(strategy, data, encodeDefaults)!!).await() }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                fieldsAndValues[0].first,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.drop(1).flatMap { (field, value) ->
-                    listOf(field, value?.let { encode(it, true) })
-                }.toTypedArray()
-            )
-            ?.await()
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(field, value, *moreFieldsAndValues)
+        }?.await()
     }.run { Unit }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        js.takeUnless { fieldsAndValues.isEmpty() }
-            ?.update(
-                fieldsAndValues[0].first.js,
-                fieldsAndValues[0].second,
-                *fieldsAndValues.flatMap { (field, value) ->
-                    listOf(field.js, value?.let { encode(it, true)!! })
-                }.toTypedArray()
-            )
-            ?.await()
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(field, value, *moreFieldsAndValues)
+        }?.await()
     }.run { Unit }
 
     actual suspend fun delete() = rethrow { js.delete().await() }
