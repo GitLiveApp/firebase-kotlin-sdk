@@ -451,12 +451,12 @@ class FirebaseFirestoreTest {
         }
         delay(100) // makes possible to catch pending writes snapshot
 
-        doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.TIMESTAMP))
+        doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.serverTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get("time", DoubleAsTimestampSerializer, ServerTimestampBehavior.ESTIMATE ))
-        assertNotEquals(DoubleAsTimestampSerializer.TIMESTAMP, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
     private suspend fun setupFirestoreData() {

@@ -2,7 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseEncoder
 import dev.gitlive.firebase.SpecialValueSerializer
-import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.TIMESTAMP
+import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.serverTimestamp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 
@@ -83,18 +83,18 @@ object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
     serialName = "Timestamp",
     toNativeValue = { value ->
         when(value) {
-            TIMESTAMP -> FieldValue.serverTimestamp.nativeValue
+            serverTimestamp -> FieldValue.serverTimestamp.nativeValue
             else -> Timestamp.fromMilliseconds(value)
         }
     },
     fromNativeValue = { value ->
         when(value) {
-            FieldValue.serverTimestamp.nativeValue -> TIMESTAMP
+            FieldValue.serverTimestamp.nativeValue -> serverTimestamp
             is NativeTimestamp -> Timestamp(value).toMilliseconds()
             is Double -> value
             else -> throw SerializationException("Cannot deserialize $value")
         }
     }
 ) {
-    const val TIMESTAMP = Double.POSITIVE_INFINITY
+    const val serverTimestamp = Double.POSITIVE_INFINITY
 }
