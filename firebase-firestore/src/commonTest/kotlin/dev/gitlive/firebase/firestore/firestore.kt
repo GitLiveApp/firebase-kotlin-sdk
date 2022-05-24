@@ -432,6 +432,33 @@ class FirebaseFirestoreTest {
         assertEquals(listOf("first"), dataAfter.list)
     }
 
+    @Test
+    fun testLegacyDoubleTimestamp() = runTest {
+        @Serializable
+        data class DoubleTimestamp(
+            @Serializable(with = DoubleAsTimestampSerializer::class)
+            val time: Double?
+        )
+
+        val doc = Firebase.firestore
+            .collection("testLegacyDoubleTimestamp")
+            .document("test${Random.nextInt()}")
+
+        val deferredPendingWritesSnapshot = async {
+            withTimeout(5000) {
+                doc.snapshots.filter { it.exists }.first()
+            }
+        }
+        delay(100) // makes possible to catch pending writes snapshot
+
+        doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.TIMESTAMP))
+
+        val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
+        assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
+        assertNotNull(pendingWritesSnapshot.get("time", DoubleAsTimestampSerializer, ServerTimestampBehavior.ESTIMATE ))
+        assertNotEquals(DoubleAsTimestampSerializer.TIMESTAMP, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")

@@ -2,6 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.FirebaseEncoder
 import dev.gitlive.firebase.SpecialValueSerializer
+import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.TIMESTAMP
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 
@@ -30,6 +31,9 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
     object ServerTimestamp: BaseTimestamp
 }
 
+fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp =
+    Timestamp((milliseconds / 1000).toLong(), (milliseconds * 1000).toInt() % 1000000)
+fun Timestamp.toMilliseconds(): Double = seconds * 1000 + (nanoseconds / 1000000.0)
 
 /** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
@@ -73,3 +77,24 @@ object ServerTimestampSerializer : SpecialValueSerializer<Timestamp.ServerTimest
         }
     }
 )
+
+/** A serializer for a Double field which is stored as a Timestamp. */
+object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
+    serialName = "Timestamp",
+    toNativeValue = { value ->
+        when(value) {
+            TIMESTAMP -> FieldValue.serverTimestamp.nativeValue
+            else -> Timestamp.fromMilliseconds(value)
+        }
+    },
+    fromNativeValue = { value ->
+        when(value) {
+            FieldValue.serverTimestamp.nativeValue -> TIMESTAMP
+            is NativeTimestamp -> Timestamp(value).toMilliseconds()
+            is Double -> value
+            else -> throw SerializationException("Cannot deserialize $value")
+        }
+    }
+) {
+    const val TIMESTAMP = Double.POSITIVE_INFINITY
+}
