@@ -39,7 +39,7 @@ object BaseTimestampSerializer : KSerializer<BaseTimestamp> {
                     is Timestamp -> {
                         encodeLongElement(descriptor, 0, value.seconds)
                         encodeIntElement(descriptor, 1, value.nanoseconds)
-                        encodeBooleanElement(descriptor, 2, true)
+                        encodeBooleanElement(descriptor, 2, false)
                     }
                     else -> throw SerializationException("Cannot serialize $value")
                 }
