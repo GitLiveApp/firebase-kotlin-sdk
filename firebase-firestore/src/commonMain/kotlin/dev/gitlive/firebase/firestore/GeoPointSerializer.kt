@@ -37,7 +37,6 @@ object GeoPointSerializer : KSerializer<GeoPoint> {
                 is PlatformGeoPoint -> GeoPoint(value)
                 else -> throw SerializationException("Cannot deserialize $value")
             }
-            GeoPoint(decoder.value as PlatformGeoPoint)
         } else {
             decoder.decodeStructure(descriptor) {
                 GeoPoint(
