@@ -16,12 +16,12 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T> decode(value: Any?, noinline decodeDouble: (value: Any?) -> Double? = { null }): T {
+inline fun <reified T> decode(value: Any?): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value, decodeDouble)
+    return decode(strategy as DeserializationStrategy<T>, value)
 }
 
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decodeDouble: (value: Any?) -> Double? = { null }): T {
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value).decodeSerializableValue(strategy)
 }
