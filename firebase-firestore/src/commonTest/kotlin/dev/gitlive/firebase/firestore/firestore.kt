@@ -24,8 +24,8 @@ expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
 /** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
-/** @return paris as raw encoded data. */
-expect fun rawEncoded(vararg pairs: Pair<String, Any?>): Any
+/** @return pairs as raw encoded data. */
+expect fun Map<String, Any?>.asEncoded(): Any
 
 // NOTE: serializer<T>() does not work in a legacy JS so serializers have to be provided explicitly
 class FirebaseFirestoreTest {
@@ -436,7 +436,7 @@ class FirebaseFirestoreTest {
     @Test
     fun decodeDocumentReferenceObject() = runTest {
         val doc = Firebase.firestore.document("a/b")
-        val obj = rawEncoded("uid" to "123", "reference" to doc.platformValue)
+        val obj = mapOf("uid" to "123", "reference" to doc.platformValue).asEncoded()
         val decoded: TestDataWithDocumentReference = decode(obj)
         assertEquals("123", decoded.uid)
         assertEquals(doc.path, decoded.reference.path)

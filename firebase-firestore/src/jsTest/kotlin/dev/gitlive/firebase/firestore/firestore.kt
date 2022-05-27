@@ -28,7 +28,8 @@ actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
         it[0] as String to it[1]
     }
 }
-actual fun rawEncoded(vararg pairs: Pair<String, Any?>): Any = json(*pairs)
+actual fun Map<String, Any?>.asEncoded(): Any =
+    json(*entries.map { (key, value) -> key to value }.toTypedArray())
 
 internal fun Throwable.log() {
     console.error(this)
