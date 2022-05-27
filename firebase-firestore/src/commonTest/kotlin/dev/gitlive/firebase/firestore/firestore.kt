@@ -412,36 +412,52 @@ class FirebaseFirestoreTest {
     @Serializable
     data class TestDataWithDocumentReference(
         val uid: String,
-        val reference: DocumentReference
+        val reference: DocumentReference,
+        val optionalReference: DocumentReference?
+    )
+
+    @Serializable
+    data class TestDataWithOptionalDocumentReference(
+        val optionalReference: DocumentReference?
     )
 
     @Test
-    fun encodeDocumentReferenceObject() = runTest {
+    fun encodeDocumentReference() = runTest {
         val doc = Firebase.firestore.document("a/b")
-        val item = TestDataWithDocumentReference("123", doc)
+        val item = TestDataWithDocumentReference("123", doc, doc)
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
         assertEquals("123", encoded["uid"])
         assertEquals(doc.platformValue, encoded["reference"])
+        assertEquals(doc.platformValue, encoded["optionalReference"])
     }
 
     @Test
-    fun encodeDeleteDocumentReferenceObject() = runTest {
-        val doc = Firebase.firestore.document("a/b")
-        val item = TestDataWithDocumentReference("123", doc)
+    fun encodeNullDocumentReference() = runTest {
+        val item = TestDataWithOptionalDocumentReference(null)
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
-        assertEquals("123", encoded["uid"])
-        assertEquals(doc.platformValue, encoded["reference"])
+        assertNull(encoded["optionalReference"])
     }
 
     @Test
-    fun decodeDocumentReferenceObject() = runTest {
+    fun decodeDocumentReference() = runTest {
         val doc = Firebase.firestore.document("a/b")
-        val obj = mapOf("uid" to "123", "reference" to doc.platformValue).asEncoded()
+        val obj = mapOf(
+            "uid" to "123",
+            "reference" to doc.platformValue,
+            "optionalReference" to doc.platformValue
+        ).asEncoded()
         val decoded: TestDataWithDocumentReference = decode(obj)
         assertEquals("123", decoded.uid)
         assertEquals(doc.path, decoded.reference.path)
+        assertEquals(doc.path, decoded.optionalReference?.path)
     }
 
+    @Test
+    fun decodeNullDocumentReference() = runTest {
+        val obj = mapOf("optionalReference" to null).asEncoded()
+        val decoded: TestDataWithOptionalDocumentReference = decode(obj)
+        assertNull(decoded.optionalReference?.path)
+    }
 
     @Test
     fun testFieldValuesOps() = runTest {
