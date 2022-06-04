@@ -11,6 +11,7 @@ import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -296,8 +297,11 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual suspend fun get() =
         DocumentSnapshot(android.get().await())
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val listener = android.addSnapshotListener { snapshot, exception ->
+    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
             snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
