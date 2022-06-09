@@ -33,8 +33,7 @@ tasks {
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
-            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
+            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion"
         )
     }
 }
@@ -209,7 +208,7 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.10")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.11")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0") {
                 exclude("com.google.android.gms")
             }
