@@ -54,7 +54,7 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     actual suspend fun clearPersistence() =
         rethrow { js.clearPersistence().await() }
 
-    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
+//    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 
     actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
         if(persistenceEnabled == true) js.enablePersistence()

@@ -57,12 +57,12 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual suspend fun clearPersistence() =
         android.clearPersistence().await().run { }
 
-    actual fun useEmulator(host: String, port: Int) {
-        android.useEmulator(host, port)
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
-    }
+//    actual fun useEmulator(host: String, port: Int) {
+//        android.useEmulator(host, port)
+//        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+//            .setPersistenceEnabled(false)
+//            .build()
+//    }
 
     actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
         android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->

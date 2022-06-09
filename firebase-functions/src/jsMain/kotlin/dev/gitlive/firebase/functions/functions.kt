@@ -28,7 +28,7 @@ actual class FirebaseFunctions internal constructor(val js: firebase.functions.F
 
     actual fun useFunctionsEmulator(origin: String) = js.useFunctionsEmulator(origin)
 
-    actual fun useEmulator(host: String, port: Int) = js.useEmulator(host, port)
+//    actual fun useEmulator(host: String, port: Int) = js.useEmulator(host, port)
 }
 
 @Suppress("UNCHECKED_CAST")
