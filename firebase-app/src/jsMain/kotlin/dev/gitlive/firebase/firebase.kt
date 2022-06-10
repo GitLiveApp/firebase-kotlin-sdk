@@ -4,33 +4,44 @@
 
 package dev.gitlive.firebase
 
+import dev.gitlive.firebase.externals.getApp
+import dev.gitlive.firebase.externals.getApps
+import dev.gitlive.firebase.externals.initializeApp
 import kotlin.js.json
+import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 
-actual val Firebase.app: FirebaseApp
-    get() = FirebaseApp(firebase.app())
+actual val Firebase.app: FirebaseApp get() = FirebaseApp(getApp())
 
-actual fun Firebase.app(name: String): FirebaseApp =
-    FirebaseApp(firebase.app(name))
+actual fun Firebase.app(name: String): FirebaseApp = FirebaseApp(getApp(name))
 
 actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
-    FirebaseApp(firebase.initializeApp(options.toJson(), name))
+    FirebaseApp(initializeApp(options.toJson(), name))
 
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
-    FirebaseApp(firebase.initializeApp(options.toJson()))
+    FirebaseApp(initializeApp(options.toJson()))
 
-actual class FirebaseApp internal constructor(val js: firebase.App) {
+actual class FirebaseApp internal constructor(val js: JsFirebaseApp) {
     actual val name: String
         get() = js.name
     actual val options: FirebaseOptions
         get() = js.options.run {
-            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
+            FirebaseOptions(
+                js.options.appId,
+                js.options.apiKey,
+                js.options.databaseURL,
+                js.options.gaTrackingId,
+                js.options.storageBucket,
+                js.options.projectId,
+                js.options.messagingSenderId,
+                js.options.authDomain
+            )
         }
 }
 
-actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
+actual fun Firebase.apps(context: Any?) = getApps().map { FirebaseApp(it) }
 
 private fun FirebaseOptions.toJson() = json(
     "apiKey" to apiKey,

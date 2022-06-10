@@ -13,27 +13,11 @@ import kotlin.js.Promise
 external object firebase {
 
     open class App {
-        val name: String
-        val options: Options
         fun functions(region: String? = definedExternally): functions.Functions
-        fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
     }
 
-    interface Options {
-        val applicationId: String
-        val apiKey: String
-        val databaseUrl: String?
-        val gaTrackingId: String?
-        val storageBucket: String?
-        val projectId: String?
-        val messagingSenderId: String?
-        val authDomain: String?
-    }
-
-    val apps : Array<App>
     fun app(name: String? = definedExternally): App
-    fun initializeApp(options: Any, name: String? = definedExternally) : App
 
     interface FirebaseError {
         var code: String
@@ -284,63 +268,6 @@ external object firebase {
         interface HttpsCallable {
         }
 
-    }
-
-    fun database(app: App? = definedExternally): database.Database
-
-    object database {
-        fun enableLogging(logger: Boolean?, persistent: Boolean? = definedExternally)
-
-        open class Database {
-            fun ref(path: String? = definedExternally): Reference
-            fun useEmulator(host: String, port: Int)
-        }
-        open class ThenableReference : Reference
-
-
-        open class Query {
-            fun on(eventType: String?, callback: SnapshotCallback, cancelCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
-            fun off(eventType: String?, callback: SnapshotCallback?, context: Any? = definedExternally)
-            fun once(eventType: String, callback: SnapshotCallback, failureCallbackOrContext: (error: Error) -> Unit? = definedExternally, context: Any? = definedExternally): SnapshotCallback
-            fun orderByChild(path: String): Query
-            fun orderByKey(): Query
-            fun orderByValue(): Query
-            fun startAt(value: Any, key: String? = definedExternally): Query
-            fun endAt(value: Any, key: String? = definedExternally): Query
-            fun equalTo(value: Any, key: String? = definedExternally): Query
-            fun limitToFirst(limit: Int): Query
-            fun limitToLast (limit: Int): Query
-        }
-
-        open class Reference: Query {
-            val key: String?
-            fun child(path: String): Reference
-            fun remove(): Promise<Unit>
-            fun onDisconnect(): OnDisconnect
-            fun update(value: Any?): Promise<Unit>
-            fun set(value: Any?): Promise<Unit>
-            fun push(): ThenableReference
-        }
-
-        open class DataSnapshot {
-            val key: String?
-            fun `val`(): Any
-            fun exists(): Boolean
-            fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
-            fun numChildren(): Int
-            fun child(path: String): DataSnapshot
-        }
-
-        open class OnDisconnect {
-            fun update(value: Any?): Promise<Unit>
-            fun remove(): Promise<Unit>
-            fun cancel(): Promise<Unit>
-            fun set(value: Any?): Promise<Unit>
-        }
-
-        object ServerValue {
-            val TIMESTAMP: Any
-        }
     }
 
     fun firestore(): firestore.Firestore
