@@ -1,0 +1,202 @@
+name: JVM Pull Request
+
+on:
+  pull_request:
+    branches: [ jvm-target ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+          
+      - name: Short SHA
+        env:
+          COMMIT_SHA: ${{github.event.pull_request.head.sha}}
+        run: echo "short_sha=${COMMIT_SHA::7}" >> $GITHUB_ENV
+          
+      - name: Read firebase-app version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-app.version'
+      - name: Update firebase-app version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-app.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-auth version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-auth.version'
+      - name: Update firebase-auth version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-auth.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-common version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-common.version'
+      - name: Update firebase-common version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-common.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-database version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-database.version'
+      - name: Update firebase-database version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-database.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-firestore version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-firestore.version'
+      - name: Update firebase-firestore version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-firestore.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-functions version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-functions.version'
+      - name: Update firebase-functions version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-functions.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Read firebase-config version
+        id: read_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-config.version'
+      - name: Update firebase-config version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: 'gradle.properties'
+          property: 'firebase-config.version'
+          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          
+      - name: Setup versions
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: :updateVersions
+          
+#      - name: Build
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: assemble
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          
+#      - name: Publish firebase-app
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-app:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Publish firebase-auth
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-auth:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Publish firebase-common
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-common:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Publish firebase-database
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-database:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Publish firebase-firestore
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-firestore:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Publish firebase-functions
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: :firebase-functions:publishAllPublicationsToGitHubPackagesRepository -x publishAndroidReleasePublicationToGitHubPackagesRepository
+#        continue-on-error: true
+#        env:
+#          TOKEN: ${{ secrets.AUTO_TOKEN }}
+#          USERNAME: ${{ secrets.AUTO_USERNAME }}
+#          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+#          
+#      - name: Setup NPM
+#        run: npm config set //npm.pkg.github.com/:_authToken=$token
+#        env:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          
+#      - name: Publish npm
+#        uses: eskatos/gradle-command-action@v1
+#        continue-on-error: true
+#        with:
+#          arguments: prepareForNpmPublish publishToNpm
