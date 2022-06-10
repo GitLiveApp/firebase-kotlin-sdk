@@ -21,7 +21,7 @@ jobs:
         run: echo "short_sha=${COMMIT_SHA::7}" >> $GITHUB_ENV
           
       - name: Read firebase-app version
-        id: read_version
+        id: read_app_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -31,10 +31,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-app.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_app_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-auth version
-        id: read_version
+        id: read_auth_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -44,10 +44,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-auth.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_auth_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-common version
-        id: read_version
+        id: read_common_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -57,10 +57,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-common.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_common_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-database version
-        id: read_version
+        id: read_database_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -70,10 +70,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-database.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_database_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-firestore version
-        id: read_version
+        id: read_firestore_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -83,10 +83,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-firestore.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_firestore_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-functions version
-        id: read_version
+        id: read_functions_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -96,10 +96,10 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-functions.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_functions_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Read firebase-config version
-        id: read_version
+        id: read_config_version
         uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
@@ -109,7 +109,7 @@ jobs:
         with:
           path: 'gradle.properties'
           property: 'firebase-config.version'
-          value: "${{ steps.read_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
+          value: "${{ steps.read_config_version.outputs.value }}-${{ github.head_ref }}-${{ env.short_sha }}"
           
       - name: Setup versions
         uses: eskatos/gradle-command-action@v1
