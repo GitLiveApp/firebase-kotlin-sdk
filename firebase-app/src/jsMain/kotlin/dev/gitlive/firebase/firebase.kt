@@ -11,7 +11,7 @@ import kotlin.js.json
 import dev.gitlive.firebase.externals.app.FirebaseApp as JsFirebaseApp
 
 actual val Firebase.app: FirebaseApp
-get() = FirebaseApp(getApp())
+    get() = FirebaseApp(getApp())
 
 actual fun Firebase.app(name: String): FirebaseApp =
     FirebaseApp(getApp(name))

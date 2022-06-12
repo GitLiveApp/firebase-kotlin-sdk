@@ -99,7 +99,6 @@ actual open class Query internal constructor(open val js: JsQuery) {
                     ChildEvent.Type.MOVED -> onChildMoved(js, callback, cancelCallback)
                     ChildEvent.Type.REMOVED -> onChildRemoved(js, callback, cancelCallback)
                 }
-
             }
         }
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }

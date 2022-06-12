@@ -62,14 +62,8 @@ actual class OAuthProvider(val js: JsOAuthProvider) {
             js.setCustomParameters(customParameters)
         }
     }
-
     actual companion object {
-        actual fun credential(
-            providerId: String,
-            accessToken: String?,
-            idToken: String?,
-            rawNonce: String?
-        ): OAuthCredential = rethrow {
+        actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential = rethrow {
             JsOAuthProvider(providerId)
                 .credential(
                     json(
@@ -88,15 +82,9 @@ actual class PhoneAuthProvider(val js: PhoneAuthProvider) {
 
     actual constructor(auth: FirebaseAuth) : this(PhoneAuthProvider(auth.js))
 
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential =
-        PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
-
-    actual suspend fun verifyPhoneNumber(
-        phoneNumber: String,
-        verificationProvider: PhoneVerificationProvider
-    ): AuthCredential = rethrow {
-        val verificationId =
-            js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
+    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
+    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
+        val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)
         credential(verificationId, verificationCode)
     }
@@ -108,6 +96,5 @@ actual interface PhoneVerificationProvider {
 }
 
 actual object TwitterAuthProvider {
-    actual fun credential(token: String, secret: String): AuthCredential =
-        AuthCredential(TwitterAuthProvider.credential(token, secret))
+    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(TwitterAuthProvider.credential(token, secret))
 }

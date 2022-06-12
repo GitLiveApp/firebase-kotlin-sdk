@@ -30,35 +30,20 @@ actual class FirebaseUser internal constructor(val js: User) {
         get() = rethrow { js.providerId }
     actual suspend fun delete() = rethrow { js.delete().await() }
     actual suspend fun reload() = rethrow { js.reload().await() }
-    actual suspend fun getIdToken(forceRefresh: Boolean): String? = rethrow {
-        js.getIdToken(forceRefresh).await()
-    }
-    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = rethrow {
-        AuthTokenResult(getIdTokenResult(js, forceRefresh).await())
-    }
-    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow {
-        AuthResult( linkWithCredential(js, credential.js).await())
-    }
+    actual suspend fun getIdToken(forceRefresh: Boolean): String? = rethrow { js.getIdToken(forceRefresh).await() }
+    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = rethrow { AuthTokenResult(getIdTokenResult(js, forceRefresh).await()) }
+    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow { AuthResult( linkWithCredential(js, credential.js).await()) }
     actual suspend fun reauthenticate(credential: AuthCredential) = rethrow {
         reauthenticateWithCredential(js, credential.js).await()
         Unit
     }
-    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult =
-        rethrow { AuthResult(reauthenticateWithCredential(js, credential.js).await()) }
+    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = rethrow { AuthResult(reauthenticateWithCredential(js, credential.js).await()) }
 
-    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = rethrow {
-        sendEmailVerification(js, actionCodeSettings?.toJson()).await()
-    }
-    actual suspend fun unlink(provider: String): FirebaseUser? = rethrow {
-        FirebaseUser(unlink(js, provider).await())
-    }
+    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) = rethrow { sendEmailVerification(js, actionCodeSettings?.toJson()).await() }
+    actual suspend fun unlink(provider: String): FirebaseUser? = rethrow { FirebaseUser(unlink(js, provider).await()) }
     actual suspend fun updateEmail(email: String) = rethrow { updateEmail(js, email).await() }
-    actual suspend fun updatePassword(password: String) = rethrow {
-        updatePassword(js, password).await()
-    }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow {
-        updatePhoneNumber(js, credential.js).await()
-    }
+    actual suspend fun updatePassword(password: String) = rethrow { updatePassword(js, password).await() }
+    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { updatePhoneNumber(js, credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
         val request = object : ProfileUpdateRequest {
             override val displayName: String? = displayName
@@ -66,10 +51,7 @@ actual class FirebaseUser internal constructor(val js: User) {
         }
         updateProfile(js, request).await()
     }
-    actual suspend fun verifyBeforeUpdateEmail(
-        newEmail: String,
-        actionCodeSettings: ActionCodeSettings?
-    ) = rethrow { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJson()).await() }
+    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJson()).await() }
 }
 
 actual class UserInfo(val js: JsUserInfo) {
