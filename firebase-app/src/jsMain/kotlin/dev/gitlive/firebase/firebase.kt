@@ -4,11 +4,11 @@
 
 package dev.gitlive.firebase
 
-import dev.gitlive.firebase.externals.getApp
-import dev.gitlive.firebase.externals.getApps
-import dev.gitlive.firebase.externals.initializeApp
+import dev.gitlive.firebase.externals.app.getApp
+import dev.gitlive.firebase.externals.app.getApps
+import dev.gitlive.firebase.externals.app.initializeApp
 import kotlin.js.json
-import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
+import dev.gitlive.firebase.externals.app.FirebaseApp as JsFirebaseApp
 
 actual val Firebase.app: FirebaseApp get() = FirebaseApp(getApp())
 

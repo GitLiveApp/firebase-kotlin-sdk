@@ -6,12 +6,12 @@ package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.*
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.externals.*
+import dev.gitlive.firebase.externals.auth.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
-import dev.gitlive.firebase.externals.AuthResult as JsAuthResult
+import dev.gitlive.firebase.externals.auth.AuthResult as JsAuthResult
 
 actual val Firebase.auth
     get() = rethrow { FirebaseAuth(getAuth()) }

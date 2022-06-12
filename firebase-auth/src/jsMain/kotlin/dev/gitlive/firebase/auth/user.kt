@@ -1,17 +1,9 @@
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.externals.*
+import dev.gitlive.firebase.externals.auth.*
 import kotlinx.coroutines.await
 import kotlin.js.Date
-import dev.gitlive.firebase.externals.UserInfo as JsUserInfo
-import dev.gitlive.firebase.externals.getIdTokenResult
-import dev.gitlive.firebase.externals.linkWithCredential
-import dev.gitlive.firebase.externals.sendEmailVerification
-import dev.gitlive.firebase.externals.unlink
-import dev.gitlive.firebase.externals.updateEmail
-import dev.gitlive.firebase.externals.updatePassword
-import dev.gitlive.firebase.externals.updatePhoneNumber
-import dev.gitlive.firebase.externals.updateProfile
+import dev.gitlive.firebase.externals.auth.UserInfo as JsUserInfo
 
 actual class FirebaseUser internal constructor(val js: User) {
     actual val uid: String

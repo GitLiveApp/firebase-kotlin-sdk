@@ -6,7 +6,7 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.externals.*
+import dev.gitlive.firebase.externals.database.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -16,18 +16,18 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Promise
-import dev.gitlive.firebase.externals.DataSnapshot as JsDataSnapshot
-import dev.gitlive.firebase.externals.DatabaseReference as JsDatabaseReference
-import dev.gitlive.firebase.externals.OnDisconnect as JsOnDisconnect
-import dev.gitlive.firebase.externals.Query as JsQuery
-import dev.gitlive.firebase.externals.endAt as jsEndAt
-import dev.gitlive.firebase.externals.equalTo as jsEqualTo
-import dev.gitlive.firebase.externals.limitToFirst as jsLimitToFirst
-import dev.gitlive.firebase.externals.limitToLast as jsLimitToLast
-import dev.gitlive.firebase.externals.orderByChild as jsOrderByChild
-import dev.gitlive.firebase.externals.orderByKey as jsOrderByKey
-import dev.gitlive.firebase.externals.orderByValue as jsOrderByValue
-import dev.gitlive.firebase.externals.startAt as jsStartAt
+import dev.gitlive.firebase.externals.database.DataSnapshot as JsDataSnapshot
+import dev.gitlive.firebase.externals.database.DatabaseReference as JsDatabaseReference
+import dev.gitlive.firebase.externals.database.OnDisconnect as JsOnDisconnect
+import dev.gitlive.firebase.externals.database.Query as JsQuery
+import dev.gitlive.firebase.externals.database.endAt as jsEndAt
+import dev.gitlive.firebase.externals.database.equalTo as jsEqualTo
+import dev.gitlive.firebase.externals.database.limitToFirst as jsLimitToFirst
+import dev.gitlive.firebase.externals.database.limitToLast as jsLimitToLast
+import dev.gitlive.firebase.externals.database.orderByChild as jsOrderByChild
+import dev.gitlive.firebase.externals.database.orderByKey as jsOrderByKey
+import dev.gitlive.firebase.externals.database.orderByValue as jsOrderByValue
+import dev.gitlive.firebase.externals.database.startAt as jsStartAt
 
 @PublishedApi
 internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =

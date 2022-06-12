@@ -4,20 +4,8 @@
 
 package dev.gitlive.firebase
 
-import dev.gitlive.firebase.externals.DataSnapshot
+import dev.gitlive.firebase.externals.database.DataSnapshot
 import kotlin.js.Promise
-
-@JsModule("firebase/compat/auth")
-@JsName("default")
-external object auth
-
-@JsModule("firebase/compat/database")
-@JsName("default")
-external object database
-
-@JsModule("firebase/compat/firestore")
-@JsName("default")
-external object firestore
 
 @JsModule("firebase/compat/functions")
 @JsName("default")

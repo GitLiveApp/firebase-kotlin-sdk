@@ -1,7 +1,7 @@
 @file:JsModule("firebase/app")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals
+package dev.gitlive.firebase.externals.app
 
 external fun initializeApp(options: Any, name: String = definedExternally): FirebaseApp
 

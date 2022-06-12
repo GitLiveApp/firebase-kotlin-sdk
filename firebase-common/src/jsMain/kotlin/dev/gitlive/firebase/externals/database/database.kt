@@ -1,9 +1,10 @@
 @file:JsModule("firebase/database")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals
+package dev.gitlive.firebase.externals.database
 
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.externals.app.FirebaseApp
 import kotlin.js.Promise
 
 external fun child(parent: DatabaseReference, path: String): DatabaseReference

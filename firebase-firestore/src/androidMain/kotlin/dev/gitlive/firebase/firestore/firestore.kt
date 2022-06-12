@@ -471,7 +471,7 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
+    actual val serverTimestamp: Any = Double.POSITIVE_INFINITY
     actual val delete: Any get() = FieldValue.delete()
     actual fun increment(value: Int): Any = FieldValue.increment(value.toDouble())
     actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)

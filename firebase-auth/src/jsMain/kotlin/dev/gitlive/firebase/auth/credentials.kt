@@ -1,16 +1,16 @@
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.externals.*
-import dev.gitlive.firebase.externals.EmailAuthProvider
-import dev.gitlive.firebase.externals.FacebookAuthProvider
-import dev.gitlive.firebase.externals.GithubAuthProvider
-import dev.gitlive.firebase.externals.GoogleAuthProvider
-import dev.gitlive.firebase.externals.PhoneAuthProvider
-import dev.gitlive.firebase.externals.TwitterAuthProvider
+import dev.gitlive.firebase.externals.auth.*
+import dev.gitlive.firebase.externals.auth.EmailAuthProvider
+import dev.gitlive.firebase.externals.auth.FacebookAuthProvider
+import dev.gitlive.firebase.externals.auth.GithubAuthProvider
+import dev.gitlive.firebase.externals.auth.GoogleAuthProvider
+import dev.gitlive.firebase.externals.auth.PhoneAuthProvider
+import dev.gitlive.firebase.externals.auth.TwitterAuthProvider
 import kotlinx.coroutines.await
 import kotlin.js.json
-import dev.gitlive.firebase.externals.AuthCredential as JsAuthCredential
-import dev.gitlive.firebase.externals.OAuthProvider as JsOAuthProvider
+import dev.gitlive.firebase.externals.auth.AuthCredential as JsAuthCredential
+import dev.gitlive.firebase.externals.auth.OAuthProvider as JsOAuthProvider
 
 actual open class AuthCredential(val js: JsAuthCredential) {
     actual val providerId: String
