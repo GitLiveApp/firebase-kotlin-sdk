@@ -43,16 +43,12 @@ actual class FirebaseAuth internal constructor(val js: Auth) {
         set(value) { js.languageCode = value }
 
     actual suspend fun applyActionCode(code: String) = rethrow { applyActionCode(js, code).await() }
-    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow {
-        confirmPasswordReset(js, code, newPassword).await()
-    }
+    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow { confirmPasswordReset(js, code, newPassword).await() }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         rethrow { AuthResult(createUserWithEmailAndPassword(js, email, password).await()) }
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = rethrow {
-        fetchSignInMethodsForEmail(js, email).await().asList()
-    }
+    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = rethrow { fetchSignInMethodsForEmail(js, email).await().asList() }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) =
         rethrow { sendPasswordResetEmail(js, email, actionCodeSettings?.toJson()).await() }
@@ -105,9 +101,7 @@ actual class FirebaseAuth internal constructor(val js: Auth) {
         } as T
     }
 
-    actual fun useEmulator(host: String, port: Int) = rethrow {
-        connectAuthEmulator(js, "http://$host:$port")
-    }
+    actual fun useEmulator(host: String, port: Int) = rethrow { connectAuthEmulator(js, "http://$host:$port") }
 }
 
 actual class AuthResult internal constructor(val js: JsAuthResult) {

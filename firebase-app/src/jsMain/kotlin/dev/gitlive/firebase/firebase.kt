@@ -10,9 +10,11 @@ import dev.gitlive.firebase.externals.app.initializeApp
 import kotlin.js.json
 import dev.gitlive.firebase.externals.app.FirebaseApp as JsFirebaseApp
 
-actual val Firebase.app: FirebaseApp get() = FirebaseApp(getApp())
+actual val Firebase.app: FirebaseApp
+get() = FirebaseApp(getApp())
 
-actual fun Firebase.app(name: String): FirebaseApp = FirebaseApp(getApp(name))
+actual fun Firebase.app(name: String): FirebaseApp =
+    FirebaseApp(getApp(name))
 
 actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
@@ -28,16 +30,7 @@ actual class FirebaseApp internal constructor(val js: JsFirebaseApp) {
         get() = js.name
     actual val options: FirebaseOptions
         get() = js.options.run {
-            FirebaseOptions(
-                js.options.appId,
-                js.options.apiKey,
-                js.options.databaseURL,
-                js.options.gaTrackingId,
-                js.options.storageBucket,
-                js.options.projectId,
-                js.options.messagingSenderId,
-                js.options.authDomain
-            )
+            FirebaseOptions(appId, apiKey, databaseURL, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
 }
 
