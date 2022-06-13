@@ -5,34 +5,40 @@
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.externals.functions.*
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import org.w3c.dom.url.URL
 import kotlin.js.json
+import dev.gitlive.firebase.externals.functions.HttpsCallableResult as JsHttpsCallableResult
 
 actual val Firebase.functions: FirebaseFunctions
-    get() = rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(firebase.functions()) }
+    get() = rethrow { FirebaseFunctions(getFunctions()) }
 
 actual fun Firebase.functions(region: String) =
-    rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(firebase.app().functions(region)) }
+    rethrow { FirebaseFunctions(getFunctions(regionOrCustomDomain = region)) }
 
 actual fun Firebase.functions(app: FirebaseApp) =
-    rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(firebase.functions(app.js)) }
+    rethrow { FirebaseFunctions(getFunctions(app.js)) }
 
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
-    rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(app.js.functions(region)) }
+    rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
 
-actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
+actual class FirebaseFunctions internal constructor(val js: Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
+        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 
-    actual fun useFunctionsEmulator(origin: String) = js.useFunctionsEmulator(origin)
+    actual fun useFunctionsEmulator(origin: String) {
+        val url = URL(origin)
+        useEmulator(url.host, url.port.toInt())
+    }
 
-    actual fun useEmulator(host: String, port: Int) = js.useEmulator(host, port)
+    actual fun useEmulator(host: String, port: Int) = connectFunctionsEmulator(js, host, port)
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) {
+actual class HttpsCallableReference internal constructor(val js: HttpsCallable) {
 
     actual suspend operator fun invoke() =
         rethrow { HttpsCallableResult(js().await()) }
@@ -44,7 +50,7 @@ actual class HttpsCallableReference internal constructor(val js: firebase.functi
         rethrow { HttpsCallableResult(js(encode(strategy, data, encodeDefaults)).await()) }
 }
 
-actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCallableResult) {
+actual class HttpsCallableResult constructor(val js: JsHttpsCallableResult) {
 
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
