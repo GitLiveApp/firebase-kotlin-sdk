@@ -7,7 +7,7 @@ external fun initializeApp(options: Any, name: String = definedExternally): Fire
 
 external fun getApp(name: String = definedExternally): FirebaseApp
 
-external fun getApps(): List<FirebaseApp>
+external fun getApps(): Array<FirebaseApp>
 
 external interface FirebaseApp {
     val automaticDataCollectionEnabled: Boolean

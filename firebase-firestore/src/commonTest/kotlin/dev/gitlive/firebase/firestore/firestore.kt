@@ -32,9 +32,9 @@ class FirebaseFirestoreTest {
 
     @Serializable
     data class FirestoreTest(
-        val prop1: String, 
+        val prop1: String,
         val time: Double = 0.0,
-        val count: Int = 0, 
+        val count: Int = 0,
         val list: List<String> = emptyList(),
     )
 

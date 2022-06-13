@@ -241,7 +241,7 @@ expect class FieldPath(vararg fieldNames: String) {
 }
 
 expect object FieldValue {
-    val serverTimestamp: Any
+    val serverTimestamp: Double
     val delete: Any
     fun increment(value: Int): Any
     fun arrayUnion(vararg elements: Any): Any

@@ -66,7 +66,7 @@ external fun getDoc(
     options: Any? = definedExternally
 ): Promise<DocumentSnapshot>
 
-external fun get(query: Query): Promise<QuerySnapshot>
+external fun getDocs(query: Query): Promise<QuerySnapshot>
 
 external fun getFirestore(app: FirebaseApp? = definedExternally): Firestore
 
@@ -125,16 +125,16 @@ external fun startAt(document: DocumentSnapshot): QueryConstraint
 
 external fun startAt(vararg fieldValues: Any): QueryConstraint
 
-external fun update(reference: DocumentReference, data: Any): Promise<Unit>
+external fun updateDoc(reference: DocumentReference, data: Any): Promise<Unit>
 
-external fun update(
+external fun updateDoc(
     reference: DocumentReference,
     field: String,
     value: Any?,
     vararg moreFieldsAndValues: Any?
 ): Promise<Unit>
 
-external fun update(
+external fun updateDoc(
     reference: DocumentReference,
     field: FieldPath,
     value: Any?,
@@ -173,9 +173,9 @@ external interface DocumentReference {
 external interface DocumentSnapshot {
     val id: String
     val ref: DocumentReference
-    val exists: Boolean
     val metadata: SnapshotMetadata
     fun data(options: Any? = definedExternally): Any?
+    fun exists(): Boolean
     fun get(fieldPath: String, options: Any? = definedExternally): Any?
     fun get(fieldPath: FieldPath, options: Any? = definedExternally): Any?
 }

@@ -29,7 +29,7 @@ import dev.gitlive.firebase.externals.firestore.arrayUnion as jsArrayUnion
 import dev.gitlive.firebase.externals.firestore.endAt as jsEndAt
 import dev.gitlive.firebase.externals.firestore.endBefore as jsEndBefore
 import dev.gitlive.firebase.externals.firestore.increment as jsIncrement
-import dev.gitlive.firebase.externals.firestore.update as jsUpdate
+import dev.gitlive.firebase.externals.firestore.updateDoc as jsUpdate
 import dev.gitlive.firebase.externals.firestore.limit as jsLimit
 import dev.gitlive.firebase.externals.firestore.startAfter as jsStartAfter
 import dev.gitlive.firebase.externals.firestore.startAt as jsStartAt
@@ -284,7 +284,7 @@ actual class DocumentReference(val js: JsDocumentReference) {
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         js.takeUnless { fieldsAndValues.isEmpty() }?.let {
             jsUpdate(
-                js,
+                it,
                 fieldsAndValues[0].first.js,
                 fieldsAndValues[0].second,
                 *fieldsAndValues.flatMap { (field, value) ->
@@ -310,7 +310,7 @@ actual class DocumentReference(val js: JsDocumentReference) {
 
 actual open class Query(open val js: JsQuery) {
 
-    actual suspend fun get() =  rethrow { QuerySnapshot(get(js).await()) }
+    actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
     actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
@@ -462,7 +462,7 @@ actual class DocumentSnapshot(val js: JsDocumentSnapshot) {
         rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
-    actual val exists get() = rethrow { js.exists }
+    actual val exists get() = rethrow { js.exists() }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 
     fun getTimestampsOptions(serverTimestampBehavior: ServerTimestampBehavior) =
@@ -482,7 +482,7 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
 }
 
 actual object FieldValue {
-    actual val serverTimestamp: Any = serverTimestamp()
+    actual val serverTimestamp: Double = Double.POSITIVE_INFINITY
     actual val delete: Any get() = rethrow { deleteField() }
     actual fun increment(value: Int): Any = rethrow { jsIncrement(value) }
     actual fun arrayUnion(vararg elements: Any): Any = rethrow { jsArrayUnion(*elements) }
