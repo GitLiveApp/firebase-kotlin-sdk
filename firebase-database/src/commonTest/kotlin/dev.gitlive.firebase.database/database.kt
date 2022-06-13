@@ -6,8 +6,10 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.*
 import kotlin.test.*
+import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -71,7 +73,9 @@ class FirebaseDatabaseTest {
 
     private suspend fun awaitDatabaseConnection() {
         // workaround to avoid "Database not connected" exception with Firebase emulator
-        Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
+        withTimeout(5.seconds) {
+            Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
+        }
     }
 
     private suspend fun setupRealtimeData() {

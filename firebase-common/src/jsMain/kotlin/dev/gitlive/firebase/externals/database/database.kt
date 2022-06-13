@@ -39,6 +39,10 @@ external fun limitToLast(limit: Int): QueryConstraint
 
 external fun off(query: Query, eventType: String?, callback: Any?)
 
+external fun goOffline(db: Database)
+
+external fun goOnline(db: Database)
+
 external fun onChildAdded(
     query: Query,
     callback: ChangeSnapshotCallback,

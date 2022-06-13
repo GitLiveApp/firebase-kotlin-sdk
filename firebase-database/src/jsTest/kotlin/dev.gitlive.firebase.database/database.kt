@@ -4,6 +4,9 @@
 
 package dev.gitlive.firebase.database
 
+import dev.gitlive.firebase.externals.database.getDatabase
+import dev.gitlive.firebase.externals.database.goOffline
+import dev.gitlive.firebase.externals.database.goOnline
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
 
@@ -14,7 +17,10 @@ actual val context: Any = Unit
 actual fun runTest(test: suspend () -> Unit) = GlobalScope
     .promise {
         try {
+            val db = getDatabase()
+            goOnline(db)
             test()
+            goOffline(db) // infinitely running test task workaround
         } catch (e: Throwable) {
             e.log()
             throw e
@@ -28,4 +34,3 @@ internal fun Throwable.log() {
         it.log()
     }
 }
-
