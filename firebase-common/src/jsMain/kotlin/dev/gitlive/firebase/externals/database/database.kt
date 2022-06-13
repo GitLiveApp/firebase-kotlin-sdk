@@ -115,10 +115,10 @@ external interface ThenableReference : DatabaseReference
 
 external interface DataSnapshot {
     val key: String?
+    val size: Int
     fun `val`(): Any
     fun exists(): Boolean
     fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
-    fun numChildren(): Int
     fun child(path: String): DataSnapshot
 }
 
