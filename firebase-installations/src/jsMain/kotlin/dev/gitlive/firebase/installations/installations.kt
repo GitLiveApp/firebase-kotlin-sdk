@@ -1,28 +1,23 @@
 package dev.gitlive.firebase.installations
 
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.externals.installations.*
 import kotlinx.coroutines.await
 
 actual val Firebase.installations
-    get() = rethrow {
-        dev.gitlive.firebase.installations
-        FirebaseInstallations(firebase.installations())
-    }
+    get() = rethrow { FirebaseInstallations(getInstallations()) }
 
 actual fun Firebase.installations(app: FirebaseApp) =
-    rethrow {
-        dev.gitlive.firebase.installations
-        FirebaseInstallations(firebase.installations(app.js))
-    }
+    rethrow { FirebaseInstallations(getInstallations(app.js)) }
 
-actual class FirebaseInstallations internal constructor(val js: firebase.installations.Installations) {
+actual class FirebaseInstallations internal constructor(val js: Installations) {
 
-    actual suspend fun delete() = rethrow { js.delete().await() }
+    actual suspend fun delete() = rethrow { delete(js).await() }
 
-    actual suspend fun getId(): String = rethrow { js.getId().await() }
+    actual suspend fun getId(): String = rethrow { getId(js).await() }
 
     actual suspend fun getToken(forceRefresh: Boolean): String =
-        rethrow { js.getToken(forceRefresh).await() }
+        rethrow { getToken(js, forceRefresh).await() }
 }
 
 actual open class FirebaseInstallationsException(code: String?, cause: Throwable): FirebaseException(code, cause)
