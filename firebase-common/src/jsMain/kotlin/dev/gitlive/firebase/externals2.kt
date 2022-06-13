@@ -13,10 +13,6 @@ external object functions
 
 external object installations
 
-@JsModule("firebase/compat/remote-config")
-@JsName("default")
-external object remoteConfig
-
 typealias ChangeSnapshotCallback = (data: DataSnapshot, previousChildName: String?) -> Unit
 typealias ValueSnapshotCallback = (data: DataSnapshot) -> Unit
 typealias CancelCallback = (error: Throwable) -> Unit

@@ -3,44 +3,40 @@ package dev.gitlive.firebase.remoteconfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.externals.remoteconfig.*
 import kotlinx.coroutines.await
 import kotlin.js.json
 
 actual val Firebase.remoteConfig: FirebaseRemoteConfig
-    get() = rethrow {
-        dev.gitlive.firebase.remoteConfig
-        FirebaseRemoteConfig(firebase.remoteConfig())
-    }
+    get() = rethrow { FirebaseRemoteConfig(getRemoteConfig()) }
 
 actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = rethrow {
-    dev.gitlive.firebase.remoteConfig
-    FirebaseRemoteConfig(firebase.remoteConfig(app.js))
+    FirebaseRemoteConfig(getRemoteConfig(app.js))
 }
 
-actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteConfig.RemoteConfig) {
+actual class FirebaseRemoteConfig internal constructor(val js: RemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
         get() = rethrow { getAllKeys().map { Pair(it, getValue(it)) }.toMap() }
 
     actual val info: FirebaseRemoteConfigInfo
         get() = rethrow {
             FirebaseRemoteConfigInfo(
-                configSettings = js.settings.toSettings(),
+                configSettings = js.settings.toFirebaseRemoteConfigSettings(),
                 fetchTimeMillis = js.fetchTimeMillis,
                 lastFetchStatus = js.lastFetchStatus.toFetchStatus()
             )
         }
 
-    actual suspend fun activate(): Boolean = rethrow { js.activate().await() }
-    actual suspend fun ensureInitialized(): Unit = rethrow { js.activate().await() }
+    actual suspend fun activate(): Boolean = rethrow { activate(js).await() }
+    actual suspend fun ensureInitialized(): Unit = rethrow { ensureInitialized(js).await() }
 
     actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?): Unit =
-        rethrow { js.fetch().await() }
+        rethrow { fetchConfig(js).await() }
 
-    actual suspend fun fetchAndActivate(): Boolean = rethrow { js.fetchAndActivate().await() }
+    actual suspend fun fetchAndActivate(): Boolean = rethrow { fetchAndActivate(js).await() }
 
     actual fun getValue(key: String): FirebaseRemoteConfigValue = rethrow {
-        FirebaseRemoteConfigValue(js.getValue(key))
+        FirebaseRemoteConfigValue(getValue(js, key))
     }
 
     actual fun getKeysByPrefix(prefix: String): Set<String> {
@@ -49,7 +45,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
 
     private fun getAllKeys(): Set<String> {
         val objectKeys = js("Object.keys")
-        return objectKeys(js.getAll()).unsafeCast<Array<String>>().toSet()
+        return objectKeys(getAll(js)).unsafeCast<Array<String>>().toSet()
     }
 
     actual suspend fun reset() {
@@ -68,7 +64,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: firebase.remoteCo
         js.defaultConfig = json(*defaults)
     }
 
-    private fun firebase.remoteConfig.Settings.toSettings(): FirebaseRemoteConfigSettings {
+    private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings {
         return FirebaseRemoteConfigSettings(
             fetchTimeoutInSeconds = fetchTimeoutMillis.toLong() / 1000,
             minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000

@@ -1,8 +1,8 @@
 package dev.gitlive.firebase.remoteconfig
 
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.externals.remoteconfig.Value
 
-actual class FirebaseRemoteConfigValue(val js: firebase.remoteConfig.Value) {
+actual class FirebaseRemoteConfigValue(val js: Value) {
     actual fun asBoolean(): Boolean = rethrow { js.asBoolean() }
     actual fun asByteArray(): ByteArray = rethrow { js.asString()?.encodeToByteArray() ?: byteArrayOf() }
     actual fun asDouble(): Double = rethrow { js.asNumber().toDouble() }
