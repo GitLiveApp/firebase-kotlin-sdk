@@ -165,7 +165,7 @@ actual class DataSnapshot internal constructor(val js: JsDataSnapshot) {
 
     actual val children: Iterable<DataSnapshot> = rethrow {
         ArrayList<DataSnapshot>(js.size).also {
-            js.forEach { snapshot -> it.add(DataSnapshot(snapshot)) }
+            js.forEach { snapshot -> it.add(DataSnapshot(snapshot)); false /* don't cancel enumeration */ }
         }
     }
 

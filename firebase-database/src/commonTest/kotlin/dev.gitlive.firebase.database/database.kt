@@ -40,6 +40,8 @@ class FirebaseDatabaseTest {
 
     @Test
     fun testSetValue() = runTest {
+        awaitDatabaseConnection()
+
         val testValue = "test"
         val testReference = Firebase.database.reference("testPath")
 
@@ -52,9 +54,11 @@ class FirebaseDatabaseTest {
 
         assertEquals(testValue, testReferenceValue)
     }
-    
+
     @Test
     fun testChildCount() = runTest {
+        awaitDatabaseConnection()
+
         setupRealtimeData()
         val dataSnapshot = Firebase.database
             .reference("FirebaseRealtimeDatabaseTest")
@@ -63,6 +67,11 @@ class FirebaseDatabaseTest {
 
         val firebaseDatabaseChildCount = dataSnapshot.children.count()
         assertEquals(3, firebaseDatabaseChildCount)
+    }
+
+    private suspend fun awaitDatabaseConnection() {
+        // workaround to avoid "Database not connected" exception with Firebase emulator
+        Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
     }
 
     private suspend fun setupRealtimeData() {
