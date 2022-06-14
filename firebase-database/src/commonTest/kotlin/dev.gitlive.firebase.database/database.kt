@@ -73,7 +73,7 @@ class FirebaseDatabaseTest {
 
     private suspend fun awaitDatabaseConnection() {
         // workaround to avoid "Database not connected" exception with Firebase emulator
-        withTimeout(5.seconds) {
+        withTimeout(30.seconds) {
             Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
         }
     }
