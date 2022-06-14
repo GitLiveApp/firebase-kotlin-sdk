@@ -58,4 +58,4 @@ jobs:
         if: failure()
         with:
           name: "Android Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/androidTests/"
+          path: "firebase-firestore/build/reports/androidTests/"
