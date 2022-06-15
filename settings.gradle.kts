@@ -4,5 +4,6 @@ include(
     "firebase-firestore",
     "firebase-database",
     "firebase-auth",
-    "firebase-functions"
+    "firebase-functions",
+    "firebase-config"
 )
