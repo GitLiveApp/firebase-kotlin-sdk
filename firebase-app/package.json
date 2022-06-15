@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@gitliveapp/firebase-common-js-legacy": "0.7.9",
+    "@gitliveapp/firebase-common-js-legacy": "0.7.10",
     "firebase": "8.4.3",
-    "kotlin": "1.5.32",
-    "kotlinx-coroutines-core": "1.5.0"
+    "kotlin": "1.6.21",
+    "kotlinx-coroutines-core": "1.6.2"
   }
 }
 
