@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build and Publish PR
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK
@@ -23,12 +23,12 @@ jobs:
           
       - name: Read firebase-app version
         id: read_app_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-app.version'
       - name: Update firebase-app version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-app.version'
@@ -36,12 +36,12 @@ jobs:
           
       - name: Read firebase-auth version
         id: read_auth_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-auth.version'
       - name: Update firebase-auth version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-auth.version'
@@ -49,12 +49,12 @@ jobs:
           
       - name: Read firebase-common version
         id: read_common_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-common.version'
       - name: Update firebase-common version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-common.version'
@@ -62,12 +62,12 @@ jobs:
           
       - name: Read firebase-database version
         id: read_database_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-database.version'
       - name: Update firebase-database version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-database.version'
@@ -75,12 +75,12 @@ jobs:
           
       - name: Read firebase-firestore version
         id: read_firestore_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-firestore.version'
       - name: Update firebase-firestore version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-firestore.version'
@@ -88,12 +88,12 @@ jobs:
           
       - name: Read firebase-functions version
         id: read_functions_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-functions.version'
       - name: Update firebase-functions version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-functions.version'
@@ -101,12 +101,12 @@ jobs:
           
       - name: Read firebase-config version
         id: read_config_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: reedyuk/read-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-config.version'
       - name: Update firebase-config version
-        uses: christian-draeger/write-properties@1.0.1
+        uses: reedyuk/write-properties@v1.0.1
         with:
           path: 'gradle.properties'
           property: 'firebase-config.version'
