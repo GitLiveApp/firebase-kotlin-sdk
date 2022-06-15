@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.5.32" apply false
+    kotlin("multiplatform") version "1.6.21" apply false
     id("base")
 }
 
@@ -17,7 +17,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.1")
+        classpath("com.android.tools.build:gradle:7.0.4")
         classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
     }
 }
@@ -208,14 +208,16 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.11-revert-to-old-versions-of-firebase-6f8c7ed")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0") {
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-169e4da")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2") {
                 exclude("com.google.android.gms")
             }
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+            "commonMainImplementation"("org.jetbrains.kotlin:atomicfu:1.6.21") // Temp fix waiting for coroutines 1.6.3 [https://github.com/Kotlin/kotlinx.coroutines/issues/3305]
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+            "commonTestImplementation"(kotlin("test"))
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
