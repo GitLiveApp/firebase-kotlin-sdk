@@ -85,6 +85,8 @@ kotlin {
         }
     }
 
+    setupHierarchicalSourceSets()
+
     sourceSets {
         all {
             languageSettings.apply {
@@ -110,42 +112,6 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-common")
             }
-        }
-
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
-        val macosArm64Main by getting
-        val macosX64Main by getting
-        val tvosMain by getting
-        val tvosSimulatorArm64Main by getting
-
-        val nativeMain by creating {
-            dependsOn(commonMain)
-
-            iosMain.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
-            macosArm64Main.dependsOn(this)
-            macosX64Main.dependsOn(this)
-            tvosMain.dependsOn(this)
-            tvosSimulatorArm64Main.dependsOn(this)
-        }
-
-        val iosTest by getting
-        val iosSimulatorArm64Test by getting
-        val macosArm64Test by getting
-        val macosX64Test by getting
-        val tvosTest by getting
-        val tvosSimulatorArm64Test by getting
-
-        val nativeTest by creating {
-            dependsOn(commonTest)
-
-            iosTest.dependsOn(this)
-            iosSimulatorArm64Test.dependsOn(this)
-            macosArm64Test.dependsOn(this)
-            macosX64Test.dependsOn(this)
-            tvosTest.dependsOn(this)
-            tvosSimulatorArm64Test.dependsOn(this)
         }
 
         val jsMain by getting {
