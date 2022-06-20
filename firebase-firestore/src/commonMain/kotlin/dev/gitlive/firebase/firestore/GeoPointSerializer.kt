@@ -3,6 +3,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
@@ -11,7 +12,7 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
 /** Serializer for [GeoPoint].If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
-object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
+object GeoPointSerializer : KSerializer<GeoPoint> {
     override val descriptor = buildClassSerialDescriptor("GeoPoint") {
         element<Double>("latitude")
         element<Double>("longitude")
@@ -20,7 +21,7 @@ object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override fun serialize(encoder: Encoder, value: GeoPoint) {
         if (encoder is FirebaseEncoder) {
             // special case if encoding. Firestore encodes and decodes GeoPoints without use of serializers
-            encoder.value = value
+            encoder.value = value.platformValue
         } else {
             encoder.encodeStructure(descriptor) {
                 encodeDoubleElement(descriptor, 0, value.latitude)
@@ -32,10 +33,13 @@ object FirebaseGeoPointSerializer : KSerializer<GeoPoint> {
     override fun deserialize(decoder: Decoder): GeoPoint {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
-            decoder.value as GeoPoint
+            when (val value = decoder.value) {
+                is PlatformGeoPoint -> GeoPoint(value)
+                else -> throw SerializationException("Cannot deserialize $value")
+            }
         } else {
             decoder.decodeStructure(descriptor) {
-                geoPointWith(
+                GeoPoint(
                     latitude = decodeDoubleElement(descriptor, 0),
                     longitude = decodeDoubleElement(descriptor, 1)
                 )

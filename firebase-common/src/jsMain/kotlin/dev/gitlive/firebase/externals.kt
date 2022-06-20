@@ -422,6 +422,8 @@ external object firebase {
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
             fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+
+            fun isEqual(other: DocumentReference): Boolean
         }
 
         open class WriteBatch {
@@ -442,13 +444,15 @@ external object firebase {
             fun delete(documentReference: DocumentReference): Transaction
         }
 
-        open class Timestamp(seconds: Long, nanoseconds: Int) {
+        open class Timestamp(seconds: Double, nanoseconds: Double) {
             companion object {
                 fun now(): Timestamp
             }
 
-            val seconds: Long
-            val nanoseconds: Int
+            val seconds: Double
+            val nanoseconds: Double
+
+            fun isEqual(other: Timestamp): Boolean
         }
         open class FieldPath(vararg fieldNames: String) {
             companion object {
@@ -459,6 +463,8 @@ external object firebase {
         open class GeoPoint(latitude: Double, longitude: Double) {
             val latitude: Double
             val longitude: Double
+
+            fun isEqual(other: GeoPoint): Boolean
         }
 
         abstract class FieldValue {
@@ -468,6 +474,7 @@ external object firebase {
                 fun arrayUnion(vararg elements: Any): FieldValue
                 fun serverTimestamp(): FieldValue
             }
+            fun isEqual(other: FieldValue): Boolean
         }
     }
 

@@ -1,10 +1,35 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
+import kotlinx.serialization.Serializable
 
-actual typealias Timestamp = firebase.firestore.Timestamp
+/** A base class that could be used to combine [Timestamp] and [Timestamp.ServerTimestamp] in the same field. */
+@Serializable(with = BaseTimestampSerializer::class)
+actual sealed class BaseTimestamp
 
-actual fun timestampNow(): Timestamp = Timestamp.now()
-actual fun timestampWith(seconds: Long, nanoseconds: Int) = Timestamp(seconds, nanoseconds)
-actual val Timestamp.seconds: Long get() = seconds
-actual val Timestamp.nanoseconds: Int get() = nanoseconds
+/** A class representing a platform specific Firebase Timestamp. */
+actual typealias PlatformTimestamp = firebase.firestore.Timestamp
+
+/** A class representing a Firebase Timestamp. */
+@Serializable(with = TimestampSerializer::class)
+actual class Timestamp internal actual constructor(
+    internal actual val platformValue: PlatformTimestamp
+): BaseTimestamp() {
+    actual constructor(seconds: Long, nanoseconds: Int) : this(PlatformTimestamp(seconds.toDouble(), nanoseconds.toDouble()))
+
+    actual val seconds: Long = platformValue.seconds.toLong()
+    actual val nanoseconds: Int = platformValue.nanoseconds.toInt()
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is Timestamp && platformValue.isEqual(other.platformValue)
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual fun now(): Timestamp = Timestamp(PlatformTimestamp.now())
+    }
+
+    /** A server time timestamp. */
+    actual object ServerTimestamp: BaseTimestamp()
+}
+

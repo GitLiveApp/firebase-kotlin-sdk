@@ -7,7 +7,7 @@ package dev.gitlive.firebase.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
-import kotlin.js.Json
+import kotlin.js.json
 
 actual val emulatorHost: String = "localhost"
 
@@ -28,6 +28,8 @@ actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
         it[0] as String to it[1]
     }
 }
+actual fun Map<String, Any?>.asEncoded(): Any =
+    json(*entries.map { (key, value) -> key to value }.toTypedArray())
 
 internal fun Throwable.log() {
     console.error(this)

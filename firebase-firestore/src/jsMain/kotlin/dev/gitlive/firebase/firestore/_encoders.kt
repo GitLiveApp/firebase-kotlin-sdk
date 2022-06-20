@@ -4,8 +4,8 @@ import dev.gitlive.firebase.firebase
 
 actual fun isSpecialValue(value: Any) = when(value) {
     is firebase.firestore.FieldValue,
-    is firebase.firestore.GeoPoint,
-    is firebase.firestore.Timestamp,
-    is firebase.firestore.DocumentReference -> true
+    is PlatformGeoPoint,
+    is PlatformTimestamp,
+    is PlatformDocumentReference -> true
     else -> false
 }

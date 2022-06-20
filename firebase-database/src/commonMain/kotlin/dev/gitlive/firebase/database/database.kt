@@ -82,10 +82,6 @@ expect class DataSnapshot {
     val children: Iterable<DataSnapshot>
 }
 
-object ServerValue {
-    val TIMESTAMP = Double.POSITIVE_INFINITY
-}
-
 expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
 
 expect class OnDisconnect {

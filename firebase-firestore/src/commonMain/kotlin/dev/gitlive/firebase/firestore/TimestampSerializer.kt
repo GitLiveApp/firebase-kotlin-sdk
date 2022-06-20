@@ -4,63 +4,105 @@ import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 
-sealed class AbstractTimestampSerializer<T>(
-    private val isNullable: Boolean
-) : KSerializer<T> {
 
-    override val descriptor = buildClassSerialDescriptor("Timestamp", isNullable = isNullable) {
-        isNullable = this@AbstractTimestampSerializer.isNullable
+/** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+object BaseTimestampSerializer : KSerializer<BaseTimestamp> {
+    override val descriptor = buildClassSerialDescriptor("Timestamp") {
+        element<Long>("seconds")
+        element<Int>("nanoseconds")
+        element<Boolean>("isServerTimestamp")
+    }
+
+    override fun serialize(encoder: Encoder, value: BaseTimestamp) {
+        if (encoder is FirebaseEncoder) {
+            // special case if encoding. Firestore encodes and decodes Timestamp without use of serializers
+            encoder.value = when (value) {
+                Timestamp.ServerTimestamp -> FieldValue.serverTimestamp().platformValue
+                is Timestamp -> value.platformValue
+                else -> throw SerializationException("Cannot serialize $value")
+            }
+        } else {
+            encoder.encodeStructure(descriptor) {
+                when (value) {
+                    Timestamp.ServerTimestamp -> {
+                        encodeLongElement(descriptor, 0, 0)
+                        encodeIntElement(descriptor, 1, 0)
+                        encodeBooleanElement(descriptor, 2, true)
+                    }
+                    is Timestamp -> {
+                        encodeLongElement(descriptor, 0, value.seconds)
+                        encodeIntElement(descriptor, 1, value.nanoseconds)
+                        encodeBooleanElement(descriptor, 2, false)
+                    }
+                    else -> throw SerializationException("Cannot serialize $value")
+                }
+            }
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): BaseTimestamp {
+        return if (decoder is FirebaseDecoder) {
+            // special case if decoding. Firestore encodes and decodes Timestamp without use of serializers
+            when (val value = decoder.value) {
+                is PlatformTimestamp -> Timestamp(value)
+                FieldValue.serverTimestamp().platformValue -> Timestamp.ServerTimestamp
+                else -> throw SerializationException("Cannot deserialize $value")
+            }
+        } else {
+            decoder.decodeStructure(descriptor) {
+                if (decodeBooleanElement(descriptor, 2)) {
+                    Timestamp.ServerTimestamp
+                } else {
+                    Timestamp(
+                        seconds = decodeLongElement(descriptor, 0),
+                        nanoseconds = decodeIntElement(descriptor, 1)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+object TimestampSerializer : KSerializer<Timestamp> {
+    override val descriptor = buildClassSerialDescriptor("Timestamp") {
         element<Long>("seconds")
         element<Int>("nanoseconds")
     }
 
-    protected fun encode(encoder: Encoder, value: FirebaseTimestamp?) {
+    override fun serialize(encoder: Encoder, value: Timestamp) {
         if (encoder is FirebaseEncoder) {
-            encoder.value = value?.let {
-                when(value) {
-                    is FirebaseTimestamp.Value -> value.value
-                    is FirebaseTimestamp.ServerValue -> FieldValue.serverTimestamp()
-                    is FirebaseTimestamp.ServerDelete -> FieldValue.delete
-                }
+            // special case if encoding. Firestore encodes and decodes Timestamp without use of serializers
+            encoder.value = value.platformValue
+        } else {
+            encoder.encodeStructure(descriptor) {
+                encodeLongElement(descriptor, 0, value.seconds)
+                encodeIntElement(descriptor, 1, value.nanoseconds)
+            }
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): Timestamp {
+        return if (decoder is FirebaseDecoder) {
+            // special case if decoding. Firestore encodes and decodes Timestamp without use of serializers
+            when (val value = decoder.value) {
+                is PlatformTimestamp -> Timestamp(value)
+                else -> throw SerializationException("Cannot deserialize $value")
             }
         } else {
-            throw IllegalArgumentException("This serializer must be used with FirebaseEncoder")
+            decoder.decodeStructure(descriptor) {
+                Timestamp(
+                    seconds = decodeLongElement(descriptor, 0),
+                    nanoseconds = decodeIntElement(descriptor, 1)
+                )
+            }
         }
     }
-
-    protected fun decode(decoder: Decoder): FirebaseTimestamp? {
-        return if (decoder is FirebaseDecoder) {
-            (decoder.value as? Timestamp)?.let(FirebaseTimestamp::Value)
-        } else {
-            throw IllegalArgumentException("This serializer must be used with FirebaseDecoder")
-        }
-    }
-}
-
-/** A nullable serializer for [FirebaseTimestamp]. */
-object TimestampNullableSerializer : AbstractTimestampSerializer<FirebaseTimestamp?>(
-    isNullable = true
-) {
-
-    override fun serialize(encoder: Encoder, value: FirebaseTimestamp?) = encode(encoder, value)
-
-    override fun deserialize(decoder: Decoder): FirebaseTimestamp? {
-        return try {
-            decode(decoder)
-        } catch (exception: SerializationException) {
-            null
-        }
-    }
-}
-
-/** A nullable serializer for [FirebaseTimestamp]. */
-object TimestampSerializer : AbstractTimestampSerializer<FirebaseTimestamp>(
-    isNullable = false
-) {
-    override fun serialize(encoder: Encoder, value: FirebaseTimestamp) = encode(encoder, value)
-    override fun deserialize(decoder: Decoder): FirebaseTimestamp = requireNotNull(decode(decoder))
 }

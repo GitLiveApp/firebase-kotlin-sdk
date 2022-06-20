@@ -13,12 +13,11 @@ import kotlin.collections.set
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST, is PolymorphicKind -> mutableListOf<Any?>()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it.add(index, value) } }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> it.add(index, value) } }
     StructureKind.MAP -> mutableListOf<Any?>()
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
-    StructureKind.CLASS -> mutableMapOf<Any?, Any?>()
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
+    StructureKind.CLASS, StructureKind.OBJECT -> mutableMapOf<Any?, Any?>()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[descriptor.getElementName(index)] = value } }
-    StructureKind.OBJECT -> FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, _, obj -> value = obj }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> it[descriptor.getElementName(index)] = value } }
     else -> TODO("Not implemented ${descriptor.kind}")
 }

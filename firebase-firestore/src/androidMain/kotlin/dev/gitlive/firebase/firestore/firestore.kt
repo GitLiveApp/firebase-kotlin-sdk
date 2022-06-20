@@ -5,7 +5,6 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -13,14 +12,8 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
-
-@PublishedApi
-internal inline fun <reified T> decode(value: Any?): T =
-    decode(value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
-
-internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
-    decode(strategy, value) { (it as? Timestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -107,10 +100,12 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         merge: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
+        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        val result = serializedItem + serializedFieldAndValues
         if (merge) {
             android.set(documentRef.android, result, SetOptions.merge())
         } else {
@@ -142,10 +137,12 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
     ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
+        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
+        val result = serializedItem + serializedFieldAndValues
         return android.update(documentRef.android, result).let { this }
     }
 
@@ -244,7 +241,12 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         DocumentSnapshot(android.get(documentRef.android))
 }
 
-actual class DocumentReference(val android: com.google.firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias PlatformDocumentReference = com.google.firebase.firestore.DocumentReference
+
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
+    val android: PlatformDocumentReference = platformValue
 
     actual val id: String
         get() = android.id
@@ -326,7 +328,10 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         awaitClose { listener.remove() }
     }
 
-    actual companion object
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
 }
 
 actual open class Query(open val android: com.google.firebase.firestore.Query) {
@@ -492,10 +497,26 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
 }
 
-actual object FieldValue {
-    actual fun serverTimestamp(): Any = FieldValue.serverTimestamp()
-    actual val delete: Any get() = FieldValue.delete()
-    actual fun arrayUnion(vararg elements: Any): Any = FieldValue.arrayUnion(*elements)
-    actual fun arrayRemove(vararg elements: Any): Any = FieldValue.arrayRemove(*elements)
-    actual fun delete(): Any = delete
+/** A class representing a platform specific Firebase FieldValue. */
+internal typealias PlatformFieldValue = com.google.firebase.firestore.FieldValue
+
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val platformValue: Any) {
+    init {
+        require(platformValue is PlatformFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && platformValue == other.platformValue
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
+        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
+        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
+        actual fun delete(): FieldValue = delete
+    }
 }

@@ -11,7 +11,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.Json
 import kotlin.js.json
 
 actual val Firebase.firestore get() =
@@ -86,25 +88,20 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
             .let { this }
 
-    actual fun <T> set(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        merge: Boolean,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean, vararg fieldsAndValues: Pair<String, Any?>) =
+        rethrow {
+            val serializedItem = encode(strategy, data, encodeDefaults) as Json
+            val serializedFieldAndValues = fieldsAndValues.map { (field, value) ->
+                field to encode(value, encodeDefaults)
+            }.let { json(*it.toTypedArray()) }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
-        if (merge) {
-            js.set(documentRef.js, result, json("merge" to merge))
-        } else {
-            js.set(documentRef.js, result)
-        }
-        return this
-    }
+            val result = serializedItem.add(serializedFieldAndValues)
+            if (merge) {
+                js.set(documentRef.js, result, json("merge" to merge))
+            } else {
+                js.set(documentRef.js, result)
+            }
+        }.let { this }
 
     actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
         rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
@@ -126,13 +123,15 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
         data: T,
         encodeDefaults: Boolean,
         vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encodeAsMap(strategy, data, encodeDefaults)
-        val serializedFieldAndValues = encodeAsMap(fieldsAndValues = fieldsAndValues)
+    ) = rethrow {
+        val serializedItem = encode(strategy, data, encodeDefaults) as Json
+        val serializedFieldAndValues = fieldsAndValues.map { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }.let { json(*it.toTypedArray()) }
 
-        val result = serializedItem + (serializedFieldAndValues ?: emptyMap())
-        return js.update(documentRef.js, result).let { this }
-    }
+        val result = serializedItem.add(serializedFieldAndValues)
+        js.update(documentRef.js, result)
+    }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
@@ -220,7 +219,12 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias PlatformDocumentReference = firebase.firestore.DocumentReference
+
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
+    val js: PlatformDocumentReference = platformValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -257,7 +261,15 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
         fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
             ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> js.update(encoded.toMap()) }
+            ?.let { encoded ->
+                js.update(
+                    encoded.first().first,
+                    encoded.first().second,
+                    *encoded.drop(1)
+                        .flatMap { (field, value) -> listOf(field, value) }
+                        .toTypedArray()
+                )
+            }
             ?.await()
     }.run { Unit }
 
@@ -287,7 +299,11 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         )
         awaitClose { unsubscribe() }
     }
-    actual companion object
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && platformValue.isEqual(other.platformValue)
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = "DocumentReference(path=$path)"
 }
 
 actual open class Query(open val js: firebase.firestore.Query) {
@@ -460,16 +476,6 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
 }
 
-actual object FieldValue {
-    @JsName("_serverTimestamp")
-    actual val delete: Any get() = rethrow { firebase.firestore.FieldValue.delete() }
-    actual fun arrayUnion(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayUnion(*elements) }
-    actual fun arrayRemove(vararg elements: Any): Any = rethrow { firebase.firestore.FieldValue.arrayRemove(*elements) }
-    actual fun serverTimestamp(): Any = rethrow { firebase.firestore.FieldValue.serverTimestamp() }
-    @JsName("deprecatedDelete")
-    actual fun delete(): Any = delete
-}
-
 //actual data class FirebaseFirestoreSettings internal constructor(
 //    val cacheSizeBytes: Number? = undefined,
 //    val host: String? = undefined,
@@ -477,6 +483,32 @@ actual object FieldValue {
 //    var timestampsInSnapshots: Boolean? = undefined,
 //    var enablePersistence: Boolean = false
 //)
+
+/** A class representing a platform specific Firebase FieldValue. */
+private typealias PlatformFieldValue = firebase.firestore.FieldValue
+
+/** A class representing a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val platformValue: Any) {
+    init {
+        require(platformValue is PlatformFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue &&
+                (platformValue as PlatformFieldValue).isEqual(other.platformValue as PlatformFieldValue)
+    override fun hashCode(): Int = platformValue.hashCode()
+    override fun toString(): String = platformValue.toString()
+
+    actual companion object {
+        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
+        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
+        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
+        @JsName("deprecatedDelete")
+        actual fun delete(): FieldValue = delete
+    }
+}
 
 actual enum class FirestoreExceptionCode {
     OK,

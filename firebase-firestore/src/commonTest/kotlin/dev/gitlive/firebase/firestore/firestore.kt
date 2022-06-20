@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 import kotlin.random.Random
 import kotlin.test.*
 
@@ -19,8 +22,12 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
+/** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
+/** @return pairs as raw encoded data. */
+expect fun Map<String, Any?>.asEncoded(): Any
 
+// NOTE: serializer<T>() does not work in a legacy JS so serializers have to be provided explicitly
 class FirebaseFirestoreTest {
 
     @Serializable
@@ -32,8 +39,7 @@ class FirebaseFirestoreTest {
     @Serializable
     data class FirestoreTimeTest(
         val prop1: String,
-        @Serializable(with = FirebaseNullableTimestampSerializer::class)
-        val time: Any?
+        val time: BaseTimestamp?
     )
 
     @BeforeTest
@@ -135,20 +141,19 @@ class FirebaseFirestoreTest {
             .document("test")
         doc.set(
             FirestoreTimeTest.serializer(),
-            FirestoreTimeTest("ServerTimestamp", timestampWith(0, 0)),
+            FirestoreTimeTest("ServerTimestamp", Timestamp(123, 0)),
         )
-        assertEquals(timestampWith(0, 0), doc.get().get("time", FirebaseTimestampSerializer))
+        assertEquals(Timestamp(123, 0), doc.get().get("time", TimestampSerializer))
 
         doc.update(
             fieldsAndValues = arrayOf(
-                "time" to timestampWith(123, 0)
-                    .withSerializer(FirebaseTimestampSerializer)
+                "time" to Timestamp(321, 0)
             )
         )
-        assertEquals(timestampWith(123, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertEquals(Timestamp(321, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
 
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().get("time", FirebaseTimestampSerializer))
-        assertNotEquals(FieldValue.serverTimestamp(), doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertNotEquals<Any>(Timestamp.ServerTimestamp, doc.get().get("time", TimestampSerializer))
+        assertNotEquals<Any?>(Timestamp.ServerTimestamp, doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
     @Test
@@ -166,12 +171,12 @@ class FirebaseFirestoreTest {
 
         doc.set(
             FirestoreTimeTest.serializer(),
-            FirestoreTimeTest("ServerTimestampBehavior", FieldValue.serverTimestamp())
+            FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp)
         )
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer, ServerTimestampBehavior.NONE))
+        assertNull(pendingWritesSnapshot.get("time", TimestampSerializer.nullable, ServerTimestampBehavior.NONE))
     }
 
     @Test
@@ -211,12 +216,12 @@ class FirebaseFirestoreTest {
         }
         delay(100) // makes possible to catch pending writes snapshot
 
-        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", FieldValue.serverTimestamp()))
+        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNotNull(pendingWritesSnapshot.get("time", FirebaseTimestampSerializer, ServerTimestampBehavior.ESTIMATE))
-        assertNotEquals(timestampWith(0, 0), pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotNull(pendingWritesSnapshot.get("time", TimestampSerializer, ServerTimestampBehavior.ESTIMATE))
+        assertNotEquals(Timestamp(0, 0), pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -232,11 +237,11 @@ class FirebaseFirestoreTest {
         }
         delay(100) // makes possible to catch pending writes snapshot
 
-        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", FieldValue.serverTimestamp()))
+        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", FirebaseNullableTimestampSerializer, ServerTimestampBehavior.PREVIOUS))
+        assertNull(pendingWritesSnapshot.get("time", TimestampSerializer.nullable, ServerTimestampBehavior.PREVIOUS))
     }
 
     @Test
@@ -350,39 +355,35 @@ class FirebaseFirestoreTest {
     @Test
     fun testGeoPointSerialization() = runTest {
         @Serializable
-        data class DataWithGeoPoint(
-            @Serializable(with = FirebaseGeoPointSerializer::class)
-            val geoPoint: GeoPoint
-        )
+        data class DataWithGeoPoint(val geoPoint: GeoPoint)
 
         fun getDocument() = Firebase.firestore.collection("geoPointSerialization")
             .document("geoPointSerialization")
 
-        val data = DataWithGeoPoint(geoPointWith(12.34, 56.78))
+        val data = DataWithGeoPoint(GeoPoint(12.34, 56.78))
         // store geo point
-        getDocument().set(data)
+        getDocument().set(DataWithGeoPoint.serializer(), data)
         // restore data
-        val savedData = getDocument().get().data<DataWithGeoPoint>()
-        assertEquals(data, savedData)
+        val savedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        assertEquals(data.geoPoint, savedData.geoPoint)
 
         // update data
-        val updatedData = DataWithGeoPoint(geoPointWith(87.65, 43.21))
+        val updatedData = DataWithGeoPoint(GeoPoint(87.65, 43.21))
         getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
         // verify update
-        val updatedSavedData = getDocument().get().data<DataWithGeoPoint>()
-        assertEquals(updatedData, updatedSavedData)
+        val updatedSavedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        assertEquals(updatedData.geoPoint, updatedSavedData.geoPoint)
     }
 
     @Test
     fun testDocumentReferenceSerialization() = runTest {
         @Serializable
         data class DataWithDocumentReference(
-            @Serializable(with = FirebaseDocumentReferenceSerializer::class)
             val documentReference: DocumentReference
         )
 
         fun getCollection() = Firebase.firestore.collection("documentReferenceSerialization")
-        fun getDocument() = Firebase.firestore.collection("documentReferenceSerialization")
+        fun getDocument() = getCollection()
             .document("documentReferenceSerialization")
         val documentRef1 = getCollection().document("refDoc1").apply {
             set(mapOf("value" to 1))
@@ -392,19 +393,99 @@ class FirebaseFirestoreTest {
         }
 
         val data = DataWithDocumentReference(documentRef1)
-        // store geo point
-        getDocument().set(data)
+        // store reference
+        getDocument().set(DataWithDocumentReference.serializer(), data)
         // restore data
-        val savedData = getDocument().get().data<DataWithDocumentReference>()
+        val savedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(data.documentReference.path, savedData.documentReference.path)
 
         // update data
         val updatedData = DataWithDocumentReference(documentRef2)
         getDocument().update(
-            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(FirebaseDocumentReferenceSerializer)
+            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(DocumentReferenceSerializer)
         )
         // verify update
-        val updatedSavedData = getDocument().get().data<DataWithDocumentReference>()
+        val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
     }
+
+    @Serializable
+    data class TestDataWithDocumentReference(
+        val uid: String,
+        val reference: DocumentReference,
+        val optionalReference: DocumentReference?
+    )
+
+    @Serializable
+    data class TestDataWithOptionalDocumentReference(
+        val optionalReference: DocumentReference?
+    )
+
+    @Test
+    fun encodeDocumentReference() = runTest {
+        val doc = Firebase.firestore.document("a/b")
+        val item = TestDataWithDocumentReference("123", doc, doc)
+        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        assertEquals("123", encoded["uid"])
+        assertEquals(doc.platformValue, encoded["reference"])
+        assertEquals(doc.platformValue, encoded["optionalReference"])
+    }
+
+    @Test
+    fun encodeNullDocumentReference() = runTest {
+        val item = TestDataWithOptionalDocumentReference(null)
+        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        assertNull(encoded["optionalReference"])
+    }
+
+    @Test
+    fun decodeDocumentReference() = runTest {
+        val doc = Firebase.firestore.document("a/b")
+        val obj = mapOf(
+            "uid" to "123",
+            "reference" to doc.platformValue,
+            "optionalReference" to doc.platformValue
+        ).asEncoded()
+        val decoded: TestDataWithDocumentReference = decode(obj)
+        assertEquals("123", decoded.uid)
+        assertEquals(doc.path, decoded.reference.path)
+        assertEquals(doc.path, decoded.optionalReference?.path)
+    }
+
+    @Test
+    fun decodeNullDocumentReference() = runTest {
+        val obj = mapOf("optionalReference" to null).asEncoded()
+        val decoded: TestDataWithOptionalDocumentReference = decode(obj)
+        assertNull(decoded.optionalReference?.path)
+    }
+
+    @Test
+    fun testFieldValuesOps() = runTest {
+        @Serializable
+        data class TestData(val values: List<Int>)
+        fun getDocument() = Firebase.firestore.collection("fieldValuesOps")
+            .document("fieldValuesOps")
+
+        val data = TestData(listOf(1))
+        // store
+        getDocument().set(TestData.serializer(), data)
+        // append & verify
+        getDocument().update(FieldPath(TestData::values.name) to FieldValue.arrayUnion(2))
+
+        var savedData = getDocument().get().data(TestData.serializer())
+        assertEquals(listOf(1, 2), savedData.values)
+
+        // remove & verify
+        getDocument().update(FieldPath(TestData::values.name) to FieldValue.arrayRemove(1))
+        savedData = getDocument().get().data(TestData.serializer())
+        assertEquals(listOf(2), savedData.values)
+
+        val list = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        assertEquals(listOf(2), list)
+        // delete & verify
+        getDocument().update(FieldPath(TestData::values.name) to FieldValue.delete)
+        val deletedList = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        assertNull(deletedList)
+    }
+
 }
