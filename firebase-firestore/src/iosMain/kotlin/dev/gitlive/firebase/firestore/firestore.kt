@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 import cocoapods.FirebaseFirestore.*
 import cocoapods.FirebaseFirestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
+import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -261,10 +262,12 @@ actual class DocumentReference actual constructor(internal actual val platformVa
         DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val listener = ios.addSnapshotListener { snapshot, error ->
+        val callback = { snapshot: FIRDocumentSnapshot?, error: NSError? ->
             snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
-        }
+            Unit
+        }.freeze()
+        val listener = ios.addSnapshotListener(callback)
         awaitClose { listener.remove() }
     }
 
@@ -281,10 +284,12 @@ actual open class Query(open val ios: FIRQuery) {
     actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
-        val listener = ios.addSnapshotListener { snapshot, error ->
+        val callback = { snapshot: FIRQuerySnapshot?, error: NSError? ->
             snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
-        }
+            Unit
+        }.freeze()
+        val listener = ios.addSnapshotListener(callback)
         awaitClose { listener.remove() }
     }
 
@@ -535,25 +540,27 @@ private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<N
 
 suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()
-    function { result, error ->
-         if(error == null) {
+    val callback = { result: T?, error: NSError? ->
+        if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    function(callback)
     return job.await() as T
 }
 
 suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     val job = CompletableDeferred<Unit>()
-    val result = function { error ->
+    val callback = { error: NSError? ->
         if(error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    val result = function(callback)
     job.await()
     return result
 }
