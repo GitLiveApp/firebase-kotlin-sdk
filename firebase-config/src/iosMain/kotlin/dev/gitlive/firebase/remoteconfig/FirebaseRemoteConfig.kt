@@ -12,6 +12,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
+import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.timeIntervalSince1970
@@ -110,29 +111,29 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
     }
 }
 
-private suspend inline fun <T, reified R> T.awaitResult(
-    function: T.(callback: (R?, NSError?) -> Unit) -> Unit
-): R {
+private suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
-    function { result, error ->
-        if (error == null) {
+    val callback = { result: R?, error: NSError? ->
+        if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    function(callback)
     return job.await() as R
 }
 
 private suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
-    function { error ->
-        if (error == null) {
+    val callback = { error: NSError? ->
+        if(error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    function(callback)
     job.await()
 }
 
