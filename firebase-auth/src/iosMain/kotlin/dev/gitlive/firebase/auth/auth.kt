@@ -34,7 +34,6 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
             safeOffer(user?.let { FirebaseUser(it) })
             Unit
         }.freeze()
-        println("=== this $this, ios: $ios, callback: $callback")
         val handle = ios.addAuthStateDidChangeListener(callback)
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
