@@ -10,6 +10,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.safeOffer
 import dev.gitlive.firebase.auth.ActionCodeResult.*
+import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -29,12 +30,20 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addAuthStateDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        val callback = { _: FIRAuth?, user: FIRUser? ->
+            safeOffer(user?.let { FirebaseUser(it) })
+            Unit
+        }.freeze()
+        val handle = ios.addAuthStateDidChangeListener(callback)
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addIDTokenDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        val callback = { _: FIRAuth?, user: FIRUser? ->
+            safeOffer(user?.let { FirebaseUser(it) })
+            Unit
+        }.freeze()
+        val handle = ios.addIDTokenDidChangeListener(callback)
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
 
@@ -150,25 +159,27 @@ internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<
 
 internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
-    function { result, error ->
+    val callback = { result: R?, error: NSError? ->
         if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    function(callback)
     return job.await() as R
 }
 
 internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
-    function { error ->
+    val callback = { error: NSError? ->
         if(error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
         }
-    }
+    }.freeze()
+    function(callback)
     job.await()
 }
 

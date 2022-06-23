@@ -10,6 +10,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
+import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -59,24 +60,26 @@ actual class FirebaseFunctionsException(message: String): FirebaseException(mess
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
-    function { error ->
+    val callback = { error: NSError? ->
         if(error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(FirebaseFunctionsException(error.toString()))
         }
-    }
+    }.freeze()
+    function(callback)
     job.await()
 }
 
 suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
-    function { result, error ->
+    val callback = { result: R?, error: NSError? ->
         if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(FirebaseFunctionsException(error.toString()))
         }
-    }
+    }.freeze()
+    function(callback)
     return job.await() as R
 }
