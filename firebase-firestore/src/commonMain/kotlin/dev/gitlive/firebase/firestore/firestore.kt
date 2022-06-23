@@ -59,8 +59,6 @@ expect open class Query {
     suspend fun get(): QuerySnapshot
     internal fun _where(field: String, equalTo: Any?): Query
     internal fun _where(path: FieldPath, equalTo: Any?): Query
-    internal fun _where(field: String, equalTo: DocumentReference): Query
-    internal fun _where(path: FieldPath, equalTo: DocumentReference): Query
     internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null,
                         arrayContains: Any? = null, notEqualTo: Any? = null,
                         lessThanOrEqualTo: Any? = null, greaterThanOrEqualTo: Any? = null): Query
@@ -78,14 +76,13 @@ expect open class Query {
 private val Any?.value get() = when (this) {
     is Timestamp -> platformValue
     is GeoPoint -> platformValue
+    is DocumentReference -> platformValue
     else -> this
 }
 
 
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo.value)
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo.value)
-fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo.value)
-fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo.value)
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null,
                 arrayContains: Any? = null, notEqualTo: Any? = null,
                 lessThanOrEqualTo: Any? = null, greaterThanOrEqualTo: Any? = null) =
