@@ -303,8 +303,7 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
             snapshot?.let {
-                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
-                println("[$ts] DEBUG: [DocumentReference] Got data from ${snapshot.reference.path}")
+                println("DEBUG: [DocumentReference] Got data from ${snapshot.reference.path}")
                 trySend(DocumentSnapshot(snapshot))
             }
             exception?.let { close(exception) }
@@ -322,9 +321,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
             snapshot?.let {
-                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
                 snapshot.documentChanges.forEach {
-                    println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
+                    println("DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
                 }
                 trySend(QuerySnapshot(snapshot))
             }
@@ -337,9 +335,8 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
             snapshot?.let {
-                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
                 snapshot.documentChanges.forEach {
-                    println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
+                    println("DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
                 }
                 trySend(QuerySnapshot(snapshot))
             }
