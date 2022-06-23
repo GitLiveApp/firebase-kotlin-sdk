@@ -274,7 +274,10 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val unsubscribe = js.onSnapshot(
             json("includeMetadataChanges" to includeMetadataChanges),
-            { trySend(DocumentSnapshot(it)) },
+            {
+                println("DEBUG: [DocumentReference] Got data from ${it.ref.path}")
+                trySend(DocumentSnapshot(it))
+            },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
@@ -336,7 +339,12 @@ actual open class Query(open val js: firebase.firestore.Query) {
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
-                { trySend(QuerySnapshot(it)) },
+                {
+                    it.docChanges().forEach {
+                        println("DEBUG: [Query] [${it.type}] Data changed on ${it.doc.ref.path}")
+                    }
+                    trySend(QuerySnapshot(it))
+                },
                 { close(errorToException(it)) }
             )
         }
@@ -347,7 +355,12 @@ actual open class Query(open val js: firebase.firestore.Query) {
         val unsubscribe = rethrow {
             js.onSnapshot(
                 json("includeMetadataChanges" to includeMetadataChanges),
-                { trySend(QuerySnapshot(it)) },
+                {
+                    it.docChanges().forEach {
+                        println("DEBUG: [Query] [${it.type}] Data changed on ${it.doc.ref.path}")
+                    }
+                    trySend(QuerySnapshot(it))
+                },
                 { close(errorToException(it)) }
             )
         }
