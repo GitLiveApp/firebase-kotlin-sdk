@@ -17,6 +17,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?): T =
@@ -302,7 +304,11 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
-            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            snapshot?.let {
+                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                println("[$ts] DEBUG: [DocumentReference] Got data from ${snapshot.reference.path}")
+                trySend(DocumentSnapshot(snapshot))
+            }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -317,7 +323,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            snapshot?.let {
+                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                snapshot.documentChanges.forEach {
+                    println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
+                }
+//                snapshot.documents.forEach {
+//                    println("DEBUG: [Query] Got data from ${it.reference.path}")
+//                }
+                trySend(QuerySnapshot(snapshot))
+            }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -326,7 +341,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
         val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
-            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            snapshot?.let {
+                val ts = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                snapshot.documentChanges.forEach {
+                    println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
+                }
+//                snapshot.documents.forEach {
+//                    println("DEBUG: [Query meta] Got data from ${it.reference.path}")
+//                }
+                trySend(QuerySnapshot(snapshot))
+            }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
