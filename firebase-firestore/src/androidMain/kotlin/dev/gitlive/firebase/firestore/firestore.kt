@@ -17,8 +17,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import java.time.Instant
-import java.time.format.DateTimeFormatter
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?): T =
@@ -328,9 +326,6 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
                 snapshot.documentChanges.forEach {
                     println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
                 }
-//                snapshot.documents.forEach {
-//                    println("DEBUG: [Query] Got data from ${it.reference.path}")
-//                }
                 trySend(QuerySnapshot(snapshot))
             }
             exception?.let { close(exception) }
@@ -346,9 +341,6 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
                 snapshot.documentChanges.forEach {
                     println("[$ts] DEBUG: [Query] [${it.type}] Data changed on ${it.document.reference.path}")
                 }
-//                snapshot.documents.forEach {
-//                    println("DEBUG: [Query meta] Got data from ${it.reference.path}")
-//                }
                 trySend(QuerySnapshot(snapshot))
             }
             exception?.let { close(exception) }
