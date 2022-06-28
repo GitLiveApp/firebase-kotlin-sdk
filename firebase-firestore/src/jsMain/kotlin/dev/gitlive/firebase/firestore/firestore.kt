@@ -220,11 +220,11 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias PlatformDocumentReference = firebase.firestore.DocumentReference
+actual typealias NativeDocumentReference = firebase.firestore.DocumentReference
 
 @Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
-    val js: PlatformDocumentReference = platformValue
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val js: NativeDocumentReference = nativeValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -301,8 +301,8 @@ actual class DocumentReference actual constructor(internal actual val platformVa
     }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && platformValue.isEqual(other.platformValue)
-    override fun hashCode(): Int = platformValue.hashCode()
+        this === other || other is DocumentReference && nativeValue.isEqual(other.nativeValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
 }
 
@@ -480,32 +480,6 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
 //    var timestampsInSnapshots: Boolean? = undefined,
 //    var enablePersistence: Boolean = false
 //)
-
-/** A class representing a platform specific Firebase FieldValue. */
-private typealias PlatformFieldValue = firebase.firestore.FieldValue
-
-/** A class representing a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val platformValue: Any) {
-    init {
-        require(platformValue is PlatformFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue &&
-                (platformValue as PlatformFieldValue).isEqual(other.platformValue as PlatformFieldValue)
-    override fun hashCode(): Int = platformValue.hashCode()
-    override fun toString(): String = platformValue.toString()
-
-    actual companion object {
-        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
-        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
-        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
-        @JsName("deprecatedDelete")
-        actual fun delete(): FieldValue = delete
-    }
-}
 
 actual enum class FirestoreExceptionCode {
     OK,

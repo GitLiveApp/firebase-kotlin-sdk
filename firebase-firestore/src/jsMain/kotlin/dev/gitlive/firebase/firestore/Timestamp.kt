@@ -8,28 +8,28 @@ import kotlinx.serialization.Serializable
 actual sealed class BaseTimestamp
 
 /** A class representing a platform specific Firebase Timestamp. */
-actual typealias PlatformTimestamp = firebase.firestore.Timestamp
+actual typealias NativeTimestamp = firebase.firestore.Timestamp
 
 /** A class representing a Firebase Timestamp. */
 @Serializable(with = TimestampSerializer::class)
 actual class Timestamp internal actual constructor(
-    internal actual val platformValue: PlatformTimestamp
+    internal actual val nativeValue: NativeTimestamp
 ): BaseTimestamp() {
-    actual constructor(seconds: Long, nanoseconds: Int) : this(PlatformTimestamp(seconds.toDouble(), nanoseconds.toDouble()))
+    actual constructor(seconds: Long, nanoseconds: Int) : this(NativeTimestamp(seconds.toDouble(), nanoseconds.toDouble()))
 
-    actual val seconds: Long = platformValue.seconds.toLong()
-    actual val nanoseconds: Int = platformValue.nanoseconds.toInt()
+    actual val seconds: Long = nativeValue.seconds.toLong()
+    actual val nanoseconds: Int = nativeValue.nanoseconds.toInt()
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is Timestamp && platformValue.isEqual(other.platformValue)
-    override fun hashCode(): Int = platformValue.hashCode()
-    override fun toString(): String = platformValue.toString()
+        this === other || other is Timestamp && nativeValue.isEqual(other.nativeValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
 
     actual companion object {
-        actual fun now(): Timestamp = Timestamp(PlatformTimestamp.now())
+        actual fun now(): Timestamp = Timestamp(NativeTimestamp.now())
     }
 
     /** A server time timestamp. */
+    @Serializable(with = ServerTimestampSerializer::class)
     actual object ServerTimestamp: BaseTimestamp()
 }
-

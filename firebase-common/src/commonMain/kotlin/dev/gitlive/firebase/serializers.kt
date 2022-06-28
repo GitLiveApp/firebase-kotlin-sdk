@@ -104,3 +104,31 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
     }
 }
 
+/**
+ * A special case of serializer for values natively supported by Firebase and
+ * don't require an additional encoding/decoding.
+ */
+abstract class SpecialValueSerializer<T>(
+    serialName: String,
+    private val toNativeValue: (T) -> Any?,
+    private val fromNativeValue: (Any?) -> T
+) : KSerializer<T> {
+    override val descriptor = buildClassSerialDescriptor(serialName) { }
+
+    override fun serialize(encoder: Encoder, value: T) {
+        if (encoder is FirebaseEncoder) {
+            encoder.value = toNativeValue(value)
+        } else {
+            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): T {
+        return if (decoder is FirebaseDecoder) {
+            fromNativeValue(decoder.value)
+        } else {
+            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+        }
+    }
+}
+

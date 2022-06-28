@@ -242,11 +242,11 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias PlatformDocumentReference = com.google.firebase.firestore.DocumentReference
+actual typealias NativeDocumentReference = com.google.firebase.firestore.DocumentReference
 
 @Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val platformValue: PlatformDocumentReference) {
-    val android: PlatformDocumentReference = platformValue
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val android: NativeDocumentReference = nativeValue
 
     actual val id: String
         get() = android.id
@@ -329,9 +329,9 @@ actual class DocumentReference actual constructor(internal actual val platformVa
     }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && platformValue == other.platformValue
-    override fun hashCode(): Int = platformValue.hashCode()
-    override fun toString(): String = platformValue.toString()
+        this === other || other is DocumentReference && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
 }
 
 actual open class Query(open val android: com.google.firebase.firestore.Query) {
@@ -492,28 +492,4 @@ actual class SnapshotMetadata(val android: com.google.firebase.firestore.Snapsho
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
     actual constructor(vararg fieldNames: String) : this(com.google.firebase.firestore.FieldPath.of(*fieldNames))
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
-}
-
-/** A class representing a platform specific Firebase FieldValue. */
-internal typealias PlatformFieldValue = com.google.firebase.firestore.FieldValue
-
-/** A class representing a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val platformValue: Any) {
-    init {
-        require(platformValue is PlatformFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue && platformValue == other.platformValue
-    override fun hashCode(): Int = platformValue.hashCode()
-    override fun toString(): String = platformValue.toString()
-
-    actual companion object {
-        actual val delete: FieldValue get() = FieldValue(PlatformFieldValue.delete())
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayUnion(*elements))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(PlatformFieldValue.arrayRemove(*elements))
-        actual fun serverTimestamp(): FieldValue = FieldValue(PlatformFieldValue.serverTimestamp())
-        @Deprecated("Replaced with FieldValue.delete", replaceWith = ReplaceWith("delete"))
-        actual fun delete(): FieldValue = delete
-    }
 }

@@ -2,7 +2,9 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.firebaseSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationStrategy
 import kotlin.test.*
 
 @Serializable
@@ -32,8 +34,8 @@ class TimestampTests {
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
         assertEquals("uid123", encoded["uid"])
         // NOTE: wrapping is required because JS does not override equals
-        assertEquals(timestamp, Timestamp(encoded["createdAt"] as PlatformTimestamp))
-        assertEquals(timestamp, Timestamp(encoded["updatedAt"] as PlatformTimestamp))
+        assertEquals(timestamp, Timestamp(encoded["createdAt"] as NativeTimestamp))
+        assertEquals(timestamp, Timestamp(encoded["updatedAt"] as NativeTimestamp))
         assertNull(encoded["deletedAt"])
     }
 
@@ -43,9 +45,9 @@ class TimestampTests {
         val item = TestData("uid123", timestamp, Timestamp.ServerTimestamp, Timestamp.ServerTimestamp)
         val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
         assertEquals("uid123", encoded["uid"])
-        assertEquals(timestamp, Timestamp(encoded["createdAt"] as PlatformTimestamp))
-        assertEquals(FieldValue.serverTimestamp(), FieldValue(encoded["updatedAt"]!!))
-        assertEquals(FieldValue.serverTimestamp(), FieldValue(encoded["deletedAt"]!!))
+        assertEquals(timestamp, Timestamp(encoded["createdAt"] as NativeTimestamp))
+        assertEquals(FieldValue.serverTimestamp, FieldValue(encoded["updatedAt"]!!))
+        assertEquals(FieldValue.serverTimestamp, FieldValue(encoded["deletedAt"]!!))
     }
 
     @Test
@@ -53,9 +55,9 @@ class TimestampTests {
         val timestamp = Timestamp(123, 345)
         val obj = mapOf(
             "uid" to "uid123",
-            "createdAt" to timestamp.platformValue,
-            "updatedAt" to timestamp.platformValue,
-            "deletedAt" to timestamp.platformValue
+            "createdAt" to timestamp.nativeValue,
+            "updatedAt" to timestamp.nativeValue,
+            "deletedAt" to timestamp.nativeValue
         ).asEncoded()
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
@@ -80,13 +82,22 @@ class TimestampTests {
     fun decodeEmptyTimestampObject() = runTest {
         val obj = mapOf(
             "uid" to "uid123",
-            "createdAt" to Timestamp.now().platformValue,
-            "updatedAt" to Timestamp.now().platformValue,
+            "createdAt" to Timestamp.now().nativeValue,
+            "updatedAt" to Timestamp.now().nativeValue,
             "deletedAt" to null
         ).asEncoded()
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         assertNotNull(decoded.updatedAt)
         assertNull(decoded.deletedAt)
+    }
+
+    @Test
+    @IgnoreJs
+    fun serializers() = runTest {
+        assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
+        assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
+        assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
+        assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
     }
 }

@@ -4,8 +4,8 @@ import cocoapods.FirebaseFirestore.FIRFieldValue
 
 actual fun isSpecialValue(value: Any) = when(value) {
     is FIRFieldValue,
-    is PlatformGeoPoint,
-    is PlatformTimestamp,
-    is PlatformDocumentReference -> true
+    is NativeGeoPoint,
+    is NativeTimestamp,
+    is NativeDocumentReference -> true
     else -> false
 }
