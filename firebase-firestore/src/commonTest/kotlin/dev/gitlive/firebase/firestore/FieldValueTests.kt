@@ -25,6 +25,7 @@ class FieldValueTests {
     }
 
     @Test
+    @IgnoreJs
     fun serializers() = runTest {
         assertEquals(FieldValueSerializer, FieldValue.delete.firebaseSerializer())
     }

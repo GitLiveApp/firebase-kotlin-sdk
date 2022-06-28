@@ -41,6 +41,7 @@ class GeoPointTests {
     }
 
     @Test
+    @IgnoreJs
     fun serializers() = runTest {
         assertEquals(GeoPointSerializer, GeoPoint(0.0,0.0).firebaseSerializer())
     }

@@ -93,6 +93,7 @@ class TimestampTests {
     }
 
     @Test
+    @IgnoreJs
     fun serializers() = runTest {
         assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
         assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
