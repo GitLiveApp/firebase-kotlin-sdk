@@ -74,9 +74,9 @@ expect open class Query {
 }
 
 private val Any?.value get() = when (this) {
-    is Timestamp -> platformValue
-    is GeoPoint -> platformValue
-    is DocumentReference -> platformValue
+    is Timestamp -> nativeValue
+    is GeoPoint -> nativeValue
+    is DocumentReference -> nativeValue
     else -> this
 }
 
@@ -122,12 +122,12 @@ expect class WriteBatch {
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
-expect class PlatformDocumentReference
+expect class NativeDocumentReference
 
 /** A class representing a Firebase DocumentReference. */
 @Serializable(with = DocumentReferenceSerializer::class)
-expect class DocumentReference internal constructor(platformValue: PlatformDocumentReference) {
-    internal val platformValue: PlatformDocumentReference
+expect class DocumentReference internal constructor(nativeValue: NativeDocumentReference) {
+    internal val nativeValue: NativeDocumentReference
 
     val id: String
     val path: String
@@ -242,35 +242,4 @@ expect class SnapshotMetadata {
 
 expect class FieldPath(vararg fieldNames: String) {
     val documentId: FieldPath
-}
-
-/** A class representing a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-expect class FieldValue internal constructor(platformValue: Any) {
-    // implementation note. unfortunately declaring a common `expect PlatformFieldValue`
-    // is not possible due to different platform class signatures
-    internal val platformValue: Any
-
-    companion object {
-        val delete: FieldValue
-        fun arrayUnion(vararg elements: Any): FieldValue
-        fun arrayRemove(vararg elements: Any): FieldValue
-        fun serverTimestamp(): FieldValue
-
-        @Deprecated("Replaced with FieldValue.delete")
-        @JsName("deprecatedDelete")
-        fun delete(): FieldValue
-    }
-}
-
-@Serializable
-internal sealed class FieldValueRepresentation(val isSerializable: Boolean) {
-    @Serializable
-    object Delete : FieldValueRepresentation(true)
-    @Serializable
-    object Union : FieldValueRepresentation(false) // TODO use json to serialize?
-    @Serializable
-    object Remove : FieldValueRepresentation(false)
-    @Serializable
-    object ServerTimestamp : FieldValueRepresentation(true)
 }

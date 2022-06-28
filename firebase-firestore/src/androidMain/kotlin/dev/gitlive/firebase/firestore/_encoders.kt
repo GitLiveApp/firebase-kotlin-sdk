@@ -4,8 +4,8 @@ import com.google.firebase.firestore.FieldValue
 
 actual fun isSpecialValue(value: Any) = when(value) {
     is FieldValue,
-    is PlatformGeoPoint,
-    is PlatformTimestamp,
-    is PlatformDocumentReference -> true
+    is NativeGeoPoint,
+    is NativeTimestamp,
+    is NativeDocumentReference -> true
     else -> false
 }

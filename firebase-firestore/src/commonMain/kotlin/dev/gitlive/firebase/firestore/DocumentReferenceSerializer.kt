@@ -22,7 +22,7 @@ object DocumentReferenceSerializer : KSerializer<DocumentReference> {
     override fun serialize(encoder: Encoder, value: DocumentReference) {
         if (encoder is FirebaseEncoder) {
             // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
-            encoder.value = value.platformValue
+            encoder.value = value.nativeValue
         } else {
             encoder.encodeStructure(descriptor) {
                 encodeStringElement(descriptor, 0, value.path)
@@ -34,7 +34,7 @@ object DocumentReferenceSerializer : KSerializer<DocumentReference> {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes DocumentReferences without use of serializers
             when (val value = decoder.value) {
-                is PlatformDocumentReference -> DocumentReference(value)
+                is NativeDocumentReference -> DocumentReference(value)
                 else -> throw SerializationException("Cannot deserialize $value")
             }
         } else {

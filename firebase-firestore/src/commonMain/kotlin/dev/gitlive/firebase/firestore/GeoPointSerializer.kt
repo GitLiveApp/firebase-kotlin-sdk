@@ -11,7 +11,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 
-/** Serializer for [GeoPoint].If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+/** Serializer for [GeoPoint]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object GeoPointSerializer : KSerializer<GeoPoint> {
     override val descriptor = buildClassSerialDescriptor("GeoPoint") {
         element<Double>("latitude")
@@ -21,7 +21,7 @@ object GeoPointSerializer : KSerializer<GeoPoint> {
     override fun serialize(encoder: Encoder, value: GeoPoint) {
         if (encoder is FirebaseEncoder) {
             // special case if encoding. Firestore encodes and decodes GeoPoints without use of serializers
-            encoder.value = value.platformValue
+            encoder.value = value.nativeValue
         } else {
             encoder.encodeStructure(descriptor) {
                 encodeDoubleElement(descriptor, 0, value.latitude)
@@ -34,7 +34,7 @@ object GeoPointSerializer : KSerializer<GeoPoint> {
         return if (decoder is FirebaseDecoder) {
             // special case if decoding. Firestore encodes and decodes GeoPoints without use of serializers
             when (val value = decoder.value) {
-                is PlatformGeoPoint -> GeoPoint(value)
+                is NativeGeoPoint -> GeoPoint(value)
                 else -> throw SerializationException("Cannot deserialize $value")
             }
         } else {
