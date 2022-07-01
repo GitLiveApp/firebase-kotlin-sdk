@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.FIRFieldValue
+import kotlin.native.concurrent.freeze
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase FieldValue. */
@@ -20,7 +21,7 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     actual companion object {
         actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
         actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList().freeze()))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList().freeze()))
     }
 }
