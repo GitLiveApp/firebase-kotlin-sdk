@@ -1,0 +1,130 @@
+package dev.gitlive.firebase.firestore
+
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
+import kotlinx.coroutines.*
+import kotlin.native.concurrent.freeze
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
+import kotlin.test.*
+
+import platform.Foundation.*
+
+
+private val backgroundContext = newSingleThreadContext("background")
+/**
+ * This function performs is intended to test object sharing across several threads.
+ * @param create a block for object creation
+ * @param test a block to perform test on a thread different from the one used in [create]
+ */
+fun <T> runTestWithContextSwitch(create: suspend CoroutineScope.() -> T, test: suspend CoroutineScope.(T) -> Unit) =
+    runBlocking {
+        val testRun = MainScope().async {
+            val objMain = create()
+            withContext(backgroundContext) {
+                test(objMain)
+            }
+            val objBcg = withContext(backgroundContext) {
+                create()
+            }
+            test(objBcg)
+        }
+        while (testRun.isActive) {
+            NSRunLoop.mainRunLoop.runMode(
+                NSDefaultRunLoopMode,
+                beforeDate = NSDate.create(timeInterval = 1.0, sinceDate = NSDate())
+            )
+            yield()
+        }
+        testRun.await()
+    }
+
+
+class ContextSwitchTest {
+    @BeforeTest
+    fun initializeFirebase() {
+        Firebase
+            .takeIf { Firebase.apps(context).isEmpty() }
+            ?.apply {
+                initialize(
+                    context,
+                    FirebaseOptions(
+                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                        storageBucket = "fir-kotlin-sdk.appspot.com",
+                        projectId = "fir-kotlin-sdk",
+                        gcmSenderId = "846484016111"
+                    )
+                )
+                Firebase.firestore.useEmulator(emulatorHost, 8080)
+            }
+    }
+
+
+    private data class TestFieldValuesOps(
+        val initial: List<Int>,
+        val updates: List<Update>
+    ) {
+        data class Update(
+            val op: Pair<FieldPath, Any>,
+            val expected: List<Int>?
+        )
+    }
+
+    @Serializable
+    data class TestData(val values: List<Int>)
+
+    @Test
+    fun testFieldValuesOps() = runTestWithContextSwitch(
+        create = {
+            TestFieldValuesOps(
+                initial = listOf(1),
+                updates = listOf(
+                    TestFieldValuesOps.Update(
+                        FieldPath(TestData::values.name) to FieldValue.arrayUnion(2),
+                        listOf(1, 2)
+                    ),
+                    TestFieldValuesOps.Update(
+                        FieldPath(TestData::values.name) to FieldValue.arrayRemove(1),
+                        listOf(2)
+                    ),
+                    TestFieldValuesOps.Update(
+                        FieldPath(TestData::values.name) to FieldValue.delete,
+                        null
+                    )
+                )
+            ).apply{ freeze() }
+        }
+    ) { data ->
+
+        fun getDocument() = Firebase.firestore.collection("fieldValuesOps")
+            .document("fieldValuesOps")
+
+        // store
+        getDocument().set(strategy = TestData.serializer(), data = TestData(data.initial), encodeDefaults = true, merge = false)
+
+        // append & verify
+        getDocument().update(data.updates[0].op)
+
+        var savedData = getDocument().get().data(TestData.serializer())
+        assertEquals(data.updates[0].expected, savedData.values)
+
+        // remove & verify
+        getDocument().update(data.updates[1].op)
+        savedData = getDocument().get().data(TestData.serializer())
+        assertEquals(data.updates[1].expected, savedData.values)
+
+        val list = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        assertEquals(data.updates[1].expected, list)
+        // delete & verify
+        getDocument().update(data.updates[2].op)
+        val deletedList = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        assertEquals(data.updates[2].expected, deletedList)
+    }
+}
