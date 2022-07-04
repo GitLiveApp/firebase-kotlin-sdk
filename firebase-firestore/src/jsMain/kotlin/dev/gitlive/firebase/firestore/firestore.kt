@@ -471,6 +471,9 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
         js("Reflect").construct(firebase.firestore.FieldPath, fieldNames).unsafeCast<firebase.firestore.FieldPath>()
     })
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
+    override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
+    override fun hashCode(): Int = js.hashCode()
+    override fun toString(): String = js.toString()
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(
