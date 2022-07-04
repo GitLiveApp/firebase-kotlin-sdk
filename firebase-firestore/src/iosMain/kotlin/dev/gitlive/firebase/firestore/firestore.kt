@@ -497,6 +497,9 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
 actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
     actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
+    override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
+    override fun hashCode(): Int = ios.hashCode()
+    override fun toString(): String = ios.toString()
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

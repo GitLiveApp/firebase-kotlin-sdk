@@ -459,6 +459,8 @@ external object firebase {
             companion object {
                 val documentId: FieldPath
             }
+
+            fun isEqual(other: FieldPath): Boolean
         }
 
         open class GeoPoint(latitude: Double, longitude: Double) {
