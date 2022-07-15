@@ -23,7 +23,7 @@ buildscript {
 }
 
 val targetSdkVersion by extra(30)
-val minSdkVersion by extra(16)
+val minSdkVersion by extra(19)
 
 tasks {
     val updateVersions by registering {
@@ -212,11 +212,11 @@ subprojects {
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2") {
                 exclude("com.google.android.gms")
             }
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
-            "commonMainImplementation"("org.jetbrains.kotlin:atomicfu:1.6.21") // Temp fix waiting for coroutines 1.6.3 [https://github.com/Kotlin/kotlinx.coroutines/issues/3305]
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+//            "commonMainImplementation"("org.jetbrains.kotlin:atomicfu:1.6.21") // Temp fix waiting for coroutines 1.6.3 [https://github.com/Kotlin/kotlinx.coroutines/issues/3305]
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
             "commonTestImplementation"(kotlin("test"))
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
