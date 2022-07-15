@@ -209,7 +209,7 @@ subprojects {
 
         dependencies {
             "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-169e4da")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.2") {
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3") {
                 exclude("com.google.android.gms")
             }
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
