@@ -29,7 +29,7 @@
     "@gitliveapp/firebase-app-js-legacy": "0.7.10",
     "firebase": "8.4.3",
     "kotlin": "1.6.10",
-    "kotlinx-coroutines-core": "1.6.3"
+    "kotlinx-coroutines-core": "1.6.0"
   }
 }
 
