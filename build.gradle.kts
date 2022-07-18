@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("multiplatform") version "1.6.21" apply false
+    kotlin("multiplatform") version "1.6.10" apply false
     id("base")
 }
 
@@ -208,15 +208,15 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-1726a13")
-            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3") {
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-c296997")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
                 exclude("com.google.android.gms")
             }
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 //            "commonMainImplementation"("org.jetbrains.kotlin:atomicfu:1.6.21") // Temp fix waiting for coroutines 1.6.3 [https://github.com/Kotlin/kotlinx.coroutines/issues/3305]
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.3")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
             "commonTestImplementation"(kotlin("test"))
             "jsTestImplementation"(kotlin("test-js"))
             "androidAndroidTestImplementation"(kotlin("test-junit"))
