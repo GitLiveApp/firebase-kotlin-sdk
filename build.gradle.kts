@@ -208,12 +208,11 @@ subprojects {
         }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-c296997")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.12-1.6.21-d3cbe60")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
                 exclude("com.google.android.gms")
             }
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-//            "commonMainImplementation"("org.jetbrains.kotlin:atomicfu:1.6.21") // Temp fix waiting for coroutines 1.6.3 [https://github.com/Kotlin/kotlinx.coroutines/issues/3305]
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:30.0.0"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
