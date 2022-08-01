@@ -153,10 +153,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
 
     actual suspend fun commit() = async.commit().await()
 
-    actual class Async(
-        @PublishedApi
-        internal val ios: FIRWriteBatch
-    ) {
+    actual class Async(@PublishedApi internal val ios: FIRWriteBatch) {
         actual fun commit() = deferred { ios.commitWithCompletion(it) }
     }
 }
@@ -277,10 +274,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
 
-    actual class Async(
-        @PublishedApi
-        internal val ios: NativeDocumentReference
-    ) {
+    actual class Async(@PublishedApi internal val ios: NativeDocumentReference) {
         actual inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
             deferred { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
 
@@ -418,10 +412,7 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
     actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) })
 
-    actual class Async(
-        @PublishedApi
-        internal val ios: FIRCollectionReference
-    ) {
+    actual class Async(@PublishedApi internal val ios: FIRCollectionReference) {
         actual inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
             deferred { ios.addDocumentWithData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
                 .convert(::DocumentReference)

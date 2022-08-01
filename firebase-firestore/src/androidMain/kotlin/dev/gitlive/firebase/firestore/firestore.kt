@@ -23,9 +23,9 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
-@Suppress("UNCHECKED_CAST", "FunctionName")
+@Suppress("DeferredIsResult")
 @PublishedApi
-internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = asDeferred() as Deferred<Unit>
+internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = asDeferred().convert { }
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
