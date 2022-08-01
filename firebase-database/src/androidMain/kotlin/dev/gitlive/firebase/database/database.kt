@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
