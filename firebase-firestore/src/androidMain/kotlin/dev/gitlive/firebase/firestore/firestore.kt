@@ -25,7 +25,12 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 @Suppress("DeferredIsResult")
 @PublishedApi
-internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = asDeferred().convert { }
+internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<Unit>()
+    .apply {
+        asDeferred().invokeOnCompletion { exception ->
+            if (exception == null) complete(Unit) else completeExceptionally(exception)
+        }
+    }
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
