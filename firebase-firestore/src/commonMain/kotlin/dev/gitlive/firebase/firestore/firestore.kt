@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
@@ -101,6 +102,8 @@ fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 expect class WriteBatch {
+    val async: Async
+
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
@@ -119,6 +122,11 @@ expect class WriteBatch {
 
     fun delete(documentRef: DocumentReference): WriteBatch
     suspend fun commit()
+
+    @Suppress("DeferredIsResult")
+    class Async {
+        fun commit(): Deferred<Unit>
+    }
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
@@ -132,6 +140,8 @@ expect class DocumentReference internal constructor(nativeValue: NativeDocumentR
     val id: String
     val path: String
     val snapshots: Flow<DocumentSnapshot>
+
+    val async: Async
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
@@ -151,17 +161,40 @@ expect class DocumentReference internal constructor(nativeValue: NativeDocumentR
     suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
 
     suspend fun delete()
+
+    @Suppress("DeferredIsResult")
+    class Async {
+        inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false): Deferred<Unit>
+        inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): Deferred<Unit>
+        inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Deferred<Unit>
+
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): Deferred<Unit>
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): Deferred<Unit>
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Deferred<Unit>
+
+        inline fun <reified T> update(data: T, encodeDefaults: Boolean = true): Deferred<Unit>
+        fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): Deferred<Unit>
+
+        fun update(vararg fieldsAndValues: Pair<String, Any?>): Deferred<Unit>
+        fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>): Deferred<Unit>
+
+        fun delete(): Deferred<Unit>
+    }
 }
 
 expect class CollectionReference : Query {
     val path: String
+    val async: Async
 
     fun document(documentPath: String): DocumentReference
     fun document(): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
-    @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
-    suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
     suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
+    @Suppress("DeferredIsResult")
+    class Async {
+        inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): Deferred<DocumentReference>
+        fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): Deferred<DocumentReference>
+    }
 }
 
 expect class FirebaseFirestoreException : FirebaseException
