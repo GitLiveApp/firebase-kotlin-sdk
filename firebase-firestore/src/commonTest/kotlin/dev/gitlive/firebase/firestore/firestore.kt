@@ -294,6 +294,8 @@ class FirebaseFirestoreTest {
                     )
                 )
             }
+
+
         val batch = Firebase.firestore.batch()
         batch.update(
             documentRef = doc,
@@ -317,7 +319,14 @@ class FirebaseFirestoreTest {
     fun testUpdateBatchDoesNotEncodeEmptyValues() = runTest {
         val doc = Firebase.firestore
             .collection("testServerTestSetBatch")
-            .document("test")
+            .document("test").apply {
+                set(
+                    FirestoreTest(
+                        prop1 = "prop1",
+                        time = 123.0
+                    )
+                )
+            }
         val batch = Firebase.firestore.batch()
         batch.update(
             documentRef = doc,
