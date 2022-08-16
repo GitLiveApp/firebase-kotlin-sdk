@@ -106,6 +106,7 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
+            else -> error("Unknown FetchStatus: $this")
         }
     }
 }
