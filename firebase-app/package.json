@@ -25,7 +25,7 @@
   "dependencies": {
     "@gitlive/firebase-common": "1.6.2",
     "firebase": "9.9.0",
-    "kotlin": "1.6.21",
+    "kotlin": "1.7.10",
     "kotlinx-coroutines-core": "1.6.3-native-mt"
   }
 }

@@ -9,7 +9,7 @@ version = project.property("firebase-common.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 android {
@@ -84,7 +84,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.3")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
             }
         }
 
