@@ -4,7 +4,6 @@ import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firebaseSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
 import kotlin.test.*
 
 @Serializable
@@ -99,5 +98,18 @@ class TimestampTests {
         assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
         assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
         assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
+    }
+
+    @Test
+    fun timestampMillisecondsConversion() = runTest {
+        val ms = 1666170858063
+        val seconds = 1666170858
+        val nanoseconds = 63000000 // 1 millisecond = 1000 microseconds = 1000000 nanoseconds
+        val timestamp = Timestamp.fromMilliseconds(ms)
+
+        assertEquals(seconds.toLong(), timestamp.seconds)
+        assertEquals(nanoseconds, timestamp.nanoseconds)
+
+        assertEquals(ms, timestamp.toMilliseconds())
     }
 }
