@@ -27,6 +27,7 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
     object ServerTimestamp: BaseTimestamp
 }
 
-fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp =
-    Timestamp((milliseconds / 1000).toLong(), (milliseconds * 1000).toInt() % 1000000)
-fun Timestamp.toMilliseconds(): Double = seconds * 1000 + (nanoseconds / 1000.0)
+private const val FACTOR = 1000000
+fun Timestamp.Companion.fromMilliseconds(milliseconds: Long): Timestamp =
+    Timestamp(milliseconds / 1000, ((milliseconds % 1000) * FACTOR).toInt())
+fun Timestamp.toMilliseconds(): Long = seconds * 1000 + nanoseconds / FACTOR

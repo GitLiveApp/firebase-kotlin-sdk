@@ -54,13 +54,13 @@ object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
     toNativeValue = { value ->
         when(value) {
             serverTimestamp -> FieldValue.serverTimestamp.nativeValue
-            else -> Timestamp.fromMilliseconds(value)
+            else -> Timestamp.fromMilliseconds(value.toLong())
         }
     },
     fromNativeValue = { value ->
         when(value) {
             FieldValue.serverTimestamp.nativeValue -> serverTimestamp
-            is NativeTimestamp -> Timestamp(value).toMilliseconds()
+            is NativeTimestamp -> Timestamp(value).toMilliseconds().toDouble()
             is Double -> value
             else -> throw SerializationException("Cannot deserialize $value")
         }
