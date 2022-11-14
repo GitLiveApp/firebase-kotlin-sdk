@@ -99,21 +99,30 @@ open class FirebaseCompositeDecoder constructor(
         index: Int,
         deserializer: DeserializationStrategy<T>,
         previousValue: T?
-    ) = deserializer.deserialize(FirebaseDecoder(get(descriptor, index)))
+    ) = decodeElement(descriptor, index) {
+        deserializer.deserialize(FirebaseDecoder(it))
+    }
 
-    override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) = decodeBoolean(get(descriptor, index))
+    override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeBoolean)
 
-    override fun decodeByteElement(descriptor: SerialDescriptor, index: Int) = decodeByte(get(descriptor, index))
+    override fun decodeByteElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeByte)
 
-    override fun decodeCharElement(descriptor: SerialDescriptor, index: Int) = decodeChar(get(descriptor, index))
+    override fun decodeCharElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeChar)
 
-    override fun decodeDoubleElement(descriptor: SerialDescriptor, index: Int) = decodeDouble(get(descriptor, index))
+    override fun decodeDoubleElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeDouble)
 
-    override fun decodeFloatElement(descriptor: SerialDescriptor, index: Int) = decodeFloat(get(descriptor, index))
+    override fun decodeFloatElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeFloat)
 
-    override fun decodeIntElement(descriptor: SerialDescriptor, index: Int) = decodeInt(get(descriptor, index))
+    override fun decodeIntElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeInt)
 
-    override fun decodeLongElement(descriptor: SerialDescriptor, index: Int) = decodeLong(get(descriptor, index))
+    override fun decodeLongElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeLong)
 
     override fun <T : Any> decodeNullableSerializableElement(
         descriptor: SerialDescriptor,
@@ -122,18 +131,35 @@ open class FirebaseCompositeDecoder constructor(
         previousValue: T?
     ): T? {
         val isNullabilitySupported = deserializer.descriptor.isNullable
-        return if (isNullabilitySupported || decodeNotNullMark(get(descriptor, index))) decodeSerializableElement(descriptor, index, deserializer, previousValue) else decodeNull(get(descriptor, index))
+        return if (isNullabilitySupported || decodeElement(descriptor, index, ::decodeNotNullMark)) {
+            decodeSerializableElement(descriptor, index, deserializer, previousValue)
+        } else {
+            decodeElement(descriptor, index, ::decodeNull)
+        }
     }
 
-    override fun decodeShortElement(descriptor: SerialDescriptor, index: Int) = decodeShort(get(descriptor, index))
+    override fun decodeShortElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeShort)
 
-    override fun decodeStringElement(descriptor: SerialDescriptor, index: Int) = decodeString(get(descriptor, index))
+    override fun decodeStringElement(descriptor: SerialDescriptor, index: Int) =
+        decodeElement(descriptor, index, ::decodeString)
 
     override fun endStructure(descriptor: SerialDescriptor) {}
 
     @ExperimentalSerializationApi
     override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder =
-        FirebaseDecoder(get(descriptor, index))
+        decodeElement(descriptor, index, ::FirebaseDecoder)
+
+    private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T {
+        return try {
+            decoder(get(descriptor, index))
+        } catch (e: Exception) {
+            throw SerializationException(
+                message = "Exception during decoding ${descriptor.serialName} ${descriptor.getElementName(index)}",
+                cause = e
+            )
+        }
+    }
 }
 
 private fun decodeString(value: Any?) = value.toString()
