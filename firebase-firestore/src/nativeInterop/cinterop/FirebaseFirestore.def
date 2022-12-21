@@ -2,4 +2,4 @@ language = Objective-C
 package = cocoapods.FirebaseFirestore
 modules = FirebaseFirestore
 compilerOpts = -framework FirebaseFirestore
-linkerOpts = -framework FirebaseFirestore -framework abseil -framework gRPC-Core -framework gRPC-C++ -framework BoringSSL-GRPC -framework leveldb-library -framework SystemConfiguration -framework MobileCoreServices
+linkerOpts = -framework abseil -framework BoringSSL-GRPC -framework FirebaseCoreExtension -framework FirebaseFirestore -framework FirebaseFirestoreSwift -framework FirebaseSharedSwift -framework gRPC-C++ -framework gRPC-Core -framework leveldb-library -framework Libuv-gRPC -framework SystemConfiguration -framework MobileCoreServices

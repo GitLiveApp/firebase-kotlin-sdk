@@ -50,7 +50,7 @@ kotlin {
 
     if (supportIosTarget) {
         ios()
-        iosSimulatorArm64()
+        iosSimulatorArm64("ios")
     }
 
     js {
@@ -98,17 +98,12 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "9.4.1"))
+                api(npm("firebase", "9.15.0"))
             }
         }
     }

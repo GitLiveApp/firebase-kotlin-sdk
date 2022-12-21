@@ -41,6 +41,12 @@ tasks {
     }
 }
 
+// Workaround for kotlin versions < 1.7.10 on Apple M1 architectures (node 16.0 is required for arm64)
+// https://youtrack.jetbrains.com/issue/KT-49109#focus=Comments-27-5259190.0-0
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
 subprojects {
 
     group = "dev.gitlive"
@@ -201,7 +207,7 @@ subprojects {
         dependencies {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1-native-mt")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.3.0"))
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:31.1.1"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")

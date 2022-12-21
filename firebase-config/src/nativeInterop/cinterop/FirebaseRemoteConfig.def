@@ -2,4 +2,4 @@ language = Objective-C
 package = cocoapods.FirebaseRemoteConfig
 modules = FirebaseRemoteConfig
 compilerOpts = -framework FirebaseRemoteConfig
-linkerOpts = -framework FirebaseABTesting -framework FirebaseRemoteConfig
+linkerOpts = -framework FirebaseABTesting -framework FirebaseRemoteConfig -framework FirebaseRemoteConfigSwift -framework FirebaseSharedSwift

@@ -44,11 +44,11 @@ android {
     }
 }
 
-val KonanTarget.archVariant: String
+val KonanTarget.archVariants: List<String>
     get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
+        listOf("ios-arm64_x86_64-simulator", "ios-arm64_i386_x86_64-simulator")
     } else {
-        "ios-arm64_armv7"
+        listOf("ios-arm64", "ios-arm64_arm7")
     }
 
 kotlin {
@@ -62,23 +62,21 @@ kotlin {
 
         fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
             val nativeFrameworkPaths = listOf(
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            )
+                "FBLPromises",
+                "FirebaseAnalytics",
+                "FirebaseAnalyticsSwift",
+                "FirebaseCore",
+                "FirebaseCoreInternal",
+                "FirebaseInstallations",
+                "GoogleAppMeasurement",
+                "GoogleAppMeasurementIdentitySupport",
+                "GoogleUtilities",
+                "nanopb"
+            ).map { framework ->
+                konanTarget.archVariants
+                    .map { rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$framework.xcframework/$it") }
+                    .firstOrNull { it.exists() }
+            }
 
             binaries {
                 getTest("DEBUG").apply {
@@ -96,7 +94,7 @@ kotlin {
         }
 
         ios(configure = nativeTargetConfig())
-        iosSimulatorArm64(configure = nativeTargetConfig())
+        iosSimulatorArm64("ios", configure = nativeTargetConfig())
     }
 
     js {
@@ -140,12 +138,7 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting
