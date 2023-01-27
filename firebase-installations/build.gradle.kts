@@ -9,6 +9,7 @@ version = project.property("firebase-installations.version") as String
 
 plugins {
     id("com.android.library")
+    kotlin("native.cocoapods")
     kotlin("multiplatform")
 }
 
@@ -38,12 +39,7 @@ android {
     }
 }
 
-val KonanTarget.archVariant: String
-    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
-    } else {
-        "ios-arm64_armv7"
-    }
+val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
@@ -51,45 +47,21 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
-        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-            val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            )
-
+        ios {
             binaries {
-                getTest("DEBUG").apply {
-                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    linkerOpts("-ObjC")
-                }
-            }
-
-            compilations.getByName("main") {
-                cinterops.create("FirebaseInstallations") {
-                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
+                framework {
+                    baseName = "FirebaseFunctions"
                 }
             }
         }
-
-        ios(configure = nativeTargetConfig())
-        iosSimulatorArm64(configure = nativeTargetConfig())
+//        iosSimulatorArm64 {
+//            binaries {
+//                framework {
+//                    baseName = "FirebaseFunctions"
+//                }
+//            }
+//        }
     }
 
     js {
@@ -134,12 +106,12 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
+//            val iosSimulatorArm64Main by getting
+//            iosSimulatorArm64Main.dependsOn(iosMain)
 
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
+//            val iosSimulatorArm64Test by sourceSets.getting
+//            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting
@@ -149,6 +121,24 @@ kotlin {
 if (project.property("firebase-installations.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (supportIosTarget) {
+    kotlin {
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                isStatic = true
+            }
+            noPodspec()
+            pod("FirebaseCore")
+            pod("FirebaseAnalytics")
+            pod("FirebaseFunctions")
+            pod("FirebaseCoreDiagnostics")
+            pod("GTMSessionFetcher")
+            pod("FirebaseInstallations")
+        }
     }
 }
 
