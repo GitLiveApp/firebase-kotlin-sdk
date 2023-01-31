@@ -67,6 +67,15 @@ kotlin {
 //                }
 //            }
 //        }
+
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                isStatic = true
+            }
+            noPodspec()
+            pod("FirebaseCore")
+        }
     }
 
     js {
@@ -119,21 +128,6 @@ kotlin {
         }
 
         val jsMain by getting
-    }
-}
-if (supportIosTarget) {
-    kotlin {
-        cocoapods {
-            ios.deploymentTarget = "11.0"
-            framework {
-                isStatic = true
-            }
-            noPodspec()
-            pod("FirebaseCore")
-            pod("FirebaseAnalytics")
-            pod("FirebaseCoreDiagnostics")
-            pod("FirebaseInstallations")
-        }
     }
 }
 

@@ -17,7 +17,7 @@ import platform.Foundation.*
 
 
 actual val Firebase.auth
-    get() = FirebaseAuth(FIRAuth.auth())
+    get() = FirebaseAuth(FIRAuth.auth()!!)
 
 actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = TODO("Come back to issue")
 //    FirebaseAuth(FIRAuth.authWithApp(app.ios))

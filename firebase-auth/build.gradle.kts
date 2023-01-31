@@ -92,6 +92,16 @@ kotlin {
 //                }
 //            }
 //        }
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                isStatic = true
+            }
+            noPodspec()
+            pod("FirebaseAuth") {
+                version = "8.15.0"
+            }
+        }
     }
 
     js {
@@ -146,24 +156,6 @@ kotlin {
         }
 
         val jsMain by getting
-    }
-}
-
-if (supportIosTarget) {
-    kotlin {
-        cocoapods {
-            ios.deploymentTarget = "11.0"
-            framework {
-                isStatic = true
-            }
-            noPodspec()
-            pod("FirebaseCore")
-            pod("FirebaseAnalytics")
-            pod("FirebaseAuth")
-            pod("FirebaseCoreDiagnostics")
-            pod("GTMSessionFetcher")
-            pod("FirebaseInstallations")
-        }
     }
 }
 

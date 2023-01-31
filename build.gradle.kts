@@ -8,7 +8,7 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.7.22" apply false
+    kotlin("multiplatform") version "1.7.20" apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -24,7 +24,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.2.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }

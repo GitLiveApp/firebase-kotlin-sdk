@@ -62,6 +62,14 @@ kotlin {
 //                }
 //            }
 //        }
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                isStatic = true
+            }
+            noPodspec()
+            pod("FirebaseInstallations")
+        }
     }
 
     js {
@@ -121,24 +129,6 @@ kotlin {
 if (project.property("firebase-installations.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (supportIosTarget) {
-    kotlin {
-        cocoapods {
-            ios.deploymentTarget = "11.0"
-            framework {
-                isStatic = true
-            }
-            noPodspec()
-            pod("FirebaseCore")
-            pod("FirebaseAnalytics")
-            pod("FirebaseFunctions")
-            pod("FirebaseCoreDiagnostics")
-            pod("GTMSessionFetcher")
-            pod("FirebaseInstallations")
-        }
     }
 }
 

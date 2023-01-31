@@ -2,16 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-firestore.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.7.22"
+    kotlin("plugin.serialization") version "1.7.20"
 }
 
 android {
@@ -70,6 +67,16 @@ kotlin {
 //                }
 //            }
 //        }
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                isStatic = true
+            }
+            noPodspec()
+            pod("FirebaseFirestore") {
+                version = "8.15.0"
+            }
+        }
     }
 
     js {
@@ -131,31 +138,6 @@ kotlin {
 if (project.property("firebase-firestore.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (supportIosTarget) {
-    kotlin {
-        cocoapods {
-            ios.deploymentTarget = "11.0"
-            framework {
-                isStatic = true
-            }
-            noPodspec()
-//            pod("FirebaseCore")
-//            pod("FirebaseAnalytics")
-            pod("FirebaseFirestore") {
-                version = "8.15.0"
-            }
-//            pod("leveldb-library")
-//            pod("gRPC-Core")
-//            pod("gRPC-C++")
-//            pod("abseil")
-//            pod("BoringSSL-GRPC")
-//            pod("FirebaseCoreDiagnostics")
-//            pod("GTMSessionFetcher")
-//            pod("FirebaseInstallations")
-        }
     }
 }
 
