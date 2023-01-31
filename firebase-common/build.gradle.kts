@@ -74,8 +74,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                apiVersion = "1.7"
+                languageVersion = "1.7"
                 progressiveMode = true
                 optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
