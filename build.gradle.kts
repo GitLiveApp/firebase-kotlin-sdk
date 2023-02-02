@@ -8,8 +8,9 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.7.20" apply false
-    id("base")
+    kotlin("multiplatform") version "1.8.0" apply false
+    kotlin("native.cocoapods") version "1.8.0" apply false
+//    id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
 
@@ -24,7 +25,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.2.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
@@ -66,16 +67,6 @@ subprojects {
 
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
-    }
-
-    tasks.whenTaskAdded {
-        enabled = when(name) {
-            "compileDebugUnitTestKotlinAndroid" -> false
-            "compileReleaseUnitTestKotlinAndroid" -> false
-            "testDebugUnitTest" -> false
-            "testReleaseUnitTest" -> false
-            else -> enabled
-        }
     }
 
     tasks {

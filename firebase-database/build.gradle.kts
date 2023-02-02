@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("plugin.serialization") version "1.8.0"
 }
 
 repositories {
@@ -91,9 +91,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.7"
-                languageVersion = "1.7"
-                progressiveMode = false
+                apiVersion = "1.8"
+                languageVersion = "1.8"
+                progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.FlowPreview")
                 optIn("kotlinx.serialization.InternalSerializationApi")

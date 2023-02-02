@@ -85,9 +85,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.7"
-                languageVersion = "1.7"
-                progressiveMode = false
+                apiVersion = "1.8"
+                languageVersion = "1.8"
+                progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
             }
