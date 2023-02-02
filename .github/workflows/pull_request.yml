@@ -24,9 +24,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '13.4.0'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Install Firebase tools

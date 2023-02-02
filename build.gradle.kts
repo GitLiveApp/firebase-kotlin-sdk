@@ -10,7 +10,7 @@ repositories {
 plugins {
     kotlin("multiplatform") version "1.8.0" apply false
     kotlin("native.cocoapods") version "1.8.0" apply false
-//    id("base")
+    id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
 

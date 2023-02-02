@@ -50,6 +50,7 @@ kotlin {
 
     if (supportIosTarget) {
         ios()
+        iosSimulatorArm64()
     }
 
     js {
@@ -97,7 +98,11 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
+            val iosSimulatorArm64Main by getting
+            iosSimulatorArm64Main.dependsOn(iosMain)
             val iosTest by sourceSets.getting
+            val iosSimulatorArm64Test by getting
+            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting {
