@@ -45,24 +45,12 @@ kotlin {
     }
 
     if (supportIosTarget) {
-        ios {
-            binaries {
-                framework {
-                    baseName = "FirebaseFunctions"
-                }
-            }
-        }
-        iosSimulatorArm64 {
-            binaries {
-                framework {
-                    baseName = "FirebaseFunctions"
-                }
-            }
-        }
+        ios()
+        iosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                isStatic = true
+                baseName = "FirebaseFunctions"
             }
             noPodspec()
             pod("FirebaseInstallations") {

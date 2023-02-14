@@ -77,24 +77,12 @@ kotlin {
     }
 
     if (supportIosTarget) {
-        ios {
-            binaries {
-                framework {
-                    baseName = "FirebaseAuth"
-                }
-            }
-        }
-        iosSimulatorArm64 {
-            binaries {
-                framework {
-                    baseName = "FirebaseAuth"
-                }
-            }
-        }
+        ios()
+        iosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                isStatic = true
+                baseName = "FirebaseAuth"
             }
             noPodspec()
             pod("FirebaseAuth") {

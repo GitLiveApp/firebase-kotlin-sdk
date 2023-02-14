@@ -66,24 +66,12 @@ kotlin {
     }
 
     if (supportIosTarget) {
-        ios {
-            binaries {
-                framework {
-                    baseName = "FirebaseConfig"
-                }
-            }
-        }
-        iosSimulatorArm64 {
-            binaries {
-                framework {
-                    baseName = "FirebaseConfig"
-                }
-            }
-        }
+        ios()
+        iosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                isStatic = true
+                baseName = "FirebaseConfig"
             }
             noPodspec()
             pod("FirebaseRemoteConfig") {
