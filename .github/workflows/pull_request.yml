@@ -33,13 +33,13 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
       - name: Run JS Tests
-        run: ./gradlew cleanTest jsLegacyTest
+        run: ./gradlew cleanTest jsIrTest
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: "JS Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/jsLegacyTest/"
+          path: "firebase-firestore/build/reports/tests/jsIrTest/"
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
       - name: Upload iOS test artifact
