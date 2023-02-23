@@ -6,7 +6,8 @@ include(
     "firebase-database",
     "firebase-firestore",
     "firebase-functions",
-    "firebase-installations"
+    "firebase-installations",
+    "firebase-perf"
 )
 
 //enableFeaturePreview("GRADLE_METADATA")
