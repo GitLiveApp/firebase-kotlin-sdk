@@ -54,6 +54,10 @@ subprojects {
         mavenCentral()
     }
 
+    rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "14.20.0"
+    }
+
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
     }

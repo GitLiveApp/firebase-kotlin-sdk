@@ -183,7 +183,7 @@ kotlin {
     }
 }
 
-if (project.property("firebase-auth.skipIosTests") == "true") {
+if (project.property("firebase-perf.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
