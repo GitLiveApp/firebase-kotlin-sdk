@@ -13,7 +13,6 @@ import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
@@ -164,7 +163,10 @@ actual class DatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-                FIRTransactionResult.successWithValue(transactionUpdate(decode(strategy, firMutableData.value)))
+                firMutableData?.value = firMutableData?.value?.let {
+                    transactionUpdate(decode(strategy, firMutableData.value))
+                }
+                FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->
                 if (error != null) {
