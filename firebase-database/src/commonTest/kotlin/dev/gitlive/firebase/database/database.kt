@@ -134,6 +134,7 @@ class FirebaseDatabaseTest {
             ref.setValue(strategy, data)
         } catch (err: DatabaseException) {
             println(err)
+            throw err
         }
     }
 

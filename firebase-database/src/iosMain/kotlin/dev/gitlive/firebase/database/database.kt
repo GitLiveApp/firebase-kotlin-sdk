@@ -164,12 +164,10 @@ actual class DatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-
-                val transaction = transactionUpdate(decode(strategy, firMutableData?.value))
-
-                require(transaction is FIRMutableData)
-
-                FIRTransactionResult.successWithValue(transaction)
+                firMutableData?.value = firMutableData?.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->
                 if (error != null) {
