@@ -10,6 +10,8 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
 import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 expect val emulatorHost: String
 expect val context: Any
@@ -36,4 +38,13 @@ class FirebasePerformanceTest {
             }
     }
 
+    @Test
+    fun testNewTrace() = runTest {
+
+        val performance = Firebase.performance
+
+        val trace = performance.newTrace("Test Trace")
+
+        assertNotNull(trace)
+    }
 }
