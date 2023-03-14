@@ -131,13 +131,6 @@ kotlin {
 
     js {
         useCommonJs()
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "5s"
-                }
-            }
-        }
         browser {
             testTask {
                 useKarma {
@@ -180,11 +173,7 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting {
-            dependencies {
-                api(npm("firebase", "9.4.1"))
-            }
-        }
+        val jsMain by getting
     }
 }
 
