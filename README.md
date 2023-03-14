@@ -20,6 +20,7 @@ The following libraries are available for the various Firebase products.
 | [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.7.0/pom)             | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.7.0/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
 | [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.7.0/pom)               | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)                                                                                                     |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.7.0/pom)                   | ![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)                                                                                                       |
 
 
 
@@ -209,6 +210,7 @@ If you are building a Kotlin multiplatform library which will be consumed from J
   "@gitlive/firebase-installations": "1.7.0",
   "@gitlive/firebase-messaging": "1.7.0",
   "@gitlive/firebase-storage": "1.7.0"
+  "@gitlive/firebase-perf": "1.7.0"
 }
 ```
 
