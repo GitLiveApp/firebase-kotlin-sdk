@@ -158,7 +158,11 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                api(npm("firebase", "9.4.1"))
+            }
+        }
     }
 }
 

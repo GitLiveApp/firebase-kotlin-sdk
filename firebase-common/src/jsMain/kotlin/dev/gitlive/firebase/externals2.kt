@@ -28,6 +28,10 @@ external object installations
 @JsName("default")
 external object remoteConfig
 
+@JsModule("firebase/compat/performance")
+@JsName("default")
+external object performance
+
 typealias SnapshotCallback = (data: firebase.database.DataSnapshot, b: String?) -> Unit
 
 operator fun firebase.functions.HttpsCallable.invoke() = asDynamic()() as Promise<firebase.functions.HttpsCallableResult>

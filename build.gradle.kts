@@ -18,7 +18,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.2.0")
+        classpath("com.android.tools.build:gradle:7.2.2")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
@@ -36,7 +36,8 @@ tasks {
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion"
+            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
+            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion"
         )
     }
 }
@@ -51,6 +52,10 @@ subprojects {
         mavenLocal()
         google()
         mavenCentral()
+    }
+
+    rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
     }
 
     tasks.withType<Sign>().configureEach {

@@ -524,4 +524,20 @@ external object firebase {
             fun getToken(forceRefresh: Boolean): Promise<String>
         }
     }
+
+    fun performance(app: App? = definedExternally): performance.Performance
+
+    object performance {
+        interface Performance {
+            fun trace(
+                performance: Performance,
+                name: String
+            ): Trace
+        }
+
+        interface Trace {
+            fun start()
+            fun stop()
+        }
+    }
 }
