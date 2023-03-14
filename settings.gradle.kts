@@ -7,7 +7,8 @@ include(
     "firebase-firestore",
     "firebase-functions",
     "firebase-installations",
-    "firebase-perf"
+    "firebase-perf",
+    "firebase-crashlytics"
 )
 
 //enableFeaturePreview("GRADLE_METADATA")
