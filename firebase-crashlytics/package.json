@@ -1,8 +1,8 @@
 {
-  "name": "@gitlive/firebase-config",
+  "name": "@gitlive/firebase-crashlytics",
   "version": "1.7.1",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
-  "main": "firebase-config.js",
+  "main": "firebase-crashlytics.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
