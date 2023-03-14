@@ -25,10 +25,10 @@ jobs:
         run: brew list carthage || brew install carthage
       - name: Install Firebase tools
         run: npm install -g firebase-tools
-      - name: Assemble
-        run: ./gradlew assemble
       - name: Start Firebase emulator
         run: "firebase emulators:start --config=./test/firebase.json &"
+      - name: Assemble
+        run: ./gradlew assemble
       - name: Run JS Tests
         run: ./gradlew cleanTest jsLegacyTest
       - name: Upload JS test artifact
