@@ -29,6 +29,7 @@ android {
         minSdk = property("minSdkVersion") as Int
         targetSdk = property("targetSdkVersion") as Int
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
     }
     sourceSets {
         getByName("main") {
