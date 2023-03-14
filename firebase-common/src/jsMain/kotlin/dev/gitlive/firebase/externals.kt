@@ -538,6 +538,14 @@ external object firebase {
         interface Trace {
             fun start()
             fun stop()
+
+            fun getAttribute(attr: String): String?
+            fun getAttributes(): Map<String, String>
+            fun getMetric(metricName: String): Long
+            fun incrementMetric(metricName: String, num: Long)
+            fun putAttribute(attr: String, value: String)
+            fun putMetric(metricName: String, num: Long)
+            fun removeAttribute(attr: String)
         }
     }
 }
