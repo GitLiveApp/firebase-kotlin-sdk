@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.perf
 
+import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.perf.metrics.Trace
@@ -14,3 +15,5 @@ actual class FirebasePerformance(val android: com.google.firebase.perf.FirebaseP
 
     actual fun newTrace(traceName: String): Trace = Trace(android.newTrace(traceName))
 }
+
+actual open class FirebasePerformanceException(message: String) : FirebaseException(message)

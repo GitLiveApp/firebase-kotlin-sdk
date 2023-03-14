@@ -104,7 +104,8 @@ kotlin {
             ).plus(
                 listOf(
                     "FirebasePerformance",
-                    "GTMSessionFetcher"
+                    "FirebaseRemoteConfig",
+                    "FirebaseABTesting"
                 ).map {
                     projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
                 }
@@ -139,8 +140,8 @@ kotlin {
         }
         browser {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }

@@ -2,4 +2,4 @@ language = Objective-C
 package = cocoapods.FirebasePerformance
 modules = FirebasePerformance
 compilerOpts = -framework FirebasePerformance
-linkerOpts = -framework FirebasePerformance -framework GTMSessionFetcher
+linkerOpts = -framework FirebasePerformance

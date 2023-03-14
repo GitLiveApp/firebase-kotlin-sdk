@@ -2,6 +2,7 @@ package dev.gitlive.firebase.perf
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
 
 /** Returns the [FirebasePerformance] instance of the default [FirebaseApp]. */
@@ -14,3 +15,5 @@ expect class FirebasePerformance {
 
     fun newTrace(traceName: String): Trace
 }
+
+expect open class FirebasePerformanceException : FirebaseException

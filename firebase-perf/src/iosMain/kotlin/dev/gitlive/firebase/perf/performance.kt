@@ -3,6 +3,7 @@ package dev.gitlive.firebase.perf
 import cocoapods.FirebasePerformance.FIRPerformance
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
 
 actual val Firebase.performance get() =
@@ -15,3 +16,5 @@ actual class FirebasePerformance(val ios: FIRPerformance) {
 
     actual fun newTrace(traceName: String): Trace = Trace(ios.traceWithName(traceName))
 }
+
+actual open class FirebasePerformanceException(message: String) : FirebaseException(message)
