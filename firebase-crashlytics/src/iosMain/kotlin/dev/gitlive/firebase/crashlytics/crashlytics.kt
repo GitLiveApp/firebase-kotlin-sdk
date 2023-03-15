@@ -15,9 +15,13 @@ actual fun Firebase.crashlytics(app: FirebaseApp) =
 
 actual class FirebaseCrashlytics internal constructor(val ios: FIRCrashlytics) {
 
-    actual fun recordException(exception: Throwable) {
-        ios.recordError(exception.asNSError())
-    }
+    actual fun recordException(exception: Throwable) { ios.recordError(exception.asNSError()) }
+    actual fun log(message: String) { ios.log(message) }
+    actual fun setUserId(userId: String) { ios.setUserID(userId) }
+    actual fun setCrashlyticsCollectionEnabled(enabled: Boolean) { ios.setCrashlyticsCollectionEnabled(enabled) }
+    actual fun sendUnsentReports() { ios.sendUnsentReports() }
+    actual fun deleteUnsentReports() { ios.deleteUnsentReports() }
+    actual fun didCrashOnPreviousExecution(): Boolean = ios.didCrashDuringPreviousExecution()
 }
 
 actual open class FirebaseCrashlyticsException internal constructor(message: String) : FirebaseException(message)

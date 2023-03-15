@@ -11,6 +11,7 @@ import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
 expect val emulatorHost: String
@@ -43,5 +44,52 @@ class FirebaseCrashlyticsTest {
 
         val crashlytics = Firebase.crashlytics
         crashlytics.recordException(Exception("Test Exception"))
+    }
+
+    @Test
+    fun testLog() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        crashlytics.log("Test Log")
+    }
+
+    @Test
+    fun testSetUserId() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        crashlytics.setUserId("Test User Id")
+
+    }
+
+    @Test
+    fun testSendUnsentReports() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        crashlytics.sendUnsentReports()
+
+    }
+
+    @Test
+    fun testDeleteUnsentReports() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        crashlytics.deleteUnsentReports()
+
+    }
+
+    @Test
+    fun testDidCrashOnPreviousExecution() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        val didCrash = crashlytics.didCrashOnPreviousExecution()
+        assertFalse { didCrash }
+    }
+
+    @Test
+    fun testSetCrashlyticsCollectionEnabled() = runTest {
+
+        val crashlytics = Firebase.crashlytics
+        crashlytics.setCrashlyticsCollectionEnabled(true)
+
     }
 }
