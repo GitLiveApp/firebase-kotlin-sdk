@@ -6,20 +6,13 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.perf.FirebasePerformance
 import dev.gitlive.firebase.perf.performance
-import kotlinx.coroutines.CoroutineScope
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-expect val emulatorHost: String
-expect val context: Any
-expect fun runTest(test: suspend CoroutineScope.() -> Unit)
-
 class TraceTest {
 
     private lateinit var performance: FirebasePerformance
-
-    private lateinit var trace: Trace
 
     @BeforeTest
     fun initializeFirebase() {
@@ -41,38 +34,45 @@ class TraceTest {
 
         performance = Firebase.performance
 
-        trace = performance.newTrace("Test Trace")
+
     }
 
     @Test
     fun testGetLongMetric() {
-
+        val trace = performance.newTrace("testGetLongMetric")
+        trace.start()
         trace.putMetric("Get Long Metric Test", 1L)
 
         assertEquals(1L,  trace.getLongMetric("Get Long Metric Test"))
+        trace.stop()
     }
 
     @Test
     fun testIncrementMetric() {
-
+        val trace = performance.newTrace("testIncrementMetric")
+        trace.start()
         trace.putMetric("Get Increment Metric Test", 1L)
 
         trace.incrementMetric("Get Increment Metric Test", 1L)
 
         assertEquals(2L,  trace.getLongMetric("Get Increment Metric Test"))
+        trace.stop()
     }
 
     @Test
     fun testPutMetric() {
-
+        val trace = performance.newTrace("testPutMetric")
+        trace.start()
         trace.putMetric("Get Put Metric Test", 1L)
 
         assertEquals(1L,  trace.getLongMetric("Get Put Metric Test"))
+        trace.stop()
     }
 
     @Test
     fun testGetAttributes() {
-
+        val trace = performance.newTrace("testGetAttributes")
+        trace.start()
         val values = listOf(1, 2, 3)
 
         values.forEach {
@@ -88,21 +88,26 @@ class TraceTest {
         values.forEach {
             trace.removeAttribute("Test_Get_Attributes_$it")
         }
+        trace.stop()
     }
 
     @Test
     fun testGetAttribute() {
-
+        val trace = performance.newTrace("testGetAttribute")
+        trace.start()
         trace.putAttribute("Test_Get_Attribute", "Test Get Attribute Value")
 
         assertEquals("Test Get Attribute Value", trace.getAttribute("Test_Get_Attribute"))
+        trace.stop()
     }
 
     @Test
     fun testPutAttribute() {
-
+        val trace = performance.newTrace("testPutAttribute")
+        trace.start()
         trace.putAttribute("Test_Put_Attribute", "Test Put Attribute Value")
 
         assertEquals("Test Put Attribute Value", trace.getAttribute("Test_Put_Attribute"))
+        trace.stop()
     }
 }
