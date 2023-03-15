@@ -104,24 +104,6 @@ kotlin {
         iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
-    js {
-        useCommonJs()
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "5s"
-                }
-            }
-        }
-        browser {
-            testTask {
-                useMocha {
-                    timeout = "5s"
-                }
-            }
-        }
-    }
-
     sourceSets {
         all {
             languageSettings.apply {
@@ -154,12 +136,10 @@ kotlin {
             val iosSimulatorArm64Test by sourceSets.getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        val jsMain by getting
     }
 }
 
-if (project.property("firebase-perf.skipIosTests") == "true") {
+if (project.property("firebase-crashlytics.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
