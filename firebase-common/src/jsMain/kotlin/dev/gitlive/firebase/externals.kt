@@ -541,10 +541,10 @@ external object firebase {
 
             fun getAttribute(attr: String): String?
             fun getAttributes(): Map<String, String>
-            fun getMetric(metricName: String): Int
-            fun incrementMetric(metricName: String, num: Int)
+            fun getMetric(metricName: String): Number
+            fun incrementMetric(metricName: String, num: Number)
             fun putAttribute(attr: String, value: String)
-            fun putMetric(metricName: String, num: Int)
+            fun putMetric(metricName: String, num: Number)
             fun removeAttribute(attr: String)
         }
     }
