@@ -76,23 +76,33 @@ class TraceTest {
         val values = listOf(1, 2, 3)
 
         values.forEach {
-            trace.putAttribute("Test Get Attributes Attribute $it", "Test Get Attributes Value $it")
+            trace.putAttribute("Test_Get_Attributes_$it", "Test Get Attributes Value $it")
         }
 
-        val expected = values.associateBy({"Test Get Attributes Attribute $it"}, {"Test Get Attributes Value $it"})
+        trace.getAttributes().onEachIndexed { index, entry ->
 
-        assertEquals(expected, trace.getAttributes())
+            assertEquals("Test_Get_Attributes_$index", entry.key)
+            assertEquals("Test Get Attributes Value $index", entry.value)
+        }
 
         values.forEach {
-            trace.removeAttribute("Test Get Attributes Attribute $it")
+            trace.removeAttribute("Test_Get_Attributes_$it")
         }
     }
 
     @Test
     fun testGetAttribute() {
 
-        trace.putAttribute("Test Get Attribute Attribute", "Test Get Attribute Value")
+        trace.putAttribute("Test_Get_Attribute", "Test Get Attribute Value")
 
-        assertEquals("Test Get Attribute Value", trace.getAttribute("Test Get Attribute Attribute"))
+        assertEquals("Test Get Attribute Value", trace.getAttribute("Test_Get_Attribute"))
+    }
+
+    @Test
+    fun testPutAttribute() {
+
+        trace.putAttribute("Test_Put_Attribute", "Test Put Attribute Value")
+
+        assertEquals("Test Put Attribute Value", trace.getAttribute("Test_Put_Attribute"))
     }
 }
