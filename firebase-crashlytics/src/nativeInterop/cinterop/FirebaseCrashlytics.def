@@ -1,0 +1,5 @@
+language = Objective-C
+package = cocoapods.FirebaseCrashlytics
+modules = FirebaseCrashlytics
+compilerOpts = -framework FirebaseCrashlytics
+linkerOpts = -framework FirebaseCrashlytics

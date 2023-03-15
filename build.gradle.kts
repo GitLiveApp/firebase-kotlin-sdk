@@ -210,7 +210,9 @@ subprojects {
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
-            "jsTestImplementation"(kotlin("test-js"))
+            if (this@afterEvaluate.name != "firebase-crashlytics") {
+                "jsTestImplementation"(kotlin("test-js"))
+            }
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
