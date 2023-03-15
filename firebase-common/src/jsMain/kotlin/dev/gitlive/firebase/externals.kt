@@ -540,14 +540,4 @@ external object firebase {
             fun stop()
         }
     }
-
-    fun crashlytics(app: App? = definedExternally): crashlytics.Crashlytics
-
-    object crashlytics {
-
-        interface Crashlytics {
-            fun recordException(exception: Throwable): Unit
-        }
-
-    }
 }
