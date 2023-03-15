@@ -19,7 +19,9 @@ actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = rethrow
 
 actual class FirebasePerformance internal constructor(val js: firebase.performance.Performance) {
 
-    actual fun newTrace(traceName: String): Trace = Trace(js.trace(js, traceName))
+    actual fun newTrace(traceName: String): Trace = rethrow {
+        Trace(js.trace(js, traceName))
+    }
 }
 
 actual open class FirebasePerformanceException(code: String, cause: Throwable) :
