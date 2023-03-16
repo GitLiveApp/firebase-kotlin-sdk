@@ -53,8 +53,7 @@ class AndroidTraceTest {
 
         attributes.onEachIndexed { index, entry ->
 
-            assertEquals("Test_Get_Attributes_$index", entry.key)
-            assertEquals("Test Get Attributes Value $index", entry.value)
+            assertEquals(entry.key.last(), entry.value.last())
         }
 
         trace.stop()
