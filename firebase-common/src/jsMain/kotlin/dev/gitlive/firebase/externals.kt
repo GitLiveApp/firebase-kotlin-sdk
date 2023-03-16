@@ -542,7 +542,6 @@ external object firebase {
             fun stop()
 
             fun getAttribute(attr: String): String?
-            fun getAttributes(): Any?
             fun getMetric(metricName: String): Number
             fun incrementMetric(metricName: String, num: Number)
             fun putAttribute(attr: String, value: String)

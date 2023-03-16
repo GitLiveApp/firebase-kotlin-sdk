@@ -10,7 +10,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class TraceTest {
+class AndroidTraceTest {
 
     private lateinit var performance: FirebasePerformance
 
@@ -38,34 +38,45 @@ class TraceTest {
     }
 
     @Test
-    fun testGetLongMetric() {
-        val trace = performance.newTrace("testGetLongMetric")
+    fun testGetAttributes() {
+        val trace = performance.newTrace("testGetAttributes")
         trace.start()
-        trace.putMetric("Get Long Metric Test", 1L)
+        val values = listOf(1, 2, 3)
 
-        assertEquals(1L,  trace.getLongMetric("Get Long Metric Test"))
+        values.forEach {
+            trace.putAttribute("Test_Get_Attributes_$it", "Test Get Attributes Value $it")
+        }
+
+        val attributes = trace.getAttributes()
+
+        assertEquals(3, attributes.size)
+
+        attributes.onEachIndexed { index, entry ->
+
+            assertEquals("Test_Get_Attributes_$index", entry.key)
+            assertEquals("Test Get Attributes Value $index", entry.value)
+        }
+
         trace.stop()
     }
 
     @Test
-    fun testIncrementMetric() {
-        val trace = performance.newTrace("testIncrementMetric")
+    fun testGetAttribute() {
+        val trace = performance.newTrace("testGetAttribute")
         trace.start()
-        trace.putMetric("Get Increment Metric Test", 1L)
+        trace.putAttribute("Test_Get_Attribute", "Test Get Attribute Value")
 
-        trace.incrementMetric("Get Increment Metric Test", 1L)
-
-        assertEquals(2L,  trace.getLongMetric("Get Increment Metric Test"))
+        assertEquals("Test Get Attribute Value", trace.getAttribute("Test_Get_Attribute"))
         trace.stop()
     }
 
     @Test
-    fun testPutMetric() {
-        val trace = performance.newTrace("testPutMetric")
+    fun testPutAttribute() {
+        val trace = performance.newTrace("testPutAttribute")
         trace.start()
-        trace.putMetric("Get Put Metric Test", 1L)
+        trace.putAttribute("Test_Put_Attribute", "Test Put Attribute Value")
 
-        assertEquals(1L,  trace.getLongMetric("Get Put Metric Test"))
+        assertEquals("Test Put Attribute Value", trace.getAttribute("Test_Put_Attribute"))
         trace.stop()
     }
 }

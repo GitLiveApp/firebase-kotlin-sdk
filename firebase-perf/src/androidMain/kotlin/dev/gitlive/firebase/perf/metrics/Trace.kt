@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.perf.metrics
 
 import com.google.firebase.perf.metrics.Trace
+import dev.gitlive.firebase.perf.session.PerfSession
 
 actual class Trace internal constructor(private val android: Trace) {
 
@@ -14,13 +15,13 @@ actual class Trace internal constructor(private val android: Trace) {
 
     actual fun putMetric(metricName: String, value: Long) = android.putMetric(metricName, value)
 
-    actual fun getAttributes(): Map<String, String> = android.attributes
+    fun getAttributes(): Map<String, String> = android.attributes
 
-    actual fun getAttribute(attribute: String): String? = android.getAttribute(attribute)
+    fun getAttribute(attribute: String): String? = android.getAttribute(attribute)
 
-    actual fun putAttribute(attribute: String, value: String) = android.putAttribute(attribute, value)
+    fun putAttribute(attribute: String, value: String) = android.putAttribute(attribute, value)
 
-    actual fun removeAttribute(attribute: String) = android.removeAttribute(attribute)
+    fun removeAttribute(attribute: String) = android.removeAttribute(attribute)
 
-    actual fun updateSession(session: dev.gitlive.firebase.perf.session.PerfSession) = android.updateSession(session.android)
+    fun updateSession(session: PerfSession) = android.updateSession(session.android)
 }
