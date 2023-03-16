@@ -525,14 +525,16 @@ external object firebase {
         }
     }
 
-    fun performance(app: App? = definedExternally): performance.Performance
+    fun performance(app: App? = definedExternally): performance
 
     object performance {
-        open class Performance {
-            fun trace(
-                performance: Performance,
-                name: String
+
+        fun trace(
+            name: String
             ): PerformanceTrace
+
+        open class Performance {
+
         }
 
         open class PerformanceTrace {

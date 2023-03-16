@@ -17,10 +17,10 @@ actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = rethrow
     FirebasePerformance(firebase.performance(app.js))
 }
 
-actual class FirebasePerformance internal constructor(val js: firebase.performance.Performance) {
+actual class FirebasePerformance internal constructor(val js: firebase.performance) {
 
     actual fun newTrace(traceName: String): Trace = rethrow {
-        Trace(js.trace(js, traceName))
+        Trace(js.trace(traceName))
     }
 }
 
