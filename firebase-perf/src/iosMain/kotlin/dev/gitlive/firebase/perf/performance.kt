@@ -21,12 +21,6 @@ actual class FirebasePerformance(val ios: FIRPerformance) {
     actual fun setPerformanceCollectionEnabled(enable: Boolean) {
         ios.dataCollectionEnabled = enable
     }
-
-    fun isInstrumentationEnabled(): Boolean = ios.isInstrumentationEnabled()
-
-    fun setInstrumentationEnabled(enable: Boolean) {
-        ios.instrumentationEnabled = enable
-    }
 }
 
 actual open class FirebasePerformanceException(message: String) : FirebaseException(message)
