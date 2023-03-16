@@ -525,19 +525,28 @@ external object firebase {
         }
     }
 
-    fun performance(app: App? = definedExternally): performance.Performance
+    fun performance(app: App? = definedExternally): performance
 
     object performance {
-        interface Performance {
-            fun trace(
-                performance: Performance,
-                name: String
-            ): Trace
+
+        fun trace(
+            name: String
+            ): PerformanceTrace
+
+        open class Performance {
+
         }
 
-        interface Trace {
+        open class PerformanceTrace {
             fun start()
             fun stop()
+
+            fun getAttribute(attr: String): String?
+            fun getMetric(metricName: String): Number
+            fun incrementMetric(metricName: String, num: Number)
+            fun putAttribute(attr: String, value: String)
+            fun putMetric(metricName: String, num: Number)
+            fun removeAttribute(attr: String)
         }
     }
 }
