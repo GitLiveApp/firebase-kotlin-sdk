@@ -4,8 +4,13 @@
 
 package dev.gitlive.firebase.perf
 
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import platform.Foundation.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 actual val emulatorHost: String = "localhost"
 
@@ -21,4 +26,38 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
         yield()
     }
     testRun.await()
+}
+
+class iOSPerformanceTest {
+
+    @BeforeTest
+    fun initializeFirebase() {
+        Firebase
+            .takeIf { Firebase.apps(context).isEmpty() }
+            ?.apply {
+                initialize(
+                    context,
+                    FirebaseOptions(
+                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                        storageBucket = "fir-kotlin-sdk.appspot.com",
+                        projectId = "fir-kotlin-sdk",
+                        gcmSenderId = "846484016111"
+                    )
+                )
+            }
+    }
+
+    @Test
+    fun testInstrumentationEnabled() {
+
+        val performance = Firebase.performance
+
+        assertTrue(performance.isInstrumentationEnabled())
+
+        performance.setInstrumentationEnabled(false)
+
+        assertFalse(performance.isInstrumentationEnabled())
+    }
 }

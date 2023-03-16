@@ -28,6 +28,12 @@ actual class FirebasePerformance internal constructor(val js: firebase.performan
     actual fun setPerformanceCollectionEnabled(enable: Boolean) {
         js.dataCollectionEnabled = enable
     }
+
+    fun isInstrumentationEnabled(): Boolean = js.instrumentationEnabled
+
+    fun setInstrumentationEnabled(enable: Boolean) {
+        js.instrumentationEnabled = enable
+    }
 }
 
 actual open class FirebasePerformanceException(code: String, cause: Throwable) :
