@@ -529,6 +529,9 @@ external object firebase {
 
     object performance {
 
+        var dataCollectionEnabled: Boolean
+        var instrumentationEnabled: Boolean
+
         fun trace(
             name: String
             ): PerformanceTrace

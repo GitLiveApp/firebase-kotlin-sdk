@@ -15,6 +15,12 @@ actual fun Firebase.performance(app: FirebaseApp) =
 actual class FirebasePerformance(val ios: FIRPerformance) {
 
     actual fun newTrace(traceName: String): Trace = Trace(ios.traceWithName(traceName))
+
+    actual fun isPerformanceCollectionEnabled(): Boolean = ios.isDataCollectionEnabled()
+
+    actual fun setPerformanceCollectionEnabled(enable: Boolean) {
+        ios.dataCollectionEnabled = enable
+    }
 }
 
 actual open class FirebasePerformanceException(message: String) : FirebaseException(message)

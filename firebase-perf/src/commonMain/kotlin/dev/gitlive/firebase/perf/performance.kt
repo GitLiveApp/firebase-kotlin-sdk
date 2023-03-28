@@ -14,6 +14,10 @@ expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
 expect class FirebasePerformance {
 
     fun newTrace(traceName: String): Trace
+
+    fun isPerformanceCollectionEnabled(): Boolean
+
+    fun setPerformanceCollectionEnabled(enable: Boolean)
 }
 
 expect open class FirebasePerformanceException : FirebaseException

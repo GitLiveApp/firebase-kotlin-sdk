@@ -4,9 +4,14 @@
 
 package dev.gitlive.firebase.perf
 
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.promise
+import kotlin.test.*
 
 actual val emulatorHost: String = "localhost"
 
@@ -27,5 +32,47 @@ internal fun Throwable.log() {
     cause?.let {
         console.error("Caused by:")
         it.log()
+    }
+}
+
+class JsPerformanceTest {
+
+    private lateinit var performance: FirebasePerformance
+
+    @BeforeTest
+    fun initializeFirebase() {
+        Firebase
+            .takeIf { Firebase.apps(context).isEmpty() }
+            ?.apply {
+                initialize(
+                    context,
+                    FirebaseOptions(
+                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                        storageBucket = "fir-kotlin-sdk.appspot.com",
+                        projectId = "fir-kotlin-sdk",
+                        gcmSenderId = "846484016111"
+                    )
+                )
+            }
+
+        performance = Firebase.performance
+
+
+    }
+
+    @Test
+    fun testInstrumentationEnabled() = runTest {
+
+        val performance = Firebase.performance
+
+        performance.setInstrumentationEnabled(false)
+
+        assertFalse(performance.isInstrumentationEnabled())
+
+        performance.setInstrumentationEnabled(true)
+
+        assertTrue(performance.isInstrumentationEnabled())
     }
 }
