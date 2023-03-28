@@ -73,13 +73,6 @@ kotlin {
                 }
             }
         }
-//        iosSimulatorArm64 {
-//            binaries {
-//                framework {
-//                    baseName = "FirebaseConfig"
-//                }
-//            }
-//        }
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
@@ -87,7 +80,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseRemoteConfig") {
-                version = "8.15.0"
+                version = "10.4.0"
             }
         }
     }
@@ -108,7 +101,7 @@ kotlin {
             languageSettings.apply {
                 apiVersion = "1.7"
                 languageVersion = "1.7"
-                progressiveMode = true
+                progressiveMode = false
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
@@ -128,12 +121,7 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
-//            val iosSimulatorArm64Main by getting
-//            iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-//            val iosSimulatorArm64Test by sourceSets.getting
-//            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting

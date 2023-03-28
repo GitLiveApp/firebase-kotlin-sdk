@@ -2,9 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-database.version") as String
 
 plugins {
@@ -61,13 +58,6 @@ kotlin {
                 }
             }
         }
-//        iosSimulatorArm64 {
-//            binaries {
-//                framework {
-//                    baseName = "FirebaseDatabase"
-//                }
-//            }
-//        }
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
@@ -75,7 +65,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseDatabase") {
-                version = "8.15.0"
+                version = "10.4.0"
             }
         }
     }
@@ -103,10 +93,10 @@ kotlin {
             languageSettings.apply {
                 apiVersion = "1.7"
                 languageVersion = "1.7"
-                progressiveMode = true
-//                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-//                optIn("kotlinx.coroutines.FlowPreview")
-//                optIn("kotlinx.serialization.InternalSerializationApi")
+                progressiveMode = false
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.coroutines.FlowPreview")
+                optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 
@@ -125,12 +115,7 @@ kotlin {
 
         if (supportIosTarget) {
             val iosMain by getting
-//            val iosSimulatorArm64Main by getting
-//            iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-//            val iosSimulatorArm64Test by sourceSets.getting
-//            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         val jsMain by getting {

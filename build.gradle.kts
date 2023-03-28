@@ -167,36 +167,6 @@ subprojects {
                 )
             }
         }
-
-//        val carthageTasks = if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
-//            listOf("bootstrap", "update").map {
-//                task<Exec>("carthage${it.capitalize()}") {
-//                    group = "carthage"
-//                    executable = "carthage"
-//                    args(
-//                        it,
-//                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-//                        "--platform", "iOS"
-//                    )
-//                }
-//            }
-//        } else emptyList()
-//
-//        if (Os.isFamily(Os.FAMILY_MAC)) {
-//            withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-//                if (carthageTasks.isNotEmpty()) {
-//                    dependsOn("carthageBootstrap")
-//                }
-//            }
-//        }
-//
-//        create("carthageClean", Delete::class.java) {
-//            group = "carthage"
-//            delete(
-//                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
-//                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
-//            )
-//        }
     }
 
     afterEvaluate  {
@@ -204,10 +174,6 @@ subprojects {
         if(!File("$buildDir/node_module").exists()) {
             mkdir("$buildDir/node_module")
         }
-
-//        tasks.named<Delete>("clean") {
-//            dependsOn("carthageClean")
-//        }
 
         dependencies {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
