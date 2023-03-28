@@ -26,6 +26,6 @@
     "@gitlive/firebase-app": "1.7.3",
     "firebase": "9.7.0",
     "kotlin": "1.8.0",
-    "kotlinx-coroutines-core": "1.6.1-native-mt"
+    "kotlinx-coroutines-core": "1.6.4"
   }
 }
