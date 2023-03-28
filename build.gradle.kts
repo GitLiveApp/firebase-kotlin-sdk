@@ -25,7 +25,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.2.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20-RC")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
