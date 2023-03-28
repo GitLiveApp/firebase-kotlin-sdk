@@ -4,7 +4,7 @@ include(
     "firebase-common",
     "firebase-config",
     "firebase-database",
-//    "firebase-firestore",
+    "firebase-firestore",
     "firebase-functions",
     "firebase-installations",
     "firebase-perf",
