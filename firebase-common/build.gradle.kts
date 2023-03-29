@@ -119,6 +119,12 @@ if (project.property("firebase-common.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-common.skipJsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 signing {
     val signingKey: String? by project
     val signingPassword: String? by project
