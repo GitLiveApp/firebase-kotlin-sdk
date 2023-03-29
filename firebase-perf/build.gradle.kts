@@ -10,18 +10,8 @@ version = project.property("firebase-perf.version") as String
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    //id("com.quittle.android-emulator") version "0.2.0"
+    kotlin("native.cocoapods")
 }
-
-//buildscript {
-//    repositories {
-//        google()
-//        gradlePluginPortal()
-//    }
-//    dependencies {
-//        classpath("com.android.tools.build:gradle:3.6.1")
-//    }
-//}
 
 android {
     compileSdk = property("targetSdkVersion") as Int
@@ -55,25 +45,7 @@ android {
     }
 }
 
-// Optional configuration
-//androidEmulator {
-//    emulator {
-//        name("givlive_emulator")
-//        sdkVersion(28)
-//        abi("x86_64")
-//        includeGoogleApis(true) // Defaults to false
-//
-//    }
-//    headless(false)
-//    logEmulatorOutput(false)
-//}
-
-val KonanTarget.archVariant: String
-    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
-    } else {
-        "ios-arm64_armv7"
-    }
+val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
@@ -81,53 +53,19 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
-
-        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-            val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            ).plus(
-                listOf(
-                    "FirebasePerformance",
-                    "FirebaseRemoteConfig",
-                    "FirebaseABTesting"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            )
-            binaries {
-                getTest("DEBUG").apply {
-                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    linkerOpts("-ObjC")
-                }
+        ios()
+        iosSimulatorArm64()
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                baseName = "FirebasePerformance"
             }
-
-            compilations.getByName("main") {
-                cinterops.create("FirebasePerformance") {
-                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
-                }
+            noPodspec()
+            pod("FirebasePerformance") {
+                version = "10.4.0"
             }
         }
-
-        ios(configure = nativeTargetConfig())
-        iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
     js {
