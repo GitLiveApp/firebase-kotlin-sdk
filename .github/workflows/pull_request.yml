@@ -17,6 +17,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Cocoapods cache
+        uses: actions/cache@v3
+        id: cocoapods-cache
+        with:
+          path: |
+            ~/.cocoapods
+            ~/Library/Caches/CocoaPods
+            */build/cocoapods
+            */build/classes
+          key: cocoapods-cache
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
       - name: Set up JDK
