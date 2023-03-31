@@ -27,13 +27,14 @@ jobs:
             */build/cocoapods
             */build/classes
           key: cocoapods-cache
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '11'
+          cache: gradle
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Install Firebase tools
