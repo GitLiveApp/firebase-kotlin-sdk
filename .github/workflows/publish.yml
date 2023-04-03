@@ -25,8 +25,6 @@ jobs:
           arguments: :updateVersions
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Install Carthage
-        run: brew install carthage
       - name: Publish Firebase App
         uses: eskatos/gradle-command-action@v1
         with:

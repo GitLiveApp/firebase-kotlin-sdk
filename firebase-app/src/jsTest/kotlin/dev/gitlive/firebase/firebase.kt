@@ -4,25 +4,10 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.promise
+import kotlinx.coroutines.test.runTest
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = GlobalScope
-    .promise {
-        try {
-            test()
-        } catch (e: dynamic) {
-            (e as? Throwable)?.log()
-            throw e
-        }
-    }.asDynamic()
-
-internal fun Throwable.log() {
-    console.error(this)
-    cause?.let {
-        console.error("Caused by:")
-        it.log()
-    }
+actual fun runTest(test: suspend () -> Unit) {
+    runTest { test() }
 }

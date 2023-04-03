@@ -10,18 +10,18 @@ The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar 
 
 The following libraries are available for the various Firebase products.
 
-| Service or Product	                                                             | Gradle Dependency                                                                                                            | API Coverage                                                                                                                                                             |
-|---------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.7.3/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.7.3/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.7.3/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.7.3/pom)         | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
-| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.7.3/pom)         | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
-| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.7.3/pom)             | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
-| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.7.3/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.7.3/pom)               | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)                                                                                                     |
-| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.7.3/pom)                   | ![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)                                                                                                     |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.7.3`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.7.3/pom)     | ![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)                                                                                                      |
+| Service or Product	                                                             | Gradle Dependency                                                                                                                         | API Coverage                                                                                                                                                             |
+|---------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.8.0/pom)                                | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.8.0/pom)                        | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.8.0/pom)                      | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.8.0/pom)                      | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.8.0/pom)                      | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
+| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.8.0/pom)                          | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.8.0/pom)              | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.8.0/pom)                            | ![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)                                                                                                     |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.8.0/pom)                                | ![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)                                                                                                       |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.8.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.8.0/pom)                  | ![80%](https://img.shields.io/badge/-1%25-orange?style=flat-square)                                                                                                      |
 
 
 
@@ -69,8 +69,8 @@ The Firebase Kotlin SDK uses Kotlin serialization to read and write custom class
 
 ```groovy
 plugins {
-    kotlin("multiplatform") version "1.6.10" // or kotlin("jvm") or any other kotlin plugin
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.8.20" // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.8.20"
 }
 ```
 
@@ -203,16 +203,16 @@ If you are building a Kotlin multiplatform library which will be consumed from J
 
 ```json
 "dependencies": {
-  "@gitlive/firebase-auth": "1.7.3",
-  "@gitlive/firebase-config": "1.7.3",
-  "@gitlive/firebase-database": "1.7.3",
-  "@gitlive/firebase-firestore": "1.7.3",
-  "@gitlive/firebase-functions": "1.7.3",
-  "@gitlive/firebase-installations": "1.7.3",
-  "@gitlive/firebase-messaging": "1.7.3",
-  "@gitlive/firebase-storage": "1.7.3"
-  "@gitlive/firebase-perf": "1.7.3"
-  "@gitlive/firebase-crashlytics": "1.7.3"
+  "@gitlive/firebase-auth": "1.8.0",
+  "@gitlive/firebase-config": "1.8.0",
+  "@gitlive/firebase-database": "1.8.0",
+  "@gitlive/firebase-firestore": "1.8.0",
+  "@gitlive/firebase-functions": "1.8.0",
+  "@gitlive/firebase-installations": "1.8.0",
+  "@gitlive/firebase-messaging": "1.8.0",
+  "@gitlive/firebase-storage": "1.8.0"
+  "@gitlive/firebase-perf": "1.8.0"
+  "@gitlive/firebase-crashlytics": "1.8.0"
 }
 ```
 

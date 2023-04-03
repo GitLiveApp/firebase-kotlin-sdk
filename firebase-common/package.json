@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-common",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-common.js",
   "scripts": {
@@ -24,8 +24,8 @@
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk",
   "dependencies": {
     "firebase": "9.7.0",
-    "kotlin": "1.6.10",
-    "kotlinx-coroutines-core": "1.6.1-native-mt",
+    "kotlin": "1.8.20",
+    "kotlinx-coroutines-core": "1.6.4",
     "kotlinx-serialization-kotlinx-serialization-runtime": "1.3.2"
   }
 }
