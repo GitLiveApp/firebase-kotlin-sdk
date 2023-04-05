@@ -2,8 +2,14 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 plugins {
-    kotlin("multiplatform") version "1.6.10" apply false
+    kotlin("multiplatform") version "1.8.20" apply false
+    kotlin("native.cocoapods") version "1.8.20" apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -18,7 +24,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.2.0")
+        classpath("com.android.tools.build:gradle:7.2.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20-RC")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
@@ -36,7 +43,8 @@ tasks {
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion"
+            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
+            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion"
         )
     }
 }
@@ -55,16 +63,6 @@ subprojects {
 
     tasks.withType<Sign>().configureEach {
         onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
-    }
-
-    tasks.whenTaskAdded {
-        enabled = when(name) {
-            "compileDebugUnitTestKotlinAndroid" -> false
-            "compileReleaseUnitTestKotlinAndroid" -> false
-            "testDebugUnitTest" -> false
-            "testReleaseUnitTest" -> false
-            else -> enabled
-        }
     }
 
     tasks {
@@ -156,36 +154,6 @@ subprojects {
                 )
             }
         }
-
-        val carthageTasks = if (projectDir.resolve("src/nativeInterop/cinterop/Cartfile").exists()) { // skipping firebase-common module
-            listOf("bootstrap", "update").map {
-                task<Exec>("carthage${it.capitalize()}") {
-                    group = "carthage"
-                    executable = "carthage"
-                    args(
-                        it,
-                        "--project-directory", projectDir.resolve("src/nativeInterop/cinterop"),
-                        "--platform", "iOS"
-                    )
-                }
-            }
-        } else emptyList()
-
-        if (Os.isFamily(Os.FAMILY_MAC)) {
-            withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-                if (carthageTasks.isNotEmpty()) {
-                    dependsOn("carthageBootstrap")
-                }
-            }
-        }
-
-        create("carthageClean", Delete::class.java) {
-            group = "carthage"
-            delete(
-                projectDir.resolve("src/nativeInterop/cinterop/Carthage"),
-                projectDir.resolve("src/nativeInterop/cinterop/Cartfile.resolved")
-            )
-        }
     }
 
     afterEvaluate  {
@@ -194,18 +162,17 @@ subprojects {
             mkdir("$buildDir/node_module")
         }
 
-        tasks.named<Delete>("clean") {
-            dependsOn("carthageClean")
-        }
-
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1-native-mt")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:29.3.0"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:31.4.0"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
-            "jsTestImplementation"(kotlin("test-js"))
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+            if (this@afterEvaluate.name != "firebase-crashlytics") {
+                "jsTestImplementation"(kotlin("test-js"))
+            }
             "androidAndroidTestImplementation"(kotlin("test-junit"))
             "androidAndroidTestImplementation"("junit:junit:4.13.2")
             "androidAndroidTestImplementation"("androidx.test:core:1.4.0")

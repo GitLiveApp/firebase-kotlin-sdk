@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 import kotlin.collections.component1
@@ -39,11 +40,11 @@ actual val Firebase.database
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
+actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = TODO("Come back to issue")
+//    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
 
-actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = TODO("Come back to issue")
+//    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
@@ -157,6 +158,27 @@ actual class DatabaseReference internal constructor(
 
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
+    }
+
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        ios.runTransactionBlock(
+            block = { firMutableData ->
+                firMutableData?.value = firMutableData?.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                FIRTransactionResult.successWithValue(firMutableData!!)
+            },
+            andCompletionBlock = { error, _, snapshot ->
+                if (error != null) {
+                    deferred.completeExceptionally(DatabaseException(error.toString(), null))
+                } else {
+                    deferred.complete(DataSnapshot(snapshot!!))
+                }
+            },
+            withLocalEvents = false
+        )
+        return deferred.await()
     }
 }
 

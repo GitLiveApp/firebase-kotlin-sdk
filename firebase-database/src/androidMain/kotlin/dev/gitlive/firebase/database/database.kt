@@ -5,10 +5,8 @@
 package dev.gitlive.firebase.database
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.Logger
+import com.google.firebase.database.*
 import com.google.firebase.database.ServerValue
-import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
@@ -22,7 +20,9 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 
 @PublishedApi
@@ -189,8 +189,34 @@ actual class DatabaseReference internal constructor(
     actual suspend fun removeValue() = android.removeValue()
         .run { if(persistenceEnabled) await() else awaitWhileOnline() }
         .run { Unit }
-}
 
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        android.runTransaction(object : Transaction.Handler {
+
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.value = currentData.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                snapshot: com.google.firebase.database.DataSnapshot?
+            ) {
+                if (error != null) {
+                    deferred.completeExceptionally(error.toException())
+                } else {
+                    deferred.complete(DataSnapshot(snapshot!!))
+                }
+            }
+
+        })
+        return deferred.await()
+    }
+}
 @Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
 
