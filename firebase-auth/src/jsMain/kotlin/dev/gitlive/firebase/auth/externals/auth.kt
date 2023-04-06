@@ -77,6 +77,12 @@ external fun signInWithEmailAndPassword(
 
 external fun signInWithEmailLink(auth: Auth, email: String, link: String): Promise<AuthResult>
 
+external fun signInWithPopup(auth: Auth, provider: AuthProvider): Promise<UserCredential>
+
+external fun signInWithRedirect(auth: Auth, provider: AuthProvider): Promise<Nothing>
+
+external fun getRedirectResult(auth: Auth): Promise<UserCredential?>
+
 external fun signOut(auth: Auth): Promise<Unit>
 
 external fun unlink(user: User, providerId: String): Promise<User>
@@ -169,6 +175,18 @@ external interface AuthCredential {
     val signInMethod: String
 }
 
+external interface OAuthCredential : AuthCredential {
+    val accessToken: String?
+    val idToken: String?
+    val secret: String?
+}
+
+external interface UserCredential {
+    val operationType: String
+    val providerId: String?
+    val user: User
+}
+
 external interface ProfileUpdateRequest {
     val displayName: String?
     val photoURL: String?
@@ -206,6 +224,8 @@ external interface MultiFactorResolver {
 
 external interface AuthProvider
 
+external interface AuthError
+
 external object EmailAuthProvider : AuthProvider {
     fun credential(email: String, password: String): AuthCredential
     fun credentialWithLink(email: String, emailLink: String): AuthCredential
@@ -219,8 +239,13 @@ external object GithubAuthProvider : AuthProvider {
     fun credential(token: String): AuthCredential
 }
 
-external object GoogleAuthProvider : AuthProvider {
-    fun credential(idToken: String?, accessToken: String?): AuthCredential
+external class GoogleAuthProvider : AuthProvider {
+    fun addScope(scope: String)
+    companion object {
+        fun credential(idToken: String?, accessToken: String?): AuthCredential
+        fun credentialFromResult(userCredential: UserCredential): OAuthCredential?
+        fun credentialFromError(error: AuthError): OAuthCredential?
+    }
 }
 
 external class OAuthProvider(providerId: String) : AuthProvider {
