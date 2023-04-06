@@ -1,9 +1,9 @@
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.externals.auth.*
+import dev.gitlive.firebase.auth.externals.*
 import kotlinx.coroutines.await
 import kotlin.js.Date
-import dev.gitlive.firebase.externals.auth.UserInfo as JsUserInfo
+import dev.gitlive.firebase.auth.externals.UserInfo as JsUserInfo
 
 actual class FirebaseUser internal constructor(val js: User) {
     actual val uid: String

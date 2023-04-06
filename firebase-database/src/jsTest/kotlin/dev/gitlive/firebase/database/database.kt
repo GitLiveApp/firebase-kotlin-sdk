@@ -1,9 +1,9 @@
 package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.externals.database.getDatabase
-import dev.gitlive.firebase.externals.database.goOffline
-import dev.gitlive.firebase.externals.database.goOnline
+import dev.gitlive.firebase.database.externals.getDatabase
+import dev.gitlive.firebase.database.externals.goOffline
+import dev.gitlive.firebase.database.externals.goOnline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext

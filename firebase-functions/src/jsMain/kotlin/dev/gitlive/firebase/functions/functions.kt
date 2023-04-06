@@ -5,13 +5,13 @@
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.*
-import dev.gitlive.firebase.externals.functions.*
+import dev.gitlive.firebase.functions.externals.*
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import org.w3c.dom.url.URL
 import kotlin.js.json
-import dev.gitlive.firebase.externals.functions.HttpsCallableResult as JsHttpsCallableResult
+import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 
 actual val Firebase.functions: FirebaseFunctions
     get() = rethrow { FirebaseFunctions(getFunctions()) }

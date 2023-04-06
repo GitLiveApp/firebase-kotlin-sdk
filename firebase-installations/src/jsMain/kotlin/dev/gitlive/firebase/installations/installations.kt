@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.installations
 
 import dev.gitlive.firebase.*
-import dev.gitlive.firebase.externals.installations.*
+import dev.gitlive.firebase.installations.externals.*
 import kotlinx.coroutines.await
 
 actual val Firebase.installations

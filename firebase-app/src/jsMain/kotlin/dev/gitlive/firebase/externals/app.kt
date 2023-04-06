@@ -1,7 +1,7 @@
 @file:JsModule("firebase/app")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals.app
+package dev.gitlive.firebase.externals
 
 import kotlin.js.Promise
 

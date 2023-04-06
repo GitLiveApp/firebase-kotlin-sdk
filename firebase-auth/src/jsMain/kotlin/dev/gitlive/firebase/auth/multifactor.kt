@@ -1,12 +1,12 @@
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.externals.auth.MultiFactorUser
+import dev.gitlive.firebase.auth.externals.MultiFactorUser
 import kotlinx.coroutines.await
 import kotlin.js.Date
-import dev.gitlive.firebase.externals.auth.MultiFactorAssertion as JsMultiFactorAssertion
-import dev.gitlive.firebase.externals.auth.MultiFactorInfo as JsMultiFactorInfo
-import dev.gitlive.firebase.externals.auth.MultiFactorResolver as JsMultiFactorResolver
-import dev.gitlive.firebase.externals.auth.MultiFactorSession as JsMultiFactorSession
+import dev.gitlive.firebase.auth.externals.MultiFactorAssertion as JsMultiFactorAssertion
+import dev.gitlive.firebase.auth.externals.MultiFactorInfo as JsMultiFactorInfo
+import dev.gitlive.firebase.auth.externals.MultiFactorResolver as JsMultiFactorResolver
+import dev.gitlive.firebase.auth.externals.MultiFactorSession as JsMultiFactorSession
 
 actual class MultiFactor(val js: MultiFactorUser) {
     actual val enrolledFactors: List<MultiFactorInfo>

@@ -6,7 +6,7 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.externals.database.*
+import dev.gitlive.firebase.database.externals.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,18 +18,18 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Promise
 import kotlin.js.json
-import dev.gitlive.firebase.externals.database.DataSnapshot as JsDataSnapshot
-import dev.gitlive.firebase.externals.database.DatabaseReference as JsDatabaseReference
-import dev.gitlive.firebase.externals.database.OnDisconnect as JsOnDisconnect
-import dev.gitlive.firebase.externals.database.Query as JsQuery
-import dev.gitlive.firebase.externals.database.endAt as jsEndAt
-import dev.gitlive.firebase.externals.database.equalTo as jsEqualTo
-import dev.gitlive.firebase.externals.database.limitToFirst as jsLimitToFirst
-import dev.gitlive.firebase.externals.database.limitToLast as jsLimitToLast
-import dev.gitlive.firebase.externals.database.orderByChild as jsOrderByChild
-import dev.gitlive.firebase.externals.database.orderByKey as jsOrderByKey
-import dev.gitlive.firebase.externals.database.orderByValue as jsOrderByValue
-import dev.gitlive.firebase.externals.database.startAt as jsStartAt
+import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
+import dev.gitlive.firebase.database.externals.DatabaseReference as JsDatabaseReference
+import dev.gitlive.firebase.database.externals.OnDisconnect as JsOnDisconnect
+import dev.gitlive.firebase.database.externals.Query as JsQuery
+import dev.gitlive.firebase.database.externals.endAt as jsEndAt
+import dev.gitlive.firebase.database.externals.equalTo as jsEqualTo
+import dev.gitlive.firebase.database.externals.limitToFirst as jsLimitToFirst
+import dev.gitlive.firebase.database.externals.limitToLast as jsLimitToLast
+import dev.gitlive.firebase.database.externals.orderByChild as jsOrderByChild
+import dev.gitlive.firebase.database.externals.orderByKey as jsOrderByKey
+import dev.gitlive.firebase.database.externals.orderByValue as jsOrderByValue
+import dev.gitlive.firebase.database.externals.startAt as jsStartAt
 
 @PublishedApi
 internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
@@ -153,7 +153,7 @@ actual class DatabaseReference internal constructor(override val js: JsDatabaseR
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot =
         rethrow {
-            val result = dev.gitlive.firebase.externals.database.runTransaction(
+            val result = runTransaction(
                 js,
                 transactionUpdate,
             ).awaitWhileOnline()

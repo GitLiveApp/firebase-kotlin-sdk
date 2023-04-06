@@ -1,9 +1,9 @@
 @file:JsModule("firebase/installations")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals.installations
+package dev.gitlive.firebase.installations.externals
 
-import dev.gitlive.firebase.externals.app.FirebaseApp
+import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 
 external fun delete(installations: Installations): Promise<Unit>

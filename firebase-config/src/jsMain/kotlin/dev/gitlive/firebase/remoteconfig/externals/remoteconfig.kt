@@ -1,9 +1,9 @@
 @file:JsModule("firebase/remote-config")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals.remoteconfig
+package dev.gitlive.firebase.remoteconfig.externals
 
-import dev.gitlive.firebase.externals.app.FirebaseApp
+import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 import kotlin.js.Promise
 

@@ -1,11 +1,10 @@
 @file:JsModule("firebase/firestore")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals.firestore
+package dev.gitlive.firebase.firestore.externals
 
 import dev.gitlive.firebase.Unsubscribe
-import dev.gitlive.firebase.externals.app.FirebaseApp
-import dev.gitlive.firebase.externals.database.QueryConstraint
+import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 import kotlin.js.Promise
 

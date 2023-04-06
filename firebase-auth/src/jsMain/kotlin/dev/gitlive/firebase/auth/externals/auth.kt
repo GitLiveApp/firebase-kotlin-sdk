@@ -1,10 +1,10 @@
 @file:JsModule("firebase/auth")
 @file:JsNonModule
 
-package dev.gitlive.firebase.externals.auth
+package dev.gitlive.firebase.auth.externals
 
 import dev.gitlive.firebase.Unsubscribe
-import dev.gitlive.firebase.externals.app.FirebaseApp
+import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 import kotlin.js.Promise
 

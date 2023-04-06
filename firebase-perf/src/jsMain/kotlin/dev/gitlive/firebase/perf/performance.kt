@@ -3,7 +3,10 @@ package dev.gitlive.firebase.perf
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.perf.externals.getPerformance
+import dev.gitlive.firebase.perf.externals.trace
 import dev.gitlive.firebase.perf.metrics.Trace
+import dev.gitlive.firebase.perf.externals.FirebasePerformance as JsFirebasePerformance
 
 actual val Firebase.performance: FirebasePerformance
     get() = rethrow {

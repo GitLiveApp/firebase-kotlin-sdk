@@ -5,7 +5,8 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
-import dev.gitlive.firebase.externals.firestore.*
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.firestore.externals.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
@@ -14,26 +15,26 @@ import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
-import dev.gitlive.firebase.externals.firestore.CollectionReference as JsCollectionReference
-import dev.gitlive.firebase.externals.firestore.DocumentChange as JsDocumentChange
-import dev.gitlive.firebase.externals.firestore.DocumentReference as JsDocumentReference
-import dev.gitlive.firebase.externals.firestore.DocumentSnapshot as JsDocumentSnapshot
-import dev.gitlive.firebase.externals.firestore.FieldPath as JsFieldPath
-import dev.gitlive.firebase.externals.firestore.Query as JsQuery
-import dev.gitlive.firebase.externals.firestore.QuerySnapshot as JsQuerySnapshot
-import dev.gitlive.firebase.externals.firestore.SnapshotMetadata as JsSnapshotMetadata
-import dev.gitlive.firebase.externals.firestore.Transaction as JsTransaction
-import dev.gitlive.firebase.externals.firestore.WriteBatch as JsWriteBatch
-import dev.gitlive.firebase.externals.firestore.arrayRemove as jsArrayRemove
-import dev.gitlive.firebase.externals.firestore.arrayUnion as jsArrayUnion
-import dev.gitlive.firebase.externals.firestore.endAt as jsEndAt
-import dev.gitlive.firebase.externals.firestore.endBefore as jsEndBefore
-import dev.gitlive.firebase.externals.firestore.increment as jsIncrement
-import dev.gitlive.firebase.externals.firestore.updateDoc as jsUpdate
-import dev.gitlive.firebase.externals.firestore.limit as jsLimit
-import dev.gitlive.firebase.externals.firestore.startAfter as jsStartAfter
-import dev.gitlive.firebase.externals.firestore.startAt as jsStartAt
-import dev.gitlive.firebase.externals.firestore.where as jsWhere
+import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
+import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
+import dev.gitlive.firebase.firestore.externals.DocumentReference as JsDocumentReference
+import dev.gitlive.firebase.firestore.externals.DocumentSnapshot as JsDocumentSnapshot
+import dev.gitlive.firebase.firestore.externals.FieldPath as JsFieldPath
+import dev.gitlive.firebase.firestore.externals.Query as JsQuery
+import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
+import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
+import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
+import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
+import dev.gitlive.firebase.firestore.externals.arrayRemove as jsArrayRemove
+import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
+import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
+import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
+import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
+import dev.gitlive.firebase.firestore.externals.limit as jsLimit
+import dev.gitlive.firebase.firestore.externals.startAfter as jsStartAfter
+import dev.gitlive.firebase.firestore.externals.startAt as jsStartAt
+import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
+import dev.gitlive.firebase.firestore.externals.where as jsWhere
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?): T =
