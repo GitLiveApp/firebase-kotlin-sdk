@@ -264,4 +264,3 @@ actual class OnDisconnect internal constructor(
 }
 
 actual typealias DatabaseException = com.google.firebase.database.DatabaseException
-

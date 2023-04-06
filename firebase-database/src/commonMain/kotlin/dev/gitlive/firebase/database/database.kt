@@ -99,4 +99,3 @@ expect class OnDisconnect {
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
 }
-

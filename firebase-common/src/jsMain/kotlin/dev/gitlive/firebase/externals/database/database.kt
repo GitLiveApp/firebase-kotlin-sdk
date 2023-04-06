@@ -99,6 +99,12 @@ external fun startAt(value: Any?, key: String? = definedExternally): QueryConstr
 
 external fun update(ref: DatabaseReference, values: Any): Promise<Unit>
 
+external fun <T> runTransaction(
+    ref: DatabaseReference,
+    transactionUpdate: (currentData: T) -> T,
+    options: Any? = definedExternally
+): Promise<TransactionResult>
+
 external interface Database {
     val app: FirebaseApp
 }
@@ -131,4 +137,9 @@ external interface OnDisconnect {
     fun remove(): Promise<Unit>
     fun set(value: Any?): Promise<Unit>
     fun update(value: Any): Promise<Unit>
+}
+
+external interface TransactionResult {
+    val committed: Boolean
+    val snapshot: DataSnapshot
 }

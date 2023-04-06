@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase
 
+import dev.gitlive.firebase.externals.app.deleteApp
 import dev.gitlive.firebase.externals.app.getApp
 import dev.gitlive.firebase.externals.app.getApps
 import dev.gitlive.firebase.externals.app.initializeApp
@@ -33,7 +34,9 @@ actual class FirebaseApp internal constructor(val js: JsFirebaseApp) {
             FirebaseOptions(appId, apiKey, databaseURL, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
 
-    actual fun delete() = js.delete()
+    actual fun delete() {
+        deleteApp(js)
+    }
 }
 
 actual fun Firebase.apps(context: Any?) = getApps().map { FirebaseApp(it) }

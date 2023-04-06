@@ -3,11 +3,15 @@
 
 package dev.gitlive.firebase.externals.app
 
+import kotlin.js.Promise
+
 external fun initializeApp(options: Any, name: String = definedExternally): FirebaseApp
 
 external fun getApp(name: String = definedExternally): FirebaseApp
 
 external fun getApps(): Array<FirebaseApp>
+
+external fun deleteApp(app: FirebaseApp): Promise<Unit>
 
 external interface FirebaseApp {
     val automaticDataCollectionEnabled: Boolean

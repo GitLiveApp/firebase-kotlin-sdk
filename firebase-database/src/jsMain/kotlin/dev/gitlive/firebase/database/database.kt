@@ -151,21 +151,15 @@ actual class DatabaseReference internal constructor(override val js: JsDatabaseR
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
         rethrow { set(js, encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        val deferred = CompletableDeferred<DataSnapshot>()
-        js.transaction(
-            transactionUpdate,
-            { error, _, snapshot ->
-                if (error != null) {
-                    deferred.completeExceptionally(error)
-                } else {
-                    deferred.complete(DataSnapshot(snapshot!!))
-                }
-            },
-            applyLocally = false
-        )
-        return deferred.await()
-    }
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot =
+        rethrow {
+            val result = dev.gitlive.firebase.externals.database.runTransaction(
+                js,
+                transactionUpdate,
+            ).awaitWhileOnline()
+
+            DataSnapshot(result.snapshot)
+        }
 }
 
 actual class DataSnapshot internal constructor(val js: JsDataSnapshot) {

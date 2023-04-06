@@ -2,20 +2,18 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestResult
 import kotlinx.serialization.*
 import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit)
+expect fun runTest(test: suspend () -> Unit): TestResult
 
 class FirebaseDatabaseTest {
 
     @Serializable
     data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
-
-    @Serializable
-    data class DatabaseTest(val title: String, val likes: Int = 0)
 
     @BeforeTest
     fun initializeFirebase() {

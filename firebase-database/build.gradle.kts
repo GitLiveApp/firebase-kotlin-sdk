@@ -21,6 +21,7 @@ android {
     defaultConfig {
         minSdk = property("minSdkVersion") as Int
         targetSdk = property("targetSdkVersion") as Int
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
@@ -143,4 +144,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
-
