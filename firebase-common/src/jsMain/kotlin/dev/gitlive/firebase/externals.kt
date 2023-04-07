@@ -15,6 +15,7 @@ external object firebase {
     open class App {
         val name: String
         val options: Options
+        fun delete()
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
@@ -320,6 +321,11 @@ external object firebase {
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
             fun push(): ThenableReference
+            fun <T> transaction(
+                transactionUpdate: (currentData: T) -> T,
+                onComplete: (error: Error?, committed: Boolean, snapshot: DataSnapshot?) -> Unit,
+                applyLocally: Boolean?
+            ): Promise<T>
         }
 
         open class DataSnapshot {
@@ -525,6 +531,34 @@ external object firebase {
             fun delete(): Promise<Unit>
             fun getId(): Promise<String>
             fun getToken(forceRefresh: Boolean): Promise<String>
+        }
+    }
+
+    fun performance(app: App? = definedExternally): performance
+
+    object performance {
+
+        var dataCollectionEnabled: Boolean
+        var instrumentationEnabled: Boolean
+
+        fun trace(
+            name: String
+            ): PerformanceTrace
+
+        open class Performance {
+
+        }
+
+        open class PerformanceTrace {
+            fun start()
+            fun stop()
+
+            fun getAttribute(attr: String): String?
+            fun getMetric(metricName: String): Number
+            fun incrementMetric(metricName: String, num: Number)
+            fun putAttribute(attr: String, value: String)
+            fun putMetric(metricName: String, num: Number)
+            fun removeAttribute(attr: String)
         }
     }
 }

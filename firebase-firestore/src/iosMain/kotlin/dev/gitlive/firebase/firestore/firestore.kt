@@ -21,9 +21,10 @@ import platform.Foundation.NSNull
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
-}
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = TODO("Come back to issue")
+//actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
+//    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
+//}
 
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {

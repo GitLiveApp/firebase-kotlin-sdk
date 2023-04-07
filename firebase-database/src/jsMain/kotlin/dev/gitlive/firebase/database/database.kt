@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Promise
 
@@ -120,6 +121,23 @@ actual class DatabaseReference internal constructor(override val js: firebase.da
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
         rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline() }
+
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        js.transaction(
+            transactionUpdate,
+            { error, _, snapshot ->
+                if (error != null) {
+                    deferred.completeExceptionally(error)
+                } else {
+                    deferred.complete(DataSnapshot(snapshot!!))
+                }
+            },
+            applyLocally = false
+        )
+        return deferred.await()
+    }
+
 }
 
 actual class DataSnapshot internal constructor(val js: firebase.database.DataSnapshot) {
@@ -178,7 +196,9 @@ suspend fun <T> Promise<T>.awaitWhileOnline(): T = coroutineScope {
     val notConnected = Firebase.database
         .reference(".info/connected")
         .valueEvents
-        .filter { !it.value<Boolean>() }
+        .filter {
+            !it.value<Boolean>()
+        }
         .produceIn(this)
 
     select<T> {

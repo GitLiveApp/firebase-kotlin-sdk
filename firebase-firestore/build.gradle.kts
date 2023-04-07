@@ -2,15 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-firestore.version") as String
 
 plugins {
     id("com.android.library")
+    kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("plugin.serialization") version "1.8.20"
 }
 
 android {
@@ -46,12 +44,7 @@ android {
     }
 }
 
-val KonanTarget.archVariant: String
-    get() = if (this is KonanTarget.IOS_X64 || this is KonanTarget.IOS_SIMULATOR_ARM64) {
-        "ios-arm64_i386_x86_64-simulator"
-    } else {
-        "ios-arm64_armv7"
-    }
+val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
@@ -59,71 +52,34 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
     if (supportIosTarget) {
-        fun nativeTargetConfig(): KotlinNativeTarget.() -> Unit = {
-            val nativeFrameworkPaths = listOf(
-                rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/iOS")
-            ).plus(
-                listOf(
-                    "FirebaseAnalytics",
-                    "FirebaseCore",
-                    "FirebaseCoreDiagnostics",
-                    "FirebaseInstallations",
-                    "GoogleAppMeasurement",
-                    "GoogleAppMeasurementIdentitySupport",
-                    "GoogleDataTransport",
-                    "GoogleUtilities",
-                    "nanopb",
-                    "PromisesObjC"
-                ).map {
-                    rootProject.project("firebase-app").projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            ).plus(
-                listOf(
-                    "abseil",
-                    "BoringSSL-GRPC",
-                    "FirebaseFirestore",
-                    "gRPC-C++",
-                    "gRPC-Core",
-                    "leveldb-library"
-                ).map {
-                    projectDir.resolve("src/nativeInterop/cinterop/Carthage/Build/$it.xcframework/${konanTarget.archVariant}")
-                }
-            )
-
-            binaries {
-                getTest("DEBUG").apply {
-                    linkerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    linkerOpts("-ObjC")
-                }
+        ios()
+        iosSimulatorArm64()
+        cocoapods {
+            ios.deploymentTarget = "11.0"
+            framework {
+                baseName = "FirebaseFirestore"
             }
-
-            compilations.getByName("main") {
-                cinterops.create("FirebaseFirestore") {
-                    compilerOpts(nativeFrameworkPaths.map { "-F$it" })
-                    extraOpts = listOf("-compiler-option", "-DNS_FORMAT_ARGUMENT(A)=", "-verbose")
-                }
+            noPodspec()
+            pod("FirebaseFirestore") {
+                version = "10.7.0"
             }
         }
-
-        ios(configure = nativeTargetConfig())
-        iosSimulatorArm64(configure = nativeTargetConfig())
     }
 
     js {
         useCommonJs()
         nodejs {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
         browser {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
@@ -132,8 +88,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                apiVersion = "1.8"
+                languageVersion = "1.8"
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
@@ -157,9 +113,8 @@ kotlin {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
+            val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
@@ -170,6 +125,12 @@ kotlin {
 if (project.property("firebase-firestore.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-firestore.skipJsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

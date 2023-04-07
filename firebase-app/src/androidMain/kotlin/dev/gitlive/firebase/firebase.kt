@@ -34,6 +34,8 @@ actual class FirebaseApp internal constructor(val android: com.google.firebase.F
         get() = android.name
     actual val options: FirebaseOptions
         get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId) }
+
+    actual fun delete() = android.delete()
 }
 
 actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)

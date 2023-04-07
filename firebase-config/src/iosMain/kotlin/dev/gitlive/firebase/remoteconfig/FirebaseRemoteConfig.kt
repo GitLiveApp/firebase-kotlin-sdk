@@ -19,8 +19,8 @@ import platform.Foundation.timeIntervalSince1970
 actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
-actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
-    FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios))
+actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = TODO("Come back to issue")
+//    FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios))
 
 actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>
@@ -106,6 +106,7 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
             FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
+            else -> FetchStatus.Failure
         }
     }
 }
