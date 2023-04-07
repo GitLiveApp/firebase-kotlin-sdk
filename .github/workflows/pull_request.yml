@@ -92,4 +92,4 @@ jobs:
         if: failure()
         with:
           name: "Android Test Report HTML"
-          path: "**/build/reports/tests/androidTests/"
+          path: "**/build/reports/androidTests/"
