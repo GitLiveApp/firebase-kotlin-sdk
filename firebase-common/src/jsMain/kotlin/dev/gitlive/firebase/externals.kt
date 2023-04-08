@@ -346,6 +346,7 @@ external object firebase {
 
         object ServerValue {
             val TIMESTAMP: Any
+            fun increment (delta: Double): Any
         }
     }
 
@@ -372,10 +373,16 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
-        open class Timestamp {
+        open class Timestamp(seconds: Double, nanoseconds: Double) {
+            companion object {
+                fun now(): Timestamp
+            }
+
             val seconds: Double
             val nanoseconds: Double
             fun toMillis(): Double
+
+            fun isEqual(other: Timestamp): Boolean
         }
 
         open class Query {
@@ -480,6 +487,8 @@ external object firebase {
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
             }
+            
+            fun isEqual(other: FieldValue): Boolean
         }
     }
 
