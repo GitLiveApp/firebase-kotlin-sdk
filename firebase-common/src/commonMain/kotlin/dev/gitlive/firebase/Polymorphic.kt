@@ -30,7 +30,6 @@ internal fun <T> FirebaseEncoder.encodePolymorphically(
 @Suppress("UNCHECKED_CAST")
 internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     value: Any?,
-    decodeDouble: (value: Any?) -> Double?,
     deserializer: DeserializationStrategy<T>,
 ): T {
     if (deserializer !is AbstractPolymorphicSerializer<*>) {
@@ -41,7 +40,7 @@ internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     val discriminator = deserializer.descriptor.classDiscriminator()
     val type = getPolymorphicType(value, discriminator)
     val actualDeserializer = casted.findPolymorphicSerializerOrNull(
-        structureDecoder(deserializer.descriptor, decodeDouble),
+        structureDecoder(deserializer.descriptor),
         type
     ) as DeserializationStrategy<T>
     return actualDeserializer.deserialize(this)

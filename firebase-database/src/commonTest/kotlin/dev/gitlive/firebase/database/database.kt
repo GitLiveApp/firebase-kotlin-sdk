@@ -110,6 +110,42 @@ class FirebaseDatabaseTest {
 //        cleanUp()
 //    }
 
+    @Test
+    fun testSetServerTimestamp() = runTest {
+        val testReference = Firebase.database.reference("testSetServerTimestamp")
+
+        testReference.setValue(ServerValue.TIMESTAMP)
+
+        val timestamp = testReference
+            .valueEvents
+            .first()
+            .value<Long>()
+
+        assertTrue(timestamp > 0)
+    }
+
+    @Test
+    fun testIncrement() = runTest {
+        val testReference = Firebase.database.reference("testIncrement")
+
+        testReference.setValue(2.0)
+
+        val value = testReference
+            .valueEvents
+            .first()
+            .value<Double>()
+
+        assertEquals(2.0, value)
+
+        testReference.setValue(ServerValue.increment(5.0))
+        val updatedValue = testReference
+            .valueEvents
+            .first()
+            .value<Double>()
+
+        assertEquals(7.0, updatedValue)
+    }
+
     private suspend fun setupRealtimeData() {
         val firebaseDatabaseTestReference = Firebase.database
             .reference("FirebaseRealtimeDatabaseTest")
@@ -137,5 +173,4 @@ class FirebaseDatabaseTest {
             throw err
         }
     }
-
 }

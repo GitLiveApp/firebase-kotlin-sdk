@@ -9,16 +9,16 @@ import kotlinx.serialization.encoding.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.modules.EmptySerializersModule
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? =
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? =
+    FirebaseEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(strategy, value) }.value//.also { println("encoded $it") }
 
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, positiveInfinity: Any = Double.POSITIVE_INFINITY): Any? = value?.let {
-    FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = value?.let {
+    FirebaseEncoder(shouldEncodeElementDefault).apply { encodeSerializableValue(it.firebaseSerializer(), it) }.value
 }
 
 expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder
 
-class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positiveInfinity: Any) : TimestampEncoder(positiveInfinity), Encoder {
+class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encoder {
 
     var value: Any? = null
 
@@ -47,7 +47,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     }
 
     override fun encodeDouble(value: Double) {
-        this.value = encodeTimestamp(value)
+        this.value = value
     }
 
     override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
@@ -83,7 +83,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     }
 
     override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder =
-        FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity)
+        FirebaseEncoder(shouldEncodeElementDefault)
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         encodePolymorphically(serializer, value) {
@@ -92,20 +92,12 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean, positive
     }
 }
 
-abstract class TimestampEncoder(internal val positiveInfinity: Any) {
-    fun encodeTimestamp(value: Double) = when(value) {
-        Double.POSITIVE_INFINITY -> positiveInfinity
-        else -> value
-    }
-}
-
 open class FirebaseCompositeEncoder constructor(
     private val shouldEncodeElementDefault: Boolean,
-    positiveInfinity: Any,
     private val end: () -> Unit = {},
     private val setPolymorphicType: (String, String) -> Unit = { _, _ -> },
     private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit,
-): TimestampEncoder(positiveInfinity), CompositeEncoder {
+): CompositeEncoder {
 
     override val serializersModule = EmptySerializersModule
 
@@ -128,7 +120,7 @@ open class FirebaseCompositeEncoder constructor(
         descriptor,
         index,
         value?.let {
-            FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
+            FirebaseEncoder(shouldEncodeElementDefault).apply {
                 encodeSerializableValue(serializer, value)
             }.value
         }
@@ -142,7 +134,7 @@ open class FirebaseCompositeEncoder constructor(
     ) = set(
         descriptor,
         index,
-        FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity).apply {
+        FirebaseEncoder(shouldEncodeElementDefault).apply {
             encodeSerializableValue(serializer, value)
         }.value
     )
@@ -153,7 +145,7 @@ open class FirebaseCompositeEncoder constructor(
 
     override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) = set(descriptor, index, value)
 
-    override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) = set(descriptor, index, encodeTimestamp(value))
+    override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) = set(descriptor, index, value)
 
     override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) = set(descriptor, index, value)
 
@@ -167,7 +159,7 @@ open class FirebaseCompositeEncoder constructor(
 
     @ExperimentalSerializationApi
     override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder =
-        FirebaseEncoder(shouldEncodeElementDefault, positiveInfinity)
+        FirebaseEncoder(shouldEncodeElementDefault)
 
     fun encodePolymorphicClassDiscriminator(discriminator: String, type: String) {
         setPolymorphicType(discriminator, type)

@@ -11,12 +11,12 @@ import kotlin.collections.set
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> mutableListOf<Any?>()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it.add(index, value) } }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> it.add(index, value) } }
     StructureKind.MAP -> mutableListOf<Any?>()
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
     StructureKind.CLASS,  StructureKind.OBJECT -> mutableMapOf<Any?, Any?>()
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity,
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault,
             setPolymorphicType = { discriminator, type ->
                 it[discriminator] = type
             },
