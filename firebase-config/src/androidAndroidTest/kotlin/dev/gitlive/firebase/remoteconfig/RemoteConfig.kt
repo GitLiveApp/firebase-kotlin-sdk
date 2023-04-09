@@ -6,8 +6,7 @@
 package dev.gitlive.firebase.remoteconfig
 
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.runBlocking
 
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
-actual fun runTest(test: suspend () -> Unit) = runBlocking { test() }
+actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest { test() }

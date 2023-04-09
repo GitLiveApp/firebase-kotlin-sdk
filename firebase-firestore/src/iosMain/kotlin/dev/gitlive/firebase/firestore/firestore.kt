@@ -13,30 +13,18 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
 
-@PublishedApi
-internal inline fun <reified T> decode(value: Any?): T =
-    decode(value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
-
-internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T =
-    decode(strategy, value) { (it as? FIRTimestamp)?.run { seconds * 1000 + (nanoseconds / 1000000.0) } }
-
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    encode(value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
-
-private fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    encode(strategy, value, shouldEncodeElementDefault, FIRFieldValue.fieldValueForServerTimestamp())
-
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
-}
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = TODO("Come back to issue")
+//actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
+//    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
+//}
 
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
@@ -112,10 +100,16 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-            ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -152,10 +146,16 @@ actual class Transaction(val ios: FIRTransaction) {
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        ios.updateData(fieldsAndValues.associate { it }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, documentRef.ios).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
@@ -204,10 +204,20 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        await { block -> ios.updateData(fieldsAndValues.associate { it }, block) }
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        await { block -> ios.updateData(fieldsAndValues.associate { (path, value) -> path.ios to value }, block) }
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun delete() =
         await { ios.deleteDocumentWithCompletion(it) }
@@ -443,13 +453,27 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
 }
 
-actual object FieldValue {
-    actual val serverTimestamp = Double.POSITIVE_INFINITY
-    actual val delete: Any get() = FIRFieldValue.fieldValueForDelete()
-    actual fun increment(value: Int): Any = FIRFieldValue.fieldValueForIntegerIncrement(value.toLong())
-    actual fun arrayUnion(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayUnion(elements.asList())
-    actual fun arrayRemove(vararg elements: Any): Any = FIRFieldValue.fieldValueForArrayRemove(elements.asList())
-    actual fun delete(): Any = delete
+/** A class representing a platform specific Firebase FieldValue. */
+private typealias NativeFieldValue = FIRFieldValue
+
+/** Represents a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
+    init {
+        require(nativeValue is NativeFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
+
+    actual companion object {
+        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
+        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
+        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.fieldValueForIntegerIncrement(value.toLong()))
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
+    }
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

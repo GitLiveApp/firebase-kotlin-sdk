@@ -28,6 +28,8 @@ actual class FirebaseApp internal constructor(val js: firebase.App) {
         get() = js.options.run {
             FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
+
+    actual fun delete() = js.delete()
 }
 
 actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }

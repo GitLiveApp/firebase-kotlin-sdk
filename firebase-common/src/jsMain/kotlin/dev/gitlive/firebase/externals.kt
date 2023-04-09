@@ -15,6 +15,7 @@ external object firebase {
     open class App {
         val name: String
         val options: Options
+        fun delete()
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
@@ -320,6 +321,11 @@ external object firebase {
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
             fun push(): ThenableReference
+            fun <T> transaction(
+                transactionUpdate: (currentData: T) -> T,
+                onComplete: (error: Error?, committed: Boolean, snapshot: DataSnapshot?) -> Unit,
+                applyLocally: Boolean?
+            ): Promise<T>
         }
 
         open class DataSnapshot {
@@ -340,6 +346,7 @@ external object firebase {
 
         object ServerValue {
             val TIMESTAMP: Any
+            fun increment (delta: Double): Any
         }
     }
 
@@ -366,10 +373,16 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
-        open class Timestamp {
+        open class Timestamp(seconds: Double, nanoseconds: Double) {
+            companion object {
+                fun now(): Timestamp
+            }
+
             val seconds: Double
             val nanoseconds: Double
             fun toMillis(): Double
+
+            fun isEqual(other: Timestamp): Boolean
         }
 
         open class Query {
@@ -474,6 +487,8 @@ external object firebase {
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
             }
+            
+            fun isEqual(other: FieldValue): Boolean
         }
     }
 
@@ -516,6 +531,34 @@ external object firebase {
             fun delete(): Promise<Unit>
             fun getId(): Promise<String>
             fun getToken(forceRefresh: Boolean): Promise<String>
+        }
+    }
+
+    fun performance(app: App? = definedExternally): performance
+
+    object performance {
+
+        var dataCollectionEnabled: Boolean
+        var instrumentationEnabled: Boolean
+
+        fun trace(
+            name: String
+            ): PerformanceTrace
+
+        open class Performance {
+
+        }
+
+        open class PerformanceTrace {
+            fun start()
+            fun stop()
+
+            fun getAttribute(attr: String): String?
+            fun getMetric(metricName: String): Number
+            fun incrementMetric(metricName: String, num: Number)
+            fun putAttribute(attr: String, value: String)
+            fun putMetric(metricName: String, num: Number)
+            fun removeAttribute(attr: String)
         }
     }
 }

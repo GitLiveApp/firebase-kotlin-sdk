@@ -21,17 +21,18 @@ actual val Firebase.functions
 actual fun Firebase.functions(region: String) =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
-actual fun Firebase.functions(app: FirebaseApp) =
-    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios))
+actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = TODO("Come back to issue")
+//    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios))
 
-actual fun Firebase.functions(app: FirebaseApp, region: String) =
-    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region = region))
+actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions = TODO("Come back to issue")
+//    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region = region))
 
 actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
 
-    actual fun useFunctionsEmulator(origin: String) = ios.useFunctionsEmulatorOrigin(origin)
+    actual fun useFunctionsEmulator(origin: String): Unit = TODO("Come back to issue")
+        //ios.useFunctionsEmulatorOrigin(origin)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
@@ -49,10 +50,10 @@ actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallab
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
 
     actual inline fun <reified T> data() =
-        decode<T>(value = ios.data)
+        decode<T>(value = ios.data())
 
     actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.data)
+        decode(strategy, ios.data())
 }
 
 actual class FirebaseFunctionsException(message: String): FirebaseException(message)
@@ -63,7 +64,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
         if(error == null) {
             job.complete(Unit)
         } else {
-            job.completeExceptionally(FirebaseFunctionsException(error.toString()))
+            job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
         }
     }
     job.await()
@@ -75,7 +76,7 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
         if(error == null) {
             job.complete(result)
         } else {
-            job.completeExceptionally(FirebaseFunctionsException(error.toString()))
+            job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
         }
     }
     return job.await() as R

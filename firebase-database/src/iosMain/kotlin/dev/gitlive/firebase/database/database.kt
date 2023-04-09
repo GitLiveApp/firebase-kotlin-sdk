@@ -6,6 +6,7 @@ package dev.gitlive.firebase.database
 
 import cocoapods.FirebaseDatabase.*
 import cocoapods.FirebaseDatabase.FIRDataEventType.*
+import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
@@ -13,7 +14,6 @@ import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,17 +21,11 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
 import kotlin.collections.component1
 import kotlin.collections.component2
-
-@PublishedApi
-internal inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean) =
-    dev.gitlive.firebase.encode(value, shouldEncodeElementDefault, FIRServerValue.timestamp())
-
-internal fun <T> encode(strategy: SerializationStrategy<T> , value: T, shouldEncodeElementDefault: Boolean): Any? =
-    dev.gitlive.firebase.encode(strategy, value, shouldEncodeElementDefault, FIRServerValue.timestamp())
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -39,11 +33,11 @@ actual val Firebase.database
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
+actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = TODO("Come back to issue")
+//    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
 
-actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = TODO("Come back to issue")
+//    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
@@ -157,6 +151,27 @@ actual class DatabaseReference internal constructor(
 
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
+    }
+
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        ios.runTransactionBlock(
+            block = { firMutableData ->
+                firMutableData?.value = firMutableData?.value?.let {
+                    transactionUpdate(decode(strategy, it))
+                }
+                FIRTransactionResult.successWithValue(firMutableData!!)
+            },
+            andCompletionBlock = { error, _, snapshot ->
+                if (error != null) {
+                    deferred.completeExceptionally(DatabaseException(error.toString(), null))
+                } else {
+                    deferred.complete(DataSnapshot(snapshot!!))
+                }
+            },
+            withLocalEvents = false
+        )
+        return deferred.await()
     }
 }
 
