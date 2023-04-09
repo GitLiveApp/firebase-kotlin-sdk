@@ -50,7 +50,10 @@ jobs:
         if: failure()
         with:
           name: "JS Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/jsLegacyTest/"
+          path: |
+            **/build/reports/tests/jsLegacyTest/
+            **/build/reports/tests/jsLegacyBrowserTest/
+            **/build/reports/tests/jsLegacyNodeTest/
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
       - name: Upload iOS test artifact
@@ -58,7 +61,7 @@ jobs:
         if: failure()
         with:
           name: "iOS Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/iosTest/"
+          path: "**/build/reports/tests/iosX64Test/"
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
@@ -89,4 +92,4 @@ jobs:
         if: failure()
         with:
           name: "Android Test Report HTML"
-          path: "firebase-firestore/build/reports/androidTests/"
+          path: "**/build/reports/androidTests/"

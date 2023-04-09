@@ -93,17 +93,21 @@ You can also omit the serializer but this is discouraged due to a [current limit
 
 <h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
 
-[Firestore](https://firebase.google.com/docs/reference/kotlin/com/google/firebase/firestore/FieldValue?hl=en#serverTimestamp()) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes they are of type `Double`:
+[Firestore](https://firebase.google.com/docs/reference/kotlin/com/google/firebase/firestore/FieldValue?hl=en#serverTimestamp()) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes:
 
 ```kotlin
 @Serializable
 data class Post(
     // In case using Realtime Database.
-    val timestamp: Double = ServerValue.TIMESTAMP,
+    val timestamp = ServerValue.TIMESTAMP,
     // In case using Cloud Firestore.
-    val timestamp: Double = FieldValue.serverTimestamp,
+    val timestamp: Timestamp = Timestamp.ServerTimestamp,
+    // or
+    val alternativeTimestamp = FieldValue.serverTimestamp,
+    // or
+    @Serializable(with = DoubleAsTimestampSerializer::class),
+    val doubleTimestamp: Double = DoubleAsTimestampSerializer.serverTimestamp
 )
-
 ```
 
 <h4>Polymorphic serialization (sealed classes)</h4>

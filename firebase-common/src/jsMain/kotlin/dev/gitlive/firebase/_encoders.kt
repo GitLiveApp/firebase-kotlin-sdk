@@ -13,18 +13,17 @@ import kotlin.js.json
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> Array<Any?>(descriptor.elementsCount) { null }
         .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> it[index] = value } }
+        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> it[index] = value } }
     StructureKind.MAP -> {
         val map = json()
         var lastKey: String = ""
         value = map
-        FirebaseCompositeEncoder(shouldEncodeElementDefault, positiveInfinity) { _, index, value -> if(index % 2 == 0) lastKey = value as String else map[lastKey] = value }
+        FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> if(index % 2 == 0) lastKey = value as String else map[lastKey] = value }
     }
     StructureKind.CLASS,  StructureKind.OBJECT, PolymorphicKind.SEALED -> json()
         .also { value = it }
         .let { FirebaseCompositeEncoder(
             shouldEncodeElementDefault,
-            positiveInfinity,
             setPolymorphicType = { discriminator, type ->
                 it[discriminator] = type
             },
