@@ -25,26 +25,26 @@ jobs:
           java-version: '11'
       - uses: gradle/gradle-build-action@v2
       - name: Setup versions
-        run: :updateVersions
+        run: ./gradlew :updateVersions
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish Firebase App
-        run: :firebase-app:publish
+        run: ./gradlew :firebase-app:publish
       - name: Publish Firebase Auth
-        run: :firebase-auth:publish
+        run: ./gradlew :firebase-auth:publish
       - name: Publish Firebase Common
-        run: :firebase-common:publish
+        run: ./gradlew :firebase-common:publish
       - name: Publish Firebase Config
-        run: :firebase-config:publish
+        run: ./gradlew :firebase-config:publish
       - name: Publish Firebase Database
-        run: :firebase-database:publish
+        run: ./gradlew :firebase-database:publish
       - name: Publish Firebase Firestore
-        run: :firebase-firestore:publish
+        run: ./gradlew :firebase-firestore:publish
       - name: Publish Firebase Functions
-        run: :firebase-functions:publish
+        run: ./gradlew :firebase-functions:publish
       - name: Publish Firebase Installations
-        run: :firebase-installations:publish
+        run: ./gradlew :firebase-installations:publish
       - name: Publish Firebase Performance
-        run: :firebase-perf:publish
+        run: ./gradlew :firebase-perf:publish
       - name: Publish Firebase Crashlytics
-        run: :firebase-crashlytics:publish
+        run: ./gradlew :firebase-crashlytics:publish
