@@ -4,8 +4,11 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firestore.externals.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
@@ -52,7 +55,7 @@ private fun <R> performUpdate(
 /** Helper method to perform an update operation. */
 private fun <R> performUpdate(
     fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
-    update: (firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
+    update: (dev.gitlive.firebase.firestore.externals.FieldPath, Any?, Array<Any?>) -> R
 ) = performUpdate(fieldsAndValues, { it.js }, { encode(it, true) }, update)
 
 actual class FirebaseFirestore(jsFirestore: Firestore) {
@@ -246,13 +249,13 @@ actual class DocumentReference(val js: JsDocumentReference) {
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
         performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            js.update(field, value, *moreFieldsAndValues)
+            jsUpdate(js, field, value, *moreFieldsAndValues)
         }?.await()
     }.run { Unit }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
         performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            js.update(field, value, *moreFieldsAndValues)
+            jsUpdate(js, field, value, *moreFieldsAndValues)
         }?.await()
     }.run { Unit }
 
@@ -444,7 +447,7 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
 }
 
 /** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = firebase.firestore.FieldValue
+private typealias NativeFieldValue = dev.gitlive.firebase.firestore.externals.FieldValue
 
 /** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)

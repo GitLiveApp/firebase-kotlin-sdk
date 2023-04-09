@@ -31,7 +31,7 @@ external fun getDatabase(
     url: String? = definedExternally
 ): Database
 
-external fun increment(delta: Long): Any
+external fun increment(delta: Double): Any
 
 external fun limitToFirst(limit: Int): QueryConstraint
 

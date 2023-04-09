@@ -179,7 +179,9 @@ external interface DocumentSnapshot {
     fun get(fieldPath: FieldPath, options: Any? = definedExternally): Any?
 }
 
-external interface FieldValue
+external class FieldValue {
+    fun isEqual(other: FieldValue): Boolean
+}
 
 external interface Query
 
@@ -251,4 +253,16 @@ external interface WriteBatch {
         value: Any?,
         vararg moreFieldsAndValues: Any?
     ): WriteBatch
+}
+
+external class Timestamp(seconds: Double, nanoseconds: Double) {
+    companion object {
+        fun now(): Timestamp
+    }
+
+    val seconds: Double
+    val nanoseconds: Double
+    fun toMillis(): Double
+
+    fun isEqual(other: Timestamp): Boolean
 }
