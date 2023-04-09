@@ -5,13 +5,17 @@ name: Publish
 
 on:
   release:
-    types: [prereleased, released]
+    types: [ prereleased, released ]
+
+env:
+  sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+  sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
 
 jobs:
   build:
-
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK
@@ -19,99 +23,28 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
+      - uses: gradle/gradle-build-action@v2
       - name: Setup versions
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :updateVersions
+        run: :updateVersions
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish Firebase App
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-app:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-app:publish
       - name: Publish Firebase Auth
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-auth:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-auth:publish
       - name: Publish Firebase Common
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-common:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-common:publish
       - name: Publish Firebase Config
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-config:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-config:publish
       - name: Publish Firebase Database
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-database:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-database:publish
       - name: Publish Firebase Firestore
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-firestore:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-firestore:publish
       - name: Publish Firebase Functions
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-functions:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-functions:publish
       - name: Publish Firebase Installations
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-installations:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-installations:publish
       - name: Publish Firebase Performance
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-perf:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-perf:publish
       - name: Publish Firebase Crashlytics
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :firebase-crashlytics:publish
-        env:
-          sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-          sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+        run: :firebase-crashlytics:publish
