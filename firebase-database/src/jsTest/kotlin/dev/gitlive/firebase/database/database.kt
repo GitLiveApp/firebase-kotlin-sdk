@@ -10,16 +10,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration.Companion.seconds
 
-actual val emulatorHost: String = "127.0.0.1" // in JS connection is refused if we use localhost
+actual val emulatorHost: String = "127.0.0.1" // in JS tests connection is refused if we use localhost
 
 actual val context: Any = Unit
 actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest {
-    val db = getDatabase()
-    goOnline(db)
+    // in JS tests we need to wait for the database to be connected
     awaitDatabaseConnection()
     test()
-    // in JS tests are running infinitely without going database offline
-    goOffline(db)
 }
 
 private suspend fun awaitDatabaseConnection() = withContext(Dispatchers.Default) {
