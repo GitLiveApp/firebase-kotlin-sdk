@@ -464,6 +464,39 @@ class FirebaseFirestoreTest {
         assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
+    @Test
+    fun testQueryByTimestamp() = runTest {
+        @Serializable
+        data class DocumentWithTimestamp(
+            val time: Timestamp
+        )
+
+        val collection = Firebase.firestore
+            .collection("testQueryByTimestamp")
+
+        val timestamp = Timestamp.now()
+
+        val pastTimestamp = Timestamp(timestamp.seconds - 60, timestamp.nanoseconds)
+        val futureTimestamp = Timestamp(timestamp.seconds + 60, timestamp.nanoseconds)
+
+        collection.add(DocumentWithTimestamp(pastTimestamp))
+        collection.add(DocumentWithTimestamp(futureTimestamp))
+
+        val equalityQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            equalTo = pastTimestamp
+        ).get().documents.map { it.data<DocumentWithTimestamp>() }
+
+        assertEquals(listOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
+
+        val gtQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            greaterThan = timestamp
+        ).get().documents.map { it.data<DocumentWithTimestamp>() }
+
+        assertEquals(listOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")
