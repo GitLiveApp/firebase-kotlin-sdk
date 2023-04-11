@@ -14,3 +14,8 @@ actual val emulatorHost: String = "10.0.2.2"
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
 actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking { test() }
+
+@Suppress("UNCHECKED_CAST")
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
+
+actual fun Map<String, Any?>.asEncoded(): Any = this

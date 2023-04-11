@@ -22,3 +22,8 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     }
     testRun.await()
 }
+
+@Suppress("UNCHECKED_CAST")
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
+
+actual fun Map<String, Any?>.asEncoded(): Any = this

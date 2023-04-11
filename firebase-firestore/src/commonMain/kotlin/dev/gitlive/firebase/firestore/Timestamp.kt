@@ -32,8 +32,8 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
 }
 
 fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp =
-    Timestamp((milliseconds / 1000).toLong(), (milliseconds * 1000).toInt() % 1000000)
-fun Timestamp.toMilliseconds(): Double = seconds * 1000 + (nanoseconds / 1000.0)
+    Timestamp((milliseconds / 1000).toLong(), ((milliseconds % 1000) * 1000000).toInt())
+fun Timestamp.toMilliseconds(): Double = seconds * 1000 + nanoseconds / 1000000.0
 
 /** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(

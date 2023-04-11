@@ -79,27 +79,35 @@ expect open class Query {
     internal fun _endAt(vararg fieldValues: Any): Query
 }
 
-fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo)
-fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo)
-fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo)
-fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo)
-fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan, greaterThan, arrayContains)
-fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan, greaterThan, arrayContains)
-fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray, arrayContainsAny)
-fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray, arrayContainsAny)
+/** @return a native value of a wrapper or self. */
+private val Any.value get() = when (this) {
+    is Timestamp -> nativeValue
+    is GeoPoint -> nativeValue
+    is DocumentReference -> nativeValue
+    else -> this
+}
+
+fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo,value)
+fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo?.value)
+fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo.value)
+fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo.value)
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan?.value, greaterThan?.value, arrayContains?.value)
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan?.value, greaterThan?.value, arrayContains?.value)
+fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray?.value, arrayContainsAny?.value)
+fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray?.value, arrayContainsAny?.value)
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
-fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*fieldValues)
+fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.map { it.value }.toTypedArray()))
 fun Query.startAt(document: DocumentSnapshot) = _startAt(document)
-fun Query.startAt(vararg fieldValues: Any) = _startAt(*fieldValues)
+fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.map { it.value }.toTypedArray()))
 
 fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
-fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*fieldValues)
+fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.map { it.value }.toTypedArray()))
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
-fun Query.endAt(vararg fieldValues: Any) = _endAt(*fieldValues)
+fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.map { it.value }.toTypedArray()))
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
@@ -120,7 +128,13 @@ expect class WriteBatch {
     suspend fun commit()
 }
 
-expect class DocumentReference {
+/** A class representing a platform specific Firebase DocumentReference. */
+expect class NativeDocumentReference
+
+/** A class representing a Firebase DocumentReference. */
+@Serializable(with = DocumentReferenceSerializer::class)
+expect class DocumentReference internal constructor(nativeValue: NativeDocumentReference) {
+    internal val nativeValue: NativeDocumentReference
 
     val id: String
     val path: String
@@ -146,6 +160,20 @@ expect class DocumentReference {
 
     suspend fun delete()
 }
+
+/**
+ * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
+ */
+object DocumentReferenceSerializer : SpecialValueSerializer<DocumentReference>(
+    serialName = "DocumentReference",
+    toNativeValue = DocumentReference::nativeValue,
+    fromNativeValue = { value ->
+        when (value) {
+            is NativeDocumentReference -> DocumentReference(value)
+            else -> throw SerializationException("Cannot deserialize $value")
+        }
+    }
+)
 
 expect class CollectionReference : Query {
     val path: String

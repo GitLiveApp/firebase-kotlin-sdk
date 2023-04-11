@@ -181,7 +181,12 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
         rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReference = firebase.firestore.DocumentReference
+
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val js: NativeDocumentReference by ::nativeValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -241,6 +246,11 @@ actual class DocumentReference(val js: firebase.firestore.DocumentReference) {
         )
         awaitClose { unsubscribe() }
     }
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && nativeValue.isEqual(other.nativeValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = "DocumentReference(path=$path)"
 }
 
 actual open class Query(open val js: firebase.firestore.Query) {
@@ -412,6 +422,10 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
         js("Reflect").construct(firebase.firestore.FieldPath, fieldNames).unsafeCast<firebase.firestore.FieldPath>()
     })
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
+
+    override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
+    override fun hashCode(): Int = js.hashCode()
+    override fun toString(): String = js.toString()
 }
 
 /** Represents a platform specific Firebase FieldValue. */

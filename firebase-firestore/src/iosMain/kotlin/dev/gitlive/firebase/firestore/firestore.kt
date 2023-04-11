@@ -165,8 +165,12 @@ actual class Transaction(val ios: FIRTransaction) {
 
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class DocumentReference(val ios: FIRDocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReference = FIRDocumentReference
+
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val ios: NativeDocumentReference by ::nativeValue
 
     actual val id: String
         get() = ios.documentID
@@ -232,6 +236,11 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         }
         awaitClose { listener.remove() }
     }
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
 }
 
 actual open class Query(open val ios: FIRQuery) {
@@ -451,6 +460,10 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
 actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
     actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
+
+    override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
+    override fun hashCode(): Int = ios.hashCode()
+    override fun toString(): String = ios.toString()
 }
 
 /** A class representing a platform specific Firebase FieldValue. */
