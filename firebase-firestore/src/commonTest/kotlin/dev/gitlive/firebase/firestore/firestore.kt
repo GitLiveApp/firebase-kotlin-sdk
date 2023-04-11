@@ -476,8 +476,8 @@ class FirebaseFirestoreTest {
 
         val timestamp = Timestamp.now()
 
-        val pastTimestamp = Timestamp(timestamp.seconds - 60, timestamp.nanoseconds)
-        val futureTimestamp = Timestamp(timestamp.seconds + 60, timestamp.nanoseconds)
+        val pastTimestamp = Timestamp(timestamp.seconds - 60, 12345000) // note: iOS truncates 3 last digits of nanoseconds due to internal conversions
+        val futureTimestamp = Timestamp(timestamp.seconds + 60, 78910000)
 
         collection.add(DocumentWithTimestamp(pastTimestamp))
         collection.add(DocumentWithTimestamp(futureTimestamp))
