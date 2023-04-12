@@ -90,7 +90,7 @@ class EncodersTest {
             TestData.serializer(),
             encoded
         )
-        nativeAssertEquals(target, decoded)
+        assertEquals(target, decoded)
     }
 
     @Test
@@ -106,6 +106,6 @@ class EncodersTest {
             TestSealedList.serializer(),
             encoded
         )
-        nativeAssertEquals(target, decoded)
+        assertEquals(target, decoded)
     }
 }
