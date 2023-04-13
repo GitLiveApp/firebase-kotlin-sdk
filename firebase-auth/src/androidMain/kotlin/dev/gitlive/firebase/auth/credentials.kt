@@ -90,7 +90,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
-                onRecievedVerificationID(verificationId = verificationId)
+                verificationProvider.onRecievedVerificationID(verificationId = verificationId)
                 verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
             }
 
