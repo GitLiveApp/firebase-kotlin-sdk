@@ -79,33 +79,60 @@ class EncodersTest {
     }
 
     @Test
-    fun encodeDecodeSealedClass() {
-        val target = TestData(mapOf("key" to "value"), true)
-        val encoded = encode<TestData>(
-            TestData.serializer(),
-            target,
-            shouldEncodeElementDefault = false
+    fun encodeSealedClassList() {
+        val toEncode = TestSealedList(
+            list = listOf(
+                TestSealed.ChildClass(
+                    map = mapOf("key" to "value"),
+                    bool = false
+                )
+            )
         )
-        val decoded = decode<TestData>(
-            TestData.serializer(),
-            encoded
+        val encoded = encode<TestSealedList>(
+            TestSealedList.serializer(),
+            toEncode,
+            shouldEncodeElementDefault = true
         )
-        assertEquals(target, decoded)
+        val expected = nativeMapOf(
+            "list" to nativeListOf(
+                nativeMapOf(
+                    "type" to "child",
+                    "map" to nativeMapOf(
+                        "key" to "value"
+                    ),
+                    "bool" to false
+                )
+            )
+        )
+        nativeAssertEquals(expected, encoded)
     }
 
     @Test
-    fun encodeDecodeSealedClassList() {
-        val target =
-            TestSealedList(list = listOf(TestSealed.ChildClass(map = emptyMap(), bool = false)))
-        val encoded = encode<TestSealedList>(
-            TestSealedList.serializer(),
-            target,
-            shouldEncodeElementDefault = true
+    fun decodeSealedClassList() {
+        val toDecode = nativeMapOf(
+            "list" to nativeListOf(
+                nativeMapOf(
+                    "type" to "child",
+                    "map" to nativeMapOf(
+                        "key" to "value"
+                    ),
+                    "bool" to false
+                )
+            )
         )
-        val decoded = decode<TestSealedList>(
+        val decoded = decode(
             TestSealedList.serializer(),
-            encoded
+            toDecode
         )
-        assertEquals(target, decoded)
+        val expected = TestSealedList(
+            list = listOf(
+                TestSealed.ChildClass(
+                    map = mapOf("key" to "value"),
+                    bool = false
+                )
+            )
+        )
+
+        assertEquals(expected, decoded)
     }
 }
