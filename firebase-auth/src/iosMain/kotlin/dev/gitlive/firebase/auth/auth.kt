@@ -8,7 +8,6 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.safeOffer
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
@@ -21,8 +20,8 @@ import platform.Foundation.*
 actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
 
-actual fun Firebase.auth(app: FirebaseApp) =
-    FirebaseAuth(FIRAuth.authWithApp(app.ios))
+actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = TODO("Come back to issue")
+//    FirebaseAuth(FIRAuth.authWithApp(app.ios))
 
 actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
@@ -30,20 +29,12 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val callback = { _: FIRAuth?, user: FIRUser? ->
-            safeOffer(user?.let { FirebaseUser(it) })
-            Unit
-        }.freeze()
-        val handle = ios.addAuthStateDidChangeListener(callback)
+        val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
-        val callback = { _: FIRAuth?, user: FIRUser? ->
-            safeOffer(user?.let { FirebaseUser(it) })
-            Unit
-        }.freeze()
-        val handle = ios.addIDTokenDidChangeListener(callback)
+        val handle = ios.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
 

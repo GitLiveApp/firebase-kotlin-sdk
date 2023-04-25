@@ -23,9 +23,10 @@ import platform.Foundation.NSNull
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
-}
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = TODO("Come back to issue")
+//actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
+//    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
+//}
 
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
@@ -121,22 +122,16 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
         ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-            ios.updateData(
-                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
-                documentRef.ios
-            ).let { this }
+        ios.updateData(
+            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
-    actual inline fun <reified T> update(
-        documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<Any?, *>
-        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
-            field to encode(value, encodeDefaults)
-        }
+    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        ios.updateData(
+            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+            documentRef.ios
+        ).let { this }
 
         val result = serializedItem + serializedFieldAndValues
         return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
@@ -219,6 +214,9 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val path: String
         get() = ios.path
 
+    actual val parent: CollectionReference
+        get() = CollectionReference(ios.parent)
+
     actual val async = Async(nativeValue)
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
@@ -248,10 +246,20 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         async.update(strategy, data, encodeDefaults).await()
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        async.update(fieldsAndValues = fieldsAndValues).await()
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        async.update(fieldsAndValues = fieldsAndValues).await()
+        await { block ->
+            ios.updateData(
+                fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
+                block
+            )
+        }
 
     actual suspend fun delete() =
         async.delete().await()
@@ -260,8 +268,8 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val callback = { snapshot: FIRDocumentSnapshot?, error: NSError? ->
-            snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
+        val listener = ios.addSnapshotListener { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
             Unit
         }.freeze()
@@ -327,12 +335,20 @@ actual open class Query(open val ios: FIRQuery) {
     actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
-        val callback = { snapshot: FIRQuerySnapshot?, error: NSError? ->
-            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
+        val listener = ios.addSnapshotListener { snapshot, error ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
             Unit
         }.freeze()
         val listener = ios.addSnapshotListener(callback)
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
         awaitClose { listener.remove() }
     }
 
@@ -395,6 +411,17 @@ actual open class Query(open val ios: FIRQuery) {
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
 }
 
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios))
+    internal actual fun _startAfter(vararg fieldValues: Any) = Query(ios.queryStartingAfterValues(fieldValues.asList()))
+    internal actual fun _startAt(document: DocumentSnapshot) = Query(ios.queryStartingAtDocument(document.ios))
+    internal actual fun _startAt(vararg fieldValues: Any) = Query(ios.queryStartingAtValues(fieldValues.asList()))
+
+    internal actual fun _endBefore(document: DocumentSnapshot) = Query(ios.queryEndingBeforeDocument(document.ios))
+    internal actual fun _endBefore(vararg fieldValues: Any) = Query(ios.queryEndingBeforeValues(fieldValues.asList()))
+    internal actual fun _endAt(document: DocumentSnapshot) = Query(ios.queryEndingAtDocument(document.ios))
+    internal actual fun _endAt(vararg fieldValues: Any) = Query(ios.queryEndingAtValues(fieldValues.asList()))
+
+}
 @Suppress("UNCHECKED_CAST")
 actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
 
@@ -402,6 +429,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
         get() = ios.path
 
     actual val async = Async(ios)
+
+    actual val parent get() = ios.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
@@ -552,6 +581,29 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
     override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
     override fun hashCode(): Int = ios.hashCode()
     override fun toString(): String = ios.toString()
+}
+
+/** A class representing a platform specific Firebase FieldValue. */
+private typealias NativeFieldValue = FIRFieldValue
+
+/** Represents a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
+    init {
+        require(nativeValue is NativeFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
+
+    actual companion object {
+        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
+        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
+        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.fieldValueForIntegerIncrement(value.toLong()))
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
+    }
 }
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {

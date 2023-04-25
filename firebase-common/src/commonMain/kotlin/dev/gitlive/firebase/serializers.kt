@@ -119,7 +119,7 @@ abstract class SpecialValueSerializer<T>(
         if (encoder is FirebaseEncoder) {
             encoder.value = toNativeValue(value)
         } else {
-            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+            throw SerializationException("This serializer must be used with FirebaseEncoder")
         }
     }
 
@@ -127,8 +127,7 @@ abstract class SpecialValueSerializer<T>(
         return if (decoder is FirebaseDecoder) {
             fromNativeValue(decoder.value)
         } else {
-            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+            throw SerializationException("This serializer must be used with FirebaseDecoder")
         }
     }
 }
-

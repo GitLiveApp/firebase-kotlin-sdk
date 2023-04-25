@@ -20,6 +20,18 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
 
+/** Helper method to perform an update operation. */
+private fun <R> performUpdate(
+    fieldsAndValues: Array<out Pair<String, Any?>>,
+    update: (String, Any?, Array<Any?>) -> R
+) = performUpdate(fieldsAndValues, { it }, { encode(it, true) }, update)
+
+/** Helper method to perform an update operation. */
+private fun <R> performUpdate(
+    fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
+    update: (firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
+) = performUpdate(fieldsAndValues, { it.js }, { encode(it, true) }, update)
+
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
@@ -112,9 +124,9 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> js.update(documentRef.js, encoded.toMap()) }
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual inline fun <reified T> update(
@@ -134,18 +146,9 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) {
     }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field.js to encode(value, true) }
-            ?.let { encoded ->
-                js.update(
-                    documentRef.js,
-                    encoded.first().first,
-                    encoded.first().second,
-                    *encoded.drop(1)
-                        .flatMap { (field, value) -> listOf(field, value) }
-                        .toTypedArray()
-                )
-            }
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
@@ -195,24 +198,15 @@ actual class Transaction(val js: firebase.firestore.Transaction) {
             .let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> js.update(documentRef.js, encoded.toMap()) }
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field.js to encode(value, true) }
-            ?.let { encoded ->
-                js.update(
-                    documentRef.js,
-                    encoded.first().first,
-                    encoded.first().second,
-                    *encoded.drop(1)
-                        .flatMap { (field, value) -> listOf(field, value) }
-                        .toTypedArray()
-                )
-            }
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(documentRef.js, field, value, *moreFieldsAndValues)
+        }
     }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
@@ -235,6 +229,9 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual val path: String
         get() = rethrow { js.path }
+
+    actual val parent: CollectionReference
+        get() = rethrow { CollectionReference(js.parent) }
 
     actual val async = Async(nativeValue)
 
@@ -264,11 +261,17 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         rethrow { async.update(strategy, data, encodeDefaults).await() }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        rethrow { async.update(fieldsAndValues = fieldsAndValues).await() }
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(field, value, *moreFieldsAndValues)
+        }?.await()
+    }.run { Unit }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        rethrow { async.update(fieldsAndValues = fieldsAndValues).await() }
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
+        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+            js.update(field, value, *moreFieldsAndValues)
+        }?.await()
+    }.run { Unit }
 
     actual suspend fun delete() = rethrow { async.delete().await() }
 
@@ -276,7 +279,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val unsubscribe = js.onSnapshot(
-            { safeOffer(DocumentSnapshot(it)) },
+            { trySend(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
@@ -424,10 +427,37 @@ actual open class Query(open val js: firebase.firestore.Query) {
         Query(js.orderBy(field.js, direction.jsString))
     }
 
+    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow { Query(js.startAfter(document.js)) }
+
+    internal actual fun _startAfter(vararg fieldValues: Any) = rethrow { Query(js.startAfter(*fieldValues)) }
+
+    internal actual fun _startAt(document: DocumentSnapshot) = rethrow { Query(js.startAt(document.js)) }
+
+    internal actual fun _startAt(vararg fieldValues: Any) = rethrow { Query(js.startAt(*fieldValues)) }
+
+    internal actual fun _endBefore(document: DocumentSnapshot) = rethrow { Query(js.endBefore(document.js)) }
+
+    internal actual fun _endBefore(vararg fieldValues: Any) = rethrow { Query(js.endBefore(*fieldValues)) }
+
+    internal actual fun _endAt(document: DocumentSnapshot) = rethrow { Query(js.endAt(document.js)) }
+
+    internal actual fun _endAt(vararg fieldValues: Any) = rethrow { Query(js.endAt(*fieldValues)) }
+
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
             js.onSnapshot(
-                { safeOffer(QuerySnapshot(it)) },
+                { trySend(QuerySnapshot(it)) },
+                { close(errorToException(it)) }
+            )
+        }
+        awaitClose { rethrow { unsubscribe() } }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val unsubscribe = rethrow {
+            js.onSnapshot(
+                json("includeMetadataChanges" to includeMetadataChanges),
+                { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
         }
@@ -440,6 +470,10 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
     actual val path: String
         get() =  rethrow { js.path }
     actual val async = Async(js)
+
+    actual val document get() = rethrow { DocumentReference(js.doc()) }
+
+    actual val parent get() = rethrow { js.parent?.let{DocumentReference(it)} }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
@@ -527,6 +561,30 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
+}
+
+/** Represents a platform specific Firebase FieldValue. */
+private typealias NativeFieldValue = firebase.firestore.FieldValue
+
+/** Represents a Firebase FieldValue. */
+@Serializable(with = FieldValueSerializer::class)
+actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
+    init {
+        require(nativeValue is NativeFieldValue)
+    }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is FieldValue &&
+                (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
+
+    actual companion object {
+        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(NativeFieldValue.serverTimestamp()) }
+        actual val delete: FieldValue get() = rethrow { FieldValue(NativeFieldValue.delete()) }
+        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(firebase.firestore.FieldValue.increment(value)) }
+        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayUnion(*elements)) }
+        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayRemove(*elements)) }
+    }
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(

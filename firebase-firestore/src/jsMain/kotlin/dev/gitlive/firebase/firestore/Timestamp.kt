@@ -33,3 +33,4 @@ actual class Timestamp internal actual constructor(
     @Serializable(with = ServerTimestampSerializer::class)
     actual object ServerTimestamp: BaseTimestamp()
 }
+

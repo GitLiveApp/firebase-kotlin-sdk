@@ -40,7 +40,16 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encode
     var value: Any? = null
 
     override val serializersModule = EmptySerializersModule
-    override fun beginStructure(descriptor: SerialDescriptor) = structureEncoder(descriptor)
+    private var polymorphicDiscriminator: String? = null
+
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
+        val encoder = structureEncoder(descriptor)
+        if (polymorphicDiscriminator != null) {
+            encoder.encodePolymorphicClassDiscriminator(polymorphicDiscriminator!!, descriptor.serialName)
+            polymorphicDiscriminator = null
+        }
+        return encoder
+    }
 
     override fun encodeBoolean(value: Boolean) {
         this.value = value
@@ -90,15 +99,21 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encode
         this.value = value
     }
 
-    @ExperimentalSerializationApi
     override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder =
         FirebaseEncoder(shouldEncodeElementDefault)
+
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        encodePolymorphically(serializer, value) {
+            polymorphicDiscriminator = it
+        }
+    }
 }
 
 open class FirebaseCompositeEncoder constructor(
     private val shouldEncodeElementDefault: Boolean,
     private val end: () -> Unit = {},
-    private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit
+    private val setPolymorphicType: (String, String) -> Unit = { _, _ -> },
+    private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit,
 ): CompositeEncoder {
 
     override val serializersModule = EmptySerializersModule
@@ -164,6 +179,9 @@ open class FirebaseCompositeEncoder constructor(
     @ExperimentalSerializationApi
     override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder =
         FirebaseEncoder(shouldEncodeElementDefault)
-}
 
+    fun encodePolymorphicClassDiscriminator(discriminator: String, type: String) {
+        setPolymorphicType(discriminator, type)
+    }
+}
 

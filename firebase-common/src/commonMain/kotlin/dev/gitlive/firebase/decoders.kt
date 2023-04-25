@@ -25,10 +25,11 @@ fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value).decodeSerializableValue(strategy)
 }
-
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder
+expect fun getPolymorphicType(value: Any?, discriminator: String): String
 
-class FirebaseDecoder(val value: Any?) : Decoder {
+class FirebaseDecoder(internal val value: Any?) : Decoder {
+
 
     override val serializersModule: SerializersModule
         get() = EmptySerializersModule
@@ -59,8 +60,11 @@ class FirebaseDecoder(val value: Any?) : Decoder {
 
     override fun decodeNull() = decodeNull(value)
 
-    @ExperimentalSerializationApi
     override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
+
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return decodeSerializableValuePolymorphic(value, deserializer)
+    }
 }
 
 class FirebaseClassDecoder(
@@ -79,9 +83,7 @@ class FirebaseClassDecoder(
             ?: DECODE_DONE
 }
 
-open class FirebaseEmptyCompositeDecoder(): FirebaseCompositeDecoder(0, { _, _ -> })
-
-open class FirebaseCompositeDecoder constructor(
+open class FirebaseCompositeDecoder(
     private val size: Int,
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?
 ): CompositeDecoder {

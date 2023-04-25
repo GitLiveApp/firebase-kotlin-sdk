@@ -6,23 +6,24 @@ package dev.gitlive.firebase
 
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import platform.Foundation.*
 import platform.darwin.NSObject
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder = when(descriptor.kind) {
-    StructureKind.CLASS, StructureKind.OBJECT -> when (value) {
-        is Map<*, *> -> FirebaseClassDecoder(value.size, { value.containsKey(it) }) { desc, index ->
-            value[desc.getElementName(index)]
-        }
-        else -> FirebaseEmptyCompositeDecoder()
+    StructureKind.CLASS, StructureKind.OBJECT, PolymorphicKind.SEALED -> (value as Map<*, *>).let { map ->
+        FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
     }
-    StructureKind.LIST, is PolymorphicKind -> (value as List<*>).let {
+    StructureKind.LIST -> (value as List<*>).let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
     }
     StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
     }
-    else -> TODO("Not implemented ${descriptor.kind}")
+    else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
+
+actual fun getPolymorphicType(value: Any?, discriminator: String): String =
+    (value as Map<*,*>)[discriminator] as String

@@ -32,8 +32,10 @@ class FirebaseFirestoreTest {
 
     @Serializable
     data class FirestoreTest(
-        val prop1: String,
-        val time: Double = 0.0
+        val prop1: String, 
+        val time: Double = 0.0,
+        val count: Int = 0, 
+        val list: List<String> = emptyList(),
     )
 
     @Serializable
@@ -66,7 +68,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
         val resultDocs = Firebase.firestore
-            .collection("FirebaseFirestoreTest")
+            .collection("testFirestoreQuerying")
             .orderBy("prop1")
             .get()
             .documents
@@ -79,8 +81,9 @@ class FirebaseFirestoreTest {
     @Test
     fun testFieldOrderBy() = runTest {
         setupFirestoreData()
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy(FieldPath("prop1")).get().documentChanges
+
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+            .orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].document.get("prop1"))
         assertEquals("bbb", resultDocs[1].document.get("prop1"))
@@ -90,8 +93,9 @@ class FirebaseFirestoreTest {
     @Test
     fun testStringOrderByAscending() = runTest {
         setupFirestoreData()
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy("prop1", Direction.ASCENDING).get().documentChanges
+
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].document.get("prop1"))
         assertEquals("bbb", resultDocs[1].document.get("prop1"))
@@ -102,8 +106,8 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documentChanges
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+            .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].document.get("prop1"))
         assertEquals("bbb", resultDocs[1].document.get("prop1"))
@@ -114,8 +118,8 @@ class FirebaseFirestoreTest {
     fun testStringOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy("prop1", Direction.DESCENDING).get().documentChanges
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].document.get("prop1"))
         assertEquals("bbb", resultDocs[1].document.get("prop1"))
@@ -126,8 +130,8 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("FirebaseFirestoreTest")
-            .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documentChanges
+        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+            .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].document.get("prop1"))
         assertEquals("bbb", resultDocs[1].document.get("prop1"))
@@ -145,15 +149,10 @@ class FirebaseFirestoreTest {
         )
         assertEquals(Timestamp(123, 0), doc.get().get("time", TimestampSerializer))
 
-        doc.update(
-            fieldsAndValues = arrayOf(
-                "time" to Timestamp(321, 0)
-            )
-        )
-        assertEquals(Timestamp(321, 0), doc.get().data(FirestoreTimeTest.serializer()).time)
+        doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestamp", Timestamp.ServerTimestamp))
 
-        assertNotEquals<Any>(Timestamp.ServerTimestamp, doc.get().get("time", TimestampSerializer))
-        assertNotEquals<Any?>(Timestamp.ServerTimestamp, doc.get().data(FirestoreTimeTest.serializer()).time)
+        assertNotEquals(Timestamp.ServerTimestamp, doc.get().get<BaseTimestamp>("time"))
+        assertNotEquals(Timestamp.ServerTimestamp, doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
     @Test
@@ -176,7 +175,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", TimestampSerializer.nullable, ServerTimestampBehavior.NONE))
+        assertNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.NONE))
     }
 
     @Test
@@ -220,8 +219,8 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNotNull(pendingWritesSnapshot.get("time", TimestampSerializer, ServerTimestampBehavior.ESTIMATE))
-        assertNotEquals(Timestamp(0, 0), pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.ESTIMATE))
+        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -241,7 +240,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", TimestampSerializer.nullable, ServerTimestampBehavior.PREVIOUS))
+        assertNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.PREVIOUS))
     }
 
     @Test
@@ -259,6 +258,234 @@ class FirebaseFirestoreTest {
 
         assertEquals(true, resultDoc.exists)
         assertEquals("AutoId", resultDoc.get("prop1"))
+    }
+
+    @Test
+    fun testStartAfterDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+
+        val secondPage = query.startAfter(lastDocumentSnapshot).get().documents
+        assertEquals(1, secondPage.size)
+        assertEquals("ccc", secondPage[0].get("prop1"))
+    }
+
+    @Test
+    fun testStartAfterFieldValues() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.get().documents
+        assertEquals(3, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
+
+        val secondPage = query.startAfter("bbb").get().documents
+        assertEquals(1, secondPage.size)
+        assertEquals("ccc", secondPage[0].get("prop1"))
+    }
+
+    @Test
+    fun testStartAtDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+
+        val secondPage = query.startAt(lastDocumentSnapshot).get().documents
+        assertEquals(2, secondPage.size)
+        assertEquals("bbb", secondPage[0].get("prop1"))
+        assertEquals("ccc", secondPage[1].get("prop1"))
+    }
+
+    @Test
+    fun testStartAtFieldValues() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.get().documents // First 2 results
+        assertEquals(3, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
+
+        val secondPage = query.startAt("bbb").get().documents
+        assertEquals(2, secondPage.size)
+        assertEquals("bbb", secondPage[0].get("prop1"))
+        assertEquals("ccc", secondPage[1].get("prop1"))
+    }
+
+    @Test
+    fun testEndBeforeDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+
+        val secondPage = query.endBefore(lastDocumentSnapshot).get().documents
+        assertEquals(1, secondPage.size)
+        assertEquals("aaa", secondPage[0].get("prop1"))
+    }
+
+    @Test
+    fun testEndBeforeFieldValues() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.get().documents
+        assertEquals(3, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
+
+        val secondPage = query.endBefore("bbb").get().documents
+        assertEquals(1, secondPage.size)
+        assertEquals("aaa", secondPage[0].get("prop1"))
+    }
+
+    @Test
+    fun testEndAtDocumentSnapshot() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.limit(2).get().documents // First 2 results
+        assertEquals(2, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+
+        val lastDocumentSnapshot = firstPage.lastOrNull()
+        assertNotNull(lastDocumentSnapshot)
+
+        val secondPage = query.endAt(lastDocumentSnapshot).get().documents
+        assertEquals(2, secondPage.size)
+        assertEquals("aaa", secondPage[0].get("prop1"))
+        assertEquals("bbb", secondPage[1].get("prop1"))
+    }
+
+    @Test
+    fun testEndAtFieldValues() = runTest {
+        setupFirestoreData()
+        val query = Firebase.firestore
+            .collection("testFirestoreQuerying")
+            .orderBy("prop1", Direction.ASCENDING)
+
+        val firstPage = query.get().documents // First 2 results
+        assertEquals(3, firstPage.size)
+        assertEquals("aaa", firstPage[0].get("prop1"))
+        assertEquals("bbb", firstPage[1].get("prop1"))
+        assertEquals("ccc", firstPage[2].get("prop1"))
+
+        val secondPage = query.endAt("bbb").get().documents
+        assertEquals(2, secondPage.size)
+        assertEquals("aaa", secondPage[0].get("prop1"))
+        assertEquals("bbb", secondPage[1].get("prop1"))
+    }
+
+    @Test
+    fun testIncrementFieldValue() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreIncrementFieldValue")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", count = 0))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(0, dataBefore.count)
+
+        doc.update("count" to FieldValue.increment(5))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(5, dataAfter.count)
+    }
+
+    @Test
+    fun testArrayUnion() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreArrayUnion")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first")))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first"), dataBefore.list)
+
+        doc.update("list" to FieldValue.arrayUnion("second"))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first", "second"), dataAfter.list)
+    }
+
+    @Test
+    fun testArrayRemove() = runTest {
+        val doc = Firebase.firestore
+            .collection("testFirestoreArrayRemove")
+            .document("test1")
+
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first", "second")))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first", "second"), dataBefore.list)
+
+        doc.update("list" to FieldValue.arrayRemove("second"))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(listOf("first"), dataAfter.list)
+    }
+
+    @Test
+    fun testLegacyDoubleTimestamp() = runTest {
+        @Serializable
+        data class DoubleTimestamp(
+            @Serializable(with = DoubleAsTimestampSerializer::class)
+            val time: Double?
+        )
+
+        val doc = Firebase.firestore
+            .collection("testLegacyDoubleTimestamp")
+            .document("test${Random.nextInt()}")
+
+        val deferredPendingWritesSnapshot = async {
+            withTimeout(5000) {
+                doc.snapshots.filter { it.exists }.first()
+            }
+        }
+        delay(100) // makes possible to catch pending writes snapshot
+
+        doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.serverTimestamp))
+
+        val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
+        assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
+        assertNotNull(pendingWritesSnapshot.get("time", DoubleAsTimestampSerializer, ServerTimestampBehavior.ESTIMATE ))
+        assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -345,13 +572,13 @@ class FirebaseFirestoreTest {
     }
 
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")
             .set(FirestoreTest.serializer(), FirestoreTest("aaa"))
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("two")
             .set(FirestoreTest.serializer(), FirestoreTest("bbb"))
-        Firebase.firestore.collection("FirebaseFirestoreTest")
+        Firebase.firestore.collection("testFirestoreQuerying")
             .document("three")
             .set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }

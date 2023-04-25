@@ -30,6 +30,13 @@ data class GenericClass<T : SealedClass>(
     val inner: T
 )
 
+@Serializable
+sealed class TestSealed {
+    @Serializable
+    @SerialName("child")
+    data class ChildClass(val map: Map<String, String>, val bool: Boolean = false): TestSealed()
+}
+
 class EncodersTest {
     @Test
     fun encodeMap() {
@@ -48,6 +55,12 @@ class EncodersTest {
     fun encodeObjectNullableValue() {
         val encoded = encode<TestData>(TestData.serializer(), TestData(mapOf("key" to "value"), true, nullableBool = true), shouldEncodeElementDefault = true)
         nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true, "nullableBool" to true), encoded)
+    }
+
+    @Test
+    fun encodeSealedClass() {
+        val encoded = encode<TestSealed>(TestSealed.serializer(), TestSealed.ChildClass(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
+        nativeAssertEquals(nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
     }
 
     @Test
@@ -85,5 +98,11 @@ class EncodersTest {
         val encoded = encode(serializer, generic, false)
         val decoded = decode(serializer, encoded)
         assertEquals(generic, decoded)
+    }
+
+    @Test
+    fun decodeSealedClass() {
+        val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true))
+        assertEquals(TestSealed.ChildClass(mapOf("key" to "value"), true), decoded)
     }
 }
