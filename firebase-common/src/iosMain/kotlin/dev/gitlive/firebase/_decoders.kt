@@ -20,7 +20,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
         FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
     }
     StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
-        FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
+        FirebaseCompositeDecoder(it.size, serializersModule = serializersModule) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
     }
     else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
