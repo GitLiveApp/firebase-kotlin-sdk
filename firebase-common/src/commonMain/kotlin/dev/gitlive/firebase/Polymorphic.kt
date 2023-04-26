@@ -14,9 +14,10 @@ import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 internal fun <T> FirebaseEncoder.encodePolymorphically(
     serializer: SerializationStrategy<T>,
     value: T,
+    settings: EncodeSettings,
     ifPolymorphic: (String) -> Unit
 ) {
-    if (serializer !is AbstractPolymorphicSerializer<*>) {
+    if (serializer !is AbstractPolymorphicSerializer<*> || settings.polymorphicStructure == EncodeDecodeSettings.PolymorphicStructure.LIST) {
         serializer.serialize(this, value)
         return
     }
@@ -30,9 +31,10 @@ internal fun <T> FirebaseEncoder.encodePolymorphically(
 @Suppress("UNCHECKED_CAST")
 internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     value: Any?,
+    decodeSettings: DecodeSettings,
     deserializer: DeserializationStrategy<T>,
 ): T {
-    if (deserializer !is AbstractPolymorphicSerializer<*>) {
+    if (deserializer !is AbstractPolymorphicSerializer<*> || decodeSettings.polymorphicStructure == EncodeDecodeSettings.PolymorphicStructure.LIST) {
         return deserializer.deserialize(this)
     }
 

@@ -18,17 +18,21 @@ import kotlinx.serialization.serializer
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T> decode(value: Any?): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value, EmptySerializersModule)
+    return decode(strategy as DeserializationStrategy<T>, value)
 }
-
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, serializersModule: SerializersModule = EmptySerializersModule): T {
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T = decode(strategy, value, DecodeSettings())
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, settings: DecodeSettings): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
-    return FirebaseDecoder(value, serializersModule).decodeSerializableValue(strategy)
+    return FirebaseDecoder(value, settings).decodeSerializableValue(strategy)
 }
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder
 expect fun getPolymorphicType(value: Any?, discriminator: String): String
 
-class FirebaseDecoder(val value: Any?, override val serializersModule: SerializersModule) : Decoder {
+class FirebaseDecoder(val value: Any?, internal val settings: DecodeSettings) : Decoder {
+
+    constructor(value: Any?) : this(value, DecodeSettings())
+
+    override val serializersModule: SerializersModule = settings.serializersModule
 
     override fun beginStructure(descriptor: SerialDescriptor) = structureDecoder(descriptor)
 
@@ -56,19 +60,19 @@ class FirebaseDecoder(val value: Any?, override val serializersModule: Serialize
 
     override fun decodeNull() = decodeNull(value)
 
-    override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
+    override fun decodeInline(descriptor: SerialDescriptor) = FirebaseDecoder(value, settings)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return decodeSerializableValuePolymorphic(value, deserializer)
+        return decodeSerializableValuePolymorphic(value, settings, deserializer)
     }
 }
 
 class FirebaseClassDecoder(
     size: Int,
-    serializersModule: SerializersModule,
+    settings: DecodeSettings,
     private val containsKey: (name: String) -> Boolean,
     get: (descriptor: SerialDescriptor, index: Int) -> Any?
-) : FirebaseCompositeDecoder(size, serializersModule, get) {
+) : FirebaseCompositeDecoder(size, settings, get) {
     private var index: Int = 0
 
     override fun decodeSequentially() = false
@@ -82,9 +86,11 @@ class FirebaseClassDecoder(
 
 open class FirebaseCompositeDecoder(
     private val size: Int,
-    override val serializersModule: SerializersModule,
+    internal val settings: DecodeSettings,
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?,
 ): CompositeDecoder {
+
+    override val serializersModule: SerializersModule = settings.serializersModule
 
     override fun decodeSequentially() = true
 
@@ -98,7 +104,7 @@ open class FirebaseCompositeDecoder(
         deserializer: DeserializationStrategy<T>,
         previousValue: T?
     ) = decodeElement(descriptor, index) {
-        deserializer.deserialize(FirebaseDecoder(it, serializersModule))
+        deserializer.deserialize(FirebaseDecoder(it, settings))
     }
 
     override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int) =
@@ -147,7 +153,7 @@ open class FirebaseCompositeDecoder(
     @ExperimentalSerializationApi
     override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder =
         decodeElement(descriptor, index) {
-            FirebaseDecoder(it, serializersModule)
+            FirebaseDecoder(it, settings)
         }
 
     private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T {

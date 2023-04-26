@@ -373,18 +373,6 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
-        open class Timestamp(seconds: Double, nanoseconds: Double) {
-            companion object {
-                fun now(): Timestamp
-            }
-
-            val seconds: Double
-            val nanoseconds: Double
-            fun toMillis(): Double
-
-            fun isEqual(other: Timestamp): Boolean
-        }
-
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
             fun where(field: String, opStr: String, value: Any?): Query

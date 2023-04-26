@@ -16,6 +16,7 @@ pluginManagement {
 
     plugins {
         kotlin("multiplatform") version kotlinVersion
+        kotlin("native.cocoapods") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
     }
 }
