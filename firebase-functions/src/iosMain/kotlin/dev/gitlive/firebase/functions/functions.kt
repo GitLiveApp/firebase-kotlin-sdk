@@ -10,7 +10,6 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
-import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -67,7 +66,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
         } else {
             job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
         }
-    }.freeze()
+    }
     function(callback)
     job.await()
 }
@@ -80,7 +79,7 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
         } else {
             job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
         }
-    }.freeze()
+    }
     function(callback)
     return job.await() as R
 }

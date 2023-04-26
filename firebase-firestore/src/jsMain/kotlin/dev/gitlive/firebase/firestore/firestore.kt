@@ -261,17 +261,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
         rethrow { async.update(strategy, data, encodeDefaults).await() }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            js.update(field, value, *moreFieldsAndValues)
-        }?.await()
-    }.run { Unit }
+    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
+        rethrow { async.update(fieldsAndValues = fieldsAndValues).await() }
 
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            js.update(field, value, *moreFieldsAndValues)
-        }?.await()
-    }.run { Unit }
+    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
+        rethrow { async.update(fieldsAndValues = fieldsAndValues).await() }
 
     actual suspend fun delete() = rethrow { async.delete().await() }
 
@@ -358,6 +352,9 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
     internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path.js, "==", equalTo)) }
+
+    internal actual fun _where(field: String, equalTo: DocumentReference) = rethrow { Query(js.where(field, "==", equalTo.js)) }
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = rethrow { Query(js.where(path.js, "==", equalTo.js)) }
 
     internal actual fun _where(
         field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
@@ -477,8 +474,6 @@ actual class CollectionReference(override val js: firebase.firestore.CollectionR
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
-    actual fun document() = rethrow { DocumentReference(js.doc()) }
-
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         rethrow { DocumentReference(js.add(encode(data, encodeDefaults)!!).await()) }
     actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
@@ -561,30 +556,6 @@ actual class FieldPath private constructor(val js: firebase.firestore.FieldPath)
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
-}
-
-/** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = firebase.firestore.FieldValue
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
-    init {
-        require(nativeValue is NativeFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue &&
-                (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
-
-    actual companion object {
-        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(NativeFieldValue.serverTimestamp()) }
-        actual val delete: FieldValue get() = rethrow { FieldValue(NativeFieldValue.delete()) }
-        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(firebase.firestore.FieldValue.increment(value)) }
-        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayUnion(*elements)) }
-        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayRemove(*elements)) }
-    }
 }
 
 //actual data class FirebaseFirestoreSettings internal constructor(

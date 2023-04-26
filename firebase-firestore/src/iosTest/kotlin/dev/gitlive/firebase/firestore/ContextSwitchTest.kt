@@ -5,7 +5,6 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.*
-import kotlin.native.concurrent.freeze
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -99,7 +98,7 @@ class ContextSwitchTest {
                         null
                     )
                 )
-            ).apply{ freeze() }
+            )
         }
     ) { data ->
 

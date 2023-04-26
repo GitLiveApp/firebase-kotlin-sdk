@@ -12,7 +12,6 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
-import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.timeIntervalSince1970
@@ -120,7 +119,7 @@ private suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     return job.await() as R
 }
@@ -133,7 +132,7 @@ private suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     job.await()
 }

@@ -3,10 +3,10 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.firebase
 import kotlinx.serialization.Serializable
 
-/** A class representing a platform specific Firebase FieldValue. */
+/** Represents a platform specific Firebase FieldValue. */
 private typealias NativeFieldValue = firebase.firestore.FieldValue
 
-/** A class representing a Firebase FieldValue. */
+/** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
 actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
     init {
@@ -19,9 +19,10 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     override fun toString(): String = nativeValue.toString()
 
     actual companion object {
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.delete())
-        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.serverTimestamp())
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayUnion(*elements))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayRemove(*elements))
+        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(NativeFieldValue.serverTimestamp()) }
+        actual val delete: FieldValue get() = rethrow { FieldValue(NativeFieldValue.delete()) }
+        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(firebase.firestore.FieldValue.increment(value)) }
+        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayUnion(*elements)) }
+        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayRemove(*elements)) }
     }
 }

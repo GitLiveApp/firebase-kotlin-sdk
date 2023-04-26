@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.SpecialValueSerializer
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
@@ -61,6 +62,8 @@ expect open class Query {
     suspend fun get(): QuerySnapshot
     internal fun _where(field: String, equalTo: Any?): Query
     internal fun _where(path: FieldPath, equalTo: Any?): Query
+    internal fun _where(field: String, equalTo: DocumentReference): Query
+    internal fun _where(path: FieldPath, equalTo: DocumentReference): Query
     internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null,
                         arrayContains: Any? = null, notEqualTo: Any? = null,
                         lessThanOrEqualTo: Any? = null, greaterThanOrEqualTo: Any? = null): Query
@@ -92,9 +95,10 @@ private val Any?.value get() = when (this) {
     else -> this
 }
 
-
 fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo.value)
 fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo.value)
+fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo)
+fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo)
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null,
                 arrayContains: Any? = null, notEqualTo: Any? = null,
                 lessThanOrEqualTo: Any? = null, greaterThanOrEqualTo: Any? = null) =
@@ -211,7 +215,6 @@ expect class CollectionReference : Query {
     val parent: DocumentReference?
 
     fun document(documentPath: String): DocumentReference
-    fun document(): DocumentReference
     suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
     suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
     @Suppress("DeferredIsResult")
@@ -300,26 +303,3 @@ expect class SnapshotMetadata {
 expect class FieldPath(vararg fieldNames: String) {
     val documentId: FieldPath
 }
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-expect class FieldValue internal constructor(nativeValue: Any) {
-    internal val nativeValue: Any
-
-    companion object {
-        val serverTimestamp: FieldValue
-        val delete: FieldValue
-        fun increment(value: Int): FieldValue
-        fun arrayUnion(vararg elements: Any): FieldValue
-        fun arrayRemove(vararg elements: Any): FieldValue
-    }
-}
-
-/** A serializer for [FieldValue]. Must be used in conjunction with [FirebaseEncoder]. */
-object FieldValueSerializer : SpecialValueSerializer<FieldValue>(
-    serialName = "FieldValue",
-    toNativeValue = FieldValue::nativeValue,
-    fromNativeValue = { raw ->
-        raw?.let(::FieldValue) ?: throw SerializationException("Cannot deserialize $raw")
-    }
-)

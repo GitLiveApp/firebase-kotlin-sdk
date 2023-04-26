@@ -102,7 +102,7 @@ class TimestampTests {
 
     @Test
     fun timestampMillisecondsConversion() = runTest {
-        val ms = 1666170858063
+        val ms = 1666170858063.0
         val seconds = 1666170858
         val nanoseconds = 63000000 // 1 millisecond = 1000 microseconds = 1000000 nanoseconds
         val timestamp = Timestamp.fromMilliseconds(ms)

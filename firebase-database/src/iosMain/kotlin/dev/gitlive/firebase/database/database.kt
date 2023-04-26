@@ -228,7 +228,7 @@ private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, fu
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
-    }.freeze()
+    }
     function(callback)
     return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
 }
@@ -241,7 +241,7 @@ suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSE
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
-    }.freeze()
+    }
     function(callback)
     job.run { if(whileOnline) awaitWhileOnline() else await() }
 }

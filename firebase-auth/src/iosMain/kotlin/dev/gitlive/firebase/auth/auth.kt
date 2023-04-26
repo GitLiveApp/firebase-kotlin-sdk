@@ -9,7 +9,6 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
-import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -156,7 +155,7 @@ internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: 
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     return job.await() as R
 }
@@ -169,7 +168,7 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     job.await()
 }

@@ -7,7 +7,6 @@ package dev.gitlive.firebase.firestore
 import cocoapods.FirebaseFirestore.*
 import cocoapods.FirebaseFirestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
-import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -127,11 +126,17 @@ actual class WriteBatch(val ios: FIRWriteBatch) {
             documentRef.ios
         ).let { this }
 
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(
-            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
-            documentRef.ios
-        ).let { this }
+    actual inline fun <reified T> update(
+        documentRef: DocumentReference,
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean,
+        vararg fieldsAndValues: Pair<String, Any?>
+    ): WriteBatch {
+        val serializedItem = encode(strategy, data, encodeDefaults) as Map<Any?, *>
+        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
+            field to encode(value, encodeDefaults)
+        }
 
         val result = serializedItem + serializedFieldAndValues
         return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
@@ -246,20 +251,10 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         async.update(strategy, data, encodeDefaults).await()
 
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        await { block ->
-            ios.updateData(
-                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
-                block
-            )
-        }
+        async.update(fieldsAndValues = fieldsAndValues).await()
 
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        await { block ->
-            ios.updateData(
-                fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
-                block
-            )
-        }
+        async.update(fieldsAndValues = fieldsAndValues).await()
 
     actual suspend fun delete() =
         async.delete().await()
@@ -271,9 +266,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         val listener = ios.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
-            Unit
-        }.freeze()
-        val listener = ios.addSnapshotListener(callback)
+        }
         awaitClose { listener.remove() }
     }
 
@@ -338,9 +331,7 @@ actual open class Query(open val ios: FIRQuery) {
         val listener = ios.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
-            Unit
-        }.freeze()
-        val listener = ios.addSnapshotListener(callback)
+        }
         awaitClose { listener.remove() }
     }
 
@@ -354,6 +345,9 @@ actual open class Query(open val ios: FIRQuery) {
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(ios.queryWhereField(field, isEqualTo = equalTo!!))
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(ios.queryWhereFieldPath(path.ios, isEqualTo = equalTo!!))
+
+    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(ios.queryWhereField(field, isEqualTo = equalTo.ios))
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(ios.queryWhereFieldPath(path.ios, isEqualTo = equalTo.ios))
 
     internal actual fun _where(
         field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
@@ -409,7 +403,6 @@ actual open class Query(open val ios: FIRQuery) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
-}
 
     internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios))
     internal actual fun _startAfter(vararg fieldValues: Any) = Query(ios.queryStartingAfterValues(fieldValues.asList()))
@@ -430,11 +423,11 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
 
     actual val async = Async(ios)
 
+    actual val document get() = DocumentReference(ios.documentWithAutoID())
+
     actual val parent get() = ios.parent?.let{DocumentReference(it)}
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
-
-    actual fun document() = DocumentReference(ios.documentWithAutoID())
 
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(await { ios.addDocumentWithData(encode(data, encodeDefaults) as Map<Any?, *>, it) })
@@ -583,29 +576,6 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
     override fun toString(): String = ios.toString()
 }
 
-/** A class representing a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = FIRFieldValue
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
-    init {
-        require(nativeValue is NativeFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue && nativeValue == other.nativeValue
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
-
-    actual companion object {
-        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
-        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.fieldValueForIntegerIncrement(value.toLong()))
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
-    }
-}
-
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
         val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
@@ -626,7 +596,7 @@ suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     return job.await() as T
 }
@@ -639,7 +609,7 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     val result = function(callback)
     job.await()
     return result
@@ -655,7 +625,7 @@ internal inline fun <T> deferred(function: (callback: (NSError?) -> Unit) -> T):
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     val result = function(callback)
     return job.convert { result }
 }

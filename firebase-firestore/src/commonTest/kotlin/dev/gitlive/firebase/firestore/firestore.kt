@@ -85,9 +85,9 @@ class FirebaseFirestoreTest {
         val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
-        assertEquals("aaa", resultDocs[0].document.get("prop1"))
-        assertEquals("bbb", resultDocs[1].document.get("prop1"))
-        assertEquals("ccc", resultDocs[2].document.get("prop1"))
+        assertEquals("aaa", resultDocs[0].get("prop1"))
+        assertEquals("bbb", resultDocs[1].get("prop1"))
+        assertEquals("ccc", resultDocs[2].get("prop1"))
     }
 
     @Test
@@ -97,9 +97,9 @@ class FirebaseFirestoreTest {
         val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
-        assertEquals("aaa", resultDocs[0].document.get("prop1"))
-        assertEquals("bbb", resultDocs[1].document.get("prop1"))
-        assertEquals("ccc", resultDocs[2].document.get("prop1"))
+        assertEquals("aaa", resultDocs[0].get("prop1"))
+        assertEquals("bbb", resultDocs[1].get("prop1"))
+        assertEquals("ccc", resultDocs[2].get("prop1"))
     }
 
     @Test
@@ -109,9 +109,9 @@ class FirebaseFirestoreTest {
         val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
-        assertEquals("aaa", resultDocs[0].document.get("prop1"))
-        assertEquals("bbb", resultDocs[1].document.get("prop1"))
-        assertEquals("ccc", resultDocs[2].document.get("prop1"))
+        assertEquals("aaa", resultDocs[0].get("prop1"))
+        assertEquals("bbb", resultDocs[1].get("prop1"))
+        assertEquals("ccc", resultDocs[2].get("prop1"))
     }
 
     @Test
@@ -121,9 +121,9 @@ class FirebaseFirestoreTest {
         val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
-        assertEquals("ccc", resultDocs[0].document.get("prop1"))
-        assertEquals("bbb", resultDocs[1].document.get("prop1"))
-        assertEquals("aaa", resultDocs[2].document.get("prop1"))
+        assertEquals("ccc", resultDocs[0].get("prop1"))
+        assertEquals("bbb", resultDocs[1].get("prop1"))
+        assertEquals("aaa", resultDocs[2].get("prop1"))
     }
 
     @Test
@@ -133,9 +133,9 @@ class FirebaseFirestoreTest {
         val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
-        assertEquals("ccc", resultDocs[0].document.get("prop1"))
-        assertEquals("bbb", resultDocs[1].document.get("prop1"))
-        assertEquals("aaa", resultDocs[2].document.get("prop1"))
+        assertEquals("ccc", resultDocs[0].get("prop1"))
+        assertEquals("bbb", resultDocs[1].get("prop1"))
+        assertEquals("aaa", resultDocs[2].get("prop1"))
     }
 
     @Test
@@ -247,7 +247,7 @@ class FirebaseFirestoreTest {
     fun testDocumentAutoId() = runTest {
         val doc = Firebase.firestore
             .collection("testDocumentAutoId")
-            .document()
+            .document
 
         doc.set(FirestoreTest.serializer(), FirestoreTest("AutoId"))
 

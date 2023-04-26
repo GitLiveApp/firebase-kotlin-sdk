@@ -5,6 +5,7 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SetOptions
@@ -37,6 +38,15 @@ private fun <R> performUpdate(
     fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
     update: (com.google.firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
 ) = performUpdate(fieldsAndValues, { it.android }, { encode(it, true) }, update)
+
+@Suppress("DeferredIsResult")
+@PublishedApi
+internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<Unit>()
+    .apply {
+        asDeferred().invokeOnCompletion { exception ->
+            if (exception == null) complete(Unit) else completeExceptionally(exception)
+        }
+    }
 
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
@@ -291,17 +301,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     @JvmName("updateFields")
     actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            android.update(field, value, *moreFieldsAndValues)
-        }?.await()
-            .run { Unit }
+        async.update(fieldsAndValues = fieldsAndValues).await()
 
     @JvmName("updateFieldPaths")
     actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            android.update(field, value, *moreFieldsAndValues)
-        }?.await()
-            .run { Unit }
+        async.update(fieldsAndValues = fieldsAndValues).await()
 
     actual suspend fun delete() =
         async.delete().await()
@@ -411,6 +415,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
 
+    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
+
     internal actual fun _where(
         field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
         lessThanOrEqualTo: Any?, greaterThanOrEqualTo: Any?
@@ -494,8 +501,6 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
-    actual fun document() = DocumentReference(android.document())
-
     actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
         DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
     actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
@@ -572,28 +577,11 @@ actual class SnapshotMetadata(val android: com.google.firebase.firestore.Snapsho
 }
 
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
-    actual constructor(vararg fieldNames: String) : this(com.google.firebase.firestore.FieldPath.of(*fieldNames))
+    actual constructor(vararg fieldNames: String) : this(
+        com.google.firebase.firestore.FieldPath.of(
+            *fieldNames
+        )
+    )
+
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
-
-/** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = com.google.firebase.firestore.FieldValue
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
-    init {
-        require(nativeValue is NativeFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue && nativeValue == other.nativeValue
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
-
-    actual companion object {
-        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.serverTimestamp())
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.delete())
-        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.increment(value.toDouble()))
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayUnion(*elements))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayRemove(*elements))
-    }
 }
