@@ -17,25 +17,27 @@ repositories {
 
 android {
     val minSdkVersion: Int by project
-    val targetSdkVersion: Int by project
+    val compileSdkVersion: Int by project
 
-    compileSdk = targetSdkVersion
+    compileSdk = compileSdkVersion
+    namespace="dev.gitlive.firebase"
+
     defaultConfig {
         minSdk = minSdkVersion
-        targetSdk = targetSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -69,12 +71,12 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseCore") {
-                version = "10.7.0"
+                version = "10.9.0"
             }
         }
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs {
             testTask {
@@ -95,19 +97,21 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 implementation(project(":firebase-common"))
             }
         }
 
-        val androidMain by getting {
+        getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-common")
             }
@@ -121,8 +125,6 @@ kotlin {
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        val jsMain by getting
     }
 }
 

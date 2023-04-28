@@ -14,28 +14,29 @@ plugins {
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.crashlytics"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -63,7 +64,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseCrashlytics") {
-                version = "10.7.0"
+                version = "10.9.0"
             }
         }
     }
@@ -71,21 +72,23 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
             }
         }
 
-        val androidMain by getting {
+        getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-crashlytics")
             }
