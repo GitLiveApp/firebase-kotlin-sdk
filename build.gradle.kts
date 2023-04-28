@@ -242,7 +242,7 @@ subprojects {
         }
     }
 
-    // Workaround for Kapt not setting the proper JVM target
+    // Workaround for setting kotlinOptions.jvmTarget
     // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions.jvmTarget = "11"

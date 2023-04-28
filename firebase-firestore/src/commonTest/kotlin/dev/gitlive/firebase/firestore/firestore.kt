@@ -220,7 +220,7 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.ESTIMATE))
-        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), serverTimestampBehavior = ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -484,8 +484,8 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNotNull(pendingWritesSnapshot.get("time", DoubleAsTimestampSerializer, ServerTimestampBehavior.ESTIMATE ))
-        assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotNull(pendingWritesSnapshot.get("time", DoubleAsTimestampSerializer, serverTimestampBehavior = ServerTimestampBehavior.ESTIMATE ))
+        assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), serverTimestampBehavior = ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -531,7 +531,7 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-updated",
                 time = 123.0
             ),
-            encodeDefaults = false,
+            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false),
             fieldsAndValues = arrayOf(
                 "time" to FieldValue.delete
             )
@@ -562,7 +562,7 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-set",
                 time = 126.0
             ),
-            encodeDefaults = false,
+            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false),
             fieldsAndValues = arrayOf<Pair<String, Any>>()
         )
         batch.commit()

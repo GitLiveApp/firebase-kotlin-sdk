@@ -99,9 +99,17 @@ kotlin {
             }
         }
 
+        val commonTest by getting
+
         getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-common")
+            }
+        }
+
+        getByName("androidInstrumentedTest") {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 

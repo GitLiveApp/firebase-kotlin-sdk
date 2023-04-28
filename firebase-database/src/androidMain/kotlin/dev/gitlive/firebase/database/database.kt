@@ -263,5 +263,4 @@ actual class OnDisconnect internal constructor(
             .run { Unit }
 }
 
-actual typealias DatabaseException = com.google.firebase.database.DatabaseException
-
+actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)

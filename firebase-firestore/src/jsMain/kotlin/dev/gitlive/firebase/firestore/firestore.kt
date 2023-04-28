@@ -71,13 +71,13 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
 
     actual val async = Async(js)
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
     ): BaseWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>,
@@ -94,10 +94,10 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
             }
         }.let { this }
 
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
             .let { this }
 
-    override fun update(
+    override fun updateEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>
@@ -109,7 +109,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
         js.update(documentRef.js, result)
     }.let { this }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseWriteBatch = rethrow {
@@ -118,7 +118,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
         }
     }.let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): BaseWriteBatch = rethrow {
@@ -141,7 +141,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
 
 actual class Transaction(val js: firebase.firestore.Transaction) : BaseTransaction() {
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
@@ -150,10 +150,10 @@ actual class Transaction(val js: firebase.firestore.Transaction) : BaseTransacti
     }
     .let { this }
 
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseTransaction = rethrow { js.update(documentRef.js, encodedData) }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = rethrow { js.update(documentRef.js, encodedData) }
             .let { this }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseTransaction = rethrow {
@@ -162,7 +162,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) : BaseTransacti
         }
     }.let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): BaseTransaction = rethrow {
@@ -217,13 +217,13 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     @Suppress("DeferredIsResult")
     class Async(@PublishedApi internal val js: NativeDocumentReference) : BaseDocumentReference.Async() {
 
-        override fun set(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = rethrow {
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = rethrow {
             js.set(encodedData, setOptions.js).asDeferred()
         }
 
-        override fun update(encodedData: Any): Deferred<Unit> = rethrow { js.update(encodedData).asDeferred() }
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = rethrow { js.update(encodedData).asDeferred() }
 
-        override fun updateFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = rethrow {
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
                 js.update(field, value, *moreFieldsAndValues)
@@ -231,7 +231,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
                 ?.asDeferred() ?: CompletableDeferred(Unit)
         }
 
-        override fun updateFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = rethrow {
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
                     js.update(field, value, *moreFieldsAndValues)

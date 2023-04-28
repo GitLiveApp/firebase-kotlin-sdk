@@ -46,7 +46,7 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         com.google.firebase.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
+    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T =
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
@@ -87,7 +87,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
 
     actual val async = Async(android)
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
@@ -98,7 +98,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>,
@@ -117,10 +117,10 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    override fun update(
+    override fun updateEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>
@@ -132,14 +132,14 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
         return android.update(documentRef.android, result).let { this }
     }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseWriteBatch = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
         android.update(documentRef.android, field, value, *moreFieldsAndValues)
     }.let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): BaseWriteBatch = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
@@ -159,7 +159,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
 
 actual class Transaction(val android: com.google.firebase.firestore.Transaction) : BaseTransaction() {
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
@@ -171,16 +171,16 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseTransaction = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseTransaction = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
         android.update(documentRef.android, field, value, *moreFieldsAndValues)
     }.let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ) = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
@@ -233,18 +233,18 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     @Suppress("DeferredIsResult")
     class Async(@PublishedApi internal val android: NativeDocumentReference) : BaseDocumentReference.Async() {
 
-        override fun set(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = (setOptions.android?.let {
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = (setOptions.android?.let {
             android.set(encodedData, it)
         } ?: android.set(encodedData)).asUnitDeferred()
 
         @Suppress("UNCHECKED_CAST")
-        override fun update(encodedData: Any): Deferred<Unit> = android.update(encodedData as Map<String, Any>).asUnitDeferred()
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = android.update(encodedData as Map<String, Any>).asUnitDeferred()
 
-        override fun updateFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }?.let {
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }?.let {
             android.update(encodedFieldsAndValues.toMap())
         }?.asUnitDeferred() ?: CompletableDeferred(Unit)
 
-        override fun updateFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
             ?.performUpdate { field, value, moreFieldsAndValues ->
                 android.update(field, value, moreFieldsAndValues)
             }?.asUnitDeferred() ?: CompletableDeferred(Unit)

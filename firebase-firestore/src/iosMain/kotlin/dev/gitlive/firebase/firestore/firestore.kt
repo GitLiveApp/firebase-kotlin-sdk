@@ -78,7 +78,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
 
     actual val async = Async(ios)
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
@@ -89,7 +89,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
         is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.encodedFieldPaths)
     }.let { this }
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>,
@@ -103,9 +103,9 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
         return this
     }
 
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
 
-    override fun update(
+    override fun updateEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         encodedFieldsAndValues: List<Pair<String, Any?>>
@@ -117,7 +117,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
         return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
     }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseWriteBatch = ios.updateData(
@@ -125,7 +125,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
         documentRef.ios
     ).let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): BaseWriteBatch = ios.updateData(
@@ -146,7 +146,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
 @Suppress("UNCHECKED_CAST")
 actual class Transaction(val ios: FIRTransaction) : BaseTransaction() {
 
-    override fun set(
+    override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
@@ -157,9 +157,9 @@ actual class Transaction(val ios: FIRTransaction) : BaseTransaction() {
         is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.encodedFieldPaths)
     }.let { this }
 
-    override fun update(documentRef: DocumentReference, encodedData: Any): BaseTransaction = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
 
-    override fun updateFieldsAndValues(
+    override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): BaseTransaction = ios.updateData(
@@ -167,7 +167,7 @@ actual class Transaction(val ios: FIRTransaction) : BaseTransaction() {
         documentRef.ios
     ).let { this }
 
-    override fun updateFieldPathsAndValues(
+    override fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): BaseTransaction = ios.updateData(
@@ -222,7 +222,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     class Async(@PublishedApi internal val ios: NativeDocumentReference) : BaseDocumentReference.Async() {
 
-        override fun set(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = deferred {
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = deferred {
             when (setOptions) {
                 is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, true, it)
                 is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, false, it)
@@ -231,15 +231,15 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
             }
         }
 
-        override fun update(encodedData: Any): Deferred<Unit> = deferred {
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = deferred {
             ios.updateData(encodedData as Map<Any?, *>, it)
         }
 
-        override fun updateFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = deferred {
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = deferred {
             ios.updateData(encodedFieldsAndValues.toMap(), it)
         }
 
-        override fun updateFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = deferred {
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = deferred {
             ios.updateData(encodedFieldsAndValues.toMap(), it)
         }
 
@@ -374,6 +374,7 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
 
 actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual enum class FirestoreExceptionCode {

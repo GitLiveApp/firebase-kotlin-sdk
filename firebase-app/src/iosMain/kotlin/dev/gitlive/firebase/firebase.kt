@@ -57,7 +57,7 @@ actual class FirebaseOptions actual constructor(
                 is String -> FIROptions(contentsOfFile = context)
                 else -> FIROptions.defaultOptions()
             }?.run {
-                FirebaseOptions(googleAppID!!, APIKey!!, databaseURL, trackingID, storageBucket, projectID, GCMSenderID)
+                FirebaseOptions(googleAppID, APIKey!!, databaseURL, trackingID, storageBucket, projectID, GCMSenderID)
             }
         }
     }

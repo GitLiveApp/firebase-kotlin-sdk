@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -106,7 +107,7 @@ class ContextSwitchTest {
             .document("fieldValuesOps")
 
         // store
-        getDocument().set(strategy = TestData.serializer(), data = TestData(data.initial), encodeDefaults = true, merge = false)
+        getDocument().set(strategy = TestData.serializer(), data = TestData(data.initial), encodeSettings = EncodeSettings(shouldEncodeElementDefault = true), merge = false)
 
         // append & verify
         getDocument().update(data.updates[0].op)
