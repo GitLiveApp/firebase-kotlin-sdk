@@ -15,7 +15,7 @@ sealed class EncodeDecodeSettings {
 }
 
 data class EncodeSettings(
-    val shouldEncodeElementDefault: Boolean,
+    val shouldEncodeElementDefault: Boolean = true,
     override val serializersModule: SerializersModule = EmptySerializersModule(),
     override val polymorphicStructure: PolymorphicStructure = PolymorphicStructure.MAP
 ) : EncodeDecodeSettings()

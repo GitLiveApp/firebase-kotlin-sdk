@@ -43,7 +43,7 @@ class FirebaseEncoder(
     internal val settings: EncodeSettings
 ) : Encoder {
 
-    constructor(shouldEncodeElementDefault: Boolean) : this(EncodeSettings(shouldEncodeElementDefault))
+//    constructor(shouldEncodeElementDefault: Boolean) : this(EncodeSettings(shouldEncodeElementDefault))
 
     var value: Any? = null
 

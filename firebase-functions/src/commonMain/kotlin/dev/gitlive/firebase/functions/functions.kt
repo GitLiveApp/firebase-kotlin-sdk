@@ -4,9 +4,12 @@
 
 package dev.gitlive.firebase.functions
 
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.encode
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 
@@ -18,15 +21,19 @@ expect class FirebaseFunctions {
     fun useFunctionsEmulator(origin: String)
 }
 
-expect class HttpsCallableReference {
-    suspend operator inline fun <reified T> invoke(data: T, encodeDefaults: Boolean = true): HttpsCallableResult
-    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): HttpsCallableResult
+abstract class BaseHttpsCallableReference {
+    suspend inline operator fun <reified T> invoke(data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(data, encodeSettings)!!)
+    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(strategy, data, encodeSettings)!!)
+    abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
+}
+
+expect class HttpsCallableReference : BaseHttpsCallableReference {
     suspend operator fun invoke(): HttpsCallableResult
 }
 
 expect class HttpsCallableResult {
     inline fun <reified T> data(): T
-    fun <T> data(strategy: DeserializationStrategy<T>): T
+    fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings()): T
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

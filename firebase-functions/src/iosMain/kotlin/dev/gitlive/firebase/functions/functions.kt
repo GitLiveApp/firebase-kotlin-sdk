@@ -5,6 +5,8 @@
 package dev.gitlive.firebase.functions
 
 import cocoapods.FirebaseFunctions.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -37,14 +39,10 @@ actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
-actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {
+actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) : BaseHttpsCallableReference() {
     actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 
-    actual suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(data, encodeDefaults), it) })
-
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(strategy, data, encodeDefaults), it) })
+    override suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(ios.awaitResult { callWithObject(encodedData, it) })
 }
 
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
@@ -52,8 +50,8 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
     actual inline fun <reified T> data() =
         decode<T>(value = ios.data())
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.data())
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
+        decode(strategy, ios.data(), decodeSettings)
 }
 
 actual class FirebaseFunctionsException(message: String): FirebaseException(message)
