@@ -5,6 +5,8 @@ import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firebaseSerializer
 import kotlinx.serialization.Serializable
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 
 @Serializable
 data class TestData(
@@ -102,14 +104,12 @@ class TimestampTests {
 
     @Test
     fun timestampMillisecondsConversion() = runTest {
-        val ms = 1666170858063.0
-        val seconds = 1666170858
-        val nanoseconds = 63000000 // 1 millisecond = 1000 microseconds = 1000000 nanoseconds
-        val timestamp = Timestamp.fromMilliseconds(ms)
-
-        assertEquals(seconds.toLong(), timestamp.seconds)
+        val ms = 1666170858063.milliseconds
+        val (seconds, nanoseconds) = ms.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
+        val timestamp = Timestamp.fromDuration(ms)
+        assertEquals(seconds, timestamp.seconds)
         assertEquals(nanoseconds, timestamp.nanoseconds)
 
-        assertEquals(ms, timestamp.toMilliseconds())
+        assertEquals(ms.toDouble(DurationUnit.MILLISECONDS), timestamp.toMilliseconds())
     }
 }

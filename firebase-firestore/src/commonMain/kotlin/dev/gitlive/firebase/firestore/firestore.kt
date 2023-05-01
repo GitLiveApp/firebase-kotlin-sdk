@@ -62,9 +62,9 @@ abstract class BaseTransaction {
     fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncoded(documentRef, encode(strategy, data, encodeSettings)!!)
 
     @JvmName("updateFields")
-    fun update(documentRef: DocumentReference, encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<String, Any?>) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
     @JvmName("updateFieldPaths")
-    fun update(documentRef: DocumentReference, encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<FieldPath, Any?>) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
 
     protected abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction
     protected abstract fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<String, Any?>>): BaseTransaction
@@ -175,9 +175,9 @@ abstract class BaseWriteBatch {
         updateEncoded(documentRef, encode(strategy, data, encodeSettings)!!, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
 
     @JvmName("updateField")
-    fun update(documentRef: DocumentReference, encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<String, Any?>) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
     @JvmName("updateFieldPath")
-    fun update(documentRef: DocumentReference, encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<FieldPath, Any?>) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
 
     abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch
     abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any, encodedFieldsAndValues: List<Pair<String, Any?>>): BaseWriteBatch
@@ -221,9 +221,9 @@ abstract class BaseDocumentReference {
         fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) = update(encode(strategy, data, encodeSettings))
 
         @JvmName("updateFields")
-        fun update(encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<String, Any?>) = updateEncodedFieldsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+        fun update(vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
         @JvmName("updateFieldPaths")
-        fun update(encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<FieldPath, Any?>) = updateEncodedFieldPathsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+        fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
 
         abstract fun updateEncoded(encodedData: Any): Deferred<Unit>
         protected abstract fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit>
@@ -261,12 +261,12 @@ abstract class BaseDocumentReference {
         async.update(strategy, data, encodeSettings).await()
 
     @JvmName("updateFields")
-    suspend fun update(encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<String, Any?>) =
-        async.update(encodeSettings, fieldsAndValues = fieldsAndValues).await()
+    suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(fieldsAndValues = fieldsAndValues, encodeSettings).await()
 
     @JvmName("updateFieldPaths")
-    suspend fun update(encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        async.update(encodeSettings, fieldsAndValues = fieldsAndValues).await()
+    suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(fieldsAndValues = fieldsAndValues, encodeSettings).await()
 
     suspend fun delete() =
         async.delete().await()

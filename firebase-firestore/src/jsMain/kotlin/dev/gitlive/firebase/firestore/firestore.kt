@@ -77,6 +77,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
         setOptions: SetOptions
     ): BaseWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
@@ -97,6 +98,7 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
     override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
             .let { this }
 
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
     override fun updateEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
