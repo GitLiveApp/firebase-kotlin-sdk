@@ -8,6 +8,7 @@ import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlin.js.Json
 import kotlin.js.json
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
@@ -16,7 +17,9 @@ actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): Fireb
         val map = json()
         var lastKey = ""
         value = map
-        FirebaseCompositeEncoder(settings) { _, index, value -> if(index % 2 == 0) lastKey = value as String else map[lastKey] = value }
+        FirebaseCompositeEncoder(settings) { _, index, value -> if(index % 2 == 0) {
+            lastKey = (value as? String) ?: JSON.stringify(value)
+        }else map[lastKey] = value }
     }
     StructureKind.CLASS,  StructureKind.OBJECT -> encodeAsMap(descriptor)
     is PolymorphicKind -> when (settings.polymorphicStructure) {

@@ -5,21 +5,35 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.descriptors.PolymorphicKind
+import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.descriptors.elementDescriptors
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlin.js.Json
 
-actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder = when(descriptor.kind) {
+actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder = when (descriptor.kind) {
     StructureKind.CLASS, StructureKind.OBJECT -> decodeAsMap(false)
     StructureKind.LIST -> decodeAsList()
     StructureKind.MAP -> (js("Object").entries(value) as Array<Array<Any>>).let {
-        FirebaseCompositeDecoder(it.size, settings) { _, index -> it[index/2].run { if(index % 2 == 0) get(0) else get(1) } }
+        FirebaseCompositeDecoder(
+            it.size,
+            settings
+        ) { desc, index -> it[index / 2].run { if (index % 2 == 0) {
+            val key = get(0) as String
+            if (desc.getElementDescriptor(index).kind == PrimitiveKind.STRING) {
+                key
+            } else {
+                JSON.parse(key)
+            }
+        } else get(1) } }
     }
+
     is PolymorphicKind -> when (settings.polymorphicStructure) {
         EncodeDecodeSettings.PolymorphicStructure.MAP -> decodeAsMap(polymorphicIsNested)
         EncodeDecodeSettings.PolymorphicStructure.LIST -> decodeAsList()
     }
+
     else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
 

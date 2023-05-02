@@ -16,10 +16,10 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T> decode(value: Any?): T {
+inline fun <reified T> decode(value: Any?): T = decode(value, DecodeSettings())
+inline fun <reified T> decode(value: Any?, settings: DecodeSettings): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value)
+    return decode(strategy as DeserializationStrategy<T>, value, settings)
 }
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T = decode(strategy, value, DecodeSettings())
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, settings: DecodeSettings): T {
@@ -166,7 +166,7 @@ open class FirebaseCompositeDecoder(
 
     private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T {
         return try {
-            decoder(get(descriptor, index))
+          decoder(get(descriptor, index))
         } catch (e: Exception) {
             throw SerializationException(
                 message = "Exception during decoding ${descriptor.serialName} ${descriptor.getElementName(index)}",

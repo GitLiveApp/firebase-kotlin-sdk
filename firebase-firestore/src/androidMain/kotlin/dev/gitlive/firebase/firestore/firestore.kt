@@ -450,6 +450,9 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
     actual val encoded: EncodedFieldPath = android
+    override fun equals(other: Any?): Boolean = other is FieldPath && android == other.android
+    override fun hashCode(): Int = android.hashCode()
+    override fun toString(): String = android.toString()
 }
 
 actual typealias EncodedFieldPath = com.google.firebase.firestore.FieldPath
