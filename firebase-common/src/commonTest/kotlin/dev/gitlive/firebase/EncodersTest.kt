@@ -48,6 +48,12 @@ abstract class AbstractClass {
 @SerialName("implemented")
 data class ImplementedClass(override val value: String, val otherValue: Boolean) : AbstractClass()
 
+@Serializable
+data class NestedClass(
+    val sealed: SealedClass,
+    val abstractClass: AbstractClass
+)
+
 class EncodersTest {
 
     @Test
@@ -163,5 +169,51 @@ class EncodersTest {
 
         val decoded = decode(AbstractClass.serializer(), encoded, DecodeSettings(module, polymorphicStructure = EncodeDecodeSettings.PolymorphicStructure.LIST))
         assertEquals(abstractClass, decoded)
+    }
+
+    @Test
+    fun encodeDecodeNestedClass() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, ImplementedClass::class, ImplementedClass.serializer())
+        }
+
+        val sealedClass: SealedClass = SealedClass.Test("value")
+        val abstractClass: AbstractClass = ImplementedClass("value", true)
+        val nestedClass = NestedClass(sealedClass, abstractClass)
+        val encoded = encode(NestedClass.serializer(), nestedClass, EncodeSettings(true, module))
+
+        nativeAssertEquals(
+            nativeMapOf(
+                "sealed" to nativeMapOf("type" to "test", "value" to "value"),
+                "abstractClass" to nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true)
+            ),
+            encoded
+        )
+
+        val decoded = decode(NestedClass.serializer(), encoded, DecodeSettings(module))
+        assertEquals(nestedClass, decoded)
+    }
+
+    @Test
+    fun encodeDecodeNestedClassAsList() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, ImplementedClass::class, ImplementedClass.serializer())
+        }
+
+        val sealedClass: SealedClass = SealedClass.Test("value")
+        val abstractClass: AbstractClass = ImplementedClass("value", true)
+        val nestedClass = NestedClass(sealedClass, abstractClass)
+        val encoded = encode(NestedClass.serializer(), nestedClass, EncodeSettings(true, module, polymorphicStructure = EncodeDecodeSettings.PolymorphicStructure.LIST))
+
+        nativeAssertEquals(
+            nativeMapOf(
+                "sealed" to nativeListOf("test", nativeMapOf("value" to "value")),
+                "abstractClass" to nativeListOf("implemented", nativeMapOf("value" to "value", "otherValue" to true))
+            ),
+            encoded
+        )
+
+        val decoded = decode(NestedClass.serializer(), encoded, DecodeSettings(module, polymorphicStructure = EncodeDecodeSettings.PolymorphicStructure.LIST))
+        assertEquals(nestedClass, decoded)
     }
 }

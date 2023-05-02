@@ -7,6 +7,7 @@ package dev.gitlive.firebase
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
@@ -25,7 +26,7 @@ fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, settings: Deco
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
     return FirebaseDecoder(value, settings).decodeSerializableValue(strategy)
 }
-expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder
+expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder
 expect fun getPolymorphicType(value: Any?, discriminator: String): String
 
 class FirebaseDecoder(val value: Any?, internal val settings: DecodeSettings) : Decoder {
@@ -34,7 +35,7 @@ class FirebaseDecoder(val value: Any?, internal val settings: DecodeSettings) : 
 
     override val serializersModule: SerializersModule = settings.serializersModule
 
-    override fun beginStructure(descriptor: SerialDescriptor) = structureDecoder(descriptor)
+    override fun beginStructure(descriptor: SerialDescriptor) = structureDecoder(descriptor, true)
 
     override fun decodeString() = decodeString(value)
 
@@ -77,11 +78,18 @@ class FirebaseClassDecoder(
 
     override fun decodeSequentially() = false
 
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int =
-        (index until descriptor.elementsCount)
-            .firstOrNull { !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it)) }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return (index until descriptor.elementsCount)
+            .firstOrNull {
+                !descriptor.isElementOptional(it) || containsKey(
+                    descriptor.getElementName(
+                        it
+                    )
+                )
+            }
             ?.also { index = it + 1 }
             ?: DECODE_DONE
+    }
 }
 
 open class FirebaseCompositeDecoder(

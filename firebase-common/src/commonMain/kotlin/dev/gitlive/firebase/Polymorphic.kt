@@ -37,12 +37,11 @@ internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     if (deserializer !is AbstractPolymorphicSerializer<*> || decodeSettings.polymorphicStructure == EncodeDecodeSettings.PolymorphicStructure.LIST) {
         return deserializer.deserialize(this)
     }
-
     val casted = deserializer as AbstractPolymorphicSerializer<Any>
     val discriminator = deserializer.descriptor.classDiscriminator()
     val type = getPolymorphicType(value, discriminator)
     val actualDeserializer = casted.findPolymorphicSerializerOrNull(
-        structureDecoder(deserializer.descriptor),
+        structureDecoder(deserializer.descriptor, false),
         type
     ) as DeserializationStrategy<T>
     return actualDeserializer.deserialize(this)
