@@ -22,10 +22,10 @@ import platform.Foundation.NSNull
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = TODO("Come back to issue")
-//actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-//    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios))
-//}
+@Suppress("CAST_NEVER_SUCCEEDS")
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
+    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp))
+}
 
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
@@ -48,8 +48,8 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         await { ios.clearPersistenceWithCompletion(it) }
 
     actual fun useEmulator(host: String, port: Int) {
+        ios.useEmulatorWithHost(host, port.toLong())
         ios.settings = ios.settings.apply {
-            this.host = "$host:$port"
             persistenceEnabled = false
             sslEnabled = false
         }
