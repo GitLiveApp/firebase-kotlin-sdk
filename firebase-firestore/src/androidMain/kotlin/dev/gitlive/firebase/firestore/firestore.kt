@@ -276,7 +276,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
         override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
             ?.performUpdate { field, value, moreFieldsAndValues ->
-                android.update(field, value, moreFieldsAndValues)
+                android.update(field, value, *moreFieldsAndValues)
             }?.asUnitDeferred() ?: CompletableDeferred(Unit)
 
         override fun delete() =
