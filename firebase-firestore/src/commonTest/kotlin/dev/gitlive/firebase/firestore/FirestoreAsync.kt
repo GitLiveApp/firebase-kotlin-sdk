@@ -28,7 +28,7 @@ class FirestoreAsync {
                     )
                 )
                 Firebase.firestore.useEmulator(emulatorHost, 8080)
-                Firebase.firestore.setSettings(persistenceEnabled = true)
+                Firebase.firestore.setSettings(createFirestoreTestSettings(cacheSettings = LocalCacheSettings.Persistent()))
             }
     }
     @Serializable

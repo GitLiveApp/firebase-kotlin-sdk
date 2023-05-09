@@ -5,11 +5,9 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.*
 import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.encoding.*
 import kotlinx.serialization.modules.SerializersModule
-import kotlin.reflect.KClass
 
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value, EncodeSettings(shouldEncodeElementDefault))
 

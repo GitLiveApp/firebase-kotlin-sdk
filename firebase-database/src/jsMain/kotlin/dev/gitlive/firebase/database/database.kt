@@ -29,9 +29,20 @@ actual fun Firebase.database(app: FirebaseApp, url: String) =
     rethrow { dev.gitlive.firebase.database; FirebaseDatabase(app.js.database(url)) }
 
 actual class FirebaseDatabase internal constructor(val js: firebase.database.Database) {
+
+    actual data class Settings(
+        actual val persistenceEnabled: Boolean = false,
+        actual val persistenceCacheSizeBytes: Long? = null,
+    ) {
+
+        actual companion object {
+            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
+        }
+    }
+
     actual fun reference(path: String) = rethrow { DatabaseReference(js.ref(path)) }
     actual fun reference() = rethrow { DatabaseReference(js.ref()) }
-    actual fun setPersistenceEnabled(enabled: Boolean) {}
+    actual fun setSettings(settings: Settings) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { firebase.database.enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 }

@@ -5,9 +5,9 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }

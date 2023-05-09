@@ -4,8 +4,15 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.coroutines.*
-import platform.Foundation.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
+import platform.Foundation.NSDate
+import platform.Foundation.NSDefaultRunLoopMode
+import platform.Foundation.NSRunLoop
+import platform.Foundation.create
+import platform.Foundation.runMode
 
 actual val context: Any = Unit
 

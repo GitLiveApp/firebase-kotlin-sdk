@@ -4,7 +4,14 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.withSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -16,7 +23,13 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlin.random.Random
-import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 expect val emulatorHost: String
 expect val context: Any

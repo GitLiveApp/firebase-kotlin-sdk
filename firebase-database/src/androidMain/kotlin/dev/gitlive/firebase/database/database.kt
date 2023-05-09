@@ -2,6 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("AndroidDatabase")
 package dev.gitlive.firebase.database
 
 import com.google.android.gms.tasks.Task
@@ -60,6 +61,16 @@ actual fun Firebase.database(app: FirebaseApp, url: String) =
 
 actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
 
+    actual data class Settings(
+        actual val persistenceEnabled: Boolean = false,
+        actual val persistenceCacheSizeBytes: Long? = null,
+    ) {
+
+        actual companion object {
+            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
+        }
+    }
+
     private var persistenceEnabled = true
 
     actual fun reference(path: String) =
@@ -68,8 +79,11 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
     actual fun reference() =
         DatabaseReference(android.reference, persistenceEnabled)
 
-    actual fun setPersistenceEnabled(enabled: Boolean) =
-        android.setPersistenceEnabled(enabled).also { persistenceEnabled = enabled }
+    actual fun setSettings(settings: Settings) {
+        android.setPersistenceEnabled(settings.persistenceEnabled)
+        persistenceEnabled = settings.persistenceEnabled
+        settings.persistenceCacheSizeBytes?.let { android.setPersistenceCacheSizeBytes(it) }
+    }
 
     actual fun setLoggingEnabled(enabled: Boolean) =
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)

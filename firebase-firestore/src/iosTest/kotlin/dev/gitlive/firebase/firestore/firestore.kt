@@ -6,11 +6,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.Serializable
 import platform.Foundation.*
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 actual val emulatorHost: String = "localhost"
 

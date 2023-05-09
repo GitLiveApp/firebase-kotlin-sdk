@@ -6,8 +6,11 @@
 package dev.gitlive.firebase.firestore
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.MemoryCacheSettings
+import com.google.firebase.firestore.MemoryEagerGcSettings
+import com.google.firebase.firestore.MemoryLruGcSettings
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.PersistentCacheSettings
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -33,7 +36,35 @@ internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<U
         }
     }
 
+val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
+    is LocalCacheSettings.Persistent -> PersistentCacheSettings.newBuilder().apply {
+        sizeBytes?.let { setSizeBytes(it) }
+    }.build()
+    is LocalCacheSettings.Memory -> MemoryCacheSettings.newBuilder().apply {
+        setGcSettings(
+            when (garbaseCollectorSettings) {
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> MemoryEagerGcSettings.newBuilder().build()
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> MemoryLruGcSettings.newBuilder().apply {
+                    garbaseCollectorSettings.sizeBytes?.let {
+                        setSizeBytes(it)
+                    }
+                }.build()
+            }
+        )
+    }.build()
+}
+
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
@@ -55,16 +86,15 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
         android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
+            .setLocalCacheSettings(MemoryCacheSettings.newBuilder().build())
             .build()
     }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
+    actual fun setSettings(settings: Settings) {
         android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
-                sslEnabled?.let { builder.isSslEnabled = it }
-                host?.let { builder.host = it }
-                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
+                settings.sslEnabled?.let { builder.isSslEnabled = it }
+                settings.host?.let { builder.host = it }
+                settings.cacheSettings?.let { builder.setLocalCacheSettings(it.android) }
             }.build()
         }
 

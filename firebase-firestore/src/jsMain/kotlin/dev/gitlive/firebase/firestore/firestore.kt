@@ -22,6 +22,16 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
+
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
@@ -41,13 +51,20 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        if(persistenceEnabled == true) js.enablePersistence()
+    actual fun setSettings(settings: Settings) {
+        if(settings.cacheSettings is LocalCacheSettings.Persistent) js.enablePersistence()
 
         js.settings(json().apply {
-            sslEnabled?.let { set("ssl", it) }
-            host?.let { set("host", it) }
-            cacheSizeBytes?.let { set("cacheSizeBytes", it) }
+            settings.sslEnabled?.let { set("ssl", it) }
+            settings.host?.let { set("host", it) }
+            when (val cacheSettings = settings.cacheSettings) {
+                is LocalCacheSettings.Persistent -> cacheSettings.sizeBytes
+                is LocalCacheSettings.Memory -> when (val garbaseCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> null
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbaseCollectorSettings.sizeBytes
+                }
+                null -> null
+            }?.let { set("cacheSizeBytes", it) }
         })
     }
 

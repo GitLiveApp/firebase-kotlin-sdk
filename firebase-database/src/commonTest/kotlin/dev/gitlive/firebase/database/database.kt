@@ -34,6 +34,7 @@ class FirebaseDatabaseTest {
                     )
                 )
                 Firebase.database.useEmulator(emulatorHost, 9000)
+                Firebase.database.setSettings(createFirebaseDatabaseTestSettings())
             }
     }
 
@@ -41,7 +42,6 @@ class FirebaseDatabaseTest {
     fun testSetValue() = runTest {
         val testValue = "test"
         val testReference = Firebase.database.reference("testPath")
-
         testReference.setValue(testValue)
 
         val testReferenceValue = testReference

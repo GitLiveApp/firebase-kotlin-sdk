@@ -23,7 +23,29 @@ expect val Firebase.firestore: FirebaseFirestore
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
+sealed class LocalCacheSettings {
+    data class Persistent(val sizeBytes: Long? = null) : LocalCacheSettings()
+    data class Memory(val garbaseCollectorSettings: GarbageCollectorSettings) : LocalCacheSettings() {
+        sealed class GarbageCollectorSettings {
+            object Eager : GarbageCollectorSettings()
+            data class LRUGC(val sizeBytes: Long? = null) : GarbageCollectorSettings()
+        }
+    }
+}
+
 expect class FirebaseFirestore {
+
+    class Settings {
+
+        companion object {
+            fun create(sslEnabled: Boolean? = null, host: String? = null, cacheSettings: LocalCacheSettings? = null): Settings
+        }
+
+        val sslEnabled: Boolean?
+        val host: String?
+        val cacheSettings: LocalCacheSettings?
+    }
+
     fun collection(collectionPath: String): CollectionReference
     fun document(documentPath: String): DocumentReference
     fun collectionGroup(collectionId: String): Query
@@ -32,10 +54,16 @@ expect class FirebaseFirestore {
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
-    fun setSettings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
+    fun setSettings(settings: Settings)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }
+
+fun FirebaseFirestore.setSettings(
+    sslEnabled: Boolean? = null,
+    host: String? = null,
+    cacheSettings: LocalCacheSettings? = null
+) = FirebaseFirestore.Settings.create(sslEnabled, host, cacheSettings)
 
 sealed class SetOptions {
     object Merge : SetOptions()
