@@ -92,7 +92,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-crashlytics")
+                api("com.google.firebase:firebase-crashlytics-ktx")
             }
         }
 

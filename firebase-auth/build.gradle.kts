@@ -137,7 +137,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-auth")
+                api("com.google.firebase:firebase-auth-ktx")
             }
         }
 

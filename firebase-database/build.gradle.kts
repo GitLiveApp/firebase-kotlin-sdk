@@ -117,7 +117,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-database")
+                api("com.google.firebase:firebase-database-ktx")
             }
         }
 

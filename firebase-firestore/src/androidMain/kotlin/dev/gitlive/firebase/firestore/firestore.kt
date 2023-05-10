@@ -11,6 +11,11 @@ import com.google.firebase.firestore.MemoryEagerGcSettings
 import com.google.firebase.firestore.MemoryLruGcSettings
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.PersistentCacheSettings
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.firestore.ktx.memoryCacheSettings
+import com.google.firebase.firestore.ktx.memoryEagerGcSettings
+import com.google.firebase.firestore.ktx.memoryLruGcSettings
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -37,21 +42,21 @@ internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<U
     }
 
 val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
-    is LocalCacheSettings.Persistent -> PersistentCacheSettings.newBuilder().apply {
+    is LocalCacheSettings.Persistent -> persistentCacheSettings {
         sizeBytes?.let { setSizeBytes(it) }
-    }.build()
-    is LocalCacheSettings.Memory -> MemoryCacheSettings.newBuilder().apply {
+    }
+    is LocalCacheSettings.Memory -> memoryCacheSettings {
         setGcSettings(
             when (garbaseCollectorSettings) {
-                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> MemoryEagerGcSettings.newBuilder().build()
-                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> MemoryLruGcSettings.newBuilder().apply {
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> memoryEagerGcSettings {  }
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> memoryLruGcSettings {
                     garbaseCollectorSettings.sizeBytes?.let {
                         setSizeBytes(it)
                     }
-                }.build()
+                }
             }
         )
-    }.build()
+    }
 }
 
 actual data class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
@@ -85,32 +90,30 @@ actual data class FirebaseFirestore(val android: com.google.firebase.firestore.F
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setLocalCacheSettings(MemoryCacheSettings.newBuilder().build())
-            .build()
+        android.firestoreSettings = firestoreSettings {  }
     }
 
     actual fun setSettings(settings: Settings) {
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-                settings.sslEnabled?.let { builder.isSslEnabled = it }
-                settings.host?.let { builder.host = it }
-                settings.cacheSettings?.let { builder.setLocalCacheSettings(it.android) }
-            }.build()
+        android.firestoreSettings = firestoreSettings {
+            settings.sslEnabled?.let { isSslEnabled = it }
+            settings.host?.let { host = it }
+            settings.cacheSettings?.let { setLocalCacheSettings(it.android) }
         }
+    }
 
     @Suppress("DEPRECATION")
     actual fun updateSettings(settings: Settings) {
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-            builder.isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
-            builder.host = settings.host ?: android.firestoreSettings.host
+        android.firestoreSettings = firestoreSettings {
+            isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
+            host = settings.host ?: android.firestoreSettings.host
             val cacheSettings = settings.cacheSettings?.android ?: android.firestoreSettings.cacheSettings
             cacheSettings?.let {
-                builder.setLocalCacheSettings(it)
+                setLocalCacheSettings(it)
             } ?: kotlin.run {
-                builder.isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
-                builder.setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
+                isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
+                setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
             }
-        }.build()
+        }
     }
 
     actual suspend fun disableNetwork() =

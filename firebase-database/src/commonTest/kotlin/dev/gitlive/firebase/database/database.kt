@@ -159,7 +159,7 @@ class FirebaseDatabaseTest {
         firebaseDatabaseTestReference.child("3").setValue(firebaseDatabaseChildTest3)
     }
 
-    private fun cleanUp() {
+    private suspend fun cleanUp() {
         Firebase
             .takeIf { Firebase.apps(context).isNotEmpty() }
             ?.apply { app.delete() }
