@@ -26,7 +26,7 @@ actual fun Firebase.functions(app: FirebaseApp) =
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
 
-actual class FirebaseFunctions internal constructor(val android: com.google.firebase.functions.FirebaseFunctions) {
+actual data class FirebaseFunctions internal constructor(val android: com.google.firebase.functions.FirebaseFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } })
 

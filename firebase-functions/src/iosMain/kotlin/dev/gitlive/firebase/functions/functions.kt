@@ -29,7 +29,7 @@ actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFun
 @Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions = FirebaseFunctions(FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region))
 
-actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
+actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
 

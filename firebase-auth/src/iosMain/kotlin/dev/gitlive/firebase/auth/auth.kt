@@ -22,7 +22,7 @@ actual val Firebase.auth
 @Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp))
 
-actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
+actual data class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }

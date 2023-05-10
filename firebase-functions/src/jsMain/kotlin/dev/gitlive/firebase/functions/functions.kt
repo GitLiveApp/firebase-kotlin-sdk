@@ -22,7 +22,7 @@ actual fun Firebase.functions(app: FirebaseApp) =
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(app.js.functions(region)) }
 
-actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
+actual data class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 

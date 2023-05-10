@@ -41,7 +41,7 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class FirebaseFirestore(val ios: FIRFirestore) {
+actual data class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual data class Settings(
         actual val sslEnabled: Boolean? = null,
@@ -80,12 +80,18 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
     }
 
     actual fun setSettings(settings: Settings) {
-        ios.settings = FIRFirestoreSettings().also { iosSettings ->
-            settings.cacheSettings?.let { iosSettings.cacheSettings = it.ios }
-            settings.sslEnabled?.let { iosSettings.sslEnabled = it }
-            settings.host?.let { iosSettings.host = it }
-            settings.dispatchQueue?.let { iosSettings.dispatchQueue = it }
-        }
+        ios.settings = FIRFirestoreSettings().applySettings(settings)
+    }
+
+    actual fun updateSettings(settings: Settings) {
+        ios.settings = ios.settings.applySettings(settings)
+    }
+
+    private fun FIRFirestoreSettings.applySettings(settings: Settings): FIRFirestoreSettings = apply {
+        settings.cacheSettings?.let { cacheSettings = it.ios }
+        settings.sslEnabled?.let { sslEnabled = it }
+        settings.host?.let { host = it }
+        settings.dispatchQueue?.let { dispatchQueue = it }
     }
 
     actual suspend fun disableNetwork() {
@@ -95,6 +101,8 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
     actual suspend fun enableNetwork() {
         await { ios.enableNetworkWithCompletion(it) }
     }
+
+    override fun toString(): String = ios.app.toString()
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -54,7 +54,7 @@ val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings
     }.build()
 }
 
-actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+actual data class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
     actual data class Settings(
         actual val sslEnabled: Boolean? = null,
@@ -97,6 +97,21 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
                 settings.cacheSettings?.let { builder.setLocalCacheSettings(it.android) }
             }.build()
         }
+
+    @Suppress("DEPRECATION")
+    actual fun updateSettings(settings: Settings) {
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
+            builder.isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
+            builder.host = settings.host ?: android.firestoreSettings.host
+            val cacheSettings = settings.cacheSettings?.android ?: android.firestoreSettings.cacheSettings
+            cacheSettings?.let {
+                builder.setLocalCacheSettings(it)
+            } ?: kotlin.run {
+                builder.isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
+                builder.setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
+            }
+        }.build()
+    }
 
     actual suspend fun disableNetwork() =
         android.disableNetwork().await().run { }

@@ -21,7 +21,7 @@ actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: St
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
     FirebaseApp(firebase.initializeApp(options.toJson()))
 
-actual class FirebaseApp internal constructor(val js: firebase.App) {
+actual data class FirebaseApp internal constructor(val js: firebase.App) {
     actual val name: String
         get() = js.name
     actual val options: FirebaseOptions
@@ -29,7 +29,7 @@ actual class FirebaseApp internal constructor(val js: firebase.App) {
             FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
 
-    actual fun delete() = js.delete()
+    actual suspend fun delete() = js.delete()
 }
 
 actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }

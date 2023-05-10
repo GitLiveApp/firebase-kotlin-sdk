@@ -20,7 +20,7 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
 
-actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
+actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual data class Settings(
         actual val sslEnabled: Boolean? = null,
@@ -31,6 +31,8 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
             actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
         }
     }
+
+    private var lastSettings = Settings()
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
 
@@ -52,6 +54,7 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
 
     actual fun setSettings(settings: Settings) {
+        lastSettings = settings
         if(settings.cacheSettings is LocalCacheSettings.Persistent) js.enablePersistence()
 
         js.settings(json().apply {
@@ -67,6 +70,10 @@ actual class FirebaseFirestore(val js: firebase.firestore.Firestore) {
             }?.let { set("cacheSizeBytes", it) }
         })
     }
+
+    actual fun updateSettings(settings: Settings) = setSettings(
+        Settings(settings.sslEnabled ?: lastSettings.sslEnabled, settings.host ?: lastSettings.host, settings.cacheSettings ?: lastSettings.cacheSettings)
+    )
 
     actual suspend fun disableNetwork() {
         rethrow { js.disableNetwork().await() }

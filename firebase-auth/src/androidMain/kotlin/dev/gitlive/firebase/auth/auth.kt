@@ -22,7 +22,7 @@ actual val Firebase.auth
 actual fun Firebase.auth(app: FirebaseApp) =
     FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
 
-actual class FirebaseAuth internal constructor(val android: com.google.firebase.auth.FirebaseAuth) {
+actual data class FirebaseAuth internal constructor(val android: com.google.firebase.auth.FirebaseAuth) {
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 

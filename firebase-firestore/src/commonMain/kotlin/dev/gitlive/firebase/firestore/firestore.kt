@@ -55,6 +55,7 @@ expect class FirebaseFirestore {
     suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
     fun useEmulator(host: String, port: Int)
     fun setSettings(settings: Settings)
+    fun updateSettings(settings: Settings)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }
