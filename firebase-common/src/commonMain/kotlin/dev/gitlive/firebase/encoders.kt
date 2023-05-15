@@ -22,7 +22,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encode
 
     var value: Any? = null
 
-    override val serializersModule = EmptySerializersModule
+    override val serializersModule = EmptySerializersModule()
     private var polymorphicDiscriminator: String? = null
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
@@ -82,7 +82,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encode
         this.value = value
     }
 
-    override fun encodeInline(inlineDescriptor: SerialDescriptor): Encoder =
+    override fun encodeInline(descriptor: SerialDescriptor): Encoder =
         FirebaseEncoder(shouldEncodeElementDefault)
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
@@ -99,7 +99,7 @@ open class FirebaseCompositeEncoder constructor(
     private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit,
 ): CompositeEncoder {
 
-    override val serializersModule = EmptySerializersModule
+    override val serializersModule = EmptySerializersModule()
 
 //    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(descriptor.kind) {
 //        StructureKind.MAP -> FirebaseMapSerializer<Any>(descriptor.getElementDescriptor(1)) as SerializationStrategy<T>

@@ -13,6 +13,7 @@ actual class ServerValue internal actual constructor(
 ){
     actual companion object {
         actual val TIMESTAMP: ServerValue get() = ServerValue(NativeServerValue.timestamp())
+        @Suppress("CAST_NEVER_SUCCEEDS")
         actual fun increment(delta: Double): ServerValue = ServerValue(NativeServerValue.increment(delta as NSNumber))
     }
 

@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        api-level: [ 29 ]
+        api-level: [ 33 ]
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
           cache: gradle
       - name: Gradle cache
         uses: gradle/gradle-build-action@v2
@@ -42,16 +42,16 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
       - name: Run JS Tests
-        run: ./gradlew cleanTest jsLegacyTest
+        run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
         uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: "JS Test Report HTML"
           path: |
-            **/build/reports/tests/jsLegacyTest/
-            **/build/reports/tests/jsLegacyBrowserTest/
-            **/build/reports/tests/jsLegacyNodeTest/
+            **/build/reports/tests/jsTest/
+            **/build/reports/tests/jsBrowserTest/
+            **/build/reports/tests/jsNodeTest/
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
       - name: Upload iOS test artifact

@@ -2,9 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-perf.version") as String
 
 plugins {
@@ -14,28 +11,29 @@ plugins {
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.perf"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -63,12 +61,12 @@ kotlin {
             }
             noPodspec()
             pod("FirebasePerformance") {
-                version = "10.7.0"
+                version = "10.9.0"
             }
         }
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         browser {
             testTask {
@@ -82,23 +80,33 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
             }
         }
 
-        val androidMain by getting {
+        val commonTest by getting
+
+        getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-perf")
+                api("com.google.firebase:firebase-perf-ktx")
+            }
+        }
+
+        getByName("androidInstrumentedTest") {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 
@@ -111,8 +119,6 @@ kotlin {
             val iosSimulatorArm64Test by sourceSets.getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        val jsMain by getting
     }
 }
 

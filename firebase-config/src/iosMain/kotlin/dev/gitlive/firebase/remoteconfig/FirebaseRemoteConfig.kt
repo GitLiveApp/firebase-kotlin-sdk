@@ -23,6 +23,7 @@ actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = TODO(
 //    FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios))
 
 actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
+    @Suppress("UNCHECKED_CAST")
     actual val all: Map<String, FirebaseRemoteConfigValue>
         get() {
             return listOf(
@@ -54,8 +55,8 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         ios.await { ensureInitializedWithCompletionHandler(it) }
 
     actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
-        val status: FIRRemoteConfigFetchStatus = if (minimumFetchIntervalInSeconds != null) {
-            ios.awaitResult {
+        if (minimumFetchIntervalInSeconds != null) {
+            ios.awaitResult<FIRRemoteConfig, FIRRemoteConfigFetchStatus> {
                 fetchWithExpirationDuration(minimumFetchIntervalInSeconds.toDouble(), it)
             }
         } else {

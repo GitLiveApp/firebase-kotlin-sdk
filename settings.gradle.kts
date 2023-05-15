@@ -11,5 +11,12 @@ include(
     "firebase-crashlytics"
 )
 
-//enableFeaturePreview("GRADLE_METADATA")
+pluginManagement {
+    val kotlinVersion: String by settings
 
+    plugins {
+        kotlin("multiplatform") version kotlinVersion
+        kotlin("native.cocoapods") version kotlinVersion
+        kotlin("plugin.serialization") version kotlinVersion
+    }
+}

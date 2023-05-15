@@ -2,35 +2,36 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 version = project.property("firebase-common.version") as String
 
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.common"
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -53,7 +54,7 @@ kotlin {
         iosSimulatorArm64()
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs {
             testTask {
@@ -74,8 +75,10 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
                 optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
@@ -84,15 +87,31 @@ kotlin {
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
+            val serializationVersion: String by project
+
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
             }
         }
 
-        val androidMain by getting {
+        val commonTest by getting {
             dependencies {
-                api("com.google.firebase:firebase-common")
+                implementation(kotlin("test"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        getByName("androidMain") {
+            dependencies {
+                api("com.google.firebase:firebase-common-ktx")
+            }
+        }
+
+        getByName("androidInstrumentedTest") {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 
@@ -105,9 +124,9 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting {
+        getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "9.4.1"))
+                api(npm("firebase", "9.21.0"))
             }
         }
     }
