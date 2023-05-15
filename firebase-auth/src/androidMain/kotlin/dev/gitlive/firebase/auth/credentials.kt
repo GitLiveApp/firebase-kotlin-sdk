@@ -92,13 +92,14 @@ actual class PhoneAuthProvider(val createOptionsBuilder: () -> PhoneAuthOptions.
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
                 verificationProvider.codeSent {
-                    val optionsBuilder = createOptionsBuilder()
-                    optionsBuilder.setPhoneNumber(phoneNumber)
-                    optionsBuilder.setTimeout(verificationProvider.timeout, verificationProvider.unit)
-                    optionsBuilder.setActivity(verificationProvider.activity)
-                    optionsBuilder.setCallbacks(this)
-                    optionsBuilder.setForceResendingToken(forceResending)
-                    PhoneAuthProvider.verifyPhoneNumber(optionsBuilder.build())
+                    val options = createOptionsBuilder()
+                        .setPhoneNumber(phoneNumber)
+                        .setTimeout(verificationProvider.timeout, verificationProvider.unit)
+                        .setActivity(verificationProvider.activity)
+                        .setCallbacks(this)
+                        .setForceResendingToken(forceResending)
+                        .build()
+                    PhoneAuthProvider.verifyPhoneNumber(options)
                 }
             }
 
@@ -123,12 +124,13 @@ actual class PhoneAuthProvider(val createOptionsBuilder: () -> PhoneAuthOptions.
 
         }
 
-        val optionsBuilder = createOptionsBuilder()
-        optionsBuilder.setPhoneNumber(phoneNumber)
-        optionsBuilder.setTimeout(verificationProvider.timeout, verificationProvider.unit)
-        optionsBuilder.setActivity(verificationProvider.activity)
-        optionsBuilder.setCallbacks(callback)
-        PhoneAuthProvider.verifyPhoneNumber(optionsBuilder.build())
+        val options = createOptionsBuilder()
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(verificationProvider.timeout, verificationProvider.unit)
+            .setActivity(verificationProvider.activity)
+            .setCallbacks(callback)
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
 
         response.await().getOrThrow()
     }
