@@ -81,7 +81,6 @@ kotlin {
                 this.apiVersion = apiVersion
                 this.languageVersion = languageVersion
                 progressiveMode = true
-                optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")

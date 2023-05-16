@@ -85,14 +85,6 @@ kotlin {
             }
         }
     }
-    tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-Xopt-in=kotlin.Experimental",
-            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
-            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
-        )
-    }
 
     sourceSets {
         all {
