@@ -11,16 +11,6 @@ plugins {
     //id("com.quittle.android-emulator") version "0.2.0"
 }
 
-//buildscript {
-//    repositories {
-//        google()
-//        gradlePluginPortal()
-//    }
-//    dependencies {
-//        classpath("com.android.tools.build:gradle:3.6.1")
-//    }
-//}
-
 android {
     val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
