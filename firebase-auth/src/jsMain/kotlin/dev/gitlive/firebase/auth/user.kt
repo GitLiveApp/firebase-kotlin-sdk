@@ -4,16 +4,16 @@ import dev.gitlive.firebase.firebase
 import kotlinx.coroutines.await
 import kotlin.js.Date
 
-actual class FirebaseUser internal constructor(val js: firebase.user.User) {
+actual class FirebaseUser internal constructor(val js: firebase.user.User) : FirebaseUserProfile {
     actual val uid: String
         get() = rethrow { js.uid }
-    actual val displayName: String?
+    override val displayName: String?
         get() = rethrow { js.displayName }
     actual val email: String?
         get() = rethrow { js.email }
     actual val phoneNumber: String?
         get() = rethrow { js.phoneNumber }
-    actual val photoURL: String?
+    override val photoURL: String?
         get() = rethrow { js.photoURL }
     actual val isAnonymous: Boolean
         get() = rethrow { js.isAnonymous }
@@ -43,7 +43,7 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
     actual suspend fun updateEmail(email: String) = rethrow { js.updateEmail(email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { js.updatePassword(password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { js.updatePhoneNumber(credential.js).await() }
-    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
+    override suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
         val request = object : firebase.user.ProfileUpdateRequest {
             override val displayName: String? = displayName
             override val photoURL: String? = photoUrl
@@ -56,9 +56,9 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) {
 actual class UserInfo(val js: firebase.user.UserInfo) {
     actual val displayName: String?
         get() = rethrow { js.displayName }
-        actual val email: String?
+    actual val email: String?
         get() = rethrow { js.email }
-        actual val phoneNumber: String?
+    actual val phoneNumber: String?
         get() = rethrow { js.phoneNumber }
     actual val photoURL: String?
         get() = rethrow { js.photoURL }

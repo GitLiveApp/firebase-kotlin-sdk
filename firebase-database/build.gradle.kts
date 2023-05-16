@@ -45,10 +45,6 @@ android {
     lint {
         abortOnError = false
     }
-    dependencies {
-        val firebaseBoMVersion: String by project
-        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
-    }
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"

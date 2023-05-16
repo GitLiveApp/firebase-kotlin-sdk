@@ -2,9 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-auth.version") as String
 
 plugins {
@@ -13,16 +10,6 @@ plugins {
     kotlin("native.cocoapods")
     //id("com.quittle.android-emulator") version "0.2.0"
 }
-
-//buildscript {
-//    repositories {
-//        google()
-//        gradlePluginPortal()
-//    }
-//    dependencies {
-//        classpath("com.android.tools.build:gradle:3.6.1")
-//    }
-//}
 
 android {
     val minSdkVersion: Int by project
@@ -53,10 +40,6 @@ android {
     }
     lint {
         abortOnError = false
-    }
-    dependencies {
-        val firebaseBoMVersion: String by project
-        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 

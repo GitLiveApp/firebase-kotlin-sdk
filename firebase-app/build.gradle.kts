@@ -10,11 +10,6 @@ plugins {
     kotlin("multiplatform")
 }
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 android {
     val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
@@ -44,10 +39,6 @@ android {
     }
     lint {
         abortOnError = false
-    }
-    dependencies {
-        val firebaseBoMVersion: String by project
-        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 

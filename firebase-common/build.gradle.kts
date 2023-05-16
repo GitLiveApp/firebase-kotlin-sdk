@@ -21,14 +21,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 
     packaging {
@@ -38,10 +39,6 @@ android {
     }
     lint {
         abortOnError = false
-    }
-    dependencies {
-        val firebaseBoMVersion: String by project
-        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
     }
 }
 
