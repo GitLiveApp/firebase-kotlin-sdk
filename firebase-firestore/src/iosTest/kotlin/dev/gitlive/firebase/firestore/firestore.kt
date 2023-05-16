@@ -6,11 +6,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.Serializable
 import platform.Foundation.*
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 actual val emulatorHost: String = "localhost"
 
@@ -28,5 +24,6 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     testRun.await()
 }
 
+@Suppress("UNCHECKED_CAST")
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
 actual fun Map<String, Any?>.asEncoded(): Any = this

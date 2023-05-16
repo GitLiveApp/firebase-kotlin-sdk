@@ -8,9 +8,7 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.safeOffer
 import dev.gitlive.firebase.auth.ActionCodeResult.*
-import kotlin.native.concurrent.freeze
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -21,29 +19,21 @@ import platform.Foundation.*
 actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
 
-actual fun Firebase.auth(app: FirebaseApp) =
-    FirebaseAuth(FIRAuth.authWithApp(app.ios))
+@Suppress("CAST_NEVER_SUCCEEDS")
+actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp))
 
-actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
+actual data class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val callback = { _: FIRAuth?, user: FIRUser? ->
-            safeOffer(user?.let { FirebaseUser(it) })
-            Unit
-        }.freeze()
-        val handle = ios.addAuthStateDidChangeListener(callback)
+        val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
-        val callback = { _: FIRAuth?, user: FIRUser? ->
-            safeOffer(user?.let { FirebaseUser(it) })
-            Unit
-        }.freeze()
-        val handle = ios.addIDTokenDidChangeListener(callback)
+        val handle = ios.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
 
@@ -165,7 +155,7 @@ internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: 
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     return job.await() as R
 }
@@ -178,7 +168,7 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
         } else {
             job.completeExceptionally(error.toException())
         }
-    }.freeze()
+    }
     function(callback)
     job.await()
 }

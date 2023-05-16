@@ -1,13 +1,12 @@
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestore.FIRFieldValue
-import kotlin.native.concurrent.freeze
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase FieldValue. */
 private typealias NativeFieldValue = FIRFieldValue
 
-/** A class representing a Firebase FieldValue. */
+/** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
 actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
     init {
@@ -19,9 +18,10 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     override fun toString(): String = nativeValue.toString()
 
     actual companion object {
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
         actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList().freeze()))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList().freeze()))
+        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
+        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.fieldValueForIntegerIncrement(value.toLong()))
+        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
+        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
     }
 }

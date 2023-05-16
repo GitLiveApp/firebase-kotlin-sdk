@@ -12,36 +12,33 @@ plugins {
 
 android {
     val minSdkVersion: Int by project
-    val targetSdkVersion: Int by project
+    val compileSdkVersion: Int by project
 
-    compileSdk = targetSdkVersion
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.common"
     defaultConfig {
         minSdk = minSdkVersion
-        targetSdk = targetSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
     }
     lint {
-        isAbortOnError = false
-    }
-    dependencies {
-        val firebaseBoMVersion: String by project
-        implementation(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
+        abortOnError = false
     }
 }
 
@@ -58,19 +55,19 @@ kotlin {
         iosSimulatorArm64()
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
         browser {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
@@ -79,17 +76,18 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
-                optIn("kotlin.Experimental")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             val serializationVersion: String by project
 
             dependencies {
@@ -97,9 +95,23 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        val commonTest by getting {
             dependencies {
-                api("com.google.firebase:firebase-common")
+                implementation(kotlin("test"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        getByName("androidMain") {
+            dependencies {
+                api("com.google.firebase:firebase-common-ktx")
+            }
+        }
+
+        getByName("androidInstrumentedTest") {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 
@@ -107,15 +119,14 @@ kotlin {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
+            val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting {
+        getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "9.6.10"))
+                api(npm("firebase", "9.21.0"))
             }
         }
     }
@@ -124,6 +135,12 @@ kotlin {
 if (project.property("firebase-common.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-common.skipJsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

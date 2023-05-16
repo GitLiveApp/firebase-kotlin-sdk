@@ -6,14 +6,14 @@ package dev.gitlive.firebase.database
 
 import cocoapods.FirebaseDatabase.*
 import cocoapods.FirebaseDatabase.FIRDataEventType.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.safeOffer
-import kotlin.native.concurrent.freeze
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -23,8 +23,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.*
+import platform.darwin.dispatch_queue_t
 import kotlin.collections.component1
 import kotlin.collections.component2
 
@@ -34,19 +36,35 @@ actual val Firebase.database
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
+@Suppress("CAST_NEVER_SUCCEEDS")
+actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp))
 
-actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+@Suppress("CAST_NEVER_SUCCEEDS")
+actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url))
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
+
+    actual data class Settings(
+        actual val persistenceEnabled: Boolean = false,
+        actual val persistenceCacheSizeBytes: Long? = null,
+        val callbackQueue: dispatch_queue_t = null
+    ) {
+
+        actual companion object {
+            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
+        }
+    }
 
     actual fun reference(path: String) =
         DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
 
-    actual fun setPersistenceEnabled(enabled: Boolean) {
-        ios.persistenceEnabled = enabled
+    actual fun reference() =
+        DatabaseReference(ios.reference(), ios.persistenceEnabled)
+
+    actual fun setSettings(settings: Settings) {
+        ios.persistenceEnabled = settings.persistenceEnabled
+        settings.persistenceCacheSizeBytes?.let { ios.setPersistenceCacheSizeBytes(it.toULong()) }
+        settings.callbackQueue?.let { ios.callbackQueue = it }
     }
 
     actual fun setLoggingEnabled(enabled: Boolean) =
@@ -98,10 +116,9 @@ actual open class Query internal constructor(
     actual val valueEvents get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
-            withBlock = { snapShot: FIRDataSnapshot? ->
-                safeOffer(DataSnapshot(snapShot!!))
-                Unit
-            }.freeze()
+            withBlock = { snapShot ->
+                trySend(DataSnapshot(snapShot!!))
+            }
         ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
@@ -110,10 +127,9 @@ actual open class Query internal constructor(
         val handles = types.map { type ->
             ios.observeEventType(
                 type.toEventType(),
-                andPreviousSiblingKeyWithBlock = { snapShot: FIRDataSnapshot?, key: String? ->
-                    safeOffer(ChildEvent(DataSnapshot(snapShot!!), type, key))
-                    Unit
-                }.freeze()
+                andPreviousSiblingKeyWithBlock = { snapShot, key ->
+                    trySend(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                }
             ) { close(DatabaseException(it.toString(), null)) }
         }
         awaitClose {
@@ -136,21 +152,42 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
 
-    actual suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(value, encodeDefaults), it) }
+    actual suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { setValue(encode(value, encodeSettings), it) }
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeDefaults), it) }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeSettings), it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults) as Map<Any?, *>, it) }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeSettings) as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
+    }
+
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        ios.runTransactionBlock(
+            block = { firMutableData ->
+                firMutableData?.value = firMutableData?.value?.let {
+                    transactionUpdate(decode(strategy, it, decodeSettings))
+                }
+                FIRTransactionResult.successWithValue(firMutableData!!)
+            },
+            andCompletionBlock = { error, _, snapshot ->
+                if (error != null) {
+                    deferred.completeExceptionally(DatabaseException(error.toString(), null))
+                } else {
+                    deferred.complete(DataSnapshot(snapshot!!))
+                }
+            },
+            withLocalEvents = false
+        )
+        return deferred.await()
     }
 }
 
@@ -164,8 +201,8 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.value)
+    actual fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
+        decode(strategy, ios.value, decodeSettings)
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
     actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
@@ -183,17 +220,17 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeDefaults), it) }
+    actual suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeSettings), it) }
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeDefaults), it) }
+    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeSettings), it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults) } as Map<Any?, *>, it) }
+    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeSettings) } as Map<Any?, *>, it) }
     }
 }
 
@@ -207,7 +244,7 @@ private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, fu
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
-    }.freeze()
+    }
     function(callback)
     return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
 }
@@ -220,7 +257,7 @@ suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSE
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
-    }.freeze()
+    }
     function(callback)
     job.run { if(whileOnline) awaitWhileOnline() else await() }
 }

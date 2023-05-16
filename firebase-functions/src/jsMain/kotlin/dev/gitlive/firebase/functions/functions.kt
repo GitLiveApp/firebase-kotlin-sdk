@@ -22,7 +22,7 @@ actual fun Firebase.functions(app: FirebaseApp) =
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     rethrow { dev.gitlive.firebase.functions; FirebaseFunctions(app.js.functions(region)) }
 
-actual class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
+actual data class FirebaseFunctions internal constructor(val js: firebase.functions.Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 
@@ -32,16 +32,14 @@ actual class FirebaseFunctions internal constructor(val js: firebase.functions.F
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) {
+actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) : BaseHttpsCallableReference() {
 
     actual suspend operator fun invoke() =
         rethrow { HttpsCallableResult(js().await()) }
 
-    actual suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) =
-        rethrow { HttpsCallableResult(js(encode(data, encodeDefaults)).await()) }
-
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { HttpsCallableResult(js(encode(strategy, data, encodeDefaults)).await()) }
+    override suspend fun invoke(encodedData: Any): HttpsCallableResult = rethrow {
+        HttpsCallableResult(js(encodedData).await())
+    }
 }
 
 actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCallableResult) {
@@ -49,8 +47,8 @@ actual class HttpsCallableResult constructor(val js: firebase.functions.HttpsCal
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        rethrow { decode(strategy, js.data) }
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
+        rethrow { decode(strategy, js.data, decodeSettings) }
 
 }
 

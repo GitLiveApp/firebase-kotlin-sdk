@@ -16,21 +16,21 @@ actual val Firebase.auth
 actual fun Firebase.auth(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.auth; FirebaseAuth(firebase.auth(app.js)) }
 
-actual class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
+actual data class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
 
     actual val currentUser: FirebaseUser?
         get() = rethrow { js.currentUser?.let { FirebaseUser(it) } }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
         val unsubscribe = js.onAuthStateChanged {
-            safeOffer(it?.let { FirebaseUser(it) })
+            trySend(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
         val unsubscribe = js.onIdTokenChanged {
-            safeOffer(it?.let { FirebaseUser(it) })
+            trySend(it?.let { FirebaseUser(it) })
         }
         awaitClose { unsubscribe() }
     }

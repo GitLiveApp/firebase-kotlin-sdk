@@ -5,9 +5,9 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
@@ -119,7 +119,7 @@ abstract class SpecialValueSerializer<T>(
         if (encoder is FirebaseEncoder) {
             encoder.value = toNativeValue(value)
         } else {
-            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+            throw SerializationException("This serializer must be used with FirebaseEncoder")
         }
     }
 
@@ -127,8 +127,7 @@ abstract class SpecialValueSerializer<T>(
         return if (decoder is FirebaseDecoder) {
             fromNativeValue(decoder.value)
         } else {
-            throw SerializationException("This serializer must be used with ${FirebaseEncoder::class}")
+            throw SerializationException("This serializer must be used with FirebaseDecoder")
         }
     }
 }
-

@@ -7,16 +7,16 @@ package dev.gitlive.firebase.auth
 import cocoapods.FirebaseAuth.*
 import platform.Foundation.NSURL
 
-actual class FirebaseUser internal constructor(val ios: FIRUser) {
+actual class FirebaseUser internal constructor(val ios: FIRUser) : FirebaseUserProfile {
     actual val uid: String
         get() = ios.uid
-    actual val displayName: String?
+    override val displayName: String?
         get() = ios.displayName
     actual val email: String?
         get() = ios.email
     actual val phoneNumber: String?
         get() = ios.phoneNumber
-    actual val photoURL: String?
+    override val photoURL: String?
         get() = ios.photoURL?.absoluteString
     actual val isAnonymous: Boolean
         get() = ios.anonymous
@@ -64,7 +64,7 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun updateEmail(email: String) = ios.await { updateEmail(email, it) }.run { Unit }
     actual suspend fun updatePassword(password: String) = ios.await { updatePassword(password, it) }.run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
-    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
+    override suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = ios.profileChangeRequest().apply {
             this.displayName = displayName
             this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }

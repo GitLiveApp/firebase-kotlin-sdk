@@ -5,7 +5,7 @@ import dev.gitlive.firebase.SpecialValueSerializer
 import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.serverTimestamp
 import kotlinx.serialization.SerializationException
 
-/** A serializer for [BaseTimestamp]. Must be used in conjunction with [FirebaseEncoder].  */
+/** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
     serialName = "Timestamp",
     toNativeValue = { value ->
@@ -24,7 +24,7 @@ object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
     }
 )
 
-/** A serializer for [Timestamp]. Must be used in conjunction with [FirebaseEncoder]. */
+/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object TimestampSerializer : SpecialValueSerializer<Timestamp>(
     serialName = "Timestamp",
     toNativeValue = Timestamp::nativeValue,
@@ -36,7 +36,7 @@ object TimestampSerializer : SpecialValueSerializer<Timestamp>(
     }
 )
 
-/** A serializer for [Timestamp.ServerTimestamp]. Must be used in conjunction with [FirebaseEncoder]. */
+/** A serializer for [Timestamp.ServerTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
 object ServerTimestampSerializer : SpecialValueSerializer<Timestamp.ServerTimestamp>(
     serialName = "Timestamp",
     toNativeValue = { FieldValue.serverTimestamp.nativeValue },
@@ -54,13 +54,13 @@ object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
     toNativeValue = { value ->
         when(value) {
             serverTimestamp -> FieldValue.serverTimestamp.nativeValue
-            else -> Timestamp.fromMilliseconds(value.toLong())
+            else -> Timestamp.fromMilliseconds(value)
         }
     },
     fromNativeValue = { value ->
         when(value) {
             FieldValue.serverTimestamp.nativeValue -> serverTimestamp
-            is NativeTimestamp -> Timestamp(value).toMilliseconds().toDouble()
+            is NativeTimestamp -> Timestamp(value).toMilliseconds()
             is Double -> value
             else -> throw SerializationException("Cannot deserialize $value")
         }

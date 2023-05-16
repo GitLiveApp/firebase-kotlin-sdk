@@ -2,10 +2,10 @@ package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.Serializable
 
-/** A class representing a platform specific Firebase FieldValue. */
-internal typealias NativeFieldValue = com.google.firebase.firestore.FieldValue
+/** Represents a platform specific Firebase FieldValue. */
+private typealias NativeFieldValue = com.google.firebase.firestore.FieldValue
 
-/** A class representing a Firebase FieldValue. */
+/** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
 actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
     init {
@@ -17,8 +17,9 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     override fun toString(): String = nativeValue.toString()
 
     actual companion object {
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.delete())
         actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.serverTimestamp())
+        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.delete())
+        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.increment(value.toDouble()))
         actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayUnion(*elements))
         actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayRemove(*elements))
     }

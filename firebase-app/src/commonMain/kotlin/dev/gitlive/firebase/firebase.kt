@@ -6,9 +6,6 @@
 @file:JvmName("CommonKt")
 package dev.gitlive.firebase
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.ClosedSendChannelException
-import kotlinx.coroutines.channels.SendChannel
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -22,6 +19,7 @@ object Firebase
 expect class FirebaseApp {
     val name: String
     val options: FirebaseOptions
+    suspend fun delete()
 }
 
 /** Returns the default firebase app instance. */

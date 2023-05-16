@@ -5,19 +5,33 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.descriptors.PolymorphicKind
-import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
-actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): CompositeEncoder = when(descriptor.kind) {
-    StructureKind.LIST, is PolymorphicKind -> mutableListOf<Any?>()
-        .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, serializersModule = serializersModule) { _, index, value -> it.add(index, value) } }
+actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
+    StructureKind.LIST -> encodeAsList()
     StructureKind.MAP -> mutableListOf<Any?>()
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, serializersModule = serializersModule, end = { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
-    StructureKind.CLASS, StructureKind.OBJECT -> mutableMapOf<Any?, Any?>()
-        .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, serializersModule = serializersModule) { _, index, value -> it[descriptor.getElementName(index)] = value } }
-    else -> TODO("Not implemented ${descriptor.kind}")
+        .let { FirebaseCompositeEncoder(settings, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
+    StructureKind.CLASS,  StructureKind.OBJECT-> encodeAsMap(descriptor)
+    is PolymorphicKind -> when (settings.polymorphicStructure) {
+        EncodeDecodeSettings.PolymorphicStructure.MAP -> encodeAsMap(descriptor)
+        EncodeDecodeSettings.PolymorphicStructure.LIST -> encodeAsList()
+    }
+    else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
+
+private fun FirebaseEncoder.encodeAsList(): FirebaseCompositeEncoder = mutableListOf<Any?>()
+    .also { value = it }
+    .let { FirebaseCompositeEncoder(settings) { _, index, value -> it.add(index, value) } }
+private fun FirebaseEncoder.encodeAsMap(descriptor: SerialDescriptor): FirebaseCompositeEncoder = mutableMapOf<Any?, Any?>()
+    .also { value = it }
+    .let {
+        FirebaseCompositeEncoder(
+            settings,
+            setPolymorphicType = { discriminator, type ->
+                it[discriminator] = type
+            },
+            set = { _, index, value -> it[descriptor.getElementName(index)] = value }
+        )
+    }

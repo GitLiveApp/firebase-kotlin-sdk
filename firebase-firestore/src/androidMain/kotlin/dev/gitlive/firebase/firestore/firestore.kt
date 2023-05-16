@@ -6,7 +6,16 @@
 package dev.gitlive.firebase.firestore
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.MemoryCacheSettings
+import com.google.firebase.firestore.MemoryEagerGcSettings
+import com.google.firebase.firestore.MemoryLruGcSettings
+import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.PersistentCacheSettings
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.firestore.ktx.memoryCacheSettings
+import com.google.firebase.firestore.ktx.memoryEagerGcSettings
+import com.google.firebase.firestore.ktx.memoryLruGcSettings
+import com.google.firebase.firestore.ktx.persistentCacheSettings
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -32,7 +41,35 @@ internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<U
         }
     }
 
-actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
+    is LocalCacheSettings.Persistent -> persistentCacheSettings {
+        sizeBytes?.let { setSizeBytes(it) }
+    }
+    is LocalCacheSettings.Memory -> memoryCacheSettings {
+        setGcSettings(
+            when (garbaseCollectorSettings) {
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> memoryEagerGcSettings {  }
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> memoryLruGcSettings {
+                    garbaseCollectorSettings.sizeBytes?.let {
+                        setSizeBytes(it)
+                    }
+                }
+            }
+        )
+    }
+}
+
+actual data class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
@@ -45,7 +82,7 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         com.google.firebase.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
+    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T =
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
@@ -53,19 +90,31 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
+        android.firestoreSettings = firestoreSettings {  }
     }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
-                sslEnabled?.let { builder.isSslEnabled = it }
-                host?.let { builder.host = it }
-                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
-            }.build()
+    actual fun setSettings(settings: Settings) {
+        android.firestoreSettings = firestoreSettings {
+            settings.sslEnabled?.let { isSslEnabled = it }
+            settings.host?.let { host = it }
+            settings.cacheSettings?.let { setLocalCacheSettings(it.android) }
         }
+    }
+
+    @Suppress("DEPRECATION")
+    actual fun updateSettings(settings: Settings) {
+        android.firestoreSettings = firestoreSettings {
+            isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
+            host = settings.host ?: android.firestoreSettings.host
+            val cacheSettings = settings.cacheSettings?.android ?: android.firestoreSettings.cacheSettings
+            cacheSettings?.let {
+                setLocalCacheSettings(it)
+            } ?: kotlin.run {
+                isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
+                setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
+            }
+        }
+    }
 
     actual suspend fun disableNetwork() =
         android.disableNetwork().await().run { }
@@ -75,52 +124,40 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
 }
 
-actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
+val SetOptions.android: com.google.firebase.firestore.SetOptions? get() = when (this) {
+    is SetOptions.Merge -> com.google.firebase.firestore.SetOptions.merge()
+    is SetOptions.Overwrite -> null
+    is SetOptions.MergeFields -> com.google.firebase.firestore.SetOptions.mergeFields(fields)
+    is SetOptions.MergeFieldPaths -> com.google.firebase.firestore.SetOptions.mergeFieldPaths(encodedFieldPaths)
+}
+
+actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) : BaseWriteBatch() {
 
     actual val async = Async(android)
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
-        true -> android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.merge())
-        false -> android.set(documentRef.android, encode(data, encodeDefaults)!!)
-    }.let { this }
-
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-            .let { this }
-
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
-        true -> android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.merge())
-        false -> android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!)
-    }.let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-            .let { this }
-
-    actual fun <T> set(
+    override fun setEncoded(
         documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        merge: Boolean,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
-        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
-            field to encode(value, encodeDefaults)
-        }
+        encodedData: Any,
+        setOptions: SetOptions
+    ): BaseWriteBatch = (setOptions.android?.let {
+        android.set(documentRef.android, encodedData, it)
+    } ?: android.set(documentRef.android, encodedData)).let {
+        this
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
+        merge: Boolean
+    ): BaseWriteBatch {
+        val serializedItem = encodedData as Map<String, *>
+        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
 
         val result = serializedItem + serializedFieldAndValues
         if (merge) {
-            android.set(documentRef.android, result, SetOptions.merge())
+            android.set(documentRef.android, result, com.google.firebase.firestore.SetOptions.merge())
         } else {
             android.set(documentRef.android, result)
         }
@@ -128,53 +165,34 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
-        android.update(documentRef.android, encode(data, encodeDefaults) as Map<String, Any>).let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
 
     @Suppress("UNCHECKED_CAST")
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        android.update(documentRef.android, encode(strategy, data, encodeDefaults) as Map<String, Any>).let { this }
-
-    @JvmName("updateFields")
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
-            .let { this }
-
-    @JvmName("updateFieldsExtended")
-    actual inline fun <reified T> update(
+    override fun updateEncoded(
         documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        vararg fieldsAndValues: Pair<String, Any?>
-    ): WriteBatch {
-        val serializedItem = encode(strategy, data, encodeDefaults) as Map<String, *>
-        val serializedFieldAndValues = fieldsAndValues.associate { (field, value) ->
-            field to encode(value, encodeDefaults)
-        }
+        encodedData: Any,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseWriteBatch {
+        val serializedItem = encodedData as Map<String, *>
+        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
 
         val result = serializedItem + serializedFieldAndValues
         return android.update(documentRef.android, result).let { this }
     }
 
+    override fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseWriteBatch = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        android.update(documentRef.android, field, value, *moreFieldsAndValues)
+    }.let { this }
 
-    @JvmName("updateFieldPaths")
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field.android to encode(value, true) }
-            ?.let { encoded ->
-                android.update(
-                    documentRef.android,
-                    encoded.first().first,
-                    encoded.first().second,
-                    *encoded.drop(1)
-                        .flatMap { (field, value) -> listOf(field, value) }
-                        .toTypedArray()
-                )
-            }
-            .let { this }
+    override fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ): BaseWriteBatch = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        android.update(documentRef.android, field, value, *moreFieldsAndValues)
+    }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -187,69 +205,35 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) {
     }
 }
 
-actual class Transaction(val android: com.google.firebase.firestore.Transaction) {
+actual class Transaction(val android: com.google.firebase.firestore.Transaction) : BaseTransaction() {
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
-        true -> android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.merge())
-        false -> android.set(documentRef.android, encode(data, encodeDefaults)!!)
-    }.let { this }
-
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-            .let { this }
-
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-            .let { this }
-
-    actual fun <T> set(
+    override fun setEncoded(
         documentRef: DocumentReference,
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean,
-        merge: Boolean
-    ) = when(merge) {
-        true -> android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.merge())
-        false -> android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!)
+        encodedData: Any,
+        setOptions: SetOptions
+    ): BaseTransaction {
+        setOptions.android?.let {
+            android.set(documentRef.android, encodedData, it)
+        } ?: android.set(documentRef.android, encodedData)
+        return this
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
+
+    override fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseTransaction = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        android.update(documentRef.android, field, value, *moreFieldsAndValues)
     }.let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        android.set(documentRef.android, encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-            .let { this }
-
-    @Suppress("UNCHECKED_CAST")
-    actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
-        android.update(documentRef.android, encode(data, encodeDefaults) as Map<String, Any>).let { this }
-
-    @Suppress("UNCHECKED_CAST")
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        android.update(documentRef.android, encode(strategy, data, encodeDefaults) as Map<String, Any>).let { this }
-
-    @JvmName("updateFields")
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field to encode(value, true) }
-            ?.let { encoded -> android.update(documentRef.android, encoded.toMap()) }
-            .let { this }
-
-    @JvmName("updateFieldPaths")
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-            ?.map { (field, value) -> field.android to encode(value, true) }
-            ?.let { encoded ->
-                android.update(
-                    documentRef.android,
-                    encoded.first().first,
-                    encoded.first().second,
-                    *encoded.drop(1)
-                        .flatMap { (field, value) -> listOf(field, value) }
-                        .toTypedArray()
-                )
-            }.let { this }
+    override fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ) = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        android.update(documentRef.android, field, value, *moreFieldsAndValues)
+    }.let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
@@ -262,7 +246,7 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
 actual typealias NativeDocumentReference = com.google.firebase.firestore.DocumentReference
 
 @Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
     val android: NativeDocumentReference = nativeValue
 
     actual val id: String
@@ -271,53 +255,19 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val path: String
         get() = android.path
 
-    actual val async = Async(android)
+    actual val parent: CollectionReference
+        get() = CollectionReference(android.parent)
+
+    override val async = Async(android)
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
-        async.set(data, encodeDefaults, merge).await()
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        async.set(data, encodeDefaults, mergeFields = mergeFields).await()
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        async.set(data, encodeDefaults, mergeFieldPaths = mergeFieldPaths).await()
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        async.set(strategy, data, encodeDefaults, merge).await()
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        async.set(strategy, data, encodeDefaults, mergeFields = mergeFields).await()
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        async.set(strategy, data, encodeDefaults, mergeFieldPaths = mergeFieldPaths).await()
-
-    @Suppress("UNCHECKED_CAST")
-    actual suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
-        async.update(data, encodeDefaults).await()
-
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        async.update(strategy, data, encodeDefaults).await()
-
-    @JvmName("updateFields")
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        async.update(fieldsAndValues = fieldsAndValues).await()
-
-    @JvmName("updateFieldPaths")
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        async.update(fieldsAndValues = fieldsAndValues).await()
-
-    actual suspend fun delete() =
-        async.delete().await()
 
     actual suspend fun get() =
         DocumentSnapshot(android.get().await())
 
     actual val snapshots get() = callbackFlow<DocumentSnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(DocumentSnapshot(snapshot)) }
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -329,64 +279,25 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     override fun toString(): String = nativeValue.toString()
 
     @Suppress("DeferredIsResult")
-    actual class Async(@PublishedApi internal val android: NativeDocumentReference) {
-        actual inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
-            true -> android.set(encode(data, encodeDefaults)!!, SetOptions.merge())
-            false -> android.set(encode(data, encodeDefaults)!!)
-        }.asUnitDeferred()
+    class Async(@PublishedApi internal val android: NativeDocumentReference) : BaseDocumentReference.Async() {
 
-        actual inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-            android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-                .asUnitDeferred()
-
-        actual inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-            android.set(encode(data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-                .asUnitDeferred()
-
-        actual fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) = when(merge) {
-            true -> android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.merge())
-            false -> android.set(encode(strategy, data, encodeDefaults)!!)
-        }.asUnitDeferred()
-
-        actual fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-            android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFields(*mergeFields))
-                .asUnitDeferred()
-
-        actual fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-            android.set(encode(strategy, data, encodeDefaults)!!, SetOptions.mergeFieldPaths(mergeFieldPaths.map { it.android }))
-                .asUnitDeferred()
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = (setOptions.android?.let {
+            android.set(encodedData, it)
+        } ?: android.set(encodedData)).asUnitDeferred()
 
         @Suppress("UNCHECKED_CAST")
-        actual inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
-            android.update(encode(data, encodeDefaults) as Map<String, Any>).asUnitDeferred()
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = android.update(encodedData as Map<String, Any>).asUnitDeferred()
 
-        @Suppress("UNCHECKED_CAST")
-        actual fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-            android.update(encode(strategy, data, encodeDefaults) as Map<String, Any>).asUnitDeferred()
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }?.let {
+            android.update(encodedFieldsAndValues.toMap())
+        }?.asUnitDeferred() ?: CompletableDeferred(Unit)
 
-        @JvmName("updateFields")
-        actual fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-            fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-                ?.map { (field, value) -> field to encode(value, true) }
-                ?.let { encoded -> android.update(encoded.toMap()) }
-                ?.asUnitDeferred() ?: CompletableDeferred(Unit)
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+            ?.performUpdate { field, value, moreFieldsAndValues ->
+                android.update(field, value, *moreFieldsAndValues)
+            }?.asUnitDeferred() ?: CompletableDeferred(Unit)
 
-        @JvmName("updateFieldPaths")
-        actual fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-            fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-                ?.map { (field, value) -> field.android to encode(value, true) }
-                ?.let { encoded ->
-                    android.update(
-                        encoded.first().first,
-                        encoded.first().second,
-                        *encoded.drop(1)
-                            .flatMap { (field, value) -> listOf(field, value) }
-                            .toTypedArray()
-                    )
-                }
-                ?.asUnitDeferred() ?: CompletableDeferred(Unit)
-
-        actual fun delete() =
+        override fun delete() =
             android.delete().asUnitDeferred()
     }
 }
@@ -399,7 +310,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { safeOffer(QuerySnapshot(snapshot)) }
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            exception?.let { close(exception) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
         }
         awaitClose { listener.remove() }
@@ -407,6 +327,9 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
     internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
+
+    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
 
     internal actual fun _where(
         field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
@@ -462,6 +385,16 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
+
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(android.startAfter(document.android))
+    internal actual fun _startAfter(vararg fieldValues: Any) = Query(android.startAfter(*fieldValues))
+    internal actual fun _startAt(document: DocumentSnapshot) = Query(android.startAt(document.android))
+    internal actual fun _startAt(vararg fieldValues: Any) = Query(android.startAt(*fieldValues))
+
+    internal actual fun _endBefore(document: DocumentSnapshot) = Query(android.endBefore(document.android))
+    internal actual fun _endBefore(vararg fieldValues: Any) = Query(android.endBefore(*fieldValues))
+    internal actual fun _endAt(document: DocumentSnapshot) = Query(android.endAt(document.android))
+    internal actual fun _endAt(vararg fieldValues: Any) = Query(android.endAt(*fieldValues))
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
@@ -473,21 +406,25 @@ actual class CollectionReference(override val android: com.google.firebase.fires
         get() = android.path
     actual val async = Async(android)
 
+    actual val document: DocumentReference
+        get() = DocumentReference(android.document())
+
+    actual val parent: DocumentReference?
+        get() = android.parent?.let{DocumentReference(it)}
+
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
-    actual fun document() = DocumentReference(android.document())
-
-    actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
-        DocumentReference(android.add(encode(data, encodeDefaults)!!).await())
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        DocumentReference(android.add(encode(strategy, data, encodeDefaults)!!).await())
+    actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
+        DocumentReference(android.add(encode(data, encodeSettings)!!).await())
+    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
+        DocumentReference(android.add(encode(strategy, data, encodeSettings)!!).await())
 
     @Suppress("DeferredIsResult")
     actual class Async(@PublishedApi internal val android: com.google.firebase.firestore.CollectionReference) {
-        actual inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
-            android.add(encode(data, encodeDefaults)!!).asDeferred().convert(::DocumentReference)
-        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-            android.add(encode(strategy, data, encodeDefaults)!!).asDeferred().convert(::DocumentReference)
+        actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
+            android.add(encode(data, encodeSettings)!!).asDeferred().convert(::DocumentReference)
+        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
+            android.add(encode(strategy, data, encodeSettings)!!).asDeferred().convert(::DocumentReference)
     }
 }
 
@@ -525,14 +462,14 @@ actual class DocumentSnapshot(val android: com.google.firebase.firestore.Documen
     actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(value = android.getData(serverTimestampBehavior.toAndroid()))
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(strategy, android.getData(serverTimestampBehavior.toAndroid()))
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.getData(serverTimestampBehavior.toAndroid()), decodeSettings)
 
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
         decode(value = android.get(field, serverTimestampBehavior.toAndroid()))
 
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(strategy, android.get(field, serverTimestampBehavior.toAndroid()))
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
+        decode(strategy, android.get(field, serverTimestampBehavior.toAndroid()), decodeSettings)
 
     actual fun contains(field: String) = android.contains(field)
 
@@ -553,10 +490,17 @@ actual class SnapshotMetadata(val android: com.google.firebase.firestore.Snapsho
 }
 
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
-    actual constructor(vararg fieldNames: String) : this(com.google.firebase.firestore.FieldPath.of(*fieldNames))
-    actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+    actual constructor(vararg fieldNames: String) : this(
+        com.google.firebase.firestore.FieldPath.of(
+            *fieldNames
+        )
+    )
 
+    actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+    actual val encoded: EncodedFieldPath = android
     override fun equals(other: Any?): Boolean = other is FieldPath && android == other.android
     override fun hashCode(): Int = android.hashCode()
     override fun toString(): String = android.toString()
 }
+
+actual typealias EncodedFieldPath = com.google.firebase.firestore.FieldPath

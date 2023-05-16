@@ -4,11 +4,14 @@
 
 package dev.gitlive.firebase.database
 
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
@@ -24,11 +27,24 @@ expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
 expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
 expect class FirebaseDatabase {
+
+    class Settings {
+        val persistenceEnabled: Boolean
+        val persistenceCacheSizeBytes: Long?
+
+        companion object {
+            fun createSettings(persistenceEnabled: Boolean = false, persistenceCacheSizeBytes:  Long? = null): Settings
+        }
+    }
+
     fun reference(path: String): DatabaseReference
-    fun setPersistenceEnabled(enabled: Boolean)
+    fun reference(): DatabaseReference
+    fun setSettings(settings: Settings)
     fun setLoggingEnabled(enabled: Boolean)
     fun useEmulator(host: String, port: Int)
 }
+
+fun FirebaseDatabase.setPersistenceEnabled(enabled: Boolean) = setSettings(FirebaseDatabase.Settings.createSettings(persistenceEnabled = enabled))
 
 data class ChildEvent internal constructor(
     val snapshot: DataSnapshot,
@@ -67,17 +83,19 @@ expect class DatabaseReference : Query {
     fun push(): DatabaseReference
     fun child(path: String): DatabaseReference
     fun onDisconnect(): OnDisconnect
-    suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean = true)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings())
     suspend fun removeValue()
+
+    suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings = DecodeSettings(), transactionUpdate: (currentData: T) -> T): DataSnapshot
 }
 
 expect class DataSnapshot {
     val exists: Boolean
     val key: String?
     inline fun <reified T> value(): T
-    fun <T> value(strategy: DeserializationStrategy<T>): T
+    fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings()): T
     fun child(path: String): DataSnapshot
     val children: Iterable<DataSnapshot>
 }
@@ -87,8 +105,8 @@ expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeExc
 expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
-    suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean = true)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings())
 }
 

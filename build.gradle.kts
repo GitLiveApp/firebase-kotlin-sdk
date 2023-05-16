@@ -2,16 +2,16 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-// TODO: To be removed once we will migrate to kotlin version 1.6.20
-// https://youtrack.jetbrains.com/issue/KT-49109#focus=Comments-27-5667134.0-0
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.13.2"
+repositories {
+    google()
+    mavenCentral()
 }
 
 plugins {
     kotlin("multiplatform") apply false
-    kotlin("plugin.serialization") apply false
+    kotlin("native.cocoapods") apply false
     id("base")
+    id("com.github.ben-manes.versions") version "0.42.0"
 }
 
 buildscript {
@@ -24,27 +24,27 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.3")
-        classpath("com.adarshr:gradle-test-logger-plugin:2.1.1")
+        classpath("com.android.tools.build:gradle:${project.extra["gradlePluginVersion"]}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
+        classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
 
-val targetSdkVersion by extra(31)
+val compileSdkVersion by extra(33)
 val minSdkVersion by extra(19)
-val firebaseBoMVersion by extra("29.0.0")
-
-val cinteropDir: String by extra("src/nativeInterop/cinterop")
 
 tasks {
-    val updateVersions by registering {
+    register("updateVersions") {
         dependsOn(
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
+            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion",
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion"
+            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
+            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion"
         )
     }
 }
@@ -53,7 +53,7 @@ subprojects {
 
     group = "dev.gitlive"
 
-    apply(plugin="com.adarshr.test-logger")
+    apply(plugin = "com.adarshr.test-logger")
 
     repositories {
         mavenLocal()
@@ -65,27 +65,18 @@ subprojects {
         onlyIf { project.gradle.startParameter.taskNames.contains("MavenRepository") }
     }
 
-    tasks.whenTaskAdded {
-        enabled = when(name) {
-            "compileDebugUnitTestKotlinAndroid" -> false
-            "compileReleaseUnitTestKotlinAndroid" -> false
-            "testDebugUnitTest" -> false
-            "testReleaseUnitTest" -> false
-            else -> enabled
-        }
-    }
-
     tasks {
 
-        val updateVersion by registering(Exec::class) {
+        register<Exec>("updateVersion") {
             commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
         }
 
-        val updateDependencyVersion by registering(Copy::class) {
+        register<Copy>("updateDependencyVersion") {
             mustRunAfter("updateVersion")
             val from = file("package.json")
             from.writeText(
                 from.readText()
+                    .replace("version\": \"([^\"]+)".toRegex(), "version\": \"${project.property("${project.name}.version")}")
                     .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
                     .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
             )
@@ -116,7 +107,7 @@ subprojects {
                 into.writeText(
                     from.readText()
                         .replace("require('firebase-kotlin-sdk-", "require('@gitlive/")
-                    //                .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
+//                        .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
                 )
             }
         }
@@ -126,7 +117,7 @@ subprojects {
             into(file("$buildDir/node_module"))
         }
 
-        val prepareForNpmPublish by registering {
+        register("prepareForNpmPublish") {
             dependsOn(
                 unzipJar,
                 copyPackageJson,
@@ -136,7 +127,7 @@ subprojects {
             )
         }
 
-        val publishToNpm by creating(Exec::class) {
+        create<Exec>("publishToNpm") {
             workingDir("$buildDir/node_module")
             isIgnoreExitValue = true
             if(Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -163,35 +154,6 @@ subprojects {
                 )
             }
         }
-
-        if (projectDir.resolve("$cinteropDir/Cartfile").exists()) { // skipping firebase-common module
-            listOf("bootstrap", "update").forEach {
-                task<Exec>("carthage${it.capitalize()}") {
-                    group = "carthage"
-                    executable = "carthage"
-                    args(
-                        it,
-                        "--project-directory", projectDir.resolve(cinteropDir),
-                        "--platform", "iOS",
-                        "--cache-builds"
-                    )
-                }
-            }
-        }
-
-        if (Os.isFamily(Os.FAMILY_MAC)) {
-            withType(org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-                dependsOn("carthageBootstrap")
-            }
-        }
-
-        create("carthageClean", Delete::class.java) {
-            group = "carthage"
-            delete(
-                projectDir.resolve("$cinteropDir/Carthage"),
-                projectDir.resolve("$cinteropDir/Cartfile.resolved")
-            )
-        }
     }
 
     afterEvaluate  {
@@ -200,26 +162,25 @@ subprojects {
             mkdir("$buildDir/node_module")
         }
 
-        tasks.named<Delete>("clean") {
-            dependsOn("carthageClean")
-        }
-
         val coroutinesVersion: String by project
+        val firebaseBoMVersion: String by project
 
         dependencies {
-            "commonMainImplementation"(kotlin("stdlib-common"))
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-            "jsMainImplementation"(kotlin("stdlib-js"))
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-            "jsTestImplementation"(kotlin("test-js"))
-            "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13.1")
-            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
+            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+            if (this@afterEvaluate.name != "firebase-crashlytics") {
+                "jsTestImplementation"(kotlin("test-js"))
+            }
+            "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
+            "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
+            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
+            "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
         }
     }
 
@@ -278,4 +239,30 @@ subprojects {
             }
         }
     }
+
+    // Workaround for setting kotlinOptions.jvmTarget
+    // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.jvmTarget = "11"
+    }
 }
+
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+
+    fun isNonStable(version: String): Boolean {
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+        val versionMatch = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
+
+        return (stableKeyword || versionMatch).not()
+    }
+
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+
+    checkForGradleUpdate = true
+    outputFormatter = "plain,html"
+    outputDir = "build/dependency-reports"
+    reportfileName = "dependency-updates"
+}
+// check for latest dependencies - ./gradlew dependencyUpdates -Drevision=release

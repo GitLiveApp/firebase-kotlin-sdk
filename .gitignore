@@ -7,10 +7,7 @@ local.properties
 *.iml
 Firebase*.zip
 /Firebase
-/.DS_Store
+.DS_Store
 *.log
 /kotlin-js-store/
-
-/**/src/nativeInterop/cinterop/modules/
-/**/nativeInterop/cinterop/Cartfile.resolved
-/**/nativeInterop/cinterop/Carthage/
+/kotlin-js-store/yarn.lock

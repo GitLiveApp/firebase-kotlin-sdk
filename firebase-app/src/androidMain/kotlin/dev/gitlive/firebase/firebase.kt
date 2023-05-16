@@ -29,11 +29,13 @@ actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: St
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
     FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid()))
 
-actual class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
+actual data class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
     actual val name: String
         get() = android.name
     actual val options: FirebaseOptions
         get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId) }
+
+    actual suspend fun delete() = android.delete()
 }
 
 actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)

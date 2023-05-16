@@ -5,7 +5,10 @@ include(
     "firebase-config",
     "firebase-database",
     "firebase-firestore",
-    "firebase-functions"
+    "firebase-functions",
+    "firebase-installations",
+    "firebase-perf",
+    "firebase-crashlytics"
 )
 
 pluginManagement {
@@ -13,6 +16,7 @@ pluginManagement {
 
     plugins {
         kotlin("multiplatform") version kotlinVersion
+        kotlin("native.cocoapods") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
     }
 }

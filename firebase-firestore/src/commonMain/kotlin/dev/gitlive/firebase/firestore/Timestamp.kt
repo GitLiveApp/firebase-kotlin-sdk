@@ -1,6 +1,11 @@
 package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /** A class representing a platform specific Firebase Timestamp. */
 expect class NativeTimestamp
@@ -27,7 +32,7 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
     object ServerTimestamp: BaseTimestamp
 }
 
-private const val FACTOR = 1000000
-fun Timestamp.Companion.fromMilliseconds(milliseconds: Long): Timestamp =
-    Timestamp(milliseconds / 1000, ((milliseconds % 1000) * FACTOR).toInt())
-fun Timestamp.toMilliseconds(): Long = seconds * 1000 + nanoseconds / FACTOR
+fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp = duration.toComponents { seconds, nanoseconds -> Timestamp(seconds, nanoseconds) }
+fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp = fromDuration(milliseconds.milliseconds)
+fun Timestamp.toDuration(): Duration = seconds.seconds + nanoseconds.nanoseconds
+fun Timestamp.toMilliseconds(): Double = toDuration().toDouble(DurationUnit.MILLISECONDS)

@@ -9,20 +9,32 @@ on:
 
 jobs:
   build:
-
     runs-on: macos-latest
-
+    strategy:
+      matrix:
+        api-level: [ 33 ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Cocoapods cache
+        uses: actions/cache@v3
+        id: cocoapods-cache
+        with:
+          path: |
+            ~/.cocoapods
+            ~/Library/Caches/CocoaPods
+            */build/cocoapods
+            */build/classes
+          key: cocoapods-cache
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
+          cache: gradle
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Install Carthage
-        run: brew list carthage || brew install carthage
       - name: Install Firebase tools
         run: npm install -g firebase-tools
       - name: Start Firebase emulator
@@ -30,32 +42,56 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
       - name: Run JS Tests
-        run: ./gradlew cleanTest jsLegacyTest
+        run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: "JS Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/jsTest/"
+          path: |
+            **/build/reports/tests/jsTest/
+            **/build/reports/tests/jsBrowserTest/
+            **/build/reports/tests/jsNodeTest/
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
       - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: "iOS Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/iosTest/"
+          path: "**/build/reports/tests/iosX64Test/"
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
       - name: Run Android Instrumented Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
-          target: google_apis
+          api-level: ${{ matrix.api-level }}
           arch: x86_64
-          profile: Nexus 6
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
           script: ./gradlew connectedAndroidTest
       - name: Upload Android test artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: "Android Test Report HTML"
-          path: "firebase-firestore/build/reports/tests/androidTests/"
+          path: "**/build/reports/androidTests/"
