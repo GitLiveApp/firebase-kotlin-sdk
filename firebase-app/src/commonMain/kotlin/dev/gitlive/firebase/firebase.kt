@@ -19,6 +19,7 @@ object Firebase
 expect class FirebaseApp {
     val name: String
     val options: FirebaseOptions
+    suspend fun delete()
 }
 
 /** Returns the default firebase app instance. */
@@ -43,15 +44,29 @@ expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, n
 val Firebase.options: FirebaseOptions
     get() = Firebase.app.options
 
-data class FirebaseOptions(
-    val applicationId: String,
-    val apiKey: String,
-    val databaseUrl: String? = null,
-    val gaTrackingId: String? = null,
-    val storageBucket: String? = null,
-    val projectId: String? = null,
-    val gcmSenderId: String? = null
-)
+expect class FirebaseOptions(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String? = null,
+    gaTrackingId: String? = null,
+    storageBucket: String? = null,
+    projectId: String? = null,
+    gcmSenderId: String? = null,
+    authDomain: String? = null
+) {
+    val applicationId: String
+    val apiKey: String
+    val databaseUrl: String?
+    val gaTrackingId: String?
+    val storageBucket: String?
+    val projectId: String?
+    val gcmSenderId: String?
+    val authDomain: String?
+
+    companion object {
+        fun withContext(context: Any): FirebaseOptions?
+    }
+}
 
 expect open class FirebaseException : Exception
 

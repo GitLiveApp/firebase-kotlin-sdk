@@ -8,7 +8,6 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.safeOffer
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
@@ -20,21 +19,21 @@ import platform.Foundation.*
 actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
 
-actual fun Firebase.auth(app: FirebaseApp) =
-    FirebaseAuth(FIRAuth.authWithApp(app.ios))
+@Suppress("CAST_NEVER_SUCCEEDS")
+actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp))
 
-actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
+actual data class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addAuthStateDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
     actual val idTokenChanged get() = callbackFlow<FirebaseUser?> {
-        val handle = ios.addIDTokenDidChangeListener { _, user -> safeOffer(user?.let { FirebaseUser(it) }) }
+        val handle = ios.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
 
@@ -58,6 +57,8 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
 
+    actual fun isSignInWithEmailLink(link: String) = ios.isSignInWithEmailLink(link)
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
@@ -69,6 +70,9 @@ actual class FirebaseAuth internal constructor(val ios: FIRAuth) {
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
 
     actual suspend fun signOut() = ios.throwError { signOut(it) }.run { Unit }
 
@@ -145,25 +149,27 @@ internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<
 
 internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
-    function { result, error ->
+    val callback = { result: R?, error: NSError? ->
         if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
         }
     }
+    function(callback)
     return job.await() as R
 }
 
 internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
-    function { error ->
+    val callback = { error: NSError? ->
         if(error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
         }
     }
+    function(callback)
     job.await()
 }
 

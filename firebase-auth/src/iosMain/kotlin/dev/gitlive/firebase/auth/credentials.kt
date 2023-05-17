@@ -20,6 +20,12 @@ actual object EmailAuthProvider {
         password: String
     ): AuthCredential =
         AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
+
+    actual fun credentialWithLink(
+        email: String,
+        emailLink: String
+    ): AuthCredential =
+        AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, link = emailLink))
 }
 
 actual object FacebookAuthProvider {
@@ -31,7 +37,11 @@ actual object GithubAuthProvider {
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
+    actual fun credential(idToken: String?, accessToken: String?): AuthCredential {
+        requireNotNull(idToken) { "idToken must not be null" }
+        requireNotNull(accessToken) { "accessToken must not be null" }
+        return AuthCredential(FIRGoogleAuthProvider.credentialWithIDToken(idToken, accessToken))
+    }
 }
 
 actual class OAuthProvider(val ios: FIROAuthProvider) {

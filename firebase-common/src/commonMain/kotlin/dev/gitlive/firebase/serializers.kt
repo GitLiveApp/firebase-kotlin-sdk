@@ -5,9 +5,9 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.encoding.*
 
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
@@ -36,7 +36,6 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
         override fun isElementOptional(index: Int) = false
     }
 
-    @InternalSerializationApi
     @Suppress("UNCHECKED_CAST")
     override fun serialize(encoder: Encoder, value: Map<String, Any?>) {
         map = value
@@ -81,7 +80,6 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
         override fun isElementOptional(index: Int) = false
     }
 
-    @InternalSerializationApi
     @Suppress("UNCHECKED_CAST")
     override fun serialize(encoder: Encoder, value: Iterable<Any?>) {
         list = value.toList()
@@ -106,3 +104,30 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
     }
 }
 
+/**
+ * A special case of serializer for values natively supported by Firebase and
+ * don't require an additional encoding/decoding.
+ */
+abstract class SpecialValueSerializer<T>(
+    serialName: String,
+    private val toNativeValue: (T) -> Any?,
+    private val fromNativeValue: (Any?) -> T
+) : KSerializer<T> {
+    override val descriptor = buildClassSerialDescriptor(serialName) { }
+
+    override fun serialize(encoder: Encoder, value: T) {
+        if (encoder is FirebaseEncoder) {
+            encoder.value = toNativeValue(value)
+        } else {
+            throw SerializationException("This serializer must be used with FirebaseEncoder")
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): T {
+        return if (decoder is FirebaseDecoder) {
+            fromNativeValue(decoder.value)
+        } else {
+            throw SerializationException("This serializer must be used with FirebaseDecoder")
+        }
+    }
+}

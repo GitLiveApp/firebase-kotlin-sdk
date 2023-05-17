@@ -21,25 +21,43 @@ actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: St
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
     FirebaseApp(firebase.initializeApp(options.toJson()))
 
-actual class FirebaseApp internal constructor(val js: firebase.App) {
+actual data class FirebaseApp internal constructor(val js: firebase.App) {
     actual val name: String
         get() = js.name
     actual val options: FirebaseOptions
         get() = js.options.run {
-            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId)
+            FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, messagingSenderId, authDomain)
         }
+
+    actual suspend fun delete() = js.delete()
 }
 
 actual fun Firebase.apps(context: Any?) = firebase.apps.map { FirebaseApp(it) }
 
+actual class FirebaseOptions actual constructor(
+    actual val applicationId: String,
+    actual val apiKey: String,
+    actual val databaseUrl: String?,
+    actual val gaTrackingId: String?,
+    actual val storageBucket: String?,
+    actual val projectId: String?,
+    actual val gcmSenderId: String?,
+    actual val authDomain: String?
+) {
+    actual companion object {
+        actual fun withContext(context: Any): FirebaseOptions? = null
+    }
+}
+
 private fun FirebaseOptions.toJson() = json(
     "apiKey" to apiKey,
-    "applicationId" to applicationId,
+    "appId" to applicationId,
     "databaseURL" to (databaseUrl ?: undefined),
     "storageBucket" to (storageBucket ?: undefined),
     "projectId" to (projectId ?: undefined),
     "gaTrackingId" to (gaTrackingId ?: undefined),
-    "messagingSenderId" to (gcmSenderId ?: undefined)
+    "messagingSenderId" to (gcmSenderId ?: undefined),
+    "authDomain" to (authDomain ?: undefined)
 )
 
 actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)

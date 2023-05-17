@@ -11,7 +11,6 @@ import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.safeOffer
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -23,14 +22,14 @@ actual val Firebase.auth
 actual fun Firebase.auth(app: FirebaseApp) =
     FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
 
-actual class FirebaseAuth internal constructor(val android: com.google.firebase.auth.FirebaseAuth) {
+actual data class FirebaseAuth internal constructor(val android: com.google.firebase.auth.FirebaseAuth) {
     actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
     actual val authStateChanged: Flow<FirebaseUser?> get() = callbackFlow {
         val listener = object : AuthStateListener {
             override fun onAuthStateChanged(auth: com.google.firebase.auth.FirebaseAuth) {
-                safeOffer(auth.currentUser?.let { FirebaseUser(it) })
+                trySend(auth.currentUser?.let { FirebaseUser(it) })
             }
         }
         android.addAuthStateListener(listener)
@@ -40,7 +39,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual val idTokenChanged get(): Flow<FirebaseUser?> = callbackFlow {
         val listener = object : com.google.firebase.auth.FirebaseAuth.IdTokenListener {
             override fun onIdTokenChanged(auth: com.google.firebase.auth.FirebaseAuth) {
-                safeOffer(auth.currentUser?.let { FirebaseUser(it) })
+                trySend(auth.currentUser?.let { FirebaseUser(it) })
             }
         }
         android.addIdTokenListener(listener)
@@ -66,6 +65,8 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) = android.sendSignInLinkToEmail(email, actionCodeSettings.toAndroid()).await().run { Unit }
 
+    actual fun isSignInWithEmailLink(link: String) = android.isSignInWithEmailLink(link)
+
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
@@ -76,6 +77,9 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
         AuthResult(android.signInWithCredential(authCredential.android).await())
+
+    actual suspend fun signInWithEmailLink(email: String, link: String) =
+        AuthResult(android.signInWithEmailLink(email, link).await())
 
     actual suspend fun signOut() = android.signOut()
 

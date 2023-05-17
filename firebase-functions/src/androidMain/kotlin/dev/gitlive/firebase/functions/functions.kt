@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.functions
 
+import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.decode
@@ -25,7 +26,7 @@ actual fun Firebase.functions(app: FirebaseApp) =
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
 
-actual class FirebaseFunctions internal constructor(val android: com.google.firebase.functions.FirebaseFunctions) {
+actual data class FirebaseFunctions internal constructor(val android: com.google.firebase.functions.FirebaseFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } })
 
@@ -34,14 +35,10 @@ actual class FirebaseFunctions internal constructor(val android: com.google.fire
     actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
-actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) {
+actual class HttpsCallableReference internal constructor(val android: com.google.firebase.functions.HttpsCallableReference) : BaseHttpsCallableReference() {
     actual suspend operator fun invoke() = HttpsCallableResult(android.call().await())
 
-    actual suspend operator inline fun <reified T> invoke(data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(android.call(encode(data, encodeDefaults)).await())
-
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(android.call(encode(strategy, data, encodeDefaults)).await())
+    override suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(android.call(encodedData).await())
 }
 
 actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
@@ -49,8 +46,8 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual inline fun <reified T> data() =
         decode<T>(value = android.data)
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        decode(strategy, android.data)
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
+        decode(strategy, android.data, decodeSettings)
 }
 
 actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

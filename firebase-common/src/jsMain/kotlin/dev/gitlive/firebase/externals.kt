@@ -2,7 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JsModule("firebase/app")
+@file:JsModule("firebase/compat/app")
 
 package dev.gitlive.firebase
 
@@ -15,6 +15,7 @@ external object firebase {
     open class App {
         val name: String
         val options: Options
+        fun delete()
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
@@ -27,6 +28,8 @@ external object firebase {
         val gaTrackingId: String?
         val storageBucket: String?
         val projectId: String?
+        val messagingSenderId: String?
+        val authDomain: String?
     }
 
     val apps : Array<App>
@@ -54,12 +57,14 @@ external object firebase {
             fun fetchSignInMethodsForEmail(email: String): Promise<Array<String>>
             fun sendPasswordResetEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
             fun sendSignInLinkToEmail(email: String, actionCodeSettings: Any?): Promise<Unit>
+            fun isSignInWithEmailLink(link: String): Boolean
             fun signInWithEmailAndPassword(email: String, password: String): Promise<AuthResult>
             fun signInWithCustomToken(token: String): Promise<AuthResult>
             fun signInAnonymously(): Promise<AuthResult>
             fun signInWithCredential(authCredential: AuthCredential): Promise<AuthResult>
             fun signInWithPopup(provider: AuthProvider): Promise<AuthResult>
             fun signInWithRedirect(provider: AuthProvider): Promise<Unit>
+            fun signInWithEmailLink(email: String, link: String): Promise<AuthResult>
             fun getRedirectResult(): Promise<AuthResult>
             fun signOut(): Promise<Unit>
             fun updateCurrentUser(user: user.User?): Promise<Unit>
@@ -124,6 +129,7 @@ external object firebase {
         class EmailAuthProvider : AuthProvider {
             companion object {
                 fun credential(email :  String, password : String): AuthCredential
+                fun credentialWithLink(email: String, emailLink: String): AuthCredential
             }
         }
 
@@ -315,6 +321,11 @@ external object firebase {
             fun update(value: Any?): Promise<Unit>
             fun set(value: Any?): Promise<Unit>
             fun push(): ThenableReference
+            fun <T> transaction(
+                transactionUpdate: (currentData: T) -> T,
+                onComplete: (error: Error?, committed: Boolean, snapshot: DataSnapshot?) -> Unit,
+                applyLocally: Boolean?
+            ): Promise<T>
         }
 
         open class DataSnapshot {
@@ -335,6 +346,7 @@ external object firebase {
 
         object ServerValue {
             val TIMESTAMP: Any
+            fun increment (delta: Double): Any
         }
     }
 
@@ -361,25 +373,29 @@ external object firebase {
             fun enableNetwork(): Promise<Unit>
         }
 
-        open class Timestamp {
-            val seconds: Double
-            val nanoseconds: Double
-            fun toMillis(): Double
-        }
-
         open class Query {
             fun get(options: Any? = definedExternally): Promise<QuerySnapshot>
             fun where(field: String, opStr: String, value: Any?): Query
             fun where(field: FieldPath, opStr: String, value: Any?): Query
             fun onSnapshot(next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
+            fun onSnapshot(options: Json, next: (snapshot: QuerySnapshot) -> Unit, error: (error: Error) -> Unit): () -> Unit
             fun limit(limit: Double): Query
             fun orderBy(field: String, direction: Any): Query
             fun orderBy(field: FieldPath, direction: Any): Query
+            fun startAfter(document: DocumentSnapshot): Query
+            fun startAfter(vararg fieldValues: Any): Query
+            fun startAt(document: DocumentSnapshot): Query
+            fun startAt(vararg fieldValues: Any): Query
+            fun endBefore(document: DocumentSnapshot): Query
+            fun endBefore(vararg fieldValues: Any): Query
+            fun endAt(document: DocumentSnapshot): Query
+            fun endAt(vararg fieldValues: Any): Query
         }
 
         open class CollectionReference : Query {
             val path: String
-            fun doc(path: String): DocumentReference
+            val parent: DocumentReference?
+            fun doc(path: String = definedExternally): DocumentReference
             fun add(data: Any): Promise<DocumentReference>
         }
 
@@ -415,6 +431,7 @@ external object firebase {
         open class DocumentReference {
             val id: String
             val path: String
+            val parent: CollectionReference
 
             fun collection(path: String): CollectionReference
             fun get(options: Any? = definedExternally): Promise<DocumentSnapshot>
@@ -424,6 +441,8 @@ external object firebase {
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
             fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+
+            fun isEqual(other: DocumentReference): Boolean
         }
 
         open class WriteBatch {
@@ -444,19 +463,111 @@ external object firebase {
             fun delete(documentReference: DocumentReference): Transaction
         }
 
+        open class Timestamp(seconds: Double, nanoseconds: Double) {
+            companion object {
+                fun now(): Timestamp
+            }
+
+            val seconds: Double
+            val nanoseconds: Double
+
+            fun isEqual(other: Timestamp): Boolean
+        }
         open class FieldPath(vararg fieldNames: String) {
             companion object {
                 val documentId: FieldPath
             }
+
+            fun isEqual(other: FieldPath): Boolean
+        }
+
+        open class GeoPoint(latitude: Double, longitude: Double) {
+            val latitude: Double
+            val longitude: Double
+
+            fun isEqual(other: GeoPoint): Boolean
         }
 
         abstract class FieldValue {
             companion object {
-                fun serverTimestamp(): FieldValue
                 fun delete(): FieldValue
+                fun increment(value: Int): FieldValue
                 fun arrayRemove(vararg elements: Any): FieldValue
                 fun arrayUnion(vararg elements: Any): FieldValue
+                fun serverTimestamp(): FieldValue
             }
+            
+            fun isEqual(other: FieldValue): Boolean
+        }
+    }
+
+    fun remoteConfig(app: App? = definedExternally): remoteConfig.RemoteConfig
+
+    object remoteConfig {
+        interface RemoteConfig {
+            var defaultConfig: Any
+            var fetchTimeMillis: Long
+            var lastFetchStatus: String
+            val settings: Settings
+            fun activate(): Promise<Boolean>
+            fun ensureInitialized(): Promise<Unit>
+            fun fetch(): Promise<Unit>
+            fun fetchAndActivate(): Promise<Boolean>
+            fun getAll(): Json
+            fun getBoolean(key: String): Boolean
+            fun getNumber(key: String): Number
+            fun getString(key: String): String?
+            fun getValue(key: String): Value
+        }
+
+        interface Settings {
+            var fetchTimeoutMillis: Number
+            var minimumFetchIntervalMillis: Number
+        }
+
+        interface Value {
+            fun asBoolean(): Boolean
+            fun asNumber(): Number
+            fun asString(): String?
+            fun getSource(): String
+        }
+    }
+
+    fun installations(app: App? = definedExternally): installations.Installations
+
+    object installations {
+        interface Installations {
+            fun delete(): Promise<Unit>
+            fun getId(): Promise<String>
+            fun getToken(forceRefresh: Boolean): Promise<String>
+        }
+    }
+
+    fun performance(app: App? = definedExternally): performance
+
+    object performance {
+
+        var dataCollectionEnabled: Boolean
+        var instrumentationEnabled: Boolean
+
+        fun trace(
+            name: String
+            ): PerformanceTrace
+
+        open class Performance {
+
+        }
+
+        open class PerformanceTrace {
+            fun start()
+            fun stop()
+
+            fun getAttribute(attr: String): String?
+            fun getMetric(metricName: String): Number
+            fun incrementMetric(metricName: String, num: Number)
+            fun putAttribute(attr: String, value: String)
+            fun putMetric(metricName: String, num: Number)
+            fun removeAttribute(attr: String)
         }
     }
 }

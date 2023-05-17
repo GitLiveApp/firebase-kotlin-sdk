@@ -7,6 +7,7 @@ package dev.gitlive.firebase.auth
 import android.app.Activity
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
@@ -28,6 +29,11 @@ actual object EmailAuthProvider {
         email: String,
         password: String
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
+
+    actual fun credentialWithLink(
+        email: String,
+        emailLink: String
+    ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredentialWithLink(email, emailLink))
 }
 
 actual object FacebookAuthProvider {
@@ -39,7 +45,12 @@ actual object GithubAuthProvider {
 }
 
 actual object GoogleAuthProvider {
-    actual fun credential(idToken: String, accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+    actual fun credential(idToken: String?, accessToken: String?): AuthCredential {
+        require(idToken != null || accessToken != null) {
+            "Both parameters are optional but at least one must be present."
+        }
+        return AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+    }
 }
 
 actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) {
@@ -68,9 +79,9 @@ actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) 
     }
 }
 
-actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthProvider) {
+actual class PhoneAuthProvider(val createOptionsBuilder: () -> PhoneAuthOptions.Builder) {
 
-    actual constructor(auth: FirebaseAuth) : this(com.google.firebase.auth.PhoneAuthProvider.getInstance(auth.android))
+    actual constructor(auth: FirebaseAuth) : this({ PhoneAuthOptions.newBuilder(auth.android) })
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
 
@@ -80,7 +91,16 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
-                verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
+                verificationProvider.codeSent {
+                    val options = createOptionsBuilder()
+                        .setPhoneNumber(phoneNumber)
+                        .setTimeout(verificationProvider.timeout, verificationProvider.unit)
+                        .setActivity(verificationProvider.activity)
+                        .setCallbacks(this)
+                        .setForceResendingToken(forceResending)
+                        .build()
+                    PhoneAuthProvider.verifyPhoneNumber(options)
+                }
             }
 
             override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
@@ -103,7 +123,14 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             }
 
         }
-        android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, callback)
+
+        val options = createOptionsBuilder()
+            .setPhoneNumber(phoneNumber)
+            .setTimeout(verificationProvider.timeout, verificationProvider.unit)
+            .setActivity(verificationProvider.activity)
+            .setCallbacks(callback)
+            .build()
+        PhoneAuthProvider.verifyPhoneNumber(options)
 
         response.await().getOrThrow()
     }

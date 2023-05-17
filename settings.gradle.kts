@@ -1,11 +1,22 @@
 include(
-    "firebase-common",
     "firebase-app",
-    "firebase-firestore",
-    "firebase-database",
     "firebase-auth",
-    "firebase-functions"
+    "firebase-common",
+    "firebase-config",
+    "firebase-database",
+    "firebase-firestore",
+    "firebase-functions",
+    "firebase-installations",
+    "firebase-perf",
+    "firebase-crashlytics"
 )
 
-//enableFeaturePreview("GRADLE_METADATA")
+pluginManagement {
+    val kotlinVersion: String by settings
 
+    plugins {
+        kotlin("multiplatform") version kotlinVersion
+        kotlin("native.cocoapods") version kotlinVersion
+        kotlin("plugin.serialization") version kotlinVersion
+    }
+}

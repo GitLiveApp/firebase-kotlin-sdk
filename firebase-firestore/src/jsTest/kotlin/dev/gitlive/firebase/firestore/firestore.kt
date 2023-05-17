@@ -4,28 +4,23 @@
 
 package dev.gitlive.firebase.firestore
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.promise
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.runTest
+import kotlin.js.json
 
 actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = GlobalScope
-    .promise {
-        try {
-            test()
-        } catch (e: dynamic) {
-            e.log()
-            throw e
-        }
-    }.asDynamic()
+actual fun runTest(test: suspend CoroutineScope.() -> Unit) {
+    runTest { test() }
+}
 
-internal fun Throwable.log() {
-    console.error(this)
-    cause?.let {
-        console.error("Caused by:")
-        it.log()
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
+    return (js("Object").entries(encoded) as Array<Array<Any>>).associate {
+        it[0] as String to it[1]
     }
 }
+actual fun Map<String, Any?>.asEncoded(): Any =
+    json(*entries.map { (key, value) -> key to value }.toTypedArray())
 

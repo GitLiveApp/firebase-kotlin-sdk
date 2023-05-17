@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import platform.Foundation.*
 
@@ -11,7 +12,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) = runBlocking {
+actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     val testRun = MainScope().async { test() }
     while (testRun.isActive) {
         NSRunLoop.mainRunLoop.runMode(
@@ -22,3 +23,7 @@ actual fun runTest(test: suspend () -> Unit) = runBlocking {
     }
     testRun.await()
 }
+
+@Suppress("UNCHECKED_CAST")
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
+actual fun Map<String, Any?>.asEncoded(): Any = this

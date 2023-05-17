@@ -15,6 +15,7 @@ expect class OAuthCredential : AuthCredential
 
 expect object EmailAuthProvider {
     fun credential(email: String, password: String): AuthCredential
+    fun credentialWithLink(email: String, emailLink: String): AuthCredential
 }
 
 expect object FacebookAuthProvider {
@@ -26,7 +27,7 @@ expect object GithubAuthProvider {
 }
 
 expect object GoogleAuthProvider {
-    fun credential(idToken: String, accessToken: String): AuthCredential
+    fun credential(idToken: String?, accessToken: String?): AuthCredential
 }
 
 expect class OAuthProvider constructor(

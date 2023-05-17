@@ -4,24 +4,56 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.encoding.CompositeDecoder
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.PolymorphicKind
+import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.encoding.CompositeDecoder
 import kotlin.js.Json
 
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, decodeDouble: (value: Any?) -> Double?): CompositeDecoder = when(descriptor.kind as StructureKind) {
-    StructureKind.CLASS, StructureKind.OBJECT -> (value as Json).let { json ->
-        FirebaseClassDecoder(decodeDouble, js("Object").keys(value).length as Int, { json[it] != undefined }) {
-                desc, index -> json[desc.getElementName(index)]
-        }
-    }
-    StructureKind.LIST -> (value as Array<*>).let {
-        FirebaseCompositeDecoder(decodeDouble, it.size) { _, index -> it[index] }
-    }
+actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder = when (descriptor.kind) {
+    StructureKind.CLASS, StructureKind.OBJECT -> decodeAsMap(false)
+    StructureKind.LIST -> decodeAsList()
     StructureKind.MAP -> (js("Object").entries(value) as Array<Array<Any>>).let {
-        FirebaseCompositeDecoder(decodeDouble, it.size) { _, index -> it[index/2].run { if(index % 2 == 0) get(0) else get(1) } }
+        FirebaseCompositeDecoder(
+            it.size,
+            settings
+        ) { desc, index -> it[index / 2].run { if (index % 2 == 0) {
+            val key = get(0) as String
+            if (desc.getElementDescriptor(index).kind == PrimitiveKind.STRING) {
+                key
+            } else {
+                JSON.parse(key)
+            }
+        } else get(1) } }
+    }
+
+    is PolymorphicKind -> when (settings.polymorphicStructure) {
+        EncodeDecodeSettings.PolymorphicStructure.MAP -> decodeAsMap(polymorphicIsNested)
+        EncodeDecodeSettings.PolymorphicStructure.LIST -> decodeAsList()
+    }
+
+    else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
+}
+
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+actual fun getPolymorphicType(value: Any?, discriminator: String): String =
+    (value as Json)[discriminator] as String
+
+private fun FirebaseDecoder.decodeAsList(): CompositeDecoder = (value as Array<*>).let {
+    FirebaseCompositeDecoder(it.size, settings) { _, index -> it[index] }
+}
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+private fun FirebaseDecoder.decodeAsMap(isNestedPolymorphic: Boolean): CompositeDecoder = (value as Json).let { json ->
+    FirebaseClassDecoder(js("Object").keys(value).length as Int, settings, { json[it] != undefined }) { desc, index ->
+        if (isNestedPolymorphic) {
+            if (index == 0) {
+                json[desc.getElementName(index)]
+            } else {
+                json
+            }
+        } else {
+            json[desc.getElementName(index)]
+        }
     }
 }
