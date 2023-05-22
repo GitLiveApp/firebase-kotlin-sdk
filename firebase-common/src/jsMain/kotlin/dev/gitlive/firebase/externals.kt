@@ -276,7 +276,6 @@ external object firebase {
     object functions {
         class Functions {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
-            fun useFunctionsEmulator(origin: String)
             fun useEmulator(host: String, port: Int)
         }
         interface HttpsCallableResult {
