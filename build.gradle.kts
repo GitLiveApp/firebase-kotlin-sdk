@@ -62,7 +62,7 @@ subprojects {
     }
 
     tasks.withType<Sign>().configureEach {
-        onlyIf { !project.gradle.startParameter.taskNames.contains("publishToMavenLocal") }
+        onlyIf { !project.gradle.startParameter.taskNames.any { "MavenLocal" in it } && !project.gradle.startParameter.taskNames.contains("publishToGitHubPackagesRepository") }
     }
 
     tasks {

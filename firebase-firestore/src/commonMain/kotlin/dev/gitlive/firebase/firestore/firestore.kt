@@ -126,6 +126,7 @@ expect class DocumentReference {
     val path: String
     val snapshots: Flow<DocumentSnapshot>
     val parent: CollectionReference
+    fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot>
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot

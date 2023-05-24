@@ -454,7 +454,7 @@ external object firebase {
             fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
-            fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+            fun onSnapshot(options: Json, next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
         }
 
         open class WriteBatch {
