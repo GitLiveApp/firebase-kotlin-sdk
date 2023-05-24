@@ -310,7 +310,7 @@ external object firebase {
             fun endAt(value: Any, key: String? = definedExternally): Query
             fun equalTo(value: Any, key: String? = definedExternally): Query
             fun limitToFirst(limit: Int): Query
-            fun limitToLast (limit: Int): Query
+            fun limitToLast(limit: Int): Query
         }
 
         open class Reference: Query {
@@ -330,8 +330,10 @@ external object firebase {
 
         open class DataSnapshot {
             val key: String?
-            fun `val`(): Any
+            val ref: Reference
+            fun `val`(): Any?
             fun exists(): Boolean
+            fun hasChildren(): Boolean
             fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
             fun numChildren(): Int
             fun child(path: String): DataSnapshot
