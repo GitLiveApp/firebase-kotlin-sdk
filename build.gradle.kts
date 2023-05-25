@@ -59,6 +59,14 @@ subprojects {
         mavenLocal()
         google()
         mavenCentral()
+        maven {
+            name = "github"
+            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
     }
 
     tasks.withType<Sign>().configureEach {
@@ -163,6 +171,10 @@ subprojects {
         }
 
         dependencies {
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.17")
+            "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
+                exclude("com.google.android.gms")
+            }
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:31.4.0"))
