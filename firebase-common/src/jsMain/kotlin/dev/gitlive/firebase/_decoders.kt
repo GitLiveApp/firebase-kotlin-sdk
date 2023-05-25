@@ -13,8 +13,13 @@ import kotlin.js.Json
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder = when(descriptor.kind) {
     StructureKind.CLASS, StructureKind.OBJECT, PolymorphicKind.SEALED -> (value as Json).let { json ->
-        FirebaseClassDecoder(js("Object").keys(value).length as Int, { json[it] != undefined }) {
-                desc, index -> json[desc.getElementName(index)]
+        FirebaseClassDecoder(js("Object").keys(value).length as Int, { json[it] != undefined }) { desc, index ->
+            val elementName = desc.getElementName(index)
+            if (desc.kind is PolymorphicKind && elementName == "value") {
+                json
+            } else {
+                json[desc.getElementName(index)]
+            }
         }
     }
     StructureKind.LIST -> (value as Array<*>).let {
