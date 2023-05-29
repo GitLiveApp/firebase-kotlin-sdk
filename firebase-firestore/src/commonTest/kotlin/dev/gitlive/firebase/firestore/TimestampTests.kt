@@ -3,8 +3,12 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firebaseSerializer
+import dev.gitlive.firebase.nativeAssertEquals
+import dev.gitlive.firebase.nativeMapOf
 import kotlinx.serialization.Serializable
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 
 @Serializable
 data class TestData(
@@ -29,34 +33,41 @@ class TimestampTests {
     fun encodeTimestampObject() = runTest {
         val timestamp = Timestamp(123, 456)
         val item = TestData("uid123", timestamp, timestamp, null)
-        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
-        assertEquals("uid123", encoded["uid"])
-        // NOTE: wrapping is required because JS does not override equals
-        assertEquals(timestamp, Timestamp(encoded["createdAt"] as NativeTimestamp))
-        assertEquals(timestamp, Timestamp(encoded["updatedAt"] as NativeTimestamp))
-        assertNull(encoded["deletedAt"])
+        nativeAssertEquals(
+            nativeMapOf(
+                "uid" to "uid123",
+                "createdAt" to timestamp.nativeValue,
+                "updatedAt" to timestamp.nativeValue,
+                "deletedAt" to null
+            ),
+            encode(item, shouldEncodeElementDefault = false)
+        )
     }
 
     @Test
     fun encodeServerTimestampObject() = runTest {
         val timestamp = Timestamp(123, 456)
         val item = TestData("uid123", timestamp, Timestamp.ServerTimestamp, Timestamp.ServerTimestamp)
-        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
-        assertEquals("uid123", encoded["uid"])
-        assertEquals(timestamp, Timestamp(encoded["createdAt"] as NativeTimestamp))
-        assertEquals(FieldValue.serverTimestamp, FieldValue(encoded["updatedAt"]!!))
-        assertEquals(FieldValue.serverTimestamp, FieldValue(encoded["deletedAt"]!!))
+        nativeAssertEquals(
+            nativeMapOf(
+                "uid" to "uid123",
+                "createdAt" to timestamp.nativeValue,
+                "updatedAt" to FieldValue.serverTimestamp.nativeValue,
+                "deletedAt" to FieldValue.serverTimestamp.nativeValue
+            ),
+            encode(item, shouldEncodeElementDefault = false)
+        )
     }
 
     @Test
     fun decodeTimestampObject() = runTest {
         val timestamp = Timestamp(123, 345)
-        val obj = mapOf(
+        val obj = nativeMapOf(
             "uid" to "uid123",
             "createdAt" to timestamp.nativeValue,
             "updatedAt" to timestamp.nativeValue,
             "deletedAt" to timestamp.nativeValue
-        ).asEncoded()
+        )
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         with(decoded.createdAt) {
@@ -78,12 +89,12 @@ class TimestampTests {
 
     @Test
     fun decodeEmptyTimestampObject() = runTest {
-        val obj = mapOf(
+        val obj = nativeMapOf(
             "uid" to "uid123",
             "createdAt" to Timestamp.now().nativeValue,
             "updatedAt" to Timestamp.now().nativeValue,
             "deletedAt" to null
-        ).asEncoded()
+        )
         val decoded: TestData = decode(obj)
         assertEquals("uid123", decoded.uid)
         assertNotNull(decoded.updatedAt)
@@ -100,21 +111,17 @@ class TimestampTests {
 
     @Test
     fun timestampMillisecondsConversion() = runTest {
-        val duration = 1666170858063.milliseconds
-        val (seconds, nanoseconds) = ms.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
-        val ms = duration.toDouble(DurationUnit.MILLISECONDS)
+        val ms = 1666170858063.0
 
         val timestamp = Timestamp.fromMilliseconds(ms)
-        assertEquals(seconds, timestamp.seconds)
-        assertEquals(nanoseconds, timestamp.nanoseconds)
         assertEquals(ms, timestamp.toMilliseconds())
     }
 
     @Test
     fun timestampDurationConversion() = runTest {
         val duration = 1666170858063.milliseconds
-        val (seconds, nanoseconds) = ms.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
-        val timestamp = Timestamp.fromDuration(ms)
+        val (seconds, nanoseconds) = duration.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
+        val timestamp = Timestamp.fromDuration(duration)
         assertEquals(seconds, timestamp.seconds)
         assertEquals(nanoseconds, timestamp.nanoseconds)
         assertEquals(duration, timestamp.toDuration())

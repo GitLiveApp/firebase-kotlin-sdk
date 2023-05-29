@@ -28,11 +28,6 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
 
-/** @return a map extracted from the encoded data. */
-expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
-/** @return pairs as raw encoded data. */
-expect fun Map<String, Any?>.asEncoded(): Any
-
 class FirebaseFirestoreTest {
 
     @Serializable
