@@ -460,6 +460,31 @@ class FirebaseFirestoreTest {
     }
 
     @Test
+    fun testLegacyDoubleTimestampWriteNewFormatRead() = runTest {
+        @Serializable
+        data class LegacyDocument(
+            @Serializable(with = DoubleAsTimestampSerializer::class)
+            val time: Double
+        )
+
+        @Serializable
+        data class NewDocument(
+            val time: Timestamp
+        )
+
+        val doc = Firebase.firestore
+            .collection("testLegacyDoubleTimestampEncodeDecode")
+            .document("testLegacy")
+
+        val ms = 12345678.0
+
+        doc.set(LegacyDocument(time = ms))
+
+        val fetched: NewDocument = doc.get().data()
+        assertEquals(ms, fetched.time.toMilliseconds())
+    }
+
+    @Test
     fun testQueryByTimestamp() = runTest {
         @Serializable
         data class DocumentWithTimestamp(
