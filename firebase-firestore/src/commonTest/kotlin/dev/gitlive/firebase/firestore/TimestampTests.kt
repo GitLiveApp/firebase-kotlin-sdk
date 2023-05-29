@@ -100,14 +100,23 @@ class TimestampTests {
 
     @Test
     fun timestampMillisecondsConversion() = runTest {
-        val ms = 1666170858063
-        val seconds = 1666170858
-        val nanoseconds = 63000000 // 1 millisecond = 1000 microseconds = 1000000 nanoseconds
-        val timestamp = Timestamp.fromMilliseconds(ms.toDouble())
+        val duration = 1666170858063.milliseconds
+        val (seconds, nanoseconds) = ms.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
+        val ms = duration.toDouble(DurationUnit.MILLISECONDS)
 
-        assertEquals(seconds.toLong(), timestamp.seconds)
+        val timestamp = Timestamp.fromMilliseconds(ms)
+        assertEquals(seconds, timestamp.seconds)
         assertEquals(nanoseconds, timestamp.nanoseconds)
+        assertEquals(ms, timestamp.toMilliseconds())
+    }
 
-        assertEquals(ms, timestamp.toMilliseconds().toLong())
+    @Test
+    fun timestampDurationConversion() = runTest {
+        val duration = 1666170858063.milliseconds
+        val (seconds, nanoseconds) = ms.toComponents { seconds, nanoseconds -> seconds to nanoseconds }
+        val timestamp = Timestamp.fromDuration(ms)
+        assertEquals(seconds, timestamp.seconds)
+        assertEquals(nanoseconds, timestamp.nanoseconds)
+        assertEquals(duration, timestamp.toDuration())
     }
 }

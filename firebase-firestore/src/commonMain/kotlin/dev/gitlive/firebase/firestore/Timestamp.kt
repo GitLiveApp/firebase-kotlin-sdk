@@ -1,10 +1,16 @@
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
 import dev.gitlive.firebase.SpecialValueSerializer
 import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.serverTimestamp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /** A class representing a platform specific Firebase Timestamp. */
 expect class NativeTimestamp
@@ -31,11 +37,16 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
     object ServerTimestamp: BaseTimestamp
 }
 
-fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp =
-    Timestamp((milliseconds / 1000).toLong(), ((milliseconds % 1000) * 1000000).toInt())
-fun Timestamp.toMilliseconds(): Double = seconds * 1000 + nanoseconds / 1000000.0
+fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp =
+    duration.toComponents { seconds, nanoseconds ->
+        Timestamp(seconds, nanoseconds)
+    }
+fun Timestamp.toDuration(): Duration = seconds.seconds + nanoseconds.nanoseconds
 
-/** A serializer for [BaseTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp = fromDuration(milliseconds.milliseconds)
+fun Timestamp.toMilliseconds(): Double = toDuration().toDouble(DurationUnit.MILLISECONDS)
+
+/** A serializer for [BaseTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
 object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
     serialName = "Timestamp",
     toNativeValue = { value ->
@@ -54,7 +65,7 @@ object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
     }
 )
 
-/** A serializer for [Timestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+/** A serializer for [Timestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
 object TimestampSerializer : SpecialValueSerializer<Timestamp>(
     serialName = "Timestamp",
     toNativeValue = Timestamp::nativeValue,
@@ -66,7 +77,7 @@ object TimestampSerializer : SpecialValueSerializer<Timestamp>(
     }
 )
 
-/** A serializer for [Timestamp.ServerTimestamp]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
+/** A serializer for [Timestamp.ServerTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
 object ServerTimestampSerializer : SpecialValueSerializer<Timestamp.ServerTimestamp>(
     serialName = "Timestamp",
     toNativeValue = { FieldValue.serverTimestamp.nativeValue },
@@ -84,7 +95,7 @@ object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
     toNativeValue = { value ->
         when(value) {
             serverTimestamp -> FieldValue.serverTimestamp.nativeValue
-            else -> Timestamp.fromMilliseconds(value)
+            else -> Timestamp.fromMilliseconds(value).nativeValue
         }
     },
     fromNativeValue = { value ->
