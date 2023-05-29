@@ -6,7 +6,6 @@ package dev.gitlive.firebase.firestore
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
-import kotlin.js.json
 
 actual val emulatorHost: String = "localhost"
 
