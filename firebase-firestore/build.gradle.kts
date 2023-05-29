@@ -99,7 +99,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":firebase-app"))
-                implementation(project(":firebase-common"))
+                api(project(":firebase-common"))
             }
         }
 
