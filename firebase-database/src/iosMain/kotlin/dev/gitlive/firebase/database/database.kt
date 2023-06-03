@@ -33,11 +33,13 @@ actual val Firebase.database
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
-actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios))
+actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp)
+)
 
-actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase =
-    FirebaseDatabase(FIRDatabase.databaseForApp(app.ios, url))
+actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url)
+)
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
