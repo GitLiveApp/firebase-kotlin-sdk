@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
@@ -164,7 +165,7 @@ expect class DocumentReference internal constructor(nativeValue: NativeDocumentR
 /**
  * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
  */
-object DocumentReferenceSerializer : SpecialValueSerializer<DocumentReference>(
+object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialValueSerializer(
     serialName = "DocumentReference",
     toNativeValue = DocumentReference::nativeValue,
     fromNativeValue = { value ->
@@ -282,7 +283,7 @@ expect class FieldValue internal constructor(nativeValue: Any) {
 }
 
 /** A serializer for [FieldValue]. Must be used in conjunction with [FirebaseEncoder]. */
-object FieldValueSerializer : SpecialValueSerializer<FieldValue>(
+object FieldValueSerializer : KSerializer<FieldValue> by SpecialValueSerializer(
     serialName = "FieldValue",
     toNativeValue = FieldValue::nativeValue,
     fromNativeValue = { raw ->

@@ -4,6 +4,7 @@ import dev.gitlive.firebase.FirebaseDecoder
 import dev.gitlive.firebase.FirebaseEncoder
 import dev.gitlive.firebase.SpecialValueSerializer
 import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.serverTimestamp
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlin.time.Duration
@@ -47,7 +48,7 @@ fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp = from
 fun Timestamp.toMilliseconds(): Double = toDuration().toDouble(DurationUnit.MILLISECONDS)
 
 /** A serializer for [BaseTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
+object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { value ->
         when (value) {
@@ -66,7 +67,7 @@ object BaseTimestampSerializer : SpecialValueSerializer<BaseTimestamp>(
 )
 
 /** A serializer for [Timestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object TimestampSerializer : SpecialValueSerializer<Timestamp>(
+object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = Timestamp::nativeValue,
     fromNativeValue = { value ->
@@ -78,7 +79,7 @@ object TimestampSerializer : SpecialValueSerializer<Timestamp>(
 )
 
 /** A serializer for [Timestamp.ServerTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object ServerTimestampSerializer : SpecialValueSerializer<Timestamp.ServerTimestamp>(
+object ServerTimestampSerializer : KSerializer<Timestamp.ServerTimestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { FieldValue.serverTimestamp.nativeValue },
     fromNativeValue = { value ->
@@ -90,7 +91,7 @@ object ServerTimestampSerializer : SpecialValueSerializer<Timestamp.ServerTimest
 )
 
 /** A serializer for a Double field which is stored as a Timestamp. */
-object DoubleAsTimestampSerializer : SpecialValueSerializer<Double>(
+object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { value ->
         when(value) {

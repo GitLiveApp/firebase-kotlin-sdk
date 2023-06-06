@@ -108,7 +108,7 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
  * A special case of serializer for values natively supported by Firebase and
  * don't require an additional encoding/decoding.
  */
-abstract class SpecialValueSerializer<T>(
+class SpecialValueSerializer<T>(
     serialName: String,
     private val toNativeValue: (T) -> Any?,
     private val fromNativeValue: (Any?) -> T

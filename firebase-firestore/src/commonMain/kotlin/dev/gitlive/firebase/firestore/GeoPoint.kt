@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.SpecialValueSerializer
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 
@@ -17,7 +18,7 @@ expect class GeoPoint internal constructor(nativeValue: NativeGeoPoint) {
 }
 
 /** Serializer for [GeoPoint]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms. */
-object GeoPointSerializer : SpecialValueSerializer<GeoPoint>(
+object GeoPointSerializer : KSerializer<GeoPoint> by SpecialValueSerializer(
     serialName = "GeoPoint",
     toNativeValue = GeoPoint::nativeValue,
     fromNativeValue = { value ->
