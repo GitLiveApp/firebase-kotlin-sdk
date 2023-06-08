@@ -16,19 +16,21 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import java.util.WeakHashMap
 
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
@@ -56,7 +58,15 @@ actual fun Firebase.database(app: FirebaseApp) =
 actual fun Firebase.database(app: FirebaseApp, url: String) =
     FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+actual class FirebaseDatabase private constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+
+    companion object {
+        private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
+
+        internal fun FirebaseDatabase(
+            android: com.google.firebase.database.FirebaseDatabase
+        ) = instances.getOrPut(android) { dev.gitlive.firebase.database.FirebaseDatabase(android) }
+    }
 
     private var persistenceEnabled = true
 
@@ -112,11 +122,11 @@ actual open class Query internal constructor(
         get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                trySend(DataSnapshot(snapshot, persistenceEnabled))
+                trySendBlocking(DataSnapshot(snapshot, persistenceEnabled))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                close(error.toException())
+                cancel(CancellationException(error.message, error.toException()))
             }
         }
         android.addValueEventListener(listener)
