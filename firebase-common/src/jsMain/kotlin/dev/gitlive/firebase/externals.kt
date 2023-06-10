@@ -276,7 +276,6 @@ external object firebase {
     object functions {
         class Functions {
             fun httpsCallable(name: String, options: Json?): HttpsCallable
-            fun useFunctionsEmulator(origin: String)
             fun useEmulator(host: String, port: Int)
         }
         interface HttpsCallableResult {
@@ -453,6 +452,8 @@ external object firebase {
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
             fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
+
+            fun isEqual(other: DocumentReference): Boolean
         }
 
         open class WriteBatch {
@@ -477,6 +478,8 @@ external object firebase {
             companion object {
                 val documentId: FieldPath
             }
+
+            fun isEqual(other: FieldPath): Boolean
         }
 
         abstract class FieldValue {
@@ -489,6 +492,13 @@ external object firebase {
             }
             
             fun isEqual(other: FieldValue): Boolean
+        }
+
+        open class GeoPoint(latitude: Double, longitude: Double) {
+            val latitude: Double
+            val longitude: Double
+
+            fun isEqual(other: GeoPoint): Boolean
         }
     }
 

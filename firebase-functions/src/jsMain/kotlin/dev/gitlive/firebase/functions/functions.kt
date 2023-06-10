@@ -26,8 +26,6 @@ actual class FirebaseFunctions internal constructor(val js: firebase.functions.F
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference(js.httpsCallable(name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
 
-    actual fun useFunctionsEmulator(origin: String) = js.useFunctionsEmulator(origin)
-
     actual fun useEmulator(host: String, port: Int) = js.useEmulator(host, port)
 }
 

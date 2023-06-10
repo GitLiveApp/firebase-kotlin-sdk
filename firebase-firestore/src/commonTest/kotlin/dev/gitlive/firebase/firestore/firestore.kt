@@ -459,6 +459,64 @@ class FirebaseFirestoreTest {
         assertNotEquals(DoubleAsTimestampSerializer.serverTimestamp, pendingWritesSnapshot.data(DoubleTimestamp.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
+    @Test
+    fun testLegacyDoubleTimestampWriteNewFormatRead() = runTest {
+        @Serializable
+        data class LegacyDocument(
+            @Serializable(with = DoubleAsTimestampSerializer::class)
+            val time: Double
+        )
+
+        @Serializable
+        data class NewDocument(
+            val time: Timestamp
+        )
+
+        val doc = Firebase.firestore
+            .collection("testLegacyDoubleTimestampEncodeDecode")
+            .document("testLegacy")
+
+        val ms = 12345678.0
+
+        doc.set(LegacyDocument(time = ms))
+
+        val fetched: NewDocument = doc.get().data()
+        assertEquals(ms, fetched.time.toMilliseconds())
+    }
+
+    @Test
+    fun testQueryByTimestamp() = runTest {
+        @Serializable
+        data class DocumentWithTimestamp(
+            val time: Timestamp
+        )
+
+        val collection = Firebase.firestore
+            .collection("testQueryByTimestamp")
+
+        val timestamp = Timestamp.now()
+
+        val pastTimestamp = Timestamp(timestamp.seconds - 60, 12345000) // note: iOS truncates 3 last digits of nanoseconds due to internal conversions
+        val futureTimestamp = Timestamp(timestamp.seconds + 60, 78910000)
+
+        collection.add(DocumentWithTimestamp(pastTimestamp))
+        collection.add(DocumentWithTimestamp(futureTimestamp))
+
+        val equalityQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            equalTo = pastTimestamp
+        ).get().documents.map { it.data<DocumentWithTimestamp>() }
+
+        assertEquals(listOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
+
+        val gtQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            greaterThan = timestamp
+        ).get().documents.map { it.data<DocumentWithTimestamp>() }
+
+        assertEquals(listOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")

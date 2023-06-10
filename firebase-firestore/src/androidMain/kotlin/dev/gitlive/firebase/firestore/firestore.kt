@@ -196,8 +196,12 @@ actual class Transaction(val android: com.google.firebase.firestore.Transaction)
         DocumentSnapshot(android.get(documentRef.android))
 }
 
-actual class DocumentReference(val android: com.google.firebase.firestore.DocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReference = com.google.firebase.firestore.DocumentReference
 
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val android: NativeDocumentReference by ::nativeValue
     actual val id: String
         get() = android.id
 
@@ -270,6 +274,10 @@ actual class DocumentReference(val android: com.google.firebase.firestore.Docume
         }
         awaitClose { listener.remove() }
     }
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
 }
 
 actual open class Query(open val android: com.google.firebase.firestore.Query) {
@@ -432,6 +440,10 @@ actual class SnapshotMetadata(val android: com.google.firebase.firestore.Snapsho
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
     actual constructor(vararg fieldNames: String) : this(com.google.firebase.firestore.FieldPath.of(*fieldNames))
     actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+
+    override fun equals(other: Any?): Boolean = other is FieldPath && android == other.android
+    override fun hashCode(): Int = android.hashCode()
+    override fun toString(): String = android.toString()
 }
 
 /** Represents a platform specific Firebase FieldValue. */

@@ -21,18 +21,20 @@ actual val Firebase.functions
 actual fun Firebase.functions(region: String) =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
-actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = TODO("Come back to issue")
-//    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios))
+actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp)
+)
 
-actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions = TODO("Come back to issue")
-//    FirebaseFunctions(FIRFunctions.functionsForApp(app.ios, region = region))
+actual fun Firebase.functions(
+    app: FirebaseApp,
+    region: String,
+): FirebaseFunctions = FirebaseFunctions(
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region)
+)
 
 actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
-
-    actual fun useFunctionsEmulator(origin: String): Unit = TODO("Come back to issue")
-        //ios.useFunctionsEmulatorOrigin(origin)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }

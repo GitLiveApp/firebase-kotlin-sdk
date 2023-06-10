@@ -8,7 +8,8 @@ include(
     "firebase-functions",
     "firebase-installations",
     "firebase-perf",
-    "firebase-crashlytics"
+    "firebase-crashlytics",
+    "test-utils"
 )
 
 pluginManagement {

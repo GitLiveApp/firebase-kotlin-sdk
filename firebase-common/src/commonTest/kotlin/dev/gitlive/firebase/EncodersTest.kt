@@ -11,10 +11,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-expect fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any
-expect fun nativeListOf(vararg elements: Any): Any
-expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
-
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
 
@@ -24,6 +20,9 @@ sealed class TestSealed {
     @SerialName("child")
     data class ChildClass(val map: Map<String, String>, val bool: Boolean = false): TestSealed()
 }
+
+@Serializable
+data class TestSealedList(val list: List<TestSealed>)
 
 class EncodersTest {
     @Test
@@ -73,5 +72,63 @@ class EncodersTest {
     fun decodeSealedClass() {
         val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true))
         assertEquals(TestSealed.ChildClass(mapOf("key" to "value"), true), decoded)
+    }
+
+    @Test
+    fun encodeSealedClassList() {
+        val toEncode = TestSealedList(
+            list = listOf(
+                TestSealed.ChildClass(
+                    map = mapOf("key" to "value"),
+                    bool = false
+                )
+            )
+        )
+        val encoded = encode<TestSealedList>(
+            TestSealedList.serializer(),
+            toEncode,
+            shouldEncodeElementDefault = true
+        )
+        val expected = nativeMapOf(
+            "list" to nativeListOf(
+                nativeMapOf(
+                    "type" to "child",
+                    "map" to nativeMapOf(
+                        "key" to "value"
+                    ),
+                    "bool" to false
+                )
+            )
+        )
+        nativeAssertEquals(expected, encoded)
+    }
+
+    @Test
+    fun decodeSealedClassList() {
+        val toDecode = nativeMapOf(
+            "list" to nativeListOf(
+                nativeMapOf(
+                    "type" to "child",
+                    "map" to nativeMapOf(
+                        "key" to "value"
+                    ),
+                    "bool" to false
+                )
+            )
+        )
+        val decoded = decode(
+            TestSealedList.serializer(),
+            toDecode
+        )
+        val expected = TestSealedList(
+            list = listOf(
+                TestSealed.ChildClass(
+                    map = mapOf("key" to "value"),
+                    bool = false
+                )
+            )
+        )
+
+        assertEquals(expected, decoded)
     }
 }
