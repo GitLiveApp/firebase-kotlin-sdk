@@ -232,6 +232,14 @@ actual class DocumentReference(val ios: FIRDocumentReference) {
         }
         awaitClose { listener.remove() }
     }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
 }
 
 actual open class Query(open val ios: FIRQuery) {
