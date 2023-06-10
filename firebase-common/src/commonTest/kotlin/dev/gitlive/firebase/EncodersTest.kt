@@ -11,10 +11,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-expect fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any
-expect fun nativeListOf(vararg elements: Any): Any
-expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
-
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
 
