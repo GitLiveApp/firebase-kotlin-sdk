@@ -126,7 +126,7 @@ actual open class Query internal constructor(
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                cancel(CancellationException(error.message, error.toException()))
+                close(error.toException())
             }
         }
         android.addValueEventListener(listener)
