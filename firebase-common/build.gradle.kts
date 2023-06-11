@@ -105,7 +105,6 @@ kotlin {
 
         val commonTest by getting {
             dependencies {
-                implementation(project(":test-utils"))
             }
         }
 

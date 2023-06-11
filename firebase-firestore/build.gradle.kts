@@ -116,12 +116,6 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(project(":test-utils"))
-            }
-        }
-
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore")
