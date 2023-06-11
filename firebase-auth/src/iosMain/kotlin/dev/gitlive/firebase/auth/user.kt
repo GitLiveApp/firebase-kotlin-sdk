@@ -4,7 +4,10 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import cocoapods.FirebaseAuth.FIRAuthDataResult
+import cocoapods.FirebaseAuth.FIRUser
+import cocoapods.FirebaseAuth.FIRUserInfoProtocol
+import cocoapods.FirebaseAuth.FIRUserMetadata
 import platform.Foundation.NSURL
 
 actual class FirebaseUser internal constructor(val ios: FIRUser) {
@@ -65,10 +68,9 @@ actual class FirebaseUser internal constructor(val ios: FIRUser) {
     actual suspend fun updatePassword(password: String) = ios.await { updatePassword(password, it) }.run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = ios.await { updatePhoneNumberCredential(credential.ios, it) }.run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
-        val request = ios.profileChangeRequest().apply {
-            this.displayName = displayName
-            this.photoURL = photoUrl?.let { NSURL.URLWithString(it) }
-        }
+        val request = ios.profileChangeRequest()
+            .apply { if(displayName !== UNCHANGED) setDisplayName(displayName) }
+            .apply { if(photoUrl !== UNCHANGED) setPhotoURL(photoUrl?.let { NSURL.URLWithString(it) }) }
         ios.await { request.commitChangesWithCompletion(it) }
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = ios.await {

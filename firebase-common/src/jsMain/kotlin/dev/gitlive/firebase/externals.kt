@@ -213,7 +213,7 @@ external object firebase {
             fun updateEmail(newEmail: String): Promise<Unit>
             fun updatePassword(newPassword: String): Promise<Unit>
             fun updatePhoneNumber(phoneCredential: auth.AuthCredential): Promise<Unit>
-            fun updateProfile(profile: ProfileUpdateRequest): Promise<Unit>
+            fun updateProfile(profile: Json): Promise<Unit>
             fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: Any?): Promise<Unit>
         }
 
