@@ -88,6 +88,7 @@ db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaul
 ```
 
 The `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to theirs default values.
+Using [@EncodeDefault](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-core/kotlinx.serialization/-encode-default/) on properties is a recommended way to locally override the behavior set with `encodeDefaults`.
 
 You can also omit the serializer but this is discouraged due to a [current limitation on Kotlin/JS and Kotlin/Native](https://github.com/Kotlin/kotlinx.serialization/issues/1116#issuecomment-704342452)
 
@@ -107,6 +108,21 @@ data class Post(
     // or
     @Serializable(with = DoubleAsTimestampSerializer::class),
     val doubleTimestamp: Double = DoubleAsTimestampSerializer.serverTimestamp
+)
+```
+
+In addition `firebase-firestore` provides [GeoPoint] and [DocumentReference] classes which allow persisting
+geo points and document references in a native way:
+
+```kotlin
+@Serializable
+data class PointOfInterest(
+    val reference: DocumentReference, 
+    val location: GeoPoint
+)
+val document = PointOfInterest(
+    reference = Firebase.firestore.collection("foo").document("bar"),
+    location = GeoPoint(51.939, 4.506)
 )
 ```
 

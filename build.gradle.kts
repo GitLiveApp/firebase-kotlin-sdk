@@ -73,7 +73,28 @@ subprojects {
         onlyIf { !project.gradle.startParameter.taskNames.any { "MavenLocal" in it } && !project.gradle.startParameter.taskNames.contains("publishToGitHubPackagesRepository") }
     }
 
+    val skipPublishing = project.name == "test-utils" // skip publishing for test utils
+
     tasks {
+        withType<Test> {
+            testLogging {
+                showExceptions = true
+                exceptionFormat = TestExceptionFormat.FULL
+                showStandardStreams = true
+                showCauses = true
+                showStackTraces = true
+                events = setOf(
+                    TestLogEvent.STARTED,
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR
+                )
+            }
+        }
+
+        if (skipPublishing) return@tasks
 
         val updateVersion by registering(Exec::class) {
             commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
@@ -144,24 +165,6 @@ subprojects {
                 commandLine("npm", "publish")
             }
         }
-
-        withType<Test> {
-            testLogging {
-                showExceptions = true
-                exceptionFormat = TestExceptionFormat.FULL
-                showStandardStreams = true
-                showCauses = true
-                showStackTraces = true
-                events = setOf(
-                    TestLogEvent.STARTED,
-                    TestLogEvent.FAILED,
-                    TestLogEvent.PASSED,
-                    TestLogEvent.SKIPPED,
-                    TestLogEvent.STANDARD_OUT,
-                    TestLogEvent.STANDARD_ERROR
-                )
-            }
-        }
     }
 
     afterEvaluate  {
@@ -193,8 +196,10 @@ subprojects {
         }
     }
 
-    apply(plugin="maven-publish")
-    apply(plugin="signing")
+    if (skipPublishing) return@subprojects
+
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
 
     configure<PublishingExtension> {
@@ -247,6 +252,7 @@ subprojects {
                 }
             }
         }
+
     }
 }
 
