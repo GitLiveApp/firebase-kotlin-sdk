@@ -8,16 +8,16 @@ import android.net.Uri
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
-actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) : FirebaseUserProfile {
+actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
     actual val uid: String
         get() = android.uid
-    override val displayName: String?
+    actual val displayName: String?
         get() = android.displayName
     actual val email: String?
         get() = android.email
     actual val phoneNumber: String?
         get() = android.phoneNumber
-    override val photoURL: String?
+    actual val photoURL: String?
         get() = android.photoUrl?.toString()
     actual val isAnonymous: Boolean
         get() = android.isAnonymous
@@ -46,10 +46,10 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    override suspend fun updateProfile(displayName: String?, photoUrl: String?) {
+    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = UserProfileChangeRequest.Builder()
-            .setDisplayName(displayName)
-            .setPhotoUri(photoUrl?.let { Uri.parse(it) })
+            .apply { if(displayName !== UNCHANGED) setDisplayName(displayName) }
+            .apply { if(photoUrl !== UNCHANGED) setPhotoUri(photoUrl?.let { Uri.parse(it) }) }
             .build()
         android.updateProfile(request).await()
     }

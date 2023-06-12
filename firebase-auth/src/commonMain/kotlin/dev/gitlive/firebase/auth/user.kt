@@ -4,17 +4,15 @@
 
 package dev.gitlive.firebase.auth
 
-// Javascript IR compilation has issues with referencing to actual values as default parameters, so we should use an interface instead
-interface FirebaseUserProfile {
-    val displayName: String?
-    val photoURL: String?
-    suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
-}
+//workaround for https://youtrack.jetbrains.com/issue/KT-48836
+internal val UNCHANGED = ""
 
-expect class FirebaseUser : FirebaseUserProfile {
+expect class FirebaseUser {
     val uid: String
+    val displayName: String?
     val email: String?
     val phoneNumber: String?
+    val photoURL: String?
     val isAnonymous: Boolean
     val isEmailVerified: Boolean
     val metaData: UserMetaData?
@@ -33,6 +31,7 @@ expect class FirebaseUser : FirebaseUserProfile {
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
+    suspend fun updateProfile(displayName: String? = UNCHANGED, photoUrl: String? = UNCHANGED)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 
