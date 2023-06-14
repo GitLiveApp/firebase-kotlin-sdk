@@ -101,10 +101,16 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting
 
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-database")
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 

@@ -114,6 +114,11 @@ kotlin {
                 api("com.google.firebase:firebase-firestore")
             }
         }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
+            }
+        }
 
         if (supportIosTarget) {
             val iosMain by getting

@@ -101,6 +101,11 @@ kotlin {
                 api("com.google.firebase:firebase-common")
             }
         }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
+            }
+        }
 
         if (supportIosTarget) {
             val iosMain by getting
