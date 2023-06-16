@@ -130,6 +130,7 @@ actual open class FirebaseAuthException(message: String): FirebaseException(mess
 actual open class FirebaseAuthActionCodeException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthEmailException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthInvalidCredentialsException(message: String): FirebaseAuthException(message)
+actual open class FirebaseAuthWeakPasswordException(message: String): FirebaseAuthInvalidCredentialsException(message)
 actual open class FirebaseAuthInvalidUserException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthMultiFactorException(message: String): FirebaseAuthException(message)
 actual open class FirebaseAuthRecentLoginRequiredException(message: String): FirebaseAuthException(message)
@@ -186,8 +187,9 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidVerificationCode,
         FIRAuthErrorCodeMissingVerificationID,
         FIRAuthErrorCodeMissingVerificationCode,
-        FIRAuthErrorCodeWeakPassword,
         FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(toString())
+
+        FIRAuthErrorCodeWeakPassword -> FirebaseAuthWeakPasswordException(toString())
 
         FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(toString())
 
