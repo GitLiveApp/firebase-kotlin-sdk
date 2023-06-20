@@ -27,7 +27,9 @@ import kotlin.test.assertTrue
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+expect annotation class IgnoreForAndroidUnitTest constructor()
 
+@IgnoreForAndroidUnitTest
 class FirebaseFirestoreTest {
 
     @Serializable
@@ -45,7 +47,7 @@ class FirebaseFirestoreTest {
     )
 
     @BeforeTest
-    fun initializeFirebase() {
+    fun initializeFirebase() = runTest {
         Firebase
             .takeIf { Firebase.apps(context).isEmpty() }
             ?.apply {

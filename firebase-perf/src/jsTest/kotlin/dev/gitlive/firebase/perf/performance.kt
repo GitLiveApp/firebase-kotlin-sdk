@@ -19,6 +19,8 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) {
     kotlinx.coroutines.test.runTest { test() }
 }
 
+actual annotation class IgnoreForAndroidUnitTest()
+
 class JsPerformanceTest {
 
     private lateinit var performance: FirebasePerformance

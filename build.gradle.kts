@@ -172,8 +172,7 @@ subprojects {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
-            "commonTestImplementation"(kotlin("test-common"))
-            "commonTestImplementation"(kotlin("test-annotations-common"))
+            "commonTestImplementation"(kotlin("test"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
@@ -185,6 +184,12 @@ subprojects {
             "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
             "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
         }
+    }
+
+    // Workaround for setting kotlinOptions.jvmTarget
+    // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.jvmTarget = "11"
     }
 
     if (skipPublishing) return@subprojects
@@ -245,18 +250,12 @@ subprojects {
         }
 
     }
-
-    // Workaround for setting kotlinOptions.jvmTarget
-    // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "11"
-    }
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
 
     fun isNonStable(version: String): Boolean {
-        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase(java.util.Locale.ENGLISH).contains(it) }
         val versionMatch = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
 
         return (stableKeyword || versionMatch).not()

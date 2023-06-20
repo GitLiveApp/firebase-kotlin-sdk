@@ -8,7 +8,9 @@ import kotlin.test.*
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
+expect annotation class IgnoreForAndroidUnitTest constructor()
 
+@IgnoreForAndroidUnitTest
 class FirebaseDatabaseTest {
 
     @Serializable

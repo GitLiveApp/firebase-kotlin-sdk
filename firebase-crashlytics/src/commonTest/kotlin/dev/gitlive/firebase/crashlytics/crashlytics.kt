@@ -12,12 +12,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+expect annotation class IgnoreForAndroidUnitTest constructor()
 
+@IgnoreForAndroidUnitTest
 class FirebaseCrashlyticsTest {
 
     @BeforeTest

@@ -14,3 +14,5 @@ actual val context: Any = Unit
 actual fun runTest(test: suspend CoroutineScope.() -> Unit) {
     runTest { test() }
 }
+
+actual annotation class IgnoreForAndroidUnitTest()

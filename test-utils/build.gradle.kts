@@ -40,7 +40,6 @@ android {
 }
 
 kotlin {
-
     android {
         publishAllLibraryVariants()
     }
@@ -71,7 +70,7 @@ kotlin {
 
         getByName("commonMain") {
             dependencies {
-                implementation(kotlin("test"))
+                api(kotlin("test"))
             }
         }
 

@@ -16,7 +16,9 @@ import kotlin.test.assertEquals
 
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
+expect annotation class IgnoreForAndroidUnitTest constructor()
 
+@IgnoreForAndroidUnitTest
 class FirebaseRemoteConfigTest {
     private val defaults = arrayOf(
         "test_default_boolean" to true,

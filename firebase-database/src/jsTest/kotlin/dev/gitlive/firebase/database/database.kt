@@ -6,3 +6,5 @@ actual val context: Any = Unit
 actual fun runTest(test: suspend () -> Unit) {
     runTest { test() }
 }
+
+actual annotation class IgnoreForAndroidUnitTest()
