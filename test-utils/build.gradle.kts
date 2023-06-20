@@ -9,22 +9,27 @@ version = "0.0.1"
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.testUtils"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    packagingOptions {
+
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -47,7 +52,7 @@ kotlin {
         iosSimulatorArm64()
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs()
         browser()
@@ -56,13 +61,15 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 implementation(kotlin("test"))
             }
@@ -76,7 +83,5 @@ kotlin {
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        val jsMain by getting
     }
 }
