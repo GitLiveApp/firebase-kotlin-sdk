@@ -5,32 +5,28 @@
 package dev.gitlive.firebase.database
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.Logger
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
-import com.google.firebase.database.ValueEventListener
-import dev.gitlive.firebase.encode
+import com.google.firebase.database.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
-import kotlinx.coroutines.CancellationException
+import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.encode
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
-import java.util.WeakHashMap
+import java.util.*
 
 suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
 
@@ -40,9 +36,13 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
         .filter { !it.value<Boolean>() }
         .produceIn(this)
 
-    select<T> {
-        asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
+    try {
+        select<T> {
+            asDeferred().onAwait { it }
+            notConnected.onReceive { throw DatabaseException("Database not connected", null) }
+        }
+    } finally {
+        notConnected.cancel()
     }
 }
 
