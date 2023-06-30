@@ -6,6 +6,10 @@
 
 package dev.gitlive.firebase
 
+import kotlinx.serialization.StringFormat
+import org.khronos.webgl.Uint8Array
+import org.w3c.files.Blob
+import org.w3c.files.File
 import kotlin.js.Json
 import kotlin.js.Promise
 
@@ -514,6 +518,85 @@ external object firebase {
             fun setMaxOperationRetryTime(time: Number): Unit
             fun setMaxUploadRetryTime(time: Number): Unit
             fun useEmulator(host: String, port: Int)
+        }
+
+        open class Reference {
+            val bucket: String
+            val fullPath: String
+            val name: String
+            val parent: Reference?
+            val root: Reference
+            val storage: Storage
+
+            fun child(path: String): Reference
+            fun delete(): Promise<Unit>
+            fun getDownloadURL(): Promise<String>
+            fun getMetadata(): Promise<FullMetadata>
+            fun list(options: ListOptions? = definedExternally): Promise<ListResult>
+            fun listAll(): Promise<ListResult>
+            fun put(data: Blob, metadata: UploadMetadata? = definedExternally): UploadTask
+            fun put(data: Uint8Array, metadata: UploadMetadata? = definedExternally): UploadTask
+            fun put(data: File, metadata: UploadMetadata? = definedExternally): UploadTask
+            fun putString(data: String, format: StringFormat? = definedExternally, metadata: UploadMetadata? = definedExternally): UploadTask
+            fun updateMetadata(metadata: SettableMetadata): Promise<FullMetadata>
+        }
+
+        open class FullMetadata {
+            val bucket: String
+            val fullPath: String
+            val generation: String
+            val metageneration: String
+            val name: String
+            val size: Number
+            val timeCreated: String
+            val updated: String
+            val customMetadata: Json
+        }
+
+        open class ListOptions {
+            val maxResults: Number
+            val pageToken: String
+        }
+
+        open class ListResult {
+            val items: Array<Reference>
+            val nextPageToken: String
+            val prefixes: Array<Reference>
+        }
+
+        open class SettableMetadata {
+            var cacheControl: String?
+            var contentDisposition: String?
+            var contentEncoding: String?
+            var contentLanguage: String?
+            var contentType: String?
+            var customMetadata: Json?
+        }
+
+        open class UploadMetadata {
+            var cacheControl: String?
+            var contentDisposition: String?
+            var contentEncoding: String?
+            var contentLanguage: String?
+            var contentType: String?
+            var customMetadata: Json?
+        }
+
+        open class UploadTask {
+            val snapshot: UploadTaskSnapshot
+
+            fun cancel(): Boolean
+            fun pause(): Boolean
+            fun resume(): Boolean
+        }
+
+        open class UploadTaskSnapshot {
+            val bytesTransferred: Number
+            val metadata: FullMetadata
+            val ref: Reference
+            val state: String
+            val task: UploadTask
+            val totalBytes: Number
         }
 
     }
