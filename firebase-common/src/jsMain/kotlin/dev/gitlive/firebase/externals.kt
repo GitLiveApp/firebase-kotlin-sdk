@@ -19,6 +19,7 @@ external object firebase {
         fun functions(region: String? = definedExternally): functions.Functions
         fun database(url: String? = definedExternally): database.Database
         fun firestore(): firestore.Firestore
+        fun storage(): storage.Storage
     }
 
     interface Options {
@@ -500,6 +501,21 @@ external object firebase {
 
             fun isEqual(other: GeoPoint): Boolean
         }
+    }
+
+    fun storage(): storage.Storage
+
+    object storage {
+
+        open class Storage {
+            val maxOperationRetryTime: Number
+            val maxUploadRetryTime: Number
+
+            fun setMaxOperationRetryTime(time: Number): Unit
+            fun setMaxUploadRetryTime(time: Number): Unit
+            fun useEmulator(host: String, port: Int)
+        }
+
     }
 
     fun remoteConfig(app: App? = definedExternally): remoteConfig.RemoteConfig
