@@ -35,4 +35,15 @@ actual class FirebaseStorage(val android: com.google.firebase.storage.FirebaseSt
 
 }
 
+actual class StorageReference(val android: com.google.firebase.storage.StorageReference) {
+    actual val name: String get() = android.name
+    actual val path: String get() = android.path
+    actual val bucket: String get() = android.bucket
+    actual val parent: StorageReference? get() = android.parent?.let { StorageReference(it) }
+    actual val root: StorageReference get() = StorageReference(android.root)
+    actual val storage: FirebaseStorage get() = FirebaseStorage(android.storage)
+
+    actual fun child(path: String): StorageReference = StorageReference(android.child(path))
+}
+
 actual open class StorageException(message: String) : FirebaseException(message)

@@ -36,6 +36,17 @@ actual class FirebaseStorage(val js: firebase.storage.Storage) {
 
 }
 
+actual class StorageReference(val js: firebase.storage.Reference) {
+    actual val path: String get() = js.fullPath
+    actual val name: String get() = js.name
+    actual val bucket: String get() = js.bucket
+    actual val parent: StorageReference? get() = js.parent?.let { StorageReference(it) }
+    actual val root: StorageReference get() = StorageReference(js.root)
+    actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
+
+    actual fun child(path: String): StorageReference = StorageReference(js.child(path))
+}
+
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.storage.rethrow { function() }
 
 inline fun <R> rethrow(function: () -> R): R {

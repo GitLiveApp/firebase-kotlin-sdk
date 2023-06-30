@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
+import cocoapods.FirebaseStorage.FIRStorageReference
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -35,6 +36,17 @@ actual class FirebaseStorage(val ios: FIRStorage) {
         ios.useEmulatorWithHost(host, port.toLong())
     }
 
+}
+
+actual class StorageReference(val ios: FIRStorageReference) {
+    actual val name: String get() = ios.name()
+    actual val path: String get() = ios.fullPath()
+    actual val bucket: String get() = ios.bucket()
+    actual val parent: StorageReference? get() = ios.parent()?.let { StorageReference(it) }
+    actual val root: StorageReference get() = StorageReference(ios.root())
+    actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
+
+    actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
 }
 
 actual open class StorageException(message: String) : FirebaseException(message)
