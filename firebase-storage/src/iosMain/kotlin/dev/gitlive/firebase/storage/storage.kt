@@ -9,6 +9,9 @@ import cocoapods.FirebaseStorage.FIRStorageReference
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlinx.coroutines.CompletableDeferred
+import platform.Foundation.NSError
+import platform.Foundation.NSURL
 
 
 actual val Firebase.storage get() =
@@ -47,6 +50,35 @@ actual class StorageReference(val ios: FIRStorageReference) {
     actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
 
     actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
+    actual suspend fun delete() = await { ios.deleteWithCompletion(it) }
+    actual suspend fun getDownloadUrl(): String = awaitResult<NSURL?> { ios.downloadURLWithCompletion(it) }?.absoluteString!!
 }
 
 actual open class StorageException(message: String) : FirebaseException(message)
+
+suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
+    val job = CompletableDeferred<T?>()
+    function { result, error ->
+        if(error == null) {
+            job.complete(result)
+        } else {
+            job.completeExceptionally(error.toException())
+        }
+    }
+    return job.await() as T
+}
+
+suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
+    val job = CompletableDeferred<Unit>()
+    val result = function { error ->
+        if(error == null) {
+            job.complete(Unit)
+        } else {
+            job.completeExceptionally(error.toException())
+        }
+    }
+    job.await()
+    return result
+}
+
+fun NSError.toException() = StorageException(description!!) // TODO: Improve error handling

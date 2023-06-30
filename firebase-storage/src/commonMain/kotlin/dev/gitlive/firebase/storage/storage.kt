@@ -26,26 +26,10 @@ expect class StorageReference {
     val parent: StorageReference?
     val root: StorageReference
     val storage: FirebaseStorage
+
     fun child(path: String): StorageReference
-//    fun delete(): Task<Unit>
-//    fun downloadUrl(): Task<Uri>
-//    fun getBytes(maxDownloadSizeBytes: Long): Task<ByteArray>
-//    fun getMetadata(): Task<StorageMetadata>
-//    fun list(options: ListOptions? = definedExternally): Task<ListResult>
-//    fun listAll(): Task<ListResult>
-//    fun putBytes(bytes: ByteArray, metadata: StorageMetadata? = definedExternally): UploadTask
-//    fun putFile(file: Uri, metadata: StorageMetadata? = definedExternally): UploadTask
-//    fun putFile(file: Uri, metadata: StorageMetadata? = definedExternally, existingUploadUri: Uri? = definedExternally): UploadTask
-//    fun putFile(file: Uri, metadata: StorageMetadata? = definedExternally, existingUploadUri: Uri? = definedExternally, existingUploadHeaders: Map<String, String>? = definedExternally): UploadTask
-//    fun putStream(stream: InputStream, metadata: StorageMetadata? = definedExternally): UploadTask
-//    fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.StreamProcessor): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.StreamProcessor, cancellationFlow: Flow<Unit>): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.StreamProcessor, cancellationFlow: Flow<Unit>, executor: Executor): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.StreamProcessor, cancellationFlow: Flow<Unit>, executor: Executor, bufferSize: Int): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.StreamProcessor, cancellationFlow: Flow<Unit>, executor: Executor, bufferSize: Int, chunkSize: Int): Flow<ByteReadPacket>
-//    fun getStream(maxDownloadSizeBytes: Long = definedExternally, progressListener: StreamDownloadTask.Stream
+    suspend fun delete()
+    suspend fun getDownloadUrl(): String
 }
 
 expect open class StorageException : FirebaseException

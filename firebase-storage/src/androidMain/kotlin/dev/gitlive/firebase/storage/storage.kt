@@ -8,6 +8,7 @@ package dev.gitlive.firebase.storage
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlinx.coroutines.tasks.await
 
 actual val Firebase.storage get() =
     FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
@@ -44,6 +45,8 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
     actual val storage: FirebaseStorage get() = FirebaseStorage(android.storage)
 
     actual fun child(path: String): StorageReference = StorageReference(android.child(path))
+    actual suspend fun delete() = android.delete().await().run { Unit }
+    actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
 }
 
 actual open class StorageException(message: String) : FirebaseException(message)
