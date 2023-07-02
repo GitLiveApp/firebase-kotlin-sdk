@@ -1,16 +1,13 @@
 /*
- * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ * Copyright (c) 2023 GitLive Ltd. Use of this source code is governed by the Apache 2.0 license.
  */
-
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
 
 version = project.property("firebase-storage.version") as String
 
 plugins {
     id("com.android.library")
-    kotlin("multiplatform")
     kotlin("native.cocoapods")
+    kotlin("multiplatform")
 }
 
 android {
@@ -18,16 +15,10 @@ android {
     defaultConfig {
         minSdk = property("minSdkVersion") as Int
         targetSdk = property("targetSdkVersion") as Int
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled = true
     }
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
         }
     }
     testOptions {
@@ -70,6 +61,13 @@ kotlin {
 
     js {
         useCommonJs()
+        nodejs {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
         browser {
             testTask {
                 useKarma {
@@ -82,10 +80,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.6"
-                languageVersion = "1.6"
+                apiVersion = "1.8"
+                languageVersion = "1.8"
                 progressiveMode = true
-                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
@@ -106,9 +103,8 @@ kotlin {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
             iosSimulatorArm64Main.dependsOn(iosMain)
-
             val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by sourceSets.getting
+            val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
@@ -132,5 +128,5 @@ signing {
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+//    sign(publishing.publications)
 }

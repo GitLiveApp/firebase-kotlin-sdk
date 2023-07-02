@@ -50,7 +50,7 @@ kotlin {
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                baseName = "FirebaseFunctions"
+                baseName = "FirebaseInstallations"
             }
             noPodspec()
             pod("FirebaseInstallations") {
