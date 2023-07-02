@@ -512,11 +512,11 @@ external object firebase {
     object storage {
 
         open class Storage {
-            val maxOperationRetryTime: Number
-            val maxUploadRetryTime: Number
+            val maxOperationRetryTime: Double
+            val maxUploadRetryTime: Double
 
-            fun setMaxOperationRetryTime(time: Number): Unit
-            fun setMaxUploadRetryTime(time: Number): Unit
+            fun setMaxOperationRetryTime(time: Double): Unit
+            fun setMaxUploadRetryTime(time: Double): Unit
             fun useEmulator(host: String, port: Int)
         }
 

@@ -17,21 +17,21 @@ import kotlinx.coroutines.flow.emitAll
 
 
 actual val Firebase.storage get() =
-    rethrow { dev.gitlive.firebase.firestore; FirebaseStorage(firebase.storage()) }
+    rethrow { dev.gitlive.firebase.storage; FirebaseStorage(firebase.storage()) }
 
 actual fun Firebase.storage(app: FirebaseApp) =
-    rethrow { dev.gitlive.firebase.firestore; FirebaseStorage(firebase.app().storage()) }
+    rethrow { dev.gitlive.firebase.storage; FirebaseStorage(firebase.app().storage()) }
 
 actual class FirebaseStorage(val js: firebase.storage.Storage) {
     actual val maxOperationRetryTimeMillis = js.maxOperationRetryTime.toLong()
     actual val maxUploadRetryTimeMillis = js.maxUploadRetryTime.toLong()
 
     actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
-        js.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toInt())
+        js.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toDouble())
     }
 
     actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
-        js.setMaxUploadRetryTime(maxUploadRetryTimeMillis.toInt())
+        js.setMaxUploadRetryTime(maxUploadRetryTimeMillis.toDouble())
     }
 
     actual fun useEmulator(host: String, port: Int) {
