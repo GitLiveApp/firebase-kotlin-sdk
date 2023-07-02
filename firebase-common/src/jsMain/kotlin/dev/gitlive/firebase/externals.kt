@@ -588,6 +588,7 @@ external object firebase {
             fun cancel(): Boolean
             fun pause(): Boolean
             fun resume(): Boolean
+            fun on(event: String, next: (snapshot: UploadTaskSnapshot) -> Unit, error: (a: FirebaseStorageError) -> Unit, complete: () -> Unit): () -> Unit
         }
 
         open class UploadTaskSnapshot {
@@ -597,6 +598,13 @@ external object firebase {
             val state: String
             val task: UploadTask
             val totalBytes: Number
+        }
+
+        open class FirebaseStorageError {
+            val code: String
+            val message: String
+            val name: String
+            val stack: String?
         }
 
     }
