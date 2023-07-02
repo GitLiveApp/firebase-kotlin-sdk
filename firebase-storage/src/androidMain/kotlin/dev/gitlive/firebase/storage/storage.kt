@@ -28,10 +28,8 @@ actual fun Firebase.storage(app: FirebaseApp) =
     FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android))
 
 actual class FirebaseStorage(val android: com.google.firebase.storage.FirebaseStorage) {
-
-    actual fun getMaxOperationRetryTimeMillis(): Long = android.maxOperationRetryTimeMillis
-
-    actual fun getMaxUploadRetryTimeMillis(): Long = android.maxUploadRetryTimeMillis
+    actual val maxOperationRetryTimeMillis = android.maxOperationRetryTimeMillis
+    actual val maxUploadRetryTimeMillis = android.maxUploadRetryTimeMillis
 
     actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
         android.maxOperationRetryTimeMillis = maxOperationRetryTimeMillis

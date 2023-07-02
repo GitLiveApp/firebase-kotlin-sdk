@@ -12,8 +12,9 @@ expect val Firebase.storage: FirebaseStorage
 expect fun Firebase.storage(app: FirebaseApp): FirebaseStorage
 
 expect class FirebaseStorage {
-    fun getMaxOperationRetryTimeMillis(): Long
-    fun getMaxUploadRetryTimeMillis(): Long
+    val maxOperationRetryTimeMillis: Long
+    val maxUploadRetryTimeMillis: Long
+
     fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long)
     fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long)
     fun useEmulator(host: String, port: Int)

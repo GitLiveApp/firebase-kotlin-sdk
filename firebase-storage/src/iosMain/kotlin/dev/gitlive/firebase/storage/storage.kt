@@ -33,10 +33,8 @@ actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage
 )
 
 actual class FirebaseStorage(val ios: FIRStorage) {
-
-    actual fun getMaxOperationRetryTimeMillis(): Long = ios.maxOperationRetryTime().toLong()
-
-    actual fun getMaxUploadRetryTimeMillis(): Long = ios.maxUploadRetryTime().toLong()
+    actual val maxOperationRetryTimeMillis = ios.maxOperationRetryTime().toLong()
+    actual val maxUploadRetryTimeMillis = ios.maxUploadRetryTime().toLong()
 
     actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
         ios.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toDouble())

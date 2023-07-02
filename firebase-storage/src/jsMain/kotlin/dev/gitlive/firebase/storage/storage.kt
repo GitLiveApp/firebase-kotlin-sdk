@@ -23,10 +23,8 @@ actual fun Firebase.storage(app: FirebaseApp) =
     rethrow { dev.gitlive.firebase.firestore; FirebaseStorage(firebase.app().storage()) }
 
 actual class FirebaseStorage(val js: firebase.storage.Storage) {
-
-    actual fun getMaxOperationRetryTimeMillis(): Long = js.maxOperationRetryTime.toLong()
-
-    actual fun getMaxUploadRetryTimeMillis(): Long = js.maxUploadRetryTime.toLong()
+    actual val maxOperationRetryTimeMillis = js.maxOperationRetryTime.toLong()
+    actual val maxUploadRetryTimeMillis = js.maxUploadRetryTime.toLong()
 
     actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
         js.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toInt())
