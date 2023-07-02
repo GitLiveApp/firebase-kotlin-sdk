@@ -54,7 +54,7 @@ actual class StorageReference(val js: firebase.storage.Reference) {
 
     actual suspend fun getDownloadUrl(): String = rethrow { js.getDownloadURL().await().toString() }
 
-    actual fun putFile(file: File): ProgressFlow = rethrow {
+    actual fun putFileResumable(file: File): ProgressFlow = rethrow {
         val uploadTask = js.put(file)
 
         val flow = callbackFlow {

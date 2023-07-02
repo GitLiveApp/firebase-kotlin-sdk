@@ -59,7 +59,7 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
 
     actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
 
-    actual fun putFile(file: File): ProgressFlow {
+    actual fun putFileResumable(file: File): ProgressFlow {
         val android = android.putFile(file.uri)
 
         val flow = callbackFlow {

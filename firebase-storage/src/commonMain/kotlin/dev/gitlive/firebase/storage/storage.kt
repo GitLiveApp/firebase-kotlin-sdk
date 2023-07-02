@@ -34,7 +34,7 @@ expect class StorageReference {
 
     suspend fun getDownloadUrl(): String
 
-    fun putFile(file: File): ProgressFlow
+    fun putFileResumable(file: File): ProgressFlow
 
 }
 

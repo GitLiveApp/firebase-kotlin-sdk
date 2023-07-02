@@ -66,7 +66,7 @@ actual class StorageReference(val ios: FIRStorageReference) {
         downloadURLWithCompletion(completion = it)
     }.absoluteString()!!
 
-    actual fun putFile(file: File): ProgressFlow {
+    actual fun putFileResumable(file: File): ProgressFlow {
         val ios = ios.putFile(file.url)
 
         val flow = callbackFlow {
