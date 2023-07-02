@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ * Copyright (c) 2023 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
 package dev.gitlive.firebase.storage
@@ -9,6 +9,11 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.firebase
 import kotlinx.coroutines.await
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
 
 
 actual val Firebase.storage get() =
@@ -46,21 +51,65 @@ actual class StorageReference(val js: firebase.storage.Reference) {
     actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
 
     actual fun child(path: String): StorageReference = StorageReference(js.child(path))
+
     actual suspend fun delete() = rethrow { js.delete().await() }
+
     actual suspend fun getDownloadUrl(): String = rethrow { js.getDownloadURL().await().toString() }
+
+    actual fun putFile(file: File): ProgressFlow = rethrow {
+        val uploadTask = js.put(file)
+
+        val flow = callbackFlow {
+            val unsubscribe = uploadTask.on(
+                "state_changed",
+                {
+                    when(it.state) {
+                        "paused" -> trySend(Progress.Paused(it.bytesTransferred, it.totalBytes))
+                        "running" -> trySend(Progress.Running(it.bytesTransferred, it.totalBytes))
+                        "canceled" -> cancel()
+                        "success", "error" -> Unit
+                        else -> TODO("Unknown state ${it.state}")
+                    }
+                },
+                { close(errorToException(it)) },
+                { close() }
+            )
+            awaitClose { unsubscribe() }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = uploadTask.pause().run {}
+            override fun resume() = uploadTask.resume().run {}
+            override fun cancel() = uploadTask.cancel().run {}
+        }
+    }
+
 }
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.storage.rethrow { function() }
+actual typealias File = org.w3c.files.File
 
-inline fun <R> rethrow(function: () -> R): R {
+actual open class FirebaseStorageException(code: String, cause: Throwable) :
+    FirebaseException(code, cause)
+
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
-        throw StorageException(e.code as String, e)
+    } catch (e: dynamic) {
+        throw errorToException(e)
     }
 }
 
-actual open class StorageException(code: String, cause: Throwable) :
-    FirebaseException(code, cause)
+internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?: "")
+    .toString()
+    .lowercase()
+    .let { code ->
+        when {
+            else -> {
+                println("Unknown error code in ${JSON.stringify(error)}")
+                FirebaseStorageException(code, error)
+            }
+        }
+    }

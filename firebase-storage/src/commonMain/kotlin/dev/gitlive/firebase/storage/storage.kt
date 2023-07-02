@@ -28,8 +28,27 @@ expect class StorageReference {
     val storage: FirebaseStorage
 
     fun child(path: String): StorageReference
+
     suspend fun delete()
+
     suspend fun getDownloadUrl(): String
+
+    fun putFile(file: File): ProgressFlow
+
 }
 
-expect open class StorageException : FirebaseException
+expect class File
+
+sealed class Progress(val bytesTransferred: Number, val totalByteCount: Number) {
+    class Running internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)
+    class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)
+}
+
+interface ProgressFlow : Flow<Progress> {
+    fun pause()
+    fun resume()
+    fun cancel()
+}
+
+
+expect class FirebaseStorageException : FirebaseException

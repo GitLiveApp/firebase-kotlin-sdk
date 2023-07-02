@@ -1,15 +1,26 @@
 /*
- * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ * Copyright (c) 2023 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
 package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageReference
+import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
+import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
+import cocoapods.FirebaseStorage.FIRStorageTaskStatusProgress
+import cocoapods.FirebaseStorage.FIRStorageTaskStatusResume
+import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
@@ -50,35 +61,73 @@ actual class StorageReference(val ios: FIRStorageReference) {
     actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
 
     actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
+
     actual suspend fun delete() = await { ios.deleteWithCompletion(it) }
-    actual suspend fun getDownloadUrl(): String = awaitResult<NSURL?> { ios.downloadURLWithCompletion(it) }?.absoluteString!!
+
+    actual suspend fun getDownloadUrl(): String = ios.awaitResult {
+        downloadURLWithCompletion(completion = it)
+    }.absoluteString()!!
+
+    actual fun putFile(file: File): ProgressFlow {
+        val ios = ios.putFile(file.url)
+
+        val flow = callbackFlow {
+            ios.observeStatus(FIRStorageTaskStatusProgress) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusPause) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Paused(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusResume) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusSuccess) { close(FirebaseStorageException(it!!.error().toString())) }
+            ios.observeStatus(FIRStorageTaskStatusFailure) {
+                when(it!!.error()!!.code) {
+                    /*FIRStorageErrorCodeCancelled = */ -13040L -> cancel(it.error()!!.localizedDescription)
+                    else -> close(FirebaseStorageException(it.error().toString()))
+                }
+            }
+            awaitClose { ios.removeAllObservers() }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = ios.pause()
+            override fun resume() = ios.resume()
+            override fun cancel() = ios.cancel()
+        }
+    }
+
 }
 
-actual open class StorageException(message: String) : FirebaseException(message)
+actual class File(val url: NSURL)
 
-suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
-    val job = CompletableDeferred<T?>()
+actual class FirebaseStorageException(message: String): FirebaseException(message)
+
+suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+    val job = CompletableDeferred<Unit>()
+    function { error ->
+        if(error == null) {
+            job.complete(Unit)
+        } else {
+            job.completeExceptionally(FirebaseStorageException(error.toString()))
+        }
+    }
+    job.await()
+}
+
+suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+    val job = CompletableDeferred<R?>()
     function { result, error ->
         if(error == null) {
             job.complete(result)
         } else {
-            job.completeExceptionally(error.toException())
+            job.completeExceptionally(FirebaseStorageException(error.toString()))
         }
     }
-    return job.await() as T
+    return job.await() as R
 }
-
-suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
-    val job = CompletableDeferred<Unit>()
-    val result = function { error ->
-        if(error == null) {
-            job.complete(Unit)
-        } else {
-            job.completeExceptionally(error.toException())
-        }
-    }
-    job.await()
-    return result
-}
-
-fun NSError.toException() = StorageException(description!!) // TODO: Improve error handling
