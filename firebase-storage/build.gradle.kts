@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ * Copyright (c) 2023 GitLive Ltd. Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-installations.version") as String
+version = project.property("firebase-storage.version") as String
 
 plugins {
     id("com.android.library")
@@ -50,10 +50,10 @@ kotlin {
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                baseName = "FirebaseInstallations"
+                baseName = "FirebaseStorage"
             }
             noPodspec()
-            pod("FirebaseInstallations") {
+            pod("FirebaseStorage") {
                 version = "10.7.0"
             }
         }
@@ -95,7 +95,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("com.google.firebase:firebase-installations")
+                api("com.google.firebase:firebase-storage")
             }
         }
 
@@ -112,13 +112,13 @@ kotlin {
     }
 }
 
-if (project.property("firebase-installations.skipIosTests") == "true") {
+if (project.property("firebase-storage.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
-if (project.property("firebase-installations.skipJsTests") == "true") {
+if (project.property("firebase-storage.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
     }
@@ -128,5 +128,5 @@ signing {
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+//    sign(publishing.publications)
 }

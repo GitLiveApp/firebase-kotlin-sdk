@@ -9,6 +9,7 @@ include(
     "firebase-installations",
     "firebase-perf",
     "firebase-crashlytics",
+    "firebase-storage",
     "test-utils"
 )
 
