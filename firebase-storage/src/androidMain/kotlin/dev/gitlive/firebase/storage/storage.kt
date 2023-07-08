@@ -43,6 +43,7 @@ actual class FirebaseStorage(val android: com.google.firebase.storage.FirebaseSt
         android.useEmulator(host, port)
     }
 
+    actual val reference = StorageReference(android.reference)
 }
 
 actual class StorageReference(val android: com.google.firebase.storage.StorageReference) {
@@ -58,6 +59,8 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
     actual suspend fun delete() = android.delete().await().run { Unit }
 
     actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
+
+    actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
     actual fun putFileResumable(file: File): ProgressFlow {
         val android = android.putFile(file.uri)
@@ -86,6 +89,12 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
             override fun cancel() = android.cancel().run {}
         }
     }
+}
+
+actual class ListResult(val android: com.google.firebase.storage.ListResult) {
+    actual val prefixes: List<StorageReference> get() = android.prefixes.map { StorageReference(it) }
+    actual val items: List<StorageReference> get() = android.items.map { StorageReference(it) }
+    actual val pageToken: String? get() = android.pageToken
 }
 
 actual class File(val uri: Uri)

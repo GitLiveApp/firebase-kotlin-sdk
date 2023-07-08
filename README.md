@@ -236,4 +236,10 @@ If you are building a Kotlin multiplatform library which will be consumed from J
 }
 ```
 
-
+## Contributing
+If you'd like to contribute to this project then you can fork this repository. 
+You can build and test the project locally.
+1. Open the project in IntelliJ IDEA.
+2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
+3. Install the GitLive plugin into IntelliJ
+4. After a gradle sync then run `firebase-storage:publishToMavenLocal`
