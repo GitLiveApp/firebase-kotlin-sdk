@@ -15,36 +15,28 @@ import dev.gitlive.firebase.encode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
-suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
-
-    val notConnected = Firebase.database
-        .reference(".info/connected")
-        .valueEvents
-        .filter { !it.value<Boolean>() }
-        .produceIn(this)
-
-    try {
-        select<T> {
-            asDeferred().onAwait { it }
-            notConnected.onReceive { throw DatabaseException("Database not connected", null) }
+suspend fun <T> Task<T>.awaitWhileOnline(): T =
+    merge(
+        flow { emit(await()) },
+        flow<T> {
+            Firebase.database
+                .reference(".info/connected")
+                .valueEvents
+                .debounce(2.seconds)
+                .first { !it.value<Boolean>() }
+            throw DatabaseException("Database not connected", null)
         }
-    } finally {
-        notConnected.cancel()
-    }
-}
+    )
+    .first()
+
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
