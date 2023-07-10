@@ -38,7 +38,7 @@ actual class FirebaseStorage(val js: firebase.storage.Storage) {
         js.useEmulator(host, port)
     }
 
-    actual val reference: StorageReference get() = TODO()
+    actual val reference: StorageReference get() = StorageReference(js.ref())
 }
 
 actual class StorageReference(val js: firebase.storage.Reference) {

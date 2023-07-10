@@ -91,10 +91,10 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
     }
 }
 
-actual class ListResult(val android: com.google.firebase.storage.ListResult) {
-    actual val prefixes: List<StorageReference> get() = android.prefixes.map { StorageReference(it) }
-    actual val items: List<StorageReference> get() = android.items.map { StorageReference(it) }
-    actual val pageToken: String? get() = android.pageToken
+actual class ListResult(android: com.google.firebase.storage.ListResult) {
+    actual val prefixes: List<StorageReference> = android.prefixes.map { StorageReference(it) }
+    actual val items: List<StorageReference> = android.items.map { StorageReference(it) }
+    actual val pageToken: String? = android.pageToken
 }
 
 actual class File(val uri: Uri)
