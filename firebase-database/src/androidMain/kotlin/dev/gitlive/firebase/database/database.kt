@@ -26,14 +26,12 @@ import kotlin.time.Duration.Companion.seconds
 suspend fun <T> Task<T>.awaitWhileOnline(): T =
     merge(
         flow { emit(await()) },
-        flow<T> {
-            Firebase.database
-                .reference(".info/connected")
-                .valueEvents
-                .debounce(2.seconds)
-                .first { !it.value<Boolean>() }
-            throw DatabaseException("Database not connected", null)
-        }
+        Firebase.database
+            .reference(".info/connected")
+            .valueEvents
+            .debounce(2.seconds)
+            .filter { !it.value<Boolean>() }
+            .map<DataSnapshot, T> { throw DatabaseException("Database not connected", null) }
     )
     .first()
 
