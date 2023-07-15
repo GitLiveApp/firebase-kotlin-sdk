@@ -11,7 +11,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 actual open class AuthCredential(open val android: com.google.firebase.auth.AuthCredential) {
@@ -90,7 +89,7 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
-                verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
+                verificationProvider.codeSent(verificationId) { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
             }
 
             override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
@@ -123,7 +122,7 @@ actual interface PhoneVerificationProvider {
     val activity: Activity
     val timeout: Long
     val unit: TimeUnit
-    fun codeSent(triggerResend: (Unit) -> Unit)
+    fun codeSent(verificationId: String, triggerResend: (Unit) -> Unit)
     suspend fun getVerificationCode(): String
 }
 
