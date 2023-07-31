@@ -22,7 +22,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
             }
         }
     }
-    StructureKind.LIST -> (value as Array<*>).let {
+    StructureKind.LIST -> (js("Object").values(value) as Array<*>).let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
     }
     StructureKind.MAP -> (js("Object").entries(value) as Array<Array<Any>>).let {
