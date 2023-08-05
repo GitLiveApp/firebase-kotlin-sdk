@@ -20,9 +20,16 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
             }
         }
     }
-    StructureKind.LIST -> ((value as? Map<*, *>)?.values?.toList() ?: value as List<*>).let {
-        FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
-    }
+    StructureKind.LIST ->
+        when(value) {
+            is List<*> -> value
+            is Map<*, *> -> value.asSequence()
+                .sortedBy { (it) -> it.toString().toIntOrNull() }
+                .map { (_, it) -> it }
+                .toList()
+            else -> error("unexpected type, got $value when expecting a list")
+        }
+        .let { FirebaseCompositeDecoder(it.size) { _, index -> it[index] } }
     StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
         FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
     }
