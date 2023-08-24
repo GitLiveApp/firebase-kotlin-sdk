@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
+import cocoapods.FirebaseStorage.FIRStorageListResult
 import cocoapods.FirebaseStorage.FIRStorageReference
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
@@ -48,6 +49,7 @@ actual class FirebaseStorage(val ios: FIRStorage) {
         ios.useEmulatorWithHost(host, port.toLong())
     }
 
+    actual val reference get() = StorageReference(ios.reference())
 }
 
 actual class StorageReference(val ios: FIRStorageReference) {
@@ -65,6 +67,12 @@ actual class StorageReference(val ios: FIRStorageReference) {
     actual suspend fun getDownloadUrl(): String = ios.awaitResult {
         downloadURLWithCompletion(completion = it)
     }.absoluteString()!!
+
+    actual suspend fun listAll(): ListResult = awaitResult {
+        ios.listAllWithCompletion { firStorageListResult, nsError ->
+            it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
+        }
+    }
 
     actual fun putFileResumable(file: File): ProgressFlow {
         val ios = ios.putFile(file.url)
@@ -100,6 +108,12 @@ actual class StorageReference(val ios: FIRStorageReference) {
         }
     }
 
+}
+
+actual class ListResult(ios: FIRStorageListResult) {
+    actual val prefixes: List<StorageReference> = ios.prefixes().map { StorageReference(it as FIRStorageReference) }
+    actual val items: List<StorageReference> = ios.items().map { StorageReference(it as FIRStorageReference) }
+    actual val pageToken: String? = ios.pageToken()
 }
 
 actual class File(val url: NSURL)

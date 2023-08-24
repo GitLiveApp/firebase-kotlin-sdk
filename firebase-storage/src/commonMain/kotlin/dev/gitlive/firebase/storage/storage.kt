@@ -18,6 +18,8 @@ expect class FirebaseStorage {
     fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long)
     fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long)
     fun useEmulator(host: String, port: Int)
+
+    val reference: StorageReference
 }
 
 expect class StorageReference {
@@ -34,8 +36,15 @@ expect class StorageReference {
 
     suspend fun getDownloadUrl(): String
 
-    fun putFileResumable(file: File): ProgressFlow
+    suspend fun listAll(): ListResult
 
+    fun putFileResumable(file: File): ProgressFlow
+}
+
+expect class ListResult {
+    val prefixes: List<StorageReference>
+    val items: List<StorageReference>
+    val pageToken: String?
 }
 
 expect class File

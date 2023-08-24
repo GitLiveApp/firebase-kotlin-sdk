@@ -518,6 +518,7 @@ external object firebase {
             fun setMaxOperationRetryTime(time: Double): Unit
             fun setMaxUploadRetryTime(time: Double): Unit
             fun useEmulator(host: String, port: Int)
+            fun ref(): Reference
         }
 
         open class Reference {

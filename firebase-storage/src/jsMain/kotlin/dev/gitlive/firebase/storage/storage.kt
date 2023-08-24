@@ -38,6 +38,7 @@ actual class FirebaseStorage(val js: firebase.storage.Storage) {
         js.useEmulator(host, port)
     }
 
+    actual val reference: StorageReference get() = StorageReference(js.ref())
 }
 
 actual class StorageReference(val js: firebase.storage.Reference) {
@@ -53,6 +54,8 @@ actual class StorageReference(val js: firebase.storage.Reference) {
     actual suspend fun delete() = rethrow { js.delete().await() }
 
     actual suspend fun getDownloadUrl(): String = rethrow { js.getDownloadURL().await().toString() }
+
+    actual suspend fun listAll(): ListResult = rethrow { ListResult(js.listAll().await()) }
 
     actual fun putFileResumable(file: File): ProgressFlow = rethrow {
         val uploadTask = js.put(file)
@@ -83,6 +86,12 @@ actual class StorageReference(val js: firebase.storage.Reference) {
         }
     }
 
+}
+
+actual class ListResult(js: firebase.storage.ListResult) {
+    actual val prefixes: List<StorageReference> = js.prefixes.map { StorageReference(it) }
+    actual val items: List<StorageReference> = js.items.map { StorageReference(it) }
+    actual val pageToken: String? = js.nextPageToken
 }
 
 actual typealias File = org.w3c.files.File
