@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -59,18 +58,10 @@ subprojects {
         mavenLocal()
         google()
         mavenCentral()
-        maven {
-            name = "github"
-            url = uri("https://maven.pkg.github.com/gitliveapp/packages")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-            }
-        }
     }
 
     tasks.withType<Sign>().configureEach {
-        onlyIf { !project.gradle.startParameter.taskNames.any { "MavenLocal" in it } && !project.gradle.startParameter.taskNames.contains("publishToGitHubPackagesRepository") }
+        onlyIf { !project.gradle.startParameter.taskNames.any { "MavenLocal" in it } }
     }
 
     val skipPublishing = project.name == "test-utils" // skip publishing for test utils
@@ -110,71 +101,12 @@ subprojects {
                     .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
             )
         }
-
-        val copyReadMe by registering(Copy::class) {
-            from(rootProject.file("README.md"))
-            into(file("$buildDir/node_module"))
-        }
-
-        val copyPackageJson by registering(Copy::class) {
-            from(file("package.json"))
-            into(file("$buildDir/node_module"))
-        }
-
-        val unzipJar by registering(Copy::class) {
-            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
-            from(this.project.zipTree(zipFile))
-            into("$buildDir/classes/kotlin/js/main/")
-        }
-
-        val copyJS by registering {
-            mustRunAfter("unzipJar", "copyPackageJson")
-            doLast {
-                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
-                val into = File("$buildDir/node_module/${project.name}.js")
-                into.createNewFile()
-                into.writeText(
-                    from.readText()
-                        .replace("require('firebase-kotlin-sdk-", "require('@gitlive/")
-//                        .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
-                )
-            }
-        }
-
-        val copySourceMap by registering(Copy::class) {
-            from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
-            into(file("$buildDir/node_module"))
-        }
-
-        val prepareForNpmPublish by registering {
-            dependsOn(
-                unzipJar,
-                copyPackageJson,
-                copySourceMap,
-                copyReadMe,
-                copyJS
-            )
-        }
-
-        val publishToNpm by creating(Exec::class) {
-            workingDir("$buildDir/node_module")
-            isIgnoreExitValue = true
-            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine("cmd", "/c", "npm publish")
-            } else {
-                commandLine("npm", "publish")
-            }
-        }
     }
 
     afterEvaluate  {
-        // create the projects node_modules if they don't exist
-        if(!File("$buildDir/node_module").exists()) {
-            mkdir("$buildDir/node_module")
-        }
 
         dependencies {
-            "jvmMainApi"("dev.gitlive:firebase-java-sdk:1.0.18")
+            "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.0")
             "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
                 exclude("com.google.android.gms")
             }
