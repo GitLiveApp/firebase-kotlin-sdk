@@ -5,6 +5,10 @@ include(
     "firebase-config",
     "firebase-database",
     "firebase-firestore",
-    "firebase-functions"
+    "firebase-functions",
+    "firebase-installations",
+    "firebase-perf",
+    "firebase-crashlytics",
+    "test-utils"
 )
 
