@@ -4,10 +4,10 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.encoding.CompositeDecoder
 import kotlin.js.Json
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
@@ -24,7 +24,7 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): Compo
     }
     StructureKind.LIST ->
         when(value) {
-            is Array<*> -> value
+            is Array<*> -> value.toList()
             else -> (js("Object").entries(value) as Array<Array<Any>>)
                 .asSequence()
                 .sortedBy { (it) -> it.toString().toIntOrNull() }
