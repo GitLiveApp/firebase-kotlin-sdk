@@ -77,6 +77,14 @@ kotlin {
         }
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     sourceSets {
         all {
             languageSettings.apply {
@@ -99,6 +107,10 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-functions")
             }
+        }
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

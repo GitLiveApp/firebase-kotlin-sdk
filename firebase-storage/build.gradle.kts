@@ -44,6 +44,19 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     if (supportIosTarget) {
         ios()
         iosSimulatorArm64()

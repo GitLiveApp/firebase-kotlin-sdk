@@ -50,6 +50,19 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     if (supportIosTarget) {
         ios()
         iosSimulatorArm64()
@@ -106,6 +119,9 @@ kotlin {
             dependencies {
                 api("com.google.firebase:firebase-database")
             }
+        }
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

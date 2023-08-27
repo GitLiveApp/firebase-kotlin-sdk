@@ -314,7 +314,7 @@ external object firebase {
             fun endAt(value: Any, key: String? = definedExternally): Query
             fun equalTo(value: Any, key: String? = definedExternally): Query
             fun limitToFirst(limit: Int): Query
-            fun limitToLast (limit: Int): Query
+            fun limitToLast(limit: Int): Query
         }
 
         open class Reference: Query {
@@ -334,8 +334,10 @@ external object firebase {
 
         open class DataSnapshot {
             val key: String?
-            fun `val`(): Any
+            val ref: Reference
+            fun `val`(): Any?
             fun exists(): Boolean
+            fun hasChildren(): Boolean
             fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
             fun numChildren(): Int
             fun child(path: String): DataSnapshot
@@ -456,8 +458,7 @@ external object firebase {
             fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun update(field: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Promise<Unit>
             fun delete(): Promise<Unit>
-            fun onSnapshot(next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
-
+            fun onSnapshot(options: Json, next: (snapshot: DocumentSnapshot) -> Unit, error: (error: Error) -> Unit): ()->Unit
             fun isEqual(other: DocumentReference): Boolean
         }
 

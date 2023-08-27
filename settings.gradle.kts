@@ -13,5 +13,3 @@ include(
     "test-utils"
 )
 
-//enableFeaturePreview("GRADLE_METADATA")
-

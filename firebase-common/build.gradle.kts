@@ -23,7 +23,10 @@ android {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
-        getByName("androidTest").java.srcDir(file("src/androidAndroidTest/kotlin"))
+        getByName("androidTest") {
+            java.srcDir(file("src/androidAndroidTest/kotlin"))
+            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+        }
     }
     testOptions {
         unitTests.apply {
@@ -44,6 +47,19 @@ kotlin {
 
     android {
         publishAllLibraryVariants()
+    }
+
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
@@ -115,6 +131,17 @@ kotlin {
             dependencies {
                 api(npm("firebase", "9.4.1"))
             }
+        }
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidAndroidTest/kotlin")
         }
     }
 }

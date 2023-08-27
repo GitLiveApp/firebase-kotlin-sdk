@@ -8,6 +8,7 @@ import dev.gitlive.firebase.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
@@ -239,8 +240,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual suspend fun get() = rethrow { DocumentSnapshot(js.get().await()) }
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
+    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val unsubscribe = js.onSnapshot(
+            json("includeMetadataChanges" to includeMetadataChanges),
             { trySend(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )

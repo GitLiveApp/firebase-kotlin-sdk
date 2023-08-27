@@ -2,9 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-crashlytics.version") as String
 
 plugins {
@@ -25,7 +22,7 @@ android {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
-        getByName("androidTest"){
+        getByName("androidTest") {
             java.srcDir(file("src/androidAndroidTest/kotlin"))
             manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
         }
@@ -52,6 +49,19 @@ kotlin {
     android {
         publishAllLibraryVariants()
     }
+
+//    jvm {
+//        val main by compilations.getting {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//        val test by compilations.getting {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//    }
 
     if (supportIosTarget) {
         ios()
@@ -90,6 +100,10 @@ kotlin {
                 api("com.google.firebase:firebase-crashlytics")
             }
         }
+
+//        val jvmMain by getting {
+//            kotlin.srcDir("src/androidMain/kotlin")
+//        }
 
         if (supportIosTarget) {
             val iosMain by getting

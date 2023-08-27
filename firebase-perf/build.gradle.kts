@@ -2,9 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.konan.target.KonanTarget
-
 version = project.property("firebase-perf.version") as String
 
 plugins {
@@ -51,6 +48,19 @@ kotlin {
 
     android {
         publishAllLibraryVariants()
+    }
+
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -101,6 +111,10 @@ kotlin {
                 api("com.google.firebase:firebase-perf")
             }
         }
+
+//        val jvmMain by getting {
+//            kotlin.srcDir("src/androidMain/kotlin")
+//        }
 
         if (supportIosTarget) {
             val iosMain by getting

@@ -1,10 +1,14 @@
 <h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/badge/collaborate-on%20gitlive-blueviolet?style=flat-square"></a></h1>
 <img align="left" width="75px" src="https://avatars2.githubusercontent.com/u/42865805?s=200&v=4"> 
   <b>Built and maintained with 🧡 by <a href="https://git.live">GitLive</a></b><br/>
-  <i>Real-time code collaboration inside any IDE</i><br/>
+  <i>Development teams merge faster with GitLive</i><br/>
 <br/>
 <br/>
-The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the <a href="https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/">Firebase Android SDK Kotlin Extensions</a> but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting <strong>iOS</strong>, <strong>Android</strong> or <strong>JS</strong>.
+The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the 
+<a href="https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/">Firebase Android SDK Kotlin Extensions</a> 
+but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting 
+<strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
+Firebase as a backend for<a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
 
 ## Available libraries
 
@@ -22,9 +26,6 @@ The following libraries are available for the various Firebase products.
 | [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.8.2`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.8.2/pom)               | [![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
 | [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.8.2`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.8.2/pom)                   | [![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
 | [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.8.2`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.8.2/pom)     | [![80%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
-
-
-
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -205,6 +206,8 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 
 The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
 
+It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target.
+
 ### Accessing the underlying Firebase SDK
 
 In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` properties which holds the  equivalent object of the underlying official Firebase SDK. 
@@ -215,25 +218,6 @@ These properties are only accessible from the equivalent target's source set. Fo
   Firebase.firestore.android.firestoreSettings = FirebaseFirestoreSettings.Builder(Firebase.firestore.android.firestoreSettings)
           .setPersistenceEnabled(false)
           .build()
-```
-
-### NPM modules
-
-If you are building a Kotlin multiplatform library which will be consumed from JS code you may need to include the SDK in your `package.json`, you can do it as follows:
-
-```json
-"dependencies": {
-  "@gitlive/firebase-auth": "1.8.2",
-  "@gitlive/firebase-config": "1.8.2",
-  "@gitlive/firebase-database": "1.8.2",
-  "@gitlive/firebase-firestore": "1.8.2",
-  "@gitlive/firebase-functions": "1.8.2",
-  "@gitlive/firebase-installations": "1.8.2",
-  "@gitlive/firebase-messaging": "1.8.2",
-  "@gitlive/firebase-storage": "1.8.2"
-  "@gitlive/firebase-perf": "1.8.2"
-  "@gitlive/firebase-crashlytics": "1.8.2"
-}
 ```
 
 ## Contributing
