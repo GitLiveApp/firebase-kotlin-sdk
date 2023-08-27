@@ -10,6 +10,8 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import dev.gitlive.firebase.nativeAssertEquals
+import dev.gitlive.firebase.nativeMapOf
 
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)

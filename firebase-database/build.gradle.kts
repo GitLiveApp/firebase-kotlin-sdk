@@ -56,6 +56,11 @@ kotlin {
                 jvmTarget = "17"
             }
         }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     if (supportIosTarget) {

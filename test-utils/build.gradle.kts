@@ -81,6 +81,10 @@ kotlin {
             }
         }
 
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
         if (supportIosTarget) {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
@@ -90,6 +94,10 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
+        }
     }
 }

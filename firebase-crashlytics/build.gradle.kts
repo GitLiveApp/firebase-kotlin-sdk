@@ -22,7 +22,7 @@ android {
         getByName("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
-        getByName("androidTest"){
+        getByName("androidTest") {
             java.srcDir(file("src/androidAndroidTest/kotlin"))
             manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
         }
@@ -50,18 +50,18 @@ kotlin {
         publishAllLibraryVariants()
     }
 
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        val test by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+//    jvm {
+//        val main by compilations.getting {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//        val test by compilations.getting {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//    }
 
     if (supportIosTarget) {
         ios()

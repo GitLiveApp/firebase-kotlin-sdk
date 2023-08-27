@@ -116,6 +116,12 @@ kotlin {
             }
         }
 
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
+
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore")
@@ -126,12 +132,6 @@ kotlin {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-            kotlin.srcDir("src/androidAndroidTest/kotlin")
-        }
 
         if (supportIosTarget) {
             val iosMain by getting
