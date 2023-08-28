@@ -8,7 +8,7 @@ The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar 
 <a href="https://firebase.github.io/firebase-android-sdk/reference/kotlin/firebase-ktx/">Firebase Android SDK Kotlin Extensions</a> 
 but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting 
 <strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
-Firebase as a backend for<a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
+Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
 
 ## Available libraries
 
