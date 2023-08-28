@@ -50,6 +50,8 @@ actual class FirebaseStorage(val ios: FIRStorage) {
     }
 
     actual val reference get() = StorageReference(ios.reference())
+
+    actual fun reference(location: String) = StorageReference(ios.referenceWithPath(location))
 }
 
 actual class StorageReference(val ios: FIRStorageReference) {
@@ -73,6 +75,8 @@ actual class StorageReference(val ios: FIRStorageReference) {
             it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
         }
     }
+
+    actual suspend fun putFile(file: File) = ios.awaitResult { putFile(file.url, null, completion = it) }.run {}
 
     actual fun putFileResumable(file: File): ProgressFlow {
         val ios = ios.putFile(file.url)

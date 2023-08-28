@@ -282,7 +282,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && nativeValue.isEqual(other.nativeValue)
+        this === other || other is DocumentReference && refEqual(nativeValue, other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
 }

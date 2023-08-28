@@ -31,6 +31,10 @@ actual class FirebaseStorage {
     actual val reference: StorageReference
         get() = TODO("Not yet implemented")
 
+    actual fun reference(location: String): StorageReference {
+        TODO("Not yet implemented")
+    }
+
 }
 
 actual class StorageReference {
@@ -64,6 +68,9 @@ actual class StorageReference {
 
     actual fun putFileResumable(file: File): ProgressFlow {
         TODO("Not yet implemented")
+    }
+
+    actual suspend fun putFile(file: File) {
     }
 
 }

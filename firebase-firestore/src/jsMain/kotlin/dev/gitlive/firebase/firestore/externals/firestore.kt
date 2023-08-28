@@ -12,7 +12,11 @@ external class FieldPath(vararg fieldNames: String) {
     companion object {
         val documentId: FieldPath
     }
+    fun isEqual(other: FieldPath): Boolean
+
 }
+
+external fun refEqual(left: DocumentReference, right: DocumentReference): Boolean
 
 external fun addDoc(reference: CollectionReference, data: Any): Promise<DocumentReference>
 
@@ -77,6 +81,13 @@ external fun limit(limit: Number): QueryConstraint
 
 external fun onSnapshot(
     reference: DocumentReference,
+    next: (snapshot: DocumentSnapshot) -> Unit,
+    error: (error: Throwable) -> Unit
+): Unsubscribe
+
+external fun onSnapshot(
+    reference: DocumentReference,
+    options: Json,
     next: (snapshot: DocumentSnapshot) -> Unit,
     error: (error: Throwable) -> Unit
 ): Unsubscribe
@@ -150,6 +161,12 @@ external interface Firestore {
     val app: FirebaseApp
 }
 
+external class GeoPoint constructor(latitude: Double, longitude: Double) {
+    val latitude: Double
+    val longitude: Double
+    fun isEqual(other: GeoPoint): Boolean
+}
+
 external interface CollectionReference : Query {
     val id: String
     val path: String
@@ -163,7 +180,7 @@ external interface DocumentChange {
     val type: String
 }
 
-external interface DocumentReference {
+external class DocumentReference {
     val id: String
     val path: String
     val parent: CollectionReference

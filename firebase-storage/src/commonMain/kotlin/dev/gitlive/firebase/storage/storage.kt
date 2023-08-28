@@ -20,6 +20,8 @@ expect class FirebaseStorage {
     fun useEmulator(host: String, port: Int)
 
     val reference: StorageReference
+    fun reference(location: String): StorageReference
+
 }
 
 expect class StorageReference {
@@ -37,6 +39,8 @@ expect class StorageReference {
     suspend fun getDownloadUrl(): String
 
     suspend fun listAll(): ListResult
+
+    suspend fun putFile(file: File)
 
     fun putFileResumable(file: File): ProgressFlow
 }
