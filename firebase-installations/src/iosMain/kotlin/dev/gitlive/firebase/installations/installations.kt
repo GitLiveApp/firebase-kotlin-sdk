@@ -10,8 +10,9 @@ import platform.Foundation.*
 actual val Firebase.installations
     get() = FirebaseInstallations(FIRInstallations.installations())
 
-actual fun Firebase.installations(app: FirebaseApp) : FirebaseInstallations = TODO("Come back to issue")
-//        = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios))
+actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(
+    FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp)
+)
 
 actual class FirebaseInstallations internal constructor(val ios: FIRInstallations) {
 

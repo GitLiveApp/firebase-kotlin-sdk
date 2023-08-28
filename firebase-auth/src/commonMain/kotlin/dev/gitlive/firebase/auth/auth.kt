@@ -78,7 +78,8 @@ data class AndroidPackageName(
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException
 expect class FirebaseAuthEmailException : FirebaseAuthException
-expect class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
+expect open class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
+expect class FirebaseAuthWeakPasswordException: FirebaseAuthInvalidCredentialsException
 expect class FirebaseAuthInvalidUserException : FirebaseAuthException
 expect class FirebaseAuthMultiFactorException: FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException

@@ -4,6 +4,7 @@ import dev.gitlive.firebase.auth.externals.*
 import kotlinx.coroutines.await
 import kotlin.js.Date
 import dev.gitlive.firebase.auth.externals.UserInfo as JsUserInfo
+import kotlin.js.json
 
 actual class FirebaseUser internal constructor(val js: User) {
     actual val uid: String
@@ -45,11 +46,11 @@ actual class FirebaseUser internal constructor(val js: User) {
     actual suspend fun updatePassword(password: String) = rethrow { updatePassword(js, password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { updatePhoneNumber(js, credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) = rethrow {
-        val request = object : ProfileUpdateRequest {
-            override val displayName: String? = displayName
-            override val photoURL: String? = photoUrl
-        }
-        updateProfile(js, request).await()
+        val request = listOfNotNull(
+            displayName.takeUnless { it === UNCHANGED }?.let { "displayName" to it },
+            photoUrl.takeUnless { it === UNCHANGED }?.let { "photoURL" to it }
+        )
+        updateProfile(js, json(*request.toTypedArray())).await()
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJson()).await() }
 }

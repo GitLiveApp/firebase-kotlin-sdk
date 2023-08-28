@@ -138,6 +138,7 @@ actual open class FirebaseAuthException(code: String?, cause: Throwable): Fireba
 actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthEmailException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthInvalidCredentialsException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthWeakPasswordException(code: String?, cause: Throwable): FirebaseAuthInvalidCredentialsException(code, cause)
 actual open class FirebaseAuthInvalidUserException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthMultiFactorException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthRecentLoginRequiredException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
@@ -164,6 +165,7 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause)
     "auth/network-request-failed" -> FirebaseNetworkException(code, cause)
+    "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause)
     "auth/invalid-credential",
     "auth/invalid-verification-code",
     "auth/missing-verification-code",

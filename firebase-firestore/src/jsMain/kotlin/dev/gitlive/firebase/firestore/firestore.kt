@@ -13,6 +13,7 @@ import dev.gitlive.firebase.firestore.externals.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
@@ -210,7 +211,12 @@ actual class Transaction(val js: JsTransaction) {
         rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-actual class DocumentReference(val js: JsDocumentReference) {
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReference = JsDocumentReference
+
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val js: NativeDocumentReference by ::nativeValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -263,14 +269,22 @@ actual class DocumentReference(val js: JsDocumentReference) {
 
     actual suspend fun get() = rethrow { DocumentSnapshot(getDoc(js).await()) }
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
+    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<DocumentSnapshot>  {
         val unsubscribe = onSnapshot(
             js,
+            json("includeMetadataChanges" to includeMetadataChanges),
             { trySend(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
     }
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && nativeValue.isEqual(other.nativeValue)
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = "DocumentReference(path=$path)"
 }
 
 actual open class Query(open val js: JsQuery) {
@@ -444,6 +458,10 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
         js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
     })
     actual val documentId: FieldPath get() = FieldPath(JsFieldPath.documentId)
+
+    override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
+    override fun hashCode(): Int = js.hashCode()
+    override fun toString(): String = js.toString()
 }
 
 /** Represents a platform specific Firebase FieldValue. */
