@@ -115,6 +115,7 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting
 
         val androidMain by getting {
             dependencies {
@@ -123,6 +124,11 @@ kotlin {
         }
         val jvmMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
+            }
         }
 
         if (supportIosTarget) {

@@ -123,11 +123,12 @@ subprojects {
                 "jvmTestImplementation"(kotlin("test-junit"))
                 "jvmTestImplementation"("junit:junit:4.13.2")
             }
-            "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13.2")
-            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
+            "androidUnitTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
+            "androidInstrumentedTestImplementation"("androidx.test:core:1.4.0")
+            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.3")
+            "androidInstrumentedTestImplementation"("androidx.test:runner:1.4.0")
         }
     }
 
