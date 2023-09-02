@@ -7,7 +7,7 @@ package dev.gitlive.firebase.storage
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.storage.externals.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -15,33 +15,35 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 
-
-actual val Firebase.storage get() =
-    rethrow { dev.gitlive.firebase.storage; FirebaseStorage(firebase.storage()) }
+actual val Firebase.storage
+    get() = FirebaseStorage(getStorage())
 
 actual fun Firebase.storage(app: FirebaseApp) =
-    rethrow { dev.gitlive.firebase.storage; FirebaseStorage(firebase.app().storage()) }
+    FirebaseStorage(getStorage(app.js))
 
-actual class FirebaseStorage(val js: firebase.storage.Storage) {
+actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.FirebaseStorage) {
     actual val maxOperationRetryTimeMillis = js.maxOperationRetryTime.toLong()
     actual val maxUploadRetryTimeMillis = js.maxUploadRetryTime.toLong()
 
     actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
-        js.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toDouble())
+        js.maxOperationRetryTime = maxOperationRetryTimeMillis.toDouble()
     }
 
     actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
-        js.setMaxUploadRetryTime(maxUploadRetryTimeMillis.toDouble())
+        js.maxUploadRetryTime = maxUploadRetryTimeMillis.toDouble()
     }
 
     actual fun useEmulator(host: String, port: Int) {
-        js.useEmulator(host, port)
+        connectFirestoreEmulator(js, host, port.toDouble())
     }
 
-    actual val reference: StorageReference get() = StorageReference(js.ref())
+    actual val reference: StorageReference get() = StorageReference(ref(js))
+
+    actual fun reference(location: String) = rethrow { StorageReference(ref(js, location)) }
+
 }
 
-actual class StorageReference(val js: firebase.storage.Reference) {
+actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.StorageReference) {
     actual val path: String get() = js.fullPath
     actual val name: String get() = js.name
     actual val bucket: String get() = js.bucket
@@ -49,16 +51,18 @@ actual class StorageReference(val js: firebase.storage.Reference) {
     actual val root: StorageReference get() = StorageReference(js.root)
     actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
 
-    actual fun child(path: String): StorageReference = StorageReference(js.child(path))
+    actual fun child(path: String): StorageReference = StorageReference(ref(js, path))
 
-    actual suspend fun delete() = rethrow { js.delete().await() }
+    actual suspend fun delete() = rethrow { deleteObject(js).await() }
 
-    actual suspend fun getDownloadUrl(): String = rethrow { js.getDownloadURL().await().toString() }
+    actual suspend fun getDownloadUrl(): String = rethrow { getDownloadURL(js).await().toString() }
 
-    actual suspend fun listAll(): ListResult = rethrow { ListResult(js.listAll().await()) }
+    actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).await()) }
+
+    actual suspend fun putFile(file: File): Unit = rethrow { uploadBytes(js, file).await() }
 
     actual fun putFileResumable(file: File): ProgressFlow = rethrow {
-        val uploadTask = js.put(file)
+        val uploadTask = uploadBytesResumable(js, file)
 
         val flow = callbackFlow {
             val unsubscribe = uploadTask.on(
@@ -88,7 +92,7 @@ actual class StorageReference(val js: firebase.storage.Reference) {
 
 }
 
-actual class ListResult(js: firebase.storage.ListResult) {
+actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListResult) {
     actual val prefixes: List<StorageReference> = js.prefixes.map { StorageReference(it) }
     actual val items: List<StorageReference> = js.items.map { StorageReference(it) }
     actual val pageToken: String? = js.nextPageToken

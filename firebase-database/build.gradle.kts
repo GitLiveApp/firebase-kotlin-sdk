@@ -21,6 +21,7 @@ android {
     defaultConfig {
         minSdk = property("minSdkVersion") as Int
         targetSdk = property("targetSdkVersion") as Int
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets {
         getByName("main") {
@@ -82,15 +83,15 @@ kotlin {
         useCommonJs()
         nodejs {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
         browser {
             testTask {
-                useMocha {
-                    timeout = "5s"
+                useKarma {
+                    useChromeHeadless()
                 }
             }
         }
@@ -159,4 +160,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
-

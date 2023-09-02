@@ -1,36 +1,43 @@
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.auth.externals.ApplicationVerifier
+import dev.gitlive.firebase.auth.externals.EmailAuthProvider
+import dev.gitlive.firebase.auth.externals.FacebookAuthProvider
+import dev.gitlive.firebase.auth.externals.GithubAuthProvider
+import dev.gitlive.firebase.auth.externals.GoogleAuthProvider
+import dev.gitlive.firebase.auth.externals.PhoneAuthProvider
+import dev.gitlive.firebase.auth.externals.TwitterAuthProvider
 import kotlinx.coroutines.await
-import kotlin.js.Json
 import kotlin.js.json
+import dev.gitlive.firebase.auth.externals.AuthCredential as JsAuthCredential
+import dev.gitlive.firebase.auth.externals.OAuthProvider as JsOAuthProvider
 
-actual open class AuthCredential(val js: firebase.auth.AuthCredential) {
+actual open class AuthCredential(val js: JsAuthCredential) {
     actual val providerId: String
         get() = js.providerId
 }
 
-actual class PhoneAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(js)
-actual class OAuthCredential(js: firebase.auth.AuthCredential) : AuthCredential(js)
+actual class PhoneAuthCredential(js: JsAuthCredential) : AuthCredential(js)
+actual class OAuthCredential(js: JsAuthCredential) : AuthCredential(js)
 
 actual object EmailAuthProvider {
     actual fun credential(email: String, password: String): AuthCredential =
-        AuthCredential(firebase.auth.EmailAuthProvider.credential(email, password))
+        AuthCredential(EmailAuthProvider.credential(email, password))
 
     actual fun credentialWithLink(
         email: String,
         emailLink: String
-    ): AuthCredential = AuthCredential(firebase.auth.EmailAuthProvider.credentialWithLink(email, emailLink))
+    ): AuthCredential = AuthCredential(EmailAuthProvider.credentialWithLink(email, emailLink))
 }
 
 actual object FacebookAuthProvider {
     actual fun credential(accessToken: String): AuthCredential =
-        AuthCredential(firebase.auth.FacebookAuthProvider.credential(accessToken))
+        AuthCredential(FacebookAuthProvider.credential(accessToken))
 }
 
 actual object GithubAuthProvider {
     actual fun credential(token: String): AuthCredential =
-        AuthCredential(firebase.auth.GithubAuthProvider.credential(token))
+        AuthCredential(GithubAuthProvider.credential(token))
 }
 
 actual object GoogleAuthProvider {
@@ -38,18 +45,18 @@ actual object GoogleAuthProvider {
         require(idToken != null || accessToken != null) {
             "Both parameters are optional but at least one must be present."
         }
-        return AuthCredential(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken))
+        return AuthCredential(GoogleAuthProvider.credential(idToken, accessToken))
     }
 }
 
-actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {
+actual class OAuthProvider(val js: JsOAuthProvider) {
 
     actual constructor(
         provider: String,
         scopes: List<String>,
         customParameters: Map<String, String>,
         auth: FirebaseAuth
-    ) : this(firebase.auth.OAuthProvider(provider))  {
+    ) : this(JsOAuthProvider(provider)) {
         rethrow {
             scopes.forEach { js.addScope(it) }
             js.setCustomParameters(customParameters)
@@ -57,7 +64,7 @@ actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {
     }
     actual companion object {
         actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential = rethrow {
-            firebase.auth.OAuthProvider(providerId)
+            JsOAuthProvider(providerId)
                 .credential(
                     json(
                         "accessToken" to (accessToken ?: undefined),
@@ -71,11 +78,11 @@ actual class OAuthProvider(val js: firebase.auth.OAuthProvider) {
     }
 }
 
-actual class PhoneAuthProvider(val js: firebase.auth.PhoneAuthProvider) {
+actual class PhoneAuthProvider(val js: PhoneAuthProvider) {
 
-    actual constructor(auth: FirebaseAuth) : this(firebase.auth.PhoneAuthProvider(auth.js))
+    actual constructor(auth: FirebaseAuth) : this(PhoneAuthProvider(auth.js))
 
-    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(firebase.auth.PhoneAuthProvider.credential(verificationId, smsCode))
+    actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
     actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
         val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)
@@ -84,10 +91,10 @@ actual class PhoneAuthProvider(val js: firebase.auth.PhoneAuthProvider) {
 }
 
 actual interface PhoneVerificationProvider {
-    val verifier: firebase.auth.ApplicationVerifier
+    val verifier: ApplicationVerifier
     suspend fun getVerificationCode(verificationId: String): String
 }
 
 actual object TwitterAuthProvider {
-    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(firebase.auth.TwitterAuthProvider.credential(token, secret))
+    actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(TwitterAuthProvider.credential(token, secret))
 }
