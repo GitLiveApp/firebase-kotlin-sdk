@@ -6,6 +6,7 @@
 package dev.gitlive.firebase.database
 
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.test.TestResult
 
 actual val emulatorHost: String = "10.0.2.2"
 

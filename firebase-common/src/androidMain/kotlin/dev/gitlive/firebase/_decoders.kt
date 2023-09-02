@@ -11,11 +11,25 @@ import kotlinx.serialization.descriptors.StructureKind
 
 actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor): CompositeDecoder = when(descriptor.kind) {
         StructureKind.CLASS, StructureKind.OBJECT, PolymorphicKind.SEALED -> (value as Map<*, *>).let { map ->
-            FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index -> map[desc.getElementName(index)] }
+            FirebaseClassDecoder(map.size, { map.containsKey(it) }) { desc, index ->
+                val elementName = desc.getElementName(index)
+                if (desc.kind is PolymorphicKind && elementName == "value") {
+                    map
+                } else {
+                    map[desc.getElementName(index)]
+                }
+            }
         }
-        StructureKind.LIST -> (value as List<*>).let {
-            FirebaseCompositeDecoder(it.size) { _, index -> it[index] }
-        }
+        StructureKind.LIST ->
+            when(value) {
+                is List<*> -> value
+                is Map<*, *> -> value.asSequence()
+                    .sortedBy { (it) -> it.toString().toIntOrNull() }
+                    .map { (_, it) -> it }
+                    .toList()
+                else -> error("unexpected type, got $value when expecting a list")
+            }
+            .let { FirebaseCompositeDecoder(it.size) { _, index -> it[index] } }
         StructureKind.MAP -> (value as Map<*, *>).entries.toList().let {
             FirebaseCompositeDecoder(it.size) { _, index -> it[index/2].run { if(index % 2 == 0) key else value }  }
         }

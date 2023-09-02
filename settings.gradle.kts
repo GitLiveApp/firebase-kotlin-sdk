@@ -8,8 +8,8 @@ include(
     "firebase-functions",
     "firebase-installations",
     "firebase-perf",
-    "firebase-crashlytics"
+    "firebase-crashlytics",
+    "firebase-storage",
+    "test-utils"
 )
-
-//enableFeaturePreview("GRADLE_METADATA")
 
