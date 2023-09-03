@@ -73,7 +73,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         nodejs {
             testTask {
                 useKarma {

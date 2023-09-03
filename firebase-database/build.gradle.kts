@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -8,7 +10,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 repositories {
@@ -80,8 +82,10 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
+        binaries.library()
         nodejs {
+
             testTask {
                 useKarma {
                     useChromeHeadless()
@@ -94,6 +98,13 @@ kotlin {
                     useChromeHeadless()
                 }
             }
+        }
+    }
+
+    // Enables ES6 classes generation
+    tasks.withType<KotlinJsCompile>().configureEach {
+        kotlinOptions {
+            useEsClasses = true
         }
     }
 

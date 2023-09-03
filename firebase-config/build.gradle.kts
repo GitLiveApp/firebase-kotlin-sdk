@@ -94,7 +94,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         browser {
             testTask {
                 useKarma {

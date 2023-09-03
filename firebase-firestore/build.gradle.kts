@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -81,7 +81,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         nodejs {
             testTask {
                 useKarma {
