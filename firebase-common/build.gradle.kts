@@ -47,6 +47,19 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
     if (supportIosTarget) {
@@ -125,6 +138,17 @@ kotlin {
             dependencies {
                 api(npm("firebase", "9.21.0"))
             }
+        }
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidAndroidTest/kotlin")
         }
     }
 }

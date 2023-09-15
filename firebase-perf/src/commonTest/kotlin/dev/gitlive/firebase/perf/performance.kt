@@ -9,11 +9,12 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.TestResult
 import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+expect fun runTest(test: suspend CoroutineScope.() -> Unit): TestResult
 expect annotation class IgnoreForAndroidUnitTest constructor()
 
 @IgnoreForAndroidUnitTest

@@ -82,6 +82,14 @@ kotlin {
         }
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     sourceSets {
         all {
             languageSettings.apply {
@@ -118,6 +126,10 @@ kotlin {
             dependencies {
                 dependsOn(commonTest)
             }
+        }
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

@@ -236,6 +236,14 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         awaitClose { listener.remove() }
     }
 
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
+
     override fun equals(other: Any?): Boolean =
         this === other || other is DocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()

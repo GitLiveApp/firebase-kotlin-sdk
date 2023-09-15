@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -44,7 +43,8 @@ tasks {
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
             "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
-            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion"
+            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion",
+            "firebase-storage:updateVersion", "firebase-storage:updateDependencyVersion"
         )
     }
 }
@@ -62,7 +62,7 @@ subprojects {
     }
 
     tasks.withType<Sign>().configureEach {
-        onlyIf { project.gradle.startParameter.taskNames.contains("MavenRepository") }
+        onlyIf { !project.gradle.startParameter.taskNames.any { "MavenLocal" in it } }
     }
 
     val skipPublishing = project.name == "test-utils" // skip publishing for test utils
@@ -102,68 +102,9 @@ subprojects {
                     .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
             )
         }
-
-        val copyReadMe by registering(Copy::class) {
-            from(rootProject.file("README.md"))
-            into(file("$buildDir/node_module"))
-        }
-
-        val copyPackageJson by registering(Copy::class) {
-            from(file("package.json"))
-            into(file("$buildDir/node_module"))
-        }
-
-        val unzipJar by registering(Copy::class) {
-            val zipFile = File("$buildDir/libs", "${project.name}-js-${project.version}.jar")
-            from(this.project.zipTree(zipFile))
-            into("$buildDir/classes/kotlin/js/main/")
-        }
-
-        val copyJS by registering {
-            mustRunAfter("unzipJar", "copyPackageJson")
-            doLast {
-                val from = File("$buildDir/classes/kotlin/js/main/${rootProject.name}-${project.name}.js")
-                val into = File("$buildDir/node_module/${project.name}.js")
-                into.createNewFile()
-                into.writeText(
-                    from.readText()
-                        .replace("require('firebase-kotlin-sdk-", "require('@gitlive/")
-//                        .replace("require('kotlinx-serialization-kotlinx-serialization-runtime')", "require('@gitlive/kotlinx-serialization-runtime')")
-                )
-            }
-        }
-
-        val copySourceMap by registering(Copy::class) {
-            from(file("$buildDir/classes/kotlin/js/main/${project.name}.js.map"))
-            into(file("$buildDir/node_module"))
-        }
-
-        register("prepareForNpmPublish") {
-            dependsOn(
-                unzipJar,
-                copyPackageJson,
-                copySourceMap,
-                copyReadMe,
-                copyJS
-            )
-        }
-
-        create<Exec>("publishToNpm") {
-            workingDir("$buildDir/node_module")
-            isIgnoreExitValue = true
-            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine("cmd", "/c", "npm publish")
-            } else {
-                commandLine("npm", "publish")
-            }
-        }
     }
 
     afterEvaluate  {
-        // create the projects node_modules if they don't exist
-        if(!File("$buildDir/node_module").exists()) {
-            mkdir("$buildDir/node_module")
-        }
 
         val coroutinesVersion: String by project
         val firebaseBoMVersion: String by project
@@ -176,7 +117,13 @@ subprojects {
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
+                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.1")
+                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
+                    exclude("com.google.android.gms")
+                }
                 "jsTestImplementation"(kotlin("test-js"))
+                "jvmTestImplementation"(kotlin("test-junit"))
+                "jvmTestImplementation"("junit:junit:4.13.2")
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
             "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
@@ -197,6 +144,9 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
+    val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+    }
 
     configure<PublishingExtension> {
 
@@ -212,6 +162,7 @@ subprojects {
 
         publications.all {
             this as MavenPublication
+            artifact(javadocJar)
 
             pom {
                 name.set("firebase-kotlin-sdk")

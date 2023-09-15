@@ -49,13 +49,26 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     if (supportIosTarget) {
         ios()
         iosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                baseName = "FirebaseFunctions"
+                baseName = "FirebaseInstallations"
             }
             noPodspec()
             pod("FirebaseInstallations") {
@@ -116,6 +129,10 @@ kotlin {
             dependencies {
                 dependsOn(commonTest)
             }
+        }
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

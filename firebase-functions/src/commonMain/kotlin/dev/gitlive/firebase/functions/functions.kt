@@ -39,4 +39,3 @@ expect fun Firebase.functions(app: FirebaseApp): FirebaseFunctions
 expect fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions
 
 expect class FirebaseFunctionsException: FirebaseException
-

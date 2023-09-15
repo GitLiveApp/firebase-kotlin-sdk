@@ -44,6 +44,19 @@ kotlin {
         publishAllLibraryVariants()
     }
 
+    jvm {
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        val test by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
     if (supportIosTarget) {
@@ -74,6 +87,10 @@ kotlin {
             }
         }
 
+        val jvmMain by getting {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
         if (supportIosTarget) {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
@@ -81,6 +98,12 @@ kotlin {
             val iosTest by sourceSets.getting
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
+        }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
 import kotlinx.serialization.Serializable
 
 /** A base class that could be used to combine [Timestamp] and [Timestamp.ServerTimestamp] in the same field. */
@@ -8,7 +7,7 @@ import kotlinx.serialization.Serializable
 actual sealed class BaseTimestamp
 
 /** A class representing a platform specific Firebase Timestamp. */
-actual typealias NativeTimestamp = firebase.firestore.Timestamp
+actual typealias NativeTimestamp = dev.gitlive.firebase.firestore.externals.Timestamp
 
 /** A class representing a Firebase Timestamp. */
 @Serializable(with = TimestampSerializer::class)
@@ -22,7 +21,7 @@ actual class Timestamp internal actual constructor(
 
     override fun equals(other: Any?): Boolean =
         this === other || other is Timestamp && nativeValue.isEqual(other.nativeValue)
-    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun hashCode(): Int = nativeValue.toMillis().hashCode()
     override fun toString(): String = nativeValue.toString()
 
     actual companion object {
@@ -33,4 +32,3 @@ actual class Timestamp internal actual constructor(
     @Serializable(with = ServerTimestampSerializer::class)
     actual object ServerTimestamp: BaseTimestamp()
 }
-
