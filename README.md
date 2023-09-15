@@ -14,8 +14,8 @@ Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multipla
 
 The following libraries are available for the various Firebase products.
 
-| Service or Product	                                                             | Gradle Dependency                                                                                                            | API Coverage                                                                                                                                                             |
-|---------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
+|---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.10.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.10.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.10.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.10.0/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.10.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.10.0/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
@@ -161,17 +161,17 @@ To reduce boilerplate, default arguments are used in the places where the Fireba
 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
         .setDisplayName("Jane Q. User")
         .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
-        .build();
+        .build()
 
 user.updateProfile(profileUpdates)
         .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "User profile updated.");
+                    Log.d(TAG, "User profile updated.")
                 }
             }
-        });
+        })
 
 //...becomes...
 
