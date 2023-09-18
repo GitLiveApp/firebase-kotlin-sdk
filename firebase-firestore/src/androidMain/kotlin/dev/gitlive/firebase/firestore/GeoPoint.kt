@@ -11,6 +11,7 @@ actual class GeoPoint internal actual constructor(internal actual val nativeValu
     actual constructor(latitude: Double, longitude: Double) : this(NativeGeoPoint(latitude, longitude))
     actual val latitude: Double = nativeValue.latitude
     actual val longitude: Double = nativeValue.longitude
+
     override fun equals(other: Any?): Boolean =
         this === other || other is GeoPoint && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()

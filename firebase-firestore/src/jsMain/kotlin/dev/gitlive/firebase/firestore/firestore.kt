@@ -7,18 +7,39 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Json
 import kotlin.js.json
+import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
+import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
+import dev.gitlive.firebase.firestore.externals.DocumentReference as JsDocumentReference
+import dev.gitlive.firebase.firestore.externals.DocumentSnapshot as JsDocumentSnapshot
+import dev.gitlive.firebase.firestore.externals.FieldPath as JsFieldPath
+import dev.gitlive.firebase.firestore.externals.Query as JsQuery
+import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
+import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
+import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
+import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
+import dev.gitlive.firebase.firestore.externals.arrayRemove as jsArrayRemove
+import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
+import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
+import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
+import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
+import dev.gitlive.firebase.firestore.externals.limit as jsLimit
+import dev.gitlive.firebase.firestore.externals.startAfter as jsStartAfter
+import dev.gitlive.firebase.firestore.externals.startAt as jsStartAt
+import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
+import dev.gitlive.firebase.firestore.externals.where as jsWhere
 
 actual val Firebase.firestore get() =
-    rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.firestore()) }
+    rethrow { FirebaseFirestore(getFirestore()) }
 
 actual fun Firebase.firestore(app: FirebaseApp) =
-    rethrow { dev.gitlive.firebase.firestore; FirebaseFirestore(firebase.app().firestore()) }
+    rethrow { FirebaseFirestore(getFirestore(app.js)) }
 
 actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
@@ -34,7 +55,8 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     private var lastSettings = Settings()
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
+    var js: Firestore = jsFirestore
+        private set
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
 
@@ -42,16 +64,18 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun batch() = rethrow { WriteBatch(js.batch()) }
 
+    actual fun batch() = rethrow { WriteBatch(writeBatch(js)) }
+
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
-        rethrow { firebase.firestore.setLogLevel( if(loggingEnabled) "error" else "silent") }
+        rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        rethrow { js.runTransaction { GlobalScope.promise { Transaction(it).func() } }.await() }
+        rethrow { runTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
 
     actual suspend fun clearPersistence() =
-        rethrow { js.clearPersistence().await() }
+        rethrow { clearIndexedDbPersistence(js).await() }
 
-    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator(host, port) }
+    actual fun useEmulator(host: String, port: Int) = rethrow { connectFirestoreEmulator(js, host, port) }
 
     actual fun setSettings(settings: Settings) {
         lastSettings = settings
@@ -76,11 +100,11 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     )
 
     actual suspend fun disableNetwork() {
-        rethrow { js.disableNetwork().await() }
+        rethrow { disableNetwork(js).await() }
     }
 
     actual suspend fun enableNetwork() {
-        rethrow { js.enableNetwork().await() }
+        rethrow { enableNetwork(js).await() }
     }
 }
 
@@ -227,8 +251,12 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual suspend fun get() = rethrow { DocumentSnapshot(js.get().await()) }
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val unsubscribe = js.onSnapshot(
+    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<DocumentSnapshot>  {
+        val unsubscribe = onSnapshot(
+            js,
+            json("includeMetadataChanges" to includeMetadataChanges),
             { trySend(DocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
@@ -269,17 +297,17 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 }
 
-actual open class Query(open val js: firebase.firestore.Query) {
+actual open class Query(open val js: JsQuery) {
 
-    actual suspend fun get() =  rethrow { QuerySnapshot(js.get().await()) }
+    actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
-    actual fun limit(limit: Number) = Query(js.limit(limit.toDouble()))
+    actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
-    internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(js.where(field, "==", equalTo)) }
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(js.where(path.js, "==", equalTo)) }
+    internal actual fun _where(field: String, equalTo: Any?) = rethrow { Query(query(js, jsWhere(field, "==", equalTo))) }
+    internal actual fun _where(path: FieldPath, equalTo: Any?) = rethrow { Query(query(js, jsWhere(path.js, "==", equalTo))) }
 
-    internal actual fun _where(field: String, equalTo: DocumentReference) = rethrow { Query(js.where(field, "==", equalTo.js)) }
-    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = rethrow { Query(js.where(path.js, "==", equalTo.js)) }
+    internal actual fun _where(field: String, equalTo: DocumentReference) = rethrow { Query(query(js, jsWhere(field, "==", equalTo.js))) }
+    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = rethrow { Query(query(js, jsWhere(path.js, "==", equalTo.js))) }
 
     internal actual fun _where(
         field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?, notEqualTo: Any?,
@@ -342,32 +370,33 @@ actual open class Query(open val js: firebase.firestore.Query) {
     }
 
     internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
-        Query(js.orderBy(field, direction.jsString))
+        Query(query(js, orderBy(field, direction.jsString)))
     }
 
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
-        Query(js.orderBy(field.js, direction.jsString))
+        Query(query(js, orderBy(field.js, direction.jsString)))
     }
 
-    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow { Query(js.startAfter(document.js)) }
+    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow { Query(query(js, jsStartAfter(document.js))) }
 
-    internal actual fun _startAfter(vararg fieldValues: Any) = rethrow { Query(js.startAfter(*fieldValues)) }
+    internal actual fun _startAfter(vararg fieldValues: Any) = rethrow { Query(query(js, jsStartAfter(*fieldValues))) }
 
-    internal actual fun _startAt(document: DocumentSnapshot) = rethrow { Query(js.startAt(document.js)) }
+    internal actual fun _startAt(document: DocumentSnapshot) = rethrow { Query(query(js, jsStartAt(document.js))) }
 
-    internal actual fun _startAt(vararg fieldValues: Any) = rethrow { Query(js.startAt(*fieldValues)) }
+    internal actual fun _startAt(vararg fieldValues: Any) = rethrow { Query(query(js, jsStartAt(*fieldValues))) }
 
-    internal actual fun _endBefore(document: DocumentSnapshot) = rethrow { Query(js.endBefore(document.js)) }
+    internal actual fun _endBefore(document: DocumentSnapshot) = rethrow { Query(query(js, jsEndBefore(document.js))) }
 
-    internal actual fun _endBefore(vararg fieldValues: Any) = rethrow { Query(js.endBefore(*fieldValues)) }
+    internal actual fun _endBefore(vararg fieldValues: Any) = rethrow { Query(query(js, jsEndBefore(*fieldValues))) }
 
-    internal actual fun _endAt(document: DocumentSnapshot) = rethrow { Query(js.endAt(document.js)) }
+    internal actual fun _endAt(document: DocumentSnapshot) = rethrow { Query(query(js, jsEndAt(document.js))) }
 
-    internal actual fun _endAt(vararg fieldValues: Any) = rethrow { Query(js.endAt(*fieldValues)) }
+    internal actual fun _endAt(vararg fieldValues: Any) = rethrow { Query(query(js, jsEndAt(*fieldValues))) }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
-            js.onSnapshot(
+            onSnapshot(
+                js,
                 { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
             )
@@ -377,7 +406,8 @@ actual open class Query(open val js: firebase.firestore.Query) {
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
-            js.onSnapshot(
+            onSnapshot(
+                js,
                 json("includeMetadataChanges" to includeMetadataChanges),
                 { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) }
@@ -387,17 +417,17 @@ actual open class Query(open val js: firebase.firestore.Query) {
     }
 }
 
-actual class CollectionReference(override val js: firebase.firestore.CollectionReference) : Query(js) {
+actual class CollectionReference(override val js: JsCollectionReference) : Query(js) {
 
     actual val path: String
         get() =  rethrow { js.path }
     actual val async = Async(js)
 
-    actual val document get() = rethrow { DocumentReference(js.doc()) }
+    actual val document get() = rethrow { DocumentReference(doc(js)) }
 
     actual val parent get() = rethrow { js.parent?.let{DocumentReference(it)} }
 
-    actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
+    actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
     actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
         rethrow { DocumentReference(js.add(encode(data, encodeSettings)!!).await()) }
@@ -424,7 +454,7 @@ actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExc
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
+actual class QuerySnapshot(val js: JsQuerySnapshot) {
     actual val documents
         get() = js.docs.map { DocumentSnapshot(it) }
     actual val documentChanges
@@ -432,7 +462,7 @@ actual class QuerySnapshot(val js: firebase.firestore.QuerySnapshot) {
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
-actual class DocumentChange(val js: firebase.firestore.DocumentChange) {
+actual class DocumentChange(val js: JsDocumentChange) {
     actual val document: DocumentSnapshot
         get() = DocumentSnapshot(js.doc)
     actual val newIndex: Int
@@ -443,7 +473,7 @@ actual class DocumentChange(val js: firebase.firestore.DocumentChange) {
         get() = ChangeType.values().first { it.jsString == js.type }
 }
 
-actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
+actual class DocumentSnapshot(val js: JsDocumentSnapshot) {
 
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
@@ -461,21 +491,21 @@ actual class DocumentSnapshot(val js: firebase.firestore.DocumentSnapshot) {
         rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior)), decodeSettings) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
-    actual val exists get() = rethrow { js.exists }
+    actual val exists get() = rethrow { js.exists() }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 
     fun getTimestampsOptions(serverTimestampBehavior: ServerTimestampBehavior) =
         json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
 
-actual class SnapshotMetadata(val js: firebase.firestore.SnapshotMetadata) {
+actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
     actual val isFromCache: Boolean get() = js.fromCache
 }
 
-actual class FieldPath private constructor(val js: firebase.firestore.FieldPath) {
+actual class FieldPath private constructor(val js: JsFieldPath) {
     actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
-        js("Reflect").construct(firebase.firestore.FieldPath, fieldNames).unsafeCast<firebase.firestore.FieldPath>()
+        js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
     })
     actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
     actual val encoded: EncodedFieldPath = js

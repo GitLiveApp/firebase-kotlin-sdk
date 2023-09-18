@@ -32,7 +32,11 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
     object ServerTimestamp: BaseTimestamp
 }
 
-fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp = duration.toComponents { seconds, nanoseconds -> Timestamp(seconds, nanoseconds) }
-fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp = fromDuration(milliseconds.milliseconds)
+fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp =
+    duration.toComponents { seconds, nanoseconds ->
+        Timestamp(seconds, nanoseconds)
+    }
 fun Timestamp.toDuration(): Duration = seconds.seconds + nanoseconds.nanoseconds
+
+fun Timestamp.Companion.fromMilliseconds(milliseconds: Double): Timestamp = fromDuration(milliseconds.milliseconds)
 fun Timestamp.toMilliseconds(): Double = toDuration().toDouble(DurationUnit.MILLISECONDS)

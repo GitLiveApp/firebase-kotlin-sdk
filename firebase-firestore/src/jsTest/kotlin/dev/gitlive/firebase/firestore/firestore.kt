@@ -12,9 +12,7 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend CoroutineScope.() -> Unit) {
-    runTest { test() }
-}
+actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runTest { test() }
 
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
     return (js("Object").entries(encoded) as Array<Array<Any>>).associate {

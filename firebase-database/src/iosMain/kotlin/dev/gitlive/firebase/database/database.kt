@@ -14,6 +14,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.*
 import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.encode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -25,7 +26,8 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.allObjects
 import platform.darwin.dispatch_queue_t
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -37,10 +39,14 @@ actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp))
+actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp)
+)
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url))
+actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url)
+)
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
@@ -117,7 +123,7 @@ actual open class Query internal constructor(
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                trySend(DataSnapshot(snapShot!!))
+                trySend(DataSnapshot(snapShot!!, persistenceEnabled))
             }
         ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -128,7 +134,7 @@ actual open class Query internal constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    trySend(ChildEvent(DataSnapshot(snapShot!!), type, key))
+                    trySend(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
                 }
             ) { close(DatabaseException(it.toString(), null)) }
         }
@@ -182,7 +188,7 @@ actual class DatabaseReference internal constructor(
                 if (error != null) {
                     deferred.completeExceptionally(DatabaseException(error.toString(), null))
                 } else {
-                    deferred.complete(DataSnapshot(snapshot!!))
+                    deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                 }
             },
             withLocalEvents = false
@@ -192,11 +198,18 @@ actual class DatabaseReference internal constructor(
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
+actual class DataSnapshot internal constructor(
+    val ios: FIRDataSnapshot,
+    private val persistenceEnabled: Boolean
+) {
 
     actual val exists get() = ios.exists()
 
     actual val key: String? get() = ios.key
+
+    actual val ref: DatabaseReference get() = DatabaseReference(ios.ref, persistenceEnabled)
+
+    actual val value get() = ios.value
 
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
@@ -204,8 +217,9 @@ actual class DataSnapshot internal constructor(val ios: FIRDataSnapshot) {
     actual fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
         decode(strategy, ios.value, decodeSettings)
 
-    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path))
-    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot) }
+    actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
+    actual val hasChildren get() = ios.hasChildren()
+    actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
 }
 
 actual class OnDisconnect internal constructor(

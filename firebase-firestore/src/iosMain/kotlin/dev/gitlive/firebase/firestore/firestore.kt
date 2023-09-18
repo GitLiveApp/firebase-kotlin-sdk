@@ -25,9 +25,9 @@ actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp))
-}
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
+    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
+)
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
@@ -223,6 +223,10 @@ actual typealias NativeDocumentReference = FIRDocumentReference
 actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
     val ios: NativeDocumentReference = nativeValue
 
+@Serializable(with = DocumentReferenceSerializer::class)
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
+    val ios: NativeDocumentReference by ::nativeValue
+
     actual val id: String
         get() = ios.documentID
 
@@ -278,6 +282,19 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         override fun delete() =
             deferred { ios.deleteDocumentWithCompletion(it) }
     }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override fun equals(other: Any?): Boolean =
+        this === other || other is DocumentReference && nativeValue == other.nativeValue
+    override fun hashCode(): Int = nativeValue.hashCode()
+    override fun toString(): String = nativeValue.toString()
 }
 
 actual open class Query(open val ios: FIRQuery) {

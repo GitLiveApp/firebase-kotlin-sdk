@@ -4,7 +4,10 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import cocoapods.FirebaseAuth.FIRAuthDataResult
+import cocoapods.FirebaseAuth.FIRUser
+import cocoapods.FirebaseAuth.FIRUserInfoProtocol
+import cocoapods.FirebaseAuth.FIRUserMetadata
 import platform.Foundation.NSURL
 
 actual class FirebaseUser internal constructor(val ios: FIRUser) : FirebaseUserProfile {

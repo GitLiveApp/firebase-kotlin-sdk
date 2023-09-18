@@ -13,11 +13,13 @@ import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.withSerializer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
@@ -33,7 +35,7 @@ import kotlin.test.assertTrue
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+expect fun runTest(test: suspend CoroutineScope.() -> Unit): TestResult
 
 /** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
@@ -45,9 +47,9 @@ class FirebaseFirestoreTest {
 
     @Serializable
     data class FirestoreTest(
-        val prop1: String, 
+        val prop1: String,
         val time: Double = 0.0,
-        val count: Int = 0, 
+        val count: Int = 0,
         val list: List<String> = emptyList(),
     )
 
@@ -164,7 +166,7 @@ class FirebaseFirestoreTest {
 
         doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestamp", Timestamp.ServerTimestamp))
 
-        assertNotEquals(Timestamp.ServerTimestamp, doc.get().get<BaseTimestamp>("time"))
+        assertNotEquals(Timestamp.ServerTimestamp, doc.get().get("time", BaseTimestamp.serializer()))
         assertNotEquals(Timestamp.ServerTimestamp, doc.get().data(FirestoreTimeTest.serializer()).time)
     }
 
@@ -175,11 +177,9 @@ class FirebaseFirestoreTest {
             .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
-            withTimeout(5000) {
-                doc.snapshots.filter { it.exists }.first()
-            }
+            doc.snapshots.filter { it.exists }.first()
         }
-        delay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
 
         doc.set(
             FirestoreTimeTest.serializer(),
@@ -188,7 +188,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.NONE))
+        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, ServerTimestampBehavior.NONE))
     }
 
     @Test
@@ -222,18 +222,16 @@ class FirebaseFirestoreTest {
             .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
-            withTimeout(5000) {
-                doc.snapshots.filter { it.exists }.first()
-            }
+            doc.snapshots.filter { it.exists }.first()
         }
-        delay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
 
         doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.ESTIMATE))
-        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), serverTimestampBehavior = ServerTimestampBehavior.ESTIMATE).time)
+        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -243,17 +241,15 @@ class FirebaseFirestoreTest {
             .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
-            withTimeout(5000) {
-                doc.snapshots.filter { it.exists }.first()
-            }
+            doc.snapshots.filter { it.exists }.first()
         }
-        delay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
 
         doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.PREVIOUS))
+        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, ServerTimestampBehavior.PREVIOUS))
     }
 
     @Test
@@ -487,11 +483,9 @@ class FirebaseFirestoreTest {
             .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
-            withTimeout(5000) {
-                doc.snapshots.filter { it.exists }.first()
-            }
+            doc.snapshots.filter { it.exists }.first()
         }
-        delay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
 
         doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.serverTimestamp))
 

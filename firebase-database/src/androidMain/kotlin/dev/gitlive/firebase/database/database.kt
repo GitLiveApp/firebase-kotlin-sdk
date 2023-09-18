@@ -18,34 +18,32 @@ import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
+import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
 import dev.gitlive.firebase.decode
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.tasks.asDeferred
-import kotlinx.coroutines.tasks.await
+import dev.gitlive.firebase.encode
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
-suspend fun <T> Task<T>.awaitWhileOnline(): T = coroutineScope {
+suspend fun <T> Task<T>.awaitWhileOnline(): T =
+    merge(
+        flow { emit(await()) },
+        Firebase.database
+            .reference(".info/connected")
+            .valueEvents
+            .debounce(2.seconds)
+            .filter { !it.value<Boolean>() }
+            .map<DataSnapshot, T> { throw DatabaseException("Database not connected", null) }
+    )
+    .first()
 
-    val notConnected = Firebase.database
-        .reference(".info/connected")
-        .valueEvents
-        .filter { !it.value<Boolean>() }
-        .produceIn(this)
-
-    select<T> {
-        asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
-    }
-}
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
@@ -59,7 +57,7 @@ actual fun Firebase.database(app: FirebaseApp) =
 actual fun Firebase.database(app: FirebaseApp, url: String) =
     FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+actual class FirebaseDatabase private constructor(val android: com.google.firebase.database.FirebaseDatabase) {
 
     actual data class Settings(
         actual val persistenceEnabled: Boolean = false,
@@ -128,7 +126,7 @@ actual open class Query internal constructor(
         get() = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                trySend(DataSnapshot(snapshot))
+                trySendBlocking(DataSnapshot(snapshot, persistenceEnabled))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -144,22 +142,22 @@ actual open class Query internal constructor(
 
             val moved by lazy { types.contains(Type.MOVED) }
             override fun onChildMoved(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(moved) trySend(ChildEvent(DataSnapshot(snapshot), Type.MOVED, previousChildName))
+                if(moved) trySend(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.MOVED, previousChildName))
             }
 
             val changed by lazy { types.contains(Type.CHANGED) }
             override fun onChildChanged(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(changed) trySend(ChildEvent(DataSnapshot(snapshot), Type.CHANGED, previousChildName))
+                if(changed) trySend(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.CHANGED, previousChildName))
             }
 
             val added by lazy { types.contains(Type.ADDED) }
             override fun onChildAdded(snapshot: com.google.firebase.database.DataSnapshot, previousChildName: String?) {
-                if(added) trySend(ChildEvent(DataSnapshot(snapshot), Type.ADDED, previousChildName))
+                if(added) trySend(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.ADDED, previousChildName))
             }
 
             val removed by lazy { types.contains(Type.REMOVED) }
             override fun onChildRemoved(snapshot: com.google.firebase.database.DataSnapshot) {
-                if(removed) trySend(ChildEvent(DataSnapshot(snapshot), Type.REMOVED, null))
+                if(removed) trySend(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.REMOVED, null))
             }
 
             override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
@@ -223,7 +221,7 @@ actual class DatabaseReference internal constructor(
                 if (error != null) {
                     deferred.completeExceptionally(error.toException())
                 } else {
-                    deferred.complete(DataSnapshot(snapshot!!))
+                    deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                 }
             }
 
@@ -232,11 +230,18 @@ actual class DatabaseReference internal constructor(
     }
 }
 @Suppress("UNCHECKED_CAST")
-actual class DataSnapshot internal constructor(val android: com.google.firebase.database.DataSnapshot) {
+actual class DataSnapshot internal constructor(
+    val android: com.google.firebase.database.DataSnapshot,
+    private val persistenceEnabled: Boolean
+) {
 
     actual val exists get() = android.exists()
 
     actual val key get() = android.key
+
+    actual val ref: DatabaseReference get() = DatabaseReference(android.ref, persistenceEnabled)
+
+    actual val value get() = android.value
 
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)
@@ -244,8 +249,9 @@ actual class DataSnapshot internal constructor(val android: com.google.firebase.
     actual fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
         decode(strategy, android.value, decodeSettings)
 
-    actual fun child(path: String) = DataSnapshot(android.child(path))
-    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it) }
+    actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
+    actual val hasChildren get() = android.hasChildren()
+    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
 }
 
 actual class OnDisconnect internal constructor(

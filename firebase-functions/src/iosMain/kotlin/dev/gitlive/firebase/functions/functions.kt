@@ -24,17 +24,21 @@ actual fun Firebase.functions(region: String) =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp))
+actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp)
+)
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions = FirebaseFunctions(FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region))
+actual fun Firebase.functions(
+    app: FirebaseApp,
+    region: String,
+): FirebaseFunctions = FirebaseFunctions(
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region)
+)
 
 actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
-
-    actual fun useFunctionsEmulator(origin: String): Unit = TODO("Come back to issue")
-        //ios.useFunctionsEmulatorOrigin(origin)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
