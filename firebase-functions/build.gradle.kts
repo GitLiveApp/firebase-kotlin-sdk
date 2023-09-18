@@ -59,7 +59,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseFunctions") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }

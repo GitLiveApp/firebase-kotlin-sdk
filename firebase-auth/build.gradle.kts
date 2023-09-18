@@ -74,7 +74,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseAuth") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -147,10 +147,6 @@ kotlin {
             dependencies {
                 dependsOn(commonTest)
             }
-        }
-
-        getByName("jvmMain") {
-            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

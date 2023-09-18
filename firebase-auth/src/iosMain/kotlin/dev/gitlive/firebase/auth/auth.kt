@@ -19,6 +19,7 @@ import platform.Foundation.*
 actual val Firebase.auth
     get() = FirebaseAuth(FIRAuth.auth())
 
+@Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
     FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp)
 )
