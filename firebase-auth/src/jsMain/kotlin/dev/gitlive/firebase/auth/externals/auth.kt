@@ -28,6 +28,8 @@ external fun fetchSignInMethodsForEmail(auth: Auth, email: String): Promise<Arra
 
 external fun getAuth(app: FirebaseApp? = definedExternally): Auth
 
+external fun initializeAuth(app: FirebaseApp? = definedExternally, deps: dynamic = definedExternally): Auth
+
 external fun getIdToken(user: User, forceRefresh: Boolean?): Promise<String>
 
 external fun getIdTokenResult(user: User, forceRefresh: Boolean?): Promise<IdTokenResult>
@@ -284,3 +286,14 @@ external interface ApplicationVerifier {
 external object TwitterAuthProvider : AuthProvider {
     fun credential(token: String, secret: String): AuthCredential
 }
+
+external interface Persistence {
+    val type: String
+}
+
+external val browserLocalPersistence: Persistence
+external val browserSessionPersistence: Persistence
+external val indexedDBLocalPersistence: Persistence
+external val inMemoryPersistence: Persistence
+
+external fun setPersistence(auth: Auth, persistence: Persistence): Promise<Unit>;
