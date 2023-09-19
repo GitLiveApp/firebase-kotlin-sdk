@@ -4,6 +4,6 @@
 
 package dev.gitlive.firebase
 
-expect fun nativeMapOf(vararg pairs: Pair<String, Any?>): Any
+expect fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any
 expect fun nativeListOf(vararg elements: Any): Any
 expect fun nativeAssertEquals(expected: Any?, actual: Any?)

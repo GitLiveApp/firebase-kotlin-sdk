@@ -43,6 +43,7 @@ expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
 expect fun Map<String, Any?>.asEncoded(): Any
 
 // NOTE: serializer<T>() does not work in a legacy JS so serializers have to be provided explicitly
+@IgnoreForAndroidUnitTest
 class FirebaseFirestoreTest {
 
     @Serializable
@@ -188,7 +189,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, ServerTimestampBehavior.NONE))
+        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, serverTimestampBehavior = ServerTimestampBehavior.NONE))
     }
 
     @Test
@@ -231,7 +232,7 @@ class FirebaseFirestoreTest {
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
         assertNotNull(pendingWritesSnapshot.get<BaseTimestamp?>("time", ServerTimestampBehavior.ESTIMATE))
-        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), ServerTimestampBehavior.ESTIMATE).time)
+        assertNotEquals(Timestamp.ServerTimestamp, pendingWritesSnapshot.data(FirestoreTimeTest.serializer(), serverTimestampBehavior = ServerTimestampBehavior.ESTIMATE).time)
     }
 
     @Test
@@ -249,7 +250,7 @@ class FirebaseFirestoreTest {
 
         val pendingWritesSnapshot = deferredPendingWritesSnapshot.await()
         assertTrue(pendingWritesSnapshot.metadata.hasPendingWrites)
-        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, ServerTimestampBehavior.PREVIOUS))
+        assertNull(pendingWritesSnapshot.get("time", BaseTimestamp.serializer().nullable, serverTimestampBehavior = ServerTimestampBehavior.PREVIOUS))
     }
 
     @Test
@@ -578,6 +579,65 @@ class FirebaseFirestoreTest {
         assertEquals("prop1-set", doc.get().data(FirestoreTest.serializer()).prop1)
     }
 
+
+    @Test
+    fun testLegacyDoubleTimestampWriteNewFormatRead() = runTest {
+        @Serializable
+        data class LegacyDocument(
+            @Serializable(with = DoubleAsTimestampSerializer::class)
+            val time: Double
+        )
+
+        @Serializable
+        data class NewDocument(
+            val time: Timestamp
+        )
+
+        val doc = Firebase.firestore
+            .collection("testLegacyDoubleTimestampEncodeDecode")
+            .document("testLegacy")
+
+        val ms = 12345678.0
+
+        doc.set(LegacyDocument.serializer(), LegacyDocument(time = ms))
+
+        val fetched: NewDocument = doc.get().data(NewDocument.serializer())
+        assertEquals(ms, fetched.time.toMilliseconds())
+    }
+
+    @Test
+    fun testQueryByTimestamp() = runTest {
+        @Serializable
+        data class DocumentWithTimestamp(
+            val time: Timestamp
+        )
+
+        val collection = Firebase.firestore
+            .collection("testQueryByTimestamp")
+
+        val timestamp = Timestamp.fromMilliseconds(1693262549000.0)
+
+        val pastTimestamp = Timestamp(timestamp.seconds - 60, 12345000) // note: iOS truncates 3 last digits of nanoseconds due to internal conversions
+        val futureTimestamp = Timestamp(timestamp.seconds + 60, 78910000)
+
+        collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(pastTimestamp))
+        collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(futureTimestamp))
+
+        val equalityQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            equalTo = pastTimestamp
+        ).get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+
+        assertEquals(setOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
+
+        val gtQueryResult = collection.where(
+            path = FieldPath(DocumentWithTimestamp::time.name),
+            greaterThan = timestamp
+        ).get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+
+        assertEquals(setOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
+    }
+
     private suspend fun setupFirestoreData() {
         Firebase.firestore.collection("testFirestoreQuerying")
             .document("one")
@@ -731,4 +791,7 @@ class FirebaseFirestoreTest {
         assertNull(deletedList)
     }
 
+    private suspend fun nonSkippedDelay(timeout: Long) = withContext(Dispatchers.Default) {
+        delay(timeout)
+    }
 }

@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -116,6 +116,7 @@ kotlin {
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 if (name.lowercase().contains("ios")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
                 }
             }
         }

@@ -55,7 +55,7 @@ object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializ
     toNativeValue = { value ->
         when(value) {
             serverTimestamp -> FieldValue.serverTimestamp.nativeValue
-            else -> Timestamp.fromMilliseconds(value)
+            else -> Timestamp.fromMilliseconds(value).nativeValue
         }
     },
     fromNativeValue = { value ->

@@ -127,6 +127,7 @@ subprojects {
                 "jvmTestImplementation"("junit:junit:4.13.2")
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidUnitTestImplementation"(kotlin("test-junit"))
             "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
             "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
             "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")

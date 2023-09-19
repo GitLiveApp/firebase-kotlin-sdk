@@ -13,10 +13,6 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-expect fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any
-expect fun nativeListOf(vararg elements: Any): Any
-expect fun nativeAssertEquals(expected: Any?, actual: Any?): Unit
-
 @Serializable
 object TestObject {
     val map = mapOf("key" to "value", "key2" to 12, "key3" to null)

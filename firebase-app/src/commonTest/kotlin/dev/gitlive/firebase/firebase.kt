@@ -4,8 +4,11 @@ import kotlin.test.Test
 
 expect val context: Any
 expect fun runTest(test: suspend () -> Unit)
+expect annotation class IgnoreForAndroidUnitTest()
 
 class FirebaseAppTest {
+    
+    @IgnoreForAndroidUnitTest
     @Test
     fun testInitialize() {
         Firebase.initialize(

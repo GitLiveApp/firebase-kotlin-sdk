@@ -24,3 +24,5 @@ private suspend fun awaitDatabaseConnection() = withContext(Dispatchers.Default)
         Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
     }
 }
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest

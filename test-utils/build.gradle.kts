@@ -9,7 +9,7 @@ version = "0.0.1"
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -43,6 +43,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
@@ -65,7 +70,7 @@ kotlin {
         iosSimulatorArm64()
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs()
         browser()
