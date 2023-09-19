@@ -14,7 +14,9 @@ import kotlin.test.BeforeTest
 expect val emulatorHost: String
 expect val context: Any
 expect fun runTest(test: suspend CoroutineScope.() -> Unit)
+expect annotation class IgnoreForAndroidUnitTest()
 
+@IgnoreForAndroidUnitTest
 class FirebaseStorageTest {
 
     @BeforeTest

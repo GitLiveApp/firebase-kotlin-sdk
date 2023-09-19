@@ -62,6 +62,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -120,6 +125,7 @@ kotlin {
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 if (name.lowercase().contains("ios")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
                 }
             }
         }

@@ -46,8 +46,13 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    androidTarget() {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {

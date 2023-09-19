@@ -19,7 +19,8 @@ actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest {
     test()
 }
 
-actual annotation class IgnoreForAndroidUnitTest()
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest
 
 private suspend fun awaitDatabaseConnection() = withContext(Dispatchers.Default) {
     withTimeout(5.seconds) {

@@ -51,6 +51,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
@@ -113,8 +118,10 @@ kotlin {
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 if (name.lowercase().contains("ios")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
                 }
             }
         }

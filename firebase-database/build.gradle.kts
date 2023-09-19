@@ -25,6 +25,7 @@ android {
 
     defaultConfig {
         minSdk = minSdkVersion
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -53,6 +54,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
@@ -131,6 +137,7 @@ kotlin {
                 implementation(project(":test-utils"))
             }
         }
+
         getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
@@ -154,12 +161,6 @@ kotlin {
             val iosTest by sourceSets.getting
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
-        }
-
-        getByName("jsMain") {
-            dependencies {
-                api(npm("firebase", "9.21.0"))
-            }
         }
     }
 }

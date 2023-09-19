@@ -21,4 +21,5 @@ actual fun runTest(test: suspend () -> Unit) = runBlocking {
     testRun.await()
 }
 
-actual annotation class IgnoreForAndroidUnitTest()
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest

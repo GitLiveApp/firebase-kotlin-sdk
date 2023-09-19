@@ -113,7 +113,8 @@ subprojects {
             "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
             "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
-            "commonTestImplementation"(kotlin("test"))
+            "commonTestImplementation"(kotlin("test-common"))
+            "commonTestImplementation"(kotlin("test-annotations-common"))
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
@@ -126,17 +127,12 @@ subprojects {
                 "jvmTestImplementation"("junit:junit:4.13.2")
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidUnitTestImplementation"(kotlin("test-junit"))
             "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
             "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
             "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
             "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
         }
-    }
-
-    // Workaround for setting kotlinOptions.jvmTarget
-    // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "11"
     }
 
     if (skipPublishing) return@subprojects

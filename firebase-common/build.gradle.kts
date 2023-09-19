@@ -31,6 +31,7 @@ android {
             isIncludeAndroidResources = true
         }
     }
+
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -45,6 +46,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
@@ -140,7 +146,7 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "9.21.0"))
+                api(npm("firebase", "10.4.0"))
             }
         }
 

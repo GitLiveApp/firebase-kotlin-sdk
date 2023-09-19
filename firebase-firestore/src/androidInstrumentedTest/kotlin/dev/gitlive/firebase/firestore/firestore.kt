@@ -15,4 +15,5 @@ actual val context: Any = InstrumentationRegistry.getInstrumentation().targetCon
 
 actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking { test() }
 
-actual annotation class IgnoreForAndroidUnitTest()
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest
