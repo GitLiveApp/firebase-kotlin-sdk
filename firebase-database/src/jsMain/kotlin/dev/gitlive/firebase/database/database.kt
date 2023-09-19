@@ -30,6 +30,7 @@ import dev.gitlive.firebase.database.externals.orderByChild as jsOrderByChild
 import dev.gitlive.firebase.database.externals.orderByKey as jsOrderByKey
 import dev.gitlive.firebase.database.externals.orderByValue as jsOrderByValue
 import dev.gitlive.firebase.database.externals.startAt as jsStartAt
+import dev.gitlive.firebase.database.externals.runTransaction as jsRunTransaction
 
 actual val Firebase.database
     get() = rethrow { FirebaseDatabase(getDatabase()) }
@@ -57,7 +58,7 @@ actual class FirebaseDatabase internal constructor(val js: Database) {
 
     actual fun reference(path: String) = rethrow { DatabaseReference(ref(js, path), js) }
     actual fun reference() = rethrow { DatabaseReference(ref(js), js) }
-    actual fun setPersistenceEnabled(enabled: Boolean) {}
+    actual fun setSettings(settings: Settings) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
 }
@@ -149,35 +150,20 @@ actual class DatabaseReference internal constructor(
     actual fun onDisconnect() = rethrow { OnDisconnect(onDisconnect(js), database) }
 
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
-        rethrow { update(js, encode(update, encodeDefaults) ?: json()).awaitWhileOnline(database) }
+        rethrow { update(js, encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
 
     actual suspend fun removeValue() = rethrow { remove(js).awaitWhileOnline(database) }
 
     actual suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings) = rethrow {
-        set(js, encode(value, encodeDefaults)).awaitWhileOnline(database)
+        set(js, encode(value, encodeSettings)).awaitWhileOnline(database)
     }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) =
-        rethrow { set(js, encode(strategy, value, encodeDefaults)).awaitWhileOnline(database) }
+        rethrow { set(js, encode(strategy, value, encodeSettings)).awaitWhileOnline(database) }
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        val deferred = CompletableDeferred<DataSnapshot>()
-        js.transaction(
-            transactionUpdate,
-            { error, _, snapshot ->
-                if (error != null) {
-                    deferred.completeExceptionally(error)
-                } else {
-                    deferred.complete(DataSnapshot(snapshot!!))
-                }
-            },
-            applyLocally = false
-        )
-        return deferred.await()
+        return DataSnapshot(jsRunTransaction(js, transactionUpdate).awaitWhileOnline(database).snapshot, database)
     }
-
-            DataSnapshot(result.snapshot, database)
-        }
 }
 
 actual class DataSnapshot internal constructor(
@@ -218,13 +204,13 @@ actual class OnDisconnect internal constructor(
     actual suspend fun cancel() =  rethrow { js.cancel().awaitWhileOnline(database) }
 
     actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
-        rethrow { js.update(encode(update, encodeDefaults) ?: json()).awaitWhileOnline(database) }
+        rethrow { js.update(encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
 
     actual suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings) =
-        rethrow { js.set(encode(value, encodeDefaults)).awaitWhileOnline(database) }
+        rethrow { js.set(encode(value, encodeSettings)).awaitWhileOnline(database) }
 
     actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) =
-        rethrow { js.set(encode(strategy, value, encodeDefaults)).awaitWhileOnline(database) }
+        rethrow { js.set(encode(strategy, value, encodeSettings)).awaitWhileOnline(database) }
 }
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause) {

@@ -13,18 +13,23 @@ plugins {
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.testUtils"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    packagingOptions {
+
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -36,17 +41,17 @@ android {
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
     }
 
     jvm {
-        val main by compilations.getting {
+        compilations.getByName("main") {
             kotlinOptions {
                 jvmTarget = "17"
             }
         }
-        val test by compilations.getting {
+        compilations.getByName("test") {
             kotlinOptions {
                 jvmTarget = "17"
             }
@@ -81,7 +86,7 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
+        getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 
@@ -94,7 +99,7 @@ kotlin {
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
-        val jsMain by getting {
+        getByName("jsMain") {
             dependencies {
                 implementation(kotlin("test-js"))
             }

@@ -95,7 +95,7 @@ external fun updatePassword(user: User, newPassword: String): Promise<Unit>
 
 external fun updatePhoneNumber(user: User, phoneCredential: AuthCredential): Promise<Unit>
 
-external fun updateProfile(user: User, profile: Json): Promise<Unit>
+external fun updateProfile(user: User, profile: ProfileUpdateRequest): Promise<Unit>
 
 external fun verifyBeforeUpdateEmail(
     user: User,

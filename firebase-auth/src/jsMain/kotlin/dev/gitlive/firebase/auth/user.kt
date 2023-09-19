@@ -6,7 +6,7 @@ import kotlin.js.Date
 import dev.gitlive.firebase.auth.externals.UserInfo as JsUserInfo
 import kotlin.js.json
 
-actual class FirebaseUser internal constructor(val js: firebase.user.User) : FirebaseUserProfile {
+actual class FirebaseUser internal constructor(val js: User) : FirebaseUserProfile {
     actual val uid: String
         get() = rethrow { js.uid }
     override val displayName: String?
@@ -29,8 +29,8 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) : Fir
         get() = rethrow { js.providerData.map { UserInfo(it) } }
     actual val providerId: String
         get() = rethrow { js.providerId }
-    actual suspend fun delete() = rethrow { js.delete().await() }
-    actual suspend fun reload() = rethrow { js.reload().await() }
+    actual suspend fun delete(): Unit = rethrow { js.delete().await() }
+    actual suspend fun reload(): Unit = rethrow { js.reload().await() }
     actual suspend fun getIdToken(forceRefresh: Boolean): String? = rethrow { js.getIdToken(forceRefresh).await() }
     actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = rethrow { AuthTokenResult(getIdTokenResult(js, forceRefresh).await()) }
     actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow { AuthResult( linkWithCredential(js, credential.js).await()) }
@@ -45,12 +45,12 @@ actual class FirebaseUser internal constructor(val js: firebase.user.User) : Fir
     actual suspend fun updateEmail(email: String) = rethrow { updateEmail(js, email).await() }
     actual suspend fun updatePassword(password: String) = rethrow { updatePassword(js, password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { updatePhoneNumber(js, credential.js).await() }
-    actual suspend fun updateProfile(displayName: String?, photoUrl: String?): Unit = rethrow {
-        val request = listOfNotNull(
-            displayName.takeUnless { it === UNCHANGED }?.let { "displayName" to it },
-            photoUrl.takeUnless { it === UNCHANGED }?.let { "photoURL" to it }
-        )
-        updateProfile(js, json(*request.toTypedArray())).await()
+    override suspend fun updateProfile(displayName: String?, photoUrl: String?): Unit = rethrow {
+        val request = object : ProfileUpdateRequest {
+            override val displayName: String? = displayName
+            override val photoURL: String? = photoUrl
+        }
+        updateProfile(js, request).await()
     }
     actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) = rethrow { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJson()).await() }
 }

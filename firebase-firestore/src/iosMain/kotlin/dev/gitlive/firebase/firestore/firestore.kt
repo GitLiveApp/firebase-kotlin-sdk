@@ -221,40 +221,6 @@ actual typealias NativeDocumentReference = FIRDocumentReference
 @Suppress("UNCHECKED_CAST")
 @Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
-    val ios: NativeDocumentReference = nativeValue
-
-@Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
-    val ios: NativeDocumentReference by ::nativeValue
-
-    actual val id: String
-        get() = ios.documentID
-
-    actual val path: String
-        get() = ios.path
-
-    actual val parent: CollectionReference
-        get() = CollectionReference(ios.parent)
-
-    override val async = Async(nativeValue)
-
-    actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
-
-    actual suspend fun get() =
-        DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
-
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
-            error?.let { close(error.toException()) }
-        }
-        awaitClose { listener.remove() }
-    }
-
-    override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && nativeValue == other.nativeValue
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
 
     class Async(@PublishedApi internal val ios: NativeDocumentReference) : BaseDocumentReference.Async() {
 
@@ -285,6 +251,32 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    val ios: NativeDocumentReference by ::nativeValue
+
+    actual val id: String
+        get() = ios.documentID
+
+    actual val path: String
+        get() = ios.path
+
+    actual val parent: CollectionReference
+        get() = CollectionReference(ios.parent)
+
+    override val async = Async(nativeValue)
+
+    actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
+
+    actual suspend fun get() =
+        DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
+
+    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
+        val listener = ios.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }

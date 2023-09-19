@@ -60,7 +60,7 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
     }
 
@@ -74,7 +74,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseAuth") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -82,23 +82,27 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
     jvm {
-        val main by compilations.getting {
+        compilations.getByName("main") {
             kotlinOptions {
                 jvmTarget = "17"
             }
@@ -114,6 +118,9 @@ kotlin {
                 this.languageVersion = languageVersion
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                }
             }
         }
 
@@ -136,10 +143,6 @@ kotlin {
             dependencies {
                 dependsOn(commonTest)
             }
-        }
-
-        val jvmMain by getting {
-            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

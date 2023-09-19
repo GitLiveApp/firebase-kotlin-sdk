@@ -44,17 +44,17 @@ android {
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
     }
 
     jvm {
-        val main by compilations.getting {
+        compilations.getByName("main") {
             kotlinOptions {
                 jvmTarget = "17"
             }
         }
-        val test by compilations.getting {
+        compilations.getByName("test") {
             kotlinOptions {
                 jvmTarget = "17"
             }
@@ -71,18 +71,22 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -114,13 +118,6 @@ kotlin {
             }
         }
 
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
-
         getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-common-ktx")
@@ -144,11 +141,11 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "9.21.0"))
+                api(npm("firebase", "10.4.0"))
             }
         }
 
-        val jvmMain by getting {
+        getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 

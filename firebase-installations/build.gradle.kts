@@ -45,17 +45,17 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
     }
 
     jvm {
-        val main by compilations.getting {
+        compilations.getByName("main") {
             kotlinOptions {
                 jvmTarget = "17"
             }
         }
-        val test by compilations.getting {
+        compilations.getByName("test") {
             kotlinOptions {
                 jvmTarget = "17"
             }
@@ -72,7 +72,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseInstallations") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -80,18 +80,22 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -127,7 +131,7 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
+        getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 

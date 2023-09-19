@@ -5,6 +5,23 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.firestore.externals.Firestore
+import dev.gitlive.firebase.firestore.externals.addDoc
+import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
+import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
+import dev.gitlive.firebase.firestore.externals.deleteDoc
+import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
+import dev.gitlive.firebase.firestore.externals.getDoc
+import dev.gitlive.firebase.firestore.externals.getDocs
+import dev.gitlive.firebase.firestore.externals.getFirestore
+import dev.gitlive.firebase.firestore.externals.onSnapshot
+import dev.gitlive.firebase.firestore.externals.orderBy
+import dev.gitlive.firebase.firestore.externals.query
+import dev.gitlive.firebase.firestore.externals.refEqual
+import dev.gitlive.firebase.firestore.externals.setDoc
+import dev.gitlive.firebase.firestore.externals.setLogLevel
+import dev.gitlive.firebase.firestore.externals.writeBatch
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -24,12 +41,14 @@ import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
 import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
-import dev.gitlive.firebase.firestore.externals.arrayRemove as jsArrayRemove
-import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
+import dev.gitlive.firebase.firestore.externals.collection as jsCollection
+import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
+import dev.gitlive.firebase.firestore.externals.disableNetwork as jsDisableNetwork
+import dev.gitlive.firebase.firestore.externals.enableNetwork as jsEnableNetwork
 import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
 import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
-import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 import dev.gitlive.firebase.firestore.externals.limit as jsLimit
+import dev.gitlive.firebase.firestore.externals.runTransaction as jsRunTransaction
 import dev.gitlive.firebase.firestore.externals.startAfter as jsStartAfter
 import dev.gitlive.firebase.firestore.externals.startAt as jsStartAt
 import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
@@ -41,7 +60,7 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { FirebaseFirestore(getFirestore(app.js)) }
 
-actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
+actual data class FirebaseFirestore(val jsFirestore: Firestore) {
 
     actual data class Settings(
         actual val sslEnabled: Boolean? = null,
@@ -58,11 +77,9 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     var js: Firestore = jsFirestore
         private set
 
-    actual fun document(documentPath: String) = rethrow { DocumentReference(js.doc(documentPath)) }
+    actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
-    actual fun collectionGroup(collectionId: String) = rethrow { Query(js.collectionGroup(collectionId)) }
-
-    actual fun batch() = rethrow { WriteBatch(js.batch()) }
+    actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
     actual fun batch() = rethrow { WriteBatch(writeBatch(js)) }
 
@@ -70,7 +87,7 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
         rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        rethrow { runTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
+        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
 
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }
@@ -79,7 +96,7 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
 
     actual fun setSettings(settings: Settings) {
         lastSettings = settings
-        if(settings.cacheSettings is LocalCacheSettings.Persistent) js.enablePersistence()
+        if(settings.cacheSettings is LocalCacheSettings.Persistent) enableIndexedDbPersistence(js)
 
         js.settings(json().apply {
             settings.sslEnabled?.let { set("ssl", it) }
@@ -100,11 +117,11 @@ actual data class FirebaseFirestore(val js: firebase.firestore.Firestore) {
     )
 
     actual suspend fun disableNetwork() {
-        rethrow { disableNetwork(js).await() }
+        rethrow { jsDisableNetwork(js).await() }
     }
 
     actual suspend fun enableNetwork() {
-        rethrow { enableNetwork(js).await() }
+        rethrow { jsEnableNetwork(js).await() }
     }
 }
 
@@ -115,7 +132,7 @@ val SetOptions.js: Json get() = when (this) {
     is SetOptions.MergeFieldPaths -> json("mergeFields" to encodedFieldPaths.toTypedArray())
 }
 
-actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch() {
+actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
 
     actual val async = Async(js)
 
@@ -184,12 +201,12 @@ actual class WriteBatch(val js: firebase.firestore.WriteBatch) : BaseWriteBatch(
     actual suspend fun commit() = rethrow { async.commit().await() }
 
     @Suppress("DeferredIsResult")
-    actual class Async(private val js: firebase.firestore.WriteBatch) {
+    actual class Async(private val js: JsWriteBatch) {
         actual fun commit() = rethrow { js.commit().asDeferred() }
     }
 }
 
-actual class Transaction(val js: firebase.firestore.Transaction) : BaseTransaction() {
+actual class Transaction(val js: JsTransaction) : BaseTransaction() {
 
     override fun setEncoded(
         documentRef: DocumentReference,
@@ -230,7 +247,7 @@ actual class Transaction(val js: firebase.firestore.Transaction) : BaseTransacti
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReference = firebase.firestore.DocumentReference
+actual typealias NativeDocumentReference = JsDocumentReference
 
 @Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
@@ -247,9 +264,9 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     override val async = Async(nativeValue)
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(js.collection(collectionPath)) }
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
 
-    actual suspend fun get() = rethrow { DocumentSnapshot(js.get().await()) }
+    actual suspend fun get() = rethrow { DocumentSnapshot( getDoc(js).await()) }
 
     actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
 
@@ -264,7 +281,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && nativeValue.isEqual(other.nativeValue)
+        this === other || other is DocumentReference && refEqual(nativeValue, other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
 
@@ -272,15 +289,15 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     class Async(@PublishedApi internal val js: NativeDocumentReference) : BaseDocumentReference.Async() {
 
         override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = rethrow {
-            js.set(encodedData, setOptions.js).asDeferred()
+            setDoc(js, encodedData, setOptions.js).asDeferred()
         }
 
-        override fun updateEncoded(encodedData: Any): Deferred<Unit> = rethrow { js.update(encodedData).asDeferred() }
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = rethrow { jsUpdate(js, encodedData).asDeferred() }
 
         override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
-                js.update(field, value, *moreFieldsAndValues)
+                jsUpdate(js, field, value, *moreFieldsAndValues)
             }
                 ?.asDeferred() ?: CompletableDeferred(Unit)
         }
@@ -288,12 +305,12 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
-                    js.update(field, value, *moreFieldsAndValues)
+                    jsUpdate(js, field, value, *moreFieldsAndValues)
                 }
                 ?.asDeferred() ?: CompletableDeferred(Unit)
         }
 
-        override fun delete() = rethrow { js.delete().asDeferred() }
+        override fun delete() = rethrow { deleteDoc(js).asDeferred() }
     }
 }
 
@@ -315,12 +332,12 @@ actual open class Query(open val js: JsQuery) {
     ) = rethrow {
         Query(
             when {
-                lessThan != null -> js.where(field, "<", lessThan)
-                greaterThan != null -> js.where(field, ">", greaterThan)
-                arrayContains != null -> js.where(field, "array-contains", arrayContains)
-                notEqualTo != null -> js.where(field, "!=", notEqualTo)
-                lessThanOrEqualTo != null -> js.where(field, "<=", lessThanOrEqualTo)
-                greaterThanOrEqualTo != null -> js.where(field, ">=", greaterThanOrEqualTo)
+                lessThan != null -> query(js, jsWhere(field, "<", lessThan))
+                greaterThan != null -> query(js, jsWhere(field, ">", greaterThan))
+                arrayContains != null -> query(js, jsWhere(field, "array-contains", arrayContains))
+                notEqualTo != null -> query(js, jsWhere(field, "!=", notEqualTo))
+                lessThanOrEqualTo != null -> query(js, jsWhere(field, "<=", lessThanOrEqualTo))
+                greaterThanOrEqualTo != null -> query(js, jsWhere(field, ">=", greaterThanOrEqualTo))
                 else -> js
             }
         )
@@ -332,12 +349,12 @@ actual open class Query(open val js: JsQuery) {
     ) = rethrow {
         Query(
             when {
-                lessThan != null -> js.where(path.js, "<", lessThan)
-                greaterThan != null -> js.where(path.js, ">", greaterThan)
-                arrayContains != null -> js.where(path.js, "array-contains", arrayContains)
-                notEqualTo != null -> js.where(path.js, "!=", notEqualTo)
-                lessThanOrEqualTo != null -> js.where(path.js, "<=", lessThanOrEqualTo)
-                greaterThanOrEqualTo != null -> js.where(path.js, ">=", greaterThanOrEqualTo)
+                lessThan != null -> query(js, jsWhere(path.js, "<", lessThan))
+                greaterThan != null -> query(js, jsWhere(path.js, ">", greaterThan))
+                arrayContains != null -> query(js, jsWhere(path.js, "array-contains", arrayContains))
+                notEqualTo != null -> query(js, jsWhere(path.js, "!=", notEqualTo))
+                lessThanOrEqualTo != null -> query(js, jsWhere(path.js, "<=", lessThanOrEqualTo))
+                greaterThanOrEqualTo != null -> query(js, jsWhere(path.js, ">=", greaterThanOrEqualTo))
                 else -> js
             }
         )
@@ -348,9 +365,9 @@ actual open class Query(open val js: JsQuery) {
     ) = rethrow {
         Query(
             when {
-                inArray != null -> js.where(field, "in", inArray.toTypedArray())
-                arrayContainsAny != null -> js.where(field, "array-contains-any", arrayContainsAny.toTypedArray())
-                notInArray != null -> js.where(field, "not-in", notInArray.toTypedArray())
+                inArray != null -> query(js, jsWhere(field, "in", inArray.toTypedArray()))
+                arrayContainsAny != null -> query(js, jsWhere(field, "array-contains-any", arrayContainsAny.toTypedArray()))
+                notInArray != null -> query(js, jsWhere(field, "not-in", notInArray.toTypedArray()))
                 else -> js
             }
         )
@@ -361,9 +378,9 @@ actual open class Query(open val js: JsQuery) {
     ) = rethrow {
         Query(
             when {
-                inArray != null -> js.where(path.js, "in", inArray.toTypedArray())
-                arrayContainsAny != null -> js.where(path.js, "array-contains-any", arrayContainsAny.toTypedArray())
-                notInArray != null -> js.where(path.js, "not-in", notInArray.toTypedArray())
+                inArray != null -> query(js, jsWhere(path.js, "in", inArray.toTypedArray()))
+                arrayContainsAny != null -> query(js, jsWhere(path.js, "array-contains-any", arrayContainsAny.toTypedArray()))
+                notInArray != null -> query(js, jsWhere(path.js, "not-in", notInArray.toTypedArray()))
                 else -> js
             }
         )
@@ -430,20 +447,20 @@ actual class CollectionReference(override val js: JsCollectionReference) : Query
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
     actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-        rethrow { DocumentReference(js.add(encode(data, encodeSettings)!!).await()) }
+        rethrow { DocumentReference(addDoc(js, encode(data, encodeSettings)!!).await()) }
     actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-        rethrow { DocumentReference(js.add(encode(strategy, data, encodeSettings)!!).await()) }
+        rethrow { DocumentReference(addDoc(js, encode(strategy, data, encodeSettings)!!).await()) }
 
     @Suppress("DeferredIsResult")
-    actual class Async(@PublishedApi internal val js: firebase.firestore.CollectionReference) {
+    actual class Async(@PublishedApi internal val js: JsCollectionReference) {
         actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
             rethrow {
-                js.add(encode(data, encodeSettings)!!).asDeferred()
+                addDoc(js, encode(data, encodeSettings)!!).asDeferred()
                     .convert(::DocumentReference)
             }
         actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
             rethrow {
-                js.add(encode(strategy, data, encodeSettings)!!).asDeferred()
+                addDoc(js, encode(strategy, data, encodeSettings)!!).asDeferred()
                     .convert(::DocumentReference)
             }
     }
@@ -507,14 +524,14 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
     actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
         js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
     })
-    actual val documentId: FieldPath get() = FieldPath(firebase.firestore.FieldPath.documentId)
+    actual val documentId: FieldPath get() = FieldPath(JsFieldPath.documentId)
     actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
 }
 
-actual typealias EncodedFieldPath = firebase.firestore.FieldPath
+actual typealias EncodedFieldPath = JsFieldPath
 
 //actual data class FirebaseFirestoreSettings internal constructor(
 //    val cacheSizeBytes: Number? = undefined,

@@ -18,7 +18,6 @@ import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
 import kotlinx.coroutines.CompletableDeferred
@@ -46,18 +45,26 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T =
 
 
 actual val Firebase.database
-        by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
+        by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }
 
 actual fun Firebase.database(url: String) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(url))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(url))
 
 actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
 
 actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
 actual class FirebaseDatabase private constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+
+    companion object {
+        private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
+
+        internal fun getInstance(
+            android: com.google.firebase.database.FirebaseDatabase
+        ) = instances.getOrPut(android) { dev.gitlive.firebase.database.FirebaseDatabase(android) }
+    }
 
     actual data class Settings(
         actual val persistenceEnabled: Boolean = false,

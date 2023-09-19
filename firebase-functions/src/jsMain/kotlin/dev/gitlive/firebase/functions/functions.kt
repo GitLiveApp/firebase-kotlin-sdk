@@ -33,7 +33,7 @@ actual class FirebaseFunctions internal constructor(val js: Functions) {
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class HttpsCallableReference internal constructor(val js: firebase.functions.HttpsCallable) : BaseHttpsCallableReference() {
+actual class HttpsCallableReference internal constructor(val js: HttpsCallable) : BaseHttpsCallableReference() {
 
     actual suspend operator fun invoke() =
         rethrow { HttpsCallableResult(js().await()) }
