@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.getDoc
 import dev.gitlive.firebase.firestore.externals.getDocs
 import dev.gitlive.firebase.firestore.externals.getFirestore
+import dev.gitlive.firebase.firestore.externals.initializeFirestore
 import dev.gitlive.firebase.firestore.externals.onSnapshot
 import dev.gitlive.firebase.firestore.externals.orderBy
 import dev.gitlive.firebase.firestore.externals.query
@@ -79,6 +80,8 @@ actual data class FirebaseFirestore(val jsFirestore: Firestore) {
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
+
     actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
     actual fun batch() = rethrow { WriteBatch(writeBatch(js)) }
@@ -98,18 +101,19 @@ actual data class FirebaseFirestore(val jsFirestore: Firestore) {
         lastSettings = settings
         if(settings.cacheSettings is LocalCacheSettings.Persistent) enableIndexedDbPersistence(js)
 
-        js.settings(json().apply {
+        val jsSettings = json().apply {
             settings.sslEnabled?.let { set("ssl", it) }
             settings.host?.let { set("host", it) }
             when (val cacheSettings = settings.cacheSettings) {
                 is LocalCacheSettings.Persistent -> cacheSettings.sizeBytes
-                is LocalCacheSettings.Memory -> when (val garbaseCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                is LocalCacheSettings.Memory -> when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
                     is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> null
-                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbaseCollectorSettings.sizeBytes
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbageCollectorSettings.sizeBytes
                 }
                 null -> null
             }?.let { set("cacheSizeBytes", it) }
-        })
+        }
+        js = initializeFirestore(js.app, jsSettings)
     }
 
     actual fun updateSettings(settings: Settings) = setSettings(

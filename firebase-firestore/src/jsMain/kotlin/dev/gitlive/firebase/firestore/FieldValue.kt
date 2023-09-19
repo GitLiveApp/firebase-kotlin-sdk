@@ -8,7 +8,7 @@ import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
 import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 
 /** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = dev.gitlive.firebase.firestore.externals.FieldValue
+typealias NativeFieldValue = dev.gitlive.firebase.firestore.externals.FieldValue
 
 /** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)

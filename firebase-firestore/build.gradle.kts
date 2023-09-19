@@ -144,10 +144,6 @@ kotlin {
             }
         }
 
-        getByName("jvmMain") {
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
-
         if (supportIosTarget) {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
