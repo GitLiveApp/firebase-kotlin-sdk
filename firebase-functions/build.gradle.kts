@@ -48,6 +48,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -115,7 +120,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
@@ -141,8 +150,6 @@ kotlin {
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        getByName("androidMain")
     }
 }
 

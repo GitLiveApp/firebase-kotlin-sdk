@@ -79,15 +79,17 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
-                implementation(kotlin("test"))
+                api(kotlin("test"))
             }
         }
 

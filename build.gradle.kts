@@ -88,11 +88,11 @@ subprojects {
 
         if (skipPublishing) return@tasks
 
-        val updateVersion by registering(Exec::class) {
+        register<Exec>("updateVersion") {
             commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
         }
 
-        val updateDependencyVersion by registering(Copy::class) {
+        register<Copy>("updateDependencyVersion") {
             mustRunAfter("updateVersion")
             val from = file("package.json")
             from.writeText(
@@ -119,7 +119,7 @@ subprojects {
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
                 "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.1")
-                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
+                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
                     exclude("com.google.android.gms")
                 }
                 "jsTestImplementation"(kotlin("test-js"))
@@ -197,18 +197,12 @@ subprojects {
         }
 
     }
-
-    // Workaround for setting kotlinOptions.jvmTarget
-    // See https://youtrack.jetbrains.com/issue/KT-55947/Unable-to-set-kapt-jvm-target-version
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "11"
-    }
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
 
     fun isNonStable(version: String): Boolean {
-        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase(java.util.Locale.ENGLISH).contains(it) }
         val versionMatch = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
 
         return (stableKeyword || versionMatch).not()

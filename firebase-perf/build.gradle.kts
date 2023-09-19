@@ -49,6 +49,11 @@ kotlin {
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
@@ -111,7 +116,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
