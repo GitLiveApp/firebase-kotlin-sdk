@@ -103,6 +103,9 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
 
+    val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+    }
 
     configure<PublishingExtension> {
 
@@ -118,6 +121,7 @@ subprojects {
 
         publications.all {
             this as MavenPublication
+            artifact(javadocJar)
 
             pom {
                 name.set("firebase-kotlin-sdk")
