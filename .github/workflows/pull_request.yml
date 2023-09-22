@@ -95,3 +95,10 @@ jobs:
         with:
           name: "Android Test Report HTML"
           path: "**/build/reports/androidTests/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "./test/*.log"
+
