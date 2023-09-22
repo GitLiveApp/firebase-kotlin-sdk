@@ -100,5 +100,5 @@ jobs:
         if: failure()
         with:
           name: "Firebase Debug Log"
-          path: "./test/*.log"
+          path: "**/firebase-debug.log"
 
