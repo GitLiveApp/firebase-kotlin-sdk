@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        api-level: [ 33 ]
+        api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
