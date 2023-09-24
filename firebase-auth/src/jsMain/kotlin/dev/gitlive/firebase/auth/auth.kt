@@ -165,6 +165,7 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause)
     "auth/network-request-failed" -> FirebaseNetworkException(code, cause)
+    "auth/timeout" -> FirebaseNetworkException(code, cause)
     "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause)
     "auth/invalid-credential",
     "auth/invalid-verification-code",
@@ -176,7 +177,6 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/invalid-email" -> FirebaseAuthEmailException(code, cause)
-
 //                "auth/app-deleted" ->
 //                "auth/app-not-authorized" ->
 //                "auth/argument-error" ->
