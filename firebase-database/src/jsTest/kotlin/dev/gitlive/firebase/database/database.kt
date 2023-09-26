@@ -24,7 +24,7 @@ actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest(t
 actual annotation class IgnoreForAndroidUnitTest
 
 private suspend fun awaitDatabaseConnection() = withContext(Dispatchers.Default) {
-    withTimeout(5.seconds) {
+    withTimeout(2.minutes) {
         Firebase.database.reference(".info/connected").valueEvents.first { it.value() }
     }
 }
