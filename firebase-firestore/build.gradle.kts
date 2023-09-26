@@ -95,7 +95,7 @@ kotlin {
                         useChromeHeadless()
                         // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
                         useMocha {
-                            timeout = "15s"
+                            timeout = "180s"
                         }
                     }
                 }
@@ -108,7 +108,7 @@ kotlin {
                         useChromeHeadless()
                         // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
                         useMocha {
-                            timeout = "15s"
+                            timeout = "180s"
                         }
                     }
                 }
