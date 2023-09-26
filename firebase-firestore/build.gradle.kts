@@ -93,6 +93,10 @@ kotlin {
                 Action {
                     useKarma {
                         useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "15s"
+                        }
                     }
                 }
             )
@@ -102,6 +106,10 @@ kotlin {
                 Action {
                     useKarma {
                         useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "15s"
+                        }
                     }
                 }
             )

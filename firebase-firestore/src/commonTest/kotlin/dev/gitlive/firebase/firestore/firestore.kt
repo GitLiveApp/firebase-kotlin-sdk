@@ -50,7 +50,7 @@ class FirebaseFirestoreTest {
     )
 
     @BeforeTest
-    fun initializeFirebase() = runTest {
+    fun initializeFirebase() {
         Firebase
             .takeIf { Firebase.apps(context).isEmpty() }
             ?.apply {
