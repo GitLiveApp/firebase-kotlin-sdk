@@ -23,8 +23,8 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
         getByName("androidTest") {
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+            java.srcDir(file("src/androidInstrumentedTest/kotlin"))
+            manifest.srcFile("src/androidInstrumentedTest/AndroidManifest.xml")
         }
     }
     testOptions {
@@ -94,10 +94,16 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting
 
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-crashlytics")
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 

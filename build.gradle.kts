@@ -7,8 +7,8 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.20" apply false
-    kotlin("native.cocoapods") version "1.8.20" apply false
+    kotlin("multiplatform") version "1.9.10" apply false
+    kotlin("native.cocoapods") version "1.9.10" apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -31,23 +31,6 @@ buildscript {
 
 val targetSdkVersion by extra(32)
 val minSdkVersion by extra(19)
-
-tasks {
-    val updateVersions by registering {
-        dependsOn(
-            "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
-            "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
-            "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion",
-            "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
-            "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
-            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
-            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion",
-            "firebase-storage:updateVersion", "firebase-storage:updateDependencyVersion"
-        )
-    }
-}
 
 subprojects {
 
@@ -85,23 +68,6 @@ subprojects {
                 )
             }
         }
-
-        if (skipPublishing) return@tasks
-
-        val updateVersion by registering(Exec::class) {
-            commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
-        }
-
-        val updateDependencyVersion by registering(Copy::class) {
-            mustRunAfter("updateVersion")
-            val from = file("package.json")
-            from.writeText(
-                from.readText()
-                    .replace("version\": \"([^\"]+)".toRegex(), "version\": \"${project.property("${project.name}.version")}")
-                    .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
-                    .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
-            )
-        }
     }
 
     afterEvaluate  {
@@ -123,11 +89,12 @@ subprojects {
                 "jvmTestImplementation"(kotlin("test-junit"))
                 "jvmTestImplementation"("junit:junit:4.13.2")
             }
-            "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13.2")
-            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
+            "androidUnitTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
+            "androidInstrumentedTestImplementation"("androidx.test:core:1.4.0")
+            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.3")
+            "androidInstrumentedTestImplementation"("androidx.test:runner:1.4.0")
         }
     }
 

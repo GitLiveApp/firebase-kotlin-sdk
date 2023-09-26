@@ -73,7 +73,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         nodejs {
             testTask {
                 useKarma {
@@ -105,10 +105,16 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting
 
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-installations")
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 

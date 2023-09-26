@@ -1,6 +1,4 @@
 @file:JsModule("firebase/database")
-@file:JsNonModule
-
 package dev.gitlive.firebase.database.externals
 
 import dev.gitlive.firebase.*

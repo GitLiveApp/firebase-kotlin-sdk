@@ -26,7 +26,7 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
         getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
+            java.srcDir(file("src/androidInstrumentedTest/kotlin"))
         }
     }
     testOptions {
@@ -94,7 +94,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         browser {
             testTask {
                 useKarma {
@@ -120,10 +120,16 @@ kotlin {
                 implementation(project(":firebase-common"))
             }
         }
+        val commonTest by getting
 
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-config")
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 

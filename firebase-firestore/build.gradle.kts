@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -24,8 +24,8 @@ android {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
         }
         getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
+            java.srcDir(file("src/androidInstrumentedTest/kotlin"))
+            manifest.srcFile("src/androidInstrumentedTest/AndroidManifest.xml")
         }
     }
     testOptions {
@@ -81,7 +81,7 @@ kotlin {
     }
 
     js {
-        useCommonJs()
+        useEsModules()
         nodejs {
             testTask {
                 useKarma {
@@ -125,6 +125,11 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("com.google.firebase:firebase-firestore")
+            }
+        }
+        val androidInstrumentedTest by getting {
+            dependencies {
+                dependsOn(commonTest)
             }
         }
 
