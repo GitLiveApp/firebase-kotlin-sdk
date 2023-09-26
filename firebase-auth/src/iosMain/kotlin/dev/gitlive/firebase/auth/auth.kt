@@ -8,12 +8,14 @@ import cocoapods.FirebaseAuth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.FirebaseNetworkException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.NSURL
 
 
 actual val Firebase.auth
@@ -210,6 +212,8 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeWebContextAlreadyPresented,
         FIRAuthErrorCodeWebContextCancelled,
         FIRAuthErrorCodeWebInternalError -> FirebaseAuthWebException(toString())
+
+        FIRAuthErrorCodeNetworkError -> FirebaseNetworkException(toString())
 
         else -> FirebaseAuthException(toString())
     }
