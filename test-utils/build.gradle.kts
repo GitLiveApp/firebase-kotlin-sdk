@@ -83,16 +83,20 @@ kotlin {
                 this.apiVersion = apiVersion
                 this.languageVersion = languageVersion
                 progressiveMode = true
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
+                }
             }
         }
 
         getByName("commonMain") {
             dependencies {
                 val coroutinesVersion: String by project
-                implementation(project(":firebase-app"))
                 api(kotlin("test"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+
             }
         }
 

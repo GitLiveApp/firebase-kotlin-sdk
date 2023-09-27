@@ -7,12 +7,9 @@ package dev.gitlive.firebase.crashlytics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.firebaseOptions
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.TestResult
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -31,7 +28,14 @@ class FirebaseCrashlyticsTest {
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
-            firebaseOptions
+            FirebaseOptions(
+                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                storageBucket = "fir-kotlin-sdk.appspot.com",
+                projectId = "fir-kotlin-sdk",
+                gcmSenderId = "846484016111"
+            )
         )
 
         crashlytics = Firebase.crashlytics(app)

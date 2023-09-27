@@ -3,7 +3,6 @@ package dev.gitlive.firebase.perf.metrics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.firebaseOptions
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.perf.FirebasePerformance
 import dev.gitlive.firebase.perf.context
@@ -15,7 +14,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class AndroidTraceTest {
@@ -26,7 +24,14 @@ class AndroidTraceTest {
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?:Firebase.initialize(
             dev.gitlive.firebase.perf.context,
-            firebaseOptions
+            FirebaseOptions(
+                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                storageBucket = "fir-kotlin-sdk.appspot.com",
+                projectId = "fir-kotlin-sdk",
+                gcmSenderId = "846484016111"
+            )
         )
 
         performance = Firebase.performance(app)
