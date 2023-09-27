@@ -7,7 +7,10 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.firebaseOptions
 import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -30,7 +33,6 @@ import kotlin.test.assertTrue
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend CoroutineScope.() -> Unit): TestResult
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
@@ -50,28 +52,22 @@ class FirebaseFirestoreTest {
         val time: BaseTimestamp?
     )
 
+    lateinit var firestore: FirebaseFirestore
+
     @BeforeTest
     fun initializeFirebase() {
-        Firebase
-            .takeIf { Firebase.apps(context).isEmpty() }
-            ?.apply {
-                initialize(
-                    context,
-                    FirebaseOptions(
-                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                        storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk",
-                        gcmSenderId = "846484016111"
-                    )
-                )
-                Firebase.firestore.useEmulator(emulatorHost, 8080)
-            }
+        val app = Firebase.apps(context).firstOrNull() ?:Firebase.initialize(
+            context,
+            firebaseOptions
+        )
+
+        firestore = Firebase.firestore(app).apply {
+            useEmulator(emulatorHost, 8080)
+        }
     }
 
     @AfterTest
-    fun deinitializeFirebase() {
+    fun deinitializeFirebase() = runBlockingTest {
         Firebase.apps(context).forEach {
             it.delete()
         }
@@ -80,7 +76,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testStringOrderBy() = runTest {
         setupFirestoreData()
-        val resultDocs = Firebase.firestore
+        val resultDocs = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1")
             .get()
@@ -95,7 +91,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderBy() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+        val resultDocs = firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1")).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -107,7 +103,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+        val resultDocs = firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -119,7 +115,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByAscending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+        val resultDocs = firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.ASCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("aaa", resultDocs[0].get("prop1"))
@@ -131,7 +127,7 @@ class FirebaseFirestoreTest {
     fun testStringOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+        val resultDocs = firestore.collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -143,7 +139,7 @@ class FirebaseFirestoreTest {
     fun testFieldOrderByDescending() = runTest {
         setupFirestoreData()
 
-        val resultDocs = Firebase.firestore.collection("testFirestoreQuerying")
+        val resultDocs = firestore.collection("testFirestoreQuerying")
             .orderBy(FieldPath("prop1"), Direction.DESCENDING).get().documents
         assertEquals(3, resultDocs.size)
         assertEquals("ccc", resultDocs[0].get("prop1"))
@@ -153,7 +149,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testServerTimestampFieldValue() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testServerTimestampFieldValue")
             .document("test")
 
@@ -165,7 +161,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testServerTimestampBehaviorNone() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testServerTimestampBehaviorNone")
             .document("test${Random.nextInt()}")
 
@@ -186,7 +182,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testServerTimestampBehaviorEstimate() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testServerTimestampBehaviorEstimate")
             .document("test${Random.nextInt()}")
 
@@ -205,7 +201,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testServerTimestampBehaviorPrevious() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testServerTimestampBehaviorPrevious")
             .document("test${Random.nextInt()}")
 
@@ -223,13 +219,13 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testDocumentAutoId() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testDocumentAutoId")
             .document
 
         doc.set(FirestoreTest.serializer(), FirestoreTest("AutoId"))
 
-        val resultDoc = Firebase.firestore
+        val resultDoc = firestore
             .collection("testDocumentAutoId")
             .document(doc.id)
             .get()
@@ -241,7 +237,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testStartAfterDocumentSnapshot() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -261,7 +257,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testStartAfterFieldValues() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -279,7 +275,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testStartAtDocumentSnapshot() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -300,7 +296,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testStartAtFieldValues() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -319,7 +315,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testEndBeforeDocumentSnapshot() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -339,7 +335,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testEndBeforeFieldValues() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -357,7 +353,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testEndAtDocumentSnapshot() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -378,7 +374,7 @@ class FirebaseFirestoreTest {
     @Test
     fun testEndAtFieldValues() = runTest {
         setupFirestoreData()
-        val query = Firebase.firestore
+        val query = firestore
             .collection("testFirestoreQuerying")
             .orderBy("prop1", Direction.ASCENDING)
 
@@ -396,7 +392,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testIncrementFieldValue() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testFirestoreIncrementFieldValue")
             .document("test1")
 
@@ -411,7 +407,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testArrayUnion() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testFirestoreArrayUnion")
             .document("test1")
 
@@ -426,7 +422,7 @@ class FirebaseFirestoreTest {
 
     @Test
     fun testArrayRemove() = runTest {
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testFirestoreArrayRemove")
             .document("test1")
 
@@ -447,7 +443,7 @@ class FirebaseFirestoreTest {
             val time: Double?
         )
 
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testLegacyDoubleTimestamp")
             .document("test${Random.nextInt()}")
 
@@ -477,7 +473,7 @@ class FirebaseFirestoreTest {
             val time: Timestamp
         )
 
-        val doc = Firebase.firestore
+        val doc = firestore
             .collection("testLegacyDoubleTimestampEncodeDecode")
             .document("testLegacy")
 
@@ -496,7 +492,7 @@ class FirebaseFirestoreTest {
             val time: Timestamp
         )
 
-        val collection = Firebase.firestore
+        val collection = firestore
             .collection("testQueryByTimestamp")
 
         val timestamp = Timestamp.fromMilliseconds(1693262549000.0)
@@ -523,13 +519,13 @@ class FirebaseFirestoreTest {
     }
 
     private suspend fun setupFirestoreData() {
-        Firebase.firestore.collection("testFirestoreQuerying")
+        firestore.collection("testFirestoreQuerying")
             .document("one")
             .set(FirestoreTest.serializer(), FirestoreTest("aaa"))
-        Firebase.firestore.collection("testFirestoreQuerying")
+        firestore.collection("testFirestoreQuerying")
             .document("two")
             .set(FirestoreTest.serializer(), FirestoreTest("bbb"))
-        Firebase.firestore.collection("testFirestoreQuerying")
+        firestore.collection("testFirestoreQuerying")
             .document("three")
             .set(FirestoreTest.serializer(), FirestoreTest("ccc"))
     }

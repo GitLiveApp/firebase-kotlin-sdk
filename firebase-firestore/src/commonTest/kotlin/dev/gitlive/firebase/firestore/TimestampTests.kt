@@ -5,6 +5,7 @@ import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firebaseSerializer
 import dev.gitlive.firebase.nativeAssertEquals
 import dev.gitlive.firebase.nativeMapOf
+import dev.gitlive.firebase.runTest
 import kotlinx.serialization.Serializable
 import kotlin.test.*
 import kotlin.time.Duration.Companion.milliseconds

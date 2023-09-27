@@ -88,7 +88,11 @@ kotlin {
 
         getByName("commonMain") {
             dependencies {
+                val coroutinesVersion: String by project
+                implementation(project(":firebase-app"))
                 api(kotlin("test"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             }
         }
 

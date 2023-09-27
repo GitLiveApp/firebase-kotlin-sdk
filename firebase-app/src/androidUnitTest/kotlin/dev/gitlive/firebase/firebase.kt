@@ -9,8 +9,6 @@ import org.junit.Ignore
 
 actual val context: Any = ""
 
-actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest { test() }
-
 // Tests are to be run on AndroidInstrumentedTests.
 // Kotlin 1.8 does not allow us to remove the commonTest dependency from AndroidUnitTest
 // Therefore we just wont run them

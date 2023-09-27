@@ -3,9 +3,13 @@ package dev.gitlive.firebase.perf.metrics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.firebaseOptions
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.perf.FirebasePerformance
+import dev.gitlive.firebase.perf.context
 import dev.gitlive.firebase.perf.performance
+import dev.gitlive.firebase.runBlockingTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,25 +20,19 @@ class JsTraceTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        Firebase
-            .takeIf { Firebase.apps(dev.gitlive.firebase.perf.context).isEmpty() }
-            ?.apply {
-                initialize(
-                    dev.gitlive.firebase.perf.context,
-                    FirebaseOptions(
-                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                        storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk",
-                        gcmSenderId = "846484016111"
-                    )
-                )
-            }
+        val app = Firebase.apps(context).firstOrNull() ?:Firebase.initialize(
+            dev.gitlive.firebase.perf.context,
+            firebaseOptions
+        )
 
-        performance = Firebase.performance
+        performance = Firebase.performance(app)
+    }
 
-
+    @AfterTest
+    fun deinitializeFirebase() = runBlockingTest {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test

@@ -1,18 +1,22 @@
 package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.*
 import kotlin.test.*
+import kotlin.time.Duration.Companion.minutes
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit): TestResult
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
 class FirebaseDatabaseTest {
+
+    lateinit var database: FirebaseDatabase
 
     @Serializable
     data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
@@ -22,26 +26,18 @@ class FirebaseDatabaseTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        Firebase
-            .takeIf { Firebase.apps(context).isEmpty() }
-            ?.apply {
-                initialize(
-                    context,
-                    FirebaseOptions(
-                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                        databaseUrl = "http://fir-kotlin-sdk.firebaseio.com",
-                        storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk",
-                        gcmSenderId = "846484016111"
-                    )
-                )
-                Firebase.database.useEmulator(emulatorHost, 9000)
-            }
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+            context,
+            firebaseOptions
+        )
+
+        database = Firebase.database(app).apply {
+            useEmulator(emulatorHost, 9000)
+        }
     }
 
     @AfterTest
-    fun deinitializeFirebase() {
+    fun deinitializeFirebase() = runBlockingTest {
         Firebase.apps(context).forEach {
             it.delete()
         }
@@ -49,8 +45,9 @@ class FirebaseDatabaseTest {
 
     @Test
     fun testSetValue() = runTest {
+        ensureDatabaseConnected()
         val testValue = "test"
-        val testReference = Firebase.database.reference("testPath")
+        val testReference = database.reference("testPath")
 
         testReference.setValue(testValue)
 
@@ -65,7 +62,7 @@ class FirebaseDatabaseTest {
     @Test
     fun testChildCount() = runTest {
         setupRealtimeData()
-        val dataSnapshot = Firebase.database
+        val dataSnapshot = database
             .reference("FirebaseRealtimeDatabaseTest")
             .valueEvents
             .first()
@@ -77,7 +74,7 @@ class FirebaseDatabaseTest {
 //    @Test
 //    fun testBasicIncrementTransaction() = runTest {
 //        val data = DatabaseTest("PostOne", 2)
-//        val userRef = Firebase.database.reference("users/user_1/post_id_1")
+//        val userRef = database.reference("users/user_1/post_id_1")
 //        setupDatabase(userRef, data, DatabaseTest.serializer())
 //
 //        // Check database before transaction
@@ -100,7 +97,7 @@ class FirebaseDatabaseTest {
 //    @Test
 //    fun testBasicDecrementTransaction() = runTest {
 //        val data = DatabaseTest("PostTwo", 2)
-//        val userRef = Firebase.database.reference("users/user_1/post_id_2")
+//        val userRef = database.reference("users/user_1/post_id_2")
 //        setupDatabase(userRef, data, DatabaseTest.serializer())
 //
 //        // Check database before transaction
@@ -122,7 +119,8 @@ class FirebaseDatabaseTest {
 
     @Test
     fun testSetServerTimestamp() = runTest {
-        val testReference = Firebase.database.reference("testSetServerTimestamp")
+        ensureDatabaseConnected()
+        val testReference = database.reference("testSetServerTimestamp")
 
         testReference.setValue(ServerValue.TIMESTAMP)
 
@@ -136,7 +134,8 @@ class FirebaseDatabaseTest {
 
     @Test
     fun testIncrement() = runTest {
-        val testReference = Firebase.database.reference("testIncrement")
+        ensureDatabaseConnected()
+        val testReference = database.reference("testIncrement")
 
         testReference.setValue(2.0)
 
@@ -157,7 +156,8 @@ class FirebaseDatabaseTest {
     }
 
     private suspend fun setupRealtimeData() {
-        val firebaseDatabaseTestReference = Firebase.database
+        ensureDatabaseConnected()
+        val firebaseDatabaseTestReference = database
             .reference("FirebaseRealtimeDatabaseTest")
 
         val firebaseDatabaseChildTest1 = FirebaseDatabaseChildTest("aaa")
@@ -169,18 +169,18 @@ class FirebaseDatabaseTest {
         firebaseDatabaseTestReference.child("3").setValue(firebaseDatabaseChildTest3)
     }
 
-    private fun cleanUp() {
-        Firebase
-            .takeIf { Firebase.apps(context).isNotEmpty() }
-            ?.apply { app.delete() }
-    }
-
     private suspend fun <T> setupDatabase(ref: DatabaseReference, data: T, strategy: SerializationStrategy<T>) {
         try {
             ref.setValue(strategy, data)
         } catch (err: DatabaseException) {
             println(err)
             throw err
+        }
+    }
+
+    private suspend fun ensureDatabaseConnected() = withContext(Dispatchers.Default.limitedParallelism(1)) {
+        withTimeout(2.minutes) {
+            database.reference(".info/connected").valueEvents.first { it.value() }
         }
     }
 }
