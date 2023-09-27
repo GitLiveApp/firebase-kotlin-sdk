@@ -197,7 +197,7 @@ subprojects {
         }
 
     }
-    
+
     tasks.withType(AbstractPublishToMaven::class.java).configureEach {
         dependsOn(tasks.withType(Sign::class.java))
     }
