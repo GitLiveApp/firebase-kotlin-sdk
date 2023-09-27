@@ -50,6 +50,9 @@ class FirebaseRemoteConfigTest {
     @AfterTest
     fun tearDown() = runTest {
         Firebase.remoteConfig.reset()
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test

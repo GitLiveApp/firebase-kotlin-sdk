@@ -39,6 +39,13 @@ class FirebasePerformanceTest {
             }
     }
 
+    @AfterTest
+    fun deinitializeFirebase() {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
+    }
+
     @Test
     fun testNewTrace() = runTest {
 

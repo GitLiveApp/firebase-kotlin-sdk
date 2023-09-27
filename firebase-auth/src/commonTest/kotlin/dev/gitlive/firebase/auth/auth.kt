@@ -37,6 +37,13 @@ class FirebaseAuthTest {
             }
     }
 
+    @AfterTest
+    fun deinitializeFirebase() {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
+    }
+
     @Test
     fun testSignInWithUsernameAndPassword() = runTest {
         val uid = getTestUid("test@test.com", "test123")

@@ -40,6 +40,13 @@ class FirebaseDatabaseTest {
             }
     }
 
+    @AfterTest
+    fun deinitializeFirebase() {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
+    }
+
     @Test
     fun testSetValue() = runTest {
         val testValue = "test"

@@ -10,6 +10,7 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestResult
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -39,6 +40,13 @@ class FirebaseCrashlyticsTest {
                     )
                 )
             }
+    }
+
+    @AfterTest
+    fun deinitializeFirebase() {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test

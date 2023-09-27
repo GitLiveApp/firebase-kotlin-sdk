@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.nullable
 import kotlin.random.Random
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -67,6 +68,13 @@ class FirebaseFirestoreTest {
                 )
                 Firebase.firestore.useEmulator(emulatorHost, 8080)
             }
+    }
+
+    @AfterTest
+    fun deinitializeFirebase() {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test
