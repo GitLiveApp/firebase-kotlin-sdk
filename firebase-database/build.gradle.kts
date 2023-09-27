@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 repositories {
@@ -25,6 +25,7 @@ android {
 
     defaultConfig {
         minSdk = minSdkVersion
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -51,8 +52,26 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+
+    jvm {
+        compilations.getByName("main") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        compilations.getByName("test") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -65,7 +84,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseDatabase") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -73,18 +92,22 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useMocha {
-                    timeout = "5s"
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useMocha {
-                    timeout = "5s"
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -109,12 +132,19 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-database-ktx")
             }
+        }
+        getByName("jvmMain") {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         getByName("androidInstrumentedTest") {
@@ -130,12 +160,6 @@ kotlin {
             val iosTest by sourceSets.getting
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
-        }
-
-        getByName("jsMain") {
-            dependencies {
-                api(npm("firebase", "9.21.0"))
-            }
         }
     }
 }
@@ -158,4 +182,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
-

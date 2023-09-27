@@ -19,6 +19,7 @@ import com.google.firebase.firestore.ktx.persistentCacheSettings
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
@@ -247,8 +248,7 @@ actual typealias NativeDocumentReference = com.google.firebase.firestore.Documen
 
 @Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
-    val android: NativeDocumentReference = nativeValue
-
+    val android: NativeDocumentReference by ::nativeValue
     actual val id: String
         get() = android.id
 
@@ -265,8 +265,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual suspend fun get() =
         DocumentSnapshot(android.get().await())
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val listener = android.addSnapshotListener { snapshot, exception ->
+    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
             snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
             exception?.let { close(exception) }
         }

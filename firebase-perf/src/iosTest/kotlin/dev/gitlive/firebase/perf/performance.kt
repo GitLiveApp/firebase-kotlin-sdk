@@ -22,3 +22,5 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     }
     testRun.await()
 }
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest

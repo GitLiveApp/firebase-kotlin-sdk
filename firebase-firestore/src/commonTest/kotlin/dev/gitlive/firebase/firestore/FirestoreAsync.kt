@@ -9,6 +9,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @IgnoreJs
+@IgnoreForAndroidUnitTest
 class FirestoreAsync {
 
     @BeforeTest

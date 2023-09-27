@@ -1,10 +1,14 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.firebase
+import dev.gitlive.firebase.firestore.externals.deleteField
 import kotlinx.serialization.Serializable
+import dev.gitlive.firebase.firestore.externals.serverTimestamp as jsServerTimestamp
+import dev.gitlive.firebase.firestore.externals.arrayRemove as jsArrayRemove
+import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
+import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 
 /** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = firebase.firestore.FieldValue
+typealias NativeFieldValue = dev.gitlive.firebase.firestore.externals.FieldValue
 
 /** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
@@ -19,10 +23,10 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     override fun toString(): String = nativeValue.toString()
 
     actual companion object {
-        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(NativeFieldValue.serverTimestamp()) }
-        actual val delete: FieldValue get() = rethrow { FieldValue(NativeFieldValue.delete()) }
-        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(firebase.firestore.FieldValue.increment(value)) }
-        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayUnion(*elements)) }
-        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(NativeFieldValue.arrayRemove(*elements)) }
+        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(jsServerTimestamp()) }
+        actual val delete: FieldValue get() = rethrow { FieldValue(deleteField()) }
+        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(jsIncrement(value)) }
+        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayUnion(*elements)) }
+        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayRemove(*elements)) }
     }
 }

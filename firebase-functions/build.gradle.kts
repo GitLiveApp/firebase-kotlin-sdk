@@ -19,6 +19,7 @@ android {
 
     defaultConfig {
         minSdk = minSdkVersion
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -45,8 +46,13 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -59,7 +65,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseFunctions") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -67,17 +73,29 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
+            )
+        }
+    }
+
+    jvm {
+        compilations.getByName("main") {
+            kotlinOptions {
+                jvmTarget = "17"
             }
         }
     }
@@ -102,7 +120,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
@@ -116,6 +138,10 @@ kotlin {
             }
         }
 
+        getByName("jvmMain") {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
         if (supportIosTarget) {
             val iosMain by getting
             val iosSimulatorArm64Main by getting
@@ -124,8 +150,6 @@ kotlin {
             val iosSimulatorArm64Test by getting
             iosSimulatorArm64Test.dependsOn(iosTest)
         }
-
-        getByName("androidMain")
     }
 }
 

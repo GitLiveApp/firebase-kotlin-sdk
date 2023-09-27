@@ -51,7 +51,7 @@ class AndroidTraceTest {
 
         assertEquals(3, attributes.size)
 
-        attributes.onEachIndexed { index, entry ->
+        attributes.onEachIndexed { _, entry ->
 
             assertEquals(entry.key.last(), entry.value.last())
         }

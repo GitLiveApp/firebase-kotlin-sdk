@@ -8,6 +8,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
+import kotlinx.coroutines.test.TestResult
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
@@ -15,8 +16,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit)
+expect fun runTest(test: suspend () -> Unit): TestResult
+expect annotation class IgnoreForAndroidUnitTest()
 
+@IgnoreForAndroidUnitTest
 class FirebaseRemoteConfigTest {
     private val defaults = arrayOf(
         "test_default_boolean" to true,

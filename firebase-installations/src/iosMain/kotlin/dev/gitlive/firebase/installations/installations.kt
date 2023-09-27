@@ -11,7 +11,9 @@ actual val Firebase.installations
     get() = FirebaseInstallations(FIRInstallations.installations())
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.installations(app: FirebaseApp) : FirebaseInstallations = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp))
+actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(
+    FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp)
+)
 
 actual class FirebaseInstallations internal constructor(val ios: FIRInstallations) {
 

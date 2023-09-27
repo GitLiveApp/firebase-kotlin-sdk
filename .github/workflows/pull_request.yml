@@ -9,10 +9,10 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13
     strategy:
       matrix:
-        api-level: [ 33 ]
+        api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
@@ -39,8 +39,6 @@ jobs:
         run: npm install -g firebase-tools
       - name: Start Firebase emulator
         run: "firebase emulators:start --config=./test/firebase.json &"
-      - name: Assemble
-        run: ./gradlew assemble
       - name: Run JS Tests
         run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
@@ -95,3 +93,10 @@ jobs:
         with:
           name: "Android Test Report HTML"
           path: "**/build/reports/androidTests/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"
+

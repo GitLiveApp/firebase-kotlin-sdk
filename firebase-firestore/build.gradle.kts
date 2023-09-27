@@ -8,7 +8,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -49,8 +49,26 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+
+    jvm {
+        compilations.getByName("main") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        compilations.getByName("test") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -63,7 +81,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseFirestore") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -71,18 +89,30 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "180s"
+                        }
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "180s"
+                        }
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -97,6 +127,10 @@ kotlin {
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
+                }
             }
         }
         getByName("commonMain") {
@@ -106,7 +140,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {

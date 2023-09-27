@@ -13,6 +13,7 @@ import dev.gitlive.firebase.encode
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.jvm.JvmName
@@ -167,14 +168,14 @@ fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
-fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*fieldValues)
+fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.mapNotNull { it.value }.toTypedArray()))
 fun Query.startAt(document: DocumentSnapshot) = _startAt(document)
-fun Query.startAt(vararg fieldValues: Any) = _startAt(*fieldValues)
+fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.mapNotNull { it.value }.toTypedArray()))
 
 fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
-fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*fieldValues)
+fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.mapNotNull { it.value }.toTypedArray()))
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
-fun Query.endAt(vararg fieldValues: Any) = _endAt(*fieldValues)
+fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.mapNotNull { it.value }.toTypedArray()))
 
 abstract class BaseWriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) =
@@ -310,6 +311,7 @@ expect class DocumentReference internal constructor(nativeValue: NativeDocumentR
     val path: String
     val snapshots: Flow<DocumentSnapshot>
     val parent: CollectionReference
+    fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot>
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot

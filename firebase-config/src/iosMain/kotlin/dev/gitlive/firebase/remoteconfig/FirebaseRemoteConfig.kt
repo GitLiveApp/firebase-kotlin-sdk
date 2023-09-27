@@ -20,7 +20,9 @@ actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfigWithApp(app.ios as objcnames.classes.FIRApp))
+actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
+    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp)
+)
 
 actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
     actual val all: Map<String, FirebaseRemoteConfigValue>

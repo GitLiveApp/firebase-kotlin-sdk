@@ -5,13 +5,16 @@
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.*
+import kotlinx.coroutines.test.TestResult
 import kotlin.random.Random
 import kotlin.test.*
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit)
+expect fun runTest(test: suspend () -> Unit): TestResult
+expect annotation class IgnoreForAndroidUnitTest()
 
+@IgnoreForAndroidUnitTest
 class FirebaseAuthTest {
 
     @BeforeTest

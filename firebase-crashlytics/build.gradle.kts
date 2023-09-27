@@ -47,9 +47,27 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
+
+//    jvm {
+//        compilations.getByName("main") {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//        compilations.getByName("test") {
+//            kotlinOptions {
+//                jvmTarget = "17"
+//            }
+//        }
+//    }
 
     if (supportIosTarget) {
         ios()
@@ -61,7 +79,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseCrashlytics") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -85,7 +103,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
@@ -98,6 +120,10 @@ kotlin {
                 dependsOn(commonTest)
             }
         }
+
+//        getByName("jvmMain") {
+//            kotlin.srcDir("src/androidMain/kotlin")
+//        }
 
         if (supportIosTarget) {
             val iosMain by getting

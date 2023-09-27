@@ -5,18 +5,21 @@
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.auth.externals.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
+import dev.gitlive.firebase.auth.externals.AuthResult as JsAuthResult
 
 actual val Firebase.auth
-    get() = rethrow { dev.gitlive.firebase.auth; FirebaseAuth(firebase.auth()) }
+    get() = rethrow { FirebaseAuth(getAuth()) }
 
 actual fun Firebase.auth(app: FirebaseApp) =
-    rethrow { dev.gitlive.firebase.auth; FirebaseAuth(firebase.auth(app.js)) }
+    rethrow { FirebaseAuth(getAuth(app.js)) }
 
-actual data class FirebaseAuth internal constructor(val js: firebase.auth.Auth) {
+actual class FirebaseAuth internal constructor(val js: Auth) {
 
     actual val currentUser: FirebaseUser?
         get() = rethrow { js.currentUser?.let { FirebaseUser(it) } }
@@ -39,47 +42,47 @@ actual data class FirebaseAuth internal constructor(val js: firebase.auth.Auth) 
         get() = js.languageCode ?: ""
         set(value) { js.languageCode = value }
 
-    actual suspend fun applyActionCode(code: String) = rethrow { js.applyActionCode(code).await() }
-    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow { js.confirmPasswordReset(code, newPassword).await() }
+    actual suspend fun applyActionCode(code: String) = rethrow { applyActionCode(js, code).await() }
+    actual suspend fun confirmPasswordReset(code: String, newPassword: String) = rethrow { confirmPasswordReset(js, code, newPassword).await() }
 
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
-        rethrow { AuthResult(js.createUserWithEmailAndPassword(email, password).await()) }
+        rethrow { AuthResult(createUserWithEmailAndPassword(js, email, password).await()) }
 
-    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = rethrow { js.fetchSignInMethodsForEmail(email).await().asList() }
+    actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = rethrow { fetchSignInMethodsForEmail(js, email).await().asList() }
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) =
-        rethrow { js.sendPasswordResetEmail(email, actionCodeSettings?.toJson()).await() }
+        rethrow { sendPasswordResetEmail(js, email, actionCodeSettings?.toJson()).await() }
 
     actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings) =
-        rethrow { js.sendSignInLinkToEmail(email, actionCodeSettings.toJson()).await() }
+        rethrow { sendSignInLinkToEmail(js, email, actionCodeSettings.toJson()).await() }
 
-    actual fun isSignInWithEmailLink(link: String) = rethrow { js.isSignInWithEmailLink(link) }
+    actual fun isSignInWithEmailLink(link: String) = rethrow { isSignInWithEmailLink(js, link) }
 
     actual suspend fun signInWithEmailAndPassword(email: String, password: String) =
-        rethrow { AuthResult(js.signInWithEmailAndPassword(email, password).await()) }
+        rethrow { AuthResult(signInWithEmailAndPassword(js, email, password).await()) }
 
     actual suspend fun signInWithCustomToken(token: String) =
-        rethrow { AuthResult(js.signInWithCustomToken(token).await()) }
+        rethrow { AuthResult(signInWithCustomToken(js, token).await()) }
 
     actual suspend fun signInAnonymously() =
-        rethrow { AuthResult(js.signInAnonymously().await()) }
+        rethrow { AuthResult(signInAnonymously(js).await()) }
 
     actual suspend fun signInWithCredential(authCredential: AuthCredential) =
-        rethrow { AuthResult(js.signInWithCredential(authCredential.js).await()) }
+        rethrow { AuthResult(signInWithCredential(js, authCredential.js).await()) }
 
     actual suspend fun signInWithEmailLink(email: String, link: String) =
-        rethrow { AuthResult(js.signInWithEmailLink(email, link).await()) }
+        rethrow { AuthResult(signInWithEmailLink(js, email, link).await()) }
 
-    actual suspend fun signOut() = rethrow { js.signOut().await() }
+    actual suspend fun signOut() = rethrow { signOut(js).await() }
 
     actual suspend fun updateCurrentUser(user: FirebaseUser) =
-        rethrow { js.updateCurrentUser(user.js).await() }
+        rethrow { updateCurrentUser(js, user.js).await() }
 
     actual suspend fun verifyPasswordResetCode(code: String): String =
-        rethrow { js.verifyPasswordResetCode(code).await() }
+        rethrow { verifyPasswordResetCode(js, code).await() }
 
     actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T = rethrow {
-        val result = js.checkActionCode(code).await()
+        val result = checkActionCode(js, code).await()
         @Suppress("UNCHECKED_CAST")
         return when(result.operation) {
             "EMAIL_SIGNIN" -> ActionCodeResult.SignInWithEmailLink
@@ -98,15 +101,15 @@ actual data class FirebaseAuth internal constructor(val js: firebase.auth.Auth) 
         } as T
     }
 
-    actual fun useEmulator(host: String, port: Int) = rethrow { js.useEmulator("http://$host:$port") }
+    actual fun useEmulator(host: String, port: Int) = rethrow { connectAuthEmulator(js, "http://$host:$port") }
 }
 
-actual class AuthResult internal constructor(val js: firebase.auth.AuthResult) {
+actual class AuthResult internal constructor(val js: JsAuthResult) {
     actual val user: FirebaseUser?
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
 
-actual class AuthTokenResult(val js: firebase.auth.IdTokenResult) {
+actual class AuthTokenResult(val js: IdTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = js.authTime
     actual val claims: Map<String, Any>
@@ -135,6 +138,7 @@ actual open class FirebaseAuthException(code: String?, cause: Throwable): Fireba
 actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthEmailException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthInvalidCredentialsException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
+actual open class FirebaseAuthWeakPasswordException(code: String?, cause: Throwable): FirebaseAuthInvalidCredentialsException(code, cause)
 actual open class FirebaseAuthInvalidUserException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthMultiFactorException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
 actual open class FirebaseAuthRecentLoginRequiredException(code: String?, cause: Throwable): FirebaseAuthException(code, cause)
@@ -161,6 +165,8 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause)
     "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause)
     "auth/network-request-failed" -> FirebaseNetworkException(code, cause)
+    "auth/timeout" -> FirebaseNetworkException(code, cause)
+    "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause)
     "auth/invalid-credential",
     "auth/invalid-verification-code",
     "auth/missing-verification-code",
@@ -171,7 +177,6 @@ private fun errorToException(cause: dynamic) = when(val code = cause.code?.toStr
     "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
     "auth/invalid-email" -> FirebaseAuthEmailException(code, cause)
-
 //                "auth/app-deleted" ->
 //                "auth/app-not-authorized" ->
 //                "auth/argument-error" ->

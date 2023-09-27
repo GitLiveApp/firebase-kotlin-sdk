@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-functions",
-  "version": "1.8.1",
+  "version": "1.10.1",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-functions.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-sdk",
   "dependencies": {
-    "@gitlive/firebase-app": "1.8.1",
+    "@gitlive/firebase-app": "1.10.1",
     "firebase": "9.19.1",
     "kotlin": "1.8.20",
     "kotlinx-coroutines-core": "1.6.4"

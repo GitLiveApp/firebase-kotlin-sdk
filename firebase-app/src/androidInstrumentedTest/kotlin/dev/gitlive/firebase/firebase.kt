@@ -10,3 +10,5 @@ import androidx.test.platform.app.InstrumentationRegistry
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
 actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest { test() }
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest

@@ -19,6 +19,7 @@ android {
 
     defaultConfig {
         minSdk = minSdkVersion
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -45,8 +46,26 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+
+    jvm {
+        compilations.getByName("main") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        compilations.getByName("test") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     if (supportIosTarget) {
@@ -55,11 +74,11 @@ kotlin {
         cocoapods {
             ios.deploymentTarget = "11.0"
             framework {
-                baseName = "FirebaseFunctions"
+                baseName = "FirebaseInstallations"
             }
             noPodspec()
             pod("FirebaseInstallations") {
-                version = "10.9.0"
+                version = "10.15.0"
             }
         }
     }
@@ -67,18 +86,22 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -100,7 +123,11 @@ kotlin {
             }
         }
 
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+            }
+        }
 
         getByName("androidMain") {
             dependencies {
@@ -112,6 +139,10 @@ kotlin {
             dependencies {
                 dependsOn(commonTest)
             }
+        }
+
+        getByName("jvmMain") {
+            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         if (supportIosTarget) {

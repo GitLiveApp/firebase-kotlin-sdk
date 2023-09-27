@@ -5,11 +5,13 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.perf.FirebasePerformance
+import dev.gitlive.firebase.perf.IgnoreForAndroidUnitTest
 import dev.gitlive.firebase.perf.performance
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@IgnoreForAndroidUnitTest
 class TraceTest {
 
     private lateinit var performance: FirebasePerformance

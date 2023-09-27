@@ -25,9 +25,9 @@ actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore {
-    return FirebaseFirestore(FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp))
-}
+actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
+    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
+)
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
@@ -221,7 +221,43 @@ actual typealias NativeDocumentReference = FIRDocumentReference
 @Suppress("UNCHECKED_CAST")
 @Serializable(with = DocumentReferenceSerializer::class)
 actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
-    val ios: NativeDocumentReference = nativeValue
+
+    class Async(@PublishedApi internal val ios: NativeDocumentReference) : BaseDocumentReference.Async() {
+
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = deferred {
+            when (setOptions) {
+                is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, true, it)
+                is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, false, it)
+                is SetOptions.MergeFields -> ios.setData(encodedData as Map<Any?, *>, setOptions.fields, it)
+                is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, setOptions.encodedFieldPaths, it)
+            }
+        }
+
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = deferred {
+            ios.updateData(encodedData as Map<Any?, *>, it)
+        }
+
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = deferred {
+            ios.updateData(encodedFieldsAndValues.toMap(), it)
+        }
+
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = deferred {
+            ios.updateData(encodedFieldsAndValues.toMap(), it)
+        }
+
+        override fun delete() =
+            deferred { ios.deleteDocumentWithCompletion(it) }
+    }
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    val ios: NativeDocumentReference by ::nativeValue
 
     actual val id: String
         get() = ios.documentID
@@ -251,33 +287,6 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         this === other || other is DocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
-
-    class Async(@PublishedApi internal val ios: NativeDocumentReference) : BaseDocumentReference.Async() {
-
-        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = deferred {
-            when (setOptions) {
-                is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, true, it)
-                is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, false, it)
-                is SetOptions.MergeFields -> ios.setData(encodedData as Map<Any?, *>, setOptions.fields, it)
-                is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, setOptions.encodedFieldPaths, it)
-            }
-        }
-
-        override fun updateEncoded(encodedData: Any): Deferred<Unit> = deferred {
-            ios.updateData(encodedData as Map<Any?, *>, it)
-        }
-
-        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = deferred {
-            ios.updateData(encodedFieldsAndValues.toMap(), it)
-        }
-
-        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = deferred {
-            ios.updateData(encodedFieldsAndValues.toMap(), it)
-        }
-
-        override fun delete() =
-            deferred { ios.deleteDocumentWithCompletion(it) }
-    }
 }
 
 actual open class Query(open val ios: FIRQuery) {

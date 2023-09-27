@@ -44,8 +44,26 @@ android {
 
 kotlin {
 
-    android {
+    androidTarget {
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+
+    jvm {
+        compilations.getByName("main") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        compilations.getByName("test") {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
     }
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
@@ -58,18 +76,22 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -97,9 +119,7 @@ kotlin {
 
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
+                implementation(project(":test-utils"))
             }
         }
 
@@ -126,8 +146,19 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "9.21.0"))
+                api(npm("firebase", "10.4.0"))
             }
+        }
+
+        getByName("jvmMain") {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+            kotlin.srcDir("src/androidAndroidTest/kotlin")
         }
     }
 }

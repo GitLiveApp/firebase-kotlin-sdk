@@ -94,9 +94,12 @@ expect class DatabaseReference : Query {
 expect class DataSnapshot {
     val exists: Boolean
     val key: String?
+    val ref: DatabaseReference
+    val value: Any?
     inline fun <reified T> value(): T
     fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings()): T
     fun child(path: String): DataSnapshot
+    val hasChildren: Boolean
     val children: Iterable<DataSnapshot>
 }
 
@@ -109,4 +112,3 @@ expect class OnDisconnect {
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings = EncodeSettings())
     suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings())
 }
-
