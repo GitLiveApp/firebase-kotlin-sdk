@@ -2,8 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 version = project.property("firebase-common.version") as String
 
 plugins {
@@ -129,7 +127,7 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                api(npm("firebase", "9.4.1"))
+                api(npm("firebase", "9.6.1"))
             }
         }
 
