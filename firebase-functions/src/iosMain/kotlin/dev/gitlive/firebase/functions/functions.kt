@@ -56,10 +56,11 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
         decode(strategy, ios.data())
 }
 
-actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode) : FirebaseException(message)
+actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+
+actual val FirebaseFunctionsException.details: Any? get() = details
 
 actual enum class FunctionsExceptionCode {
     OK,
@@ -103,7 +104,7 @@ fun NSError.toException() = when(domain) {
 //        else -> FunctionsExceptionCode.UNKNOWN
 //    }
     else -> FunctionsExceptionCode.UNKNOWN
-}.let { FirebaseFunctionsException(description!!, it) }
+}.let { FirebaseFunctionsException(description!!, it, null/*userInfo[FIRFunctionsErrorDetails]*/) }
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()

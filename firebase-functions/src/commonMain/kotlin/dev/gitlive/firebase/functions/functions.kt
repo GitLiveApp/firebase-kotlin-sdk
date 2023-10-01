@@ -43,6 +43,9 @@ expect class FirebaseFunctionsException: FirebaseException
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 expect val FirebaseFunctionsException.code: FunctionsExceptionCode
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+expect val FirebaseFunctionsException.details: Any?
+
 expect enum class FunctionsExceptionCode {
     OK,
     CANCELLED,

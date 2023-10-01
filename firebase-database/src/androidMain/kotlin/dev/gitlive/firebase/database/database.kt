@@ -30,7 +30,7 @@ suspend fun <T> Task<T>.awaitWhileOnline(): T =
             .reference(".info/connected")
             .valueEvents
             .debounce(2.seconds)
-            .filter { !it.value<Boolean>() }
+            .filterNot { it.value<Boolean>() }
             .map<DataSnapshot, T> { throw DatabaseException("Database not connected", null) }
     )
     .first()
