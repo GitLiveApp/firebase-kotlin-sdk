@@ -115,7 +115,7 @@ subprojects {
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.1")
+                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.2")
                 "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
                     exclude("com.google.android.gms")
                 }
