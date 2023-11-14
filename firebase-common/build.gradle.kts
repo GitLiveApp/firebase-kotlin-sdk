@@ -143,7 +143,7 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "10.4.0"))
+                api(npm("firebase", "10.6.0"))
             }
         }
 

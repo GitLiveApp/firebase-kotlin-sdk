@@ -5,14 +5,10 @@
 @file:JvmName("tests")
 package dev.gitlive.firebase.firestore
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
-
 actual val emulatorHost: String = "10.0.2.2"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking { test() }
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreJs
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)

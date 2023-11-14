@@ -3,6 +3,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.encode
 import dev.gitlive.firebase.firebaseSerializer
+import dev.gitlive.firebase.runTest
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
