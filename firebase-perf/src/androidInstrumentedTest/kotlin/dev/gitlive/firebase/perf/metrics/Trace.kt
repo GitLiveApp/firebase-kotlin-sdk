@@ -35,7 +35,7 @@ class AndroidTraceTest {
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
         // Performance runs installation in the background, which crashes if the app is deleted before completion
-        delay(1.seconds)
+        delay(5.seconds)
         Firebase.apps(context).forEach {
             it.delete()
         }
