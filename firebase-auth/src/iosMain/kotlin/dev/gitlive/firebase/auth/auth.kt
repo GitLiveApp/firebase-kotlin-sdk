@@ -189,6 +189,7 @@ private fun NSError.toException() = when(domain) {
         FIRAuthErrorCodeInvalidVerificationCode,
         FIRAuthErrorCodeMissingVerificationID,
         FIRAuthErrorCodeMissingVerificationCode,
+        FIRAuthErrorCodeUserTokenExpired,
         FIRAuthErrorCodeInvalidCredential -> FirebaseAuthInvalidCredentialsException(toString())
 
         FIRAuthErrorCodeWeakPassword -> FirebaseAuthWeakPasswordException(toString())
