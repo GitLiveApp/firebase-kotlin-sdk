@@ -58,4 +58,4 @@ actual class FirebaseCrashlytics {
     }
 }
 
-actual open class FirebaseCrashlyticsException : FirebaseException()
+actual open class FirebaseCrashlyticsException internal constructor(message: String) : FirebaseException(message)

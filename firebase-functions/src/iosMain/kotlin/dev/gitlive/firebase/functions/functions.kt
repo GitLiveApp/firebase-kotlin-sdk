@@ -4,18 +4,14 @@
 
 package dev.gitlive.firebase.functions
 
-import cocoapods.FirebaseFunctions.*
-import dev.gitlive.firebase.DecodeSettings
-import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
+import cocoapods.FirebaseFunctions.FIRFunctions
+import cocoapods.FirebaseFunctions.FIRHTTPSCallable
+import cocoapods.FirebaseFunctions.FIRHTTPSCallableResult
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import platform.Foundation.*
+import platform.Foundation.NSError
 
 actual val Firebase.functions
     get() = FirebaseFunctions(FIRFunctions.functions())
@@ -58,7 +54,55 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
         decode(strategy, ios.data(), decodeSettings)
 }
 
-actual class FirebaseFunctionsException(message: String): FirebaseException(message)
+actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)
+
+actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+
+actual val FirebaseFunctionsException.details: Any? get() = details
+
+actual enum class FunctionsExceptionCode {
+    OK,
+    CANCELLED,
+    UNKNOWN,
+    INVALID_ARGUMENT,
+    DEADLINE_EXCEEDED,
+    NOT_FOUND,
+    ALREADY_EXISTS,
+    PERMISSION_DENIED,
+    RESOURCE_EXHAUSTED,
+    FAILED_PRECONDITION,
+    ABORTED,
+    OUT_OF_RANGE,
+    UNIMPLEMENTED,
+    INTERNAL,
+    UNAVAILABLE,
+    DATA_LOSS,
+    UNAUTHENTICATED
+}
+//todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
+fun NSError.toException() = when(domain) {
+//    FIRFunctionsErrorDomain -> when(code) {
+//        FIRFunctionsErrorCodeOK -> FunctionsExceptionCode.OK
+//        FIRFunctionsErrorCodeCancelled -> FunctionsExceptionCode.CANCELLED
+//        FIRFunctionsErrorCodeUnknown -> FunctionsExceptionCode.UNKNOWN
+//        FIRFunctionsErrorCodeInvalidArgument -> FunctionsExceptionCode.INVALID_ARGUMENT
+//        FIRFunctionsErrorCodeDeadlineExceeded -> FunctionsExceptionCode.DEADLINE_EXCEEDED
+//        FIRFunctionsErrorCodeNotFound -> FunctionsExceptionCode.NOT_FOUND
+//        FIRFunctionsErrorCodeAlreadyExists -> FunctionsExceptionCode.ALREADY_EXISTS
+//        FIRFunctionsErrorCodePermissionDenied -> FunctionsExceptionCode.PERMISSION_DENIED
+//        FIRFunctionsErrorCodeResourceExhausted -> FunctionsExceptionCode.RESOURCE_EXHAUSTED
+//        FIRFunctionsErrorCodeFailedPrecondition -> FunctionsExceptionCode.FAILED_PRECONDITION
+//        FIRFunctionsErrorCodeAborted -> FunctionsExceptionCode.ABORTED
+//        FIRFunctionsErrorCodeOutOfRange -> FunctionsExceptionCode.OUT_OF_RANGE
+//        FIRFunctionsErrorCodeUnimplemented -> FunctionsExceptionCode.UNIMPLEMENTED
+//        FIRFunctionsErrorCodeInternal -> FunctionsExceptionCode.INTERNAL
+//        FIRFunctionsErrorCodeUnavailable -> FunctionsExceptionCode.UNAVAILABLE
+//        FIRFunctionsErrorCodeDataLoss -> FunctionsExceptionCode.DATA_LOSS
+//        FIRFunctionsErrorCodeUnauthenticated -> FunctionsExceptionCode.UNAUTHENTICATED
+//        else -> FunctionsExceptionCode.UNKNOWN
+//    }
+    else -> FunctionsExceptionCode.UNKNOWN
+}.let { FirebaseFunctionsException(description!!, it, null/*userInfo[FIRFunctionsErrorDetails]*/) }
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
@@ -66,7 +110,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
         if(error == null) {
             job.complete(Unit)
         } else {
-            job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
+            job.completeExceptionally(error.toException())
         }
     }
     function(callback)
@@ -79,7 +123,7 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
         if(error == null) {
             job.complete(result)
         } else {
-            job.completeExceptionally(FirebaseFunctionsException(error.localizedDescription))
+            job.completeExceptionally(error.toException())
         }
     }
     function(callback)

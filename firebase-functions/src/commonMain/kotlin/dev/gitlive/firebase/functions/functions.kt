@@ -46,3 +46,29 @@ expect fun Firebase.functions(app: FirebaseApp): FirebaseFunctions
 expect fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions
 
 expect class FirebaseFunctionsException: FirebaseException
+
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+expect val FirebaseFunctionsException.code: FunctionsExceptionCode
+
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+expect val FirebaseFunctionsException.details: Any?
+
+expect enum class FunctionsExceptionCode {
+    OK,
+    CANCELLED,
+    UNKNOWN,
+    INVALID_ARGUMENT,
+    DEADLINE_EXCEEDED,
+    NOT_FOUND,
+    ALREADY_EXISTS,
+    PERMISSION_DENIED,
+    RESOURCE_EXHAUSTED,
+    FAILED_PRECONDITION,
+    ABORTED,
+    OUT_OF_RANGE,
+    UNIMPLEMENTED,
+    INTERNAL,
+    UNAVAILABLE,
+    DATA_LOSS,
+    UNAUTHENTICATED
+}

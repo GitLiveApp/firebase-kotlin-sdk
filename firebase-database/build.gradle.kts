@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -52,7 +54,16 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
+    targets.configureEach {
+        compilations.configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+        }
+    }
+
+    @Suppress("OPT_IN_USAGE")
     androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
         compilations.configureEach {
             kotlinOptions {
@@ -75,7 +86,8 @@ kotlin {
     }
 
     if (supportIosTarget) {
-        ios()
+        iosArm64()
+        iosX64()
         iosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = "11.0"
@@ -122,6 +134,9 @@ kotlin {
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.FlowPreview")
                 optIn("kotlinx.serialization.InternalSerializationApi")
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                }
             }
         }
 
@@ -132,7 +147,7 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
+        getByName("commonTest") {
             dependencies {
                 implementation(project(":test-utils"))
             }
@@ -145,21 +160,6 @@ kotlin {
         }
         getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
-        }
-
-        getByName("androidInstrumentedTest") {
-            dependencies {
-                dependsOn(commonTest)
-            }
-        }
-
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
         }
     }
 }

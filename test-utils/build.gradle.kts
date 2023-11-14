@@ -41,6 +41,13 @@ android {
 
 kotlin {
 
+    targets.configureEach {
+        compilations.configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+        }
+    }
+
+    @Suppress("OPT_IN_USAGE")
     androidTarget {
         publishAllLibraryVariants()
         compilations.configureEach {
@@ -66,7 +73,8 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
     if (supportIosTarget) {
-        ios()
+        iosArm64()
+        iosX64()
         iosSimulatorArm64()
     }
 
@@ -95,15 +103,6 @@ kotlin {
 
         getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
-        }
-
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
         }
 
         getByName("jsMain") {

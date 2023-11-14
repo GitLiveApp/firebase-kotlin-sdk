@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 repositories {
     google()
@@ -50,8 +51,6 @@ tasks {
 }
 
 subprojects {
-
-    group = "dev.gitlive"
 
     apply(plugin = "com.adarshr.test-logger")
 
@@ -118,7 +117,7 @@ subprojects {
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.1")
+                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.2")
                 "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
                     exclude("com.google.android.gms")
                 }
@@ -149,6 +148,7 @@ subprojects {
         repositories {
             maven {
                 url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+
                 credentials {
                     username = project.findProperty("sonatypeUsername") as String? ?: System.getenv("sonatypeUsername")
                     password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
@@ -196,6 +196,10 @@ subprojects {
             }
         }
 
+    }
+
+    tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+        dependsOn(tasks.withType(Sign::class.java))
     }
 }
 

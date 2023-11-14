@@ -11,11 +11,11 @@ import com.google.firebase.firestore.MemoryEagerGcSettings
 import com.google.firebase.firestore.MemoryLruGcSettings
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.PersistentCacheSettings
-import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.firestore.ktx.memoryCacheSettings
-import com.google.firebase.firestore.ktx.memoryEagerGcSettings
-import com.google.firebase.firestore.ktx.memoryLruGcSettings
-import com.google.firebase.firestore.ktx.persistentCacheSettings
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.memoryEagerGcSettings
+import com.google.firebase.firestore.memoryLruGcSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
