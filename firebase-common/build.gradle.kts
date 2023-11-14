@@ -54,6 +54,8 @@ kotlin {
 
     @Suppress("OPT_IN_USAGE")
     androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
         compilations.configureEach {
             kotlinOptions {
