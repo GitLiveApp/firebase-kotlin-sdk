@@ -52,6 +52,8 @@ tasks {
 
 subprojects {
 
+    group = "dev.gitlive"
+    
     apply(plugin = "com.adarshr.test-logger")
 
     repositories {
