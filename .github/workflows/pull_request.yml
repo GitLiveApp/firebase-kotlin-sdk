@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         api-level: [ 34 ]
