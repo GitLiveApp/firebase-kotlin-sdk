@@ -15,6 +15,7 @@ runs:
       with:
         node-version: '21.x'
     - name: Upgrade packages
+      shell: bash
       run: npm update
     - name: Gradle cache
       uses: gradle/gradle-build-action@v2
