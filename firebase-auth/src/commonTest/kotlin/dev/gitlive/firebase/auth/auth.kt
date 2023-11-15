@@ -33,7 +33,7 @@ class FirebaseAuthTest {
         )
 
         auth = Firebase.auth(app).apply {
-            useEmulator(emulatorHost, 9099)
+            useEmulator(emulatorHost, 9094)
         }
     }
 
