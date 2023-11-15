@@ -9,7 +9,8 @@ on:
 
 jobs:
   build-android:
-    runs-on: macos-13
+    runs-on: 
+      labels: 4-core-ubuntu
     strategy:
       matrix:
         api-level: [ 34 ]
