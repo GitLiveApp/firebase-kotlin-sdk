@@ -8,56 +8,15 @@ on:
     branches: [ master, prerelease ]
 
 jobs:
-  build:
+  build-android:
     runs-on: macos-13
     strategy:
       matrix:
         api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v3
-      - name: Cocoapods cache
-        uses: actions/cache@v3
-        id: cocoapods-cache
-        with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: gradle
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Install Firebase tools
-        run: npm install -g firebase-tools
-      - name: Start Firebase emulator
-        run: "firebase emulators:start --config=./test/firebase.json &"
-      - name: Run JS Tests
-        run: ./gradlew cleanTest jsTest
-      - name: Upload JS test artifact
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: "JS Test Report HTML"
-          path: |
-            **/build/reports/tests/jsTest/
-            **/build/reports/tests/jsBrowserTest/
-            **/build/reports/tests/jsNodeTest/
-      - name: Run iOS Tests
-        run: ./gradlew cleanTest iosX64Test
-      - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: "iOS Test Report HTML"
-          path: "**/build/reports/tests/iosX64Test/"
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
       - name: AVD cache
         uses: actions/cache@v3
         id: avd-cache
@@ -93,6 +52,59 @@ jobs:
         with:
           name: "Android Test Report HTML"
           path: "**/build/reports/androidTests/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"
+  build-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: Run JS Tests
+        run: ./gradlew cleanTest jsTest
+      - name: Upload JS test artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "JS Test Report HTML"
+          path: |
+            **/build/reports/tests/jsTest/
+            **/build/reports/tests/jsBrowserTest/
+            **/build/reports/tests/jsNodeTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"
+  build-ios:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cocoapods cache
+        uses: actions/cache@v3
+        id: cocoapods-cache
+        with:
+          path: |
+            ~/.cocoapods
+            ~/Library/Caches/CocoaPods
+            */build/cocoapods
+            */build/classes
+          key: cocoapods-cache
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: Run iOS Tests
+        run: ./gradlew cleanTest iosX64Test
+      - name: Upload iOS test artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "iOS Test Report HTML"
+          path: "**/build/reports/tests/iosX64Test/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v3
         if: failure()
