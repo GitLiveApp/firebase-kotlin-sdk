@@ -160,7 +160,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-firestore")
+                api("com.google.firebase:firebase-firestore-ktx")
             }
         }
     }
