@@ -14,7 +14,7 @@ class FirestoreAsync {
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?:Firebase.initialize(
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",

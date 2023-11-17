@@ -10,17 +10,12 @@ on:
 jobs:
   build-android:
     runs-on: 
-      labels: 4-core-ubuntu
+      labels: macos-13
     strategy:
       matrix:
         api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v3
-      - name: Enable KVM group perms
-        run: |
-            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-            sudo udevadm control --reload-rules
-            sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: AVD cache

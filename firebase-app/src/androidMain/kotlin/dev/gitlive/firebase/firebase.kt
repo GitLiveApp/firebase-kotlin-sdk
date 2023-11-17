@@ -5,8 +5,6 @@
 package dev.gitlive.firebase
 
 import android.content.Context
-import com.google.firebase.FirebaseAppLifecycleListener
-import kotlinx.coroutines.CompletableDeferred
 
 actual typealias FirebaseException = com.google.firebase.FirebaseException
 
@@ -38,10 +36,7 @@ actual data class FirebaseApp internal constructor(val android: com.google.fireb
         get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId) }
 
     actual suspend fun delete() {
-        val deletedCompleted = CompletableDeferred<Unit>()
-        android.addLifecycleEventListener { _, _ -> deletedCompleted.complete(Unit) }
         android.delete()
-        deletedCompleted.await()
     }
 }
 
