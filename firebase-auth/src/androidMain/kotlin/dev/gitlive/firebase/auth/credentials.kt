@@ -90,7 +90,10 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
-                verificationProvider.codeSent { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
+                verificationProvider.onCodeSent(
+                    verificationId = verificationId,
+                    triggerResend = { android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, this, forceResending) }
+                )
             }
 
             override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
@@ -123,7 +126,7 @@ actual interface PhoneVerificationProvider {
     val activity: Activity
     val timeout: Long
     val unit: TimeUnit
-    fun codeSent(triggerResend: (Unit) -> Unit)
+    fun onCodeSent(verificationId: String, triggerResend: () -> Unit)
     suspend fun getVerificationCode(): String
 }
 
