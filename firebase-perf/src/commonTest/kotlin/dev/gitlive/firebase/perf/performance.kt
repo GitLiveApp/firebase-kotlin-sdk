@@ -6,8 +6,10 @@ package dev.gitlive.firebase.perf
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestResult
 import kotlin.test.*
+import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -37,6 +39,8 @@ class FirebasePerformanceTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
+        // Performance runs installation in the background, which crashes if the app is deleted before completion
+        delay(5.seconds)
         Firebase.apps(context).forEach {
             it.delete()
         }
