@@ -9,13 +9,17 @@ on:
 
 jobs:
   build-android:
-    runs-on: 
-      labels: ubuntu-latest
+    runs-on: 4-core-ubuntu
     strategy:
       matrix:
         api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v3
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: AVD cache
@@ -25,7 +29,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+          key: avd-${{ matrix.api-level }}-${{ runner.os }}-${{ runner.arch }}
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
