@@ -8,11 +8,88 @@ on:
     branches: [ master, prerelease ]
 
 jobs:
-  build:
-    runs-on: macos-13
+  build-android:
+    runs-on: 4-core-ubuntu
     strategy:
       matrix:
         api-level: [ 34 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}-${{ runner.os }}-${{ runner.arch }}
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          avd-name: pixel6_API${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - name: Run Android Instrumented Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          avd-name: pixel6_API${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedAndroidTest
+      - name: Upload Android test artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Android Test Report HTML"
+          path: "**/build/reports/androidTests/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"
+  build-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: Run JS Tests
+        run: ./gradlew cleanTest jsTest
+      - name: Upload JS test artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "JS Test Report HTML"
+          path: |
+            **/build/reports/tests/jsTest/
+            **/build/reports/tests/jsBrowserTest/
+            **/build/reports/tests/jsNodeTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"
+  build-ios:
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
@@ -25,31 +102,8 @@ jobs:
             */build/cocoapods
             */build/classes
           key: cocoapods-cache
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: gradle
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Install Firebase tools
-        run: npm install -g firebase-tools
-      - name: Start Firebase emulator
-        run: "firebase emulators:start --config=./test/firebase.json &"
-      - name: Run JS Tests
-        run: ./gradlew cleanTest jsTest
-      - name: Upload JS test artifact
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: "JS Test Report HTML"
-          path: |
-            **/build/reports/tests/jsTest/
-            **/build/reports/tests/jsBrowserTest/
-            **/build/reports/tests/jsNodeTest/
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosX64Test
       - name: Upload iOS test artifact
@@ -58,41 +112,6 @@ jobs:
         with:
           name: "iOS Test Report HTML"
           path: "**/build/reports/tests/iosX64Test/"
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: google_apis
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-      - name: Run Android Instrumented Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: google_apis
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedAndroidTest
-      - name: Upload Android test artifact
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: "Android Test Report HTML"
-          path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v3
         if: failure()

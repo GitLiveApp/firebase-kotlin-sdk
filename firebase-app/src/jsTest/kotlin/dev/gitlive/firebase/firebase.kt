@@ -4,13 +4,7 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.coroutines.test.runTest
-import kotlin.time.Duration.Companion.minutes
-
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend () -> Unit) {
-    runTest(timeout = 5.minutes) { test() }
-}
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

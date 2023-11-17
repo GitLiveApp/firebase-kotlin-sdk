@@ -49,3 +49,10 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
 }
 
 actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException
+
+actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+
+actual val FirebaseFunctionsException.details: Any? get() = details
+
+actual typealias FunctionsExceptionCode = com.google.firebase.functions.FirebaseFunctionsException.Code
+

@@ -85,4 +85,4 @@ actual class ListResult {
 }
 
 actual class File
-actual class FirebaseStorageException : FirebaseException()
+actual class FirebaseStorageException internal constructor(message: String) : FirebaseException(message)

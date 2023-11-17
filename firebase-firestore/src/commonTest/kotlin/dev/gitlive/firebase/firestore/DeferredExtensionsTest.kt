@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.Test

@@ -9,5 +9,4 @@ import org.junit.Ignore
 
 actual val context: Any = ""
 
-actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest { test() }
 actual typealias IgnoreForAndroidUnitTest = Ignore

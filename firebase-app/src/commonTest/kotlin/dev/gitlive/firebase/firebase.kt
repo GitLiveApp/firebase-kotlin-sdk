@@ -1,16 +1,16 @@
 package dev.gitlive.firebase
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit)
 expect annotation class IgnoreForAndroidUnitTest()
 
 class FirebaseAppTest {
     
     @IgnoreForAndroidUnitTest
     @Test
-    fun testInitialize() {
+    fun testInitialize() = runTest {
         Firebase.initialize(
             context,
             FirebaseOptions(
@@ -22,6 +22,12 @@ class FirebaseAppTest {
                 gcmSenderId = "846484016111"
             )
         )
+
+        assertEquals(1, Firebase.apps(context).size)
+
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
 }

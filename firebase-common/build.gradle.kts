@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -44,7 +46,16 @@ android {
 
 kotlin {
 
+    targets.configureEach {
+        compilations.configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+        }
+    }
+
+    @Suppress("OPT_IN_USAGE")
     androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
         compilations.configureEach {
             kotlinOptions {
@@ -69,7 +80,8 @@ kotlin {
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
     if (supportIosTarget) {
-        ios()
+        iosArm64()
+        iosX64()
         iosSimulatorArm64()
     }
 
@@ -117,7 +129,7 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
+        getByName("commonTest") {
             dependencies {
                 implementation(project(":test-utils"))
             }
@@ -129,24 +141,9 @@ kotlin {
             }
         }
 
-        getByName("androidInstrumentedTest") {
-            dependencies {
-                dependsOn(commonTest)
-            }
-        }
-
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
-        }
-
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "10.4.0"))
+                api(npm("firebase", "10.6.0"))
             }
         }
 
@@ -154,7 +151,7 @@ kotlin {
             kotlin.srcDir("src/androidMain/kotlin")
         }
 
-        val jvmTest by getting {
+        getByName("jvmTest") {
             dependencies {
                 implementation(kotlin("test-junit"))
             }

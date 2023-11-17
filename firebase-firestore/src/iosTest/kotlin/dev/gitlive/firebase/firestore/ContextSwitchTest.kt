@@ -1,10 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -21,6 +17,7 @@ import platform.Foundation.NSDefaultRunLoopMode
 import platform.Foundation.NSRunLoop
 import platform.Foundation.create
 import platform.Foundation.runMode
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,26 +53,34 @@ fun <T> runTestWithContextSwitch(create: suspend CoroutineScope.() -> T, test: s
 
 
 class ContextSwitchTest {
+
+    lateinit var firestore: FirebaseFirestore
+
     @BeforeTest
     fun initializeFirebase() {
-        Firebase
-            .takeIf { Firebase.apps(context).isEmpty() }
-            ?.apply {
-                initialize(
-                    context,
-                    FirebaseOptions(
-                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                        storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk",
-                        gcmSenderId = "846484016111"
-                    )
-                )
-                Firebase.firestore.useEmulator(emulatorHost, 8080)
-            }
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+            context,
+            FirebaseOptions(
+                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                storageBucket = "fir-kotlin-sdk.appspot.com",
+                projectId = "fir-kotlin-sdk",
+                gcmSenderId = "846484016111"
+            )
+        )
+
+        firestore = Firebase.firestore(app).apply {
+            useEmulator(emulatorHost, 8080)
+        }
     }
 
+    @AfterTest
+    fun deinitializeFirebase() = runBlockingTest {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
+    }
 
     private data class TestFieldValuesOps(
         val initial: List<Int>,
@@ -113,7 +118,7 @@ class ContextSwitchTest {
         }
     ) { data ->
 
-        fun getDocument() = Firebase.firestore.collection("fieldValuesOps")
+        fun getDocument() = firestore.collection("fieldValuesOps")
             .document("fieldValuesOps")
 
         // store
