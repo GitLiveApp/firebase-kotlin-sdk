@@ -10,7 +10,7 @@ on:
 jobs:
   build-android:
     runs-on: 
-      labels: macos-13
+      labels: ubuntu-latest
     strategy:
       matrix:
         api-level: [ 34 ]
