@@ -4,8 +4,6 @@
 
 package dev.gitlive.firebase.auth
 
-import kotlin.time.Duration.Companion.minutes
-
 
 actual val emulatorHost: String = "localhost"
 

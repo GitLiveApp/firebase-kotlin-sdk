@@ -37,5 +37,4 @@ class FirebaseStorageTest {
             useEmulator(emulatorHost, 9199)
         }
     }
-
 }

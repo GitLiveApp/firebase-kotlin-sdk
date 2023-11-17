@@ -5,7 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationStrategy
 import kotlin.test.*
 import kotlin.time.Duration.Companion.minutes
 

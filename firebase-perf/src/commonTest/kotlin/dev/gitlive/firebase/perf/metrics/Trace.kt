@@ -1,9 +1,6 @@
 package dev.gitlive.firebase.perf.metrics
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.*
 import dev.gitlive.firebase.perf.FirebasePerformance
 import dev.gitlive.firebase.perf.IgnoreForAndroidUnitTest
 import dev.gitlive.firebase.perf.context
@@ -71,7 +68,7 @@ class TraceTest {
     }
 
     @Test
-    fun testPutMetric() {
+    fun testPutMetric() = runTest {
         val trace = performance.newTrace("testPutMetric")
         trace.start()
         trace.putMetric("Get Put Metric Test", 1L)

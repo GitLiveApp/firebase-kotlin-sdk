@@ -28,4 +28,4 @@ actual class FirebasePerformance {
 
 }
 
-actual open class FirebasePerformanceException : FirebaseException()
+actual open class FirebasePerformanceException internal constructor(message: String) : FirebaseException(message)
