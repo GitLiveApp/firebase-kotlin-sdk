@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestore.FIRFieldValue
+import cocoapods.FirebaseFirestoreInternal.FIRFieldValue
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase FieldValue. */
