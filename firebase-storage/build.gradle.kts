@@ -90,7 +90,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseStorage") {
-                version = "10.15.0"
+                version = "10.17.0"
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
