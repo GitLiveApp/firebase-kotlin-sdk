@@ -91,7 +91,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseAuth") {
-                version = "10.15.0"
+                version = "10.17.0"
             }
         }
     }
