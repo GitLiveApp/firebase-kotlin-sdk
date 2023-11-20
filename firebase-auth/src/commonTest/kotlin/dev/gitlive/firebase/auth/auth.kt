@@ -5,9 +5,10 @@
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.*
-import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.test.*
+import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -19,7 +20,7 @@ class FirebaseAuthTest {
     lateinit var auth: FirebaseAuth
 
     @BeforeTest
-    fun initializeFirebase() {
+    fun initializeFirebase() = runBlockingTest {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
@@ -35,6 +36,7 @@ class FirebaseAuthTest {
         auth = Firebase.auth(app).apply {
             useEmulator(emulatorHost, 9099)
         }
+        delay(5.seconds)
     }
 
     @AfterTest
