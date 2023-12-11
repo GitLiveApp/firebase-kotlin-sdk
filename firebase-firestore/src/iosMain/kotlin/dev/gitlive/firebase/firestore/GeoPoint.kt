@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestore.FIRGeoPoint
+import cocoapods.FirebaseFirestoreInternal.FIRGeoPoint
 import kotlinx.serialization.Serializable
 
 

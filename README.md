@@ -70,8 +70,8 @@ The Firebase Kotlin SDK uses Kotlin serialization to read and write custom class
 
 ```groovy
 plugins {
-    kotlin("multiplatform") version "1.8.20" // or kotlin("jvm") or any other kotlin plugin
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("multiplatform") version "1.8.21" // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.8.21"
 }
 ```
 
@@ -161,17 +161,17 @@ To reduce boilerplate, default arguments are used in the places where the Fireba
 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
         .setDisplayName("Jane Q. User")
         .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
-        .build();
+        .build()
 
 user.updateProfile(profileUpdates)
         .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "User profile updated.");
+                    Log.d(TAG, "User profile updated.")
                 }
             }
-        });
+        })
 
 //...becomes...
 

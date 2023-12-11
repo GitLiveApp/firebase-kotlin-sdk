@@ -31,7 +31,7 @@ expect fun getPolymorphicType(value: Any?, discriminator: String): String
 class FirebaseDecoder(internal val value: Any?) : Decoder {
 
     override val serializersModule: SerializersModule
-        get() = EmptySerializersModule
+        get() = EmptySerializersModule()
 
     override fun beginStructure(descriptor: SerialDescriptor) = structureDecoder(descriptor)
 
@@ -59,7 +59,7 @@ class FirebaseDecoder(internal val value: Any?) : Decoder {
 
     override fun decodeNull() = decodeNull(value)
 
-    override fun decodeInline(inlineDescriptor: SerialDescriptor) = FirebaseDecoder(value)
+    override fun decodeInline(descriptor: SerialDescriptor) = FirebaseDecoder(value)
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         return decodeSerializableValuePolymorphic(value, deserializer)
@@ -87,7 +87,7 @@ open class FirebaseCompositeDecoder(
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?
 ): CompositeDecoder {
 
-    override val serializersModule = EmptySerializersModule
+    override val serializersModule = EmptySerializersModule()
 
     override fun decodeSequentially() = true
 

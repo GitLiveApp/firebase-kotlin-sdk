@@ -4,8 +4,8 @@
 
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestore.*
-import cocoapods.FirebaseFirestore.FIRDocumentChangeType.*
+import cocoapods.FirebaseFirestoreInternal.*
+import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred

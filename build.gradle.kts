@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 repositories {
     google()
@@ -7,8 +8,8 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.8.20" apply false
-    kotlin("native.cocoapods") version "1.8.20" apply false
+    kotlin("multiplatform") apply false
+    kotlin("native.cocoapods") apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
 }
@@ -23,17 +24,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.2.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20-RC")
+        classpath("com.android.tools.build:gradle:${project.extra["gradlePluginVersion"]}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
     }
 }
 
-val targetSdkVersion by extra(32)
-val minSdkVersion by extra(19)
+val compileSdkVersion by extra(34)
+val minSdkVersion by extra(23)
 
 tasks {
-    val updateVersions by registering {
+    register("updateVersions") {
         dependsOn(
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
@@ -52,7 +53,7 @@ tasks {
 subprojects {
 
     group = "dev.gitlive"
-
+    
     apply(plugin = "com.adarshr.test-logger")
 
     repositories {
@@ -88,11 +89,11 @@ subprojects {
 
         if (skipPublishing) return@tasks
 
-        val updateVersion by registering(Exec::class) {
+        register<Exec>("updateVersion") {
             commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
         }
 
-        val updateDependencyVersion by registering(Copy::class) {
+        register<Copy>("updateDependencyVersion") {
             mustRunAfter("updateVersion")
             val from = file("package.json")
             from.writeText(
@@ -106,28 +107,30 @@ subprojects {
 
     afterEvaluate  {
 
+        val coroutinesVersion: String by project
+        val firebaseBoMVersion: String by project
+
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:32.3.1"))
+            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
+            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-            "commonTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
             if (this@afterEvaluate.name != "firebase-crashlytics") {
                 "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.1.2")
-                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0") {
+                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
                     exclude("com.google.android.gms")
                 }
                 "jsTestImplementation"(kotlin("test-js"))
                 "jvmTestImplementation"(kotlin("test-junit"))
                 "jvmTestImplementation"("junit:junit:4.13.2")
             }
-            "androidAndroidTestImplementation"(kotlin("test-junit"))
-            "androidAndroidTestImplementation"("junit:junit:4.13.2")
-            "androidAndroidTestImplementation"("androidx.test:core:1.4.0")
-            "androidAndroidTestImplementation"("androidx.test.ext:junit:1.1.3")
-            "androidAndroidTestImplementation"("androidx.test:runner:1.4.0")
+            "androidInstrumentedTestImplementation"(kotlin("test-junit"))
+            "androidUnitTestImplementation"(kotlin("test-junit"))
+            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
+            "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
+            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
+            "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
         }
     }
 
@@ -145,6 +148,7 @@ subprojects {
         repositories {
             maven {
                 url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+
                 credentials {
                     username = project.findProperty("sonatypeUsername") as String? ?: System.getenv("sonatypeUsername")
                     password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
@@ -193,12 +197,16 @@ subprojects {
         }
 
     }
+
+    tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+        dependsOn(tasks.withType(Sign::class.java))
+    }
 }
 
 tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
 
     fun isNonStable(version: String): Boolean {
-        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase(java.util.Locale.ENGLISH).contains(it) }
         val versionMatch = "^[0-9,.v-]+(-r)?$".toRegex().matches(version)
 
         return (stableKeyword || versionMatch).not()

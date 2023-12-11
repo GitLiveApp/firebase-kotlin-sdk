@@ -4,11 +4,10 @@
 
 package dev.gitlive.firebase.firestore
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.runTest
-
 actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runTest { test() }
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest
+

@@ -5,9 +5,8 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.SetOptions
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.*
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

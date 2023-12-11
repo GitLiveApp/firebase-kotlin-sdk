@@ -58,9 +58,9 @@ actual class FirebaseUser internal constructor(val js: User) {
 actual class UserInfo(val js: JsUserInfo) {
     actual val displayName: String?
         get() = rethrow { js.displayName }
-        actual val email: String?
+    actual val email: String?
         get() = rethrow { js.email }
-        actual val phoneNumber: String?
+    actual val phoneNumber: String?
         get() = rethrow { js.phoneNumber }
     actual val photoURL: String?
         get() = rethrow { js.photoURL }

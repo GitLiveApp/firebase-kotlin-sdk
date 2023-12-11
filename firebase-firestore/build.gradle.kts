@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -8,32 +10,33 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("plugin.serialization")
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.firestore"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-        getByName("androidTest"){
-            java.srcDir(file("src/androidAndroidTest/kotlin"))
-            manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
     }
-    packagingOptions {
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -48,17 +51,31 @@ val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
 
-    android {
+    targets.configureEach {
+        compilations.configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+        }
+    }
+
+    @Suppress("OPT_IN_USAGE")
+    androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
 
     jvm {
-        val main by compilations.getting {
+        compilations.getByName("main") {
             kotlinOptions {
                 jvmTarget = "17"
             }
         }
-        val test by compilations.getting {
+        compilations.getByName("test") {
             kotlinOptions {
                 jvmTarget = "17"
             }
@@ -66,83 +83,98 @@ kotlin {
     }
 
     if (supportIosTarget) {
-        ios()
+        iosArm64()
+        iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "11.0"
+            ios.deploymentTarget = "12.0"
             framework {
                 baseName = "FirebaseFirestore"
             }
             noPodspec()
+            // As of Firebase 10.17 Firestore has moved all ObjC headers to FirebaseFirestoreInternal and the kotlin cocoapods plugin does not handle this well
+            // Adding it manually seems to resolve the issue
+            pod("FirebaseFirestoreInternal") {
+                version = "10.17.0"
+            }
             pod("FirebaseFirestore") {
-                version = "10.7.0"
+                version = "10.17.0"
+                extraOpts += listOf("-compiler-option", "-fmodules")
+                useInteropBindingFrom("FirebaseFirestoreInternal")
             }
         }
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "180s"
+                        }
+                    }
                 }
-            }
+            )
         }
         browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                        useMocha {
+                            timeout = "180s"
+                        }
+                    }
                 }
-            }
+            )
         }
     }
 
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                val apiVersion: String by project
+                val languageVersion: String by project
+                this.apiVersion = apiVersion
+                this.languageVersion = languageVersion
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                    optIn("kotlinx.cinterop.BetaInteropApi")
+                }
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
             }
         }
 
-        val commonTest by getting {
+        getByName("commonTest") {
             dependencies {
                 implementation(project(":test-utils"))
             }
         }
 
-        val androidMain by getting {
+        getByName("androidMain") {
             dependencies {
                 api("com.google.firebase:firebase-firestore")
             }
         }
 
-        val jvmMain by getting {
+        getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
-
-
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
-        }
-
-        val jsMain by getting
     }
 }
 

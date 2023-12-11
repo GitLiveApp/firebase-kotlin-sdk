@@ -33,7 +33,11 @@ actual class FirebaseApp internal constructor(val ios: FIRApp) {
     actual val options: FirebaseOptions
         get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
 
-    actual fun delete() { }
+    actual suspend fun delete() {
+        val deleted = CompletableDeferred<Unit>()
+        ios.deleteApp { deleted.complete(Unit) }
+        deleted.await()
+    }
 }
 
 actual fun Firebase.apps(context: Any?) = FIRApp.allApps()

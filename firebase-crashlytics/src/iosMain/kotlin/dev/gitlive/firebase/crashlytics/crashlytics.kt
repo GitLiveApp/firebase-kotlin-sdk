@@ -30,6 +30,7 @@ actual class FirebaseCrashlytics internal constructor(val ios: FIRCrashlytics) {
     actual fun setCustomKey(key: String, value: Float) { ios.setCustomValue(key, value.toString()) }
     actual fun setCustomKey(key: String, value: Int) { ios.setCustomValue(key, value.toString()) }
     actual fun setCustomKey(key: String, value: Long) { ios.setCustomValue(key, value.toString()) }
+    @Suppress("UNCHECKED_CAST")
     actual fun setCustomKeys(customKeys: Map<String, Any>) { ios.setCustomKeysAndValues(customKeys as Map<Any?, *>) }
 }
 
