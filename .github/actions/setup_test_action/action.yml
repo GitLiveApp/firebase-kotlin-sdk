@@ -27,15 +27,6 @@ runs:
       run: npm install -g firebase-tools wait-on
     - name: Start Firebase emulator
       shell: bash
-      run: firebase emulators:start --config=./test/firebase.json &
-    - name: Wait for Firebase emulator to start
-      shell: bash
       run: |
-        echo "Waiting for Firebase Auth emulator to start..."
+        firebase emulators:start --config=./test/firebase.json &
         wait-on http://127.0.0.1:9099
-        echo "Waiting for Firebase Firestore emulator to start..."
-        wait-on http://127.0.0.1:8080
-        echo "Waiting for Firebase Database emulator to start..."
-        wait-on http://127.0.0.1:9000
-        echo "Waiting for Firebase Storage emulator to start..."
-        wait-on http://127.0.0.1:9199
