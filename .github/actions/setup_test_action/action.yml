@@ -29,7 +29,11 @@ runs:
       shell: bash
       run: |
         firebase emulators:start --config=./test/firebase.json &
-        wait-on http://localhost:9099
-        wait-on http://localhost:8080
-        wait-on http://localhost:9000
-        wait-on http://localhost:9199
+        echo "Waiting for Firebase Auth emulator to start..."
+        wait-on http://127.0.0.1:9099
+        echo "Waiting for Firebase Firestore emulator to start..."
+        wait-on http://127.0.0.1:8080
+        echo "Waiting for Firebase Database emulator to start..."
+        wait-on http://127.0.0.1:9000
+        echo "Waiting for Firebase Storage emulator to start..."
+        wait-on http://127.0.0.1:9199
