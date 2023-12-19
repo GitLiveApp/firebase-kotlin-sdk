@@ -5,12 +5,14 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
+import kotlin.jvm.JvmName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -32,22 +34,41 @@ expect class FirebaseFirestore {
     suspend fun enableNetwork()
 }
 
-expect class Transaction {
+sealed class SetOptions {
+    object Merge : SetOptions()
+    object Overwrite : SetOptions()
+    data class MergeFields(val fields: List<String>) : SetOptions()
+    data class MergeFieldPaths(val fieldPaths: List<FieldPath>) : SetOptions() {
+        val encodedFieldPaths = fieldPaths.map { it.encoded }
+    }
+}
 
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, merge: Boolean = false): Transaction
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
-    fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
+abstract class BaseTransaction {
 
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): Transaction
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): Transaction
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): Transaction
+    fun set(documentRef: DocumentReference, data: Any, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false): BaseTransaction = setEncoded(documentRef, encode(data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+    fun set(documentRef: DocumentReference, data: Any, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String): BaseTransaction = setEncoded(documentRef, encode(data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+    fun set(documentRef: DocumentReference, data: Any, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath): BaseTransaction = setEncoded(documentRef, encode(data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
-    fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean = true): Transaction
-    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): Transaction
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false): BaseTransaction = setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String): BaseTransaction = setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath): BaseTransaction = setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
-    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): Transaction
-    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): Transaction
+    protected abstract fun setEncoded(documentRef: DocumentReference, encodedData: Any, setOptions: SetOptions): BaseTransaction
 
+    fun update(documentRef: DocumentReference, data: Any, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncoded(documentRef, encode(data, encodeSettings)!!)
+    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncoded(documentRef, encode(strategy, data, encodeSettings)!!)
+
+    @JvmName("updateFields")
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    @JvmName("updateFieldPaths")
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+
+    protected abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction
+    protected abstract fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<String, Any?>>): BaseTransaction
+    protected abstract fun updateEncodedFieldPathsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): BaseTransaction
+}
+
+expect class Transaction : BaseTransaction {
     fun delete(documentRef: DocumentReference): Transaction
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
@@ -110,31 +131,134 @@ fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.map { it
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
 fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.map { it.value }.toTypedArray()))
 
-expect class WriteBatch {
-    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
-    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
-    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
+abstract class BaseWriteBatch {
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) =
+        setEncoded(documentRef, encode(data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String) =
+        setEncoded(documentRef, encode(data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+    inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) =
+        setEncoded(documentRef, encode(data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String): WriteBatch
-    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath): WriteBatch
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) =
+        setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String)=
+        setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) =
+        setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
+    fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false, vararg fieldsAndValues: Pair<String, Any?>) =
+        setEncoded(documentRef, encode(strategy, data, encodeSettings)!!, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty(), merge)
 
-    inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true): WriteBatch
-    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): WriteBatch
+    abstract fun setEncoded(documentRef: DocumentReference, encodedData: Any, setOptions: SetOptions): BaseWriteBatch
+    abstract fun setEncoded(documentRef: DocumentReference, encodedData: Any, encodedFieldsAndValues: List<Pair<String, Any?>>, merge: Boolean): BaseWriteBatch
 
-    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch
-    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): WriteBatch
+    inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeSettings: EncodeSettings = EncodeSettings()) =
+        updateEncoded(documentRef, encode(data, encodeSettings)!!)
+    fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) =
+        updateEncoded(documentRef, encode(strategy, data, encodeSettings)!!)
+    inline fun <reified T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg fieldsAndValues: Pair<String, Any?>) =
+        updateEncoded(documentRef, encode(strategy, data, encodeSettings)!!, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+
+    @JvmName("updateField")
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+    @JvmName("updateFieldPath")
+    fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+
+    abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch
+    abstract fun updateEncoded(documentRef: DocumentReference, encodedData: Any, encodedFieldsAndValues: List<Pair<String, Any?>>): BaseWriteBatch
+
+    protected abstract fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<String, Any?>>): BaseWriteBatch
+    protected abstract fun updateEncodedFieldPathsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): BaseWriteBatch
+}
+
+expect class WriteBatch : BaseWriteBatch {
+    val async: Async
 
     fun delete(documentRef: DocumentReference): WriteBatch
     suspend fun commit()
+
+    @Suppress("DeferredIsResult")
+    class Async {
+        fun commit(): Deferred<Unit>
+    }
 }
 
 /** A class representing a platform specific Firebase DocumentReference. */
 expect class NativeDocumentReference
 
+abstract class BaseDocumentReference {
+
+    abstract class Async {
+        inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) = setEncoded(encode(data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+        inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String) = setEncoded(encode(data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+        inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) = setEncoded(encode(data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
+
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) = setEncoded(
+            encode(strategy, data, encodeSettings)!!, if (merge) SetOptions.Merge else SetOptions.Overwrite)
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String)= setEncoded(
+            encode(strategy, data, encodeSettings)!!, SetOptions.MergeFields(mergeFields.asList()))
+        fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) = setEncoded(
+            encode(strategy, data, encodeSettings)!!, SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
+
+        abstract fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit>
+
+        inline fun <reified T> update(data: T, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncoded(encode(data, encodeSettings)!!)
+        fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) = update(encode(strategy, data, encodeSettings))
+
+        @JvmName("updateFields")
+        fun update(vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+        @JvmName("updateFieldPaths")
+        fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) = updateEncodedFieldPathsAndValues(encodeFieldAndValue(fieldsAndValues, encodeSettings).orEmpty())
+
+        abstract fun updateEncoded(encodedData: Any): Deferred<Unit>
+        protected abstract fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit>
+        protected abstract fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit>
+
+        abstract fun delete(): Deferred<Unit>
+    }
+
+    abstract val async: Async
+
+    suspend inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) =
+        async.set(data, encodeSettings, merge).await()
+
+    suspend inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String) =
+        async.set(data, encodeSettings, mergeFields = mergeFields).await()
+
+    suspend inline fun <reified T> set(data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) =
+        async.set(data, encodeSettings, mergeFieldPaths = mergeFieldPaths).await()
+
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), merge: Boolean = false) =
+        async.set(strategy, data, encodeSettings, merge).await()
+
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFields: String) =
+        async.set(strategy, data, encodeSettings, mergeFields = mergeFields).await()
+
+    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings(), vararg mergeFieldPaths: FieldPath) =
+        async.set(strategy, data, encodeSettings, mergeFieldPaths = mergeFieldPaths).await()
+
+    @Suppress("UNCHECKED_CAST")
+    suspend inline fun <reified T> update(data: T, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(data, encodeSettings).await()
+
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(strategy, data, encodeSettings).await()
+
+    @JvmName("updateFields")
+    suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(fieldsAndValues = fieldsAndValues, encodeSettings).await()
+
+    @JvmName("updateFieldPaths")
+    suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, encodeSettings: EncodeSettings = EncodeSettings()) =
+        async.update(fieldsAndValues = fieldsAndValues, encodeSettings).await()
+
+    suspend fun delete() =
+        async.delete().await()
+}
+
 /** A class representing a Firebase DocumentReference. */
 @Serializable(with = DocumentReferenceSerializer::class)
-expect class DocumentReference internal constructor(nativeValue: NativeDocumentReference) {
+expect class DocumentReference internal constructor(nativeValue: NativeDocumentReference) : BaseDocumentReference {
     internal val nativeValue: NativeDocumentReference
 
     val id: String
@@ -145,48 +269,22 @@ expect class DocumentReference internal constructor(nativeValue: NativeDocumentR
 
     fun collection(collectionPath: String): CollectionReference
     suspend fun get(): DocumentSnapshot
-
-    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
-    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
-    suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
-
-    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, merge: Boolean = false)
-    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFields: String)
-    suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true, vararg mergeFieldPaths: FieldPath)
-
-    suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean = true)
-    suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)
-
-    suspend fun update(vararg fieldsAndValues: Pair<String, Any?>)
-    suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>)
-
-    suspend fun delete()
 }
-
-/**
- * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
- */
-object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialValueSerializer(
-    serialName = "DocumentReference",
-    toNativeValue = DocumentReference::nativeValue,
-    fromNativeValue = { value ->
-        when (value) {
-            is NativeDocumentReference -> DocumentReference(value)
-            else -> throw SerializationException("Cannot deserialize $value")
-        }
-    }
-)
 
 expect class CollectionReference : Query {
     val path: String
+    val async: Async
     val document: DocumentReference
     val parent: DocumentReference?
 
     fun document(documentPath: String): DocumentReference
-    suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean = true): DocumentReference
-    @Deprecated("This will be replaced with add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true)")
-    suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean = true): DocumentReference
-    suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean = true): DocumentReference
+    suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings = EncodeSettings()): DocumentReference
+    suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()): DocumentReference
+    @Suppress("DeferredIsResult")
+    class Async {
+        inline fun <reified T> add(data: T, encodeSettings: EncodeSettings = EncodeSettings()): Deferred<DocumentReference>
+        fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()): Deferred<DocumentReference>
+    }
 }
 
 expect class FirebaseFirestoreException : FirebaseException
@@ -241,12 +339,12 @@ expect class DocumentChange {
 expect class DocumentSnapshot {
 
     inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
-    fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings(), serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     fun contains(field: String): Boolean
 
     inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
-    fun <T> data(strategy: DeserializationStrategy<T>,  serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
+    fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings(), serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): T
 
     val exists: Boolean
     val id: String
@@ -267,27 +365,7 @@ expect class SnapshotMetadata {
 
 expect class FieldPath(vararg fieldNames: String) {
     val documentId: FieldPath
+    val encoded: EncodedFieldPath
 }
 
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-expect class FieldValue internal constructor(nativeValue: Any) {
-    internal val nativeValue: Any
-
-    companion object {
-        val serverTimestamp: FieldValue
-        val delete: FieldValue
-        fun increment(value: Int): FieldValue
-        fun arrayUnion(vararg elements: Any): FieldValue
-        fun arrayRemove(vararg elements: Any): FieldValue
-    }
-}
-
-/** A serializer for [FieldValue]. Must be used in conjunction with [FirebaseEncoder]. */
-object FieldValueSerializer : KSerializer<FieldValue> by SpecialValueSerializer(
-    serialName = "FieldValue",
-    toNativeValue = FieldValue::nativeValue,
-    fromNativeValue = { raw ->
-        raw?.let(::FieldValue) ?: throw SerializationException("Cannot deserialize $raw")
-    }
-)
+expect class EncodedFieldPath

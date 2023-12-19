@@ -19,10 +19,12 @@ actual val Firebase.functions
 actual fun Firebase.functions(region: String) =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
+@Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp)
 )
 
+@Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
@@ -30,21 +32,17 @@ actual fun Firebase.functions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region)
 )
 
-actual class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
+actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
-actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) {
+actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) : BaseHttpsCallableReference() {
     actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 
-    actual suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(data, encodeDefaults), it) })
-
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        HttpsCallableResult(ios.awaitResult { callWithObject(encode(strategy, data, encodeDefaults), it) })
+    override suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(ios.awaitResult { callWithObject(encodedData, it) })
 }
 
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
@@ -52,8 +50,8 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
     actual inline fun <reified T> data() =
         decode<T>(value = ios.data())
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.data())
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
+        decode(strategy, ios.data(), decodeSettings)
 }
 
 actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)

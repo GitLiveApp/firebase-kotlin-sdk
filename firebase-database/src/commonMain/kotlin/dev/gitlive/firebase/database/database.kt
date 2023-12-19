@@ -4,6 +4,8 @@
 
 package dev.gitlive.firebase.database
 
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type.*
@@ -69,12 +71,12 @@ expect class DatabaseReference : Query {
     fun push(): DatabaseReference
     fun child(path: String): DatabaseReference
     fun onDisconnect(): OnDisconnect
-    suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean = true)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings())
     suspend fun removeValue()
 
-    suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot
+    suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings = DecodeSettings(), transactionUpdate: (currentData: T) -> T): DataSnapshot
 }
 
 expect class DataSnapshot {
@@ -83,7 +85,7 @@ expect class DataSnapshot {
     val ref: DatabaseReference
     val value: Any?
     inline fun <reified T> value(): T
-    fun <T> value(strategy: DeserializationStrategy<T>): T
+    fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings()): T
     fun child(path: String): DataSnapshot
     val hasChildren: Boolean
     val children: Iterable<DataSnapshot>
@@ -94,7 +96,7 @@ expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeExc
 expect class OnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
-    suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean = true)
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean = true)
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean = true)
+    suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings = EncodeSettings())
+    suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings = EncodeSettings())
 }

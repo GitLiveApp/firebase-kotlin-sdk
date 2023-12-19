@@ -1,10 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
-import dev.gitlive.firebase.nativeAssertEquals
-import dev.gitlive.firebase.nativeMapOf
-import dev.gitlive.firebase.runTest
+import dev.gitlive.firebase.*
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,23 +18,28 @@ class GeoPointTests {
     fun encodeGeoPointObject() = runTest {
         val geoPoint = GeoPoint(12.3, 45.6)
         val item = TestDataWithGeoPoint("123", geoPoint)
+        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        assertEquals("123", encoded["uid"])
         // check GeoPoint is encoded to a platform representation
-        nativeAssertEquals(
-            nativeMapOf("uid" to "123", "location" to geoPoint.nativeValue),
-            encode(item, shouldEncodeElementDefault = false)
-        )
+        assertEquals(geoPoint.nativeValue, encoded["location"])
     }
 
     @Test
     fun decodeGeoPointObject() = runTest {
         val geoPoint = GeoPoint(12.3, 45.6)
-        val obj = nativeMapOf(
+        val obj = mapOf(
             "uid" to "123",
             "location" to geoPoint.nativeValue
-        )
+        ).asEncoded()
         val decoded: TestDataWithGeoPoint = decode(obj)
         assertEquals("123", decoded.uid)
         // check a platform GeoPoint is properly wrapped
         assertEquals(geoPoint, decoded.location)
+    }
+
+    @Test
+    @IgnoreJs
+    fun serializers() = runTest {
+        assertEquals(GeoPointSerializer, GeoPoint(0.0,0.0).firebaseSerializer())
     }
 }

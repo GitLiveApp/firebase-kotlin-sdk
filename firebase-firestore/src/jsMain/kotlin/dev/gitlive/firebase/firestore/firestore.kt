@@ -4,21 +4,16 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.*
 import dev.gitlive.firebase.firestore.externals.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.promise
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
 import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
@@ -30,12 +25,14 @@ import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
 import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
-import dev.gitlive.firebase.firestore.externals.arrayRemove as jsArrayRemove
-import dev.gitlive.firebase.firestore.externals.arrayUnion as jsArrayUnion
+import dev.gitlive.firebase.firestore.externals.collection as jsCollection
+import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
+import dev.gitlive.firebase.firestore.externals.disableNetwork as jsDisableNetwork
+import dev.gitlive.firebase.firestore.externals.enableNetwork as jsEnableNetwork
 import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
 import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
-import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 import dev.gitlive.firebase.firestore.externals.limit as jsLimit
+import dev.gitlive.firebase.firestore.externals.runTransaction as jsRunTransaction
 import dev.gitlive.firebase.firestore.externals.startAfter as jsStartAfter
 import dev.gitlive.firebase.firestore.externals.startAt as jsStartAt
 import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
@@ -47,26 +44,14 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { FirebaseFirestore(getFirestore(app.js)) }
 
-/** Helper method to perform an update operation. */
-private fun <R> performUpdate(
-    fieldsAndValues: Array<out Pair<String, Any?>>,
-    update: (String, Any?, Array<Any?>) -> R
-) = performUpdate(fieldsAndValues, { it }, { encode(it, true) }, update)
-
-/** Helper method to perform an update operation. */
-private fun <R> performUpdate(
-    fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
-    update: (dev.gitlive.firebase.firestore.externals.FieldPath, Any?, Array<Any?>) -> R
-) = performUpdate(fieldsAndValues, { it.js }, { encode(it, true) }, update)
-
 actual class FirebaseFirestore(jsFirestore: Firestore) {
 
     var js: Firestore = jsFirestore
         private set
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(collection(js, collectionPath)) }
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
 
-    actual fun collectionGroup(collectionId: String) = rethrow { Query(collectionGroup(js, collectionId)) }
+    actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
@@ -76,7 +61,7 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
         rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        rethrow { runTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
+        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
 
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }
@@ -95,56 +80,79 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     }
 
     actual suspend fun disableNetwork() {
-        rethrow { disableNetwork(js).await() }
+        rethrow { jsDisableNetwork(js).await() }
     }
 
     actual suspend fun enableNetwork() {
-        rethrow { enableNetwork(js).await() }
+        rethrow { jsEnableNetwork(js).await() }
     }
 }
 
-actual class WriteBatch(val js: JsWriteBatch) {
+val SetOptions.js: Json get() = when (this) {
+    is SetOptions.Merge -> json("merge" to true)
+    is SetOptions.Overwrite -> json("merge" to false)
+    is SetOptions.MergeFields -> json("mergeFields" to fields.toTypedArray())
+    is SetOptions.MergeFieldPaths -> json("mergeFields" to encodedFieldPaths.toTypedArray())
+}
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("merge" to merge)) }
-            .let { this }
+actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
-            .let { this }
+    actual val async = Async(js)
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
-            .let { this }
+    override fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        setOptions: SetOptions
+    ): BaseWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("merge" to merge)) }
-            .let { this }
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    override fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
+        merge: Boolean
+    ): BaseWriteBatch = rethrow {
+        val serializedItem = encodedData as Json
+        val serializedFieldAndValues = json(*encodedFieldsAndValues.toTypedArray())
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
-            .let { this }
+        val result = serializedItem.add(serializedFieldAndValues)
+        if (merge) {
+            js.set(documentRef.js, result, json("merge" to merge))
+        } else {
+            js.set(documentRef.js, result)
+        }
+    }.let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
-            .let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
+        .let { this }
 
-    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
-        rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
-            .let { this }
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    override fun updateEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseWriteBatch = rethrow {
+        val serializedItem = encodedData as Json
+        val serializedFieldAndValues = json(*encodedFieldsAndValues.toTypedArray())
 
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { js.update(documentRef.js, encode(strategy, data, encodeDefaults)!!) }
-            .let { this }
+        val result = serializedItem.add(serializedFieldAndValues)
+        js.update(documentRef.js, result)
+    }.let { this }
 
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+    override fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseWriteBatch = rethrow {
+        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
 
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+    override fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ): BaseWriteBatch = rethrow {
+        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -153,52 +161,42 @@ actual class WriteBatch(val js: JsWriteBatch) {
         rethrow { js.delete(documentRef.js) }
             .let { this }
 
-    actual suspend fun commit() = rethrow { js.commit().await() }
+    actual suspend fun commit() = rethrow { async.commit().await() }
 
+    @Suppress("DeferredIsResult")
+    actual class Async(private val js: JsWriteBatch) {
+        actual fun commit() = rethrow { js.commit().asDeferred() }
+    }
 }
 
-actual class Transaction(val js: JsTransaction) {
+actual class Transaction(val js: JsTransaction) : BaseTransaction() {
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("merge" to merge)) }
-            .let { this }
+    override fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        setOptions: SetOptions
+    ): BaseTransaction = rethrow {
+        js.set(documentRef.js, encodedData, setOptions.js)
+    }
+        .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
-            .let { this }
+    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = rethrow { js.update(documentRef.js, encodedData) }
+        .let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("merge" to merge)) }
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)) }
-            .let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { js.set(documentRef.js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())) }
-            .let { this }
-
-    actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
-        rethrow { js.update(documentRef.js, encode(data, encodeDefaults)!!) }
-            .let { this }
-
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { js.update(documentRef.js, encode(strategy, data, encodeDefaults)!!) }
-            .let { this }
-
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+    override fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): BaseTransaction = rethrow {
+        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
 
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
+    override fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ): BaseTransaction = rethrow {
+        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -215,8 +213,8 @@ actual class Transaction(val js: JsTransaction) {
 actual typealias NativeDocumentReference = JsDocumentReference
 
 @Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
-    val js: NativeDocumentReference by ::nativeValue
+actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
+    val js: NativeDocumentReference = nativeValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -227,47 +225,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val parent: CollectionReference
         get() = rethrow { CollectionReference(js.parent) }
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(collection(js, collectionPath)) }
+    override val async = Async(nativeValue)
 
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { setDoc(js, encode(data, encodeDefaults)!!, json("merge" to merge)).await() }
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
 
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { setDoc(js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { setDoc(js, encode(data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())).await() }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        rethrow { setDoc(js, encode(strategy, data, encodeDefaults)!!, json("merge" to merge)).await() }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        rethrow { setDoc(js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFields)).await() }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        rethrow { setDoc(js, encode(strategy, data, encodeDefaults)!!, json("mergeFields" to mergeFieldPaths.map { it.js }.toTypedArray())).await() }
-
-    actual suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
-        rethrow { jsUpdate(js, encode(data, encodeDefaults)!!).await() }
-
-    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { jsUpdate(js, encode(strategy, data, encodeDefaults)!!).await() }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            jsUpdate(js, field, value, *moreFieldsAndValues)
-        }?.await()
-    }.run { Unit }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) = rethrow {
-        performUpdate(fieldsAndValues) { field, value, moreFieldsAndValues ->
-            jsUpdate(js, field, value, *moreFieldsAndValues)
-        }?.await()
-    }.run { Unit }
-
-    actual suspend fun delete() = rethrow { deleteDoc(js).await() }
-
-    actual suspend fun get() = rethrow { DocumentSnapshot(getDoc(js).await()) }
+    actual suspend fun get() = rethrow { DocumentSnapshot( getDoc(js).await()) }
 
     actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
 
@@ -285,6 +247,34 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         this === other || other is DocumentReference && refEqual(nativeValue, other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
+
+    @Suppress("DeferredIsResult")
+    class Async(@PublishedApi internal val js: NativeDocumentReference) : BaseDocumentReference.Async() {
+
+        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = rethrow {
+            setDoc(js, encodedData, setOptions.js).asDeferred()
+        }
+
+        override fun updateEncoded(encodedData: Any): Deferred<Unit> = rethrow { jsUpdate(js, encodedData).asDeferred() }
+
+        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = rethrow {
+            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+                ?.performUpdate { field, value, moreFieldsAndValues ->
+                    jsUpdate(js, field, value, *moreFieldsAndValues)
+                }
+                ?.asDeferred() ?: CompletableDeferred(Unit)
+        }
+
+        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = rethrow {
+            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+                ?.performUpdate { field, value, moreFieldsAndValues ->
+                    jsUpdate(js, field, value, *moreFieldsAndValues)
+                }
+                ?.asDeferred() ?: CompletableDeferred(Unit)
+        }
+
+        override fun delete() = rethrow { deleteDoc(js).asDeferred() }
+    }
 }
 
 actual open class Query(open val js: JsQuery) {
@@ -383,6 +373,7 @@ actual class CollectionReference(override val js: JsCollectionReference) : Query
 
     actual val path: String
         get() =  rethrow { js.path }
+    actual val async = Async(js)
 
     actual val document get() = rethrow { DocumentReference(doc(js)) }
 
@@ -390,13 +381,24 @@ actual class CollectionReference(override val js: JsCollectionReference) : Query
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
-    actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
-        rethrow { DocumentReference(addDoc(js, encode(data, encodeDefaults)!!).await()) }
+    actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
+        rethrow { DocumentReference(addDoc(js, encode(data, encodeSettings)!!).await()) }
+    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
+        rethrow { DocumentReference(addDoc(js, encode(strategy, data, encodeSettings)!!).await()) }
 
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
-        rethrow { DocumentReference(addDoc(js, encode(strategy, data, encodeDefaults)!!).await()) }
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { DocumentReference(addDoc(js, encode(strategy, data, encodeDefaults)!!).await()) }
+    @Suppress("DeferredIsResult")
+    actual class Async(@PublishedApi internal val js: JsCollectionReference) {
+        actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
+            rethrow {
+                addDoc(js, encode(data, encodeSettings)!!).asDeferred()
+                    .convert(::DocumentReference)
+            }
+        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
+            rethrow {
+                addDoc(js, encode(strategy, data, encodeSettings)!!).asDeferred()
+                    .convert(::DocumentReference)
+            }
+    }
 }
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
@@ -431,14 +433,14 @@ actual class DocumentSnapshot(val js: JsDocumentSnapshot) {
     actual inline fun <reified T : Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
         rethrow { decode(value = js.data(getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T =
-        rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior))) }
+    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
+        rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior)), decodeSettings) }
 
     actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior) =
         rethrow { decode<T>(value = js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
 
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior) =
-        rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
+    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior) =
+        rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior)), decodeSettings) }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
     actual val exists get() = rethrow { js.exists() }
@@ -458,35 +460,13 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
         js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
     })
     actual val documentId: FieldPath get() = FieldPath(JsFieldPath.documentId)
-
+    actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
 }
 
-/** Represents a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = dev.gitlive.firebase.firestore.externals.FieldValue
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
-    init {
-        require(nativeValue is NativeFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue &&
-                (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
-
-    actual companion object {
-        actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(serverTimestamp()) }
-        actual val delete: FieldValue get() = rethrow { FieldValue(deleteField()) }
-        actual fun increment(value: Int): FieldValue = rethrow { FieldValue(jsIncrement(value)) }
-        actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayUnion(*elements)) }
-        actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayRemove(*elements)) }
-    }
-}
+actual typealias EncodedFieldPath = JsFieldPath
 
 //actual data class FirebaseFirestoreSettings internal constructor(
 //    val cacheSizeBytes: Number? = undefined,

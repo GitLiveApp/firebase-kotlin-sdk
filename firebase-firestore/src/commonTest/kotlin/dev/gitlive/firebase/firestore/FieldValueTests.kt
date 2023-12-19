@@ -14,4 +14,10 @@ class FieldValueTests {
         assertNotEquals(FieldValue.delete, FieldValue.serverTimestamp)
         // Note: arrayUnion and arrayRemove can't be checked due to vararg to array conversion
     }
+
+    @Test
+    @IgnoreJs
+    fun serializers() = runTest {
+        assertEquals(FieldValueSerializer, FieldValue.delete.firebaseSerializer())
+    }
 }
