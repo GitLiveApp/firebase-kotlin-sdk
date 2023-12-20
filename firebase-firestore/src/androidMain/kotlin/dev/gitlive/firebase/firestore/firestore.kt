@@ -372,22 +372,6 @@ actual open class Query(open val android: AndroidQuery) {
         }
     )
 
-    private fun <T : Any> AndroidQuery.whereField(
-        field: String,
-        nullable: T?,
-        modified: AndroidQuery.(String, T) -> AndroidQuery
-    ) : AndroidQuery = nullable?.let {
-        modified(field, it)
-    } ?: this
-
-    private fun <T : Any> AndroidQuery.wherePath(
-        path: FieldPath,
-        nullable: T?,
-        modified: AndroidQuery.(com.google.firebase.firestore.FieldPath, T) -> AndroidQuery
-    ) : AndroidQuery = nullable?.let {
-        modified(path.android, it)
-    } ?: this
-
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
 
