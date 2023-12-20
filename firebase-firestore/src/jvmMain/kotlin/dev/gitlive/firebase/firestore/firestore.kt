@@ -2,14 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JvmName("android")
+@file:JvmName("JVM")
 package dev.gitlive.firebase.firestore
 
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.*
-import com.google.firebase.firestore.util.Executors
 import dev.gitlive.firebase.*
-import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -42,28 +41,10 @@ private fun <R> performUpdate(
     update: (com.google.firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
 ) = performUpdate(fieldsAndValues, { it.android }, { encode(it, true) }, update)
 
-val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
-    is LocalCacheSettings.Persistent -> persistentCacheSettings {
-        sizeBytes?.let { setSizeBytes(it) }
-    }
-    is LocalCacheSettings.Memory -> memoryCacheSettings {
-        setGcSettings(
-            when (garbaseCollectorSettings) {
-                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> memoryEagerGcSettings {  }
-                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> memoryLruGcSettings {
-                    garbaseCollectorSettings.sizeBytes?.let {
-                        setSizeBytes(it)
-                    }
-                }
-            }
-        )
-    }
-}
-
 // Since on iOS Callback threads are set as settings, we store the settings explicitly here as well
 private val callbackExecutorMap = ConcurrentHashMap<com.google.firebase.firestore.FirebaseFirestore, Executor>()
 
-actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+actual data class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
     actual data class Settings(
         actual val sslEnabled: Boolean? = null,
@@ -76,18 +57,20 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
         }
     }
 
+    private var lastSettings = Settings()
+
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
-    actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId))
-
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
+
+    actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId))
 
     actual fun batch() = WriteBatch(android.batch())
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         com.google.firebase.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
+    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T =
         android.runTransaction { runBlocking { Transaction(it).func() } }.await()
 
     actual suspend fun clearPersistence() =
@@ -95,33 +78,34 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = firestoreSettings {  }
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(false)
+            .build()
     }
 
     actual fun setSettings(settings: Settings) {
-        android.firestoreSettings = firestoreSettings {
-            settings.sslEnabled?.let { isSslEnabled = it }
-            settings.host?.let { host = it }
-            settings.cacheSettings?.let { setLocalCacheSettings(it.android) }
-        }
+        lastSettings = settings
+        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
+            if (settings.cacheSettings is LocalCacheSettings.Persistent) {
+                builder.isPersistenceEnabled = true
+            }
+            settings.sslEnabled?.let { builder.isSslEnabled = it }
+            settings.host?.let { builder.host = it }
+            when (val cacheSettings = settings.cacheSettings) {
+                is LocalCacheSettings.Persistent -> cacheSettings.sizeBytes
+                is LocalCacheSettings.Memory -> when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> null
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbageCollectorSettings.sizeBytes
+                }
+                null -> null
+            }?.let { builder.cacheSizeBytes = it }
+        }.build()
         callbackExecutorMap[android] = settings.callbackExecutor
     }
 
-    @Suppress("DEPRECATION")
-    actual fun updateSettings(settings: Settings) {
-        android.firestoreSettings = firestoreSettings {
-            isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
-            host = settings.host ?: android.firestoreSettings.host
-            val cacheSettings = settings.cacheSettings?.android ?: android.firestoreSettings.cacheSettings
-            cacheSettings?.let {
-                setLocalCacheSettings(it)
-            } ?: kotlin.run {
-                isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
-                setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
-            }
-        }
-        callbackExecutorMap[android] = settings.callbackExecutor
-    }
+    actual fun updateSettings(settings: Settings) = setSettings(
+        Settings(settings.sslEnabled ?: lastSettings.sslEnabled, settings.host ?: lastSettings.host, settings.cacheSettings ?: lastSettings.cacheSettings)
+    )
 
     actual suspend fun disableNetwork() =
         android.disableNetwork().await().run { }

@@ -25,12 +25,24 @@ expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
 expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
 expect class FirebaseDatabase {
+
+    class Settings {
+        val persistenceEnabled: Boolean
+        val persistenceCacheSizeBytes: Long?
+
+        companion object {
+            fun createSettings(persistenceEnabled: Boolean = false, persistenceCacheSizeBytes:  Long? = null): Settings
+        }
+    }
+
     fun reference(path: String): DatabaseReference
     fun reference(): DatabaseReference
-    fun setPersistenceEnabled(enabled: Boolean)
+    fun setSettings(settings: Settings)
     fun setLoggingEnabled(enabled: Boolean)
     fun useEmulator(host: String, port: Int)
 }
+
+fun FirebaseDatabase.setPersistenceEnabled(enabled: Boolean) = setSettings(FirebaseDatabase.Settings.createSettings(persistenceEnabled = enabled))
 
 data class ChildEvent internal constructor(
     val snapshot: DataSnapshot,
