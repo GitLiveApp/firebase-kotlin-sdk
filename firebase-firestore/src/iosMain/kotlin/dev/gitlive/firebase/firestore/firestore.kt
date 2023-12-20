@@ -272,7 +272,7 @@ actual open class Query(open val ios: FIRQuery) {
         awaitClose { listener.remove() }
     }
 
-    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
+    actual fun where(field: String, vararg clauses: WhereClause) = Query(
         clauses.fold(ios) { query, clause ->
             when (clause) {
                 is WhereClause.EqualTo -> query.queryWhereField(field, isEqualTo = clause.safeValue ?: NSNull)
@@ -289,7 +289,7 @@ actual open class Query(open val ios: FIRQuery) {
         }
     )
 
-    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
+    actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
         clauses.fold(ios) { query, clause ->
             when (clause) {
                 is WhereClause.EqualTo -> query.queryWhereFieldPath(path.ios, isEqualTo = clause.safeValue ?: NSNull)

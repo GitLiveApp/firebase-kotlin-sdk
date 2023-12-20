@@ -293,7 +293,7 @@ actual open class Query(open val js: JsQuery) {
 
     actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
-    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
+    actual fun where(field: String, vararg clauses: WhereClause) = Query(
         clauses.fold(js) { query, clause ->
             val value = when (clause) {
                 is WhereClause.ForNullableObject -> clause.safeValue
@@ -303,7 +303,7 @@ actual open class Query(open val js: JsQuery) {
             query(query, jsWhere(field, clause.filterOp, value))
         }
     )
-    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
+    actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
         clauses.fold(js) { query, clause ->
             val value = when (clause) {
                 is WhereClause.ForNullableObject -> clause.safeValue
