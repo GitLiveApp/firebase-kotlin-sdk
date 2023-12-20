@@ -11,6 +11,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
+import kotlin.jvm.JvmName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -68,8 +69,8 @@ sealed class WhereClause {
         val safeValues get() = values.map { it.safeValue }
     }
 
-    data class EqualTo(override val value: Any) : ForNullableObject()
-    data class NotEqualTo(override val value: Any) : ForNullableObject()
+    data class EqualTo(override val value: Any?) : ForNullableObject()
+    data class NotEqualTo(override val value: Any?) : ForNullableObject()
     data class LessThan(override val value: Any) : ForObject()
     data class GreaterThan(override val value: Any) : ForObject()
     data class LessThanOrEqualTo(override val value: Any) : ForObject()
@@ -111,6 +112,59 @@ private val Any.safeValue: Any get() = when (this) {
     is Collection<*> -> this.mapNotNull { it?.safeValue }
     else -> this
 }
+
+fun Query.where(field: String, equalTo: Any?) = where(field, WhereClause.EqualTo(equalTo))
+fun Query.where(path: FieldPath, equalTo: Any?) = where(path, WhereClause.EqualTo(equalTo))
+fun Query.whereNot(field: String, notEqualTo: Any?) = where(field, WhereClause.NotEqualTo(notEqualTo))
+fun Query.whereNot(path: FieldPath, notEqualTo: Any?) = where(path, WhereClause.NotEqualTo(notEqualTo))
+fun Query.where(field: String,
+                lessThan: Any? = null,
+                greaterThan: Any? = null,
+                lessThanOrEqualTo: Any? = null,
+                greaterThanOrEqualTo: Any? = null,
+                arrayContains: Any? = null,
+                arrayContainsAny: List<Any>? = null,
+                inArray: List<Any>? = null,
+                notInArray: List<Any>? = null,
+) =
+    where(
+        field,
+        listOfNotNull(
+            lessThan?.let { WhereClause.LessThan(it) },
+            greaterThan?.let { WhereClause.GreaterThan(it) },
+            lessThanOrEqualTo?.let { WhereClause.LessThanOrEqualTo(it) },
+            greaterThanOrEqualTo?.let { WhereClause.GreaterThanOrEqualTo(it) },
+            arrayContains?.let { WhereClause.ArrayContains(it) },
+            arrayContainsAny?.let { WhereClause.ArrayContainsAny(it) },
+            inArray?.let { WhereClause.InArray(it) },
+            notInArray?.let { WhereClause.NotInArray(it) }
+        )
+    )
+
+fun Query.where(path: FieldPath,
+                lessThan: Any? = null,
+                greaterThan: Any? = null,
+                lessThanOrEqualTo: Any? = null,
+                greaterThanOrEqualTo: Any? = null,
+                arrayContains: Any? = null,
+                arrayContainsAny: List<Any>? = null,
+                inArray: List<Any>? = null,
+                notInArray: List<Any>? = null,
+) =
+    where(
+        path,
+        listOfNotNull(
+            lessThan?.let { WhereClause.LessThan(it) },
+            greaterThan?.let { WhereClause.GreaterThan(it) },
+            lessThanOrEqualTo?.let { WhereClause.LessThanOrEqualTo(it) },
+            greaterThanOrEqualTo?.let { WhereClause.GreaterThanOrEqualTo(it) },
+            arrayContains?.let { WhereClause.ArrayContains(it) },
+            arrayContainsAny?.let { WhereClause.ArrayContainsAny(it) },
+            inArray?.let { WhereClause.InArray(it) },
+            notInArray?.let { WhereClause.NotInArray(it) }
+        )
+    )
+
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
