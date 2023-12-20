@@ -5,7 +5,6 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.channels.awaitClose
@@ -16,6 +15,9 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+
+import com.google.firebase.firestore.Query as AndroidQuery
+import com.google.firebase.firestore.FieldPath as AndroidFieldPath
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -283,7 +285,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     override fun toString(): String = nativeValue.toString()
 }
 
-actual open class Query(open val android: com.google.firebase.firestore.Query) {
+actual open class Query(open val android: AndroidQuery) {
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
 
@@ -306,39 +308,85 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
         awaitClose { listener.remove() }
     }
 
-    internal actual fun _where(field: String, equalTo: Any?) = Query(android.whereEqualTo(field, equalTo))
-    internal actual fun _where(path: FieldPath, equalTo: Any?) = Query(android.whereEqualTo(path.android, equalTo))
-
-    internal actual fun _where(field: String, equalTo: DocumentReference) = Query(android.whereEqualTo(field, equalTo.android))
-    internal actual fun _where(path: FieldPath, equalTo: DocumentReference) = Query(android.whereEqualTo(path.android, equalTo.android))
-
-    internal actual fun _where(field: String, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { android.whereLessThan(field, it) } ?: android).let { android2 ->
-            (greaterThan?.let { android2.whereGreaterThan(field, it) } ?: android2).let { android3 ->
-                arrayContains?.let { android3.whereArrayContains(field, it) } ?: android3
+    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
+        clauses.fold(android) { query, clause ->
+            when (clause) {
+                is WhereClause.ForNullableObject -> {
+                    val modifier: AndroidQuery.(String, Any?) -> AndroidQuery = when (clause) {
+                        is WhereClause.EqualTo -> AndroidQuery::whereEqualTo
+                        is WhereClause.NotEqualTo -> AndroidQuery::whereNotEqualTo
+                    }
+                    modifier.invoke(query, field, clause.safeValue)
+                }
+                is WhereClause.ForObject -> {
+                    val modifier: AndroidQuery.(String, Any) -> AndroidQuery = when (clause) {
+                        is WhereClause.LessThan -> AndroidQuery::whereLessThan
+                        is WhereClause.GreaterThan -> AndroidQuery::whereGreaterThan
+                        is WhereClause.LessThanOrEqualTo -> AndroidQuery::whereLessThanOrEqualTo
+                        is WhereClause.GreaterThanOrEqualTo -> AndroidQuery::whereGreaterThanOrEqualTo
+                        is WhereClause.ArrayContains -> AndroidQuery::whereArrayContains
+                    }
+                    modifier.invoke(query, field, clause.safeValue)
+                }
+                is WhereClause.ForArray -> {
+                    val modifier: AndroidQuery.(String, List<Any>) -> AndroidQuery = when (clause) {
+                        is WhereClause.InArray -> AndroidQuery::whereIn
+                        is WhereClause.ArrayContainsAny -> AndroidQuery::whereArrayContainsAny
+                        is WhereClause.NotInArray -> AndroidQuery::whereNotIn
+                    }
+                    modifier.invoke(query, field, clause.safeValues)
+                }
             }
         }
     )
 
-    internal actual fun _where(path: FieldPath, lessThan: Any?, greaterThan: Any?, arrayContains: Any?) = Query(
-        (lessThan?.let { android.whereLessThan(path.android, it) } ?: android).let { android2 ->
-            (greaterThan?.let { android2.whereGreaterThan(path.android, it) } ?: android2).let { android3 ->
-                arrayContains?.let { android3.whereArrayContains(path.android, it) } ?: android3
+    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
+        clauses.fold(android) { query, clause ->
+            when (clause) {
+                is WhereClause.ForNullableObject -> {
+                    val modifier: AndroidQuery.(AndroidFieldPath, Any?) -> AndroidQuery = when (clause) {
+                        is WhereClause.EqualTo -> AndroidQuery::whereEqualTo
+                        is WhereClause.NotEqualTo -> AndroidQuery::whereNotEqualTo
+                    }
+                    modifier.invoke(query, path.android, clause.safeValue)
+                }
+                is WhereClause.ForObject -> {
+                    val modifier: AndroidQuery.(AndroidFieldPath, Any) -> AndroidQuery = when (clause) {
+                        is WhereClause.LessThan -> AndroidQuery::whereLessThan
+                        is WhereClause.GreaterThan -> AndroidQuery::whereGreaterThan
+                        is WhereClause.LessThanOrEqualTo -> AndroidQuery::whereLessThanOrEqualTo
+                        is WhereClause.GreaterThanOrEqualTo -> AndroidQuery::whereGreaterThanOrEqualTo
+                        is WhereClause.ArrayContains -> AndroidQuery::whereArrayContains
+                    }
+                    modifier.invoke(query, path.android, clause.safeValue)
+                }
+                is WhereClause.ForArray -> {
+                    val modifier: AndroidQuery.(AndroidFieldPath, List<Any>) -> AndroidQuery = when (clause) {
+                        is WhereClause.InArray -> AndroidQuery::whereIn
+                        is WhereClause.ArrayContainsAny -> AndroidQuery::whereArrayContainsAny
+                        is WhereClause.NotInArray -> AndroidQuery::whereNotIn
+                    }
+                    modifier.invoke(query, path.android, clause.safeValues)
+                }
             }
         }
     )
 
-    internal actual fun _where(field: String, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { android.whereIn(field, it) } ?: android).let { android2 ->
-            arrayContainsAny?.let { android2.whereArrayContainsAny(field, it) } ?: android2
-        }
-    )
+    private fun <T : Any> AndroidQuery.whereField(
+        field: String,
+        nullable: T?,
+        modified: AndroidQuery.(String, T) -> AndroidQuery
+    ) : AndroidQuery = nullable?.let {
+        modified(field, it)
+    } ?: this
 
-    internal actual fun _where(path: FieldPath, inArray: List<Any>?, arrayContainsAny: List<Any>?) = Query(
-        (inArray?.let { android.whereIn(path.android, it) } ?: android).let { android2 ->
-            arrayContainsAny?.let { android2.whereArrayContainsAny(path.android, it) } ?: android2
-        }
-    )
+    private fun <T : Any> AndroidQuery.wherePath(
+        path: FieldPath,
+        nullable: T?,
+        modified: AndroidQuery.(com.google.firebase.firestore.FieldPath, T) -> AndroidQuery
+    ) : AndroidQuery = nullable?.let {
+        modified(path.android, it)
+    } ?: this
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))

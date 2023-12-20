@@ -52,19 +52,42 @@ expect class Transaction {
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
 
+sealed class WhereClause {
+
+    sealed class ForNullableObject : WhereClause() {
+        abstract val value: Any?
+        val safeValue get() = value?.safeValue
+    }
+
+    sealed class ForObject : WhereClause() {
+        abstract val value: Any
+        val safeValue get() = value.safeValue
+    }
+    sealed class ForArray : WhereClause() {
+        abstract val values: List<Any>
+        val safeValues get() = values.map { it.safeValue }
+    }
+
+    data class EqualTo(override val value: Any) : ForNullableObject()
+    data class NotEqualTo(override val value: Any) : ForNullableObject()
+    data class LessThan(override val value: Any) : ForObject()
+    data class GreaterThan(override val value: Any) : ForObject()
+    data class LessThanOrEqualTo(override val value: Any) : ForObject()
+    data class GreaterThanOrEqualTo(override val value: Any) : ForObject()
+    data class ArrayContains(override val value: Any) : ForObject()
+    data class InArray(override val values: List<Any>) : ForArray()
+    data class ArrayContainsAny(override val values: List<Any>) : ForArray()
+    data class NotInArray(override val values: List<Any>) : ForArray()
+}
+
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
-    internal fun _where(field: String, equalTo: Any?): Query
-    internal fun _where(path: FieldPath, equalTo: Any?): Query
-    internal fun _where(field: String, equalTo: DocumentReference): Query
-    internal fun _where(path: FieldPath, equalTo: DocumentReference): Query
-    internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
-    internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
+
+    internal fun where(field: String, vararg clauses: WhereClause): Query
+    internal fun where(path: FieldPath, vararg clauses: WhereClause): Query
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
@@ -80,35 +103,27 @@ expect open class Query {
     internal fun _endAt(vararg fieldValues: Any): Query
 }
 
-/** @return a native value of a wrapper or self. */
-private val Any.value get() = when (this) {
+private val Any.safeValue: Any get() = when (this) {
     is Timestamp -> nativeValue
     is GeoPoint -> nativeValue
     is DocumentReference -> nativeValue
+    is Map<*, *> -> this.mapNotNull { (key, value) -> key?.let { it.safeValue to value?.safeValue } }
+    is Collection<*> -> this.mapNotNull { it?.safeValue }
     else -> this
 }
-
-fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo?.value)
-fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo?.value)
-fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo.value)
-fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo.value)
-fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan?.value, greaterThan?.value, arrayContains?.value)
-fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan?.value, greaterThan?.value, arrayContains?.value)
-fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray?.value, arrayContainsAny?.value)
-fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray?.value, arrayContainsAny?.value)
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
-fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 fun Query.startAt(document: DocumentSnapshot) = _startAt(document)
-fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 
 fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
-fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
-fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch
