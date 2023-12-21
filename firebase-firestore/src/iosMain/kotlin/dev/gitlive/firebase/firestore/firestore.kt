@@ -272,39 +272,38 @@ actual open class Query(open val ios: FIRQuery) {
         awaitClose { listener.remove() }
     }
 
-    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
-        clauses.fold(ios) { query, clause ->
-            when (clause) {
-                is WhereClause.EqualTo -> query.queryWhereField(field, isEqualTo = clause.safeValue ?: NSNull)
-                is WhereClause.NotEqualTo -> query.queryWhereField(field, isNotEqualTo = clause.safeValue ?: NSNull)
-                is WhereClause.LessThan -> query.queryWhereField(field, isLessThan = clause.safeValue)
-                is WhereClause.GreaterThan -> query.queryWhereField(field, isGreaterThan = clause.safeValue)
-                is WhereClause.LessThanOrEqualTo -> query.queryWhereField(field, isLessThanOrEqualTo = clause.safeValue)
-                is WhereClause.GreaterThanOrEqualTo -> query.queryWhereField(field, isGreaterThanOrEqualTo = clause.safeValue)
-                is WhereClause.ArrayContains -> query.queryWhereField(field, arrayContains = clause.safeValue)
-                is WhereClause.InArray -> query.queryWhereField(field, `in` = clause.safeValues)
-                is WhereClause.ArrayContainsAny -> query.queryWhereField(field, arrayContainsAny = clause.safeValues)
-                is WhereClause.NotInArray -> query.queryWhereField(field, notIn = clause.safeValues)
-            }
-        }
+    internal actual fun where(filter: Filter): Query = Query(
+        ios.queryWhereFilter(filter.toFIRFilter())
     )
 
-    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
-        clauses.fold(ios) { query, clause ->
-            when (clause) {
-                is WhereClause.EqualTo -> query.queryWhereFieldPath(path.ios, isEqualTo = clause.safeValue ?: NSNull)
-                is WhereClause.NotEqualTo -> query.queryWhereFieldPath(path.ios, isNotEqualTo = clause.safeValue ?: NSNull)
-                is WhereClause.LessThan -> query.queryWhereFieldPath(path.ios, isLessThan = clause.safeValue)
-                is WhereClause.GreaterThan -> query.queryWhereFieldPath(path.ios, isGreaterThan = clause.safeValue)
-                is WhereClause.LessThanOrEqualTo -> query.queryWhereFieldPath(path.ios, isLessThanOrEqualTo = clause.safeValue)
-                is WhereClause.GreaterThanOrEqualTo -> query.queryWhereFieldPath(path.ios, isGreaterThanOrEqualTo = clause.safeValue)
-                is WhereClause.ArrayContains -> query.queryWhereFieldPath(path.ios, arrayContains = clause.safeValue)
-                is WhereClause.InArray -> query.queryWhereFieldPath(path.ios, `in` = clause.safeValues)
-                is WhereClause.ArrayContainsAny -> query.queryWhereFieldPath(path.ios, arrayContainsAny = clause.safeValues)
-                is WhereClause.NotInArray -> query.queryWhereFieldPath(path.ios, notIn = clause.safeValues)
-            }
+    private fun Filter.toFIRFilter(): FIRFilter = when (this) {
+        is Filter.And -> FIRFilter.andFilterWithFilters(filters.map { it.toFIRFilter() })
+        is Filter.Or -> FIRFilter.orFilterWithFilters(filters.map { it.toFIRFilter() })
+        is Filter.Field -> when (constraint) {
+            is WhereConstraint.EqualTo -> FIRFilter.filterWhereField(field, isEqualTo = constraint.safeValue ?: NSNull)
+            is WhereConstraint.NotEqualTo -> FIRFilter.filterWhereField(field, isNotEqualTo = constraint.safeValue ?: NSNull)
+            is WhereConstraint.LessThan -> FIRFilter.filterWhereField(field, isLessThan = constraint.safeValue)
+            is WhereConstraint.GreaterThan -> FIRFilter.filterWhereField(field, isGreaterThan = constraint.safeValue)
+            is WhereConstraint.LessThanOrEqualTo -> FIRFilter.filterWhereField(field, isLessThanOrEqualTo = constraint.safeValue)
+            is WhereConstraint.GreaterThanOrEqualTo -> FIRFilter.filterWhereField(field, isGreaterThanOrEqualTo = constraint.safeValue)
+            is WhereConstraint.ArrayContains -> FIRFilter.filterWhereField(field, arrayContains = constraint.safeValue)
+            is WhereConstraint.ArrayContainsAny -> FIRFilter.filterWhereField(field, arrayContainsAny = constraint.safeValues)
+            is WhereConstraint.InArray -> FIRFilter.filterWhereField(field, `in` = constraint.safeValues)
+            is WhereConstraint.NotInArray -> FIRFilter.filterWhereField(field, notIn = constraint.safeValues)
         }
-    )
+        is Filter.Path -> when (constraint) {
+            is WhereConstraint.EqualTo -> FIRFilter.filterWhereFieldPath(path.ios, isEqualTo = constraint.safeValue ?: NSNull)
+            is WhereConstraint.NotEqualTo -> FIRFilter.filterWhereFieldPath(path.ios, isNotEqualTo = constraint.safeValue ?: NSNull)
+            is WhereConstraint.LessThan -> FIRFilter.filterWhereFieldPath(path.ios, isLessThan = constraint.safeValue)
+            is WhereConstraint.GreaterThan -> FIRFilter.filterWhereFieldPath(path.ios, isGreaterThan = constraint.safeValue)
+            is WhereConstraint.LessThanOrEqualTo -> FIRFilter.filterWhereFieldPath(path.ios, isLessThanOrEqualTo = constraint.safeValue)
+            is WhereConstraint.GreaterThanOrEqualTo -> FIRFilter.filterWhereFieldPath(path.ios, isGreaterThanOrEqualTo = constraint.safeValue)
+            is WhereConstraint.ArrayContains -> FIRFilter.filterWhereFieldPath(path.ios, arrayContains = constraint.safeValue)
+            is WhereConstraint.ArrayContainsAny -> FIRFilter.filterWhereFieldPath(path.ios, arrayContainsAny = constraint.safeValues)
+            is WhereConstraint.InArray -> FIRFilter.filterWhereFieldPath(path.ios, `in` = constraint.safeValues)
+            is WhereConstraint.NotInArray -> FIRFilter.filterWhereFieldPath(path.ios, notIn = constraint.safeValues)
+        }
+    }
 
     internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))

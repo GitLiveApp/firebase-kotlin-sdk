@@ -11,8 +11,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
-import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
 expect val Firebase.firestore: FirebaseFirestore
@@ -54,42 +52,13 @@ expect class Transaction {
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
 
-internal sealed interface WhereClause {
-
-    sealed interface ForNullableObject : WhereClause {
-        abstract val value: Any?
-        val safeValue get() = value?.safeValue
-    }
-
-    sealed interface ForObject : WhereClause {
-        abstract val value: Any
-        val safeValue get() = value.safeValue
-    }
-    sealed interface ForArray : WhereClause {
-        abstract val values: List<Any>
-        val safeValues get() = values.map { it.safeValue }
-    }
-
-    data class EqualTo(override val value: Any?) : ForNullableObject
-    data class NotEqualTo(override val value: Any?) : ForNullableObject
-    data class LessThan(override val value: Any) : ForObject
-    data class GreaterThan(override val value: Any) : ForObject
-    data class LessThanOrEqualTo(override val value: Any) : ForObject
-    data class GreaterThanOrEqualTo(override val value: Any) : ForObject
-    data class ArrayContains(override val value: Any) : ForObject
-    data class InArray(override val values: List<Any>) : ForArray
-    data class ArrayContainsAny(override val values: List<Any>) : ForArray
-    data class NotInArray(override val values: List<Any>) : ForArray
-}
-
 expect open class Query {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
 
-    internal fun where(field: String, vararg clauses: WhereClause): Query
-    internal fun where(path: FieldPath, vararg clauses: WhereClause): Query
+    internal fun where(filter: Filter): Query
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
@@ -105,68 +74,63 @@ expect open class Query {
     internal fun _endAt(vararg fieldValues: Any): Query
 }
 
-private val Any.safeValue: Any get() = when (this) {
-    is Timestamp -> nativeValue
-    is GeoPoint -> nativeValue
-    is DocumentReference -> nativeValue
-    is Map<*, *> -> this.mapNotNull { (key, value) -> key?.let { it.safeValue to value?.safeValue } }
-    is Collection<*> -> this.mapNotNull { it?.safeValue }
-    else -> this
+fun Query.where(builder: FilterBuilder.() -> Filter?) = builder(FilterBuilder())?.let { where(it) } ?: this
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, equalTo: Any?) = where {
+    field equalTo equalTo
 }
 
-fun Query.where(field: String, equalTo: Any?) = where(field, clause = WhereClause.EqualTo(equalTo))
-fun Query.where(path: FieldPath, equalTo: Any?) = where(path, clause = WhereClause.EqualTo(equalTo))
-private fun Query.where(field: String, clause: WhereClause): Query = where(field, clauses = listOf(clause).toTypedArray())
-private fun Query.where(path: FieldPath, clause: WhereClause): Query = where(path, clauses = listOf(clause).toTypedArray())
-fun Query.whereNot(field: String, notEqualTo: Any?) = where(field, clause = WhereClause.NotEqualTo(notEqualTo))
-fun Query.whereNot(path: FieldPath, notEqualTo: Any?) = where(path, clause = WhereClause.NotEqualTo(notEqualTo))
-fun Query.where(field: String,
-                lessThan: Any? = null,
-                greaterThan: Any? = null,
-                lessThanOrEqualTo: Any? = null,
-                greaterThanOrEqualTo: Any? = null,
-                arrayContains: Any? = null,
-                arrayContainsAny: List<Any>? = null,
-                inArray: List<Any>? = null,
-                notInArray: List<Any>? = null,
-) =
-    where(
-        field,
-        clauses = listOfNotNull(
-            lessThan?.let { WhereClause.LessThan(it) },
-            greaterThan?.let { WhereClause.GreaterThan(it) },
-            lessThanOrEqualTo?.let { WhereClause.LessThanOrEqualTo(it) },
-            greaterThanOrEqualTo?.let { WhereClause.GreaterThanOrEqualTo(it) },
-            arrayContains?.let { WhereClause.ArrayContains(it) },
-            arrayContainsAny?.let { WhereClause.ArrayContainsAny(it) },
-            inArray?.let { WhereClause.InArray(it) },
-            notInArray?.let { WhereClause.NotInArray(it) }
-        ).toTypedArray()
-    )
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { path equalTo equalTo }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, equalTo: Any?) = where {
+    path equalTo equalTo
+}
 
-fun Query.where(path: FieldPath,
-                lessThan: Any? = null,
-                greaterThan: Any? = null,
-                lessThanOrEqualTo: Any? = null,
-                greaterThanOrEqualTo: Any? = null,
-                arrayContains: Any? = null,
-                arrayContainsAny: List<Any>? = null,
-                inArray: List<Any>? = null,
-                notInArray: List<Any>? = null,
-) =
-    where(
-        path,
-        clauses = listOfNotNull(
-            lessThan?.let { WhereClause.LessThan(it) },
-            greaterThan?.let { WhereClause.GreaterThan(it) },
-            lessThanOrEqualTo?.let { WhereClause.LessThanOrEqualTo(it) },
-            greaterThanOrEqualTo?.let { WhereClause.GreaterThanOrEqualTo(it) },
-            arrayContains?.let { WhereClause.ArrayContains(it) },
-            arrayContainsAny?.let { WhereClause.ArrayContainsAny(it) },
-            inArray?.let { WhereClause.InArray(it) },
-            notInArray?.let { WhereClause.NotInArray(it) }
-        ).toTypedArray()
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
+    val filters = listOfNotNull(
+        lessThan?.let { field lessThan it },
+        greaterThan?.let { field greaterThan it },
+        arrayContains?.let { field contains it }
     )
+    filters.fold<Filter, Filter?>(null) { acc, filter ->
+       acc?.let { it and filter } ?: filter
+    }
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
+    val filters = listOfNotNull(
+        lessThan?.let { path lessThan it },
+        greaterThan?.let { path greaterThan it },
+        arrayContains?.let { path contains it }
+    )
+    filters.fold<Filter, Filter?>(null) { acc, filter ->
+        acc?.let { it and filter } ?: filter
+    }
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
+    val filters = listOfNotNull(
+        inArray?.let { field `in` it },
+        arrayContainsAny?.let { field containsAny  it },
+    )
+    filters.fold<Filter, Filter?>(null) { acc, filter ->
+        acc?.let { it and filter } ?: filter
+    }
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
+    val filters = listOfNotNull(
+        inArray?.let { path `in` it },
+        arrayContainsAny?.let { path containsAny  it },
+    )
+    filters.fold<Filter, Filter?>(null) { acc, filter ->
+        acc?.let { it and filter } ?: filter
+    }
+}
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
@@ -180,6 +144,15 @@ fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
 fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
 fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
+
+internal val Any.safeValue: Any get() = when (this) {
+    is Timestamp -> nativeValue
+    is GeoPoint -> nativeValue
+    is DocumentReference -> nativeValue
+    is Map<*, *> -> this.mapNotNull { (key, value) -> key?.let { it.safeValue to value?.safeValue } }
+    is Collection<*> -> this.mapNotNull { it?.safeValue }
+    else -> this
+}
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch

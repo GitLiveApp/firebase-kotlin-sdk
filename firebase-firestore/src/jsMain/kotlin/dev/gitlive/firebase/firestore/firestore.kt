@@ -293,39 +293,42 @@ actual open class Query(open val js: JsQuery) {
 
     actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
-    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
-        clauses.fold(js) { query, clause ->
-            val value = when (clause) {
-                is WhereClause.ForNullableObject -> clause.safeValue
-                is WhereClause.ForObject -> clause.safeValue
-                is WhereClause.ForArray -> clause.safeValues.toTypedArray()
-            }
-            query(query, jsWhere(field, clause.filterOp, value))
-        }
+    internal actual fun where(filter: Filter): Query = Query(
+        query(js, filter.toQueryConstraint())
     )
 
-    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
-        clauses.fold(js) { query, clause ->
-            val value = when (clause) {
-                is WhereClause.ForNullableObject -> clause.safeValue
-                is WhereClause.ForObject -> clause.safeValue
-                is WhereClause.ForArray -> clause.safeValues.toTypedArray()
+    private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {
+        is Filter.And -> and(*filters.map { it.toQueryConstraint() }.toTypedArray())
+        is Filter.Or -> or(*filters.map { it.toQueryConstraint() }.toTypedArray())
+        is Filter.Field -> {
+            val value = when (constraint) {
+                is WhereConstraint.ForNullableObject -> constraint.safeValue
+                is WhereConstraint.ForObject -> constraint.safeValue
+                is WhereConstraint.ForArray -> constraint.safeValues.toTypedArray()
             }
-            query(query, jsWhere(path.js, clause.filterOp, value))
+            jsWhere(field, constraint.filterOp, value)
         }
-    )
+        is Filter.Path -> {
+            val value = when (constraint) {
+                is WhereConstraint.ForNullableObject -> constraint.safeValue
+                is WhereConstraint.ForObject -> constraint.safeValue
+                is WhereConstraint.ForArray -> constraint.safeValues.toTypedArray()
+            }
+            jsWhere(path.js, constraint.filterOp, value)
+        }
+    }
 
-    private val WhereClause.filterOp: String get() = when (this) {
-        is WhereClause.EqualTo -> "=="
-        is WhereClause.NotEqualTo -> "!="
-        is WhereClause.LessThan -> "<"
-        is WhereClause.LessThanOrEqualTo -> "<="
-        is WhereClause.GreaterThan -> ">"
-        is WhereClause.GreaterThanOrEqualTo -> ">="
-        is WhereClause.ArrayContains -> "array-contains"
-        is WhereClause.ArrayContainsAny -> "array-contains-any"
-        is WhereClause.InArray -> "in"
-        is WhereClause.NotInArray -> "not-in"
+    private val WhereConstraint.filterOp: String get() = when (this) {
+        is WhereConstraint.EqualTo -> "=="
+        is WhereConstraint.NotEqualTo -> "!="
+        is WhereConstraint.LessThan -> "<"
+        is WhereConstraint.LessThanOrEqualTo -> "<="
+        is WhereConstraint.GreaterThan -> ">"
+        is WhereConstraint.GreaterThanOrEqualTo -> ">="
+        is WhereConstraint.ArrayContains -> "array-contains"
+        is WhereConstraint.ArrayContainsAny -> "array-contains-any"
+        is WhereConstraint.InArray -> "in"
+        is WhereConstraint.NotInArray -> "not-in"
     }
 
     internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
