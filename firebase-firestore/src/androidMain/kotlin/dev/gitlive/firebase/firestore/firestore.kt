@@ -308,7 +308,7 @@ actual open class Query(open val android: AndroidQuery) {
         awaitClose { listener.remove() }
     }
 
-    actual fun where(field: String, vararg clauses: WhereClause) = Query(
+    internal actual fun where(field: String, vararg clauses: WhereClause) = Query(
         clauses.fold(android) { query, clause ->
             when (clause) {
                 is WhereClause.ForNullableObject -> {
@@ -340,7 +340,7 @@ actual open class Query(open val android: AndroidQuery) {
         }
     )
 
-    actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
+    internal actual fun where(path: FieldPath, vararg clauses: WhereClause) = Query(
         clauses.fold(android) { query, clause ->
             when (clause) {
                 is WhereClause.ForNullableObject -> {

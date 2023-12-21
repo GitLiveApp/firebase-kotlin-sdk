@@ -11,6 +11,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 /** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
@@ -53,32 +54,32 @@ expect class Transaction {
     suspend fun get(documentRef: DocumentReference): DocumentSnapshot
 }
 
-sealed class WhereClause {
+internal sealed interface WhereClause {
 
-    sealed class ForNullableObject : WhereClause() {
+    sealed interface ForNullableObject : WhereClause {
         abstract val value: Any?
         val safeValue get() = value?.safeValue
     }
 
-    sealed class ForObject : WhereClause() {
+    sealed interface ForObject : WhereClause {
         abstract val value: Any
         val safeValue get() = value.safeValue
     }
-    sealed class ForArray : WhereClause() {
+    sealed interface ForArray : WhereClause {
         abstract val values: List<Any>
         val safeValues get() = values.map { it.safeValue }
     }
 
-    data class EqualTo(override val value: Any?) : ForNullableObject()
-    data class NotEqualTo(override val value: Any?) : ForNullableObject()
-    data class LessThan(override val value: Any) : ForObject()
-    data class GreaterThan(override val value: Any) : ForObject()
-    data class LessThanOrEqualTo(override val value: Any) : ForObject()
-    data class GreaterThanOrEqualTo(override val value: Any) : ForObject()
-    data class ArrayContains(override val value: Any) : ForObject()
-    data class InArray(override val values: List<Any>) : ForArray()
-    data class ArrayContainsAny(override val values: List<Any>) : ForArray()
-    data class NotInArray(override val values: List<Any>) : ForArray()
+    data class EqualTo(override val value: Any?) : ForNullableObject
+    data class NotEqualTo(override val value: Any?) : ForNullableObject
+    data class LessThan(override val value: Any) : ForObject
+    data class GreaterThan(override val value: Any) : ForObject
+    data class LessThanOrEqualTo(override val value: Any) : ForObject
+    data class GreaterThanOrEqualTo(override val value: Any) : ForObject
+    data class ArrayContains(override val value: Any) : ForObject
+    data class InArray(override val values: List<Any>) : ForArray
+    data class ArrayContainsAny(override val values: List<Any>) : ForArray
+    data class NotInArray(override val values: List<Any>) : ForArray
 }
 
 expect open class Query {
@@ -87,8 +88,8 @@ expect open class Query {
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
 
-    fun where(field: String, vararg clauses: WhereClause): Query
-    fun where(path: FieldPath, vararg clauses: WhereClause): Query
+    internal fun where(field: String, vararg clauses: WhereClause): Query
+    internal fun where(path: FieldPath, vararg clauses: WhereClause): Query
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
@@ -115,8 +116,8 @@ private val Any.safeValue: Any get() = when (this) {
 
 fun Query.where(field: String, equalTo: Any?) = where(field, clause = WhereClause.EqualTo(equalTo))
 fun Query.where(path: FieldPath, equalTo: Any?) = where(path, clause = WhereClause.EqualTo(equalTo))
-fun Query.where(field: String, clause: WhereClause): Query = where(field, clauses = listOf(clause).toTypedArray())
-fun Query.where(path: FieldPath, clause: WhereClause): Query = where(path, clauses = listOf(clause).toTypedArray())
+private fun Query.where(field: String, clause: WhereClause): Query = where(field, clauses = listOf(clause).toTypedArray())
+private fun Query.where(path: FieldPath, clause: WhereClause): Query = where(path, clauses = listOf(clause).toTypedArray())
 fun Query.whereNot(field: String, notEqualTo: Any?) = where(field, clause = WhereClause.NotEqualTo(notEqualTo))
 fun Query.whereNot(path: FieldPath, notEqualTo: Any?) = where(path, clause = WhereClause.NotEqualTo(notEqualTo))
 fun Query.where(field: String,
