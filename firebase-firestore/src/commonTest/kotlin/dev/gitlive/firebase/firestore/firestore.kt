@@ -510,17 +510,15 @@ class FirebaseFirestoreTest {
         collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(pastTimestamp))
         collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(futureTimestamp))
 
-        val equalityQueryResult = collection.where(
-            path = FieldPath(DocumentWithTimestamp::time.name),
-            equalTo = pastTimestamp
-        ).get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+        val equalityQueryResult = collection.where {
+            FieldPath(DocumentWithTimestamp::time.name) equalTo pastTimestamp
+        }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
 
         assertEquals(setOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
 
-        val gtQueryResult = collection.where(
-            path = FieldPath(DocumentWithTimestamp::time.name),
-            greaterThan = timestamp
-        ).get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+        val gtQueryResult = collection.where {
+            FieldPath(DocumentWithTimestamp::time.name) greaterThan timestamp
+        }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
 
         assertEquals(setOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
     }
