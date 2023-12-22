@@ -112,7 +112,7 @@ fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
     all(
         *listOfNotNull(
-            inArray?.let { field `in` it },
+            inArray?.let { field inArray it },
             arrayContainsAny?.let { field containsAny  it },
         ).toTypedArray()
     )
@@ -122,7 +122,7 @@ fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: Lis
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
     all(
         *listOfNotNull(
-            inArray?.let { path `in` it },
+            inArray?.let { path inArray it },
             arrayContainsAny?.let { path containsAny  it },
         ).toTypedArray()
     )

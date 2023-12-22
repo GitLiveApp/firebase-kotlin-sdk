@@ -105,19 +105,19 @@ class FilterBuilder internal constructor() {
         return Filter.Path(this, WhereConstraint.ArrayContainsAny(values))
     }
 
-    infix fun String.`in`(values: List<Any>): Filter.WithConstraint {
+    infix fun String.inArray(values: List<Any>): Filter.WithConstraint {
         return Filter.Field(this, WhereConstraint.InArray(values))
     }
 
-    infix fun FieldPath.`in`(values: List<Any>): Filter.WithConstraint {
+    infix fun FieldPath.inArray(values: List<Any>): Filter.WithConstraint {
         return Filter.Path(this, WhereConstraint.InArray(values))
     }
 
-    infix fun String.notIn(values: List<Any>): Filter.WithConstraint {
+    infix fun String.notInArray(values: List<Any>): Filter.WithConstraint {
         return Filter.Field(this, WhereConstraint.NotInArray(values))
     }
 
-    infix fun FieldPath.notIn(values: List<Any>): Filter.WithConstraint {
+    infix fun FieldPath.notInArray(values: List<Any>): Filter.WithConstraint {
         return Filter.Path(this, WhereConstraint.NotInArray(values))
     }
 

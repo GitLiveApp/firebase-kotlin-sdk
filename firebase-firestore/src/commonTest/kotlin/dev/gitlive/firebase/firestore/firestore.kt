@@ -10,13 +10,11 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -702,13 +700,13 @@ class FirebaseFirestoreTest {
 
         val fieldQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { "prop1" `in` listOf("aaa", "bbb") }
+            .where { "prop1" inArray listOf("aaa", "bbb") }
 
         fieldQuery.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
 
         val pathQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { FieldPath(FirestoreTest::prop1.name) `in` listOf("ccc", "ddd") }
+            .where { FieldPath(FirestoreTest::prop1.name) inArray listOf("ccc", "ddd") }
 
         pathQuery.assertDocuments(FirestoreTest.serializer(), testThree)
     }
@@ -719,13 +717,13 @@ class FirebaseFirestoreTest {
 
         val fieldQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { "prop1" notIn listOf("aaa", "bbb") }
+            .where { "prop1" notInArray listOf("aaa", "bbb") }
 
         fieldQuery.assertDocuments(FirestoreTest.serializer(), testThree)
 
         val pathQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { FieldPath(FirestoreTest::prop1.name) notIn listOf("ccc", "ddd") }
+            .where { FieldPath(FirestoreTest::prop1.name) notInArray listOf("ccc", "ddd") }
 
         pathQuery.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
     }
@@ -737,7 +735,7 @@ class FirebaseFirestoreTest {
         val andQuery = firestore
             .collection("testFirestoreQuerying")
             .where {
-                FieldPath(FirestoreTest::prop1.name) `in` listOf("aaa", "bbb") and (FieldPath(FirestoreTest::count.name) equalTo 1)
+                FieldPath(FirestoreTest::prop1.name) inArray listOf("aaa", "bbb") and (FieldPath(FirestoreTest::count.name) equalTo 1)
             }
         andQuery.assertDocuments(FirestoreTest.serializer(), testOne)
 
