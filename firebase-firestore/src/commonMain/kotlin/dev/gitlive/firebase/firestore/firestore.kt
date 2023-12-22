@@ -88,48 +88,44 @@ fun Query.where(path: FieldPath, equalTo: Any?) = where {
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
 fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
-    val filters = listOfNotNull(
-        lessThan?.let { field lessThan it },
-        greaterThan?.let { field greaterThan it },
-        arrayContains?.let { field contains it }
+    all(
+        *listOfNotNull(
+            lessThan?.let { field lessThan it },
+            greaterThan?.let { field greaterThan it },
+            arrayContains?.let { field contains it }
+        ).toTypedArray()
     )
-    filters.fold<Filter, Filter?>(null) { acc, filter ->
-       acc?.let { it and filter } ?: filter
-    }
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
 fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
-    val filters = listOfNotNull(
-        lessThan?.let { path lessThan it },
-        greaterThan?.let { path greaterThan it },
-        arrayContains?.let { path contains it }
+    all(
+        *listOfNotNull(
+            lessThan?.let { path lessThan it },
+            greaterThan?.let { path greaterThan it },
+            arrayContains?.let { path contains it }
+        ).toTypedArray()
     )
-    filters.fold<Filter, Filter?>(null) { acc, filter ->
-        acc?.let { it and filter } ?: filter
-    }
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
 fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
-    val filters = listOfNotNull(
-        inArray?.let { field `in` it },
-        arrayContainsAny?.let { field containsAny  it },
+    all(
+        *listOfNotNull(
+            inArray?.let { field `in` it },
+            arrayContainsAny?.let { field containsAny  it },
+        ).toTypedArray()
     )
-    filters.fold<Filter, Filter?>(null) { acc, filter ->
-        acc?.let { it and filter } ?: filter
-    }
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
 fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
-    val filters = listOfNotNull(
-        inArray?.let { path `in` it },
-        arrayContainsAny?.let { path containsAny  it },
+    all(
+        *listOfNotNull(
+            inArray?.let { path `in` it },
+            arrayContainsAny?.let { path containsAny  it },
+        ).toTypedArray()
     )
-    filters.fold<Filter, Filter?>(null) { acc, filter ->
-        acc?.let { it and filter } ?: filter
-    }
 }
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)

@@ -144,4 +144,11 @@ class FilterBuilder internal constructor() {
         }
         return Filter.Or(leftList + rightList)
     }
+
+    fun all(vararg filters: Filter): Filter? = filters.toList().combine { left, right -> left and right }
+    fun any(vararg filters: Filter): Filter? = filters.toList().combine { left, right -> left or right }
+
+    private fun Collection<Filter>.combine(over: (Filter, Filter) -> Filter): Filter? = fold<Filter, Filter?>(null) { acc, filter ->
+        acc?.let { over(acc, filter) } ?: filter
+    }
 }

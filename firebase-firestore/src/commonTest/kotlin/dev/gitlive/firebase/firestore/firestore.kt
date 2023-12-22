@@ -751,10 +751,13 @@ class FirebaseFirestoreTest {
         val andOrQuery = firestore
             .collection("testFirestoreQuerying")
             .where {
-                (
-                        FieldPath(FirestoreTest::prop1.name) equalTo "aaa" or
-                                (FieldPath(FirestoreTest::count.name) equalTo 2)
-                        ) and (FieldPath(FirestoreTest::list.name) contains "a")
+                all(
+                    any(
+                        FieldPath(FirestoreTest::prop1.name) equalTo "aaa",
+                        FieldPath(FirestoreTest::count.name) equalTo 2,
+                    )!!,
+                    FieldPath(FirestoreTest::list.name) contains "a"
+                )
             }
         andOrQuery.assertDocuments(FirestoreTest.serializer(), testOne)
     }
