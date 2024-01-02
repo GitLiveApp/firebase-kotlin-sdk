@@ -24,7 +24,9 @@ runs:
       run: chmod +x gradlew
     - name: Install Firebase tools
       shell: bash
-      run: npm install -g firebase-tools
+      run: npm install -g firebase-tools wait-on
     - name: Start Firebase emulator
       shell: bash
-      run: "firebase emulators:start --config=./test/firebase.json &"
+      run: |
+        firebase emulators:start --config=./test/firebase.json &
+        wait-on http://127.0.0.1:9099
