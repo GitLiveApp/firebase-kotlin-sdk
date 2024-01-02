@@ -66,6 +66,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
+        timeout-minutes: 10
       - name: Run JS Tests
         run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
@@ -89,14 +90,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
         uses: actions/cache@v3
-        id: cocoapods-cache
         with:
           path: |
             ~/.cocoapods
             ~/Library/Caches/CocoaPods
             */build/cocoapods
             */build/classes
-          key: cocoapods-cache
+          key: cocoapods-cache-v2
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: Run iOS Tests
