@@ -14,8 +14,8 @@ Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multipla
 
 The following libraries are available for the various Firebase products.
 
-| Service or Product	                                                             | Gradle Dependency                                                                                                            | API Coverage                                                                                                                                                             |
-|---------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
+|---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.10.4/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.10.4/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.10.4/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
@@ -178,18 +178,36 @@ user.updateProfile(profileUpdates)
 user.updateProfile(displayName = "state", photoURL = "CA")
 ```
 
-<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
 
-To improve readability functions such as the Cloud Firestore query operators use named arguments:
+
+<h3><a href="https://kotlinlang.org/docs/functions.html#infix-notation">Infix notation</a></h3>
+
+To improve readability and reduce boilerplate for functions such as the Cloud Firestore query operators are built with infix notation:
 
 ```kotlin
 citiesRef.whereEqualTo("state", "CA")
 citiesRef.whereArrayContains("regions", "west_coast")
+citiesRef.where(Filter.and(
+    Filter.equalTo("state", "CA"),
+    Filter.or(
+        Filter.equalTo("capital", true),
+        Filter.greaterThanOrEqualTo("population", 1000000)
+    )
+))
 
 //...becomes...
 
-citiesRef.where("state", equalTo = "CA")
-citiesRef.where("regions", arrayContains = "west_coast")
+citiesRef.where { "state" equalTo "CA" }
+citiesRef.where { "regions" contains "west_coast" }
+citiesRef.where {
+    all(
+        "state" equalTo "CA",
+        any(
+            "capital" equalTo true,
+            "population" greaterThanOrEqualTo 1000000
+        )
+    )
+}
 ```
 
 <h3><a href="https://kotlinlang.org/docs/reference/operator-overloading.html">Operator overloading</a></h3>

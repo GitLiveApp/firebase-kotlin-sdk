@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore
 
 import com.google.firebase.firestore.*
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -310,72 +311,77 @@ actual open class Query(open val android: AndroidQuery) {
     }
 
     internal actual fun where(filter: Filter) = Query(
-        android.where(filter.toAndroidFilter())
+        filter.parseForQuery(android)
     )
 
-    private fun Filter.toAndroidFilter(): AndroidFilter = when (this) {
-        is Filter.And -> AndroidFilter.and(*filters.map { it.toAndroidFilter() }.toTypedArray())
-        is Filter.Or -> AndroidFilter.or(*filters.map { it.toAndroidFilter() }.toTypedArray())
+    private fun Filter.parseForQuery(query: AndroidQuery): AndroidQuery = when (this) {
+        is Filter.And -> filters.fold(query) { acc, andFilter ->
+            andFilter.parseForQuery(acc)
+        }
+        is Filter.Or -> throw FirebaseFirestoreException(
+            "Filter.Or not supported on JVM",
+            com.google.firebase.firestore.FirebaseFirestoreException.Code.INVALID_ARGUMENT
+        )
         is Filter.Field -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
-                    val modifier: (String, Any?) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.EqualTo -> AndroidFilter::equalTo
-                        is WhereConstraint.NotEqualTo -> AndroidFilter::notEqualTo
+                    val modifier: AndroidQuery.(String, Any?) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.EqualTo -> AndroidQuery::whereEqualTo
+                        is WhereConstraint.NotEqualTo -> AndroidQuery::whereNotEqualTo
                     }
-                    modifier.invoke(field, constraint.safeValue)
+                    modifier.invoke(query, field, constraint.safeValue)
                 }
                 is WhereConstraint.ForObject -> {
-                    val modifier: (String, Any) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.LessThan -> AndroidFilter::lessThan
-                        is WhereConstraint.GreaterThan -> AndroidFilter::greaterThan
-                        is WhereConstraint.LessThanOrEqualTo -> AndroidFilter::lessThanOrEqualTo
-                        is WhereConstraint.GreaterThanOrEqualTo -> AndroidFilter::greaterThanOrEqualTo
-                        is WhereConstraint.ArrayContains -> AndroidFilter::arrayContains
+                    val modifier: AndroidQuery.(String, Any) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.LessThan -> AndroidQuery::whereLessThan
+                        is WhereConstraint.GreaterThan -> AndroidQuery::whereGreaterThan
+                        is WhereConstraint.LessThanOrEqualTo -> AndroidQuery::whereLessThanOrEqualTo
+                        is WhereConstraint.GreaterThanOrEqualTo -> AndroidQuery::whereGreaterThanOrEqualTo
+                        is WhereConstraint.ArrayContains -> AndroidQuery::whereArrayContains
                     }
-                    modifier.invoke(field, constraint.safeValue)
+                    modifier.invoke(query, field, constraint.safeValue)
                 }
                 is WhereConstraint.ForArray -> {
-                    val modifier: (String, List<Any>) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.InArray -> AndroidFilter::inArray
-                        is WhereConstraint.ArrayContainsAny -> AndroidFilter::arrayContainsAny
-                        is WhereConstraint.NotInArray -> AndroidFilter::notInArray
+                    val modifier: AndroidQuery.(String, List<Any>) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.InArray -> AndroidQuery::whereIn
+                        is WhereConstraint.ArrayContainsAny -> AndroidQuery::whereArrayContainsAny
+                        is WhereConstraint.NotInArray -> AndroidQuery::whereNotIn
                     }
-                    modifier.invoke(field, constraint.safeValues)
+                    modifier.invoke(query, field, constraint.safeValues)
                 }
             }
         }
         is Filter.Path -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
-                    val modifier: (AndroidFieldPath, Any?) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.EqualTo -> AndroidFilter::equalTo
-                        is WhereConstraint.NotEqualTo -> AndroidFilter::notEqualTo
+                    val modifier: AndroidQuery.(AndroidFieldPath, Any?) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.EqualTo -> AndroidQuery::whereEqualTo
+                        is WhereConstraint.NotEqualTo -> AndroidQuery::whereNotEqualTo
                     }
-                    modifier.invoke(path.android, constraint.safeValue)
+                    modifier.invoke(query, path.android, constraint.safeValue)
                 }
                 is WhereConstraint.ForObject -> {
-                    val modifier: (AndroidFieldPath, Any) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.LessThan -> AndroidFilter::lessThan
-                        is WhereConstraint.GreaterThan -> AndroidFilter::greaterThan
-                        is WhereConstraint.LessThanOrEqualTo -> AndroidFilter::lessThanOrEqualTo
-                        is WhereConstraint.GreaterThanOrEqualTo -> AndroidFilter::greaterThanOrEqualTo
-                        is WhereConstraint.ArrayContains -> AndroidFilter::arrayContains
+                    val modifier: AndroidQuery.(AndroidFieldPath, Any) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.LessThan -> AndroidQuery::whereLessThan
+                        is WhereConstraint.GreaterThan -> AndroidQuery::whereGreaterThan
+                        is WhereConstraint.LessThanOrEqualTo -> AndroidQuery::whereLessThanOrEqualTo
+                        is WhereConstraint.GreaterThanOrEqualTo -> AndroidQuery::whereGreaterThanOrEqualTo
+                        is WhereConstraint.ArrayContains -> AndroidQuery::whereArrayContains
                     }
-                    modifier.invoke(path.android, constraint.safeValue)
+                    modifier.invoke(query, path.android, constraint.safeValue)
                 }
                 is WhereConstraint.ForArray -> {
-                    val modifier: (AndroidFieldPath, List<Any>) -> AndroidFilter = when (constraint) {
-                        is WhereConstraint.InArray -> AndroidFilter::inArray
-                        is WhereConstraint.ArrayContainsAny -> AndroidFilter::arrayContainsAny
-                        is WhereConstraint.NotInArray -> AndroidFilter::notInArray
+                    val modifier: AndroidQuery.(AndroidFieldPath, List<Any>) -> AndroidQuery = when (constraint) {
+                        is WhereConstraint.InArray -> AndroidQuery::whereIn
+                        is WhereConstraint.ArrayContainsAny -> AndroidQuery::whereArrayContainsAny
+                        is WhereConstraint.NotInArray -> AndroidQuery::whereNotIn
                     }
-                    modifier.invoke(path.android, constraint.safeValues)
+                    modifier.invoke(query, path.android, constraint.safeValues)
                 }
             }
         }
     }
-
+    
     internal actual fun _orderBy(field: String, direction: Direction) = Query(android.orderBy(field, direction))
     internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(android.orderBy(field.android, direction))
 
