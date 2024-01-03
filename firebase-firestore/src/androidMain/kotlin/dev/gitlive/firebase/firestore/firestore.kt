@@ -100,39 +100,7 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun setEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>,
-        merge: Boolean
-    ): BaseWriteBatch {
-        val serializedItem = encodedData as Map<String, *>
-        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
-
-        val result = serializedItem + serializedFieldAndValues
-        if (merge) {
-            android.set(documentRef.android, result, com.google.firebase.firestore.SetOptions.merge())
-        } else {
-            android.set(documentRef.android, result)
-        }
-        return this
-    }
-
-    @Suppress("UNCHECKED_CAST")
     override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = android.update(documentRef.android, encodedData as Map<String, Any>).let { this }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun updateEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): BaseWriteBatch {
-        val serializedItem = encodedData as Map<String, *>
-        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
-
-        val result = serializedItem + serializedFieldAndValues
-        return android.update(documentRef.android, result).let { this }
-    }
 
     override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -258,7 +226,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 }
 
-actual open class Query(open val android: com.google.firebase.firestore.Query) {
+actual typealias NativeQuery = com.google.firebase.firestore.Query
+
+actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
+
+    open val android = nativeQuery
 
     actual suspend fun get() = QuerySnapshot(android.get().await())
 
@@ -332,11 +304,11 @@ actual open class Query(open val android: com.google.firebase.firestore.Query) {
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
 actual typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
 
-actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : Query(android) {
+actual class CollectionReference(override val android: com.google.firebase.firestore.CollectionReference) : BaseCollectionReference(android) {
 
     actual val path: String
         get() = android.path
-    actual val async = Async(android)
+    override val async = Async(android)
 
     actual val document: DocumentReference
         get() = DocumentReference(android.document())
@@ -346,17 +318,9 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
-    actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-        DocumentReference(android.add(encode(data, encodeSettings)!!).await())
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-        DocumentReference(android.add(encode(strategy, data, encodeSettings)!!).await())
-
     @Suppress("DeferredIsResult")
-    actual class Async(@PublishedApi internal val android: com.google.firebase.firestore.CollectionReference) {
-        actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-            android.add(encode(data, encodeSettings)!!).asDeferred().convert(::DocumentReference)
-        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-            android.add(encode(strategy, data, encodeSettings)!!).asDeferred().convert(::DocumentReference)
+    class Async(@PublishedApi internal val android: com.google.firebase.firestore.CollectionReference) : BaseCollectionReference.Async() {
+        override fun addEncoded(data: Any): Deferred<DocumentReference> = android.add(data).asDeferred().convert(::DocumentReference)
     }
 }
 
@@ -385,23 +349,13 @@ actual class DocumentChange(val android: com.google.firebase.firestore.DocumentC
         get() = android.type
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) {
+actual class DocumentSnapshot(val android: com.google.firebase.firestore.DocumentSnapshot) : BaseDocumentSnapshot() {
 
     actual val id get() = android.id
     actual val reference get() = DocumentReference(android.reference)
 
-    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(value = android.getData(serverTimestampBehavior.toAndroid()))
-
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(strategy, android.getData(serverTimestampBehavior.toAndroid()), decodeSettings)
-
-    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(value = android.get(field, serverTimestampBehavior.toAndroid()))
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
-        decode(strategy, android.get(field, serverTimestampBehavior.toAndroid()), decodeSettings)
+    override fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? = android.get(field, serverTimestampBehavior.toAndroid())
+    override fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = android.getData(serverTimestampBehavior.toAndroid())
 
     actual fun contains(field: String) = android.contains(field)
 

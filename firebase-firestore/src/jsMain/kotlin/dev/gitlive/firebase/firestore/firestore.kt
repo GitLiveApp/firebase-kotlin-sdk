@@ -105,39 +105,8 @@ actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
         setOptions: SetOptions
     ): BaseWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
-    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    override fun setEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>,
-        merge: Boolean
-    ): BaseWriteBatch = rethrow {
-        val serializedItem = encodedData as Json
-        val serializedFieldAndValues = json(*encodedFieldsAndValues.toTypedArray())
-
-        val result = serializedItem.add(serializedFieldAndValues)
-        if (merge) {
-            js.set(documentRef.js, result, json("merge" to merge))
-        } else {
-            js.set(documentRef.js, result)
-        }
-    }.let { this }
-
     override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
         .let { this }
-
-    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    override fun updateEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): BaseWriteBatch = rethrow {
-        val serializedItem = encodedData as Json
-        val serializedFieldAndValues = json(*encodedFieldsAndValues.toTypedArray())
-
-        val result = serializedItem.add(serializedFieldAndValues)
-        js.update(documentRef.js, result)
-    }.let { this }
 
     override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -277,7 +246,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 }
 
-actual open class Query(open val js: JsQuery) {
+actual typealias NativeQuery = JsQuery
+
+actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
+
+    open val js: JsQuery = nativeQuery
 
     actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
@@ -369,11 +342,11 @@ actual open class Query(open val js: JsQuery) {
     }
 }
 
-actual class CollectionReference(override val js: JsCollectionReference) : Query(js) {
+actual class CollectionReference(override val js: JsCollectionReference) : BaseCollectionReference(js) {
 
     actual val path: String
         get() =  rethrow { js.path }
-    actual val async = Async(js)
+    override val async = Async(js)
 
     actual val document get() = rethrow { DocumentReference(doc(js)) }
 
@@ -381,23 +354,11 @@ actual class CollectionReference(override val js: JsCollectionReference) : Query
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
-    actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-        rethrow { DocumentReference(addDoc(js, encode(data, encodeSettings)!!).await()) }
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-        rethrow { DocumentReference(addDoc(js, encode(strategy, data, encodeSettings)!!).await()) }
+    class Async(@PublishedApi internal val js: JsCollectionReference) : BaseCollectionReference.Async() {
 
-    @Suppress("DeferredIsResult")
-    actual class Async(@PublishedApi internal val js: JsCollectionReference) {
-        actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-            rethrow {
-                addDoc(js, encode(data, encodeSettings)!!).asDeferred()
-                    .convert(::DocumentReference)
-            }
-        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-            rethrow {
-                addDoc(js, encode(strategy, data, encodeSettings)!!).asDeferred()
-                    .convert(::DocumentReference)
-            }
+        override fun addEncoded(data: Any): Deferred<DocumentReference> = rethrow {
+            addDoc(js, data).asDeferred().convert(::DocumentReference)
+        }
     }
 }
 
@@ -425,22 +386,18 @@ actual class DocumentChange(val js: JsDocumentChange) {
         get() = ChangeType.values().first { it.jsString == js.type }
 }
 
-actual class DocumentSnapshot(val js: JsDocumentSnapshot) {
+actual class DocumentSnapshot(val js: JsDocumentSnapshot) : BaseDocumentSnapshot() {
 
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { DocumentReference(js.ref) }
 
-    actual inline fun <reified T : Any> data(serverTimestampBehavior: ServerTimestampBehavior): T =
-        rethrow { decode(value = js.data(getTimestampsOptions(serverTimestampBehavior))) }
+    override fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
+        js.get(field, getTimestampsOptions(serverTimestampBehavior))
+    }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T =
-        rethrow { decode(strategy, js.data(getTimestampsOptions(serverTimestampBehavior)), decodeSettings) }
-
-    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior) =
-        rethrow { decode<T>(value = js.get(field, getTimestampsOptions(serverTimestampBehavior))) }
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior) =
-        rethrow { decode(strategy, js.get(field, getTimestampsOptions(serverTimestampBehavior)), decodeSettings) }
+    override fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
+        js.data(getTimestampsOptions(serverTimestampBehavior))
+    }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
     actual val exists get() = rethrow { js.exists() }

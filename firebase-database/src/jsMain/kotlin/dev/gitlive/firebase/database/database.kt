@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Promise
 import kotlin.js.json
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
@@ -52,10 +51,19 @@ actual class FirebaseDatabase internal constructor(val js: Database) {
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
 }
 
-actual open class Query internal constructor(
-    open val js: JsQuery,
+actual data class NativeQuery(
+    val js: JsQuery,
     val database: Database
+)
+
+actual open class Query internal actual constructor(
+    nativeQuery: NativeQuery
 ) {
+
+    internal constructor(js: JsQuery, database: Database) : this(NativeQuery(js, database))
+
+    open val js: JsQuery = nativeQuery.js
+    val database: Database = nativeQuery.database
 
     actual fun orderByKey() = Query(query(js, jsOrderByKey()), database)
     actual fun orderByValue() = Query(query(js, jsOrderByValue()), database)
@@ -130,7 +138,7 @@ actual open class Query internal constructor(
 actual class DatabaseReference internal constructor(
     override val js: JsDatabaseReference,
     database: Database
-) : Query(js, database) {
+) : BaseDatabaseReference(NativeQuery(js, database)) {
 
     actual val key get() = rethrow { js.key }
     actual fun push() = rethrow { DatabaseReference(push(js), database) }
@@ -138,17 +146,15 @@ actual class DatabaseReference internal constructor(
 
     actual fun onDisconnect() = rethrow { OnDisconnect(onDisconnect(js), database) }
 
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
-        rethrow { update(js, encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
-
     actual suspend fun removeValue() = rethrow { remove(js).awaitWhileOnline(database) }
 
-    actual suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings) = rethrow {
-        set(js, encode(value, encodeSettings)).awaitWhileOnline(database)
+    override suspend fun setValueEncoded(encodedValue: Any?) = rethrow {
+        set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) =
-        rethrow { set(js, encode(strategy, value, encodeSettings)).awaitWhileOnline(database) }
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
+        rethrow { update(js, encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
+
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         return DataSnapshot(jsRunTransaction(js, transactionUpdate).awaitWhileOnline(database).snapshot, database)
@@ -187,19 +193,17 @@ actual class DataSnapshot internal constructor(
 actual class OnDisconnect internal constructor(
     val js: JsOnDisconnect,
     val database: Database
-) {
+) : BaseOnDisconnect() {
 
     actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
     actual suspend fun cancel() =  rethrow { js.cancel().awaitWhileOnline(database) }
 
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
+    override suspend fun setValue(encodedValue: Any?) =
+        rethrow { js.set(encodedValue).awaitWhileOnline(database) }
+
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
         rethrow { js.update(encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
 
-    actual suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings) =
-        rethrow { js.set(encode(value, encodeSettings)).awaitWhileOnline(database) }
-
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) =
-        rethrow { js.set(encode(strategy, value, encodeSettings)).awaitWhileOnline(database) }
 }
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause) {

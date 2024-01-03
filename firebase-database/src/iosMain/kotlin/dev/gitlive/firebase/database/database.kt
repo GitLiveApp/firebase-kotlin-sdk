@@ -65,10 +65,20 @@ fun Type.toEventType() = when(this) {
     REMOVED -> FIRDataEventTypeChildRemoved
 }
 
-actual open class Query internal constructor(
+actual data class NativeQuery(
     open val ios: FIRDatabaseQuery,
     val persistenceEnabled: Boolean
+)
+
+actual open class Query internal actual constructor(
+    nativeQuery: NativeQuery
 ) {
+
+    internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
+
+    open val ios: FIRDatabaseQuery = nativeQuery.ios
+    val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
     actual fun orderByValue() = Query(ios.queryOrderedByValue(), persistenceEnabled)
@@ -127,7 +137,7 @@ actual open class Query internal constructor(
 actual class DatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
     persistenceEnabled: Boolean
-): Query(ios, persistenceEnabled) {
+): BaseDatabaseReference(NativeQuery(ios, persistenceEnabled)) {
 
     actual val key get() = ios.key
 
@@ -136,16 +146,12 @@ actual class DatabaseReference internal constructor(
     actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
     actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
 
-    actual suspend inline fun <reified T> setValue(value: T?, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { setValue(encode(value, encodeSettings), it) }
-    }
-
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeSettings), it) }
+    override suspend fun setValueEncoded(encodedValue: Any?) {
+        ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
         ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeSettings) as Map<Any?, *>, it) }
     }
 
@@ -203,7 +209,7 @@ actual class DataSnapshot internal constructor(
 actual class OnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
     val persistenceEnabled: Boolean
-) {
+) : BaseOnDisconnect() {
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
     }
@@ -212,16 +218,12 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend inline fun <reified T> setValue(value: T, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeSettings), it) }
-    }
-
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeSettings), it) }
+    override suspend fun setValue(encodedValue: Any?) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
         ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeSettings) } as Map<Any?, *>, it) }
     }
 }

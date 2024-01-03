@@ -195,7 +195,7 @@ class FirebaseFirestoreTest {
     }
 
     @Test
-    fun testExtendedSetBatch() = runTest {
+    fun testSetBatch() = runTest {
         val doc = firestore
             .collection("testServerTestSetBatch")
             .document("test")
@@ -207,13 +207,9 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1",
                 time = 123.0
             ),
-            fieldsAndValues = arrayOf(
-                "time" to 124.0
-            )
         )
         batch.commit()
 
-        assertEquals(124.0, doc.get().get("time"))
         assertEquals("prop1", doc.get().data(FirestoreTest.serializer()).prop1)
 
     }
@@ -485,8 +481,7 @@ class FirebaseFirestoreTest {
             data = FirestoreTest(
                 prop1 = "prop1-set",
                 time = 125.0
-            ),
-            fieldsAndValues = arrayOf<Pair<String, Any>>()
+            )
         )
         batch.commit()
 
@@ -495,7 +490,7 @@ class FirebaseFirestoreTest {
     }
 
     @Test
-    fun testExtendedUpdateBatch() = runTest {
+    fun testUpdateBatch() = runTest {
         val doc = firestore
             .collection("testServerTestSetBatch")
             .document("test").apply {
@@ -517,13 +512,9 @@ class FirebaseFirestoreTest {
                 time = 123.0
             ),
             encodeSettings = EncodeSettings(shouldEncodeElementDefault = false),
-            fieldsAndValues = arrayOf(
-                "time" to FieldValue.delete
-            )
         )
         batch.commit()
 
-        assertEquals(null, doc.get().get("time") as Double?)
         assertEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
     }
 
@@ -547,8 +538,7 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-set",
                 time = 126.0
             ),
-            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false),
-            fieldsAndValues = arrayOf<Pair<String, Any>>()
+            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false)
         )
         batch.commit()
 

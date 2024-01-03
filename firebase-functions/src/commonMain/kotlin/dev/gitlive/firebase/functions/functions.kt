@@ -14,7 +14,10 @@ expect class FirebaseFunctions {
 }
 
 abstract class BaseHttpsCallableReference {
+    suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data, EncodeSettings(shouldEncodeElementDefault = encodeDefaults))
     suspend inline operator fun <reified T> invoke(data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(data, encodeSettings)!!)
+
+    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data, EncodeSettings(shouldEncodeElementDefault = encodeDefaults))
     suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(strategy, data, encodeSettings)!!)
     abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
 }

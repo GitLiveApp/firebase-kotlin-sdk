@@ -88,33 +88,7 @@ actual class WriteBatch(val ios: FIRWriteBatch) : BaseWriteBatch() {
         is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.encodedFieldPaths)
     }.let { this }
 
-    override fun setEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>,
-        merge: Boolean
-    ): BaseWriteBatch {
-        val serializedItem = encodedData as Map<Any?, *>
-        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
-
-        val result = serializedItem + serializedFieldAndValues
-        ios.setData(result as Map<Any?, *>, documentRef.ios, merge)
-        return this
-    }
-
     override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
-
-    override fun updateEncoded(
-        documentRef: DocumentReference,
-        encodedData: Any,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): BaseWriteBatch {
-        val serializedItem = encodedData as Map<Any?, *>
-        val serializedFieldAndValues = encodedFieldsAndValues.toMap()
-
-        val result = serializedItem + serializedFieldAndValues
-        return ios.updateData(result as Map<Any?, *>, documentRef.ios).let { this }
-    }
 
     override fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -256,7 +230,11 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     override fun toString(): String = nativeValue.toString()
 }
 
-actual open class Query(open val ios: FIRQuery) {
+actual typealias NativeQuery = FIRQuery
+
+actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
+
+    open val ios: FIRQuery = nativeQuery
 
     actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
 
@@ -328,12 +306,12 @@ actual open class Query(open val ios: FIRQuery) {
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
+actual class CollectionReference(override val ios: FIRCollectionReference) : BaseCollectionReference(ios) {
 
     actual val path: String
         get() = ios.path
 
-    actual val async = Async(ios)
+    override val async = Async(ios)
 
     actual val document get() = DocumentReference(ios.documentWithAutoID())
 
@@ -341,19 +319,8 @@ actual class CollectionReference(override val ios: FIRCollectionReference) : Que
 
     actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
 
-    actual suspend inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-        DocumentReference(await { ios.addDocumentWithData(encode(data, encodeSettings) as Map<Any?, *>, it) })
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeSettings) as Map<Any?, *>, it) })
-
-    actual class Async(@PublishedApi internal val ios: FIRCollectionReference) {
-        actual inline fun <reified T> add(data: T, encodeSettings: EncodeSettings) =
-            deferred { ios.addDocumentWithData(encode(data, encodeSettings) as Map<Any?, *>, it) }
-                .convert(::DocumentReference)
-
-        actual fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings) =
-            deferred { ios.addDocumentWithData(encode(strategy, data, encodeSettings) as Map<Any?, *>, it) }
-                .convert(::DocumentReference)
+    class Async(@PublishedApi internal val ios: FIRCollectionReference) : BaseCollectionReference.Async() {
+        override fun addEncoded(data: Any): Deferred<DocumentReference> = deferred { ios.addDocumentWithData(data as Map<Any?, *>, it) }.convert(::DocumentReference)
     }
 }
 
@@ -435,32 +402,20 @@ actual class DocumentChange(val ios: FIRDocumentChange) {
         get() = ChangeType.values().first { it.ios == ios.type }
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
+actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) : BaseDocumentSnapshot() {
 
     actual val id get() = ios.documentID
 
     actual val reference get() = DocumentReference(ios.reference)
 
-    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T {
-        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-        return decode(value = data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
-    }
+    override fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? =
+        ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-        return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } }, decodeSettings)
-    }
-
-    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
-        return decode(value)
-    }
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
-        return decode(strategy, value, decodeSettings)
-    }
+    override fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? =
+        ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+            ?.mapValues { (_, value) ->
+                value?.takeIf { it !is NSNull }
+            }
 
     actual fun contains(field: String) = ios.valueForField(field) != null
 
@@ -506,7 +461,7 @@ private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<N
 suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()
     function { result, error ->
-         if(error == null) {
+        if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
