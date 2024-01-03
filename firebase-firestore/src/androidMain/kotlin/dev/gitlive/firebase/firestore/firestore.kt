@@ -5,6 +5,7 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.runBlocking

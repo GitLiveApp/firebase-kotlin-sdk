@@ -246,11 +246,13 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     }
 }
 
-actual typealias NativeQuery = JsQuery
+actual data class NativeQuery(val js: JsQuery)
 
 actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
-    open val js: JsQuery = nativeQuery
+    constructor(js: JsQuery) : this(NativeQuery(js))
+
+    open val js: JsQuery = nativeQuery.js
 
     actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
@@ -342,7 +344,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
     }
 }
 
-actual class CollectionReference(override val js: JsCollectionReference) : BaseCollectionReference(js) {
+actual class CollectionReference(override val js: JsCollectionReference) : BaseCollectionReference(NativeQuery(js)) {
 
     actual val path: String
         get() =  rethrow { js.path }

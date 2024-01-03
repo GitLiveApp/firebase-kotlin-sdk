@@ -4,12 +4,15 @@
 
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.decode
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
+import dev.gitlive.firebase.withSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -728,7 +731,7 @@ class FirebaseFirestoreTest {
     fun encodeDocumentReference() = runTest {
         val doc = firestore.document("a/b")
         val item = TestDataWithDocumentReference("123", doc, doc)
-        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        val encoded = encodedAsMap(encode(item, EncodeSettings(shouldEncodeElementDefault =  false)))
         assertEquals("123", encoded["uid"])
         assertEquals(doc.nativeValue, encoded["reference"])
         assertEquals(doc.nativeValue, encoded["optionalReference"])
@@ -737,7 +740,7 @@ class FirebaseFirestoreTest {
     @Test
     fun encodeNullDocumentReference() = runTest {
         val item = TestDataWithOptionalDocumentReference(null)
-        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        val encoded = encodedAsMap(encode(item, EncodeSettings(shouldEncodeElementDefault =  false)))
         assertNull(encoded["optionalReference"])
     }
 
@@ -791,7 +794,6 @@ class FirebaseFirestoreTest {
         assertNull(deletedList)
     }
 
-    private suspend fun setupFirestoreData() {
     @Test
     fun testQueryEqualTo() = runTest {
         setupFirestoreData()
