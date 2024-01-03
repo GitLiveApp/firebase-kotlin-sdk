@@ -86,14 +86,8 @@ expect open class Query {
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(): QuerySnapshot
-    internal fun _where(field: String, equalTo: Any?): Query
-    internal fun _where(path: FieldPath, equalTo: Any?): Query
-    internal fun _where(field: String, equalTo: DocumentReference): Query
-    internal fun _where(path: FieldPath, equalTo: DocumentReference): Query
-    internal fun _where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    internal fun _where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null): Query
-    internal fun _where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
-    internal fun _where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null): Query
+
+    internal fun where(filter: Filter): Query
 
     internal fun _orderBy(field: String, direction: Direction): Query
     internal fun _orderBy(field: FieldPath, direction: Direction): Query
@@ -109,35 +103,81 @@ expect open class Query {
     internal fun _endAt(vararg fieldValues: Any): Query
 }
 
-/** @return a native value of a wrapper or self. */
-private val Any.value get() = when (this) {
-    is Timestamp -> nativeValue
-    is GeoPoint -> nativeValue
-    is DocumentReference -> nativeValue
-    else -> this
+fun Query.where(builder: FilterBuilder.() -> Filter?) = builder(FilterBuilder())?.let { where(it) } ?: this
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, equalTo: Any?) = where {
+    field equalTo equalTo
 }
 
-fun Query.where(field: String, equalTo: Any?) = _where(field, equalTo?.value)
-fun Query.where(path: FieldPath, equalTo: Any?) = _where(path, equalTo?.value)
-fun Query.where(field: String, equalTo: DocumentReference) = _where(field, equalTo.value)
-fun Query.where(path: FieldPath, equalTo: DocumentReference) = _where(path, equalTo.value)
-fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(field, lessThan?.value, greaterThan?.value, arrayContains?.value)
-fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = _where(path, lessThan?.value, greaterThan?.value, arrayContains?.value)
-fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(field, inArray?.value, arrayContainsAny?.value)
-fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = _where(path, inArray?.value, arrayContainsAny?.value)
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { path equalTo equalTo }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, equalTo: Any?) = where {
+    path equalTo equalTo
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
+    all(
+        *listOfNotNull(
+            lessThan?.let { field lessThan it },
+            greaterThan?.let { field greaterThan it },
+            arrayContains?.let { field contains it }
+        ).toTypedArray()
+    )
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null, arrayContains: Any? = null) = where {
+    all(
+        *listOfNotNull(
+            lessThan?.let { path lessThan it },
+            greaterThan?.let { path greaterThan it },
+            arrayContains?.let { path contains it }
+        ).toTypedArray()
+    )
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
+    all(
+        *listOfNotNull(
+            inArray?.let { field inArray it },
+            arrayContainsAny?.let { field containsAny  it },
+        ).toTypedArray()
+    )
+}
+
+@Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where {  }", "dev.gitlive.firebase.firestore"))
+fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: List<Any>? = null) = where {
+    all(
+        *listOfNotNull(
+            inArray?.let { path inArray it },
+            arrayContainsAny?.let { path containsAny  it },
+        ).toTypedArray()
+    )
+}
 
 fun Query.orderBy(field: String, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 fun Query.orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING) = _orderBy(field, direction)
 
 fun Query.startAfter(document: DocumentSnapshot) = _startAfter(document)
-fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.startAfter(vararg fieldValues: Any) = _startAfter(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 fun Query.startAt(document: DocumentSnapshot) = _startAt(document)
-fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.startAt(vararg fieldValues: Any) = _startAt(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 
 fun Query.endBefore(document: DocumentSnapshot) = _endBefore(document)
-fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.endBefore(vararg fieldValues: Any) = _endBefore(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
 fun Query.endAt(document: DocumentSnapshot) = _endAt(document)
-fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.map { it.value }.toTypedArray()))
+fun Query.endAt(vararg fieldValues: Any) = _endAt(*(fieldValues.mapNotNull { it.safeValue }.toTypedArray()))
+
+internal val Any.safeValue: Any get() = when (this) {
+    is Timestamp -> nativeValue
+    is GeoPoint -> nativeValue
+    is DocumentReference -> nativeValue
+    is Map<*, *> -> this.mapNotNull { (key, value) -> key?.let { it.safeValue to value?.safeValue } }
+    is Collection<*> -> this.mapNotNull { it?.safeValue }
+    else -> this
+}
 
 expect class WriteBatch {
     inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean = true, merge: Boolean = false): WriteBatch

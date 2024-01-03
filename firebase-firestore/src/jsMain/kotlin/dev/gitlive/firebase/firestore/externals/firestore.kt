@@ -155,6 +155,10 @@ external fun where(field: String, opStr: String, value: Any?): QueryConstraint
 
 external fun where(field: FieldPath, opStr: String, value: Any?): QueryConstraint
 
+external fun and(vararg queryConstraints: QueryConstraint): QueryConstraint
+
+external fun or(vararg queryConstraints: QueryConstraint): QueryConstraint
+
 external fun writeBatch(firestore: Firestore): WriteBatch
 
 external interface Firestore {
