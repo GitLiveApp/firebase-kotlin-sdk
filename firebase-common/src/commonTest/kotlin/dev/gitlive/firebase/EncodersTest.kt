@@ -10,8 +10,14 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import dev.gitlive.firebase.nativeAssertEquals
-import dev.gitlive.firebase.nativeMapOf
+import kotlin.jvm.JvmInline
+
+@Serializable
+@JvmInline
+value class TestValue(val int: Int)
+
+@Serializable
+data class TestDataWithValueClassInstance(val value: TestValue)
 
 @Serializable
 data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
@@ -38,6 +44,12 @@ class EncodersTest {
     fun encodeObject() {
         val encoded = encode<TestData>(TestData.serializer(), TestData(mapOf("key" to "value"), true), shouldEncodeElementDefault = false)
         nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
+    }
+
+    @Test
+    fun testEncodeValueClass() {
+        val encoded = encode(TestDataWithValueClassInstance.serializer(), TestDataWithValueClassInstance(TestValue(30)), shouldEncodeElementDefault = false)
+        nativeAssertEquals(nativeMapOf("value" to 30), encoded)
     }
 
     @Test
@@ -68,6 +80,12 @@ class EncodersTest {
     fun decodeObjectNullableValue() {
         val decoded = decode(TestData.serializer(), nativeMapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
         assertNull(decoded.nullableBool)
+    }
+
+    @Test
+    fun testDecodeValueClas() {
+        val decoded = decode(TestDataWithValueClassInstance.serializer(), nativeMapOf("value" to 30))
+        nativeAssertEquals(TestDataWithValueClassInstance(TestValue(30)), decoded)
     }
 
     @Test

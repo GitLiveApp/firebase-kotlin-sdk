@@ -82,8 +82,7 @@ class FirebaseEncoder(internal val shouldEncodeElementDefault: Boolean) : Encode
         this.value = value
     }
 
-    override fun encodeInline(descriptor: SerialDescriptor): Encoder =
-        FirebaseEncoder(shouldEncodeElementDefault)
+    override fun encodeInline(descriptor: SerialDescriptor): Encoder = this
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         encodePolymorphically(serializer, value) {
