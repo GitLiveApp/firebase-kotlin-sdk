@@ -171,6 +171,11 @@ kotlin {
                 api("com.google.firebase:firebase-firestore")
             }
         }
+
+        getByName("jvmMain") {
+            kotlin.srcDir("src/androidMain/kotlin")
+        }
+
     }
 }
 
