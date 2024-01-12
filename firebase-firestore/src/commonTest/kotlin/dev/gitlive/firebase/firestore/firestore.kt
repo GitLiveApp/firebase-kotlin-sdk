@@ -541,7 +541,7 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-updated",
                 time = 123.0
             ),
-            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false),
+            encodeDefaults = false,
         )
         batch.commit()
 
@@ -568,7 +568,7 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-set",
                 time = 126.0
             ),
-            encodeSettings = EncodeSettings(shouldEncodeElementDefault = false)
+            encodeDefaults = false
         )
         batch.commit()
 
@@ -731,7 +731,7 @@ class FirebaseFirestoreTest {
     fun encodeDocumentReference() = runTest {
         val doc = firestore.document("a/b")
         val item = TestDataWithDocumentReference("123", doc, doc)
-        val encoded = encodedAsMap(encode(item, EncodeSettings(shouldEncodeElementDefault =  false)))
+        val encoded = encodedAsMap(encode(item, encodeDefaults = false))
         assertEquals("123", encoded["uid"])
         assertEquals(doc.nativeValue, encoded["reference"])
         assertEquals(doc.nativeValue, encoded["optionalReference"])
@@ -740,7 +740,7 @@ class FirebaseFirestoreTest {
     @Test
     fun encodeNullDocumentReference() = runTest {
         val item = TestDataWithOptionalDocumentReference(null)
-        val encoded = encodedAsMap(encode(item, EncodeSettings(shouldEncodeElementDefault =  false)))
+        val encoded = encodedAsMap(encode(item, encodeDefaults = false))
         assertNull(encoded["optionalReference"])
     }
 

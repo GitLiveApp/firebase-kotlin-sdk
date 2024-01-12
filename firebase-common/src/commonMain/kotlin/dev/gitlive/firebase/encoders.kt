@@ -7,14 +7,15 @@ package dev.gitlive.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value, EncodeSettings(shouldEncodeElementDefault))
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()): Any? = encode(strategy, value, EncodeSettings(shouldEncodeElementDefault, serializersModule))
 
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, settings: EncodeSettings): Any? =
     FirebaseEncoder(settings).apply { encodeSerializableValue(strategy, value) }.value
 
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value, EncodeSettings(shouldEncodeElementDefault))
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()): Any? = encode(value, EncodeSettings(shouldEncodeElementDefault, serializersModule))
 inline fun <reified T> encode(value: T, settings: EncodeSettings): Any? = value?.let {
     FirebaseEncoder(settings).apply {
         if (it is ValueWithSerializer<*> && it.value is T) {
@@ -42,7 +43,7 @@ class FirebaseEncoder(
     internal val settings: EncodeSettings
 ) : Encoder {
 
-//    constructor(shouldEncodeElementDefault: Boolean) : this(EncodeSettings(shouldEncodeElementDefault))
+    constructor(shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()) : this(EncodeSettings(shouldEncodeElementDefault, serializersModule))
 
     var value: Any? = null
 

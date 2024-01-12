@@ -1,21 +1,24 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.EncodeSettings
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.jvm.JvmName
 
 //** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")
 fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<String, Any?>>,
-    encodeSettings: EncodeSettings
-) = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, encodeSettings) })
+    encodeDefaults: Boolean = true,
+    serializersModule: SerializersModule = EmptySerializersModule()
+) = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, encodeDefaults, serializersModule) })
 
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFieldPaths")
 fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
-    encodeSettings: EncodeSettings,
-) = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, encodeSettings) })
+    encodeDefaults: Boolean = true,
+    serializersModule: SerializersModule = EmptySerializersModule()
+) = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, encodeDefaults, serializersModule) })
 
 /** Helper method to perform an update operation in Android and JS. */
 internal fun <T, K> encodeFieldAndValue(

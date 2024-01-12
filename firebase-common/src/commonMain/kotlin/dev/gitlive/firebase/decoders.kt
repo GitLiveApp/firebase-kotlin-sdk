@@ -15,15 +15,13 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-inline fun <reified T> decode(value: Any?): T = decode(value, DecodeSettings())
-inline fun <reified T> decode(value: Any?, settings: DecodeSettings): T {
+inline fun <reified T> decode(value: Any?, serializersModule: SerializersModule = EmptySerializersModule()): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value, settings)
+    return decode(strategy as DeserializationStrategy<T>, value, serializersModule)
 }
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T = decode(strategy, value, DecodeSettings())
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, settings: DecodeSettings): T {
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, serializersModule: SerializersModule = EmptySerializersModule()): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
-    return FirebaseDecoder(value, settings).decodeSerializableValue(strategy)
+    return FirebaseDecoder(value, DecodeSettings(serializersModule)).decodeSerializableValue(strategy)
 }
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder
 expect fun getPolymorphicType(value: Any?, discriminator: String): String

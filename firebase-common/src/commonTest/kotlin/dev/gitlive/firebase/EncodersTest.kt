@@ -145,7 +145,7 @@ class EncodersTest {
 
         nativeAssertEquals(nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true), encoded)
 
-        val decoded = decode(AbstractClass.serializer(), encoded, DecodeSettings(module))
+        val decoded = decode(AbstractClass.serializer(), encoded, module)
         assertEquals(abstractClass, decoded)
     }
 
@@ -174,7 +174,7 @@ class EncodersTest {
             encoded
         )
 
-        val decoded = decode(NestedClass.serializer(), encoded, DecodeSettings(module))
+        val decoded = decode(NestedClass.serializer(), encoded, module)
         assertEquals(nestedClass, decoded)
     }
 }

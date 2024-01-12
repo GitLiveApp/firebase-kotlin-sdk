@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-crashlytics",
-  "version": "1.11.4",
+  "version": "1.11.0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-crashlytics.js",
   "scripts": {

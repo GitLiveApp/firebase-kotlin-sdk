@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.js.Promise
 import kotlin.js.json
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
@@ -152,11 +153,11 @@ actual class DatabaseReference internal constructor(
         set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
-        rethrow { update(js, encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean, serializersModule: SerializersModule) =
+        rethrow { update(js, encode(update, encodeDefaults, serializersModule) ?: json()).awaitWhileOnline(database) }
 
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, serializersModule: SerializersModule, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         return DataSnapshot(jsRunTransaction(js, transactionUpdate).awaitWhileOnline(database).snapshot, database)
     }
 }
@@ -173,8 +174,8 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         rethrow { decode<T>(value = js.`val`()) }
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
-        rethrow { decode(strategy, js.`val`(), decodeSettings) }
+    actual fun <T> value(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
+        rethrow { decode(strategy, js.`val`(), serializersModule) }
 
     actual val exists get() = rethrow { js.exists() }
     actual val key get() = rethrow { js.key }
@@ -201,8 +202,8 @@ actual class OnDisconnect internal constructor(
     override suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) =
-        rethrow { js.update(encode(update, encodeSettings) ?: json()).awaitWhileOnline(database) }
+    override suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean, serializersModule: SerializersModule) =
+        rethrow { js.update(encode(update, encodeDefaults, serializersModule) ?: json()).awaitWhileOnline(database) }
 
 }
 

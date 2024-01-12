@@ -7,6 +7,8 @@ package dev.gitlive.firebase.functions
 import dev.gitlive.firebase.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 
 expect class FirebaseFunctions {
     fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
@@ -14,11 +16,18 @@ expect class FirebaseFunctions {
 }
 
 abstract class BaseHttpsCallableReference {
-    suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data, EncodeSettings(shouldEncodeElementDefault = encodeDefaults))
-    suspend inline operator fun <reified T> invoke(data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(data, encodeSettings)!!)
+    suspend inline operator fun <reified T> invoke(
+        data: T,
+        encodeDefaults: Boolean = true,
+        serializersModule: SerializersModule = EmptySerializersModule()
+    ) = invoke(encode(data, encodeDefaults, serializersModule)!!)
 
-    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data, EncodeSettings(shouldEncodeElementDefault = encodeDefaults))
-    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeSettings: EncodeSettings = EncodeSettings()): HttpsCallableResult = invoke(encode(strategy, data, encodeSettings)!!)
+    suspend operator fun <T> invoke(
+        strategy: SerializationStrategy<T>,
+        data: T,
+        encodeDefaults: Boolean = true,
+        serializersModule: SerializersModule = EmptySerializersModule()
+    ): HttpsCallableResult = invoke(strategy, data, encodeDefaults, serializersModule)
     abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
 }
 
@@ -28,7 +37,7 @@ expect class HttpsCallableReference : BaseHttpsCallableReference {
 
 expect class HttpsCallableResult {
     inline fun <reified T> data(): T
-    fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings = DecodeSettings()): T
+    fun <T> data(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule = EmptySerializersModule()): T
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

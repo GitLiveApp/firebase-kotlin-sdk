@@ -12,6 +12,7 @@ import dev.gitlive.firebase.encode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.SerializersModule
 import java.util.concurrent.TimeUnit
 
 actual val Firebase.functions
@@ -44,8 +45,8 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual inline fun <reified T> data() =
         decode<T>(value = android.data)
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
-        decode(strategy, android.data, decodeSettings)
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
+        decode(strategy, android.data, serializersModule)
 }
 
 actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

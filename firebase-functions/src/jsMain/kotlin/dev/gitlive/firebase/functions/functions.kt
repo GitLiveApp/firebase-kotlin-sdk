@@ -9,6 +9,7 @@ import dev.gitlive.firebase.functions.externals.*
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 
@@ -47,8 +48,8 @@ actual class HttpsCallableResult constructor(val js: JsHttpsCallableResult) {
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
-        rethrow { decode(strategy, js.data, decodeSettings) }
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
+        rethrow { decode(strategy, js.data, serializersModule) }
 
 }
 

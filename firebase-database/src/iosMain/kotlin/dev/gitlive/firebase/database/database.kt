@@ -20,6 +20,8 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 import platform.Foundation.NSError
 import platform.Foundation.allObjects
 import kotlin.collections.component1
@@ -150,21 +152,24 @@ actual class DatabaseReference internal constructor(
         ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeSettings) as Map<Any?, *>, it) }
+    override suspend fun updateChildren(
+        update: Map<String, Any?>,
+        encodeDefaults: Boolean,
+        serializersModule: SerializersModule
+    ) {
+        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults, serializersModule) as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
     }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, decodeSettings: DecodeSettings, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, serializersModule: SerializersModule, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
                 firMutableData?.value = firMutableData?.value?.let {
-                    transactionUpdate(decode(strategy, it, decodeSettings))
+                    transactionUpdate(decode(strategy, it, serializersModule))
                 }
                 FIRTransactionResult.successWithValue(firMutableData!!)
             },
@@ -198,8 +203,8 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
-        decode(strategy, ios.value, decodeSettings)
+    actual fun <T> value(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
+        decode(strategy, ios.value, serializersModule)
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
     actual val hasChildren get() = ios.hasChildren()
@@ -223,8 +228,12 @@ actual class OnDisconnect internal constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeSettings: EncodeSettings) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeSettings) } as Map<Any?, *>, it) }
+    override suspend fun updateChildren(
+        update: Map<String, Any?>,
+        encodeDefaults: Boolean,
+        serializersModule: SerializersModule
+    ) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults, serializersModule) } as Map<Any?, *>, it) }
     }
 }
 

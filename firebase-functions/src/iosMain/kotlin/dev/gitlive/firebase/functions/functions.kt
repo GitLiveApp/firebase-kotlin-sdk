@@ -11,6 +11,8 @@ import dev.gitlive.firebase.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 import platform.Foundation.NSError
 
 actual val Firebase.functions
@@ -50,8 +52,8 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
     actual inline fun <reified T> data() =
         decode<T>(value = ios.data())
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, decodeSettings: DecodeSettings) =
-        decode(strategy, ios.data(), decodeSettings)
+    actual fun <T> data(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
+        decode(strategy, ios.data(), serializersModule)
 }
 
 actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)
