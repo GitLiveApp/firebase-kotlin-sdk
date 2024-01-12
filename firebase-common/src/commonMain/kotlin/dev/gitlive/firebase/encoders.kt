@@ -7,17 +7,22 @@ package dev.gitlive.firebase
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()): Any? = encode(strategy, value, EncodeSettings(shouldEncodeElementDefault, serializersModule))
+@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value) {
+    this.shouldEncodeElementDefault = shouldEncodeElementDefault
+}
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, settings: EncodeSettings): Any? =
-    FirebaseEncoder(settings).apply { encodeSerializableValue(strategy, value) }.value
+fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? =
+    FirebaseEncoder(EncodeSettings.Builder().apply(buildSettings).build()).apply { encodeSerializableValue(strategy, value) }.value
 
-inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()): Any? = encode(value, EncodeSettings(shouldEncodeElementDefault, serializersModule))
-inline fun <reified T> encode(value: T, settings: EncodeSettings): Any? = value?.let {
-    FirebaseEncoder(settings).apply {
+@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))
+inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value) {
+    this.shouldEncodeElementDefault = shouldEncodeElementDefault
+}
+inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? = value?.let {
+    FirebaseEncoder(EncodeSettings.Builder().apply(buildSettings).build()).apply {
         if (it is ValueWithSerializer<*> && it.value is T) {
             @Suppress("UNCHECKED_CAST")
             (it as ValueWithSerializer<T>).let {
@@ -43,7 +48,9 @@ class FirebaseEncoder(
     internal val settings: EncodeSettings
 ) : Encoder {
 
-    constructor(shouldEncodeElementDefault: Boolean, serializersModule: SerializersModule = EmptySerializersModule()) : this(EncodeSettings(shouldEncodeElementDefault, serializersModule))
+    constructor(shouldEncodeElementDefault: Boolean) : this(
+        EncodeSettings.Builder().apply { this.shouldEncodeElementDefault = shouldEncodeElementDefault }.build()
+    )
 
     var value: Any? = null
 

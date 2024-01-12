@@ -15,13 +15,15 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
-inline fun <reified T> decode(value: Any?, serializersModule: SerializersModule = EmptySerializersModule()): T {
+inline fun <reified T> decode(value: Any?): T = decode(value) {}
+inline fun <reified T> decode(value: Any?, noinline buildSettings: DecodeSettings.Builder.() -> Unit): T {
     val strategy = serializer<T>()
-    return decode(strategy as DeserializationStrategy<T>, value, serializersModule)
+    return decode(strategy as DeserializationStrategy<T>, value, buildSettings)
 }
-fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, serializersModule: SerializersModule = EmptySerializersModule()): T {
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T = decode(strategy, value) {}
+fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, buildSettings: DecodeSettings.Builder.() -> Unit): T {
     require(value != null || strategy.descriptor.isNullable) { "Value was null for non-nullable type ${strategy.descriptor.serialName}" }
-    return FirebaseDecoder(value, DecodeSettings(serializersModule)).decodeSerializableValue(strategy)
+    return FirebaseDecoder(value, DecodeSettings.Builder().apply(buildSettings).build()).decodeSerializableValue(strategy)
 }
 expect fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder
 expect fun getPolymorphicType(value: Any?, discriminator: String): String

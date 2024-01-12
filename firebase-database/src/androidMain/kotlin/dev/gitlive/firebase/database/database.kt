@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.modules.SerializersModule
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
@@ -184,8 +183,8 @@ actual class DatabaseReference internal constructor(
         .run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean, serializersModule: SerializersModule) =
-        android.updateChildren(encode(update, encodeDefaults, serializersModule) as Map<String, Any?>)
+    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
+        android.updateChildren(encode(update, buildSettings) as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -193,13 +192,13 @@ actual class DatabaseReference internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, serializersModule: SerializersModule, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         android.runTransaction(object : Transaction.Handler {
 
             override fun doTransaction(currentData: MutableData): Transaction.Result {
                 currentData.value = currentData.value?.let {
-                    transactionUpdate(decode(strategy, it, serializersModule))
+                    transactionUpdate(decode(strategy, it, buildSettings))
                 }
                 return Transaction.success(currentData)
             }
@@ -237,8 +236,8 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule) =
-        decode(strategy, android.value, serializersModule)
+    actual fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+        decode(strategy, android.value, buildSettings)
 
     actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
     actual val hasChildren get() = android.hasChildren()
@@ -263,8 +262,8 @@ actual class OnDisconnect internal constructor(
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean, serializersModule: SerializersModule) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(it, encodeDefaults, serializersModule) })
+    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
+        android.updateChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

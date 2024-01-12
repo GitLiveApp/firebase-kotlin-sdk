@@ -210,14 +210,6 @@ citiesRef.where {
 }
 ```
 
-<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
-
-To improve readability functions such as the Cloud Firestore data encoding/decoding use named arguments:
-
-```kotlin
-documentRef.set(data, encodeDefaults = false, serializersModule = customSerializerModule)
-```
-
 <h3><a href="https://kotlinlang.org/docs/reference/operator-overloading.html">Operator overloading</a></h3>
 
 In cases where it makes sense, such as Firebase Functions HTTPS Callable, operator overloading is used:

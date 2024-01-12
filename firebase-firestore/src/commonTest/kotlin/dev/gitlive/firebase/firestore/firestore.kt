@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -541,8 +540,9 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-updated",
                 time = 123.0
             ),
-            encodeDefaults = false,
-        )
+        ) {
+            shouldEncodeElementDefault = false
+        }
         batch.commit()
 
         assertEquals("prop1-updated", doc.get().data(FirestoreTest.serializer()).prop1)
@@ -568,8 +568,9 @@ class FirebaseFirestoreTest {
                 prop1 = "prop1-set",
                 time = 126.0
             ),
-            encodeDefaults = false
-        )
+        ) {
+            shouldEncodeElementDefault = false
+        }
         batch.commit()
 
         assertEquals(126.0, doc.get().get("time") as Double?)
@@ -731,7 +732,11 @@ class FirebaseFirestoreTest {
     fun encodeDocumentReference() = runTest {
         val doc = firestore.document("a/b")
         val item = TestDataWithDocumentReference("123", doc, doc)
-        val encoded = encodedAsMap(encode(item, encodeDefaults = false))
+        val encoded = encodedAsMap(
+            encode(item) {
+                shouldEncodeElementDefault = false
+            }
+        )
         assertEquals("123", encoded["uid"])
         assertEquals(doc.nativeValue, encoded["reference"])
         assertEquals(doc.nativeValue, encoded["optionalReference"])
@@ -740,7 +745,11 @@ class FirebaseFirestoreTest {
     @Test
     fun encodeNullDocumentReference() = runTest {
         val item = TestDataWithOptionalDocumentReference(null)
-        val encoded = encodedAsMap(encode(item, encodeDefaults = false))
+        val encoded = encodedAsMap(
+            encode(item) {
+                shouldEncodeElementDefault = false
+            }
+        )
         assertNull(encoded["optionalReference"])
     }
 

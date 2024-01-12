@@ -7,8 +7,6 @@ package dev.gitlive.firebase.functions
 import dev.gitlive.firebase.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.modules.EmptySerializersModule
-import kotlinx.serialization.modules.SerializersModule
 
 expect class FirebaseFunctions {
     fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
@@ -16,18 +14,17 @@ expect class FirebaseFunctions {
 }
 
 abstract class BaseHttpsCallableReference {
-    suspend inline operator fun <reified T> invoke(
-        data: T,
-        encodeDefaults: Boolean = true,
-        serializersModule: SerializersModule = EmptySerializersModule()
-    ) = invoke(encode(data, encodeDefaults, serializersModule)!!)
+    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { shouldEncodeElementDefault = encodeDefaults }"))
+    suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data) {
+        shouldEncodeElementDefault = encodeDefaults
+    }
+    suspend inline operator fun <reified T> invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(data, buildSettings)!!)
 
-    suspend operator fun <T> invoke(
-        strategy: SerializationStrategy<T>,
-        data: T,
-        encodeDefaults: Boolean = true,
-        serializersModule: SerializersModule = EmptySerializersModule()
-    ): HttpsCallableResult = invoke(strategy, data, encodeDefaults, serializersModule)
+    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(strategy, data) { shouldEncodeElementDefault = encodeDefaults }"))
+    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data) {
+        shouldEncodeElementDefault = encodeDefaults
+    }
+    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(strategy, data, buildSettings)!!)
     abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
 }
 
@@ -37,7 +34,7 @@ expect class HttpsCallableReference : BaseHttpsCallableReference {
 
 expect class HttpsCallableResult {
     inline fun <reified T> data(): T
-    fun <T> data(strategy: DeserializationStrategy<T>, serializersModule: SerializersModule = EmptySerializersModule()): T
+    fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

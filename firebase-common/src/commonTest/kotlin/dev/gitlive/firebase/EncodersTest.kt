@@ -141,11 +141,17 @@ class EncodersTest {
             polymorphic(AbstractClass::class, ImplementedClass::class, ImplementedClass.serializer())
         }
         val abstractClass: AbstractClass = ImplementedClass("value", true)
-        val encoded = encode(AbstractClass.serializer(), abstractClass, EncodeSettings(true, module))
+        val encoded =
+            encode(AbstractClass.serializer(), abstractClass) {
+                shouldEncodeElementDefault = true
+                serializersModule = module
+            }
 
         nativeAssertEquals(nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true), encoded)
 
-        val decoded = decode(AbstractClass.serializer(), encoded, module)
+        val decoded = decode(AbstractClass.serializer(), encoded) {
+            serializersModule = module
+        }
         assertEquals(abstractClass, decoded)
     }
 
@@ -158,7 +164,10 @@ class EncodersTest {
         val sealedClass: SealedClass = SealedClass.Test("value")
         val abstractClass: AbstractClass = ImplementedClass("value", true)
         val nestedClass = NestedClass(sealedClass, abstractClass, listOf(sealedClass), listOf(abstractClass), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
-        val encoded = encode(NestedClass.serializer(), nestedClass, EncodeSettings(true, module))
+        val encoded = encode(NestedClass.serializer(), nestedClass) {
+            shouldEncodeElementDefault = true
+            serializersModule = module
+        }
 
         val sealedEncoded = nativeMapOf("type" to "test", "value" to "value")
         val abstractEncoded = nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true)
@@ -174,7 +183,9 @@ class EncodersTest {
             encoded
         )
 
-        val decoded = decode(NestedClass.serializer(), encoded, module)
+        val decoded = decode(NestedClass.serializer(), encoded) {
+            serializersModule = module
+        }
         assertEquals(nestedClass, decoded)
     }
 }
