@@ -70,8 +70,8 @@ The Firebase Kotlin SDK uses Kotlin serialization to read and write custom class
 
 ```groovy
 plugins {
-    kotlin("multiplatform") version "1.8.21" // or kotlin("jvm") or any other kotlin plugin
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("multiplatform") version "1.9.20" // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.9.20"
 }
 ```
 
