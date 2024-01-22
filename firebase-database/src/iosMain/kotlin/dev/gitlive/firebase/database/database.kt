@@ -159,13 +159,11 @@ actual class DatabaseReference internal constructor(
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
     }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-                firMutableData?.value = firMutableData?.value?.let {
-                    transactionUpdate(decode(strategy, it, buildSettings))
-                }
+                firMutableData?.value = reencodeTransformation(strategy, firMutableData?.value, buildSettings, transactionUpdate)
                 FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->

@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -108,7 +109,7 @@ expect class DatabaseReference : BaseDatabaseReference {
 
     suspend fun removeValue()
 
-    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
+    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
 }
 
 expect class DataSnapshot {

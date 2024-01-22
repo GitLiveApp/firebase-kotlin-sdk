@@ -23,12 +23,17 @@ data class EncodeSettings internal constructor(
     val shouldEncodeElementDefault: Boolean,
     override val serializersModule: SerializersModule,
 ) : EncodeDecodeSettings() {
-    class Builder {
-        var shouldEncodeElementDefault: Boolean = true
-        var serializersModule: SerializersModule = EmptySerializersModule()
 
-        @PublishedApi
-        internal fun build() = EncodeSettings(shouldEncodeElementDefault, serializersModule)
+    interface Builder {
+        var shouldEncodeElementDefault: Boolean
+        var serializersModule: SerializersModule
+
+    }
+
+    @PublishedApi
+    internal class BuilderImpl : Builder {
+        override var shouldEncodeElementDefault: Boolean = true
+        override var serializersModule: SerializersModule = EmptySerializersModule()
     }
 }
 
@@ -40,9 +45,26 @@ data class DecodeSettings internal constructor(
     override val serializersModule: SerializersModule = EmptySerializersModule(),
 ) : EncodeDecodeSettings() {
 
-    class Builder {
-        var serializersModule: SerializersModule = EmptySerializersModule()
+    interface Builder {
+        var serializersModule: SerializersModule
+    }
 
-        fun build() = DecodeSettings(serializersModule)
+    @PublishedApi
+    internal class BuilderImpl : Builder {
+        override var serializersModule: SerializersModule = EmptySerializersModule()
     }
 }
+
+interface EncodeDecodeSettingsBuilder : EncodeSettings.Builder, DecodeSettings.Builder
+
+@PublishedApi
+internal class EncodeDecodeSettingsBuilderImpl : EncodeDecodeSettingsBuilder {
+
+    override var shouldEncodeElementDefault: Boolean = true
+    override var serializersModule: SerializersModule = EmptySerializersModule()
+}
+
+@PublishedApi
+internal fun EncodeSettings.Builder.buildEncodeSettings(): EncodeSettings = EncodeSettings(shouldEncodeElementDefault, serializersModule)
+@PublishedApi
+internal fun DecodeSettings.Builder.buildDecodeSettings(): DecodeSettings = DecodeSettings(serializersModule)

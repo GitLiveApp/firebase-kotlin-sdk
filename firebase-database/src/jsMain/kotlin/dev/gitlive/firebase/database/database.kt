@@ -156,8 +156,10 @@ actual class DatabaseReference internal constructor(
         rethrow { update(js, encodedUpdate ?: json()).awaitWhileOnline(database) }
 
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        return DataSnapshot(jsRunTransaction(js, transactionUpdate).awaitWhileOnline(database).snapshot, database)
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+        return DataSnapshot(jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+            reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
+        }).awaitWhileOnline(database).snapshot, database)
     }
 }
 
@@ -173,7 +175,7 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         rethrow { decode<T>(value = js.`val`()) }
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         rethrow { decode(strategy, js.`val`(), buildSettings) }
 
     actual val exists get() = rethrow { js.exists() }

@@ -79,51 +79,47 @@ class FirebaseDatabaseTest {
         assertEquals(3, firebaseDatabaseChildCount)
     }
 
-//    @Test
-//    fun testBasicIncrementTransaction() = runTest {
-//        val data = DatabaseTest("PostOne", 2)
-//        val userRef = database.reference("users/user_1/post_id_1")
-//        setupDatabase(userRef, data, DatabaseTest.serializer())
-//
-//        // Check database before transaction
-//        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
-//        assertEquals(data.title, userDocBefore.title)
-//        assertEquals(data.likes, userDocBefore.likes)
-//
-//        // Run transaction
-//        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes + 1) }
-//        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
-//
-//        // Check the database after transaction
-//        assertEquals(data.title, userDocAfter.title)
-//        assertEquals(data.likes + 1, userDocAfter.likes)
-//
-//        // cleanUp Firebase
-//        cleanUp()
-//    }
-//
-//    @Test
-//    fun testBasicDecrementTransaction() = runTest {
-//        val data = DatabaseTest("PostTwo", 2)
-//        val userRef = database.reference("users/user_1/post_id_2")
-//        setupDatabase(userRef, data, DatabaseTest.serializer())
-//
-//        // Check database before transaction
-//        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
-//        assertEquals(data.title, userDocBefore.title)
-//        assertEquals(data.likes, userDocBefore.likes)
-//
-//        // Run transaction
-//        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes - 1) }
-//        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
-//
-//        // Check the database after transaction
-//        assertEquals(data.title, userDocAfter.title)
-//        assertEquals(data.likes - 1, userDocAfter.likes)
-//
-//        // cleanUp Firebase
-//        cleanUp()
-//    }
+    @Test
+    fun testBasicIncrementTransaction() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostOne", 2)
+        val userRef = database.reference("users/user_1/post_id_1")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        // Check database before transaction
+        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
+        assertEquals(data.title, userDocBefore.title)
+        assertEquals(data.likes, userDocBefore.likes)
+
+        // Run transaction
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes + 1) }
+        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
+
+        // Check the database after transaction
+        assertEquals(data.title, userDocAfter.title)
+        assertEquals(data.likes + 1, userDocAfter.likes)
+    }
+
+    @Test
+    fun testBasicDecrementTransaction() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostTwo", 2)
+        val userRef = database.reference("users/user_1/post_id_2")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        // Check database before transaction
+        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
+        assertEquals(data.title, userDocBefore.title)
+        assertEquals(data.likes, userDocBefore.likes)
+
+        // Run transaction
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes - 1) }
+        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
+
+        // Check the database after transaction
+        assertEquals(data.title, userDocAfter.title)
+        assertEquals(data.likes - 1, userDocAfter.likes)
+    }
 
     @Test
     fun testSetServerTimestamp() = runTest {

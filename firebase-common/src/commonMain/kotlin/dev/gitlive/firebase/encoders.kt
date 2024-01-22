@@ -14,15 +14,24 @@ fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElement
     this.shouldEncodeElementDefault = shouldEncodeElementDefault
 }
 
-inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? =
-    FirebaseEncoder(EncodeSettings.Builder().apply(buildSettings).build()).apply { encodeSerializableValue(strategy, value) }.value
+inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit) =
+    encode(strategy, value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
+
+@PublishedApi
+internal inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
+    FirebaseEncoder(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value) {
     this.shouldEncodeElementDefault = shouldEncodeElementDefault
 }
-inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? = value?.let {
-    FirebaseEncoder(EncodeSettings.Builder().apply(buildSettings).build()).apply {
+
+inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
+    encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
+
+@PublishedApi
+internal inline fun <reified T> encode(value: T, encodeSettings: EncodeSettings): Any? = value?.let {
+    FirebaseEncoder(encodeSettings).apply {
         if (it is ValueWithSerializer<*> && it.value is T) {
             @Suppress("UNCHECKED_CAST")
             (it as ValueWithSerializer<T>).let {
@@ -49,7 +58,7 @@ class FirebaseEncoder(
 ) : Encoder {
 
     constructor(shouldEncodeElementDefault: Boolean) : this(
-        EncodeSettings.Builder().apply { this.shouldEncodeElementDefault = shouldEncodeElementDefault }.build()
+        EncodeSettings.BuilderImpl().apply { this.shouldEncodeElementDefault = shouldEncodeElementDefault }.buildEncodeSettings()
     )
 
     var value: Any? = null

@@ -192,14 +192,12 @@ actual class DatabaseReference internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         android.runTransaction(object : Transaction.Handler {
 
             override fun doTransaction(currentData: MutableData): Transaction.Result {
-                currentData.value = currentData.value?.let {
-                    transactionUpdate(decode(strategy, it, buildSettings))
-                }
+                currentData.value = reencodeTransformation(strategy, currentData.value, buildSettings, transactionUpdate)
                 return Transaction.success(currentData)
             }
 
