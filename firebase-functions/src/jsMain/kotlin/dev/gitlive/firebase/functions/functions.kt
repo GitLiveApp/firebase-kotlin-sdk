@@ -47,7 +47,7 @@ actual class HttpsCallableResult constructor(val js: JsHttpsCallableResult) {
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         rethrow { decode(strategy, js.data, buildSettings) }
 
 }

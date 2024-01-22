@@ -97,8 +97,6 @@ val SetOptions.js: Json get() = when (this) {
 
 actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
 
-    actual val async = Async(js)
-
     override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
@@ -130,12 +128,7 @@ actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
         rethrow { js.delete(documentRef.js) }
             .let { this }
 
-    actual suspend fun commit() = rethrow { async.commit().await() }
-
-    @Suppress("DeferredIsResult")
-    actual class Async(private val js: JsWriteBatch) {
-        actual fun commit() = rethrow { js.commit().asDeferred() }
-    }
+    actual suspend fun commit() = rethrow { js.commit().await() }
 }
 
 actual class Transaction(val js: JsTransaction) : BaseTransaction() {
@@ -194,8 +187,6 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val parent: CollectionReference
         get() = rethrow { CollectionReference(js.parent) }
 
-    override val async = Async(nativeValue)
-
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
 
     actual suspend fun get() = rethrow { DocumentSnapshot( getDoc(js).await()) }
@@ -212,38 +203,37 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         awaitClose { unsubscribe() }
     }
 
+    override suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = rethrow {
+        setDoc(js, encodedData, setOptions.js).await()
+    }
+
+    override suspend fun updateEncoded(encodedData: Any) = rethrow { jsUpdate(js, encodedData).await() }
+
+    override suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
+        rethrow {
+            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+                ?.performUpdate { field, value, moreFieldsAndValues ->
+                    jsUpdate(js, field, value, *moreFieldsAndValues)
+                }
+                ?.await()
+        }
+    }
+
+    override suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
+        rethrow {
+            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+                ?.performUpdate { field, value, moreFieldsAndValues ->
+                    jsUpdate(js, field, value, *moreFieldsAndValues)
+                }?.await()
+        }
+    }
+
+    override suspend fun delete() = rethrow { deleteDoc(js).await() }
+
     override fun equals(other: Any?): Boolean =
         this === other || other is DocumentReference && refEqual(nativeValue, other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
-
-    @Suppress("DeferredIsResult")
-    class Async(@PublishedApi internal val js: NativeDocumentReference) : BaseDocumentReference.Async() {
-
-        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = rethrow {
-            setDoc(js, encodedData, setOptions.js).asDeferred()
-        }
-
-        override fun updateEncoded(encodedData: Any): Deferred<Unit> = rethrow { jsUpdate(js, encodedData).asDeferred() }
-
-        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = rethrow {
-            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
-                    jsUpdate(js, field, value, *moreFieldsAndValues)
-                }
-                ?.asDeferred() ?: CompletableDeferred(Unit)
-        }
-
-        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = rethrow {
-            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
-                    jsUpdate(js, field, value, *moreFieldsAndValues)
-                }
-                ?.asDeferred() ?: CompletableDeferred(Unit)
-        }
-
-        override fun delete() = rethrow { deleteDoc(js).asDeferred() }
-    }
 }
 
 actual data class NativeQuery(val js: JsQuery)
@@ -348,7 +338,6 @@ actual class CollectionReference(override val js: JsCollectionReference) : BaseC
 
     actual val path: String
         get() =  rethrow { js.path }
-    override val async = Async(js)
 
     actual val document get() = rethrow { DocumentReference(doc(js)) }
 
@@ -356,11 +345,8 @@ actual class CollectionReference(override val js: JsCollectionReference) : BaseC
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
 
-    class Async(@PublishedApi internal val js: JsCollectionReference) : BaseCollectionReference.Async() {
-
-        override fun addEncoded(data: Any): Deferred<DocumentReference> = rethrow {
-            addDoc(js, data).asDeferred().convert(::DocumentReference)
-        }
+    override suspend fun addEncoded(data: Any) = rethrow {
+        DocumentReference(addDoc(js, data).await())
     }
 }
 

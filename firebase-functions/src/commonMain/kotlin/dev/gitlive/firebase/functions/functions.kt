@@ -24,8 +24,10 @@ abstract class BaseHttpsCallableReference {
     suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data) {
         shouldEncodeElementDefault = encodeDefaults
     }
-    suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(strategy, data, buildSettings)!!)
-    abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
+    suspend inline operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(strategy, data, buildSettings)!!)
+
+    @PublishedApi
+    internal abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
 }
 
 expect class HttpsCallableReference : BaseHttpsCallableReference {
@@ -34,7 +36,7 @@ expect class HttpsCallableReference : BaseHttpsCallableReference {
 
 expect class HttpsCallableResult {
     inline fun <reified T> data(): T
-    fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T
+    inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T
 }
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */

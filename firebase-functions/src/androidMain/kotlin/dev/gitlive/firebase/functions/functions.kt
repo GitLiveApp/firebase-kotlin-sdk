@@ -44,7 +44,7 @@ actual class HttpsCallableResult constructor(val android: com.google.firebase.fu
     actual inline fun <reified T> data() =
         decode<T>(value = android.data)
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         decode(strategy, android.data, buildSettings)
 }
 

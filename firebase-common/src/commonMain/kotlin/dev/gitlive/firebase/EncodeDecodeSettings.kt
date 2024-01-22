@@ -43,6 +43,6 @@ data class DecodeSettings internal constructor(
     class Builder {
         var serializersModule: SerializersModule = EmptySerializersModule()
 
-        internal fun build() = DecodeSettings(serializersModule)
+        fun build() = DecodeSettings(serializersModule)
     }
 }

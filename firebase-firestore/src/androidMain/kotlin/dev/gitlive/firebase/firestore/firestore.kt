@@ -30,15 +30,6 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
-@Suppress("DeferredIsResult")
-@PublishedApi
-internal fun Task<Void>.asUnitDeferred(): Deferred<Unit> = CompletableDeferred<Unit>()
-    .apply {
-        asDeferred().invokeOnCompletion { exception ->
-            if (exception == null) complete(Unit) else completeExceptionally(exception)
-        }
-    }
-
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
@@ -91,8 +82,6 @@ val SetOptions.android: com.google.firebase.firestore.SetOptions? get() = when (
 
 actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) : BaseWriteBatch() {
 
-    actual val async = Async(android)
-
     override fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
@@ -123,11 +112,8 @@ actual class WriteBatch(val android: com.google.firebase.firestore.WriteBatch) :
     actual fun delete(documentRef: DocumentReference) =
         android.delete(documentRef.android).let { this }
 
-    actual suspend fun commit() = async.commit().await()
-
-    @Suppress("DeferredIsResult")
-    actual class Async(private val android: com.google.firebase.firestore.WriteBatch) {
-        actual fun commit(): Deferred<Unit> = android.commit().asUnitDeferred()
+    actual suspend fun commit() {
+        android.commit().await()
     }
 }
 
@@ -183,12 +169,39 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val parent: CollectionReference
         get() = CollectionReference(android.parent)
 
-    override val async = Async(android)
-
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
     actual suspend fun get() =
         DocumentSnapshot(android.get().await())
+
+    override suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) {
+        val task = (setOptions.android?.let {
+            android.set(encodedData, it)
+        } ?: android.set(encodedData))
+        task.await()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override suspend fun updateEncoded(encodedData: Any) {
+        android.update(encodedData as Map<String, Any>).await()
+    }
+
+    override suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
+        encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }?.let {
+            android.update(encodedFieldsAndValues.toMap())
+        }?.await()
+    }
+
+    override suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
+        encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
+            ?.performUpdate { field, value, moreFieldsAndValues ->
+                android.update(field, value, *moreFieldsAndValues)
+            }?.await()
+    }
+
+    override suspend fun delete() {
+        android.delete().await()
+    }
 
     actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
 
@@ -205,29 +218,6 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         this === other || other is DocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
-
-    @Suppress("DeferredIsResult")
-    class Async(@PublishedApi internal val android: NativeDocumentReference) : BaseDocumentReference.Async() {
-
-        override fun setEncoded(encodedData: Any, setOptions: SetOptions): Deferred<Unit> = (setOptions.android?.let {
-            android.set(encodedData, it)
-        } ?: android.set(encodedData)).asUnitDeferred()
-
-        @Suppress("UNCHECKED_CAST")
-        override fun updateEncoded(encodedData: Any): Deferred<Unit> = android.update(encodedData as Map<String, Any>).asUnitDeferred()
-
-        override fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }?.let {
-            android.update(encodedFieldsAndValues.toMap())
-        }?.asUnitDeferred() ?: CompletableDeferred(Unit)
-
-        override fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): Deferred<Unit> = encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-            ?.performUpdate { field, value, moreFieldsAndValues ->
-                android.update(field, value, *moreFieldsAndValues)
-            }?.asUnitDeferred() ?: CompletableDeferred(Unit)
-
-        override fun delete() =
-            android.delete().asUnitDeferred()
-    }
 }
 
 actual typealias NativeQuery = AndroidQuery
@@ -345,7 +335,6 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual val path: String
         get() = android.path
-    override val async = Async(android)
 
     actual val document: DocumentReference
         get() = DocumentReference(android.document())
@@ -355,10 +344,7 @@ actual class CollectionReference(override val android: com.google.firebase.fires
 
     actual fun document(documentPath: String) = DocumentReference(android.document(documentPath))
 
-    @Suppress("DeferredIsResult")
-    class Async(@PublishedApi internal val android: com.google.firebase.firestore.CollectionReference) : BaseCollectionReference.Async() {
-        override fun addEncoded(data: Any): Deferred<DocumentReference> = android.add(data).asDeferred().convert(::DocumentReference)
-    }
+    override suspend fun addEncoded(data: Any) = DocumentReference(android.add(data).await())
 }
 
 actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException

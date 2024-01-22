@@ -152,8 +152,8 @@ actual class DatabaseReference internal constructor(
         set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
-        rethrow { update(js, encode(update, buildSettings) ?: json()).awaitWhileOnline(database) }
+    override suspend fun updateEncodedChildren(encodedUpdate: Any?) =
+        rethrow { update(js, encodedUpdate ?: json()).awaitWhileOnline(database) }
 
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: DecodeSettings.Builder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -201,8 +201,8 @@ actual class OnDisconnect internal constructor(
     override suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
-        rethrow { js.update(encode(update, buildSettings) ?: json()).awaitWhileOnline(database) }
+    override suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
+        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
 
 }
 

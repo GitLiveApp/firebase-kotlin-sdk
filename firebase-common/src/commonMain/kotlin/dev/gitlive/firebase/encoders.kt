@@ -14,7 +14,7 @@ fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElement
     this.shouldEncodeElementDefault = shouldEncodeElementDefault
 }
 
-fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? =
+inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? =
     FirebaseEncoder(EncodeSettings.Builder().apply(buildSettings).build()).apply { encodeSerializableValue(strategy, value) }.value
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))

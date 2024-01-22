@@ -183,8 +183,8 @@ actual class DatabaseReference internal constructor(
         .run { Unit }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
-        android.updateChildren(encode(update, buildSettings) as Map<String, Any?>)
+    override suspend fun updateEncodedChildren(encodedUpdate: Any?) =
+        android.updateChildren(encodedUpdate as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -236,7 +236,7 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         decode<T>(value = android.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         decode(strategy, android.value, buildSettings)
 
     actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
@@ -262,8 +262,8 @@ actual class OnDisconnect internal constructor(
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) =
-        android.updateChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
+    override suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
+        android.updateChildren(encodedUpdate)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

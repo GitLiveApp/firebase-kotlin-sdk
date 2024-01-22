@@ -50,7 +50,7 @@ actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
     actual inline fun <reified T> data() =
         decode<T>(value = ios.data())
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         decode(strategy, ios.data(), buildSettings)
 }
 

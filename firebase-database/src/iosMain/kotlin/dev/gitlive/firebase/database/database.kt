@@ -151,8 +151,8 @@ actual class DatabaseReference internal constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update, buildSettings) as Map<Any?, *>, it) }
+    override suspend fun updateEncodedChildren(encodedValue: Any?) {
+        ios.await(persistenceEnabled) { updateChildValues(encodedValue as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
@@ -198,7 +198,7 @@ actual class DataSnapshot internal constructor(
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         decode(strategy, ios.value, buildSettings)
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
@@ -223,8 +223,8 @@ actual class OnDisconnect internal constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, buildSettings) } as Map<Any?, *>, it) }
+    override suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 }
 
