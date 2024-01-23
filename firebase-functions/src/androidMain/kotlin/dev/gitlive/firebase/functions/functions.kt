@@ -8,10 +8,8 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerializationStrategy
 import java.util.concurrent.TimeUnit
 
 actual val Firebase.functions

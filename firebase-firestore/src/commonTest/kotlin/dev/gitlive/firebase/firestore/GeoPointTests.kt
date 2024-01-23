@@ -18,7 +18,11 @@ class GeoPointTests {
     fun encodeGeoPointObject() = runTest {
         val geoPoint = GeoPoint(12.3, 45.6)
         val item = TestDataWithGeoPoint("123", geoPoint)
-        val encoded = encodedAsMap(encode(item, shouldEncodeElementDefault = false))
+        val encoded = encodedAsMap(
+            encode<TestDataWithGeoPoint>(item) {
+                shouldEncodeElementDefault = false
+            }
+        )
         assertEquals("123", encoded["uid"])
         // check GeoPoint is encoded to a platform representation
         assertEquals(geoPoint.nativeValue, encoded["location"])

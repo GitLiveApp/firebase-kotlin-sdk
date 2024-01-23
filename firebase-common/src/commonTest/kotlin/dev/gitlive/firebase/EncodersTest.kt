@@ -124,7 +124,7 @@ class EncodersTest {
     @Test
     fun encodeDecodeSealedClass() {
         val sealedClass = SealedClass.Test("value")
-        val encoded = encode(SealedClass.serializer(), sealedClass, shouldEncodeElementDefault = true)
+        val encoded = encode(SealedClass.serializer(), sealedClass) { shouldEncodeElementDefault = true }
 
         nativeAssertEquals(nativeMapOf("type" to "test", "value" to "value"), encoded)
 

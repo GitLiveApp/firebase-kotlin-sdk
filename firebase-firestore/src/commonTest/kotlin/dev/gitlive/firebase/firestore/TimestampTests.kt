@@ -7,9 +7,12 @@ import dev.gitlive.firebase.nativeAssertEquals
 import dev.gitlive.firebase.nativeMapOf
 import dev.gitlive.firebase.runTest
 import kotlinx.serialization.Serializable
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 
 @Serializable
 data class TestData(
@@ -41,7 +44,7 @@ class TimestampTests {
                 "updatedAt" to timestamp.nativeValue,
                 "deletedAt" to null
             ),
-            encode(item, shouldEncodeElementDefault = false)
+            encode<TestData>(item) { shouldEncodeElementDefault = false }
         )
     }
 
@@ -56,7 +59,7 @@ class TimestampTests {
                 "updatedAt" to FieldValue.serverTimestamp.nativeValue,
                 "deletedAt" to FieldValue.serverTimestamp.nativeValue
             ),
-            encode(item, shouldEncodeElementDefault = false)
+            encode<TestData>(item) { shouldEncodeElementDefault = false }
         )
     }
 
@@ -104,11 +107,10 @@ class TimestampTests {
 
     @Test
     fun serializers() = runTest {
-        //todo dont work in js due to use of reified type in firebaseSerializer - uncomment once switched to IR
-//        assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
-//        assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
-//        assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
-//        assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
+        assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
+        assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
+        assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
+        assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
     }
 
     @Test

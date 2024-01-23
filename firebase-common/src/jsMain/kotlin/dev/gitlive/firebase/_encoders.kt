@@ -5,7 +5,6 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.descriptors.PolymorphicKind
-import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.js.json
