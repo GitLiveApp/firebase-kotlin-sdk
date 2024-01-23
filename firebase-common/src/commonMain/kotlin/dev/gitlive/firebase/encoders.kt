@@ -4,9 +4,11 @@
 
 package dev.gitlive.firebase
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.CompositeEncoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))

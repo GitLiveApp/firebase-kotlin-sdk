@@ -1,13 +1,22 @@
 package dev.gitlive.firebase.database
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 expect val emulatorHost: String
@@ -92,7 +101,7 @@ class FirebaseDatabaseTest {
         assertEquals(data.likes, userDocBefore.likes)
 
         // Run transaction
-        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes + 1) }
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1)  }
         val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
 
         // Check the database after transaction
@@ -113,7 +122,7 @@ class FirebaseDatabaseTest {
         assertEquals(data.likes, userDocBefore.likes)
 
         // Run transaction
-        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { DatabaseTest(data.title, it.likes - 1) }
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes - 1) }
         val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
 
         // Check the database after transaction

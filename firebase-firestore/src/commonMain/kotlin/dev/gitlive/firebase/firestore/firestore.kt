@@ -5,7 +5,6 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable

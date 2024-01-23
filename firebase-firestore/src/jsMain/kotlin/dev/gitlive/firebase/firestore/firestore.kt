@@ -4,15 +4,37 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
-import dev.gitlive.firebase.firestore.externals.*
-import kotlinx.coroutines.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.firestore.externals.Firestore
+import dev.gitlive.firebase.firestore.externals.QueryConstraint
+import dev.gitlive.firebase.firestore.externals.addDoc
+import dev.gitlive.firebase.firestore.externals.and
+import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
+import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
+import dev.gitlive.firebase.firestore.externals.deleteDoc
+import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
+import dev.gitlive.firebase.firestore.externals.getDoc
+import dev.gitlive.firebase.firestore.externals.getDocs
+import dev.gitlive.firebase.firestore.externals.getFirestore
+import dev.gitlive.firebase.firestore.externals.initializeFirestore
+import dev.gitlive.firebase.firestore.externals.onSnapshot
+import dev.gitlive.firebase.firestore.externals.or
+import dev.gitlive.firebase.firestore.externals.orderBy
+import dev.gitlive.firebase.firestore.externals.query
+import dev.gitlive.firebase.firestore.externals.refEqual
+import dev.gitlive.firebase.firestore.externals.setDoc
+import dev.gitlive.firebase.firestore.externals.setLogLevel
+import dev.gitlive.firebase.firestore.externals.writeBatch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.coroutines.promise
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
@@ -490,7 +512,7 @@ fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
                 FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
             }
         }
-}
+    }
 
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
 fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =

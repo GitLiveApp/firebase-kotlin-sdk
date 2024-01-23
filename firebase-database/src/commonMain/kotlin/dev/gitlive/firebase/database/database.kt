@@ -9,7 +9,10 @@ import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.database.ChildEvent.Type.*
+import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
+import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
+import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
+import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
 import dev.gitlive.firebase.encode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy

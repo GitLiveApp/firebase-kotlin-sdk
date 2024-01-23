@@ -5,24 +5,18 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.*
-import dev.gitlive.firebase.*
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
+import com.google.firebase.firestore.MetadataChanges
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
-
-import com.google.firebase.firestore.Query as AndroidQuery
 import com.google.firebase.firestore.FieldPath as AndroidFieldPath
 import com.google.firebase.firestore.Filter as AndroidFilter
+import com.google.firebase.firestore.Query as AndroidQuery
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -58,12 +52,12 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
         android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
-                sslEnabled?.let { builder.isSslEnabled = it }
-                host?.let { builder.host = it }
-                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
-            }.build()
-        }
+            persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
+            sslEnabled?.let { builder.isSslEnabled = it }
+            host?.let { builder.host = it }
+            cacheSizeBytes?.let { builder.cacheSizeBytes = it }
+        }.build()
+    }
 
     actual suspend fun disableNetwork() =
         android.disableNetwork().await().run { }

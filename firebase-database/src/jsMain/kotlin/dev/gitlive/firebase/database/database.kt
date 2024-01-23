@@ -4,11 +4,34 @@
 
 package dev.gitlive.firebase.database
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
+import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.database.externals.*
-import kotlinx.coroutines.*
+import dev.gitlive.firebase.database.externals.CancelCallback
+import dev.gitlive.firebase.database.externals.ChangeSnapshotCallback
+import dev.gitlive.firebase.database.externals.Database
+import dev.gitlive.firebase.database.externals.child
+import dev.gitlive.firebase.database.externals.connectDatabaseEmulator
+import dev.gitlive.firebase.database.externals.enableLogging
+import dev.gitlive.firebase.database.externals.getDatabase
+import dev.gitlive.firebase.database.externals.onChildAdded
+import dev.gitlive.firebase.database.externals.onChildChanged
+import dev.gitlive.firebase.database.externals.onChildMoved
+import dev.gitlive.firebase.database.externals.onChildRemoved
+import dev.gitlive.firebase.database.externals.onDisconnect
+import dev.gitlive.firebase.database.externals.onValue
+import dev.gitlive.firebase.database.externals.push
+import dev.gitlive.firebase.database.externals.query
+import dev.gitlive.firebase.database.externals.ref
+import dev.gitlive.firebase.database.externals.remove
+import dev.gitlive.firebase.database.externals.set
+import dev.gitlive.firebase.database.externals.update
+import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.reencodeTransformation
+import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.produceIn
@@ -87,7 +110,7 @@ actual open class Query internal actual constructor(
                 val callback: ChangeSnapshotCallback = { snapshot, previousChildName ->
                     trySend(
                         ChildEvent(
-                                    DataSnapshot(snapshot, database),
+                            DataSnapshot(snapshot, database),
                             type,
                             previousChildName
                         )
