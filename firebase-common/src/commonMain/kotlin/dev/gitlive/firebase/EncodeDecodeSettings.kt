@@ -16,23 +16,23 @@ sealed class EncodeDecodeSettings {
 
 /**
  * [EncodeDecodeSettings] used when encoding an object
- * @property shouldEncodeElementDefault if `true` this will explicitly encode elements even if they are their default value
+ * @property encodeDefaults if `true` this will explicitly encode elements even if they are their default value
  * @param serializersModule the [SerializersModule] to use for serialization. This allows for polymorphic serialization on runtime
  */
 data class EncodeSettings internal constructor(
-    val shouldEncodeElementDefault: Boolean,
+    val encodeDefaults: Boolean,
     override val serializersModule: SerializersModule,
 ) : EncodeDecodeSettings() {
 
     interface Builder {
-        var shouldEncodeElementDefault: Boolean
+        var encodeDefaults: Boolean
         var serializersModule: SerializersModule
 
     }
 
     @PublishedApi
     internal class BuilderImpl : Builder {
-        override var shouldEncodeElementDefault: Boolean = true
+        override var encodeDefaults: Boolean = true
         override var serializersModule: SerializersModule = EmptySerializersModule()
     }
 }
@@ -60,11 +60,11 @@ interface EncodeDecodeSettingsBuilder : EncodeSettings.Builder, DecodeSettings.B
 @PublishedApi
 internal class EncodeDecodeSettingsBuilderImpl : EncodeDecodeSettingsBuilder {
 
-    override var shouldEncodeElementDefault: Boolean = true
+    override var encodeDefaults: Boolean = true
     override var serializersModule: SerializersModule = EmptySerializersModule()
 }
 
 @PublishedApi
-internal fun EncodeSettings.Builder.buildEncodeSettings(): EncodeSettings = EncodeSettings(shouldEncodeElementDefault, serializersModule)
+internal fun EncodeSettings.Builder.buildEncodeSettings(): EncodeSettings = EncodeSettings(encodeDefaults, serializersModule)
 @PublishedApi
 internal fun DecodeSettings.Builder.buildDecodeSettings(): DecodeSettings = DecodeSettings(serializersModule)

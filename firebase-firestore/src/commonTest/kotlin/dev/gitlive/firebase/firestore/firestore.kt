@@ -541,7 +541,7 @@ class FirebaseFirestoreTest {
                 time = 123.0
             ),
         ) {
-            shouldEncodeElementDefault = false
+            encodeDefaults = false
         }
         batch.commit()
 
@@ -569,7 +569,7 @@ class FirebaseFirestoreTest {
                 time = 126.0
             ),
         ) {
-            shouldEncodeElementDefault = false
+            encodeDefaults = false
         }
         batch.commit()
 
@@ -734,7 +734,7 @@ class FirebaseFirestoreTest {
         val item = TestDataWithDocumentReference("123", doc, doc)
         val encoded = encodedAsMap(
             encode(item) {
-                shouldEncodeElementDefault = false
+                encodeDefaults = false
             }
         )
         assertEquals("123", encoded["uid"])
@@ -747,7 +747,7 @@ class FirebaseFirestoreTest {
         val item = TestDataWithOptionalDocumentReference(null)
         val encoded = encodedAsMap(
             encode(item) {
-                shouldEncodeElementDefault = false
+                encodeDefaults = false
             }
         )
         assertNull(encoded["optionalReference"])

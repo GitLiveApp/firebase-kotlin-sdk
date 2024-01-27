@@ -14,15 +14,15 @@ expect class FirebaseFunctions {
 }
 
 abstract class BaseHttpsCallableReference {
-    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { shouldEncodeElementDefault = encodeDefaults }"))
+    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { this.encodeDefaults = encodeDefaults }"))
     suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data) {
-        shouldEncodeElementDefault = encodeDefaults
+        this.encodeDefaults = encodeDefaults
     }
     suspend inline operator fun <reified T> invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(data, buildSettings)!!)
 
-    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(strategy, data) { shouldEncodeElementDefault = encodeDefaults }"))
+    @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(strategy, data) { this.encodeDefaults = encodeDefaults }"))
     suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data) {
-        shouldEncodeElementDefault = encodeDefaults
+        this.encodeDefaults = encodeDefaults
     }
     suspend inline operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(strategy, data, buildSettings)!!)
 

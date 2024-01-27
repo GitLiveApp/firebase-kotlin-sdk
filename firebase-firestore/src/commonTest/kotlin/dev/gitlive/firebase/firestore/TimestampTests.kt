@@ -44,7 +44,7 @@ class TimestampTests {
                 "updatedAt" to timestamp.nativeValue,
                 "deletedAt" to null
             ),
-            encode<TestData>(item) { shouldEncodeElementDefault = false }
+            encode<TestData>(item) { encodeDefaults = false }
         )
     }
 
@@ -59,7 +59,7 @@ class TimestampTests {
                 "updatedAt" to FieldValue.serverTimestamp.nativeValue,
                 "deletedAt" to FieldValue.serverTimestamp.nativeValue
             ),
-            encode<TestData>(item) { shouldEncodeElementDefault = false }
+            encode<TestData>(item) { encodeDefaults = false }
         )
     }
 

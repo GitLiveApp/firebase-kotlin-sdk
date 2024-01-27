@@ -11,9 +11,9 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
-@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))
+@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { encodeDefaults = shouldEncodeElementDefault }"))
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value) {
-    this.shouldEncodeElementDefault = shouldEncodeElementDefault
+    this.encodeDefaults = shouldEncodeElementDefault
 }
 
 inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit) =
@@ -23,9 +23,9 @@ inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSetting
 internal inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
     FirebaseEncoder(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
 
-@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.shouldEncodeElementDefault = shouldEncodeElementDefault }"))
+@Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.encodeDefaults = shouldEncodeElementDefault }"))
 inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value) {
-    this.shouldEncodeElementDefault = shouldEncodeElementDefault
+    this.encodeDefaults = shouldEncodeElementDefault
 }
 
 inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
@@ -60,12 +60,12 @@ class FirebaseEncoder(
 ) : Encoder {
 
     constructor(shouldEncodeElementDefault: Boolean) : this(
-        EncodeSettings.BuilderImpl().apply { this.shouldEncodeElementDefault = shouldEncodeElementDefault }.buildEncodeSettings()
+        EncodeSettings.BuilderImpl().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings()
     )
 
     var value: Any? = null
 
-    internal val shouldEncodeElementDefault = settings.shouldEncodeElementDefault
+    internal val shouldEncodeElementDefault = settings.encodeDefaults
     override val serializersModule: SerializersModule = settings.serializersModule
 
     private var polymorphicDiscriminator: String? = null
@@ -154,7 +154,7 @@ open class FirebaseCompositeEncoder constructor(
 
     override fun endStructure(descriptor: SerialDescriptor) = end()
 
-    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int) = settings.shouldEncodeElementDefault
+    override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int) = settings.encodeDefaults
 
     override fun <T : Any> encodeNullableSerializableElement(
         descriptor: SerialDescriptor,
