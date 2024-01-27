@@ -5,20 +5,23 @@ import kotlin.jvm.JvmName
 
 //** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")
-inline fun encodeFieldAndValue(
+@PublishedApi
+internal inline fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<String, Any?>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
 ) = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, buildSettings) })
 
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFieldPaths")
-inline fun encodeFieldAndValue(
+@PublishedApi
+internal inline fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
 ) = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, buildSettings) })
 
 /** Helper method to perform an update operation in Android and JS. */
-inline fun <T, K> encodeFieldAndValue(
+@PublishedApi
+internal inline fun <T, K> encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<T, Any?>>,
     encodeField: (T) -> K,
     encodeValue: (Any?) -> Any?
