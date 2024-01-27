@@ -11,6 +11,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -54,6 +55,13 @@ data class NestedClass(
     val sealedMap: Map<SealedClass, SealedClass>,
     val abstractMap: Map<AbstractClass, AbstractClass>
 )
+
+@Serializable
+@JvmInline
+value class ValueClass(val int: Int)
+
+@Serializable
+data class ValueClassWrapper(val value: ValueClass)
 
 class EncodersTest {
 
@@ -189,6 +197,28 @@ class EncodersTest {
             serializersModule = module
         }
         assertEquals(nestedClass, decoded)
+    }
+
+    @Test
+    fun encodeDecodeValueClassWrapper() {
+        val testValueClassWrapper = ValueClassWrapper(ValueClass(42))
+        val encoded = encode(ValueClassWrapper.serializer(), testValueClassWrapper) { encodeDefaults = false }
+
+        nativeAssertEquals(nativeMapOf("value" to 42), encoded)
+
+        val decoded = decode(ValueClassWrapper.serializer(), encoded)
+        assertEquals(testValueClassWrapper, decoded)
+    }
+
+    @Test
+    fun encodeDecodeValueClass() {
+        val testValueClass = ValueClass(42)
+        val encoded = encode(ValueClass.serializer(), testValueClass) { encodeDefaults = false }
+
+        nativeAssertEquals(42, encoded)
+
+        val decoded = decode(ValueClass.serializer(), encoded)
+        assertEquals(testValueClass, decoded)
     }
 
     @Test
