@@ -61,8 +61,10 @@ data class NestedClass(
     val testData: TestData,
     val sealed: SealedClass,
     val abstract: AbstractClass,
+    val testDataList: List<TestData>,
     val sealedList: List<SealedClass>,
     val abstractList: List<AbstractClass>,
+    val testDataMap: Map<TestData, TestData>,
     val sealedMap: Map<SealedClass, SealedClass>,
     val abstractMap: Map<AbstractClass, AbstractClass>
 )
@@ -189,7 +191,7 @@ class EncodersTest {
         val testData = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
         val sealedClass: SealedClass = SealedClass.Test("value")
         val abstractClass: AbstractClass = ImplementedClass("value", true)
-        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(sealedClass), listOf(abstractClass), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
+        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(testData), listOf(sealedClass), listOf(abstractClass), mapOf(testData to testData), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
         val encoded = encode(NestedClass.serializer(), nestedClass) {
             encodeDefaults = true
             serializersModule = module
@@ -203,8 +205,10 @@ class EncodersTest {
                 "testData" to testDataEncoded,
                 "sealed" to sealedEncoded,
                 "abstract" to abstractEncoded,
+                "testDataList" to nativeListOf(testDataEncoded),
                 "sealedList" to nativeListOf(sealedEncoded),
                 "abstractList" to nativeListOf(abstractEncoded),
+                "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
                 "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
                 "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
             ),
@@ -344,7 +348,7 @@ class EncodersTest {
         val testData = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
         val sealedClass: SealedClass = SealedClass.Test("value")
         val abstractClass: AbstractClass = ImplementedClass("value", true)
-        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(sealedClass), listOf(abstractClass), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
+        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(testData), listOf(sealedClass), listOf(abstractClass), mapOf(testData to testData), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
         val encoded = encode(NestedClass.serializer(), nestedClass) {
             encodeDefaults = true
             serializersModule = module
@@ -366,8 +370,10 @@ class EncodersTest {
                 "testData" to testDataEncoded,
                 "sealed" to nativeMapOf("type" to "test", "value" to "newValue"),
                 "abstract" to abstractEncoded,
+                "testDataList" to nativeListOf(testDataEncoded),
                 "sealedList" to nativeListOf(sealedEncoded),
                 "abstractList" to nativeListOf(abstractEncoded),
+                "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
                 "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
                 "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
             ),
