@@ -87,11 +87,7 @@ class FirebaseClassDecoder(
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         return (index until descriptor.elementsCount)
             .firstOrNull {
-                !descriptor.isElementOptional(it) || containsKey(
-                    descriptor.getElementName(
-                        it
-                    )
-                )
+                !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it))
             }
             ?.also { index = it + 1 }
             ?: DECODE_DONE

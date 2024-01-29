@@ -16,7 +16,7 @@ internal fun <T> FirebaseEncoder.encodePolymorphically(
     value: T,
     ifPolymorphic: (String) -> Unit
 ) {
-    // If serializer is not an AbstractPolymorphicSerializer or if we are encoding this as a list, we can just use the regular serializer
+    // If serializer is not an AbstractPolymorphicSerializer we can just use the regular serializer
     // This will result in calling structureEncoder for complicated structures
     // For PolymorphicKind this will first encode the polymorphic discriminator as a String and the remaining StructureKind.Class as a map of key-value pairs
     // This will result in a list structured like: (type, { classKey = classValue })
@@ -25,7 +25,6 @@ internal fun <T> FirebaseEncoder.encodePolymorphically(
         return
     }
 
-    // When doing Polymorphic Serialization with EncodeDecodeSettings.PolymorphicStructure.MAP we will use the polymorphic serializer of the class.
     val casted = serializer as AbstractPolymorphicSerializer<Any>
     val baseClassDiscriminator = serializer.descriptor.classDiscriminator()
     val actualSerializer = casted.findPolymorphicSerializer(this, value as Any)
@@ -38,7 +37,7 @@ internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     value: Any?,
     deserializer: DeserializationStrategy<T>,
 ): T {
-    // If deserializer is not an AbstractPolymorphicSerializer or if we are decoding this from a list, we can just use the regular serializer
+    // If deserializer is not an AbstractPolymorphicSerializer we can just use the regular serializer
     if (deserializer !is AbstractPolymorphicSerializer<*>) {
         return deserializer.deserialize(this)
     }
