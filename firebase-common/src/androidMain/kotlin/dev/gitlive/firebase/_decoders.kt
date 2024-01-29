@@ -32,10 +32,10 @@ actual fun getPolymorphicType(value: Any?, discriminator: String): String =
 private fun FirebaseDecoder.decodeAsMap(isNestedPolymorphic: Boolean): CompositeDecoder = (value as? Map<*, *>).orEmpty().let { map ->
     FirebaseClassDecoder(map.size, settings, { map.containsKey(it) }) { desc, index ->
         if (isNestedPolymorphic) {
-            if (index == 0)
-                map[desc.getElementName(index)]
-            else {
+            if (desc.getElementName(index) == "value")
                 map
+            else {
+                map[desc.getElementName(index)]
             }
         } else {
             map[desc.getElementName(index)]

@@ -49,12 +49,12 @@ data class GenericClass<T>(
 
 @Serializable
 abstract class AbstractClass {
-    abstract val value: String
+    abstract val abstractValue: String
 }
 
 @Serializable
 @SerialName("implemented")
-data class ImplementedClass(override val value: String, val otherValue: Boolean) : AbstractClass()
+data class ImplementedClass(override val abstractValue: String, val otherValue: Boolean) : AbstractClass()
 
 @Serializable
 data class NestedClass(
@@ -170,7 +170,7 @@ class EncodersTest {
                 serializersModule = module
             }
 
-        nativeAssertEquals(nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true), encoded)
+        nativeAssertEquals(nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true), encoded)
 
         val decoded = decode(AbstractClass.serializer(), encoded) {
             serializersModule = module
@@ -197,7 +197,7 @@ class EncodersTest {
 
         val testDataEncoded = nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to null, "valueClass" to 42)
         val sealedEncoded = nativeMapOf("type" to "test", "value" to "value")
-        val abstractEncoded = nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true)
+        val abstractEncoded = nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true)
         nativeAssertEquals(
             nativeMapOf(
                 "testData" to testDataEncoded,
@@ -321,16 +321,16 @@ class EncodersTest {
 
         val reencoded = reencodeTransformation(
             AbstractClass.serializer(),
-            nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true),
+            nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true),
             builder = {
                 serializersModule = module
             }
         ) {
             assertEquals(ImplementedClass("value", true), it)
-            ImplementedClass("new-${it.value}", false)
+            ImplementedClass("new-${it.abstractValue}", false)
         }
 
-        nativeAssertEquals(nativeMapOf("type" to "implemented", "value" to "new-value", "otherValue" to false), reencoded)
+        nativeAssertEquals(nativeMapOf("type" to "implemented", "abstractValue" to "new-value", "otherValue" to false), reencoded)
     }
 
     @Test
@@ -360,7 +360,7 @@ class EncodersTest {
 
         val testDataEncoded = nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to null, "valueClass" to 42)
         val sealedEncoded = nativeMapOf("type" to "test", "value" to "value")
-        val abstractEncoded = nativeMapOf("type" to "implemented", "value" to "value", "otherValue" to true)
+        val abstractEncoded = nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true)
         nativeAssertEquals(
             nativeMapOf(
                 "testData" to testDataEncoded,
