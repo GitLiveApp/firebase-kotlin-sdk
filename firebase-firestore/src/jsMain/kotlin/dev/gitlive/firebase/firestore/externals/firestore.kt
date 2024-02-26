@@ -75,7 +75,7 @@ external fun getFirestore(app: FirebaseApp? = definedExternally): Firestore
 
 external fun increment(n: Int): FieldValue
 
-external fun initializeFirestore(app: FirebaseApp, settings: Any): Firestore
+external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore
 
 external fun limit(limit: Number): QueryConstraint
 
@@ -287,3 +287,10 @@ external class Timestamp(seconds: Double, nanoseconds: Double) {
 
     fun isEqual(other: Timestamp): Boolean
 }
+
+external interface FirestoreLocalCache {
+    val kind: String
+}
+
+external fun memoryLocalCache(): FirestoreLocalCache
+external fun persistentLocalCache(settings: dynamic = definedExternally): FirestoreLocalCache
