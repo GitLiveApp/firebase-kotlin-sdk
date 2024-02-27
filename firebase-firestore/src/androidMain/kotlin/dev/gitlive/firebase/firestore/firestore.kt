@@ -5,8 +5,12 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.util.Executors
 import dev.gitlive.firebase.*
+import dev.gitlive.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,6 +19,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executor
 
 import com.google.firebase.firestore.Query as AndroidQuery
 import com.google.firebase.firestore.FieldPath as AndroidFieldPath
@@ -40,7 +46,39 @@ private fun <R> performUpdate(
     update: (com.google.firebase.firestore.FieldPath, Any?, Array<Any?>) -> R
 ) = performUpdate(fieldsAndValues, { it.android }, { encode(it, true) }, update)
 
+val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
+    is LocalCacheSettings.Persistent -> persistentCacheSettings {
+        sizeBytes?.let { setSizeBytes(it) }
+    }
+    is LocalCacheSettings.Memory -> memoryCacheSettings {
+        setGcSettings(
+            when (garbaseCollectorSettings) {
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> memoryEagerGcSettings {  }
+                is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> memoryLruGcSettings {
+                    garbaseCollectorSettings.sizeBytes?.let {
+                        setSizeBytes(it)
+                    }
+                }
+            }
+        )
+    }
+}
+
+// Since on iOS Callback threads are set as settings, we store the settings explicitly here as well
+private val callbackExecutorMap = ConcurrentHashMap<com.google.firebase.firestore.FirebaseFirestore, Executor>()
+
 actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null,
+        val callbackExecutor: Executor = TaskExecutors.MAIN_THREAD,
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
 
     actual fun collection(collectionPath: String) = CollectionReference(android.collection(collectionPath))
 
@@ -61,19 +99,33 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
+        android.firestoreSettings = firestoreSettings {  }
     }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-                persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
-                sslEnabled?.let { builder.isSslEnabled = it }
-                host?.let { builder.host = it }
-                cacheSizeBytes?.let { builder.cacheSizeBytes = it }
-            }.build()
+    actual fun setSettings(settings: Settings) {
+        android.firestoreSettings = firestoreSettings {
+            settings.sslEnabled?.let { isSslEnabled = it }
+            settings.host?.let { host = it }
+            settings.cacheSettings?.let { setLocalCacheSettings(it.android) }
         }
+        callbackExecutorMap[android] = settings.callbackExecutor
+    }
+
+    @Suppress("DEPRECATION")
+    actual fun updateSettings(settings: Settings) {
+        android.firestoreSettings = firestoreSettings {
+            isSslEnabled = settings.sslEnabled ?: android.firestoreSettings.isSslEnabled
+            host = settings.host ?: android.firestoreSettings.host
+            val cacheSettings = settings.cacheSettings?.android ?: android.firestoreSettings.cacheSettings
+            cacheSettings?.let {
+                setLocalCacheSettings(it)
+            } ?: kotlin.run {
+                isPersistenceEnabled = android.firestoreSettings.isPersistenceEnabled
+                setCacheSizeBytes(android.firestoreSettings.cacheSizeBytes)
+            }
+        }
+        callbackExecutorMap[android] = settings.callbackExecutor
+    }
 
     actual suspend fun disableNetwork() =
         android.disableNetwork().await().run { }
@@ -272,18 +324,26 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
 
     actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
-        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
-        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
-            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
-            exception?.let { close(exception) }
-        }
-        awaitClose { listener.remove() }
+    actual fun snapshots(includeMetadataChanges: Boolean) = addSnapshotListener(includeMetadataChanges) { snapshot, exception ->
+        snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+        exception?.let { close(exception) }
     }
     override fun equals(other: Any?): Boolean =
         this === other || other is DocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
+
+    private fun addSnapshotListener(
+        includeMetadataChanges: Boolean = false,
+        listener: ProducerScope<DocumentSnapshot>.(com.google.firebase.firestore.DocumentSnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+    ) = callbackFlow {
+        val executor = callbackExecutorMap[android.firestore] ?: TaskExecutors.MAIN_THREAD
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val registration = android.addSnapshotListener(executor, metadataChanges) { snapshots, exception ->
+            listener(snapshots, exception)
+        }
+        awaitClose { registration.remove() }
+    }
 }
 
 actual open class Query(open val android: AndroidQuery) {
@@ -292,21 +352,14 @@ actual open class Query(open val android: AndroidQuery) {
 
     actual fun limit(limit: Number) = Query(android.limit(limit.toLong()))
 
-    actual val snapshots get() = callbackFlow<QuerySnapshot> {
-        val listener = android.addSnapshotListener { snapshot, exception ->
-            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
-            exception?.let { close(exception) }
-        }
-        awaitClose { listener.remove() }
+    actual val snapshots get() = addSnapshotListener { snapshot, exception ->
+        snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+        exception?.let { close(exception) }
     }
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
-        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
-        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
-            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
-            exception?.let { close(exception) }
-        }
-        awaitClose { listener.remove() }
+    actual fun snapshots(includeMetadataChanges: Boolean) = addSnapshotListener(includeMetadataChanges) { snapshot, exception ->
+        snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+        exception?.let { close(exception) }
     }
 
     internal actual fun where(filter: Filter) = Query(
@@ -388,6 +441,18 @@ actual open class Query(open val android: AndroidQuery) {
     internal actual fun _endBefore(vararg fieldValues: Any) = Query(android.endBefore(*fieldValues))
     internal actual fun _endAt(document: DocumentSnapshot) = Query(android.endAt(document.android))
     internal actual fun _endAt(vararg fieldValues: Any) = Query(android.endAt(*fieldValues))
+
+    private fun addSnapshotListener(
+        includeMetadataChanges: Boolean = false,
+        listener: ProducerScope<QuerySnapshot>.(com.google.firebase.firestore.QuerySnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+    ) = callbackFlow {
+        val executor = callbackExecutorMap[android.firestore] ?: TaskExecutors.MAIN_THREAD
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val registration = android.addSnapshotListener(executor, metadataChanges) { snapshots, exception ->
+            listener(snapshots, exception)
+        }
+        awaitClose { registration.remove() }
+    }
 }
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction

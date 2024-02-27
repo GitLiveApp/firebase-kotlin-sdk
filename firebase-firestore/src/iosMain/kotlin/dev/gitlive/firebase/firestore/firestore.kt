@@ -17,6 +17,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
+import platform.Foundation.NSNumber
+import platform.Foundation.numberWithLong
+import platform.darwin.dispatch_queue_t
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -25,8 +28,29 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFir
     FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
 )
 
+val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
+    is LocalCacheSettings.Persistent -> sizeBytes?.let { FIRPersistentCacheSettings(NSNumber.numberWithLong(it)) } ?: FIRPersistentCacheSettings()
+    is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
+        when (garbaseCollectorSettings) {
+            is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
+            is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbaseCollectorSettings.sizeBytes?.let { FIRMemoryLRUGCSettings(NSNumber.numberWithLong(it)) } ?: FIRMemoryLRUGCSettings()
+        }
+    )
+}
+
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
+
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null,
+        val dispatchQueue: dispatch_queue_t = null
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
 
     actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
@@ -46,20 +70,26 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         await { ios.clearPersistenceWithCompletion(it) }
 
     actual fun useEmulator(host: String, port: Int) {
+        ios.useEmulatorWithHost(host, port.toLong())
         ios.settings = ios.settings.apply {
-            this.host = "$host:$port"
-            persistenceEnabled = false
+            cacheSettings = FIRMemoryCacheSettings()
             sslEnabled = false
         }
     }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        ios.settings = FIRFirestoreSettings().also { settings ->
-            persistenceEnabled?.let { settings.persistenceEnabled = it }
-            sslEnabled?.let { settings.sslEnabled = it }
-            host?.let { settings.host = it }
-            cacheSizeBytes?.let { settings.cacheSizeBytes = it }
-        }
+    actual fun setSettings(settings: Settings) {
+        ios.settings = FIRFirestoreSettings().applySettings(settings)
+    }
+
+    actual fun updateSettings(settings: Settings) {
+        ios.settings = ios.settings.applySettings(settings)
+    }
+
+    private fun FIRFirestoreSettings.applySettings(settings: Settings): FIRFirestoreSettings = apply {
+        settings.cacheSettings?.let { cacheSettings = it.ios }
+        settings.sslEnabled?.let { sslEnabled = it }
+        settings.host?.let { host = it }
+        settings.dispatchQueue?.let { dispatchQueue = it }
     }
 
     actual suspend fun disableNetwork() {

@@ -61,6 +61,18 @@ private fun <R> performUpdate(
 
 actual class FirebaseFirestore(jsFirestore: Firestore) {
 
+    actual data class Settings(
+        actual val sslEnabled: Boolean? = null,
+        actual val host: String? = null,
+        actual val cacheSettings: LocalCacheSettings? = null
+    ) {
+        actual companion object {
+            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+        }
+    }
+
+    private var lastSettings = Settings()
+
     var js: Firestore = jsFirestore
         private set
 
@@ -83,16 +95,28 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
 
     actual fun useEmulator(host: String, port: Int) = rethrow { connectFirestoreEmulator(js, host, port) }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        if(persistenceEnabled == true) enableIndexedDbPersistence(js)
+    actual fun setSettings(settings: Settings) {
+        lastSettings = settings
+        if(settings.cacheSettings is LocalCacheSettings.Persistent) enableIndexedDbPersistence(js)
 
-        val settings = json().apply {
-            sslEnabled?.let { set("ssl", it) }
-            host?.let { set("host", it) }
-            cacheSizeBytes?.let { set("cacheSizeBytes", it) }
+        val jsSettings = json().apply {
+            settings.sslEnabled?.let { set("ssl", it) }
+            settings.host?.let { set("host", it) }
+            when (val cacheSettings = settings.cacheSettings) {
+                is LocalCacheSettings.Persistent -> cacheSettings.sizeBytes
+                is LocalCacheSettings.Memory -> when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> null
+                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbageCollectorSettings.sizeBytes
+                }
+                null -> null
+            }?.let { set("cacheSizeBytes", it) }
         }
-        js = initializeFirestore(js.app, settings)
+        js = initializeFirestore(js.app, jsSettings)
     }
+
+    actual fun updateSettings(settings: Settings) = setSettings(
+        Settings(settings.sslEnabled ?: lastSettings.sslEnabled, settings.host ?: lastSettings.host, settings.cacheSettings ?: lastSettings.cacheSettings)
+    )
 
     actual suspend fun disableNetwork() {
         rethrow { disableNetwork(js).await() }

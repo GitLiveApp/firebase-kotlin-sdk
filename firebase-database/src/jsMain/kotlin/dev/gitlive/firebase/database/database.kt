@@ -44,9 +44,20 @@ actual fun Firebase.database(app: FirebaseApp, url: String) =
     rethrow { FirebaseDatabase(getDatabase(app = app.js, url = url)) }
 
 actual class FirebaseDatabase internal constructor(val js: Database) {
+
+    actual data class Settings(
+        actual val persistenceEnabled: Boolean = false,
+        actual val persistenceCacheSizeBytes: Long? = null,
+    ) {
+
+        actual companion object {
+            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
+        }
+    }
+
     actual fun reference(path: String) = rethrow { DatabaseReference(ref(js, path), js) }
     actual fun reference() = rethrow { DatabaseReference(ref(js), js) }
-    actual fun setPersistenceEnabled(enabled: Boolean) {}
+    actual fun setSettings(settings: Settings) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
 }
