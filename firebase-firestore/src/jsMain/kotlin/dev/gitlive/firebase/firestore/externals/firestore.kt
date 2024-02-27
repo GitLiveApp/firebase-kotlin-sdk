@@ -292,5 +292,11 @@ external interface FirestoreLocalCache {
     val kind: String
 }
 
+external interface PersistentTabManager {
+    val kind: String
+}
+
 external fun memoryLocalCache(): FirestoreLocalCache
 external fun persistentLocalCache(settings: dynamic = definedExternally): FirestoreLocalCache
+external fun persistentSingleTabManager(settings: dynamic = definedExternally): PersistentTabManager
+external fun persistentMultipleTabManager(): PersistentTabManager
