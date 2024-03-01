@@ -26,23 +26,24 @@ actual fun Firebase.functions(app: FirebaseApp, region: String) =
 
 actual class FirebaseFunctions internal constructor(val js: Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
+        rethrow { HttpsCallableReference( httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
 
     actual fun useEmulator(host: String, port: Int) = connectFunctionsEmulator(js, host, port)
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class HttpsCallableReference internal constructor(val js: HttpsCallable) : BaseHttpsCallableReference() {
-
-    actual suspend operator fun invoke() =
-        rethrow { HttpsCallableResult(js().await()) }
-
-    override suspend fun invoke(encodedData: Any): HttpsCallableResult = rethrow {
+@PublishedApi
+internal actual data class NativeHttpsCallableReference(val js: HttpsCallable) {
+    actual suspend fun invoke(encodedData: Any): HttpsCallableResult = rethrow {
         HttpsCallableResult(js(encodedData).await())
     }
+    actual suspend fun invoke(): HttpsCallableResult = rethrow { HttpsCallableResult(js().await()) }
 }
 
-actual class HttpsCallableResult constructor(val js: JsHttpsCallableResult) {
+internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
+
+val HttpsCallableReference.js: HttpsCallable get() = native.js
+
+actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
 
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }

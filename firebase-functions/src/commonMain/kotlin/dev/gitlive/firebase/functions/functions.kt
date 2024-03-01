@@ -13,25 +13,28 @@ expect class FirebaseFunctions {
     fun useEmulator(host: String, port: Int)
 }
 
-abstract class BaseHttpsCallableReference {
+@PublishedApi
+internal expect class NativeHttpsCallableReference {
+    suspend fun invoke(encodedData: Any): HttpsCallableResult
+    suspend fun invoke(): HttpsCallableResult
+}
+
+class HttpsCallableReference internal constructor(
+    @PublishedApi
+    internal val native: NativeHttpsCallableReference
+) {
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { this.encodeDefaults = encodeDefaults }"))
     suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data) {
         this.encodeDefaults = encodeDefaults
     }
-    suspend inline operator fun <reified T> invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(data, buildSettings)!!)
+    suspend inline operator fun <reified T> invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = native.invoke(encodedData = encode(data, buildSettings)!!)
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(strategy, data) { this.encodeDefaults = encodeDefaults }"))
     suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(strategy, data) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = invoke(encode(strategy, data, buildSettings)!!)
-
-    @PublishedApi
-    internal abstract suspend fun invoke(encodedData: Any): HttpsCallableResult
-}
-
-expect class HttpsCallableReference : BaseHttpsCallableReference {
-    suspend operator fun invoke(): HttpsCallableResult
+    suspend operator fun invoke(): HttpsCallableResult = native.invoke()
 }
 
 expect class HttpsCallableResult {

@@ -55,10 +55,10 @@ actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun reference(path: String) =
-        DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
+        DatabaseReference(NativeDatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled))
 
     actual fun reference() =
-        DatabaseReference(ios.reference(), ios.persistenceEnabled)
+        DatabaseReference(NativeDatabaseReference(ios.reference(), ios.persistenceEnabled))
 
     actual fun setPersistenceEnabled(enabled: Boolean) {
         ios.persistenceEnabled = enabled
@@ -78,7 +78,7 @@ fun Type.toEventType() = when(this) {
     REMOVED -> FIRDataEventTypeChildRemoved
 }
 
-actual data class NativeQuery(
+internal actual open class NativeQuery(
     open val ios: FIRDatabaseQuery,
     val persistenceEnabled: Boolean
 )
@@ -147,25 +147,26 @@ actual open class Query internal actual constructor(
     override fun toString() = ios.toString()
 }
 
-actual class DatabaseReference internal constructor(
+@PublishedApi
+internal actual class NativeDatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
     persistenceEnabled: Boolean
-): BaseDatabaseReference(NativeQuery(ios, persistenceEnabled)) {
+): NativeQuery(ios, persistenceEnabled) {
 
     actual val key get() = ios.key
 
-    actual fun child(path: String) = DatabaseReference(ios.child(path), persistenceEnabled)
+    actual fun child(path: String) = NativeDatabaseReference(ios.child(path), persistenceEnabled)
 
-    actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
-    actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
+    actual fun push() = NativeDatabaseReference(ios.childByAutoId(), persistenceEnabled)
+    actual fun onDisconnect() = NativeOnDisconnect(ios, persistenceEnabled)
 
-    override suspend fun setValueEncoded(encodedValue: Any?) {
+    actual suspend fun setValueEncoded(encodedValue: Any?) {
         ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateEncodedChildren(encodedValue: Any?) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedValue as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
@@ -192,6 +193,8 @@ actual class DatabaseReference internal constructor(
     }
 }
 
+val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
+
 @Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val ios: FIRDataSnapshot,
@@ -202,7 +205,7 @@ actual class DataSnapshot internal constructor(
 
     actual val key: String? get() = ios.key
 
-    actual val ref: DatabaseReference get() = DatabaseReference(ios.ref, persistenceEnabled)
+    actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(ios.ref, persistenceEnabled))
 
     actual val value get() = ios.value
 
@@ -217,10 +220,11 @@ actual class DataSnapshot internal constructor(
     actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
 }
 
-actual class OnDisconnect internal constructor(
+@PublishedApi
+internal actual class NativeOnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
     val persistenceEnabled: Boolean
-) : BaseOnDisconnect() {
+) {
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
     }
@@ -229,15 +233,18 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    override suspend fun setValue(encodedValue: Any?) {
+    actual suspend fun setValue(encodedValue: Any?) {
         ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
+    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
         ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 }
+
+val OnDisconnect.ios: FIRDatabaseReference get() = native.ios
+val OnDisconnect.persistenceEnabled get() = native.persistenceEnabled
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 

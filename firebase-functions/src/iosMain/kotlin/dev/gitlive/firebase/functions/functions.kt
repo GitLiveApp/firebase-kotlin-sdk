@@ -34,16 +34,20 @@ actual fun Firebase.functions(
 
 actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } })
+        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } }.native)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
 
-actual class HttpsCallableReference internal constructor(val ios: FIRHTTPSCallable) : BaseHttpsCallableReference() {
-    actual suspend operator fun invoke() = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
-
-    override suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(ios.awaitResult { callWithObject(encodedData, it) })
+@PublishedApi
+internal actual data class NativeHttpsCallableReference(val ios: FIRHTTPSCallable) {
+    actual suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(ios.awaitResult { callWithObject(encodedData, it) })
+    actual suspend fun invoke(): HttpsCallableResult = HttpsCallableResult(ios.awaitResult { callWithCompletion(it) })
 }
+
+internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
+
+val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
 
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
 

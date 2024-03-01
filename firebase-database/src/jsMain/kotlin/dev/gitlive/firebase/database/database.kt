@@ -67,15 +67,15 @@ actual fun Firebase.database(app: FirebaseApp, url: String) =
     rethrow { FirebaseDatabase(getDatabase(app = app.js, url = url)) }
 
 actual class FirebaseDatabase internal constructor(val js: Database) {
-    actual fun reference(path: String) = rethrow { DatabaseReference(ref(js, path), js) }
-    actual fun reference() = rethrow { DatabaseReference(ref(js), js) }
+    actual fun reference(path: String) = rethrow { DatabaseReference(NativeDatabaseReference(ref(js, path), js)) }
+    actual fun reference() = rethrow { DatabaseReference(NativeDatabaseReference(ref(js), js)) }
     actual fun setPersistenceEnabled(enabled: Boolean) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
 }
 
-actual data class NativeQuery(
-    val js: JsQuery,
+internal actual open class NativeQuery(
+    open val js: JsQuery,
     val database: Database
 )
 
@@ -158,24 +158,25 @@ actual open class Query internal actual constructor(
 
 }
 
-actual class DatabaseReference internal constructor(
+@PublishedApi
+internal actual class NativeDatabaseReference internal constructor(
     override val js: JsDatabaseReference,
     database: Database
-) : BaseDatabaseReference(NativeQuery(js, database)) {
+) : NativeQuery(js, database) {
 
     actual val key get() = rethrow { js.key }
-    actual fun push() = rethrow { DatabaseReference(push(js), database) }
-    actual fun child(path: String) = rethrow { DatabaseReference(child(js, path), database) }
+    actual fun push() = rethrow { NativeDatabaseReference(push(js), database) }
+    actual fun child(path: String) = rethrow { NativeDatabaseReference(child(js, path), database) }
 
-    actual fun onDisconnect() = rethrow { OnDisconnect(onDisconnect(js), database) }
+    actual fun onDisconnect() = rethrow { NativeOnDisconnect(onDisconnect(js), database) }
 
     actual suspend fun removeValue() = rethrow { remove(js).awaitWhileOnline(database) }
 
-    override suspend fun setValueEncoded(encodedValue: Any?) = rethrow {
+    actual suspend fun setValueEncoded(encodedValue: Any?) = rethrow {
         set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    override suspend fun updateEncodedChildren(encodedUpdate: Any?) =
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
         rethrow { update(js, encodedUpdate ?: json()).awaitWhileOnline(database) }
 
 
@@ -211,25 +212,29 @@ actual class DataSnapshot internal constructor(
         }
     }
     actual val ref: DatabaseReference
-        get() = DatabaseReference(js.ref, database)
+        get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
 
 }
 
-actual class OnDisconnect internal constructor(
+@PublishedApi
+internal actual class NativeOnDisconnect internal constructor(
     val js: JsOnDisconnect,
     val database: Database
-) : BaseOnDisconnect() {
+) {
 
     actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
     actual suspend fun cancel() =  rethrow { js.cancel().awaitWhileOnline(database) }
 
-    override suspend fun setValue(encodedValue: Any?) =
+    actual suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    override suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
+    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
         rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
 
 }
+
+val OnDisconnect.js get() = native.js
+val OnDisconnect.database get() = native.database
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause) {
     constructor(error: dynamic) : this("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())

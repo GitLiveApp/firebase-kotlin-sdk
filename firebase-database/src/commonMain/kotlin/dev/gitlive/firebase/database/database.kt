@@ -52,7 +52,7 @@ data class ChildEvent internal constructor(
     }
 }
 
-expect class NativeQuery
+internal expect open class NativeQuery
 
 expect open class Query internal constructor(nativeQuery: NativeQuery) {
     val valueEvents: Flow<DataSnapshot>
@@ -73,7 +73,26 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
     fun equalTo(value: Boolean, key: String? = null): Query
 }
 
-abstract class BaseDatabaseReference internal constructor(nativeQuery: NativeQuery) : Query(nativeQuery) {
+@PublishedApi
+internal expect class NativeDatabaseReference : NativeQuery {
+    val key: String?
+    fun push(): NativeDatabaseReference
+    suspend fun setValueEncoded(encodedValue: Any?)
+    suspend fun updateEncodedChildren(encodedUpdate: Any?)
+    fun child(path: String): NativeDatabaseReference
+    fun onDisconnect(): NativeOnDisconnect
+
+    suspend fun removeValue()
+
+    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
+}
+
+class DatabaseReference internal constructor(@PublishedApi internal val nativeReference: NativeDatabaseReference) : Query(nativeReference) {
+
+    val key: String? = nativeReference.key
+    fun push(): DatabaseReference = DatabaseReference(nativeReference.push())
+    fun child(path: String): DatabaseReference = DatabaseReference(nativeReference.child(path))
+    fun onDisconnect(): OnDisconnect = OnDisconnect(nativeReference.onDisconnect())
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) =
@@ -81,38 +100,25 @@ abstract class BaseDatabaseReference internal constructor(nativeQuery: NativeQue
             this.encodeDefaults = encodeDefaults
         }
     suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
-        setValueEncoded(encode(value, buildSettings))
+        nativeReference.setValueEncoded(encode(value, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
         setValue(strategy, value) {
             this.encodeDefaults = encodeDefaults
         }
-    suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValueEncoded(encode(strategy, value, buildSettings))
-
-    @PublishedApi
-    internal abstract suspend fun setValueEncoded(encodedValue: Any?)
+    suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.setValueEncoded(encode(strategy, value, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
         this.encodeDefaults = encodeDefaults
     }
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedChildren(
+    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.updateEncodedChildren(
         encode(update, buildSettings))
 
-    @PublishedApi
-    internal abstract suspend fun updateEncodedChildren(encodedUpdate: Any?)
-}
+    suspend fun removeValue() = nativeReference.removeValue()
 
-expect class DatabaseReference : BaseDatabaseReference {
-    val key: String?
-    fun push(): DatabaseReference
-    fun child(path: String): DatabaseReference
-    fun onDisconnect(): OnDisconnect
-
-    suspend fun removeValue()
-
-    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
+    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
 }
 
 expect class DataSnapshot {
@@ -129,31 +135,30 @@ expect class DataSnapshot {
 
 expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
 
-abstract class BaseOnDisconnect internal constructor() {
+@PublishedApi
+internal expect class NativeOnDisconnect {
+    suspend fun removeValue()
+    suspend fun cancel()
+    suspend fun setValue(encodedValue: Any?)
+    suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>)
+}
+
+class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
+    suspend fun removeValue() = native.removeValue()
+    suspend fun cancel() = native.cancel()
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) =
         setValue(value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
-        setValue(encode(value, buildSettings))
+        native.setValue(encode(value, buildSettings))
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
         setValue(strategy, value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValue(encode(strategy, value, buildSettings))
 
-    @PublishedApi
-    internal abstract suspend fun setValue(encodedValue: Any?)
-
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
+    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
         this.encodeDefaults = encodeDefaults
     }
-
-    @PublishedApi
-    internal abstract suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>)
-}
-
-expect class OnDisconnect : BaseOnDisconnect {
-    suspend fun removeValue()
-    suspend fun cancel()
 }
