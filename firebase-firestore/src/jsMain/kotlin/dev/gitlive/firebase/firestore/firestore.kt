@@ -71,19 +71,19 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     var js: Firestore = jsFirestore
         private set
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(NativeCollectionReference(jsCollection(js, collectionPath))) }
 
     actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
-    actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
+    actual fun document(documentPath: String) = rethrow { DocumentReference(NativeDocumentReference(doc(js, documentPath))) }
 
-    actual fun batch() = rethrow { WriteBatch(writeBatch(js)) }
+    actual fun batch() = rethrow { WriteBatch(NativeWriteBatch(writeBatch(js))) }
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
+        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(NativeTransaction(it)).func() } } ).await() }
 
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }
@@ -110,37 +110,38 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     }
 }
 
-val SetOptions.js: Json get() = when (this) {
+internal val SetOptions.js: Json get() = when (this) {
     is SetOptions.Merge -> json("merge" to true)
     is SetOptions.Overwrite -> json("merge" to false)
     is SetOptions.MergeFields -> json("mergeFields" to fields.toTypedArray())
     is SetOptions.MergeFieldPaths -> json("mergeFields" to encodedFieldPaths.toTypedArray())
 }
 
-actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
+@PublishedApi
+internal actual class NativeWriteBatch(val js: JsWriteBatch) {
 
-    override fun setEncoded(
+    actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
-    ): BaseWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
+    ): NativeWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
-    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
         .let { this }
 
-    override fun updateEncodedFieldsAndValues(
+    actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): BaseWriteBatch = rethrow {
+    ): NativeWriteBatch = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
 
-    override fun updateEncodedFieldPathsAndValues(
+    actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): BaseWriteBatch = rethrow {
+    ): NativeWriteBatch = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -153,33 +154,36 @@ actual class WriteBatch(val js: JsWriteBatch) : BaseWriteBatch() {
     actual suspend fun commit() = rethrow { js.commit().await() }
 }
 
-actual class Transaction(val js: JsTransaction) : BaseTransaction() {
+val WriteBatch.js get() = native.js
 
-    override fun setEncoded(
+@PublishedApi
+internal actual class NativeTransaction(val js: JsTransaction) {
+
+    actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
-    ): BaseTransaction = rethrow {
+    ): NativeTransaction = rethrow {
         js.set(documentRef.js, encodedData, setOptions.js)
     }
         .let { this }
 
-    override fun updateEncoded(documentRef: DocumentReference, encodedData: Any): BaseTransaction = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeTransaction = rethrow { js.update(documentRef.js, encodedData) }
         .let { this }
 
-    override fun updateEncodedFieldsAndValues(
+    actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): BaseTransaction = rethrow {
+    ): NativeTransaction = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
 
-    override fun updateEncodedFieldPathsAndValues(
+    actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): BaseTransaction = rethrow {
+    ): NativeTransaction = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -190,15 +194,17 @@ actual class Transaction(val js: JsTransaction) : BaseTransaction() {
             .let { this }
 
     actual suspend fun get(documentRef: DocumentReference) =
-        rethrow { DocumentSnapshot(js.get(documentRef.js).await()) }
+        rethrow { NativeDocumentSnapshot(js.get(documentRef.js).await()) }
 }
 
-/** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReference = JsDocumentReference
+val Transaction.js get() = native.js
 
-@Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) : BaseDocumentReference() {
-    val js: NativeDocumentReference = nativeValue
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReferenceType = JsDocumentReference
+
+@PublishedApi
+internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
+    val js: NativeDocumentReferenceType = nativeValue
 
     actual val id: String
         get() = rethrow { js.id }
@@ -206,32 +212,32 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val path: String
         get() = rethrow { js.path }
 
-    actual val parent: CollectionReference
-        get() = rethrow { CollectionReference(js.parent) }
+    actual val parent: NativeCollectionReference
+        get() = rethrow { NativeCollectionReference(js.parent) }
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(jsCollection(js, collectionPath)) }
+    actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
 
-    actual suspend fun get() = rethrow { DocumentSnapshot( getDoc(js).await()) }
+    actual suspend fun get() = rethrow { NativeDocumentSnapshot( getDoc(js).await()) }
 
-    actual val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+    actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<DocumentSnapshot>  {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<NativeDocumentSnapshot>  {
         val unsubscribe = onSnapshot(
             js,
             json("includeMetadataChanges" to includeMetadataChanges),
-            { trySend(DocumentSnapshot(it)) },
+            { trySend(NativeDocumentSnapshot(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
     }
 
-    override suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = rethrow {
+    actual suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = rethrow {
         setDoc(js, encodedData, setOptions.js).await()
     }
 
-    override suspend fun updateEncoded(encodedData: Any) = rethrow { jsUpdate(js, encodedData).await() }
+    actual suspend fun updateEncoded(encodedData: Any) = rethrow { jsUpdate(js, encodedData).await() }
 
-    override suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
+    actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
@@ -241,7 +247,7 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         }
     }
 
-    override suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
+    actual suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
         rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
                 ?.performUpdate { field, value, moreFieldsAndValues ->
@@ -250,15 +256,18 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
         }
     }
 
-    override suspend fun delete() = rethrow { deleteDoc(js).await() }
+    actual suspend fun delete() = rethrow { deleteDoc(js).await() }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && refEqual(nativeValue, other.nativeValue)
+        this === other || other is NativeDocumentReference && refEqual(nativeValue, other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = "DocumentReference(path=$path)"
 }
 
-actual data class NativeQuery(val js: JsQuery)
+val DocumentReference.js get() = native.js
+
+@PublishedApi
+internal actual open class NativeQuery(open val js: JsQuery)
 
 actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
@@ -356,21 +365,24 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
     }
 }
 
-actual class CollectionReference(override val js: JsCollectionReference) : BaseCollectionReference(NativeQuery(js)) {
+@PublishedApi
+internal actual class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js) {
 
     actual val path: String
         get() =  rethrow { js.path }
 
-    actual val document get() = rethrow { DocumentReference(doc(js)) }
+    actual val document get() = rethrow { NativeDocumentReference(doc(js)) }
 
-    actual val parent get() = rethrow { js.parent?.let{DocumentReference(it)} }
+    actual val parent get() = rethrow { js.parent?.let{ NativeDocumentReference(it) } }
 
-    actual fun document(documentPath: String) = rethrow { DocumentReference(doc(js, documentPath)) }
+    actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
 
-    override suspend fun addEncoded(data: Any) = rethrow {
-        DocumentReference(addDoc(js, data).await())
+    actual suspend fun addEncoded(data: Any) = rethrow {
+        NativeDocumentReference(addDoc(js, data).await())
     }
 }
+
+val CollectionReference.js get() = native.js
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
@@ -379,7 +391,7 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual class QuerySnapshot(val js: JsQuerySnapshot) {
     actual val documents
-        get() = js.docs.map { DocumentSnapshot(it) }
+        get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshot(it)) }
     actual val documentChanges
         get() = js.docChanges().map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
@@ -387,7 +399,7 @@ actual class QuerySnapshot(val js: JsQuerySnapshot) {
 
 actual class DocumentChange(val js: JsDocumentChange) {
     actual val document: DocumentSnapshot
-        get() = DocumentSnapshot(js.doc)
+        get() = DocumentSnapshot(NativeDocumentSnapshot(js.doc))
     actual val newIndex: Int
         get() = js.newIndex
     actual val oldIndex: Int
@@ -396,16 +408,17 @@ actual class DocumentChange(val js: JsDocumentChange) {
         get() = ChangeType.values().first { it.jsString == js.type }
 }
 
-actual class DocumentSnapshot(val js: JsDocumentSnapshot) : BaseDocumentSnapshot() {
+@PublishedApi
+internal actual class NativeDocumentSnapshot(val js: JsDocumentSnapshot) {
 
     actual val id get() = rethrow { js.id }
-    actual val reference get() = rethrow { DocumentReference(js.ref) }
+    actual val reference get() = rethrow { NativeDocumentReference(js.ref) }
 
-    override fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
+    actual fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
         js.get(field, getTimestampsOptions(serverTimestampBehavior))
     }
 
-    override fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
+    actual fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
         js.data(getTimestampsOptions(serverTimestampBehavior))
     }
 
@@ -416,6 +429,8 @@ actual class DocumentSnapshot(val js: JsDocumentSnapshot) : BaseDocumentSnapshot
     fun getTimestampsOptions(serverTimestampBehavior: ServerTimestampBehavior) =
         json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
+
+val DocumentSnapshot.js get() = native.js
 
 actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
