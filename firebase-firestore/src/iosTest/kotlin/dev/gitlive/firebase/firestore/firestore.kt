@@ -8,5 +8,6 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-actual annotation class IgnoreForAndroidUnitTest
+@Suppress("UNCHECKED_CAST")
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
+actual fun Map<String, Any?>.asEncoded(): Any = this

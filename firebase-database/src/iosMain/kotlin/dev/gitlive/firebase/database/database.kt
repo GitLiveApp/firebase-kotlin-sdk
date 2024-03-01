@@ -4,14 +4,27 @@
 
 package dev.gitlive.firebase.database
 
-import cocoapods.FirebaseDatabase.*
-import cocoapods.FirebaseDatabase.FIRDataEventType.*
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildAdded
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildChanged
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildMoved
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildRemoved
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeValue
+import cocoapods.FirebaseDatabase.FIRDataSnapshot
+import cocoapods.FirebaseDatabase.FIRDatabase
+import cocoapods.FirebaseDatabase.FIRDatabaseQuery
+import cocoapods.FirebaseDatabase.FIRDatabaseReference
+import cocoapods.FirebaseDatabase.FIRTransactionResult
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.database.ChildEvent.Type.*
+import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
+import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
+import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
+import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
 import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.reencodeTransformation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -22,11 +35,8 @@ import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 import platform.Foundation.allObjects
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -45,10 +55,10 @@ actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun reference(path: String) =
-        DatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled)
+        DatabaseReference(NativeDatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled))
 
     actual fun reference() =
-        DatabaseReference(ios.reference(), ios.persistenceEnabled)
+        DatabaseReference(NativeDatabaseReference(ios.reference(), ios.persistenceEnabled))
 
     actual fun setPersistenceEnabled(enabled: Boolean) {
         ios.persistenceEnabled = enabled
@@ -68,10 +78,20 @@ fun Type.toEventType() = when(this) {
     REMOVED -> FIRDataEventTypeChildRemoved
 }
 
-actual open class Query internal constructor(
+internal actual open class NativeQuery(
     open val ios: FIRDatabaseQuery,
     val persistenceEnabled: Boolean
+)
+
+actual open class Query internal actual constructor(
+    nativeQuery: NativeQuery
 ) {
+
+    internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
+
+    open val ios: FIRDatabaseQuery = nativeQuery.ios
+    val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+
     actual fun orderByKey() = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
     actual fun orderByValue() = Query(ios.queryOrderedByValue(), persistenceEnabled)
@@ -127,42 +147,37 @@ actual open class Query internal constructor(
     override fun toString() = ios.toString()
 }
 
-actual class DatabaseReference internal constructor(
+@PublishedApi
+internal actual class NativeDatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
     persistenceEnabled: Boolean
-): Query(ios, persistenceEnabled) {
+): NativeQuery(ios, persistenceEnabled) {
 
     actual val key get() = ios.key
 
-    actual fun child(path: String) = DatabaseReference(ios.child(path), persistenceEnabled)
+    actual fun child(path: String) = NativeDatabaseReference(ios.child(path), persistenceEnabled)
 
-    actual fun push() = DatabaseReference(ios.childByAutoId(), persistenceEnabled)
-    actual fun onDisconnect() = OnDisconnect(ios, persistenceEnabled)
+    actual fun push() = NativeDatabaseReference(ios.childByAutoId(), persistenceEnabled)
+    actual fun onDisconnect() = NativeOnDisconnect(ios, persistenceEnabled)
 
-    actual suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(value, encodeDefaults), it) }
-    }
-
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { setValue(encode(strategy, value, encodeDefaults), it) }
+    actual suspend fun setValueEncoded(encodedValue: Any?) {
+        ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { updateChildValues(encode(update, encodeDefaults) as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
     }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, transactionUpdate: (currentData: T) -> T): DataSnapshot {
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-                firMutableData?.value = firMutableData?.value?.let {
-                    transactionUpdate(decode(strategy, it))
-                }
+                firMutableData?.value = reencodeTransformation(strategy, firMutableData?.value, buildSettings, transactionUpdate)
                 FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->
@@ -178,6 +193,8 @@ actual class DatabaseReference internal constructor(
     }
 }
 
+val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
+
 @Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val ios: FIRDataSnapshot,
@@ -188,22 +205,23 @@ actual class DataSnapshot internal constructor(
 
     actual val key: String? get() = ios.key
 
-    actual val ref: DatabaseReference get() = DatabaseReference(ios.ref, persistenceEnabled)
+    actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(ios.ref, persistenceEnabled))
 
     actual val value get() = ios.value
 
     actual inline fun <reified T> value() =
         decode<T>(value = ios.value)
 
-    actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.value)
+    actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+        decode(strategy, ios.value, buildSettings)
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
     actual val hasChildren get() = ios.hasChildren()
     actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
 }
 
-actual class OnDisconnect internal constructor(
+@PublishedApi
+internal actual class NativeOnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
     val persistenceEnabled: Boolean
 ) {
@@ -215,19 +233,18 @@ actual class OnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend inline fun <reified T> setValue(value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(value, encodeDefaults), it) }
-    }
-
-    actual suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encode(strategy, value, encodeDefaults), it) }
+    actual suspend fun setValue(encodedValue: Any?) {
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(update.mapValues { (_, it) -> encode(it, encodeDefaults) } as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 }
+
+val OnDisconnect.ios: FIRDatabaseReference get() = native.ios
+val OnDisconnect.persistenceEnabled get() = native.persistenceEnabled
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
