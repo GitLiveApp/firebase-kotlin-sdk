@@ -47,6 +47,12 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { FirebaseFirestore(getFirestore(app.js)) }
 
+actual fun Firebase.firestore(app: FirebaseApp, database: String) =
+    rethrow { FirebaseFirestore(getFirestore(app.js, database)) }
+
+actual fun Firebase.firestore(database: String) =
+    rethrow { FirebaseFirestore(getFirestore(database)) }
+
 /** Helper method to perform an update operation. */
 private fun <R> performUpdate(
     fieldsAndValues: Array<out Pair<String, Any?>>,
