@@ -73,6 +73,10 @@ external fun getDocs(query: Query): Promise<QuerySnapshot>
 
 external fun getFirestore(app: FirebaseApp? = definedExternally): Firestore
 
+external fun getFirestore(app: FirebaseApp? = definedExternally, database: String = definedExternally): Firestore
+
+external fun getFirestore(database: String = definedExternally): Firestore
+
 external fun increment(n: Int): FieldValue
 
 external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore

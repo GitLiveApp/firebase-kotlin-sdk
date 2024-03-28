@@ -18,6 +18,12 @@ expect val Firebase.firestore: FirebaseFirestore
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
+/** Returns the [FirebaseFirestore] instance of a given [FirebaseApp] and [Database]. */
+expect fun Firebase.firestore(app: FirebaseApp, database: String): FirebaseFirestore
+
+/** Returns the [FirebaseFirestore] instance instance of the default [FirebaseApp] and the given [Database]. */
+expect fun Firebase.firestore(database: String): FirebaseFirestore
+
 expect class FirebaseFirestore {
     fun collection(collectionPath: String): CollectionReference
     fun collectionGroup(collectionId: String): Query

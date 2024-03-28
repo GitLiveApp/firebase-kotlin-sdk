@@ -26,6 +26,12 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
+actual fun Firebase.firestore(app: FirebaseApp, database: String) =
+    FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android, database))
+
+actual fun Firebase.firestore(database: String) =
+    FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(database))
+
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")
 private fun <R> performUpdate(
