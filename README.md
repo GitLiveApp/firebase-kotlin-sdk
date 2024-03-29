@@ -85,13 +85,43 @@ data class City(val name: String)
 Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#introduction-to-serializers) to the SDK:
 
 ```kotlin
-db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaults = true)
+db.collection("cities").document("LA").set(City.serializer(), city) { encodeDefaults = true }
 ```
 
-The `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to theirs default values.
+The `buildSettings` closure is optional and allows for configuring serialization behaviour. 
+
+Setting the `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to theirs default values.
 Using [@EncodeDefault](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-core/kotlinx.serialization/-encode-default/) on properties is a recommended way to locally override the behavior set with `encodeDefaults`.
 
-You can also omit the serializer but this is discouraged due to a [current limitation on Kotlin/JS and Kotlin/Native](https://github.com/Kotlin/kotlinx.serialization/issues/1116#issuecomment-704342452)
+You can also omit the serializer if it can be inferred using `serializer<KType>()`. 
+To support [contextual serialization](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization) or [open polymorphism](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/polymorphism.md#open-polymorphism) the `serializersModule` can be overridden in the `buildSettings` closure:
+
+```kotlin
+@Serializable
+abstract class AbstractCity {
+    abstract val name: String
+}
+
+@Serializable
+@SerialName("capital")
+data class Capital(override val name: String, val isSeatOfGovernment: Boolean) : AbstractCity()
+
+val module = SerializersModule {
+    polymorphic(AbstractCity::class, AbstractCity.serializer()) {
+        subclass(Capital::class, Capital.serializer())
+    }
+}
+
+val city = Capital("London", true)
+db.collection("cities").document("UK").set(AbstractCity.serializer(), city) { 
+    encodeDefaults = true
+    serializersModule = module
+    
+}
+val storedCity = db.collection("cities").document("UK").get().data(AbstractCity.serializer()) {
+    serializersModule = module
+}
+```
 
 <h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
 

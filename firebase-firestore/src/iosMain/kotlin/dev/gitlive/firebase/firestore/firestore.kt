@@ -9,6 +9,7 @@ import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
@@ -33,19 +34,19 @@ actual fun Firebase.firestore(database: String) =
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
-    actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
+    actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReference(ios.collectionWithPath(collectionPath)))
 
-    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId))
+    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId).native)
 
-    actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
+    actual fun document(documentPath: String) = DocumentReference(NativeDocumentReference(ios.documentWithPath(documentPath)))
 
-    actual fun batch() = WriteBatch(ios.batch())
+    actual fun batch() = WriteBatch(NativeWriteBatch(ios.batch()))
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =
         FIRFirestore.enableLogging(loggingEnabled)
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, _ -> runBlocking { Transaction(transaction!!).func() } }, it) } as T
+        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, _ -> runBlocking { Transaction(NativeTransaction(transaction!!)).func() } }, it) } as T
 
     actual suspend fun clearPersistence() =
         await { ios.clearPersistenceWithCompletion(it) }
@@ -77,104 +78,105 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 }
 
 @Suppress("UNCHECKED_CAST")
-actual class WriteBatch(val ios: FIRWriteBatch) {
+@PublishedApi
+internal actual class NativeWriteBatch(val ios: FIRWriteBatch) {
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
+    actual fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        setOptions: SetOptions
+    ): NativeWriteBatch = when (setOptions) {
+        is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, true)
+        is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, false)
+        is SetOptions.MergeFields -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.fields)
+        is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.encodedFieldPaths)
+    }.let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeWriteBatch = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
 
-    actual inline fun <reified T> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
+    actual fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): NativeWriteBatch = ios.updateData(
+        encodedFieldsAndValues.toMap(),
+        documentRef.ios
+    ).let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
-
-    actual inline fun <reified T> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean) =
-        ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
-
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
-
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        ios.updateData(
-            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
-            documentRef.ios
-        ).let { this }
-
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(
-            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
-            documentRef.ios
-        ).let { this }
+    actual fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ): NativeWriteBatch = ios.updateData(
+        encodedFieldsAndValues.toMap(),
+        documentRef.ios
+    ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
 
     actual suspend fun commit() = await { ios.commitWithCompletion(it) }
-
 }
 
+val WriteBatch.ios get() = native.ios
+
 @Suppress("UNCHECKED_CAST")
-actual class Transaction(val ios: FIRTransaction) {
+@PublishedApi
+internal actual class NativeTransaction(val ios: FIRTransaction) {
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
+    actual fun setEncoded(
+        documentRef: DocumentReference,
+        encodedData: Any,
+        setOptions: SetOptions
+    ): NativeTransaction = when (setOptions) {
+        is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, true)
+        is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, false)
+        is SetOptions.MergeFields -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.fields)
+        is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, documentRef.ios, setOptions.encodedFieldPaths)
+    }.let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeTransaction = ios.updateData(encodedData as Map<Any?, *>, documentRef.ios).let { this }
 
-    actual fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
+    actual fun updateEncodedFieldsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<String, Any?>>
+    ): NativeTransaction = ios.updateData(
+        encodedFieldsAndValues.toMap(),
+        documentRef.ios
+    ).let { this }
 
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, merge).let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFields.asList()).let { this }
-
-    actual fun <T> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, documentRef.ios, mergeFieldPaths.map { it.ios }).let { this }
-
-    actual fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean) =
-        ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
-
-    actual fun <T> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, documentRef.ios).let { this }
-
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>) =
-        ios.updateData(
-            fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
-            documentRef.ios
-        ).let { this }
-
-    actual fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        ios.updateData(
-            fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
-            documentRef.ios
-        ).let { this }
+    actual fun updateEncodedFieldPathsAndValues(
+        documentRef: DocumentReference,
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+    ): NativeTransaction = ios.updateData(
+        encodedFieldsAndValues.toMap(),
+        documentRef.ios
+    ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
         ios.deleteDocument(documentRef.ios).let { this }
 
     actual suspend fun get(documentRef: DocumentReference) =
-        throwError { DocumentSnapshot(ios.getDocument(documentRef.ios, it)!!) }
+        throwError { NativeDocumentSnapshot(ios.getDocument(documentRef.ios, it)!!) }
 
 }
 
-/** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReference = FIRDocumentReference
+val Transaction.ios get() = native.ios
 
-@Serializable(with = DocumentReferenceSerializer::class)
-actual class DocumentReference actual constructor(internal actual val nativeValue: NativeDocumentReference) {
-    val ios: NativeDocumentReference by ::nativeValue
+/** A class representing a platform specific Firebase DocumentReference. */
+actual typealias NativeDocumentReferenceType = FIRDocumentReference
+
+@Suppress("UNCHECKED_CAST")
+@PublishedApi
+internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
+
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
+        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+            snapshot?.let { trySend(NativeDocumentSnapshot(snapshot)) }
+            error?.let { close(error.toException()) }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    val ios: NativeDocumentReferenceType by ::nativeValue
 
     actual val id: String
         get() = ios.documentID
@@ -182,84 +184,65 @@ actual class DocumentReference actual constructor(internal actual val nativeValu
     actual val path: String
         get() = ios.path
 
-    actual val parent: CollectionReference
-        get() = CollectionReference(ios.parent)
+    actual val parent: NativeCollectionReference
+        get() = NativeCollectionReference(ios.parent)
 
-    actual fun collection(collectionPath: String) = CollectionReference(ios.collectionWithPath(collectionPath))
 
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean) =
-        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
-
-    actual suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        await { ios.setData(encode(data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.map { it.ios }, it) }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean) =
-        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, merge, it) }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) =
-        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFields.asList(), it) }
-
-    actual suspend fun <T> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) =
-        await { ios.setData(encode(strategy, data, encodeDefaults)!! as Map<Any?, *>, mergeFieldPaths.map { it.ios }, it) }
-
-    actual suspend inline fun <reified T> update(data: T, encodeDefaults: Boolean) =
-        await { ios.updateData(encode(data, encodeDefaults) as Map<Any?, *>, it) }
-
-    actual suspend fun <T> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        await { ios.updateData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<String, Any?>) =
-        await { block ->
-            ios.updateData(
-                fieldsAndValues.associate { (field, value) -> field to encode(value, true) },
-                block
-            )
-        }
-
-    actual suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>) =
-        await { block ->
-            ios.updateData(
-                fieldsAndValues.associate { (path, value) -> path.ios to encode(value, true) },
-                block
-            )
-        }
-
-    actual suspend fun delete() =
-        await { ios.deleteDocumentWithCompletion(it) }
+    actual fun collection(collectionPath: String) = NativeCollectionReference(ios.collectionWithPath(collectionPath))
 
     actual suspend fun get() =
-        DocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
+        NativeDocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
 
-    actual val snapshots get() = callbackFlow<DocumentSnapshot> {
-        val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
-            error?.let { close(error.toException()) }
+    actual suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = await {
+        when (setOptions) {
+            is SetOptions.Merge -> ios.setData(encodedData as Map<Any?, *>, true, it)
+            is SetOptions.Overwrite -> ios.setData(encodedData as Map<Any?, *>, false, it)
+            is SetOptions.MergeFields -> ios.setData(encodedData as Map<Any?, *>, setOptions.fields, it)
+            is SetOptions.MergeFieldPaths -> ios.setData(encodedData as Map<Any?, *>, setOptions.encodedFieldPaths, it)
         }
-        awaitClose { listener.remove() }
     }
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
-        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
-            snapshot?.let { trySend(DocumentSnapshot(snapshot)) }
+    actual suspend fun updateEncoded(encodedData: Any) = await {
+        ios.updateData(encodedData as Map<Any?, *>, it)
+    }
+
+    actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) = await {
+        ios.updateData(encodedFieldsAndValues.toMap(), it)
+    }
+
+    actual suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) = await {
+        ios.updateData(encodedFieldsAndValues.toMap(), it)
+    }
+
+    actual suspend fun delete() = await { ios.deleteDocumentWithCompletion(it) }
+
+    actual val snapshots get() = callbackFlow<NativeDocumentSnapshot> {
+        val listener = ios.addSnapshotListener { snapshot, error ->
+            snapshot?.let { trySend(NativeDocumentSnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
     }
 
     override fun equals(other: Any?): Boolean =
-        this === other || other is DocumentReference && nativeValue == other.nativeValue
+        this === other || other is NativeDocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
 }
 
-actual open class Query(open val ios: FIRQuery) {
+val DocumentReference.ios get() = native.ios
+
+@PublishedApi
+internal actual open class NativeQuery(open val ios: FIRQuery)
+internal val FIRQuery.native get() = NativeQuery(this)
+
+actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
+
+    open val ios: FIRQuery = nativeQuery.ios
 
     actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
 
-    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()))
+    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()).native)
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
@@ -278,7 +261,7 @@ actual open class Query(open val ios: FIRQuery) {
     }
 
     internal actual fun where(filter: Filter): Query = Query(
-        ios.queryWhereFilter(filter.toFIRFilter())
+        ios.queryWhereFilter(filter.toFIRFilter()).native
     )
 
     private fun Filter.toFIRFilter(): FIRFilter = when (this) {
@@ -310,40 +293,38 @@ actual open class Query(open val ios: FIRQuery) {
         }
     }
 
-    internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING))
-    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING))
+    internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING).native)
+    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING).native)
 
-    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios))
-    internal actual fun _startAfter(vararg fieldValues: Any) = Query(ios.queryStartingAfterValues(fieldValues.asList()))
-    internal actual fun _startAt(document: DocumentSnapshot) = Query(ios.queryStartingAtDocument(document.ios))
-    internal actual fun _startAt(vararg fieldValues: Any) = Query(ios.queryStartingAtValues(fieldValues.asList()))
+    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios).native)
+    internal actual fun _startAfter(vararg fieldValues: Any) = Query(ios.queryStartingAfterValues(fieldValues.asList()).native)
+    internal actual fun _startAt(document: DocumentSnapshot) = Query(ios.queryStartingAtDocument(document.ios).native)
+    internal actual fun _startAt(vararg fieldValues: Any) = Query(ios.queryStartingAtValues(fieldValues.asList()).native)
 
-    internal actual fun _endBefore(document: DocumentSnapshot) = Query(ios.queryEndingBeforeDocument(document.ios))
-    internal actual fun _endBefore(vararg fieldValues: Any) = Query(ios.queryEndingBeforeValues(fieldValues.asList()))
-    internal actual fun _endAt(document: DocumentSnapshot) = Query(ios.queryEndingAtDocument(document.ios))
-    internal actual fun _endAt(vararg fieldValues: Any) = Query(ios.queryEndingAtValues(fieldValues.asList()))
+    internal actual fun _endBefore(document: DocumentSnapshot) = Query(ios.queryEndingBeforeDocument(document.ios).native)
+    internal actual fun _endBefore(vararg fieldValues: Any) = Query(ios.queryEndingBeforeValues(fieldValues.asList()).native)
+    internal actual fun _endAt(document: DocumentSnapshot) = Query(ios.queryEndingAtDocument(document.ios).native)
+    internal actual fun _endAt(vararg fieldValues: Any) = Query(ios.queryEndingAtValues(fieldValues.asList()).native)
 
 }
+
 @Suppress("UNCHECKED_CAST")
-actual class CollectionReference(override val ios: FIRCollectionReference) : Query(ios) {
+@PublishedApi
+internal actual class NativeCollectionReference(override val ios: FIRCollectionReference) : NativeQuery(ios) {
 
     actual val path: String
         get() = ios.path
 
-    actual val document get() = DocumentReference(ios.documentWithAutoID())
+    actual val document get() = NativeDocumentReference(ios.documentWithAutoID())
 
-    actual val parent get() = ios.parent?.let{DocumentReference(it)}
+    actual val parent get() = ios.parent?.let{ NativeDocumentReference(it) }
 
-    actual fun document(documentPath: String) = DocumentReference(ios.documentWithPath(documentPath))
+    actual fun document(documentPath: String) = NativeDocumentReference(ios.documentWithPath(documentPath))
 
-    actual suspend inline fun <reified T> add(data: T, encodeDefaults: Boolean) =
-        DocumentReference(await { ios.addDocumentWithData(encode(data, encodeDefaults) as Map<Any?, *>, it) })
-
-    actual suspend fun <T> add(data: T, strategy: SerializationStrategy<T>, encodeDefaults: Boolean) =
-        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) })
-    actual suspend fun <T> add(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        DocumentReference(await { ios.addDocumentWithData(encode(strategy, data, encodeDefaults) as Map<Any?, *>, it) })
+    actual suspend fun addEncoded(data: Any) = NativeDocumentReference(await { ios.addDocumentWithData(data as Map<Any?, *>, it) })
 }
+
+val CollectionReference.ios get() = native.ios
 
 actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
 
@@ -406,7 +387,7 @@ fun NSError.toException() = when(domain) {
 
 actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
     actual val documents
-        get() = ios.documents.map { DocumentSnapshot(it as FIRDocumentSnapshot) }
+        get() = ios.documents.map { DocumentSnapshot(NativeDocumentSnapshot(it as FIRDocumentSnapshot)) }
     actual val documentChanges
         get() = ios.documentChanges.map { DocumentChange(it as FIRDocumentChange) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
@@ -414,7 +395,7 @@ actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
 
 actual class DocumentChange(val ios: FIRDocumentChange) {
     actual val document: DocumentSnapshot
-        get() = DocumentSnapshot(ios.document)
+        get() = DocumentSnapshot(NativeDocumentSnapshot(ios.document))
     actual val newIndex: Int
         get() = ios.newIndex.toInt()
     actual val oldIndex: Int
@@ -423,32 +404,21 @@ actual class DocumentChange(val ios: FIRDocumentChange) {
         get() = ChangeType.values().first { it.ios == ios.type }
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
+@PublishedApi
+internal actual class NativeDocumentSnapshot(val ios: FIRDocumentSnapshot) {
 
     actual val id get() = ios.documentID
 
-    actual val reference get() = DocumentReference(ios.reference)
+    actual val reference get() = NativeDocumentReference(ios.reference)
 
-    actual inline fun <reified T: Any> data(serverTimestampBehavior: ServerTimestampBehavior): T {
-        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-        return decode(value = data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
-    }
+    actual fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? =
+        ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val data = ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
-        return decode(strategy, data?.mapValues { (_, value) -> value?.takeIf { it !is NSNull } })
-    }
-
-    actual inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
-        return decode(value)
-    }
-
-    actual fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior): T {
-        val value = ios.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
-        return decode(strategy, value)
-    }
+    actual fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? =
+        ios.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
+            ?.mapValues { (_, value) ->
+                value?.takeIf { it !is NSNull }
+            }
 
     actual fun contains(field: String) = ios.valueForField(field) != null
 
@@ -463,6 +433,8 @@ actual class DocumentSnapshot(val ios: FIRDocumentSnapshot) {
     }
 }
 
+val DocumentSnapshot.ios get() = native.ios
+
 actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = ios.pendingWrites
     actual val isFromCache: Boolean get() = ios.fromCache
@@ -471,34 +443,13 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
 actual class FieldPath private constructor(val ios: FIRFieldPath) {
     actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
     actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
-
+    actual val encoded: EncodedFieldPath = ios
     override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
     override fun hashCode(): Int = ios.hashCode()
     override fun toString(): String = ios.toString()
 }
 
-/** A class representing a platform specific Firebase FieldValue. */
-private typealias NativeFieldValue = FIRFieldValue
-
-/** Represents a Firebase FieldValue. */
-@Serializable(with = FieldValueSerializer::class)
-actual class FieldValue internal actual constructor(internal actual val nativeValue: Any) {
-    init {
-        require(nativeValue is NativeFieldValue)
-    }
-    override fun equals(other: Any?): Boolean =
-        this === other || other is FieldValue && nativeValue == other.nativeValue
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = nativeValue.toString()
-
-    actual companion object {
-        actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForServerTimestamp())
-        actual val delete: FieldValue get() = FieldValue(NativeFieldValue.fieldValueForDelete())
-        actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.fieldValueForIntegerIncrement(value.toLong()))
-        actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayUnion(elements.asList()))
-        actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.fieldValueForArrayRemove(elements.asList()))
-    }
-}
+actual typealias EncodedFieldPath = FIRFieldPath
 
 private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
@@ -515,7 +466,7 @@ private fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<N
 suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()
     function { result, error ->
-         if(error == null) {
+        if(error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
