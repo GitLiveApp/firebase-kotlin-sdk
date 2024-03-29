@@ -1,6 +1,5 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase GeoPoint. */

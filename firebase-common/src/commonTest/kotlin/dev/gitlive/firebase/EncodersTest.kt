@@ -7,130 +7,377 @@ package dev.gitlive.firebase
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import dev.gitlive.firebase.nativeAssertEquals
-import dev.gitlive.firebase.nativeMapOf
 
 @Serializable
-data class TestData(val map: Map<String, String>, val bool: Boolean = false, val nullableBool: Boolean? = null)
-
-@Serializable
-sealed class TestSealed {
-    @Serializable
-    @SerialName("child")
-    data class ChildClass(val map: Map<String, String>, val bool: Boolean = false): TestSealed()
+object TestObject {
+    val map = mapOf("key" to "value", "key2" to 12, "key3" to null)
+    val bool = false
+    val nullableBool: Boolean? = null
 }
 
 @Serializable
-data class TestSealedList(val list: List<TestSealed>)
+@JvmInline
+value class ValueClass(val int: Int)
+
+@Serializable
+data class TestData(
+    val map: Map<String, String>,
+    val otherMap: Map<Int, Int>,
+    val bool: Boolean = false,
+    val nullableBool: Boolean? = null,
+    val valueClass: ValueClass,
+)
+
+@Serializable
+sealed class SealedClass {
+    @Serializable
+    @SerialName("test")
+    data class Test(val value: String) : SealedClass()
+}
+
+@Serializable
+data class GenericClass<T>(
+    val inner: T
+)
+
+@Serializable
+abstract class AbstractClass {
+    abstract val abstractValue: String
+}
+
+@Serializable
+@SerialName("implemented")
+data class ImplementedClass(override val abstractValue: String, val otherValue: Boolean) : AbstractClass()
+
+@Serializable
+data class NestedClass(
+    val testData: TestData,
+    val sealed: SealedClass,
+    val abstract: AbstractClass,
+    val testDataList: List<TestData>,
+    val sealedList: List<SealedClass>,
+    val abstractList: List<AbstractClass>,
+    val testDataMap: Map<TestData, TestData>,
+    val sealedMap: Map<SealedClass, SealedClass>,
+    val abstractMap: Map<AbstractClass, AbstractClass>
+)
 
 class EncodersTest {
-    @Test
-    fun encodeMap() {
-        val encoded = encode(mapOf("key" to "value", "key2" to 12, "key3" to null), shouldEncodeElementDefault = true)
 
-        nativeAssertEquals(nativeMapOf("key" to "value", "key2" to 12, "key3" to null), encoded)
+    @Test
+    fun encodeDecodeList() {
+        val list = listOf("One", "Two", "Three")
+        val encoded = encode<List<String>>(list) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeListOf("One", "Two", "Three"), encoded)
+
+        val decoded = decode(ListSerializer(String.serializer()), encoded)
+        assertEquals(listOf("One", "Two", "Three"), decoded)
     }
 
     @Test
-    fun encodeObject() {
-        val encoded = encode<TestData>(TestData.serializer(), TestData(mapOf("key" to "value"), true), shouldEncodeElementDefault = false)
-        nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
+    fun encodeDecodeMap() {
+        val map = mapOf("key" to "value", "key2" to "value2", "key3" to "value3")
+        val encoded = encode<Map<String, String>>(map) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeMapOf("key" to "value", "key2" to "value2", "key3" to "value3"), encoded)
+
+        val decoded = decode(MapSerializer(String.serializer(), String.serializer()), encoded)
+        assertEquals(mapOf("key" to "value", "key2" to "value2", "key3" to "value3"), decoded)
     }
 
     @Test
-    fun encodeObjectNullableValue() {
-        val encoded = encode<TestData>(TestData.serializer(), TestData(mapOf("key" to "value"), true, nullableBool = true), shouldEncodeElementDefault = true)
-        nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "bool" to true, "nullableBool" to true), encoded)
+    fun encodeDecodeObject() {
+        val encoded = encode(TestObject.serializer(), TestObject) { encodeDefaults = false }
+        nativeAssertEquals(nativeMapOf(), encoded)
+
+        val decoded = decode(TestObject.serializer(), encoded)
+        assertEquals(TestObject, decoded)
     }
 
     @Test
-    fun encodeSealedClass() {
-        val encoded = encode<TestSealed>(TestSealed.serializer(), TestSealed.ChildClass(mapOf("key" to "value"), true), shouldEncodeElementDefault = true)
-        nativeAssertEquals(nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true), encoded)
+    fun encodeDecodeValueClass() {
+        val testValueClass = ValueClass(42)
+        val encoded = encode(ValueClass.serializer(), testValueClass) { encodeDefaults = false }
+
+        nativeAssertEquals(42, encoded)
+
+        val decoded = decode(ValueClass.serializer(), encoded)
+        assertEquals(testValueClass, decoded)
     }
 
     @Test
-    fun decodeObject() {
-        val decoded = decode<TestData>(TestData.serializer(), nativeMapOf("map" to nativeMapOf("key" to "value")))
-        assertEquals(TestData(mapOf("key" to "value"), false), decoded)
+    fun encodeDecodeClass() {
+        val testDataClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
+        val encoded = encode(TestData.serializer(), testDataClass) { encodeDefaults = false }
+
+        nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encoded)
+
+        val decoded = decode(TestData.serializer(), encoded)
+        assertEquals(testDataClass, decoded)
     }
 
     @Test
-    fun decodeListOfObjects() {
-        val decoded = decode(ListSerializer(TestData.serializer()), nativeListOf(nativeMapOf("map" to nativeMapOf("key" to "value"))))
-        assertEquals(listOf(TestData(mapOf("key" to "value"), false)), decoded)
+    fun encodeDecodeClassNullableValue() {
+        val testDataClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, nullableBool = true, ValueClass(42))
+        val encoded = encode(TestData.serializer(), testDataClass) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to true, "valueClass" to 42), encoded)
+
+        val decoded = decode(TestData.serializer(), encoded)
+        assertEquals(testDataClass, decoded)
     }
 
     @Test
-    fun decodeObjectNullableValue() {
-        val decoded = decode(TestData.serializer(), nativeMapOf("map" to mapOf("key" to "value"), "nullableBool" to null))
-        assertNull(decoded.nullableBool)
+    fun encodeDecodeGenericClass() {
+        val innerClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, valueClass = ValueClass(42))
+        val genericClass = GenericClass(innerClass)
+        val encoded = encode(GenericClass.serializer(TestData.serializer()), genericClass) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeMapOf("inner" to nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to null, "valueClass" to 42)), encoded)
+
+        val decoded = decode(GenericClass.serializer(TestData.serializer()), encoded)
+        assertEquals(genericClass, decoded)
     }
 
     @Test
-    fun decodeSealedClass() {
-        val decoded = decode(TestSealed.serializer(), nativeMapOf("type" to "child", "map" to nativeMapOf("key" to "value"), "bool" to true))
-        assertEquals(TestSealed.ChildClass(mapOf("key" to "value"), true), decoded)
+    fun encodeDecodeSealedClass() {
+        val sealedClass = SealedClass.Test("value")
+        val encoded = encode(SealedClass.serializer(), sealedClass) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeMapOf("type" to "test", "value" to "value"), encoded)
+
+        val decoded = decode(SealedClass.serializer(), encoded)
+        assertEquals(sealedClass, decoded)
     }
 
     @Test
-    fun encodeSealedClassList() {
-        val toEncode = TestSealedList(
-            list = listOf(
-                TestSealed.ChildClass(
-                    map = mapOf("key" to "value"),
-                    bool = false
-                )
+    fun encodeDecodePolymorphicClass() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, AbstractClass.serializer()) {
+                subclass(ImplementedClass::class, ImplementedClass.serializer())
+            }
+        }
+        val abstractClass: AbstractClass = ImplementedClass("value", true)
+        val encoded =
+            encode(AbstractClass.serializer(), abstractClass) {
+                encodeDefaults = true
+                serializersModule = module
+            }
+
+        nativeAssertEquals(nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true), encoded)
+
+        val decoded = decode(AbstractClass.serializer(), encoded) {
+            serializersModule = module
+        }
+        assertEquals(abstractClass, decoded)
+    }
+
+    @Test
+    fun encodeDecodeNestedClass() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, AbstractClass.serializer()) {
+                subclass(ImplementedClass::class, ImplementedClass.serializer())
+            }
+        }
+
+        val testData = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
+        val sealedClass: SealedClass = SealedClass.Test("value")
+        val abstractClass: AbstractClass = ImplementedClass("value", true)
+        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(testData), listOf(sealedClass), listOf(abstractClass), mapOf(testData to testData), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
+        val encoded = encode(NestedClass.serializer(), nestedClass) {
+            encodeDefaults = true
+            serializersModule = module
+        }
+
+        val testDataEncoded = nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to null, "valueClass" to 42)
+        val sealedEncoded = nativeMapOf("type" to "test", "value" to "value")
+        val abstractEncoded = nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true)
+        nativeAssertEquals(
+            nativeMapOf(
+                "testData" to testDataEncoded,
+                "sealed" to sealedEncoded,
+                "abstract" to abstractEncoded,
+                "testDataList" to nativeListOf(testDataEncoded),
+                "sealedList" to nativeListOf(sealedEncoded),
+                "abstractList" to nativeListOf(abstractEncoded),
+                "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
+                "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
+                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
+            ),
+            encoded
+        )
+
+        val decoded = decode(NestedClass.serializer(), encoded) {
+            serializersModule = module
+        }
+        assertEquals(nestedClass, decoded)
+    }
+
+    @Test
+    fun reencodeTransformationList() {
+        val reencoded = reencodeTransformation<List<String>>(nativeListOf("One", "Two", "Three")) {
+            assertEquals(listOf("One", "Two", "Three"), it)
+            it.map { value -> "new$value" }
+        }
+        nativeAssertEquals(nativeListOf("newOne", "newTwo", "newThree"), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationMap() {
+        val reencoded = reencodeTransformation<Map<String, String>>(nativeMapOf("key" to "value", "key2" to "value2", "key3" to "value3")) {
+            assertEquals(mapOf("key" to "value", "key2" to "value2", "key3" to "value3"), it)
+            it.mapValues { (_, value) -> "new-$value" }
+        }
+
+        nativeAssertEquals(nativeMapOf("key" to "new-value", "key2" to "new-value2", "key3" to "new-value3"), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationObject() {
+        val reencoded = reencodeTransformation<TestObject>(nativeMapOf(), { encodeDefaults = false }) {
+            assertEquals(TestObject, it)
+            it
+        }
+        nativeAssertEquals(nativeMapOf(), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationValueClass() {
+        val reencoded = reencodeTransformation<ValueClass>(
+            42,
+            { encodeDefaults = false }
+        ) {
+            assertEquals(ValueClass(42), it)
+            ValueClass(23)
+        }
+
+        nativeAssertEquals(23, reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationClass() {
+        val reencoded = reencodeTransformation<TestData>(
+            nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to true, "valueClass" to 42),
+            { encodeDefaults = false }
+        ) {
+            assertEquals(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = true, ValueClass(42)), it)
+            it.copy(map = mapOf("newKey" to "newValue"), nullableBool = null)
+        }
+
+        nativeAssertEquals(nativeMapOf("map" to nativeMapOf("newKey" to "newValue"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationNullableValue() {
+        val reencoded = reencodeTransformation<TestData?>(
+            nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to true, "valueClass" to 42),
+            { encodeDefaults = false }
+        ) {
+            assertEquals(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = true, valueClass = ValueClass(42)), it)
+            null
+        }
+
+        nativeAssertEquals(null, reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationGenericClass() {
+        val reencoded = reencodeTransformation(
+            GenericClass.serializer(TestData.serializer()),
+            nativeMapOf("inner" to nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to false, "valueClass" to 42)),
+            { encodeDefaults = false }
+        ) {
+            assertEquals(
+                GenericClass(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = false, valueClass = ValueClass(42))),
+                it
             )
-        )
-        val encoded = encode<TestSealedList>(
-            TestSealedList.serializer(),
-            toEncode,
-            shouldEncodeElementDefault = true
-        )
-        val expected = nativeMapOf(
-            "list" to nativeListOf(
-                nativeMapOf(
-                    "type" to "child",
-                    "map" to nativeMapOf(
-                        "key" to "value"
-                    ),
-                    "bool" to false
-                )
-            )
-        )
-        nativeAssertEquals(expected, encoded)
+            GenericClass(it.inner.copy(map = mapOf("newKey" to "newValue"), nullableBool = null))
+        }
+
+        nativeAssertEquals(nativeMapOf("inner" to nativeMapOf("map" to nativeMapOf("newKey" to "newValue"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42)), reencoded)
     }
 
     @Test
-    fun decodeSealedClassList() {
-        val toDecode = nativeMapOf(
-            "list" to nativeListOf(
-                nativeMapOf(
-                    "type" to "child",
-                    "map" to nativeMapOf(
-                        "key" to "value"
-                    ),
-                    "bool" to false
-                )
-            )
-        )
-        val decoded = decode(
-            TestSealedList.serializer(),
-            toDecode
-        )
-        val expected = TestSealedList(
-            list = listOf(
-                TestSealed.ChildClass(
-                    map = mapOf("key" to "value"),
-                    bool = false
-                )
-            )
-        )
+    fun reencodeTransformationSealedClass() {
+        val reencoded = reencodeTransformation(SealedClass.serializer(), nativeMapOf("type" to "test", "value" to "value")) {
+            assertEquals(SealedClass.Test("value"), it)
+            SealedClass.Test("newTest")
+        }
 
-        assertEquals(expected, decoded)
+        nativeAssertEquals(nativeMapOf("type" to "test", "value" to "newTest"), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationPolymorphicClass() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, AbstractClass.serializer()) {
+                subclass(ImplementedClass::class, ImplementedClass.serializer())
+            }
+        }
+
+        val reencoded = reencodeTransformation(
+            AbstractClass.serializer(),
+            nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true),
+            builder = {
+                serializersModule = module
+            }
+        ) {
+            assertEquals(ImplementedClass("value", true), it)
+            ImplementedClass("new-${it.abstractValue}", false)
+        }
+
+        nativeAssertEquals(nativeMapOf("type" to "implemented", "abstractValue" to "new-value", "otherValue" to false), reencoded)
+    }
+
+    @Test
+    fun reencodeTransformationNestedClass() {
+        val module = SerializersModule {
+            polymorphic(AbstractClass::class, AbstractClass.serializer()) {
+                subclass(ImplementedClass::class, ImplementedClass.serializer())
+            }
+        }
+
+        val testData = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
+        val sealedClass: SealedClass = SealedClass.Test("value")
+        val abstractClass: AbstractClass = ImplementedClass("value", true)
+        val nestedClass = NestedClass(testData, sealedClass, abstractClass, listOf(testData), listOf(sealedClass), listOf(abstractClass), mapOf(testData to testData), mapOf(sealedClass to sealedClass), mapOf(abstractClass to abstractClass))
+        val encoded = encode(NestedClass.serializer(), nestedClass) {
+            encodeDefaults = true
+            serializersModule = module
+        }
+
+        val reencoded = reencodeTransformation(NestedClass.serializer(), encoded, builder = {
+            encodeDefaults = true
+            serializersModule = module
+        }) {
+            assertEquals(nestedClass, it)
+            it.copy(sealed = SealedClass.Test("newValue"))
+        }
+
+        val testDataEncoded = nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to null, "valueClass" to 42)
+        val sealedEncoded = nativeMapOf("type" to "test", "value" to "value")
+        val abstractEncoded = nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true)
+        nativeAssertEquals(
+            nativeMapOf(
+                "testData" to testDataEncoded,
+                "sealed" to nativeMapOf("type" to "test", "value" to "newValue"),
+                "abstract" to abstractEncoded,
+                "testDataList" to nativeListOf(testDataEncoded),
+                "sealedList" to nativeListOf(sealedEncoded),
+                "abstractList" to nativeListOf(abstractEncoded),
+                "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
+                "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
+                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
+            ),
+            reencoded
+        )
     }
 }
