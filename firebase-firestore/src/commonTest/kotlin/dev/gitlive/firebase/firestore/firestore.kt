@@ -28,6 +28,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 expect val emulatorHost: String
 expect val context: Any
@@ -100,6 +101,30 @@ class FirebaseFirestoreTest {
     fun deinitializeFirebase() = runBlockingTest {
         Firebase.apps(context).forEach {
             it.delete()
+        }
+    }
+
+    @Test
+    fun testInitializationWithAppAndDatabase() = runTest {
+        try {
+            Firebase.firestore(app, "staging").apply {
+                useEmulator(emulatorHost, 8080)
+                setSettings(persistenceEnabled = false)
+            }
+        } catch (e: Exception) {
+            fail("Should not have thrown any exception")
+        }
+    }
+
+    @Test
+    fun testInitializationWithDatabase() = runTest {
+        try {
+            Firebase.firestore("staging").apply {
+                useEmulator(emulatorHost, 8080)
+                setSettings(persistenceEnabled = false)
+            }
+        } catch (e: Exception) {
+            fail("Should not have thrown any exception")
         }
     }
 
