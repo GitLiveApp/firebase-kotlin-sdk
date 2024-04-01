@@ -85,7 +85,7 @@ jobs:
           name: "Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-ios:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
