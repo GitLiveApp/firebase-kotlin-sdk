@@ -43,5 +43,5 @@ private fun Throwable.asNSError(): NSError {
     if (message != null) {
         userInfo[NSLocalizedDescriptionKey] = message
     }
-    return NSError.errorWithDomain("KotlinException", 0, userInfo)
+    return NSError.errorWithDomain(this::class.qualifiedName, 0, userInfo)
 }

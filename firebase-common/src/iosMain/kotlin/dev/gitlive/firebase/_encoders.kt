@@ -5,24 +5,30 @@
 package dev.gitlive.firebase
 
 import kotlinx.serialization.descriptors.PolymorphicKind
-import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
-    StructureKind.LIST -> mutableListOf<Any?>()
-        .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault) { _, index, value -> it.add(index, value) } }
+    StructureKind.LIST -> encodeAsList()
     StructureKind.MAP -> mutableListOf<Any?>()
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
-    StructureKind.CLASS,  StructureKind.OBJECT, PolymorphicKind.SEALED -> mutableMapOf<Any?, Any?>()
-        .also { value = it }
-        .let { FirebaseCompositeEncoder(shouldEncodeElementDefault,
+        .let { FirebaseCompositeEncoder(settings, { value = it.chunked(2).associate { (k, v) -> k to v } }) { _, _, value -> it.add(value) } }
+    StructureKind.CLASS,  StructureKind.OBJECT-> encodeAsMap(descriptor)
+    is PolymorphicKind -> encodeAsMap(descriptor)
+    else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
+}
+
+private fun FirebaseEncoder.encodeAsList(): FirebaseCompositeEncoder = mutableListOf<Any?>()
+    .also { value = it }
+    .let { FirebaseCompositeEncoder(settings) { _, index, value -> it.add(index, value) } }
+private fun FirebaseEncoder.encodeAsMap(descriptor: SerialDescriptor): FirebaseCompositeEncoder = mutableMapOf<Any?, Any?>()
+    .also { value = it }
+    .let {
+        FirebaseCompositeEncoder(
+            settings,
             setPolymorphicType = { discriminator, type ->
                 it[discriminator] = type
             },
             set = { _, index, value -> it[descriptor.getElementName(index)] = value }
-        ) }
-    else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
-}
+        )
+    }
