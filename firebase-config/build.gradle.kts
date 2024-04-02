@@ -104,7 +104,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseRemoteConfig") {
-                version = "~> 10.19"
+                version = "10.19.0"
             }
         }
     }

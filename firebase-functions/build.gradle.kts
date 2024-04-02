@@ -77,7 +77,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseFunctions") {
-                version = "~> 10.19"
+                version = "10.19.0"
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
