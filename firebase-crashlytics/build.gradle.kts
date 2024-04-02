@@ -92,6 +92,7 @@ kotlin {
             noPodspec()
             pod("FirebaseCrashlytics") {
                 version = "~> 10.19"
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }
