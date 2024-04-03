@@ -683,7 +683,6 @@ class FirebaseFirestoreTest {
         assertEquals(setOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
     }
 
-
     @Test
     fun testGeoPointSerialization() = runTest {
         @Serializable
@@ -1040,6 +1039,16 @@ class FirebaseFirestoreTest {
                 )
             }
         andOrQuery.assertDocuments(FirestoreTest.serializer(), testOne)
+    }
+
+    @Test
+    fun testQueryByDocumentId() = runTest {
+        setupFirestoreData()
+
+        val fieldQuery = firestore
+            .collection("testFirestoreQuerying")
+            .where { FieldPath.documentId equalTo "one" }
+        fieldQuery.assertDocuments(FirestoreTest.serializer(), testOne)
     }
 
     private suspend fun setupFirestoreData(

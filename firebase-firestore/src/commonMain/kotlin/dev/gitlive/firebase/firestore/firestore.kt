@@ -550,6 +550,10 @@ expect class SnapshotMetadata {
 }
 
 expect class FieldPath(vararg fieldNames: String) {
+    companion object {
+        val documentId: FieldPath
+    }
+    @Deprecated("Use companion object instead", replaceWith = ReplaceWith("FieldPath.documentId"))
     val documentId: FieldPath
     val encoded: EncodedFieldPath
 }

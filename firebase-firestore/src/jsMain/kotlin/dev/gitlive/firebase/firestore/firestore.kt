@@ -444,10 +444,14 @@ actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
 }
 
 actual class FieldPath private constructor(val js: JsFieldPath) {
+
+    actual companion object {
+        actual val documentId = FieldPath(JsFieldPath.documentId)
+    }
     actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
         js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
     })
-    actual val documentId: FieldPath get() = FieldPath(JsFieldPath.documentId)
+    actual val documentId: FieldPath get() = FieldPath.documentId
     actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
