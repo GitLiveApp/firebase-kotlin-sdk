@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.deleteDoc
 import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.getDoc
 import dev.gitlive.firebase.firestore.externals.getDocs
@@ -440,10 +441,10 @@ actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
 actual class FieldPath private constructor(val js: JsFieldPath) {
 
     actual companion object {
-        actual val documentId = FieldPath(JsFieldPath.documentId)
+        actual val documentId = FieldPath(jsDocumentId())
     }
     actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
-        js("Reflect").construct(JsFieldPath, fieldNames).unsafeCast<JsFieldPath>()
+        JsFieldPath(*fieldNames)
     })
     actual val documentId: FieldPath get() = FieldPath.documentId
     actual val encoded: EncodedFieldPath = js

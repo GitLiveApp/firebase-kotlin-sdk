@@ -8,10 +8,9 @@ import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 import kotlin.js.Promise
 
+external fun documentId(): FieldPath
+
 external class FieldPath(vararg fieldNames: String) {
-    companion object {
-        val documentId: FieldPath
-    }
     fun isEqual(other: FieldPath): Boolean
 
 }
