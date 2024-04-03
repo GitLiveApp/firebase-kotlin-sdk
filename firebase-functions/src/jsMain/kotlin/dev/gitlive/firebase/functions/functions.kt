@@ -26,31 +26,30 @@ actual fun Firebase.functions(app: FirebaseApp, region: String) =
 
 actual class FirebaseFunctions internal constructor(val js: Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) })) }
+        rethrow { HttpsCallableReference( httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
 
     actual fun useEmulator(host: String, port: Int) = connectFunctionsEmulator(js, host, port)
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class HttpsCallableReference internal constructor(val js: HttpsCallable) {
-
-    actual suspend operator fun invoke() =
-        rethrow { HttpsCallableResult(js().await()) }
-
-    actual suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) =
-        rethrow { HttpsCallableResult(js(encode(data, encodeDefaults)).await()) }
-
-    actual suspend operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) =
-        rethrow { HttpsCallableResult(js(encode(strategy, data, encodeDefaults)).await()) }
+@PublishedApi
+internal actual data class NativeHttpsCallableReference(val js: HttpsCallable) {
+    actual suspend fun invoke(encodedData: Any): HttpsCallableResult = rethrow {
+        HttpsCallableResult(js(encodedData).await())
+    }
+    actual suspend fun invoke(): HttpsCallableResult = rethrow { HttpsCallableResult(js().await()) }
 }
 
-actual class HttpsCallableResult constructor(val js: JsHttpsCallableResult) {
+internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
+
+val HttpsCallableReference.js: HttpsCallable get() = native.js
+
+actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
 
     actual inline fun <reified T> data() =
         rethrow { decode<T>(value = js.data) }
 
-    actual fun <T> data(strategy: DeserializationStrategy<T>) =
-        rethrow { decode(strategy, js.data) }
+    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+        rethrow { decode(strategy, js.data, buildSettings) }
 
 }
 

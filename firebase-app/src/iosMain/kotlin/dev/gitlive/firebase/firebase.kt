@@ -27,11 +27,11 @@ actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: St
 actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
     FIRApp.configureWithOptions(options.toIos()).let { app }
 
-actual class FirebaseApp internal constructor(val ios: FIRApp) {
+actual data class FirebaseApp internal constructor(val ios: FIRApp) {
     actual val name: String
         get() = ios.name
     actual val options: FirebaseOptions
-        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID) }
+        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID, GCMSenderID) }
 
     actual suspend fun delete() {
         val deleted = CompletableDeferred<Unit>()
