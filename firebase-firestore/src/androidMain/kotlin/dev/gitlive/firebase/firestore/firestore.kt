@@ -409,13 +409,18 @@ actual class SnapshotMetadata(val android: com.google.firebase.firestore.Snapsho
 }
 
 actual class FieldPath private constructor(val android: com.google.firebase.firestore.FieldPath) {
+
+    actual companion object {
+        actual val documentId = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+    }
+
     actual constructor(vararg fieldNames: String) : this(
         com.google.firebase.firestore.FieldPath.of(
             *fieldNames
         )
     )
 
-    actual val documentId: FieldPath get() = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+    actual val documentId: FieldPath get() = FieldPath.documentId
     actual val encoded: EncodedFieldPath = android
     override fun equals(other: Any?): Boolean = other is FieldPath && android == other.android
     override fun hashCode(): Int = android.hashCode()
