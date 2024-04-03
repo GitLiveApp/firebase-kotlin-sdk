@@ -466,8 +466,11 @@ actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
 }
 
 actual class FieldPath private constructor(val ios: FIRFieldPath) {
+    actual companion object {
+        actual val documentId = FieldPath(FIRFieldPath.documentID())
+    }
     actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
-    actual val documentId: FieldPath get() = FieldPath(FIRFieldPath.documentID())
+    actual val documentId: FieldPath get() = FieldPath.documentId
     actual val encoded: EncodedFieldPath = ios
     override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
     override fun hashCode(): Int = ios.hashCode()
