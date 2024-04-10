@@ -8,12 +8,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @Serializable
 object TestObject {
@@ -72,6 +74,15 @@ data class NestedClass(
 class EncodersTest {
 
     @Test
+    fun encodeDecodeNullableString() {
+        val encoded = encode<String?>(null) { encodeDefaults = true }
+
+        nativeAssertEquals(null, encoded)
+
+        val decoded = decode(String.serializer().nullable, encoded)
+        assertNull(decoded)
+    }
+    @Test
     fun encodeDecodeList() {
         val list = listOf("One", "Two", "Three")
         val encoded = encode<List<String>>(list) { encodeDefaults = true }
@@ -83,6 +94,17 @@ class EncodersTest {
     }
 
     @Test
+    fun encodeDecodeNullableList() {
+        val list = listOf("One", "Two", null)
+        val encoded = encode<List<String?>>(list) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeListOf("One", "Two", null), encoded)
+
+        val decoded = decode(ListSerializer(String.serializer().nullable), encoded)
+        assertEquals(listOf("One", "Two", null), decoded)
+    }
+
+    @Test
     fun encodeDecodeMap() {
         val map = mapOf("key" to "value", "key2" to "value2", "key3" to "value3")
         val encoded = encode<Map<String, String>>(map) { encodeDefaults = true }
@@ -91,6 +113,17 @@ class EncodersTest {
 
         val decoded = decode(MapSerializer(String.serializer(), String.serializer()), encoded)
         assertEquals(mapOf("key" to "value", "key2" to "value2", "key3" to "value3"), decoded)
+    }
+
+    @Test
+    fun encodeDecodeNullableMap() {
+        val map = mapOf("key" to "value", "key2" to "value2", "key3" to null)
+        val encoded = encode<Map<String, String?>>(map) { encodeDefaults = true }
+
+        nativeAssertEquals(nativeMapOf("key" to "value", "key2" to "value2", "key3" to null), encoded)
+
+        val decoded = decode(MapSerializer(String.serializer(), String.serializer().nullable), encoded)
+        assertEquals(mapOf("key" to "value", "key2" to "value2", "key3" to null), decoded)
     }
 
     @Test
