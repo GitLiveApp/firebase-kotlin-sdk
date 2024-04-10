@@ -229,7 +229,7 @@ internal actual class NativeOnDisconnect internal constructor(
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
-        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
+        rethrow { js.update(encodedUpdate.mapValues { (_, value) -> value ?: undefined }).awaitWhileOnline(database) }
 
 }
 
