@@ -185,8 +185,8 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual fun collection(collectionPath: String) = NativeCollectionReference(ios.collectionWithPath(collectionPath))
 
-    actual suspend fun get() =
-        NativeDocumentSnapshot(awaitResult { ios.getDocumentWithCompletion(it) })
+    actual suspend fun get(source: Source) =
+        NativeDocumentSnapshot(awaitResult { ios.getDocumentWithSource(source.toIosSource(), it) })
 
     actual suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = await {
         when (setOptions) {
@@ -235,7 +235,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
     open val ios: FIRQuery = nativeQuery.ios
 
-    actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
+    actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { ios.getDocumentsWithSource(source.toIosSource(),it) })
 
     actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()).native)
 
@@ -484,4 +484,10 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     }
     job.await()
     return result
+}
+
+private fun Source.toIosSource() = when (this) {
+    Source.CACHE -> FIRFirestoreSource.FIRFirestoreSourceCache
+    Source.SERVER -> FIRFirestoreSource.FIRFirestoreSourceServer
+    Source.DEFAULT -> FIRFirestoreSource.FIRFirestoreSourceDefault
 }
