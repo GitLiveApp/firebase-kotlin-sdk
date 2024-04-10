@@ -134,7 +134,7 @@ internal actual class NativeWriteBatch(val js: JsWriteBatch) {
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): NativeWriteBatch = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        encodedFieldsAndValues.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -143,7 +143,7 @@ internal actual class NativeWriteBatch(val js: JsWriteBatch) {
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): NativeWriteBatch = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        encodedFieldsAndValues.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -176,7 +176,7 @@ internal actual class NativeTransaction(val js: JsTransaction) {
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
     ): NativeTransaction = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        encodedFieldsAndValues.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -185,7 +185,7 @@ internal actual class NativeTransaction(val js: JsTransaction) {
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
     ): NativeTransaction = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
+        encodedFieldsAndValues.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
     }.let { this }
@@ -241,7 +241,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
+                ?.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
                     jsUpdate(js, field, value, *moreFieldsAndValues)
                 }
                 ?.await()
@@ -251,7 +251,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
         rethrow {
             encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
+                ?.performUpdateWithUndefined { field, value, moreFieldsAndValues ->
                     jsUpdate(js, field, value, *moreFieldsAndValues)
                 }?.await()
         }
@@ -543,3 +543,7 @@ fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
 fun mapOf(jsObject: dynamic): Map<String, Any?> =
     entriesOf(jsObject).toMap()
+
+internal fun <K, R> List<Pair<K, Any?>>.performUpdateWithUndefined(
+    update: (K, Any?, Array<Any?>) -> R
+) = map { (key, value) -> key to (value ?: undefined) }.performUpdate(update)
