@@ -74,13 +74,15 @@ data class NestedClass(
 class EncodersTest {
 
     @Test
-    fun encodeDecodeNullableString() {
-        val encoded = encode<String?>(null) { encodeDefaults = true }
-
-        nativeAssertEquals(null, encoded)
-
-        val decoded = decode(String.serializer().nullable, encoded)
-        assertNull(decoded)
+    fun encodeDecodePrimaryTypes() {
+        assertEncode(true)
+        assertEncode(42)
+        assertEncode(8.toShort())
+        assertEncode(Int.MAX_VALUE.toLong() + 3)
+        assertEncode(0x03F)
+        assertEncode(3.33)
+        assertEncode(6.65f)
+        assertEncode("Test")
     }
     @Test
     fun encodeDecodeList() {
@@ -412,5 +414,15 @@ class EncodersTest {
             ),
             reencoded
         )
+    }
+
+    private inline fun <reified T> assertEncode(value: T) {
+        val encoded = encode(value)
+        assertEquals(value, encoded)
+        assertEquals(value, decode<T>(encoded))
+
+        val nullableEncoded = encode<T?>(null)
+        assertNull(nullableEncoded)
+        assertNull(decode<T?>(nullableEncoded))
     }
 }

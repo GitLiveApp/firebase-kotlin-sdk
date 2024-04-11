@@ -7,7 +7,25 @@ package dev.gitlive.firebase
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import java.lang.IllegalArgumentException
 import kotlin.collections.set
+
+actual data class EncodedObject(
+    val android: Map<String, Any?>
+)
+
+actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
+
+@PublishedApi
+internal actual fun Map<*, *>.asEncodedObject() = EncodedObject(
+    map { (key, value) ->
+        if (key is String) {
+            key to value
+        } else {
+            throw IllegalArgumentException("Expected a String key but received $key")
+        }
+    }.toMap()
+)
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> mutableListOf<Any?>()

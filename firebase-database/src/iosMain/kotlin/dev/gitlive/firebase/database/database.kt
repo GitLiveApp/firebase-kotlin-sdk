@@ -16,6 +16,7 @@ import cocoapods.FirebaseDatabase.FIRDatabaseReference
 import cocoapods.FirebaseDatabase.FIRTransactionResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
+import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
@@ -168,9 +169,8 @@ internal actual class NativeDatabaseReference internal constructor(
         ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
     }
 
     actual suspend fun removeValue() {
@@ -199,7 +199,6 @@ internal actual class NativeDatabaseReference internal constructor(
 
 val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
 
-@Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val ios: FIRDataSnapshot,
     private val persistenceEnabled: Boolean
@@ -241,9 +240,8 @@ internal actual class NativeOnDisconnect internal constructor(
         ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
     }
 }
 

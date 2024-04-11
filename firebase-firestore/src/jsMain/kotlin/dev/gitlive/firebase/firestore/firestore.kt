@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -35,7 +36,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
-import kotlinx.serialization.Serializable
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
@@ -72,19 +72,19 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     var js: Firestore = jsFirestore
         private set
 
-    actual fun collection(collectionPath: String) = rethrow { CollectionReference(NativeCollectionReference(jsCollection(js, collectionPath))) }
+    actual fun collection(collectionPath: String) = rethrow { CollectionReference(NativeCollectionReferenceWrapper(jsCollection(js, collectionPath))) }
 
     actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(NativeDocumentReference(doc(js, documentPath))) }
 
-    actual fun batch() = rethrow { WriteBatch(NativeWriteBatch(writeBatch(js))) }
+    actual fun batch() = rethrow { WriteBatch(NativeWriteBatchWrapper(writeBatch(js))) }
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(NativeTransaction(it)).func() } } ).await() }
+        rethrow { jsRunTransaction(js, { GlobalScope.promise { Transaction(NativeTransactionWrapper(it)).func() } } ).await() }
 
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }
@@ -119,21 +119,21 @@ internal val SetOptions.js: Json get() = when (this) {
 }
 
 @PublishedApi
-internal actual class NativeWriteBatch(val js: JsWriteBatch) {
+internal actual class NativeWriteBatchWrapper(val js: JsWriteBatch) {
 
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
-    ): NativeWriteBatch = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
+    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeWriteBatch = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): NativeWriteBatch = rethrow {
+    ): NativeWriteBatchWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -142,7 +142,7 @@ internal actual class NativeWriteBatch(val js: JsWriteBatch) {
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): NativeWriteBatch = rethrow {
+    ): NativeWriteBatchWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -158,24 +158,24 @@ internal actual class NativeWriteBatch(val js: JsWriteBatch) {
 val WriteBatch.js get() = native.js
 
 @PublishedApi
-internal actual class NativeTransaction(val js: JsTransaction) {
+internal actual class NativeTransactionWrapper(val js: JsTransaction) {
 
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: Any,
         setOptions: SetOptions
-    ): NativeTransaction = rethrow {
+    ): NativeTransactionWrapper = rethrow {
         js.set(documentRef.js, encodedData, setOptions.js)
     }
         .let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeTransaction = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): NativeTransaction = rethrow {
+    ): NativeTransactionWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -184,7 +184,7 @@ internal actual class NativeTransaction(val js: JsTransaction) {
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
         encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): NativeTransaction = rethrow {
+    ): NativeTransactionWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
         }
@@ -195,10 +195,10 @@ internal actual class NativeTransaction(val js: JsTransaction) {
             .let { this }
 
     actual suspend fun get(documentRef: DocumentReference) =
-        rethrow { NativeDocumentSnapshot(js.get(documentRef.js).await()) }
+        rethrow { NativeDocumentSnapshotWrapper(js.get(documentRef.js).await()) }
 }
 
-val Transaction.js get() = native.js
+val Transaction.js get() = nativeWrapper.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias NativeDocumentReferenceType = JsDocumentReference
@@ -213,30 +213,30 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual val path: String
         get() = rethrow { js.path }
 
-    actual val parent: NativeCollectionReference
-        get() = rethrow { NativeCollectionReference(js.parent) }
+    actual val parent: NativeCollectionReferenceWrapper
+        get() = rethrow { NativeCollectionReferenceWrapper(js.parent) }
 
-    actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
+    actual fun collection(collectionPath: String) = rethrow { NativeCollectionReferenceWrapper(jsCollection(js, collectionPath)) }
 
-    actual suspend fun get() = rethrow { NativeDocumentSnapshot( getDoc(js).await()) }
+    actual suspend fun get() = rethrow { NativeDocumentSnapshotWrapper( getDoc(js).await()) }
 
-    actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
+    actual val snapshots: Flow<NativeDocumentSnapshotWrapper> get() = snapshots()
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<NativeDocumentSnapshot>  {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<NativeDocumentSnapshotWrapper>  {
         val unsubscribe = onSnapshot(
             js,
             json("includeMetadataChanges" to includeMetadataChanges),
-            { trySend(NativeDocumentSnapshot(it)) },
+            { trySend(NativeDocumentSnapshotWrapper(it)) },
             { close(errorToException(it)) }
         )
         awaitClose { unsubscribe() }
     }
 
-    actual suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) = rethrow {
+    actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = rethrow {
         setDoc(js, encodedData, setOptions.js).await()
     }
 
-    actual suspend fun updateEncoded(encodedData: Any) = rethrow { jsUpdate(js, encodedData).await() }
+    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData).await() }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
@@ -268,13 +268,13 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 val DocumentReference.js get() = native.js
 
 @PublishedApi
-internal actual open class NativeQuery(open val js: JsQuery)
+internal actual open class NativeQueryWrapper(open val js: JsQuery)
 
-actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
+actual open class Query internal actual constructor(nativeWrapper: NativeQueryWrapper) {
 
-    constructor(js: JsQuery) : this(NativeQuery(js))
+    constructor(js: JsQuery) : this(NativeQueryWrapper(js))
 
-    open val js: JsQuery = nativeQuery.js
+    open val js: JsQuery = nativeWrapper.js
 
     actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
@@ -367,7 +367,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 }
 
 @PublishedApi
-internal actual class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js) {
+internal actual class NativeCollectionReferenceWrapper(override val js: JsCollectionReference) : NativeQueryWrapper(js) {
 
     actual val path: String
         get() =  rethrow { js.path }
@@ -383,7 +383,7 @@ internal actual class NativeCollectionReference(override val js: JsCollectionRef
     }
 }
 
-val CollectionReference.js get() = native.js
+val CollectionReference.js get() = nativeWrapper.js
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
@@ -392,7 +392,7 @@ actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 actual class QuerySnapshot(val js: JsQuerySnapshot) {
     actual val documents
-        get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshot(it)) }
+        get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
     actual val documentChanges
         get() = js.docChanges().map { DocumentChange(it) }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
@@ -400,7 +400,7 @@ actual class QuerySnapshot(val js: JsQuerySnapshot) {
 
 actual class DocumentChange(val js: JsDocumentChange) {
     actual val document: DocumentSnapshot
-        get() = DocumentSnapshot(NativeDocumentSnapshot(js.doc))
+        get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(js.doc))
     actual val newIndex: Int
         get() = js.newIndex
     actual val oldIndex: Int
@@ -410,7 +410,7 @@ actual class DocumentChange(val js: JsDocumentChange) {
 }
 
 @PublishedApi
-internal actual class NativeDocumentSnapshot(val js: JsDocumentSnapshot) {
+internal actual class NativeDocumentSnapshotWrapper(val js: JsDocumentSnapshot) {
 
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { NativeDocumentReference(js.ref) }
@@ -431,7 +431,7 @@ internal actual class NativeDocumentSnapshot(val js: JsDocumentSnapshot) {
         json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
 
-val DocumentSnapshot.js get() = native.js
+val DocumentSnapshot.js get() = nativeWrapper.js
 
 actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites

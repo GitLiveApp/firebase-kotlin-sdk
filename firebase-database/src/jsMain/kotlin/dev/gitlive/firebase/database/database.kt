@@ -6,6 +6,7 @@ package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
+import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.externals.CancelCallback
@@ -182,8 +183,8 @@ internal actual class NativeDatabaseReference internal constructor(
         set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        rethrow { update(js, encodedUpdate ?: json()).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        rethrow { update(js, encodedUpdate).awaitWhileOnline(database) }
 
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -234,8 +235,8 @@ internal actual class NativeOnDisconnect internal constructor(
     actual suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        rethrow { js.update(encodedUpdate ?: json()).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
 
 }
 

@@ -13,6 +13,7 @@ import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
+import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
@@ -205,9 +206,8 @@ internal actual class NativeDatabaseReference internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        android.updateChildren(encodedUpdate as Map<String, Any?>)
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -253,7 +253,6 @@ internal actual class NativeDatabaseReference internal constructor(
 
 val DatabaseReference.android get() = nativeReference.android
 
-@Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean
@@ -297,9 +296,8 @@ internal actual class NativeOnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        android.updateChildren(encodedUpdate as Map<String, Any?>)
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

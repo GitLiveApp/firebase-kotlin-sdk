@@ -7,8 +7,22 @@ package dev.gitlive.firebase
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import kotlin.js.Json
 import kotlin.js.json
 
+actual typealias EncodedObject = Json
+
+actual val emptyEncodedObject: EncodedObject = json()
+@PublishedApi
+internal actual fun Map<*, *>.asEncodedObject() = json(
+    *map { (key, value) ->
+        if (key is String) {
+            key to value
+        } else {
+            throw IllegalArgumentException("Expected a String key but received $key")
+        }
+    }.toTypedArray()
+)
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> encodeAsList(descriptor)
     StructureKind.MAP -> {
