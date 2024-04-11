@@ -10,19 +10,28 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlin.js.Json
 import kotlin.js.json
 
-actual typealias EncodedObject = Json
+actual data class EncodedObject(private val keyValues: List<Pair<String, Any?>>) {
+    actual companion object {
+        actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyList())
+    }
 
-actual val emptyEncodedObject: EncodedObject = json()
+    actual val raw get() = keyValues.toMap()
+    val json get() = json(*keyValues.toTypedArray())
+}
+
+
 @PublishedApi
-internal actual fun Map<*, *>.asEncodedObject() = json(
-    *map { (key, value) ->
-        if (key is String) {
-            key to value
-        } else {
-            throw IllegalArgumentException("Expected a String key but received $key")
-        }
-    }.toTypedArray()
-)
+internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(this)
+
+@PublishedApi
+internal actual fun Any.asNativeMap(): Map<*, *>? = (this as? Json)?.let { json ->
+    val mutableMap = mutableMapOf<String, Any?>()
+    for (key in js("Object").keys(json)) {
+        mutableMap[key] = json[key]
+    }
+    mutableMap.toMap()
+}
+
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> encodeAsList(descriptor)
     StructureKind.MAP -> {

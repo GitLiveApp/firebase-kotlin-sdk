@@ -10,22 +10,18 @@ import kotlinx.serialization.descriptors.StructureKind
 import java.lang.IllegalArgumentException
 import kotlin.collections.set
 
-actual data class EncodedObject(
-    val android: Map<String, Any?>
-)
-
-actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
+actual data class EncodedObject(actual val raw: Map<String, Any?>) {
+    actual companion object {
+        actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
+    }
+    val android: Map<String, Any?> get() = raw
+}
 
 @PublishedApi
-internal actual fun Map<*, *>.asEncodedObject() = EncodedObject(
-    map { (key, value) ->
-        if (key is String) {
-            key to value
-        } else {
-            throw IllegalArgumentException("Expected a String key but received $key")
-        }
-    }.toMap()
-)
+internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(toMap())
+
+@PublishedApi
+internal actual fun Any.asNativeMap(): Map<*, *>? = this as? Map<*, *>
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> mutableListOf<Any?>()

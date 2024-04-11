@@ -184,7 +184,7 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        rethrow { update(js, encodedUpdate).awaitWhileOnline(database) }
+        rethrow { update(js, encodedUpdate.json).awaitWhileOnline(database) }
 
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -236,7 +236,7 @@ internal actual class NativeOnDisconnect internal constructor(
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
+        rethrow { js.update(encodedUpdate.json).awaitWhileOnline(database) }
 
 }
 

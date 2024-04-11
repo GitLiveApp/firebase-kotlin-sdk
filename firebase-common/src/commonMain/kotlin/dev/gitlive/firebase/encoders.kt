@@ -11,9 +11,13 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
-expect class EncodedObject
+expect class EncodedObject {
+    companion object {
+        val emptyEncodedObject: EncodedObject
+    }
 
-expect val emptyEncodedObject: EncodedObject
+    val raw: Map<String, Any?>
+}
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { encodeDefaults = shouldEncodeElementDefault }"))
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value) {
@@ -36,20 +40,12 @@ inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.()
     encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
 
 inline fun <T : Any> encodeAsObject(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
-    val encoded = encode(strategy, value, buildSettings)
-    return when (encoded) {
-        is Map<*, *> -> encoded.asEncodedObject()
-        null -> throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
-        else -> throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
-    }
+    val encoded = encode(strategy, value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
+    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
 }
 inline fun <reified T : Any> encodeAsObject(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
-    val encoded = encode(value, buildSettings)
-    return when (encoded) {
-        is Map<*, *> -> encoded.asEncodedObject()
-        null -> throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
-        else -> throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
-    }
+    val encoded = encode(value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
+    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
 }
 
 @PublishedApi
@@ -67,7 +63,19 @@ internal inline fun <reified T> encode(value: T, encodeSettings: EncodeSettings)
 }
 
 @PublishedApi
-internal expect fun Map<*, *>.asEncodedObject(): EncodedObject
+expect internal fun Any.asNativeMap(): Map<*, *>?
+
+@PublishedApi
+internal fun Map<*, *>.asEncodedObject(): EncodedObject = map { (key, value) ->
+    if (key is String) {
+        key to value
+    } else {
+        throw IllegalArgumentException("Expected a String key but received $key")
+    }
+}.asEncodedObject()
+
+@PublishedApi
+internal expect fun List<Pair<String, Any?>>.asEncodedObject(): EncodedObject
 
 /**
  * An extension which which serializer to use for value. Handy in updating fields by name or path

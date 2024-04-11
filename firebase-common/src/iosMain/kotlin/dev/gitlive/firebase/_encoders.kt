@@ -9,18 +9,20 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
-actual data class EncodedObject(
-    val ios: Map<Any?, *>
-)
+actual data class EncodedObject(actual val raw: Map<String, Any?>) {
+    actual companion object {
+        actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
+    }
 
-actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap<Any?, Any?>())
+    val ios: Map<Any?, *> get() = raw.mapKeys { (key, _) -> key as? Any }
+}
 
 @PublishedApi
-internal actual fun Map<*, *>.asEncodedObject() = EncodedObject(
-    map { (key, value) ->
-        key to value
-    }.toMap()
-)
+internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(toMap())
+
+@PublishedApi
+internal actual fun Any.asNativeMap(): Map<*, *>? = this as? Map<*, *>
+
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> encodeAsList()
     StructureKind.MAP -> mutableListOf<Any?>()

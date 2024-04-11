@@ -26,7 +26,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReferenceWrapper(ios.collectionWithPath(collectionPath)))
 
-    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId).native)
+    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId).wrapped)
 
     actual fun document(documentPath: String) = DocumentReference(NativeDocumentReference(ios.documentWithPath(documentPath)))
 
@@ -70,7 +70,7 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 actual typealias NativeWriteBatch = FIRWriteBatch
 
 @PublishedApi
-internal actual class NativeWriteBatchWrapper actual constructor(val native: FIRWriteBatch) {
+internal actual class NativeWriteBatchWrapper actual constructor(actual val native: NativeWriteBatch) {
 
     actual fun setEncoded(
         documentRef: DocumentReference,
@@ -107,7 +107,7 @@ internal actual class NativeWriteBatchWrapper actual constructor(val native: FIR
     actual suspend fun commit() = await { native.commitWithCompletion(it) }
 }
 
-val WriteBatch.ios get() = native.native
+val WriteBatch.ios get() = native
 
 actual typealias NativeTransaction = FIRTransaction
 
@@ -151,7 +151,7 @@ internal actual class NativeTransactionWrapper actual constructor(actual val nat
 
 }
 
-val Transaction.ios get() = nativeWrapper.native
+val Transaction.ios get() = native
 
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias NativeDocumentReferenceType = FIRDocumentReference
@@ -223,20 +223,16 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
 val DocumentReference.ios get() = native.ios
 
+actual typealias NativeQuery = FIRQuery
+
 @PublishedApi
-internal actual open class NativeQuery(open val ios: FIRQuery)
-internal val FIRQuery.native get() = NativeQuery(this)
+internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: NativeQuery)  {
+    actual suspend fun get() = QuerySnapshot(awaitResult { native.getDocumentsWithCompletion(it) })
 
-actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
-
-    open val ios: FIRQuery = nativeQuery.ios
-
-    actual suspend fun get() = QuerySnapshot(awaitResult { ios.getDocumentsWithCompletion(it) })
-
-    actual fun limit(limit: Number) = Query(ios.queryLimitedTo(limit.toLong()).native)
+    actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong()).wrapped
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
-        val listener = ios.addSnapshotListener { snapshot, error ->
+        val listener = native.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
@@ -244,16 +240,14 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
     }
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
-        val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+        val listener = native.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
     }
 
-    internal actual fun where(filter: Filter): Query = Query(
-        ios.queryWhereFilter(filter.toFIRFilter()).native
-    )
+    actual fun where(filter: Filter) = native.queryWhereFilter(filter.toFIRFilter()).wrapped
 
     private fun Filter.toFIRFilter(): FIRFilter = when (this) {
         is Filter.And -> FIRFilter.andFilterWithFilters(filters.map { it.toFIRFilter() })
@@ -284,41 +278,42 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
         }
     }
 
-    internal actual fun _orderBy(field: String, direction: Direction) = Query(ios.queryOrderedByField(field, direction == Direction.DESCENDING).native)
-    internal actual fun _orderBy(field: FieldPath, direction: Direction) = Query(ios.queryOrderedByFieldPath(field.ios, direction == Direction.DESCENDING).native)
+    actual fun orderBy(field: String, direction: Direction) = native.queryOrderedByField(field, direction == Direction.DESCENDING).wrapped
+    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = native.queryOrderedByFieldPath(field, direction == Direction.DESCENDING).wrapped
 
-    internal actual fun _startAfter(document: DocumentSnapshot) = Query(ios.queryStartingAfterDocument(document.ios).native)
-    internal actual fun _startAfter(vararg fieldValues: Any) = Query(ios.queryStartingAfterValues(fieldValues.asList()).native)
-    internal actual fun _startAt(document: DocumentSnapshot) = Query(ios.queryStartingAtDocument(document.ios).native)
-    internal actual fun _startAt(vararg fieldValues: Any) = Query(ios.queryStartingAtValues(fieldValues.asList()).native)
+    actual fun startAfter(document: NativeDocumentSnapshot) = native.queryStartingAfterDocument(document).wrapped
+    actual fun startAfter(vararg fieldValues: Any) = native.queryStartingAfterValues(fieldValues.asList()).wrapped
+    actual fun startAt(document: NativeDocumentSnapshot) = native.queryStartingAtDocument(document).wrapped
+    actual fun startAt(vararg fieldValues: Any) = native.queryStartingAtValues(fieldValues.asList()).wrapped
 
-    internal actual fun _endBefore(document: DocumentSnapshot) = Query(ios.queryEndingBeforeDocument(document.ios).native)
-    internal actual fun _endBefore(vararg fieldValues: Any) = Query(ios.queryEndingBeforeValues(fieldValues.asList()).native)
-    internal actual fun _endAt(document: DocumentSnapshot) = Query(ios.queryEndingAtDocument(document.ios).native)
-    internal actual fun _endAt(vararg fieldValues: Any) = Query(ios.queryEndingAtValues(fieldValues.asList()).native)
-
+    actual fun endBefore(document: NativeDocumentSnapshot) = native.queryEndingBeforeDocument(document).wrapped
+    actual fun endBefore(vararg fieldValues: Any) = native.queryEndingBeforeValues(fieldValues.asList()).wrapped
+    actual fun endAt(document: NativeDocumentSnapshot) = native.queryEndingAtDocument(document).wrapped
+    actual fun endAt(vararg fieldValues: Any) = native.queryEndingAtValues(fieldValues.asList()).wrapped
 }
+
+val Query.ios get() = native
+
+internal val FIRQuery.wrapped get() = NativeQueryWrapper(this)
 
 actual typealias NativeCollectionReference = FIRCollectionReference
 
 @PublishedApi
-internal actual class NativeCollectionReferenceWrapper internal actual constructor(actual val native: NativeCollectionReference) : NativeQuery(native) {
-
-    override val ios: FIRCollectionReference = native
+internal actual class NativeCollectionReferenceWrapper internal actual constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
 
     actual val path: String
-        get() = ios.path
+        get() = native.path
 
-    actual val document get() = NativeDocumentReference(ios.documentWithAutoID())
+    actual val document get() = NativeDocumentReference(native.documentWithAutoID())
 
-    actual val parent get() = ios.parent?.let{ NativeDocumentReference(it) }
+    actual val parent get() = native.parent?.let{ NativeDocumentReference(it) }
 
-    actual fun document(documentPath: String) = NativeDocumentReference(ios.documentWithPath(documentPath))
+    actual fun document(documentPath: String) = NativeDocumentReference(native.documentWithPath(documentPath))
 
-    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(await { ios.addDocumentWithData(data.ios, it) })
+    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(await { native.addDocumentWithData(data.ios, it) })
 }
 
-val CollectionReference.ios get() = nativeWrapper.ios
+val CollectionReference.ios get() = native
 
 actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
 
@@ -411,8 +406,8 @@ internal actual class NativeDocumentSnapshotWrapper actual constructor(actual va
         native.valueForField(field, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
 
     // Despite its name implying otherwise, valueForField accepts both a String representation of a Field and a FIRFieldPath
-    actual fun getEncoded(fieldPath: FieldPath, serverTimestampBehavior: ServerTimestampBehavior): Any? =
-        native.valueForField(fieldPath.ios, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
+    actual fun getEncoded(fieldPath: EncodedFieldPath, serverTimestampBehavior: ServerTimestampBehavior): Any? =
+        native.valueForField(fieldPath, serverTimestampBehavior.toIos())?.takeIf { it !is NSNull }
 
     actual fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? =
         native.dataWithServerTimestampBehavior(serverTimestampBehavior.toIos())
@@ -421,7 +416,7 @@ internal actual class NativeDocumentSnapshotWrapper actual constructor(actual va
             }
 
     actual fun contains(field: String) = native.valueForField(field) != null
-    actual fun contains(fieldPath: FieldPath) = native.valueForField(fieldPath.ios) != null
+    actual fun contains(fieldPath: EncodedFieldPath) = native.valueForField(fieldPath) != null
 
     actual val exists get() = native.exists
 
@@ -434,7 +429,7 @@ internal actual class NativeDocumentSnapshotWrapper actual constructor(actual va
     }
 }
 
-val DocumentSnapshot.ios get() = nativeWrapper.native
+val DocumentSnapshot.ios get() = native
 
 actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = ios.pendingWrites

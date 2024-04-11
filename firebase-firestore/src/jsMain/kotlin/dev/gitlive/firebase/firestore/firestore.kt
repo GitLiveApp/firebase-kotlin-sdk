@@ -74,7 +74,7 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(NativeCollectionReferenceWrapper(jsCollection(js, collectionPath))) }
 
-    actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId)) }
+    actual fun collectionGroup(collectionId: String) = rethrow { Query(jsCollectionGroup(js, collectionId).wrapped) }
 
     actual fun document(documentPath: String) = rethrow { DocumentReference(NativeDocumentReference(doc(js, documentPath))) }
 
@@ -118,16 +118,22 @@ internal val SetOptions.js: Json get() = when (this) {
     is SetOptions.MergeFieldPaths -> json("mergeFields" to encodedFieldPaths.toTypedArray())
 }
 
+actual data class NativeWriteBatch(val js: JsWriteBatch)
+
 @PublishedApi
-internal actual class NativeWriteBatchWrapper(val js: JsWriteBatch) {
+internal actual class NativeWriteBatchWrapper actual internal constructor(actual val native: NativeWriteBatch) {
+
+    constructor(js: JsWriteBatch) : this(NativeWriteBatch(js))
+
+    val js = native.js
 
     actual fun setEncoded(
         documentRef: DocumentReference,
-        encodedData: Any,
+        encodedData: EncodedObject,
         setOptions: SetOptions
-    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
+    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.json, setOptions.js) }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -157,19 +163,25 @@ internal actual class NativeWriteBatchWrapper(val js: JsWriteBatch) {
 
 val WriteBatch.js get() = native.js
 
+actual data class NativeTransaction(val js: JsTransaction)
+
 @PublishedApi
-internal actual class NativeTransactionWrapper(val js: JsTransaction) {
+internal actual class NativeTransactionWrapper actual internal constructor(actual val native: NativeTransaction) {
+
+    constructor(js: JsTransaction) : this(NativeTransaction(js))
+
+    val js = native.js
 
     actual fun setEncoded(
         documentRef: DocumentReference,
-        encodedData: Any,
+        encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeTransactionWrapper = rethrow {
-        js.set(documentRef.js, encodedData, setOptions.js)
+        js.set(documentRef.js, encodedData.json, setOptions.js)
     }
         .let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: Any): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -198,7 +210,7 @@ internal actual class NativeTransactionWrapper(val js: JsTransaction) {
         rethrow { NativeDocumentSnapshotWrapper(js.get(documentRef.js).await()) }
 }
 
-val Transaction.js get() = nativeWrapper.js
+val Transaction.js get() = native.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias NativeDocumentReferenceType = JsDocumentReference
@@ -233,10 +245,10 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     }
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = rethrow {
-        setDoc(js, encodedData, setOptions.js).await()
+        setDoc(js, encodedData.json, setOptions.js).await()
     }
 
-    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData).await() }
+    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData.json).await() }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
@@ -267,22 +279,21 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
 val DocumentReference.js get() = native.js
 
+actual open class NativeQuery(open val js: JsQuery)
+internal val JsQuery.wrapped get() = NativeQueryWrapper(this)
+
 @PublishedApi
-internal actual open class NativeQueryWrapper(open val js: JsQuery)
+internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: NativeQuery) {
 
-actual open class Query internal actual constructor(nativeWrapper: NativeQueryWrapper) {
+    constructor(js: JsQuery) : this(NativeQuery(js))
 
-    constructor(js: JsQuery) : this(NativeQueryWrapper(js))
-
-    open val js: JsQuery = nativeWrapper.js
+    open val js: JsQuery get() = native.js
 
     actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
 
-    actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
+    actual fun limit(limit: Number) = query(js, jsLimit(limit)).wrapped
 
-    internal actual fun where(filter: Filter): Query = Query(
-        query(js, filter.toQueryConstraint())
-    )
+    actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
 
     private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {
         is Filter.And -> and(*filters.map { it.toQueryConstraint() }.toTypedArray())
@@ -318,29 +329,29 @@ actual open class Query internal actual constructor(nativeWrapper: NativeQueryWr
         is WhereConstraint.NotInArray -> "not-in"
     }
 
-    internal actual fun _orderBy(field: String, direction: Direction) = rethrow {
-        Query(query(js, orderBy(field, direction.jsString)))
+    actual fun orderBy(field: String, direction: Direction) = rethrow {
+        query(js, orderBy(field, direction.jsString)).wrapped
     }
 
-    internal actual fun _orderBy(field: FieldPath, direction: Direction) = rethrow {
-        Query(query(js, orderBy(field.js, direction.jsString)))
+    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = rethrow {
+        query(js, orderBy(field, direction.jsString)).wrapped
     }
 
-    internal actual fun _startAfter(document: DocumentSnapshot) = rethrow { Query(query(js, jsStartAfter(document.js))) }
+    actual fun startAfter(document: NativeDocumentSnapshot) = rethrow { query(js, jsStartAfter(document.js)).wrapped }
 
-    internal actual fun _startAfter(vararg fieldValues: Any) = rethrow { Query(query(js, jsStartAfter(*fieldValues))) }
+    actual fun startAfter(vararg fieldValues: Any) = rethrow { query(js, jsStartAfter(*fieldValues)).wrapped }
 
-    internal actual fun _startAt(document: DocumentSnapshot) = rethrow { Query(query(js, jsStartAt(document.js))) }
+    actual fun startAt(document: NativeDocumentSnapshot) = rethrow { query(js, jsStartAt(document.js)).wrapped }
 
-    internal actual fun _startAt(vararg fieldValues: Any) = rethrow { Query(query(js, jsStartAt(*fieldValues))) }
+    actual fun startAt(vararg fieldValues: Any) = rethrow { query(js, jsStartAt(*fieldValues)).wrapped }
 
-    internal actual fun _endBefore(document: DocumentSnapshot) = rethrow { Query(query(js, jsEndBefore(document.js))) }
+    actual fun endBefore(document: NativeDocumentSnapshot) = rethrow { query(js, jsEndBefore(document.js)).wrapped }
 
-    internal actual fun _endBefore(vararg fieldValues: Any) = rethrow { Query(query(js, jsEndBefore(*fieldValues))) }
+    actual fun endBefore(vararg fieldValues: Any) = rethrow { query(js, jsEndBefore(*fieldValues)).wrapped }
 
-    internal actual fun _endAt(document: DocumentSnapshot) = rethrow { Query(query(js, jsEndAt(document.js))) }
+    actual fun endAt(document: NativeDocumentSnapshot) = rethrow { query(js, jsEndAt(document.js)).wrapped }
 
-    internal actual fun _endAt(vararg fieldValues: Any) = rethrow { Query(query(js, jsEndAt(*fieldValues))) }
+    actual fun endAt(vararg fieldValues: Any) = rethrow { query(js, jsEndAt(*fieldValues)).wrapped }
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val unsubscribe = rethrow {
@@ -366,8 +377,16 @@ actual open class Query internal actual constructor(nativeWrapper: NativeQueryWr
     }
 }
 
+val Query.js get() = native.js
+
+actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
+
 @PublishedApi
-internal actual class NativeCollectionReferenceWrapper(override val js: JsCollectionReference) : NativeQueryWrapper(js) {
+internal actual class NativeCollectionReferenceWrapper actual internal constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
+
+    constructor(js: JsCollectionReference) : this(NativeCollectionReference(js))
+
+    override val js: JsCollectionReference = native.js
 
     actual val path: String
         get() =  rethrow { js.path }
@@ -378,12 +397,12 @@ internal actual class NativeCollectionReferenceWrapper(override val js: JsCollec
 
     actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
 
-    actual suspend fun addEncoded(data: Any) = rethrow {
-        NativeDocumentReference(addDoc(js, data).await())
+    actual suspend fun addEncoded(data: EncodedObject) = rethrow {
+        NativeDocumentReference(addDoc(js, data.json).await())
     }
 }
 
-val CollectionReference.js get() = nativeWrapper.js
+val CollectionReference.js get() = native.js
 
 actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
@@ -409,8 +428,14 @@ actual class DocumentChange(val js: JsDocumentChange) {
         get() = ChangeType.values().first { it.jsString == js.type }
 }
 
+actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
+
 @PublishedApi
-internal actual class NativeDocumentSnapshotWrapper(val js: JsDocumentSnapshot) {
+internal actual class NativeDocumentSnapshotWrapper actual internal constructor(actual val native: NativeDocumentSnapshot) {
+
+    constructor(js: JsDocumentSnapshot) : this(NativeDocumentSnapshot(js))
+
+    val js: JsDocumentSnapshot = native.js
 
     actual val id get() = rethrow { js.id }
     actual val reference get() = rethrow { NativeDocumentReference(js.ref) }
@@ -419,11 +444,16 @@ internal actual class NativeDocumentSnapshotWrapper(val js: JsDocumentSnapshot) 
         js.get(field, getTimestampsOptions(serverTimestampBehavior))
     }
 
+    actual fun getEncoded(fieldPath: EncodedFieldPath, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
+        js.get(fieldPath, getTimestampsOptions(serverTimestampBehavior))
+    }
+
     actual fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
         js.data(getTimestampsOptions(serverTimestampBehavior))
     }
 
     actual fun contains(field: String) = rethrow { js.get(field) != undefined }
+    actual fun contains(fieldPath: EncodedFieldPath) = rethrow { js.get(fieldPath) != undefined }
     actual val exists get() = rethrow { js.exists() }
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 
@@ -431,7 +461,7 @@ internal actual class NativeDocumentSnapshotWrapper(val js: JsDocumentSnapshot) 
         json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
 }
 
-val DocumentSnapshot.js get() = nativeWrapper.js
+val DocumentSnapshot.js get() = native.js
 
 actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
