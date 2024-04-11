@@ -46,6 +46,8 @@ import dev.gitlive.firebase.database.externals.OnDisconnect as JsOnDisconnect
 import dev.gitlive.firebase.database.externals.Query as JsQuery
 import dev.gitlive.firebase.database.externals.endAt as jsEndAt
 import dev.gitlive.firebase.database.externals.equalTo as jsEqualTo
+import dev.gitlive.firebase.database.externals.goOffline as jsGoOffline
+import dev.gitlive.firebase.database.externals.goOnline as jsGoOnline
 import dev.gitlive.firebase.database.externals.limitToFirst as jsLimitToFirst
 import dev.gitlive.firebase.database.externals.limitToLast as jsLimitToLast
 import dev.gitlive.firebase.database.externals.orderByChild as jsOrderByChild
@@ -72,6 +74,10 @@ actual class FirebaseDatabase internal constructor(val js: Database) {
     actual fun setPersistenceEnabled(enabled: Boolean) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
+
+    actual fun goOffline() = rethrow { jsGoOffline(js) }
+
+    actual fun goOnline() = rethrow { jsGoOnline(js) }
 }
 
 internal actual open class NativeQuery(
@@ -228,8 +234,8 @@ internal actual class NativeOnDisconnect internal constructor(
     actual suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
-        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
+        rethrow { js.update(encodedUpdate ?: json()).awaitWhileOnline(database) }
 
 }
 

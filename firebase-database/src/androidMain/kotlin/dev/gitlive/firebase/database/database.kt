@@ -87,6 +87,10 @@ actual class FirebaseDatabase private constructor(val android: com.google.fireba
 
     actual fun useEmulator(host: String, port: Int) =
         android.useEmulator(host, port)
+
+    actual fun goOffline() = android.goOffline()
+
+    actual fun goOnline() = android.goOnline()
 }
 
 internal actual open class NativeQuery(
@@ -293,8 +297,9 @@ internal actual class NativeOnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
-        android.updateChildren(encodedUpdate)
+    @Suppress("UNCHECKED_CAST")
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
+        android.updateChildren(encodedUpdate as Map<String, Any?>)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

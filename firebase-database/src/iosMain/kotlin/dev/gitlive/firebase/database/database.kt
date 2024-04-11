@@ -69,6 +69,10 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun useEmulator(host: String, port: Int) =
         ios.useEmulatorWithHost(host, port.toLong())
+
+    actual fun goOffline() = ios.goOffline()
+
+    actual fun goOnline() = ios.goOnline()
 }
 
 fun Type.toEventType() = when(this) {
@@ -238,7 +242,7 @@ internal actual class NativeOnDisconnect internal constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
+    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
         ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
     }
 }

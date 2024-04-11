@@ -37,6 +37,10 @@ expect class FirebaseDatabase {
     fun setPersistenceEnabled(enabled: Boolean)
     fun setLoggingEnabled(enabled: Boolean)
     fun useEmulator(host: String, port: Int)
+
+    fun goOffline()
+
+    fun goOnline()
 }
 
 data class ChildEvent internal constructor(
@@ -140,7 +144,7 @@ internal expect class NativeOnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
     suspend fun setValue(encodedValue: Any?)
-    suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>)
+    suspend fun updateEncodedChildren(encodedUpdate: Any?)
 }
 
 class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
@@ -156,7 +160,7 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
         setValue(strategy, value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValue(encode(strategy, value, buildSettings))
 
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
+    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(encode(update, buildSettings))
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
         this.encodeDefaults = encodeDefaults
