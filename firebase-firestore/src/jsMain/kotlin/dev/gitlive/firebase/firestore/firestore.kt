@@ -131,9 +131,9 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
         documentRef: DocumentReference,
         encodedData: EncodedObject,
         setOptions: SetOptions
-    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData, setOptions.js) }.let { this }
+    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.json, setOptions.js) }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -177,11 +177,11 @@ internal actual class NativeTransactionWrapper actual internal constructor(actua
         encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeTransactionWrapper = rethrow {
-        js.set(documentRef.js, encodedData, setOptions.js)
+        js.set(documentRef.js, encodedData.json, setOptions.js)
     }
         .let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -245,10 +245,10 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     }
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = rethrow {
-        setDoc(js, encodedData, setOptions.js).await()
+        setDoc(js, encodedData.json, setOptions.js).await()
     }
 
-    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData).await() }
+    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData.json).await() }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
@@ -398,7 +398,7 @@ internal actual class NativeCollectionReferenceWrapper actual internal construct
     actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
 
     actual suspend fun addEncoded(data: EncodedObject) = rethrow {
-        NativeDocumentReference(addDoc(js, data).await())
+        NativeDocumentReference(addDoc(js, data.json).await())
     }
 }
 

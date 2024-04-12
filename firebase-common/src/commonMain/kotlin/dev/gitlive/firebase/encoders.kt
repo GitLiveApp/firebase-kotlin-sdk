@@ -46,10 +46,16 @@ inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.()
     encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
 
 inline fun <T : Any> encodeAsObject(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
+    if (value is Map<*, *> && value.keys.any { it !is String }) {
+        throw IllegalArgumentException("$value is a Map containing non-String keys. Must be of the form Map<String, Any?>")
+    }
     val encoded = encode(strategy, value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<String, Any?>")
     return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<String, Any?>")
 }
 inline fun <reified T : Any> encodeAsObject(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
+    if (value is Map<*, *> && value.keys.any { it !is String }) {
+        throw IllegalArgumentException("$value is a Map containing non-String keys. Must be of the form Map<String, Any?>")
+    }
     val encoded = encode(value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<String, Any?>")
     return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<String, Any?>")
 }

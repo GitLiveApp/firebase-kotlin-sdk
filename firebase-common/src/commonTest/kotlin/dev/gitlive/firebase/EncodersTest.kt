@@ -422,7 +422,7 @@ class EncodersTest {
         val testDataClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
         val encodedObject = encodeAsObject(TestData.serializer(), testDataClass) { encodeDefaults = false }
 
-        assertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.raw)
+        nativeAssertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.raw)
 
         val testMap = mapOf("one" to 1, "two" to null, "three" to false)
         assertEquals(testMap, encodeAsObject(testMap).raw)
