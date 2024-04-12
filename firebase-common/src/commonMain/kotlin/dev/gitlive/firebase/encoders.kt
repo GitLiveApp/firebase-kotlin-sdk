@@ -11,6 +11,12 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
+/**
+ * Platform specific object for storing encoded data that can be used for methods that explicitly require an object.
+ * This is essentially a [Map] of [String] and [Any]? (as represented by [raw]) but since [encode] gives a platform specific value, this method wraps that.
+ *
+ * Created using [encodeAsObject]
+ */
 expect class EncodedObject {
     companion object {
         val emptyEncodedObject: EncodedObject
@@ -40,12 +46,12 @@ inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.()
     encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
 
 inline fun <T : Any> encodeAsObject(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
-    val encoded = encode(strategy, value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
-    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
+    val encoded = encode(strategy, value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<String, Any?>")
+    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<String, Any?>")
 }
 inline fun <reified T : Any> encodeAsObject(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
-    val encoded = encode(value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<Key, Value>")
-    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<Key, Value>")
+    val encoded = encode(value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<String, Any?>")
+    return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<String, Any?>")
 }
 
 @PublishedApi

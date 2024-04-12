@@ -207,7 +207,7 @@ internal actual class NativeDatabaseReference internal constructor(
         .run { Unit }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        android.updateChildren(encodedUpdate.android)
+        android.updateChildren(encodedUpdate)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -297,7 +297,7 @@ internal actual class NativeOnDisconnect internal constructor(
         .run { Unit }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        android.updateChildren(encodedUpdate.android)
+        android.updateChildren(encodedUpdate)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

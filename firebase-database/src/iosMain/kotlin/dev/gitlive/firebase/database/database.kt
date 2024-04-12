@@ -170,7 +170,7 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate, it) }
     }
 
     actual suspend fun removeValue() {
@@ -241,7 +241,7 @@ internal actual class NativeOnDisconnect internal constructor(
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate, it) }
     }
 }
 

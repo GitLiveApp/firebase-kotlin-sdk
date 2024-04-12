@@ -77,13 +77,13 @@ internal actual class NativeWriteBatchWrapper actual constructor(actual val nati
         encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeWriteBatchWrapper = when (setOptions) {
-        is SetOptions.Merge -> native.setData(encodedData.ios, documentRef.ios, true)
-        is SetOptions.Overwrite -> native.setData(encodedData.ios, documentRef.ios, false)
-        is SetOptions.MergeFields -> native.setData(encodedData.ios, documentRef.ios, setOptions.fields)
-        is SetOptions.MergeFieldPaths -> native.setData(encodedData.ios, documentRef.ios, setOptions.encodedFieldPaths)
+        is SetOptions.Merge -> native.setData(encodedData, documentRef.ios, true)
+        is SetOptions.Overwrite -> native.setData(encodedData, documentRef.ios, false)
+        is SetOptions.MergeFields -> native.setData(encodedData, documentRef.ios, setOptions.fields)
+        is SetOptions.MergeFieldPaths -> native.setData(encodedData, documentRef.ios, setOptions.encodedFieldPaths)
     }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = native.updateData(encodedData.ios, documentRef.ios).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = native.updateData(encodedData, documentRef.ios).let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -119,13 +119,13 @@ internal actual class NativeTransactionWrapper actual constructor(actual val nat
         encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeTransactionWrapper = when (setOptions) {
-        is SetOptions.Merge -> native.setData(encodedData.ios, documentRef.ios, true)
-        is SetOptions.Overwrite -> native.setData(encodedData.ios, documentRef.ios, false)
-        is SetOptions.MergeFields -> native.setData(encodedData.ios, documentRef.ios, setOptions.fields)
-        is SetOptions.MergeFieldPaths -> native.setData(encodedData.ios, documentRef.ios, setOptions.encodedFieldPaths)
+        is SetOptions.Merge -> native.setData(encodedData, documentRef.ios, true)
+        is SetOptions.Overwrite -> native.setData(encodedData, documentRef.ios, false)
+        is SetOptions.MergeFields -> native.setData(encodedData, documentRef.ios, setOptions.fields)
+        is SetOptions.MergeFieldPaths -> native.setData(encodedData, documentRef.ios, setOptions.encodedFieldPaths)
     }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = native.updateData(encodedData.ios, documentRef.ios).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = native.updateData(encodedData, documentRef.ios).let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -186,15 +186,15 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = await {
         when (setOptions) {
-            is SetOptions.Merge -> ios.setData(encodedData.ios, true, it)
-            is SetOptions.Overwrite -> ios.setData(encodedData.ios, false, it)
-            is SetOptions.MergeFields -> ios.setData(encodedData.ios, setOptions.fields, it)
-            is SetOptions.MergeFieldPaths -> ios.setData(encodedData.ios, setOptions.encodedFieldPaths, it)
+            is SetOptions.Merge -> ios.setData(encodedData, true, it)
+            is SetOptions.Overwrite -> ios.setData(encodedData, false, it)
+            is SetOptions.MergeFields -> ios.setData(encodedData, setOptions.fields, it)
+            is SetOptions.MergeFieldPaths -> ios.setData(encodedData, setOptions.encodedFieldPaths, it)
         }
     }
 
     actual suspend fun updateEncoded(encodedData: EncodedObject) = await {
-        ios.updateData(encodedData.ios, it)
+        ios.updateData(encodedData, it)
     }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) = await {
@@ -310,7 +310,7 @@ internal actual class NativeCollectionReferenceWrapper internal actual construct
 
     actual fun document(documentPath: String) = NativeDocumentReference(native.documentWithPath(documentPath))
 
-    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(await { native.addDocumentWithData(data.ios, it) })
+    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(await { native.addDocumentWithData(data, it) })
 }
 
 val CollectionReference.ios get() = native

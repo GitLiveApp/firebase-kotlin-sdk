@@ -10,11 +10,10 @@ import kotlinx.serialization.descriptors.StructureKind
 import java.lang.IllegalArgumentException
 import kotlin.collections.set
 
-actual data class EncodedObject(actual val raw: Map<String, Any?>) {
+actual data class EncodedObject(actual val raw: Map<String, Any?>) : Map<String, Any?> by raw {
     actual companion object {
         actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
     }
-    val android: Map<String, Any?> get() = raw
 }
 
 @PublishedApi

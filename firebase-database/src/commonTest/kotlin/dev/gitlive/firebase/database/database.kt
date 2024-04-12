@@ -17,6 +17,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
@@ -62,116 +63,142 @@ class FirebaseDatabaseTest {
         }
     }
 
-//    @Test
-//    fun testSetValue() = runTest {
-//        ensureDatabaseConnected()
-//        val testValue = "test"
-//        val testReference = database.reference("testPath")
-//
-//        testReference.setValue(testValue)
-//
-//        val testReferenceValue = testReference
-//            .valueEvents
-//            .first()
-//            .value<String>()
-//
-//        assertEquals(testValue, testReferenceValue)
-//    }
-//
-//    @Test
-//    fun testChildCount() = runTest {
-//        setupRealtimeData()
-//        val dataSnapshot = database
-//            .reference("FirebaseRealtimeDatabaseTest")
-//            .valueEvents
-//            .first()
-//
-//        val firebaseDatabaseChildCount = dataSnapshot.children.count()
-//        assertEquals(3, firebaseDatabaseChildCount)
-//    }
-//
-//    @Test
-//    fun testBasicIncrementTransaction() = runTest {
-//        ensureDatabaseConnected()
-//        val data = DatabaseTest("PostOne", 2)
-//        val userRef = database.reference("users/user_1/post_id_1")
-//        setupDatabase(userRef, data, DatabaseTest.serializer())
-//
-//        // Check database before transaction
-//        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
-//        assertEquals(data.title, userDocBefore.title)
-//        assertEquals(data.likes, userDocBefore.likes)
-//
-//        // Run transaction
-//        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1)  }
-//        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
-//
-//        // Check the database after transaction
-//        assertEquals(data.title, userDocAfter.title)
-//        assertEquals(data.likes + 1, userDocAfter.likes)
-//    }
-//
-//    @Test
-//    fun testBasicDecrementTransaction() = runTest {
-//        ensureDatabaseConnected()
-//        val data = DatabaseTest("PostTwo", 2)
-//        val userRef = database.reference("users/user_1/post_id_2")
-//        setupDatabase(userRef, data, DatabaseTest.serializer())
-//
-//        // Check database before transaction
-//        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
-//        assertEquals(data.title, userDocBefore.title)
-//        assertEquals(data.likes, userDocBefore.likes)
-//
-//        // Run transaction
-//        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes - 1) }
-//        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
-//
-//        // Check the database after transaction
-//        assertEquals(data.title, userDocAfter.title)
-//        assertEquals(data.likes - 1, userDocAfter.likes)
-//    }
-//
-//    @Test
-//    fun testSetServerTimestamp() = runTest {
-//        ensureDatabaseConnected()
-//        val testReference = database.reference("testSetServerTimestamp")
-//
-//        testReference.setValue(ServerValue.TIMESTAMP)
-//
-//        val timestamp = testReference
-//            .valueEvents
-//            .first()
-//            .value<Long>()
-//
-//        assertTrue(timestamp > 0)
-//    }
-//
-//    @Test
-//    fun testIncrement() = runTest {
-//        ensureDatabaseConnected()
-//        val testReference = database.reference("testIncrement")
-//
-//        testReference.setValue(2.0)
-//
-//        val value = testReference
-//            .valueEvents
-//            .first()
-//            .value<Double>()
-//
-//        assertEquals(2.0, value)
-//
-//        testReference.setValue(ServerValue.increment(5.0))
-//        val updatedValue = testReference
-//            .valueEvents
-//            .first()
-//            .value<Double>()
-//
-//        assertEquals(7.0, updatedValue)
-//    }
+    @Test
+    fun testSetValue() = runTest {
+        ensureDatabaseConnected()
+        val testValue = "test"
+        val testReference = database.reference("testPath")
+
+        testReference.setValue(testValue)
+
+        val testReferenceValue = testReference
+            .valueEvents
+            .first()
+            .value<String>()
+
+        assertEquals(testValue, testReferenceValue)
+    }
+
+    @Test
+    fun testChildCount() = runTest {
+        setupRealtimeData()
+        val dataSnapshot = database
+            .reference("FirebaseRealtimeDatabaseTest")
+            .valueEvents
+            .first()
+
+        val firebaseDatabaseChildCount = dataSnapshot.child("values").children.count()
+        assertEquals(3, firebaseDatabaseChildCount)
+    }
+
+    @Test
+    fun testBasicIncrementTransaction() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostOne", 2)
+        val userRef = database.reference("users/user_1/post_id_1")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        // Check database before transaction
+        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
+        assertEquals(data.title, userDocBefore.title)
+        assertEquals(data.likes, userDocBefore.likes)
+
+        // Run transaction
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1)  }
+        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
+
+        // Check the database after transaction
+        assertEquals(data.title, userDocAfter.title)
+        assertEquals(data.likes + 1, userDocAfter.likes)
+    }
+
+    @Test
+    fun testBasicDecrementTransaction() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostTwo", 2)
+        val userRef = database.reference("users/user_1/post_id_2")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        // Check database before transaction
+        val userDocBefore = userRef.valueEvents.first().value(DatabaseTest.serializer())
+        assertEquals(data.title, userDocBefore.title)
+        assertEquals(data.likes, userDocBefore.likes)
+
+        // Run transaction
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes - 1) }
+        val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
+
+        // Check the database after transaction
+        assertEquals(data.title, userDocAfter.title)
+        assertEquals(data.likes - 1, userDocAfter.likes)
+    }
+
+    @Test
+    fun testSetServerTimestamp() = runTest {
+        ensureDatabaseConnected()
+        val testReference = database.reference("testSetServerTimestamp")
+
+        testReference.setValue(ServerValue.TIMESTAMP)
+
+        val timestamp = testReference
+            .valueEvents
+            .first()
+            .value<Long>()
+
+        assertTrue(timestamp > 0)
+    }
+
+    @Test
+    fun testIncrement() = runTest {
+        ensureDatabaseConnected()
+        val testReference = database.reference("testIncrement")
+
+        testReference.setValue(2.0)
+
+        val value = testReference
+            .valueEvents
+            .first()
+            .value<Double>()
+
+        assertEquals(2.0, value)
+
+        testReference.setValue(ServerValue.increment(5.0))
+        val updatedValue = testReference
+            .valueEvents
+            .first()
+            .value<Double>()
+
+        assertEquals(7.0, updatedValue)
+    }
+
+    @Test
+    fun testBreakRules() = runTest {
+        ensureDatabaseConnected()
+        val reference = database
+            .reference("FirebaseRealtimeDatabaseTest")
+        val child = reference.child("lastActivity")
+        assertFailsWith<DatabaseException> {
+            child.setValue("stringNotAllowed")
+        }
+        child.setValue(2)
+        assertFailsWith<DatabaseException> {
+            reference.updateChildren(mapOf("lastActivity" to "stringNotAllowed"))
+        }
+    }
 
     @Test
     fun testUpdateChildren() = runTest {
+        setupRealtimeData()
+        val reference = database
+            .reference("FirebaseRealtimeDatabaseTest")
+        val valueEvents = reference.child("lastActivity").valueEvents
+        assertTrue(valueEvents.first().exists)
+        reference.updateChildren(mapOf("test" to false, "nested" to mapOf("lastActivity" to null), "lastActivity" to null))
+        assertFalse(valueEvents.first().exists)
+    }
+
+    @Test
+    fun testUpdateChildrenOnDisconnect() = runTest {
         setupRealtimeData()
         val reference = database
             .reference("FirebaseRealtimeDatabaseTest")

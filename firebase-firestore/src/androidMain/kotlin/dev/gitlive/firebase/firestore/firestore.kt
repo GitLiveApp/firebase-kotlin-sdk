@@ -84,12 +84,12 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
         encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeWriteBatchWrapper = (setOptions.android?.let {
-        native.set(documentRef.android, encodedData.android, it)
-    } ?: native.set(documentRef.android, encodedData.android)).let {
+        native.set(documentRef.android, encodedData, it)
+    } ?: native.set(documentRef.android, encodedData)).let {
         this
     }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject) = native.update(documentRef.android, encodedData.android).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject) = native.update(documentRef.android, encodedData).let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -126,12 +126,12 @@ internal actual class NativeTransactionWrapper actual internal constructor(actua
         setOptions: SetOptions
     ): NativeTransactionWrapper {
         setOptions.android?.let {
-            native.set(documentRef.android, encodedData.android, it)
-        } ?: native.set(documentRef.android, encodedData.android)
+            native.set(documentRef.android, encodedData, it)
+        } ?: native.set(documentRef.android, encodedData)
         return this
     }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject) = native.update(documentRef.android, encodedData.android).let { this }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject) = native.update(documentRef.android, encodedData).let { this }
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
@@ -178,13 +178,13 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) {
         val task = (setOptions.android?.let {
-            android.set(encodedData.android, it)
-        } ?: android.set(encodedData.android))
+            android.set(encodedData, it)
+        } ?: android.set(encodedData))
         task.await()
     }
 
     actual suspend fun updateEncoded(encodedData: EncodedObject) {
-        android.update(encodedData.android).await()
+        android.update(encodedData).await()
     }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
@@ -350,7 +350,7 @@ internal actual class NativeCollectionReferenceWrapper internal actual construct
 
     actual fun document(documentPath: String) = NativeDocumentReference(native.document(documentPath))
 
-    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(native.add(data.android).await())
+    actual suspend fun addEncoded(data: EncodedObject) = NativeDocumentReference(native.add(data).await())
 }
 
 val CollectionReference.android get() = native

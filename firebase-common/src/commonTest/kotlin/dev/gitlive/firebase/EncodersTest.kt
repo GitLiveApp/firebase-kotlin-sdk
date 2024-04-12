@@ -15,6 +15,7 @@ import kotlinx.serialization.modules.polymorphic
 import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 @Serializable
@@ -414,6 +415,31 @@ class EncodersTest {
             ),
             reencoded
         )
+    }
+
+    @Test
+    fun encodeAsObject() {
+        val testDataClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
+        val encodedObject = encodeAsObject(TestData.serializer(), testDataClass) { encodeDefaults = false }
+
+        assertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.raw)
+
+        val testMap = mapOf("one" to 1, "two" to null, "three" to false)
+        assertEquals(testMap, encodeAsObject(testMap).raw)
+
+        assertEquals(emptyMap(), encodeAsObject(TestObject).raw)
+
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(true) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(42) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(8.toShort()) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(Int.MAX_VALUE.toLong() + 3) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(0x03F) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(3.33) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(6.65f) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject("Test") }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(ValueClass(2)) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(mapOf(1 to "one")) }
+        assertFailsWith<IllegalArgumentException> { encodeAsObject(listOf("one")) }
     }
 
     private inline fun <reified T> assertEncode(value: T) {
