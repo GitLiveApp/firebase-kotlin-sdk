@@ -10,13 +10,18 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlin.js.Json
 import kotlin.js.json
 
-actual class EncodedObject internal constructor(private val keyValues: List<Pair<String, Any?>>) {
-    actual val raw get() = keyValues.toMap()
-    val json get() = json(*keyValues.toTypedArray())
+actual interface EncodedObject {
+    actual val raw: Map<String, Any?>
+    val json: Json
 }
 
 @PublishedApi
-internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(this)
+internal class InternalEncodedObject internal constructor(override val raw: Map<String, Any?>) : EncodedObject {
+    override val json: Json get() = json(*raw.entries.map { (key, value) -> key to value }.toTypedArray())
+}
+
+@PublishedApi
+internal actual fun Map<String, Any?>.asEncodedObject(): EncodedObject = InternalEncodedObject(this)
 
 @PublishedApi
 internal actual fun Any.asNativeMap(): Map<*, *>? {

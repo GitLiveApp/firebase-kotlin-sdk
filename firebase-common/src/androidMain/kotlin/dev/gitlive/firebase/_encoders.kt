@@ -10,10 +10,15 @@ import kotlinx.serialization.descriptors.StructureKind
 import java.lang.IllegalArgumentException
 import kotlin.collections.set
 
-actual data class EncodedObject internal constructor(actual val raw: Map<String, Any?>) : Map<String, Any?> by raw
+actual interface EncodedObject : Map<String, Any?> {
+    actual val raw: Map<String, Any?>
+}
 
 @PublishedApi
-internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(toMap())
+internal data class EncodedObjectImpl internal constructor(override val raw: Map<String, Any?>) : EncodedObject, Map<String, Any?> by raw
+
+@PublishedApi
+internal actual fun Map<String, Any?>.asEncodedObject(): EncodedObject = EncodedObjectImpl(this)
 
 @PublishedApi
 internal actual fun Any.asNativeMap(): Map<*, *>? = this as? Map<*, *>

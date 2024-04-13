@@ -17,7 +17,7 @@ import kotlinx.serialization.modules.SerializersModule
  *
  * Created using [encodeAsObject]. It is not recommended to encode to this manually.
  */
-expect class EncodedObject {
+expect interface EncodedObject {
     val raw: Map<String, Any?>
 }
 
@@ -91,10 +91,10 @@ internal fun Map<*, *>.asEncodedObject(): EncodedObject = map { (key, value) ->
     } else {
         throw IllegalArgumentException("Expected a String key but received $key")
     }
-}.asEncodedObject()
+}.toMap().asEncodedObject()
 
 @PublishedApi
-internal expect fun List<Pair<String, Any?>>.asEncodedObject(): EncodedObject
+internal expect fun Map<String, Any?>.asEncodedObject(): EncodedObject
 
 /**
  * An extension which which serializer to use for value. Handy in updating fields by name or path
