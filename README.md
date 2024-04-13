@@ -275,3 +275,16 @@ You can build and test the project locally.
 2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
+
+### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
+
+When this project began, the official Firebase Android SDK was a pure java library and the separate Kotlin extensions (KTX) module consisted of only a few extensions providing some syntactic sugar, for example `Firebase.firestore` instead of `Firebase.getInstance(),` which we naturally copied for the Firebase Kotlin SDK.
+
+But with the majority of the Android SDK being designed for Java, the Kotlin SDK was primarily guided by our [Kotlin-first design](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#kotlin-first-design) principles.
+
+More recently, with the official SDK for Android providing better support for Kotlin and the inclusion of the new Kotlin-friendly features direct in the main modules, the API differences between the official SDK and this project are likely to start to blur. Therefore, in particular for developers porting android code to multiplatform, one of our goals going forward will be API compatibility with the Android SDK where possible.
+
+For contributors this means following these points when adding new code to the public API of this project:
+- **Match the [Android SDKs API](https://firebase.google.com/docs/reference/kotlin/packages).** When adding new API coverage use the Android SDK as the guide on what the public API should be in regard to naming, parameters etc. The goal here is *near binary compatibility*, meaning code consuming the Android SDK compiles *as is* with the Kotlin SDK after just changing the package imports from `com.google` to `dev.gitlive`.
+- **Follow our [Kotlin-first design](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#kotlin-first-design) principles when needed.** If the API you are adding coverage for is new, and it's Kotlin-first in the Android SDK, then you can simply just match the Android SDKs API as described in the first point, but if it's an older Java-first API then ideally we would include an identical API for API compatibility *plus* a Kotlin-first overload. A good example for this is where the Builder pattern is employed in the Android SDK, here we can follow [this Kotlin-first design principle](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#default-arguments) and provide both methods, one taking the options created with the builder and an overload with default arguments to avoid the builder boilerplate for developers not porting an existing android code base.
+  
