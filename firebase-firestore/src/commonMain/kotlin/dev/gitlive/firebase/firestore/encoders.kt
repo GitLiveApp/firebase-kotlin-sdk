@@ -11,5 +11,5 @@ internal inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.B
     if (value?.let(::isSpecialValue) == true) {
         value
     } else {
-        dev.gitlive.firebase.encode(value, buildSettings)
+        dev.gitlive.firebase.internal.encode(value, buildSettings)
     }

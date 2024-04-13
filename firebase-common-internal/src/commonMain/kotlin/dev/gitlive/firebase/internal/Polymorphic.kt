@@ -1,5 +1,6 @@
-package dev.gitlive.firebase
+package dev.gitlive.firebase.internal
 
+import dev.gitlive.firebase.FirebaseClassDiscriminator
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor

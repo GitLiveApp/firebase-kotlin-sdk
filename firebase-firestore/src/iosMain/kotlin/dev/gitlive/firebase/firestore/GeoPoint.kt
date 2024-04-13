@@ -3,7 +3,6 @@ package dev.gitlive.firebase.firestore
 import cocoapods.FirebaseFirestoreInternal.FIRGeoPoint
 import kotlinx.serialization.Serializable
 
-
 /** A class representing a platform specific Firebase GeoPoint. */
 actual typealias NativeGeoPoint = FIRGeoPoint
 

@@ -156,7 +156,8 @@ kotlin {
         getByName("commonMain") {
             dependencies {
                 api(project(":firebase-app"))
-                implementation(project(":firebase-common"))
+                api(project(":firebase-common"))
+                implementation(project(":firebase-common-internal"))
             }
         }
 

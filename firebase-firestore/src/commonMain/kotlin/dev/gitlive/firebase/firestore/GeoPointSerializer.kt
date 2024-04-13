@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.SpecialValueSerializer
+import dev.gitlive.firebase.internal.SpecialValueSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 

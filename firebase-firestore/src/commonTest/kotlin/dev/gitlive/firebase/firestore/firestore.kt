@@ -7,11 +7,11 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import dev.gitlive.firebase.withSerializer
+import dev.gitlive.firebase.internal.withSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay

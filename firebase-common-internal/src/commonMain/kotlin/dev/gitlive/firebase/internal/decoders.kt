@@ -2,8 +2,9 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-package dev.gitlive.firebase
+package dev.gitlive.firebase.internal
 
+import dev.gitlive.firebase.DecodeSettings
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -16,7 +17,7 @@ import kotlinx.serialization.serializer
 
 inline fun <reified T> decode(value: Any?): T = decode(value) {}
 inline fun <reified T> decode(value: Any?, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-    decode(value, DecodeSettings.BuilderImpl().apply(buildSettings).buildDecodeSettings())
+    decode(value, DecodeSettingsImpl.Builder().apply(buildSettings).buildDecodeSettings())
 
 @PublishedApi
 internal inline fun <reified T> decode(value: Any?, decodeSettings: DecodeSettings): T {
@@ -25,7 +26,7 @@ internal inline fun <reified T> decode(value: Any?, decodeSettings: DecodeSettin
 }
 fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?): T = decode(strategy, value) {}
 inline fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-    decode(strategy, value, DecodeSettings.BuilderImpl().apply(buildSettings).buildDecodeSettings())
+    decode(strategy, value, DecodeSettingsImpl.Builder().apply(buildSettings).buildDecodeSettings())
 
 @PublishedApi
 internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decodeSettings: DecodeSettings): T {
@@ -37,7 +38,7 @@ expect fun getPolymorphicType(value: Any?, discriminator: String): String
 
 class FirebaseDecoder(val value: Any?, internal val settings: DecodeSettings) : Decoder {
 
-    constructor(value: Any?) : this(value, DecodeSettings())
+    constructor(value: Any?) : this(value, DecodeSettingsImpl())
 
     override val serializersModule: SerializersModule = settings.serializersModule
 

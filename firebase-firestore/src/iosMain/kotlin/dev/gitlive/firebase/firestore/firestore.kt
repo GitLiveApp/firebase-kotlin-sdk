@@ -6,7 +6,10 @@ package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestoreInternal.*
 import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.EncodedObject
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose

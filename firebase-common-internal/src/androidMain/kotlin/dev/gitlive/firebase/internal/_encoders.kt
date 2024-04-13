@@ -2,17 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-package dev.gitlive.firebase
+package dev.gitlive.firebase.internal
 
+import dev.gitlive.firebase.EncodedObject
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
-import java.lang.IllegalArgumentException
 import kotlin.collections.set
-
-actual interface EncodedObject : Map<String, Any?> {
-    actual val raw: Map<String, Any?>
-}
 
 @PublishedApi
 internal data class EncodedObjectImpl internal constructor(override val raw: Map<String, Any?>) : EncodedObject, Map<String, Any?> by raw

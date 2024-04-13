@@ -1,5 +1,6 @@
-package dev.gitlive.firebase
+package dev.gitlive.firebase.internal
 
+import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import kotlinx.serialization.KSerializer
 
 inline fun <reified T> reencodeTransformation(value: Any?, builder: EncodeDecodeSettingsBuilder.() -> Unit = {}, transform: (T) -> T): Any? {

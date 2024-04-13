@@ -4,7 +4,12 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runTest
 import kotlin.random.Random
 import kotlin.test.*
 

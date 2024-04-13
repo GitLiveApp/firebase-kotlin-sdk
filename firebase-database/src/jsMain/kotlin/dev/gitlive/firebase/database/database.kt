@@ -28,8 +28,8 @@ import dev.gitlive.firebase.database.externals.ref
 import dev.gitlive.firebase.database.externals.remove
 import dev.gitlive.firebase.database.externals.set
 import dev.gitlive.firebase.database.externals.update
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope

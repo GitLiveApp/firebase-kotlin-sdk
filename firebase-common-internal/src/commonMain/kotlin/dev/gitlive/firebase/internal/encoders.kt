@@ -2,8 +2,10 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-package dev.gitlive.firebase
+package dev.gitlive.firebase.internal
 
+import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.EncodedObject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -11,15 +13,6 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
-/**
- * Platform specific object for storing encoded data that can be used for methods that explicitly require an object.
- * This is essentially a [Map] of [String] and [Any]? (as represented by [raw]) but since [encode] gives a platform specific value, this method wraps that.
- *
- * Created using [encodeAsObject]. It is not recommended to encode to this manually.
- */
-expect interface EncodedObject {
-    val raw: Map<String, Any?>
-}
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { encodeDefaults = shouldEncodeElementDefault }"))
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value) {
@@ -27,7 +20,7 @@ fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElement
 }
 
 inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit) =
-    encode(strategy, value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
+    encode(strategy, value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 @PublishedApi
 internal inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
@@ -39,7 +32,7 @@ inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): An
 }
 
 inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
-    encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
+    encode(value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 /**
  * Encodes data as an [EncodedObject].
@@ -111,7 +104,7 @@ class FirebaseEncoder(
 ) : Encoder {
 
     constructor(shouldEncodeElementDefault: Boolean) : this(
-        EncodeSettings.BuilderImpl().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings()
+        EncodeSettingsImpl.Builder().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings()
     )
 
     var value: Any? = null
