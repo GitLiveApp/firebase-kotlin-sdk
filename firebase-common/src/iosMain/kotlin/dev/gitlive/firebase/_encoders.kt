@@ -9,11 +9,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
 
-actual data class EncodedObject(actual val raw: Map<String, Any?>) : Map<Any?, Any?> by raw.mapKeys({ (key, _) -> key as? Any })  {
-    actual companion object {
-        actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyMap())
-    }
-}
+actual data class EncodedObject internal constructor(actual val raw: Map<String, Any?>) : Map<Any?, Any?> by raw.mapKeys({ (key, _) -> key as? Any })
 
 @PublishedApi
 internal actual fun List<Pair<String, Any?>>.asEncodedObject() = EncodedObject(toMap())

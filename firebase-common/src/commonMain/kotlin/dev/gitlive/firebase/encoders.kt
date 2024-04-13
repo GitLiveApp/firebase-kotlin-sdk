@@ -15,13 +15,9 @@ import kotlinx.serialization.modules.SerializersModule
  * Platform specific object for storing encoded data that can be used for methods that explicitly require an object.
  * This is essentially a [Map] of [String] and [Any]? (as represented by [raw]) but since [encode] gives a platform specific value, this method wraps that.
  *
- * Created using [encodeAsObject]
+ * Created using [encodeAsObject]. It is not recommended to encode to this manually.
  */
 expect class EncodedObject {
-    companion object {
-        val emptyEncodedObject: EncodedObject
-    }
-
     val raw: Map<String, Any?>
 }
 
@@ -45,6 +41,11 @@ inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): An
 inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
     encode(value, EncodeSettings.BuilderImpl().apply(buildSettings).buildEncodeSettings())
 
+/**
+ * Encodes data as an [EncodedObject].
+ * This is not recommended for manual use, but may be done by the library internally.
+ * @throws IllegalArgumentException if [value] is not valid as an [EncodedObject] (e.g. not encodable in the form Map<String:Any?>
+ */
 inline fun <T : Any> encodeAsObject(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
     if (value is Map<*, *> && value.keys.any { it !is String }) {
         throw IllegalArgumentException("$value is a Map containing non-String keys. Must be of the form Map<String, Any?>")
@@ -52,6 +53,12 @@ inline fun <T : Any> encodeAsObject(strategy: SerializationStrategy<T>, value: T
     val encoded = encode(strategy, value, buildSettings) ?: throw IllegalArgumentException("$value was encoded as null. Must be of the form Map<String, Any?>")
     return encoded.asNativeMap()?.asEncodedObject() ?: throw IllegalArgumentException("$value was encoded as ${encoded::class}. Must be of the form Map<String, Any?>")
 }
+
+/**
+ * Encodes data as an [EncodedObject].
+ * This is not recommended for manual use, but may be done by the library internally.
+ * @throws IllegalArgumentException if [value] is not valid as an [EncodedObject] (e.g. not encodable in the form Map<String:Any?>
+ */
 inline fun <reified T : Any> encodeAsObject(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): EncodedObject {
     if (value is Map<*, *> && value.keys.any { it !is String }) {
         throw IllegalArgumentException("$value is a Map containing non-String keys. Must be of the form Map<String, Any?>")

@@ -10,11 +10,7 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlin.js.Json
 import kotlin.js.json
 
-actual data class EncodedObject(private val keyValues: List<Pair<String, Any?>>) {
-    actual companion object {
-        actual val emptyEncodedObject: EncodedObject = EncodedObject(emptyList())
-    }
-
+actual class EncodedObject internal constructor(private val keyValues: List<Pair<String, Any?>>) {
     actual val raw get() = keyValues.toMap()
     val json get() = json(*keyValues.toTypedArray())
 }
