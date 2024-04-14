@@ -1,6 +1,10 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.runBlockingTest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -21,7 +25,6 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
 
 private val backgroundContext = newSingleThreadContext("background")
 /**

@@ -13,13 +13,14 @@ import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
-import dev.gitlive.firebase.EncodedObject
+import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.android
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -207,7 +208,7 @@ internal actual class NativeDatabaseReference internal constructor(
         .run { Unit }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        android.updateChildren(encodedUpdate)
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -297,7 +298,7 @@ internal actual class NativeOnDisconnect internal constructor(
         .run { Unit }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
-        android.updateChildren(encodedUpdate)
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }

@@ -4,7 +4,14 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.DeserializationStrategy

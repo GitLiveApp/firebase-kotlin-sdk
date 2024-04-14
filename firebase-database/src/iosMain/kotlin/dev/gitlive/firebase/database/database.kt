@@ -16,7 +16,6 @@ import cocoapods.FirebaseDatabase.FIRDatabaseReference
 import cocoapods.FirebaseDatabase.FIRTransactionResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
-import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
@@ -24,8 +23,10 @@ import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
 import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.ios
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -170,7 +171,7 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate, it) }
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
     }
 
     actual suspend fun removeValue() {
@@ -241,7 +242,7 @@ internal actual class NativeOnDisconnect internal constructor(
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate, it) }
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
     }
 }
 

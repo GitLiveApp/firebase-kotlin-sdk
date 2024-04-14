@@ -1,10 +1,14 @@
 package dev.gitlive.firebase.perf.metrics
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.perf.FirebasePerformance
 import dev.gitlive.firebase.perf.context
 import dev.gitlive.firebase.perf.performance
 import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
