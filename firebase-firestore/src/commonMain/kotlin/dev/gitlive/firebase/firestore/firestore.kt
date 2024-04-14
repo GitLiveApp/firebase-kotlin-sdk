@@ -6,7 +6,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.EncodedObject
+import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

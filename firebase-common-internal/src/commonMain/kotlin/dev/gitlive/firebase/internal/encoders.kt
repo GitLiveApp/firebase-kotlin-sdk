@@ -5,7 +5,6 @@
 package dev.gitlive.firebase.internal
 
 import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.EncodedObject
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -73,21 +72,6 @@ internal inline fun <reified T> encode(value: T, encodeSettings: EncodeSettings)
         }
     }.value
 }
-
-@PublishedApi
-expect internal fun Any.asNativeMap(): Map<*, *>?
-
-@PublishedApi
-internal fun Map<*, *>.asEncodedObject(): EncodedObject = map { (key, value) ->
-    if (key is String) {
-        key to value
-    } else {
-        throw IllegalArgumentException("Expected a String key but received $key")
-    }
-}.toMap().asEncodedObject()
-
-@PublishedApi
-internal expect fun Map<String, Any?>.asEncodedObject(): EncodedObject
 
 /**
  * An extension which which serializer to use for value. Handy in updating fields by name or path

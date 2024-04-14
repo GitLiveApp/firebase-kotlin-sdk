@@ -4,20 +4,10 @@
 
 package dev.gitlive.firebase.internal
 
-import dev.gitlive.firebase.EncodedObject
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlin.collections.set
-
-@PublishedApi
-internal data class EncodedObjectImpl internal constructor(override val raw: Map<String, Any?>) : EncodedObject, Map<String, Any?> by raw
-
-@PublishedApi
-internal actual fun Map<String, Any?>.asEncodedObject(): EncodedObject = EncodedObjectImpl(this)
-
-@PublishedApi
-internal actual fun Any.asNativeMap(): Map<*, *>? = this as? Map<*, *>
 
 actual fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder = when(descriptor.kind) {
     StructureKind.LIST -> mutableListOf<Any?>()

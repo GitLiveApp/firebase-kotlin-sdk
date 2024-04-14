@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -16,7 +15,6 @@ import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.deleteDoc
 import dev.gitlive.firebase.firestore.externals.doc
-import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.getDoc
 import dev.gitlive.firebase.firestore.externals.getDocs
@@ -30,6 +28,8 @@ import dev.gitlive.firebase.firestore.externals.refEqual
 import dev.gitlive.firebase.firestore.externals.setDoc
 import dev.gitlive.firebase.firestore.externals.setLogLevel
 import dev.gitlive.firebase.firestore.externals.writeBatch
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
@@ -51,6 +51,7 @@ import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
 import dev.gitlive.firebase.firestore.externals.collection as jsCollection
 import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
 import dev.gitlive.firebase.firestore.externals.disableNetwork as jsDisableNetwork
+import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 import dev.gitlive.firebase.firestore.externals.enableNetwork as jsEnableNetwork
 import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
 import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
@@ -131,9 +132,9 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
         documentRef: DocumentReference,
         encodedData: EncodedObject,
         setOptions: SetOptions
-    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.json, setOptions.js) }.let { this }
+    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.js, setOptions.js) }.let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.js) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -177,11 +178,11 @@ internal actual class NativeTransactionWrapper actual internal constructor(actua
         encodedData: EncodedObject,
         setOptions: SetOptions
     ): NativeTransactionWrapper = rethrow {
-        js.set(documentRef.js, encodedData.json, setOptions.js)
+        js.set(documentRef.js, encodedData.js, setOptions.js)
     }
         .let { this }
 
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData.json) }
+    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData.js) }
         .let { this }
 
     actual fun updateEncodedFieldsAndValues(
@@ -245,10 +246,10 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     }
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = rethrow {
-        setDoc(js, encodedData.json, setOptions.js).await()
+        setDoc(js, encodedData.js, setOptions.js).await()
     }
 
-    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData.json).await() }
+    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData.js).await() }
 
     actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
         rethrow {
@@ -398,7 +399,7 @@ internal actual class NativeCollectionReferenceWrapper actual internal construct
     actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
 
     actual suspend fun addEncoded(data: EncodedObject) = rethrow {
-        NativeDocumentReference(addDoc(js, data.json).await())
+        NativeDocumentReference(addDoc(js, data.js).await())
     }
 }
 
