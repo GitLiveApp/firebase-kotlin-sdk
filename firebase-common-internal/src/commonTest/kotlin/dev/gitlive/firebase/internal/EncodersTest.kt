@@ -428,12 +428,12 @@ class EncodersTest {
             testDataClass
         ) { encodeDefaults = false }
 
-        nativeAssertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.raw)
+        nativeAssertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.getRaw())
 
         val testMap = mapOf("one" to 1, "two" to null, "three" to false)
-        assertEquals(testMap, encodeAsObject(testMap).raw)
+        assertEquals(testMap, encodeAsObject(testMap).getRaw())
 
-        assertEquals(emptyMap(), encodeAsObject(TestObject).raw)
+        assertEquals(emptyMap(), encodeAsObject(TestObject).getRaw())
 
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(

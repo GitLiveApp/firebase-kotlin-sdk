@@ -3,7 +3,7 @@ package dev.gitlive.firebase.internal
 import kotlin.js.Json
 import kotlin.js.json
 
-val EncodedObject.js: Json get() = json(*raw.entries.map { (key, value) -> key to value }.toTypedArray())
+val EncodedObject.js: Json get() = json(*getRaw().entries.map { (key, value) -> key to value }.toTypedArray())
 
 @PublishedApi
 internal actual fun Any.asNativeMap(): Map<*, *>? {

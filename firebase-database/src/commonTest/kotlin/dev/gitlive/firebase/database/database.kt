@@ -25,6 +25,7 @@ import kotlin.time.Duration.Companion.minutes
 expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
+expect annotation class IgnoreForAndroidTest()
 
 @IgnoreForAndroidUnitTest
 class FirebaseDatabaseTest {
@@ -197,6 +198,8 @@ class FirebaseDatabaseTest {
         assertFalse(valueEvents.first().exists)
     }
 
+    // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870
+    @IgnoreForAndroidTest
     @Test
     fun testUpdateChildrenOnDisconnect() = runTest {
         setupRealtimeData()
