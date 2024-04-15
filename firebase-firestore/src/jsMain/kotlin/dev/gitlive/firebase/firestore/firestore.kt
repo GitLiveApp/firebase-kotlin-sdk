@@ -105,6 +105,9 @@ actual class FirebaseFirestore(app: JsFirebaseApp) {
         rethrow { clearIndexedDbPersistence(js).await() }
 
     actual fun useEmulator(host: String, port: Int) = rethrow {
+        settings = firestoreSettings(settings) {
+            this.host = "$host:$port"
+        }
         emulatorSettings = EmulatorSettings(host, port)
     }
 

@@ -75,6 +75,7 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
                         else -> throw IllegalArgumentException("Existing settings is not of a valid type")
                     }
                 } ?: kotlin.run {
+                    @Suppress("DEPRECATION")
                     when {
                         isPersistenceEnabled -> LocalCacheSettings.Persistent(cacheSizeBytes)
                         cacheSizeBytes == FirestoreSettings.CACHE_SIZE_UNLIMITED -> LocalCacheSettings.Memory(GarbageCollectorSettings.Eager)
@@ -112,7 +113,6 @@ actual class FirebaseFirestore(val android: com.google.firebase.firestore.Fireba
 
     actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
-        android.firestoreSettings = firestoreSettings {  }
     }
 
     actual suspend fun disableNetwork() =

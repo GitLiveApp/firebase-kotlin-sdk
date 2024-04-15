@@ -102,9 +102,7 @@ class FirebaseFirestoreTest {
             useEmulator(emulatorHost, 8080)
             settings = firestoreSettings(settings) {
                 cacheSettings = memoryCacheSettings {
-                    gcSettings = memoryLruGcSettings {
-                        sizeBytes = 50L*1024L*1024L
-                    }
+                    gcSettings = memoryEagerGcSettings { }
                 }
             }
         }
