@@ -7,7 +7,10 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.externals.getApp
 import dev.gitlive.firebase.firestore.externals.Firestore
+import dev.gitlive.firebase.firestore.externals.MemoryCacheSettings
+import dev.gitlive.firebase.firestore.externals.PersistentCacheSettings
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
 import dev.gitlive.firebase.firestore.externals.addDoc
 import dev.gitlive.firebase.firestore.externals.and
@@ -15,15 +18,16 @@ import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.deleteDoc
 import dev.gitlive.firebase.firestore.externals.doc
-import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
-import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.getDoc
 import dev.gitlive.firebase.firestore.externals.getDocs
-import dev.gitlive.firebase.firestore.externals.getFirestore
 import dev.gitlive.firebase.firestore.externals.initializeFirestore
+import dev.gitlive.firebase.firestore.externals.memoryEagerGarbageCollector
+import dev.gitlive.firebase.firestore.externals.memoryLocalCache
+import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
 import dev.gitlive.firebase.firestore.externals.onSnapshot
 import dev.gitlive.firebase.firestore.externals.or
 import dev.gitlive.firebase.firestore.externals.orderBy
+import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.externals.query
 import dev.gitlive.firebase.firestore.externals.refEqual
 import dev.gitlive.firebase.firestore.externals.setDoc
@@ -35,9 +39,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
-import kotlinx.serialization.Serializable
 import kotlin.js.Json
 import kotlin.js.json
+import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
 import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
 import dev.gitlive.firebase.firestore.externals.DocumentReference as JsDocumentReference
@@ -51,6 +55,7 @@ import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
 import dev.gitlive.firebase.firestore.externals.collection as jsCollection
 import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
 import dev.gitlive.firebase.firestore.externals.disableNetwork as jsDisableNetwork
+import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 import dev.gitlive.firebase.firestore.externals.enableNetwork as jsEnableNetwork
 import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
 import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
@@ -62,27 +67,25 @@ import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
 import dev.gitlive.firebase.firestore.externals.where as jsWhere
 
 actual val Firebase.firestore get() =
-    rethrow { FirebaseFirestore(getFirestore()) }
+    rethrow { FirebaseFirestore(getApp()) }
 
 actual fun Firebase.firestore(app: FirebaseApp) =
-    rethrow { FirebaseFirestore(getFirestore(app.js)) }
+    rethrow { FirebaseFirestore(app.js) }
 
-actual class FirebaseFirestore(jsFirestore: Firestore) {
+actual class FirebaseFirestore(app: JsFirebaseApp) {
 
-    actual data class Settings(
-        actual val sslEnabled: Boolean? = null,
-        actual val host: String? = null,
-        actual val cacheSettings: LocalCacheSettings? = null
-    ) {
-        actual companion object {
-            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+    private data class EmulatorSettings(val host: String, val port: Int)
+
+    actual var settings: FirestoreSettings = FirestoreSettings.BuilderImpl().build()
+    private var emulatorSettings: EmulatorSettings? = null
+
+    val js: Firestore by lazy {
+        initializeFirestore(app, settings.js).also {
+            emulatorSettings?.run {
+                connectFirestoreEmulator(it, host, port)
+            }
         }
     }
-
-    private var lastSettings = Settings()
-
-    var js: Firestore = jsFirestore
-        private set
 
     actual fun collection(collectionPath: String) = rethrow { CollectionReference(NativeCollectionReference(jsCollection(js, collectionPath))) }
 
@@ -101,30 +104,9 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }
 
-    actual fun useEmulator(host: String, port: Int) = rethrow { connectFirestoreEmulator(js, host, port) }
-
-    actual fun setSettings(settings: Settings) {
-        lastSettings = settings
-        if(settings.cacheSettings is LocalCacheSettings.Persistent) enableIndexedDbPersistence(js)
-
-        val jsSettings = json().apply {
-            settings.sslEnabled?.let { set("ssl", it) }
-            settings.host?.let { set("host", it) }
-            when (val cacheSettings = settings.cacheSettings) {
-                is LocalCacheSettings.Persistent -> cacheSettings.sizeBytes
-                is LocalCacheSettings.Memory -> when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
-                    is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> null
-                    is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbageCollectorSettings.sizeBytes
-                }
-                null -> null
-            }?.let { set("cacheSizeBytes", it) }
-        }
-        js = initializeFirestore(js.app, jsSettings)
+    actual fun useEmulator(host: String, port: Int) = rethrow {
+        emulatorSettings = EmulatorSettings(host, port)
     }
-
-    actual fun updateSettings(settings: Settings) = setSettings(
-        Settings(settings.sslEnabled ?: lastSettings.sslEnabled, settings.host ?: lastSettings.host, settings.cacheSettings ?: lastSettings.cacheSettings)
-    )
 
     actual suspend fun disableNetwork() {
         rethrow { jsDisableNetwork(js).await() }
@@ -134,6 +116,63 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
         rethrow { jsEnableNetwork(js).await() }
     }
 }
+
+actual data class FirestoreSettings(
+    actual val sslEnabled: Boolean,
+    actual val host: String,
+    actual val cacheSettings: LocalCacheSettings,
+) {
+
+    actual companion object {}
+
+    actual interface Builder {
+        actual var sslEnabled: Boolean
+        actual var host: String
+        actual var cacheSettings: LocalCacheSettings
+
+        actual fun build(): FirestoreSettings
+    }
+
+    internal class BuilderImpl : Builder {
+        override var sslEnabled: Boolean = true
+        override var host: String = DEFAULT_HOST
+        override var cacheSettings: LocalCacheSettings = LocalCacheSettings.Persistent(CACHE_SIZE_UNLIMITED)
+
+        override fun build() = FirestoreSettings(sslEnabled, host, cacheSettings)
+    }
+
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    val js: Json get() = json().apply {
+        set("ssl", sslEnabled)
+        set("host", host)
+        set("localCache",
+        when (cacheSettings) {
+            is LocalCacheSettings.Persistent -> persistentLocalCache(
+                json(
+                    "cacheSizeBytes" to cacheSettings.sizeBytes
+                ).asDynamic() as PersistentCacheSettings
+            )
+            is LocalCacheSettings.Memory -> {
+                val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    is GarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
+                    is GarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
+                }
+                memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
+            }
+        })
+    }
+}
+
+actual fun firestoreSettings(
+    settings: FirestoreSettings?,
+    builder: FirestoreSettings.Builder.() -> Unit
+): FirestoreSettings = FirestoreSettings.BuilderImpl().apply {
+    settings?.let {
+        sslEnabled = it.sslEnabled
+        host = it.host
+        cacheSettings = it.cacheSettings
+    }
+}.apply(builder).build()
 
 internal val SetOptions.js: Json get() = when (this) {
     is SetOptions.Merge -> json("merge" to true)

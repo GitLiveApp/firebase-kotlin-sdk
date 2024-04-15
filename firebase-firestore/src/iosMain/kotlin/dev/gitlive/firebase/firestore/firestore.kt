@@ -20,6 +20,7 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
 import platform.Foundation.numberWithLong
+import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
 
 actual val Firebase.firestore get() =
@@ -30,11 +31,11 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFir
 )
 
 val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
-    is LocalCacheSettings.Persistent -> sizeBytes?.let { FIRPersistentCacheSettings(NSNumber.numberWithLong(it)) } ?: FIRPersistentCacheSettings()
+    is LocalCacheSettings.Persistent -> FIRPersistentCacheSettings(NSNumber.numberWithLong(sizeBytes))
     is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
         when (garbaseCollectorSettings) {
-            is LocalCacheSettings.Memory.GarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
-            is LocalCacheSettings.Memory.GarbageCollectorSettings.LRUGC -> garbaseCollectorSettings.sizeBytes?.let { FIRMemoryLRUGCSettings(NSNumber.numberWithLong(it)) } ?: FIRMemoryLRUGCSettings()
+            is GarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
+            is GarbageCollectorSettings.LRUGC -> FIRMemoryLRUGCSettings(NSNumber.numberWithLong(garbaseCollectorSettings.sizeBytes))
         }
     )
 }
@@ -42,16 +43,11 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
 @Suppress("UNCHECKED_CAST")
 actual class FirebaseFirestore(val ios: FIRFirestore) {
 
-    actual data class Settings(
-        actual val sslEnabled: Boolean? = null,
-        actual val host: String? = null,
-        actual val cacheSettings: LocalCacheSettings? = null,
-        val dispatchQueue: dispatch_queue_t = null
-    ) {
-        actual companion object {
-            actual fun create(sslEnabled: Boolean?, host: String?, cacheSettings: LocalCacheSettings?) = Settings(sslEnabled, host, cacheSettings)
+    actual var settings: FirestoreSettings = FirestoreSettings.BuilderImpl().build()
+        set(value) {
+            field = value
+            ios.settings = value.ios
         }
-    }
 
     actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReference(ios.collectionWithPath(collectionPath)))
 
@@ -78,21 +74,6 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         }
     }
 
-    actual fun setSettings(settings: Settings) {
-        ios.settings = FIRFirestoreSettings().applySettings(settings)
-    }
-
-    actual fun updateSettings(settings: Settings) {
-        ios.settings = ios.settings.applySettings(settings)
-    }
-
-    private fun FIRFirestoreSettings.applySettings(settings: Settings): FIRFirestoreSettings = apply {
-        settings.cacheSettings?.let { cacheSettings = it.ios }
-        settings.sslEnabled?.let { sslEnabled = it }
-        settings.host?.let { host = it }
-        settings.dispatchQueue?.let { dispatchQueue = it }
-    }
-
     actual suspend fun disableNetwork() {
         await { ios.disableNetworkWithCompletion(it) }
     }
@@ -101,6 +82,53 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
         await { ios.enableNetworkWithCompletion(it) }
     }
 }
+
+actual data class FirestoreSettings(
+    actual val sslEnabled: Boolean,
+    actual val host: String,
+    actual val cacheSettings: LocalCacheSettings,
+    val dispatchQueue: dispatch_queue_t,
+) {
+
+    actual companion object {}
+
+    actual interface Builder {
+        actual var sslEnabled: Boolean
+        actual var host: String
+        actual var cacheSettings: LocalCacheSettings
+        var dispatchQueue: dispatch_queue_t
+
+        actual fun build(): FirestoreSettings
+    }
+
+    internal class BuilderImpl : Builder {
+        override var sslEnabled: Boolean = true
+        override var host: String = DEFAULT_HOST
+        override var cacheSettings: LocalCacheSettings = LocalCacheSettings.Persistent(CACHE_SIZE_UNLIMITED)
+        override var dispatchQueue: dispatch_queue_t = dispatch_get_main_queue()
+
+        override fun build() = FirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
+    }
+
+    val ios: FIRFirestoreSettings get() = FIRFirestoreSettings().apply {
+        cacheSettings = this@FirestoreSettings.cacheSettings.ios
+        sslEnabled = this@FirestoreSettings.sslEnabled
+        host = this@FirestoreSettings.host
+        dispatchQueue = this@FirestoreSettings.dispatchQueue
+    }
+}
+
+actual fun firestoreSettings(
+    settings: FirestoreSettings?,
+    builder: FirestoreSettings.Builder.() -> Unit
+): FirestoreSettings = FirestoreSettings.BuilderImpl().apply {
+    settings?.let {
+        sslEnabled = it.sslEnabled
+        host = it.host
+        cacheSettings = it.cacheSettings
+        dispatchQueue = it.dispatchQueue
+    }
+}.apply(builder).build()
 
 @Suppress("UNCHECKED_CAST")
 @PublishedApi

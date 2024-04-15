@@ -71,16 +71,6 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
         ) = instances.getOrPut(android) { dev.gitlive.firebase.database.FirebaseDatabase(android) }
     }
 
-    actual data class Settings(
-        actual val persistenceEnabled: Boolean = false,
-        actual val persistenceCacheSizeBytes: Long? = null,
-    ) {
-
-        actual companion object {
-            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
-        }
-    }
-
     private var persistenceEnabled = true
 
     actual fun reference(path: String) =
@@ -89,10 +79,13 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
     actual fun reference() =
         DatabaseReference(NativeDatabaseReference(android.reference, persistenceEnabled))
 
-    actual fun setSettings(settings: Settings) {
-        android.setPersistenceEnabled(settings.persistenceEnabled)
-        persistenceEnabled = settings.persistenceEnabled
-        settings.persistenceCacheSizeBytes?.let { android.setPersistenceCacheSizeBytes(it) }
+    actual fun setPersistenceEnabled(enabled: Boolean) {
+        android.setPersistenceEnabled(enabled)
+        persistenceEnabled = enabled
+    }
+
+    actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
+        android.setPersistenceCacheSizeBytes(cacheSizeInBytes)
     }
 
     actual fun setLoggingEnabled(enabled: Boolean) =

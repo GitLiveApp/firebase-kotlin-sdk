@@ -57,27 +57,22 @@ actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = 
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
-    actual data class Settings(
-        actual val persistenceEnabled: Boolean = false,
-        actual val persistenceCacheSizeBytes: Long? = null,
-        val callbackQueue: dispatch_queue_t = null
-    ) {
-
-        actual companion object {
-            actual fun createSettings(persistenceEnabled: Boolean, persistenceCacheSizeBytes:  Long?) = Settings(persistenceEnabled, persistenceCacheSizeBytes)
-        }
-    }
-
     actual fun reference(path: String) =
         DatabaseReference(NativeDatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled))
 
     actual fun reference() =
         DatabaseReference(NativeDatabaseReference(ios.reference(), ios.persistenceEnabled))
 
-    actual fun setSettings(settings: Settings) {
-        ios.persistenceEnabled = settings.persistenceEnabled
-        settings.persistenceCacheSizeBytes?.let { ios.setPersistenceCacheSizeBytes(it.toULong()) }
-        settings.callbackQueue?.let { ios.callbackQueue = it }
+    actual fun setPersistenceEnabled(enabled: Boolean) {
+        ios.persistenceEnabled = enabled
+    }
+
+    actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
+        ios.setPersistenceCacheSizeBytes(cacheSizeInBytes.toULong())
+    }
+
+    fun setCallbackQueue(callbackQueue: dispatch_queue_t) {
+        ios.callbackQueue = callbackQueue
     }
 
     actual fun setLoggingEnabled(enabled: Boolean) =

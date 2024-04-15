@@ -100,7 +100,13 @@ class FirebaseFirestoreTest {
 
         firestore = Firebase.firestore(app).apply {
             useEmulator(emulatorHost, 8080)
-            setSettings(FirebaseFirestore.Settings.create(cacheSettings = LocalCacheSettings.Memory(LocalCacheSettings.Memory.GarbageCollectorSettings.Eager)))
+            settings = firestoreSettings(settings) {
+                cacheSettings = memoryCacheSettings {
+                    gcSettings = memoryLruGcSettings {
+                        sizeBytes = 50L*1024L*1024L
+                    }
+                }
+            }
         }
     }
 
