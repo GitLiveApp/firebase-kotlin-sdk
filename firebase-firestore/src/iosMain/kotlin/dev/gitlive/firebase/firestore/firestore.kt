@@ -68,8 +68,9 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
 
     actual fun useEmulator(host: String, port: Int) {
         ios.useEmulatorWithHost(host, port.toLong())
-        ios.settings = ios.settings.apply {
-            cacheSettings = FIRMemoryCacheSettings()
+        settings = firestoreSettings(settings) {
+            this.host = "$host:$port"
+            cacheSettings = memoryCacheSettings {  }
             sslEnabled = false
         }
     }
