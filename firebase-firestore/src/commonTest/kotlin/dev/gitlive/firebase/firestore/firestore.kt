@@ -28,6 +28,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -717,6 +718,19 @@ class FirebaseFirestoreTest {
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
+    }
+
+    @Test
+    fun testUpdateSettings() = runTest {
+        firestore.settings = firestoreSettings(firestore.settings) {
+            cacheSettings = persistentCacheSettings {  }
+        }
+        firestore.enableNetwork()
+        assertFailsWith<IllegalStateException> {
+            firestore.settings = firestoreSettings(firestore.settings) {
+                cacheSettings = memoryCacheSettings { }
+            }
+        }
     }
 
     @Serializable

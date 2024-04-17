@@ -9,13 +9,9 @@ import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
 import dev.gitlive.firebase.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
@@ -34,40 +30,44 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
     is LocalCacheSettings.Persistent -> FIRPersistentCacheSettings(NSNumber.numberWithLong(sizeBytes))
     is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
         when (garbaseCollectorSettings) {
-            is GarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
-            is GarbageCollectorSettings.LRUGC -> FIRMemoryLRUGCSettings(NSNumber.numberWithLong(garbaseCollectorSettings.sizeBytes))
+            is MemoryGarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
+            is MemoryGarbageCollectorSettings.LRUGC -> FIRMemoryLRUGCSettings(NSNumber.numberWithLong(garbaseCollectorSettings.sizeBytes))
         }
     )
 }
 
-@Suppress("UNCHECKED_CAST")
-actual class FirebaseFirestore(val ios: FIRFirestore) {
+actual typealias NativeFirebaseFirestore = FIRFirestore
 
-    actual var settings: FirestoreSettings = FirestoreSettings.BuilderImpl().build()
+@Suppress("UNCHECKED_CAST")
+actual internal class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
+
+    actual var settings: FirebaseFirestoreSettings = firestoreSettings { }.also {
+        native.settings = it.ios
+    }
         set(value) {
             field = value
-            ios.settings = value.ios
+            native.settings = value.ios
         }
 
-    actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReference(ios.collectionWithPath(collectionPath)))
+    actual fun collection(collectionPath: String) = NativeCollectionReference(native.collectionWithPath(collectionPath))
 
-    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId).native)
+    actual fun collectionGroup(collectionId: String) = native.collectionGroupWithID(collectionId).native
 
-    actual fun document(documentPath: String) = DocumentReference(NativeDocumentReference(ios.documentWithPath(documentPath)))
+    actual fun document(documentPath: String) = NativeDocumentReference(native.documentWithPath(documentPath))
 
-    actual fun batch() = WriteBatch(NativeWriteBatch(ios.batch()))
+    actual fun batch() = NativeWriteBatch(native.batch())
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =
         FIRFirestore.enableLogging(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, _ -> runBlocking { Transaction(NativeTransaction(transaction!!)).func() } }, it) } as T
+    actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
+        awaitResult<Any?> { native.runTransactionWithBlock({ transaction, _ -> runBlocking { NativeTransaction(transaction!!).func() } }, it) } as T
 
     actual suspend fun clearPersistence() =
-        await { ios.clearPersistenceWithCompletion(it) }
+        await { native.clearPersistenceWithCompletion(it) }
 
     actual fun useEmulator(host: String, port: Int) {
-        ios.useEmulatorWithHost(host, port.toLong())
+        native.useEmulatorWithHost(host, port.toLong())
         settings = firestoreSettings(settings) {
             this.host = "$host:$port"
             cacheSettings = memoryCacheSettings {  }
@@ -76,53 +76,66 @@ actual class FirebaseFirestore(val ios: FIRFirestore) {
     }
 
     actual suspend fun disableNetwork() {
-        await { ios.disableNetworkWithCompletion(it) }
+        await { native.disableNetworkWithCompletion(it) }
     }
 
     actual suspend fun enableNetwork() {
-        await { ios.enableNetworkWithCompletion(it) }
+        await { native.enableNetworkWithCompletion(it) }
     }
 }
 
-actual data class FirestoreSettings(
+val FirebaseFirestore.ios get() = native
+
+actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
     actual val host: String,
     actual val cacheSettings: LocalCacheSettings,
     val dispatchQueue: dispatch_queue_t,
 ) {
 
-    actual companion object {}
-
-    actual interface Builder {
-        actual var sslEnabled: Boolean
-        actual var host: String
-        actual var cacheSettings: LocalCacheSettings
-        var dispatchQueue: dispatch_queue_t
-
-        actual fun build(): FirestoreSettings
+    actual companion object {
+        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+        internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
+        internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
+        internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 100 * 1024 * 1024
     }
 
-    internal class BuilderImpl : Builder {
-        override var sslEnabled: Boolean = true
-        override var host: String = DEFAULT_HOST
-        override var cacheSettings: LocalCacheSettings = LocalCacheSettings.Persistent(CACHE_SIZE_UNLIMITED)
-        override var dispatchQueue: dispatch_queue_t = dispatch_get_main_queue()
+    actual class Builder(
+        actual var sslEnabled: Boolean,
+        actual var host: String,
+        actual var cacheSettings: LocalCacheSettings,
+        var dispatchQueue: dispatch_queue_t,
+    ) {
 
-        override fun build() = FirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
+        actual constructor() : this(
+            true,
+            DEFAULT_HOST,
+            persistentCacheSettings {  },
+            dispatch_get_main_queue(),
+        )
+
+        actual constructor(settings: FirebaseFirestoreSettings) : this(
+            settings.sslEnabled,
+            settings.host,
+            settings.cacheSettings,
+            settings.dispatchQueue,
+        )
+
+        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
     }
 
     val ios: FIRFirestoreSettings get() = FIRFirestoreSettings().apply {
-        cacheSettings = this@FirestoreSettings.cacheSettings.ios
-        sslEnabled = this@FirestoreSettings.sslEnabled
-        host = this@FirestoreSettings.host
-        dispatchQueue = this@FirestoreSettings.dispatchQueue
+        cacheSettings = this@FirebaseFirestoreSettings.cacheSettings.ios
+        sslEnabled = this@FirebaseFirestoreSettings.sslEnabled
+        host = this@FirebaseFirestoreSettings.host
+        dispatchQueue = this@FirebaseFirestoreSettings.dispatchQueue
     }
 }
 
 actual fun firestoreSettings(
-    settings: FirestoreSettings?,
-    builder: FirestoreSettings.Builder.() -> Unit
-): FirestoreSettings = FirestoreSettings.BuilderImpl().apply {
+    settings: FirebaseFirestoreSettings?,
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
     settings?.let {
         sslEnabled = it.sslEnabled
         host = it.host

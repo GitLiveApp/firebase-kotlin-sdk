@@ -6,6 +6,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
@@ -18,35 +19,123 @@ expect val Firebase.firestore: FirebaseFirestore
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
-expect class FirebaseFirestore {
+expect class NativeFirebaseFirestore
 
-    var settings: FirestoreSettings
+internal expect class NativeFirebaseFirestoreWrapper internal constructor(native: NativeFirebaseFirestore) {
+    val native: NativeFirebaseFirestore
+    var settings: FirebaseFirestoreSettings
 
-    fun collection(collectionPath: String): CollectionReference
-    fun collectionGroup(collectionId: String): Query
-    fun document(documentPath: String): DocumentReference
-    fun batch(): WriteBatch
+    fun collection(collectionPath: String): NativeCollectionReference
+    fun collectionGroup(collectionId: String): NativeQuery
+    fun document(documentPath: String): NativeDocumentReference
+    fun batch(): NativeWriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
-    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+    suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T
     fun useEmulator(host: String, port: Int)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }
 
-val FirestoreSettings.Companion.CACHE_SIZE_UNLIMITED get() = -1L
-val FirestoreSettings.Companion.DEFAULT_HOST get() = "firestore.googleapis.com"
+class FirebaseFirestore internal constructor(private val wrapper: NativeFirebaseFirestoreWrapper) {
 
-expect class FirestoreSettings {
+    constructor(native: NativeFirebaseFirestore) : this(NativeFirebaseFirestoreWrapper(native))
 
-    companion object {}
+    val native = wrapper.native
+    var settings: FirebaseFirestoreSettings
+        get() = wrapper.settings
+        set(value) {
+            if (isConfigured.compareAndSet(expect = false, update = false) || value == wrapper.settings) {
+                wrapper.settings = value
+            } else {
+                throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
+            }
+        }
 
-    interface Builder {
+    // Should probably use atomic from atomicfu
+    private val isConfigured = MutableStateFlow(false)
+
+    fun collection(collectionPath: String): CollectionReference = ensureConfigured {
+        CollectionReference(wrapper.collection(collectionPath))
+    }
+    fun collectionGroup(collectionId: String): Query = ensureConfigured {
+        Query(wrapper.collectionGroup(collectionId))
+    }
+    fun document(documentPath: String): DocumentReference = ensureConfigured {
+        DocumentReference(wrapper.document(documentPath))
+    }
+    fun batch(): WriteBatch = ensureConfigured {
+        WriteBatch(wrapper.batch())
+    }
+    fun setLoggingEnabled(loggingEnabled: Boolean) = ensureConfigured {
+        wrapper.setLoggingEnabled(loggingEnabled)
+    }
+    suspend fun clearPersistence() = ensureConfiguredSuspended {
+        wrapper.clearPersistence()
+    }
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = ensureConfiguredSuspended {
+        wrapper.runTransaction {  func(Transaction(this)) }
+    }
+    fun useEmulator(host: String, port: Int) = wrapper.useEmulator(host, port)
+    @Deprecated("Use settings instead", replaceWith = ReplaceWith("settings = firestoreSettings{}"))
+    fun setSettings(
+        persistenceEnabled: Boolean? = null,
+        sslEnabled: Boolean? = null,
+        host: String? = null,
+        cacheSizeBytes: Long? = null,
+    ) {
+        settings = firestoreSettings {
+            this.sslEnabled = sslEnabled ?: true
+            this.host = host ?: FirebaseFirestoreSettings.DEFAULT_HOST
+            this.cacheSettings = if (persistenceEnabled != false) {
+                LocalCacheSettings.Persistent(cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            } else {
+                val cacheSize = cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED
+                val garbageCollectionSettings = if (cacheSize == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED) {
+                    MemoryGarbageCollectorSettings.Eager
+                } else {
+                    MemoryGarbageCollectorSettings.LRUGC(cacheSize)
+                }
+                LocalCacheSettings.Memory(garbageCollectionSettings)
+            }
+        }
+    }
+    suspend fun disableNetwork() = ensureConfiguredSuspended {
+        wrapper.disableNetwork()
+    }
+    suspend fun enableNetwork() = ensureConfiguredSuspended {
+        wrapper.enableNetwork()
+    }
+
+    private fun <T> ensureConfigured(action: () -> T): T {
+        isConfigured.compareAndSet(expect = false, update = true)
+        return action()
+    }
+
+    private suspend fun <T> ensureConfiguredSuspended(action: suspend () -> T): T {
+        isConfigured.compareAndSet(expect = false, update = true)
+        return action()
+    }
+}
+
+expect class FirebaseFirestoreSettings {
+
+    companion object {
+        val CACHE_SIZE_UNLIMITED: Long
+        internal val DEFAULT_HOST: String
+        internal val MINIMUM_CACHE_BYTES: Long
+        internal val DEFAULT_CACHE_SIZE_BYTES: Long
+    }
+
+    class Builder constructor() {
+
+        constructor(settings: FirebaseFirestoreSettings)
+
         var sslEnabled: Boolean
         var host: String
         var cacheSettings: LocalCacheSettings
 
-        fun build(): FirestoreSettings
+        fun build(): FirebaseFirestoreSettings
     }
 
     val sslEnabled: Boolean
@@ -54,31 +143,7 @@ expect class FirestoreSettings {
     val cacheSettings: LocalCacheSettings
 }
 
-expect fun firestoreSettings(settings: FirestoreSettings? = null, builder: FirestoreSettings.Builder.() -> Unit): FirestoreSettings
-
-@Deprecated("Use dev.gitlive.firebase.firestore instead", replaceWith = ReplaceWith("setSettings(FirebaseFirestore.Settings.create())"))
-fun FirebaseFirestore.setSettings(
-    persistenceEnabled: Boolean? = null,
-    sslEnabled: Boolean? = null,
-    host: String? = null,
-    cacheSizeBytes: Long? = null,
-) {
-    settings = firestoreSettings {
-        this.sslEnabled = sslEnabled ?: true
-        this.host = host ?: FirestoreSettings.DEFAULT_HOST
-        this.cacheSettings = if (persistenceEnabled != false) {
-            LocalCacheSettings.Persistent(cacheSizeBytes ?: FirestoreSettings.CACHE_SIZE_UNLIMITED)
-        } else {
-            val cacheSize = cacheSizeBytes ?: FirestoreSettings.CACHE_SIZE_UNLIMITED
-            val garbageCollectionSettings = if (cacheSize == FirestoreSettings.CACHE_SIZE_UNLIMITED) {
-                GarbageCollectorSettings.Eager
-            } else {
-                GarbageCollectorSettings.LRUGC(cacheSize)
-            }
-            LocalCacheSettings.Memory(garbageCollectionSettings)
-        }
-    }
-}
+expect fun firestoreSettings(settings: FirebaseFirestoreSettings? = null, builder: FirebaseFirestoreSettings.Builder.() -> Unit): FirebaseFirestoreSettings
 
 @PublishedApi
 internal sealed class SetOptions {

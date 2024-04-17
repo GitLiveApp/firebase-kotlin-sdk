@@ -1,90 +1,69 @@
 package dev.gitlive.firebase.firestore
 
-sealed class LocalCacheSettings {
+sealed interface LocalCacheSettings {
 
-    internal companion object {
-        // Firestore cache defaults to 100MB
-        const val DEFAULT_CACHE_SIZE = 100L*1024L*1024L
-    }
-
-    data class Persistent(val sizeBytes: Long) : LocalCacheSettings() {
+    data class Persistent internal constructor(val sizeBytes: Long) : LocalCacheSettings {
 
         companion object {
-            fun newBuilder(): Builder = BuilderImpl()
+            fun newBuilder(): Builder = Builder()
         }
 
-        interface Builder {
-            var sizeBytes: Long
-            fun build(): Persistent
-        }
-
-        private class BuilderImpl(
-            override var sizeBytes: Long = DEFAULT_CACHE_SIZE
-        ) : Builder {
-            override fun build(): Persistent = Persistent(sizeBytes)
+        class Builder internal constructor() {
+            var sizeBytes: Long = FirebaseFirestoreSettings.DEFAULT_CACHE_SIZE_BYTES
+            fun build(): Persistent = Persistent(sizeBytes)
         }
     }
-    data class Memory(val garbaseCollectorSettings: GarbageCollectorSettings) : LocalCacheSettings() {
+    data class Memory internal constructor(val garbaseCollectorSettings: MemoryGarbageCollectorSettings) : LocalCacheSettings {
 
         companion object {
-            fun newBuilder(): Builder = BuilderImpl()
+            fun newBuilder(): Builder = Builder()
         }
 
-        interface Builder {
+        class Builder internal constructor() {
 
-            var gcSettings: GarbageCollectorSettings
+            var gcSettings: MemoryGarbageCollectorSettings = MemoryGarbageCollectorSettings.Eager.newBuilder().build()
 
-            fun build(): Memory
-        }
-
-        private class BuilderImpl(
-            override var gcSettings: GarbageCollectorSettings = GarbageCollectorSettings.Eager
-        ) : Builder {
-            override fun build(): Memory = Memory(gcSettings)
+            fun build(): Memory = Memory(gcSettings)
         }
     }
 }
 
-sealed class GarbageCollectorSettings {
-    data object Eager : GarbageCollectorSettings() {
+typealias PersistentCacheSettings = LocalCacheSettings.Persistent
+typealias MemoryCacheSettings = LocalCacheSettings.Memory
 
-        fun newBuilder(): Builder = BuilderImpl()
+sealed interface MemoryGarbageCollectorSettings {
+    data object Eager : MemoryGarbageCollectorSettings {
 
-        interface Builder {
-            fun build(): Eager
-        }
+        fun newBuilder(): Builder = Builder()
 
-        private class BuilderImpl : Builder {
-            override fun build(): Eager = Eager
+        class Builder internal constructor() {
+            fun build(): Eager = Eager
         }
     }
-    data class LRUGC(val sizeBytes: Long) : GarbageCollectorSettings() {
+    data class LRUGC internal constructor(val sizeBytes: Long) : MemoryGarbageCollectorSettings {
 
         companion object {
-            fun newBuilder(): Builder = BuilderImpl()
+            fun newBuilder(): Builder = Builder()
         }
 
-        interface Builder {
-            var sizeBytes: Long
-            fun build(): LRUGC
-        }
-
-        private class BuilderImpl(
-            override var sizeBytes: Long = LocalCacheSettings.DEFAULT_CACHE_SIZE
-        ) : Builder {
-            override fun build(): LRUGC = LRUGC(sizeBytes)
+        class Builder internal constructor() {
+            var sizeBytes: Long = FirebaseFirestoreSettings.DEFAULT_CACHE_SIZE_BYTES
+            fun build(): LRUGC = LRUGC(sizeBytes)
         }
     }
 }
+
+typealias MemoryEagerGcSettings = MemoryGarbageCollectorSettings.Eager
+typealias MemoryLruGcSettings = MemoryGarbageCollectorSettings.LRUGC
 
 fun memoryCacheSettings(builder: LocalCacheSettings.Memory.Builder.() -> Unit): LocalCacheSettings.Memory =
     LocalCacheSettings.Memory.newBuilder().apply(builder).build()
 
-fun memoryEagerGcSettings(builder: GarbageCollectorSettings.Eager.Builder.() -> Unit) =
-    GarbageCollectorSettings.Eager.newBuilder().apply(builder).build()
+fun memoryEagerGcSettings(builder: MemoryGarbageCollectorSettings.Eager.Builder.() -> Unit) =
+    MemoryGarbageCollectorSettings.Eager.newBuilder().apply(builder).build()
 
-fun memoryLruGcSettings(builder: GarbageCollectorSettings.LRUGC.Builder.() -> Unit) =
-    GarbageCollectorSettings.LRUGC.newBuilder().apply(builder).build()
+fun memoryLruGcSettings(builder: MemoryGarbageCollectorSettings.LRUGC.Builder.() -> Unit) =
+    MemoryGarbageCollectorSettings.LRUGC.newBuilder().apply(builder).build()
 
 fun persistentCacheSettings(builder: LocalCacheSettings.Persistent.Builder.() -> Unit) =
     LocalCacheSettings.Persistent.newBuilder().apply(builder).build()

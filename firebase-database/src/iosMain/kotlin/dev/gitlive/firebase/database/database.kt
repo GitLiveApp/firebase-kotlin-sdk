@@ -71,10 +71,6 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
         ios.setPersistenceCacheSizeBytes(cacheSizeInBytes.toULong())
     }
 
-    fun setCallbackQueue(callbackQueue: dispatch_queue_t) {
-        ios.callbackQueue = callbackQueue
-    }
-
     actual fun setLoggingEnabled(enabled: Boolean) =
         FIRDatabase.setLoggingEnabled(enabled)
 
