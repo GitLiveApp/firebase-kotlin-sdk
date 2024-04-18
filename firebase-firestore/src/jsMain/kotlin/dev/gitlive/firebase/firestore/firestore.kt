@@ -7,28 +7,8 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.firestore.externals.Firestore
-import dev.gitlive.firebase.firestore.externals.QueryConstraint
-import dev.gitlive.firebase.firestore.externals.addDoc
-import dev.gitlive.firebase.firestore.externals.and
-import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
-import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
-import dev.gitlive.firebase.firestore.externals.deleteDoc
-import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.*
 import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
-import dev.gitlive.firebase.firestore.externals.enableIndexedDbPersistence
-import dev.gitlive.firebase.firestore.externals.getDoc
-import dev.gitlive.firebase.firestore.externals.getDocs
-import dev.gitlive.firebase.firestore.externals.getFirestore
-import dev.gitlive.firebase.firestore.externals.initializeFirestore
-import dev.gitlive.firebase.firestore.externals.onSnapshot
-import dev.gitlive.firebase.firestore.externals.or
-import dev.gitlive.firebase.firestore.externals.orderBy
-import dev.gitlive.firebase.firestore.externals.query
-import dev.gitlive.firebase.firestore.externals.refEqual
-import dev.gitlive.firebase.firestore.externals.setDoc
-import dev.gitlive.firebase.firestore.externals.setLogLevel
-import dev.gitlive.firebase.firestore.externals.writeBatch
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
@@ -218,7 +198,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
 
-    actual suspend fun get() = rethrow { NativeDocumentSnapshot( getDoc(js).await()) }
+    actual suspend fun get(source: Source) = rethrow { NativeDocumentSnapshot( js.get(source).await()) }
 
     actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
 
@@ -276,7 +256,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
     open val js: JsQuery = nativeQuery.js
 
-    actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
+    actual suspend fun get(source: Source) =  rethrow { QuerySnapshot(js.get(source).await()) }
 
     actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
@@ -543,3 +523,15 @@ fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
 fun mapOf(jsObject: dynamic): Map<String, Any?> =
     entriesOf(jsObject).toMap()
+
+private fun NativeDocumentReferenceType.get(source: Source) = when (source) {
+    Source.DEFAULT -> getDoc(this)
+    Source.CACHE -> getDocFromCache(this)
+    Source.SERVER -> getDocFromServer(this)
+}
+
+private fun JsQuery.get(source: Source) = when (source) {
+    Source.DEFAULT -> getDocs(this)
+    Source.CACHE -> getDocsFromCache(this)
+    Source.SERVER -> getDocsFromServer(this)
+}

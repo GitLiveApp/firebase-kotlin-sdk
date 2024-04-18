@@ -8,6 +8,7 @@ package dev.gitlive.firebase.firestore
 import com.google.firebase.firestore.MetadataChanges
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.firestore.Source.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -171,8 +172,8 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual fun collection(collectionPath: String) = NativeCollectionReference(android.collection(collectionPath))
 
-    actual suspend fun get() =
-        NativeDocumentSnapshot(android.get().await())
+    actual suspend fun get(source: Source) =
+        NativeDocumentSnapshot(android.get(source.toAndroidSource()).await())
 
     actual suspend fun setEncoded(encodedData: Any, setOptions: SetOptions) {
         val task = (setOptions.android?.let {
@@ -230,7 +231,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
     open val android = nativeQuery.android
 
-    actual suspend fun get() = QuerySnapshot(android.get().await())
+    actual suspend fun get(source: Source) = QuerySnapshot(android.get(source.toAndroidSource()).await())
 
     actual fun limit(limit: Number) = Query(NativeQuery(android.limit(limit.toLong())))
 
@@ -428,3 +429,11 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 actual typealias EncodedFieldPath = com.google.firebase.firestore.FieldPath
+
+internal typealias NativeSource = com.google.firebase.firestore.Source
+
+private fun Source.toAndroidSource() = when(this) {
+    CACHE -> NativeSource.CACHE
+    SERVER -> NativeSource.SERVER
+    DEFAULT -> NativeSource.DEFAULT
+}
