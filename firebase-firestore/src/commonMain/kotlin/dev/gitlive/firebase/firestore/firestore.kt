@@ -44,11 +44,7 @@ class FirebaseFirestore internal constructor(private val wrapper: NativeFirebase
     var settings: FirebaseFirestoreSettings
         get() = wrapper.settings
         set(value) {
-            if (isConfigured.compareAndSet(expect = false, update = false) || value == wrapper.settings) {
-                wrapper.settings = value
-            } else {
-                throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
-            }
+            wrapper.settings = value
         }
 
     fun collection(collectionPath: String): CollectionReference = CollectionReference(wrapper.collection(collectionPath))
