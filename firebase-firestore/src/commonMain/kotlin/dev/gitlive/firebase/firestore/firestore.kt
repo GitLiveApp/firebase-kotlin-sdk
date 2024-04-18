@@ -208,7 +208,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
     fun limit(limit: Number): Query
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
-    suspend fun get(): QuerySnapshot
+    suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot
 
     internal fun where(filter: Filter): Query
 
@@ -404,7 +404,7 @@ internal expect class NativeDocumentReference(nativeValue: NativeDocumentReferen
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<NativeDocumentSnapshot>
 
     fun collection(collectionPath: String): NativeCollectionReference
-    suspend fun get(): NativeDocumentSnapshot
+    suspend fun get(source: Source = Source.DEFAULT): NativeDocumentSnapshot
     suspend fun setEncoded(encodedData: Any, setOptions: SetOptions)
     suspend fun updateEncoded(encodedData: Any)
     suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>)
@@ -425,7 +425,7 @@ data class DocumentReference internal constructor(@PublishedApi internal val nat
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
 
     fun collection(collectionPath: String): CollectionReference = CollectionReference(native.collection(collectionPath))
-    suspend fun get(): DocumentSnapshot = DocumentSnapshot(native.get())
+    suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(native.get(source))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(data, merge) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T> set(data: T, encodeDefaults: Boolean, merge: Boolean = false) = set(data, merge) {
@@ -630,3 +630,9 @@ expect class FieldPath(vararg fieldNames: String) {
 }
 
 expect class EncodedFieldPath
+
+enum class Source {
+    CACHE,
+    SERVER,
+    DEFAULT
+}

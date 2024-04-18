@@ -8,7 +8,6 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.externals.getApp
-import dev.gitlive.firebase.firestore.externals.Firestore
 import dev.gitlive.firebase.firestore.externals.MemoryCacheSettings
 import dev.gitlive.firebase.firestore.externals.PersistentCacheSettings
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
@@ -19,7 +18,11 @@ import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.deleteDoc
 import dev.gitlive.firebase.firestore.externals.doc
 import dev.gitlive.firebase.firestore.externals.getDoc
+import dev.gitlive.firebase.firestore.externals.getDocFromCache
+import dev.gitlive.firebase.firestore.externals.getDocFromServer
 import dev.gitlive.firebase.firestore.externals.getDocs
+import dev.gitlive.firebase.firestore.externals.getDocsFromCache
+import dev.gitlive.firebase.firestore.externals.getDocsFromServer
 import dev.gitlive.firebase.firestore.externals.initializeFirestore
 import dev.gitlive.firebase.firestore.externals.memoryEagerGarbageCollector
 import dev.gitlive.firebase.firestore.externals.memoryLocalCache
@@ -41,7 +44,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.promise
 import kotlin.js.Json
 import kotlin.js.json
-import kotlin.math.acos
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
@@ -310,7 +312,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
 
-    actual suspend fun get() = rethrow { NativeDocumentSnapshot( getDoc(js).await()) }
+    actual suspend fun get(source: Source) = rethrow { NativeDocumentSnapshot( js.get(source).await()) }
 
     actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
 
@@ -368,7 +370,7 @@ actual open class Query internal actual constructor(nativeQuery: NativeQuery) {
 
     open val js: JsQuery = nativeQuery.js
 
-    actual suspend fun get() =  rethrow { QuerySnapshot(getDocs(js).await()) }
+    actual suspend fun get(source: Source) =  rethrow { QuerySnapshot(js.get(source).await()) }
 
     actual fun limit(limit: Number) = Query(query(js, jsLimit(limit)))
 
@@ -635,3 +637,15 @@ fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
 fun mapOf(jsObject: dynamic): Map<String, Any?> =
     entriesOf(jsObject).toMap()
+
+private fun NativeDocumentReferenceType.get(source: Source) = when (source) {
+    Source.DEFAULT -> getDoc(this)
+    Source.CACHE -> getDocFromCache(this)
+    Source.SERVER -> getDocFromServer(this)
+}
+
+private fun JsQuery.get(source: Source) = when (source) {
+    Source.DEFAULT -> getDocs(this)
+    Source.CACHE -> getDocsFromCache(this)
+    Source.SERVER -> getDocsFromServer(this)
+}

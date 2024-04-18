@@ -68,7 +68,19 @@ external fun getDoc(
     options: Any? = definedExternally
 ): Promise<DocumentSnapshot>
 
+external fun getDocFromCache(
+    reference: DocumentReference,
+): Promise<DocumentSnapshot>
+
+external fun getDocFromServer(
+    reference: DocumentReference,
+): Promise<DocumentSnapshot>
+
 external fun getDocs(query: Query): Promise<QuerySnapshot>
+
+external fun getDocsFromCache(query: Query): Promise<QuerySnapshot>
+
+external fun getDocsFromServer(query: Query): Promise<QuerySnapshot>
 
 external fun getFirestore(app: FirebaseApp? = definedExternally): Firestore
 
