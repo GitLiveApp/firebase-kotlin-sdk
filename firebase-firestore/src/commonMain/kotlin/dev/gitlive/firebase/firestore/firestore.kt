@@ -6,7 +6,6 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
@@ -52,30 +51,13 @@ class FirebaseFirestore internal constructor(private val wrapper: NativeFirebase
             }
         }
 
-    // Should probably use atomic from atomicfu
-    private val isConfigured = MutableStateFlow(false)
-
-    fun collection(collectionPath: String): CollectionReference = ensureConfigured {
-        CollectionReference(wrapper.collection(collectionPath))
-    }
-    fun collectionGroup(collectionId: String): Query = ensureConfigured {
-        Query(wrapper.collectionGroup(collectionId))
-    }
-    fun document(documentPath: String): DocumentReference = ensureConfigured {
-        DocumentReference(wrapper.document(documentPath))
-    }
-    fun batch(): WriteBatch = ensureConfigured {
-        WriteBatch(wrapper.batch())
-    }
-    fun setLoggingEnabled(loggingEnabled: Boolean) = ensureConfigured {
-        wrapper.setLoggingEnabled(loggingEnabled)
-    }
-    suspend fun clearPersistence() = ensureConfiguredSuspended {
-        wrapper.clearPersistence()
-    }
-    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = ensureConfiguredSuspended {
-        wrapper.runTransaction {  func(Transaction(this)) }
-    }
+    fun collection(collectionPath: String): CollectionReference = CollectionReference(wrapper.collection(collectionPath))
+    fun collectionGroup(collectionId: String): Query = Query(wrapper.collectionGroup(collectionId))
+    fun document(documentPath: String): DocumentReference = DocumentReference(wrapper.document(documentPath))
+    fun batch(): WriteBatch = WriteBatch(wrapper.batch())
+    fun setLoggingEnabled(loggingEnabled: Boolean) = wrapper.setLoggingEnabled(loggingEnabled)
+    suspend fun clearPersistence() = wrapper.clearPersistence()
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = wrapper.runTransaction {  func(Transaction(this)) }
     fun useEmulator(host: String, port: Int) = wrapper.useEmulator(host, port)
     @Deprecated("Use settings instead", replaceWith = ReplaceWith("settings = firestoreSettings{}"))
     fun setSettings(
@@ -100,22 +82,8 @@ class FirebaseFirestore internal constructor(private val wrapper: NativeFirebase
             }
         }
     }
-    suspend fun disableNetwork() = ensureConfiguredSuspended {
-        wrapper.disableNetwork()
-    }
-    suspend fun enableNetwork() = ensureConfiguredSuspended {
-        wrapper.enableNetwork()
-    }
-
-    private fun <T> ensureConfigured(action: () -> T): T {
-        isConfigured.compareAndSet(expect = false, update = true)
-        return action()
-    }
-
-    private suspend fun <T> ensureConfiguredSuspended(action: suspend () -> T): T {
-        isConfigured.compareAndSet(expect = false, update = true)
-        return action()
-    }
+    suspend fun disableNetwork() = wrapper.disableNetwork()
+    suspend fun enableNetwork() = wrapper.enableNetwork()
 }
 
 expect class FirebaseFirestoreSettings {
