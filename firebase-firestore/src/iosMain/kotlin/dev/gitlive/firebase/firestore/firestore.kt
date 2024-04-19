@@ -39,7 +39,7 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
 actual typealias NativeFirebaseFirestore = FIRFirestore
 
 @Suppress("UNCHECKED_CAST")
-actual internal class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
+internal actual class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
 
     actual var settings: FirebaseFirestoreSettings = firestoreSettings { }.also {
         native.settings = it.ios

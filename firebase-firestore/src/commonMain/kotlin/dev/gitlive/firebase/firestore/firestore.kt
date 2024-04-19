@@ -40,7 +40,8 @@ class FirebaseFirestore internal constructor(private val wrapper: NativeFirebase
 
     constructor(native: NativeFirebaseFirestore) : this(NativeFirebaseFirestoreWrapper(native))
 
-    val native = wrapper.native
+    // Important to leave this as a get property since on JS it is initialized lazily
+    val native get() = wrapper.native
     var settings: FirebaseFirestoreSettings
         get() = wrapper.settings
         set(value) {

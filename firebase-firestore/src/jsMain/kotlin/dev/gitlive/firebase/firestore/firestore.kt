@@ -78,7 +78,7 @@ actual fun Firebase.firestore(app: FirebaseApp) =
 
 actual data class NativeFirebaseFirestore(val js: JsFirestore)
 
-actual internal class NativeFirebaseFirestoreWrapper internal constructor(
+internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore
 ){
 
@@ -98,13 +98,21 @@ actual internal class NativeFirebaseFirestoreWrapper internal constructor(
     private data class EmulatorSettings(val host: String, val port: Int)
 
     actual var settings: FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().build()
+        set(value) {
+            if (lazyNative.isInitialized()) {
+                throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
+            } else {
+                field = value
+            }
+        }
     private var emulatorSettings: EmulatorSettings? = null
 
     // initializeFirestore must be called before any call, including before `getFirestore()`
     // To allow settings to be updated, we defer creating the wrapper until the first call to `native`
-    actual val native: NativeFirebaseFirestore by lazy {
+    private val lazyNative = lazy {
         createNative()
     }
+    actual val native: NativeFirebaseFirestore by lazyNative
     private val js get() = native.js
 
     actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }

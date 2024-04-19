@@ -57,7 +57,7 @@ val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings
 private val callbackExecutorMap = ConcurrentHashMap<com.google.firebase.firestore.FirebaseFirestore, Executor>()
 
 actual typealias NativeFirebaseFirestore = com.google.firebase.firestore.FirebaseFirestore
-actual internal class NativeFirebaseFirestoreWrapper actual constructor(actual val native: NativeFirebaseFirestore) {
+internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual val native: NativeFirebaseFirestore) {
 
     actual var settings: FirebaseFirestoreSettings
         get() = with(native.firestoreSettings) {
