@@ -39,7 +39,13 @@ class FirestoreSourceTest {
 
         firestore = Firebase.firestore(app).apply {
             useEmulator(emulatorHost, 8080)
-            setSettings(persistenceEnabled = persistenceEnabled)
+            settings = firestoreSettings(settings) {
+                cacheSettings = if (persistenceEnabled) {
+                    persistentCacheSettings {  }
+                } else {
+                    memoryCacheSettings { }
+                }
+            }
         }
     }
 

@@ -100,7 +100,11 @@ class FirebaseFirestoreTest {
 
         firestore = Firebase.firestore(app).apply {
             useEmulator(emulatorHost, 8080)
-            setSettings(persistenceEnabled = false)
+            settings = firestoreSettings(settings) {
+                cacheSettings = memoryCacheSettings {
+                    gcSettings = memoryEagerGcSettings { }
+                }
+            }
         }
     }
 
