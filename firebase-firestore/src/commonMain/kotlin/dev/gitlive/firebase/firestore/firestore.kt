@@ -10,6 +10,15 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.firestore.internal.NativeCollectionReferenceWrapper
+import dev.gitlive.firebase.firestore.internal.NativeDocumentReference
+import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
+import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
+import dev.gitlive.firebase.firestore.internal.NativeQueryWrapper
+import dev.gitlive.firebase.firestore.internal.NativeTransactionWrapper
+import dev.gitlive.firebase.firestore.internal.NativeWriteBatchWrapper
+import dev.gitlive.firebase.firestore.internal.SetOptions
+import dev.gitlive.firebase.firestore.internal.safeValue
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
@@ -26,22 +35,6 @@ expect val Firebase.firestore: FirebaseFirestore
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
 expect class NativeFirebaseFirestore
-
-internal expect class NativeFirebaseFirestoreWrapper internal constructor(native: NativeFirebaseFirestore) {
-    val native: NativeFirebaseFirestore
-    var settings: FirebaseFirestoreSettings
-
-    fun collection(collectionPath: String): NativeCollectionReference
-    fun collectionGroup(collectionId: String): NativeQuery
-    fun document(documentPath: String): NativeDocumentReference
-    fun batch(): NativeWriteBatch
-    fun setLoggingEnabled(loggingEnabled: Boolean)
-    suspend fun clearPersistence()
-    suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T
-    fun useEmulator(host: String, port: Int)
-    suspend fun disableNetwork()
-    suspend fun enableNetwork()
-}
 
 class FirebaseFirestore internal constructor(private val wrapper: NativeFirebaseFirestoreWrapper) {
 
@@ -117,29 +110,7 @@ expect class FirebaseFirestoreSettings {
 
 expect fun firestoreSettings(settings: FirebaseFirestoreSettings? = null, builder: FirebaseFirestoreSettings.Builder.() -> Unit): FirebaseFirestoreSettings
 
-@PublishedApi
-internal sealed class SetOptions {
-    data object Merge : SetOptions()
-    data object Overwrite : SetOptions()
-    data class MergeFields(val fields: List<String>) : SetOptions()
-    data class MergeFieldPaths(val fieldPaths: List<FieldPath>) : SetOptions() {
-        val encodedFieldPaths = fieldPaths.map { it.encoded }
-    }
-}
-
 expect class NativeTransaction
-@PublishedApi
-internal expect class NativeTransactionWrapper internal constructor(native: NativeTransaction) {
-
-    val native: NativeTransaction
-
-    fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): NativeTransactionWrapper
-    fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper
-    fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<String, Any?>>): NativeTransactionWrapper
-    fun updateEncodedFieldPathsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): NativeTransactionWrapper
-    fun delete(documentRef: DocumentReference): NativeTransactionWrapper
-    suspend fun get(documentRef: DocumentReference): NativeDocumentSnapshotWrapper
-}
 
 data class Transaction internal constructor(@PublishedApi internal val nativeWrapper: NativeTransactionWrapper) {
 
@@ -218,32 +189,6 @@ data class Transaction internal constructor(@PublishedApi internal val nativeWra
 }
 
 expect open class NativeQuery
-
-@PublishedApi
-internal expect open class NativeQueryWrapper internal constructor(native: NativeQuery) {
-
-    open val native: NativeQuery
-
-    fun limit(limit: Number): NativeQuery
-    val snapshots: Flow<QuerySnapshot>
-    fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
-    suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot
-
-    fun where(filter: Filter): NativeQuery
-
-    fun orderBy(field: String, direction: Direction): NativeQuery
-    fun orderBy(field: EncodedFieldPath, direction: Direction): NativeQuery
-
-    fun startAfter(document: NativeDocumentSnapshot): NativeQuery
-    fun startAfter(vararg fieldValues: Any): NativeQuery
-    fun startAt(document: NativeDocumentSnapshot): NativeQuery
-    fun startAt(vararg fieldValues: Any): NativeQuery
-
-    fun endBefore(document: NativeDocumentSnapshot): NativeQuery
-    fun endBefore(vararg fieldValues: Any): NativeQuery
-    fun endAt(document: NativeDocumentSnapshot): NativeQuery
-    fun endAt(vararg fieldValues: Any): NativeQuery
-}
 
 open class Query internal constructor(internal val nativeQuery: NativeQueryWrapper) {
 
@@ -324,27 +269,7 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
     )
 }
 
-internal val Any.safeValue: Any get() = when (this) {
-    is Timestamp -> nativeValue
-    is GeoPoint -> nativeValue
-    is DocumentReference -> native.nativeValue
-    is Map<*, *> -> this.mapNotNull { (key, value) -> key?.let { it.safeValue to value?.safeValue } }
-    is Collection<*> -> this.mapNotNull { it?.safeValue }
-    else -> this
-}
-
 expect class NativeWriteBatch
-
-@PublishedApi
-internal expect class NativeWriteBatchWrapper internal constructor(native: NativeWriteBatch) {
-    val native: NativeWriteBatch
-    fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): NativeWriteBatchWrapper
-    fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper
-    fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<String, Any?>>): NativeWriteBatchWrapper
-    fun updateEncodedFieldPathsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>): NativeWriteBatchWrapper
-    fun delete(documentRef: DocumentReference): NativeWriteBatchWrapper
-    suspend fun commit()
-}
 
 data class WriteBatch internal constructor(@PublishedApi internal val nativeWrapper: NativeWriteBatchWrapper) {
 
@@ -432,24 +357,6 @@ data class WriteBatch internal constructor(@PublishedApi internal val nativeWrap
 /** A class representing a platform specific Firebase DocumentReference. */
 expect class NativeDocumentReferenceType
 
-@PublishedApi
-internal expect class NativeDocumentReference(nativeValue: NativeDocumentReferenceType) {
-    val nativeValue: NativeDocumentReferenceType
-    val id: String
-    val path: String
-    val snapshots: Flow<NativeDocumentSnapshot>
-    val parent: NativeCollectionReferenceWrapper
-    fun snapshots(includeMetadataChanges: Boolean = false): Flow<NativeDocumentSnapshot>
-
-    fun collection(collectionPath: String): NativeCollectionReference
-    suspend fun get(source: Source = Source.DEFAULT): NativeDocumentSnapshot
-    suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions)
-    suspend fun updateEncoded(encodedData: EncodedObject)
-    suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>)
-    suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>)
-    suspend fun delete()
-}
-
 /** A class representing a Firebase DocumentReference. */
 @Serializable(with = DocumentReferenceSerializer::class)
 data class DocumentReference internal constructor(@PublishedApi internal val native: NativeDocumentReference) {
@@ -531,19 +438,6 @@ data class DocumentReference internal constructor(@PublishedApi internal val nat
 }
 
 expect class NativeCollectionReference : NativeQuery
-
-@PublishedApi
-internal expect class NativeCollectionReferenceWrapper internal constructor(native: NativeCollectionReference) : NativeQueryWrapper {
-
-    override val native: NativeCollectionReference
-
-    val path: String
-    val document: NativeDocumentReference
-    val parent: NativeDocumentReference?
-
-    fun document(documentPath: String): NativeDocumentReference
-    suspend fun addEncoded(data: EncodedObject): NativeDocumentReference
-}
 
 data class CollectionReference internal constructor(@PublishedApi internal val nativeWrapper: NativeCollectionReferenceWrapper) : Query(nativeWrapper) {
 
@@ -627,23 +521,6 @@ expect class DocumentChange {
 }
 
 expect class NativeDocumentSnapshot
-@PublishedApi
-internal expect class NativeDocumentSnapshotWrapper internal constructor(native: NativeDocumentSnapshot) {
-
-    val native: NativeDocumentSnapshot
-
-    val exists: Boolean
-    val id: String
-    val reference: NativeDocumentReference
-    val metadata: SnapshotMetadata
-
-    fun contains(field: String): Boolean
-    fun contains(fieldPath: EncodedFieldPath): Boolean
-
-    fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any?
-    fun getEncoded(fieldPath: EncodedFieldPath, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any?
-    fun encodedData(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any?
-}
 
 data class DocumentSnapshot internal constructor(@PublishedApi internal val nativeWrapper: NativeDocumentSnapshotWrapper) {
 

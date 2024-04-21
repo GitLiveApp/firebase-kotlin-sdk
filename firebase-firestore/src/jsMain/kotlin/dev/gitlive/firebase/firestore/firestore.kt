@@ -10,43 +10,21 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.externals.getApp
 import dev.gitlive.firebase.firestore.externals.MemoryCacheSettings
 import dev.gitlive.firebase.firestore.externals.PersistentCacheSettings
-import dev.gitlive.firebase.firestore.externals.QueryConstraint
-import dev.gitlive.firebase.firestore.externals.addDoc
-import dev.gitlive.firebase.firestore.externals.and
-import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
-import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
-import dev.gitlive.firebase.firestore.externals.deleteDoc
-import dev.gitlive.firebase.firestore.externals.doc
 import dev.gitlive.firebase.firestore.externals.getDoc
 import dev.gitlive.firebase.firestore.externals.getDocFromCache
 import dev.gitlive.firebase.firestore.externals.getDocFromServer
 import dev.gitlive.firebase.firestore.externals.getDocs
 import dev.gitlive.firebase.firestore.externals.getDocsFromCache
 import dev.gitlive.firebase.firestore.externals.getDocsFromServer
-import dev.gitlive.firebase.firestore.externals.initializeFirestore
 import dev.gitlive.firebase.firestore.externals.memoryEagerGarbageCollector
 import dev.gitlive.firebase.firestore.externals.memoryLocalCache
 import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
-import dev.gitlive.firebase.firestore.externals.onSnapshot
-import dev.gitlive.firebase.firestore.externals.or
-import dev.gitlive.firebase.firestore.externals.orderBy
 import dev.gitlive.firebase.firestore.externals.persistentLocalCache
-import dev.gitlive.firebase.firestore.externals.query
-import dev.gitlive.firebase.firestore.externals.refEqual
-import dev.gitlive.firebase.firestore.externals.setDoc
-import dev.gitlive.firebase.firestore.externals.setLogLevel
-import dev.gitlive.firebase.firestore.externals.writeBatch
-import dev.gitlive.firebase.internal.EncodedObject
-import dev.gitlive.firebase.internal.js
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.promise
+import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
+import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
+import dev.gitlive.firebase.firestore.internal.SetOptions
 import kotlin.js.Json
 import kotlin.js.json
-import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
 import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
@@ -58,19 +36,7 @@ import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
 import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
-import dev.gitlive.firebase.firestore.externals.collection as jsCollection
-import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
-import dev.gitlive.firebase.firestore.externals.disableNetwork as jsDisableNetwork
 import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
-import dev.gitlive.firebase.firestore.externals.enableNetwork as jsEnableNetwork
-import dev.gitlive.firebase.firestore.externals.endAt as jsEndAt
-import dev.gitlive.firebase.firestore.externals.endBefore as jsEndBefore
-import dev.gitlive.firebase.firestore.externals.limit as jsLimit
-import dev.gitlive.firebase.firestore.externals.runTransaction as jsRunTransaction
-import dev.gitlive.firebase.firestore.externals.startAfter as jsStartAfter
-import dev.gitlive.firebase.firestore.externals.startAt as jsStartAt
-import dev.gitlive.firebase.firestore.externals.updateDoc as jsUpdate
-import dev.gitlive.firebase.firestore.externals.where as jsWhere
 
 actual val Firebase.firestore get() =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(getApp())) }
@@ -79,76 +45,6 @@ actual fun Firebase.firestore(app: FirebaseApp) =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js)) }
 
 actual data class NativeFirebaseFirestore(val js: JsFirestore)
-
-internal actual class NativeFirebaseFirestoreWrapper internal constructor(
-    private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore
-){
-
-    internal actual constructor(native: NativeFirebaseFirestore) : this({ native })
-    internal constructor(app: JsFirebaseApp) : this(
-        {
-            NativeFirebaseFirestore(
-                initializeFirestore(app, settings.js).also {
-                    emulatorSettings?.run {
-                        connectFirestoreEmulator(it, host, port)
-                    }
-                }
-            )
-        }
-    )
-
-    private data class EmulatorSettings(val host: String, val port: Int)
-
-    actual var settings: FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().build()
-        set(value) {
-            if (lazyNative.isInitialized()) {
-                throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
-            } else {
-                field = value
-            }
-        }
-    private var emulatorSettings: EmulatorSettings? = null
-
-    // initializeFirestore must be called before any call, including before `getFirestore()`
-    // To allow settings to be updated, we defer creating the wrapper until the first call to `native`
-    private val lazyNative = lazy {
-        createNative()
-    }
-    actual val native: NativeFirebaseFirestore by lazyNative
-    private val js get() = native.js
-
-    actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
-
-    actual fun collectionGroup(collectionId: String) = rethrow { NativeQuery(jsCollectionGroup(js, collectionId)) }
-
-    actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
-
-    actual fun batch() = rethrow { NativeWriteBatch(writeBatch(js)) }
-
-    actual fun setLoggingEnabled(loggingEnabled: Boolean) =
-        rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
-
-    actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
-        rethrow { jsRunTransaction(js, { GlobalScope.promise { NativeTransaction(it).func() } } ).await() }
-
-    actual suspend fun clearPersistence() =
-        rethrow { clearIndexedDbPersistence(js).await() }
-
-    actual fun useEmulator(host: String, port: Int) = rethrow {
-        settings = firestoreSettings(settings) {
-            this.host = "$host:$port"
-        }
-        emulatorSettings = EmulatorSettings(host, port)
-    }
-
-    actual suspend fun disableNetwork() {
-        rethrow { jsDisableNetwork(js).await() }
-    }
-
-    actual suspend fun enableNetwork() {
-        rethrow { jsEnableNetwork(js).await() }
-    }
-}
 
 val FirebaseFirestore.js: JsFirestore get() = native.js
 
@@ -215,296 +111,25 @@ actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-internal val SetOptions.js: Json get() = when (this) {
-    is SetOptions.Merge -> json("merge" to true)
-    is SetOptions.Overwrite -> json("merge" to false)
-    is SetOptions.MergeFields -> json("mergeFields" to fields.toTypedArray())
-    is SetOptions.MergeFieldPaths -> json("mergeFields" to encodedFieldPaths.toTypedArray())
-}
-
 actual data class NativeWriteBatch(val js: JsWriteBatch)
-
-@PublishedApi
-internal actual class NativeWriteBatchWrapper actual internal constructor(actual val native: NativeWriteBatch) {
-
-    constructor(js: JsWriteBatch) : this(NativeWriteBatch(js))
-
-    val js = native.js
-
-    actual fun setEncoded(
-        documentRef: DocumentReference,
-        encodedData: EncodedObject,
-        setOptions: SetOptions
-    ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.js, setOptions.js) }.let { this }
-
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.js) }
-        .let { this }
-
-    actual fun updateEncodedFieldsAndValues(
-        documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): NativeWriteBatchWrapper = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
-            js.update(documentRef.js, field, value, *moreFieldsAndValues)
-        }
-    }.let { this }
-
-    actual fun updateEncodedFieldPathsAndValues(
-        documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): NativeWriteBatchWrapper = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
-            js.update(documentRef.js, field, value, *moreFieldsAndValues)
-        }
-    }.let { this }
-
-    actual fun delete(documentRef: DocumentReference) =
-        rethrow { js.delete(documentRef.js) }
-            .let { this }
-
-    actual suspend fun commit() = rethrow { js.commit().await() }
-}
 
 val WriteBatch.js get() = native.js
 
 actual data class NativeTransaction(val js: JsTransaction)
-
-@PublishedApi
-internal actual class NativeTransactionWrapper actual internal constructor(actual val native: NativeTransaction) {
-
-    constructor(js: JsTransaction) : this(NativeTransaction(js))
-
-    val js = native.js
-
-    actual fun setEncoded(
-        documentRef: DocumentReference,
-        encodedData: EncodedObject,
-        setOptions: SetOptions
-    ): NativeTransactionWrapper = rethrow {
-        js.set(documentRef.js, encodedData.js, setOptions.js)
-    }
-        .let { this }
-
-    actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeTransactionWrapper = rethrow { js.update(documentRef.js, encodedData.js) }
-        .let { this }
-
-    actual fun updateEncodedFieldsAndValues(
-        documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
-    ): NativeTransactionWrapper = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
-            js.update(documentRef.js, field, value, *moreFieldsAndValues)
-        }
-    }.let { this }
-
-    actual fun updateEncodedFieldPathsAndValues(
-        documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
-    ): NativeTransactionWrapper = rethrow {
-        encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
-            js.update(documentRef.js, field, value, *moreFieldsAndValues)
-        }
-    }.let { this }
-
-    actual fun delete(documentRef: DocumentReference) =
-        rethrow { js.delete(documentRef.js) }
-            .let { this }
-
-    actual suspend fun get(documentRef: DocumentReference) =
-        rethrow { NativeDocumentSnapshotWrapper(js.get(documentRef.js).await()) }
-}
 
 val Transaction.js get() = native.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
 actual typealias NativeDocumentReferenceType = JsDocumentReference
 
-@PublishedApi
-internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
-    val js: NativeDocumentReferenceType = nativeValue
-
-    actual val id: String
-        get() = rethrow { js.id }
-
-    actual val path: String
-        get() = rethrow { js.path }
-
-    actual val parent: NativeCollectionReferenceWrapper
-        get() = rethrow { NativeCollectionReferenceWrapper(js.parent) }
-
-    actual fun collection(collectionPath: String) = rethrow { NativeCollectionReference(jsCollection(js, collectionPath)) }
-
-    actual suspend fun get(source: Source) = rethrow { NativeDocumentSnapshot( js.get(source).await()) }
-
-    actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
-
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<NativeDocumentSnapshot>  {
-        val unsubscribe = onSnapshot(
-            js,
-            json("includeMetadataChanges" to includeMetadataChanges),
-            { trySend(NativeDocumentSnapshot(it)) },
-            { close(errorToException(it)) }
-        )
-        awaitClose { unsubscribe() }
-    }
-
-    actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = rethrow {
-        setDoc(js, encodedData.js, setOptions.js).await()
-    }
-
-    actual suspend fun updateEncoded(encodedData: EncodedObject) = rethrow { jsUpdate(js, encodedData.js).await() }
-
-    actual suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>) {
-        rethrow {
-            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
-                    jsUpdate(js, field, value, *moreFieldsAndValues)
-                }
-                ?.await()
-        }
-    }
-
-    actual suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>) {
-        rethrow {
-            encodedFieldsAndValues.takeUnless { encodedFieldsAndValues.isEmpty() }
-                ?.performUpdate { field, value, moreFieldsAndValues ->
-                    jsUpdate(js, field, value, *moreFieldsAndValues)
-                }?.await()
-        }
-    }
-
-    actual suspend fun delete() = rethrow { deleteDoc(js).await() }
-
-    override fun equals(other: Any?): Boolean =
-        this === other || other is NativeDocumentReference && refEqual(nativeValue, other.nativeValue)
-    override fun hashCode(): Int = nativeValue.hashCode()
-    override fun toString(): String = "DocumentReference(path=$path)"
-}
-
 val DocumentReference.js get() = native.js
 
 actual open class NativeQuery(open val js: JsQuery)
 internal val JsQuery.wrapped get() = NativeQuery(this)
 
-@PublishedApi
-internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: NativeQuery) {
-
-    constructor(js: JsQuery) : this(NativeQuery(js))
-
-    open val js: JsQuery get() = native.js
-
-    actual suspend fun get(source: Source) =  rethrow { QuerySnapshot(js.get(source).await()) }
-
-    actual fun limit(limit: Number) = query(js, jsLimit(limit)).wrapped
-
-    actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
-
-    private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {
-        is Filter.And -> and(*filters.map { it.toQueryConstraint() }.toTypedArray())
-        is Filter.Or -> or(*filters.map { it.toQueryConstraint() }.toTypedArray())
-        is Filter.Field -> {
-            val value = when (constraint) {
-                is WhereConstraint.ForNullableObject -> constraint.safeValue
-                is WhereConstraint.ForObject -> constraint.safeValue
-                is WhereConstraint.ForArray -> constraint.safeValues.toTypedArray()
-            }
-            jsWhere(field, constraint.filterOp, value)
-        }
-        is Filter.Path -> {
-            val value = when (constraint) {
-                is WhereConstraint.ForNullableObject -> constraint.safeValue
-                is WhereConstraint.ForObject -> constraint.safeValue
-                is WhereConstraint.ForArray -> constraint.safeValues.toTypedArray()
-            }
-            jsWhere(path.js, constraint.filterOp, value)
-        }
-    }
-
-    private val WhereConstraint.filterOp: String get() = when (this) {
-        is WhereConstraint.EqualTo -> "=="
-        is WhereConstraint.NotEqualTo -> "!="
-        is WhereConstraint.LessThan -> "<"
-        is WhereConstraint.LessThanOrEqualTo -> "<="
-        is WhereConstraint.GreaterThan -> ">"
-        is WhereConstraint.GreaterThanOrEqualTo -> ">="
-        is WhereConstraint.ArrayContains -> "array-contains"
-        is WhereConstraint.ArrayContainsAny -> "array-contains-any"
-        is WhereConstraint.InArray -> "in"
-        is WhereConstraint.NotInArray -> "not-in"
-    }
-
-    actual fun orderBy(field: String, direction: Direction) = rethrow {
-        query(js, orderBy(field, direction.jsString)).wrapped
-    }
-
-    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = rethrow {
-        query(js, orderBy(field, direction.jsString)).wrapped
-    }
-
-    actual fun startAfter(document: NativeDocumentSnapshot) = rethrow { query(js, jsStartAfter(document.js)).wrapped }
-
-    actual fun startAfter(vararg fieldValues: Any) = rethrow { query(js, jsStartAfter(*fieldValues)).wrapped }
-
-    actual fun startAt(document: NativeDocumentSnapshot) = rethrow { query(js, jsStartAt(document.js)).wrapped }
-
-    actual fun startAt(vararg fieldValues: Any) = rethrow { query(js, jsStartAt(*fieldValues)).wrapped }
-
-    actual fun endBefore(document: NativeDocumentSnapshot) = rethrow { query(js, jsEndBefore(document.js)).wrapped }
-
-    actual fun endBefore(vararg fieldValues: Any) = rethrow { query(js, jsEndBefore(*fieldValues)).wrapped }
-
-    actual fun endAt(document: NativeDocumentSnapshot) = rethrow { query(js, jsEndAt(document.js)).wrapped }
-
-    actual fun endAt(vararg fieldValues: Any) = rethrow { query(js, jsEndAt(*fieldValues)).wrapped }
-
-    actual val snapshots get() = callbackFlow<QuerySnapshot> {
-        val unsubscribe = rethrow {
-            onSnapshot(
-                js,
-                { trySend(QuerySnapshot(it)) },
-                { close(errorToException(it)) }
-            )
-        }
-        awaitClose { rethrow { unsubscribe() } }
-    }
-
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
-        val unsubscribe = rethrow {
-            onSnapshot(
-                js,
-                json("includeMetadataChanges" to includeMetadataChanges),
-                { trySend(QuerySnapshot(it)) },
-                { close(errorToException(it)) }
-            )
-        }
-        awaitClose { rethrow { unsubscribe() } }
-    }
-}
-
 val Query.js get() = native.js
 
 actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
-
-@PublishedApi
-internal actual class NativeCollectionReferenceWrapper actual internal constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
-
-    constructor(js: JsCollectionReference) : this(NativeCollectionReference(js))
-
-    override val js: JsCollectionReference = native.js
-
-    actual val path: String
-        get() =  rethrow { js.path }
-
-    actual val document get() = rethrow { NativeDocumentReference(doc(js)) }
-
-    actual val parent get() = rethrow { js.parent?.let{ NativeDocumentReference(it) } }
-
-    actual fun document(documentPath: String) = rethrow { NativeDocumentReference(doc(js, documentPath)) }
-
-    actual suspend fun addEncoded(data: EncodedObject) = rethrow {
-        NativeDocumentReference(addDoc(js, data.js).await())
-    }
-}
 
 val CollectionReference.js get() = native.js
 
@@ -534,37 +159,6 @@ actual class DocumentChange(val js: JsDocumentChange) {
 
 actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 
-@PublishedApi
-internal actual class NativeDocumentSnapshotWrapper actual internal constructor(actual val native: NativeDocumentSnapshot) {
-
-    constructor(js: JsDocumentSnapshot) : this(NativeDocumentSnapshot(js))
-
-    val js: JsDocumentSnapshot = native.js
-
-    actual val id get() = rethrow { js.id }
-    actual val reference get() = rethrow { NativeDocumentReference(js.ref) }
-
-    actual fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
-        js.get(field, getTimestampsOptions(serverTimestampBehavior))
-    }
-
-    actual fun getEncoded(fieldPath: EncodedFieldPath, serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
-        js.get(fieldPath, getTimestampsOptions(serverTimestampBehavior))
-    }
-
-    actual fun encodedData(serverTimestampBehavior: ServerTimestampBehavior): Any? = rethrow {
-        js.data(getTimestampsOptions(serverTimestampBehavior))
-    }
-
-    actual fun contains(field: String) = rethrow { js.get(field) != undefined }
-    actual fun contains(fieldPath: EncodedFieldPath) = rethrow { js.get(fieldPath) != undefined }
-    actual val exists get() = rethrow { js.exists() }
-    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
-
-    fun getTimestampsOptions(serverTimestampBehavior: ServerTimestampBehavior) =
-        json("serverTimestamps" to serverTimestampBehavior.name.lowercase())
-}
-
 val DocumentSnapshot.js get() = native.js
 
 actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
@@ -588,14 +182,6 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
 }
 
 actual typealias EncodedFieldPath = JsFieldPath
-
-//actual data class FirebaseFirestoreSettings internal constructor(
-//    val cacheSizeBytes: Number? = undefined,
-//    val host: String? = undefined,
-//    val ssl: Boolean? = undefined,
-//    var timestampsInSnapshots: Boolean? = undefined,
-//    var enablePersistence: Boolean = false
-//)
 
 actual enum class FirestoreExceptionCode {
     OK,
@@ -677,15 +263,3 @@ fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
 fun mapOf(jsObject: dynamic): Map<String, Any?> =
     entriesOf(jsObject).toMap()
-
-private fun NativeDocumentReferenceType.get(source: Source) = when (source) {
-    Source.DEFAULT -> getDoc(this)
-    Source.CACHE -> getDocFromCache(this)
-    Source.SERVER -> getDocFromServer(this)
-}
-
-private fun JsQuery.get(source: Source) = when (source) {
-    Source.DEFAULT -> getDocs(this)
-    Source.CACHE -> getDocsFromCache(this)
-    Source.SERVER -> getDocsFromServer(this)
-}
