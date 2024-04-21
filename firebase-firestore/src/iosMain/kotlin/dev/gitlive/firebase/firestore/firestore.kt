@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
+import platform.Foundation.NSNumber
+import platform.Foundation.numberWithLong
+import platform.darwin.dispatch_get_main_queue
+import platform.darwin.dispatch_queue_t
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -26,50 +30,123 @@ actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFir
     FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
 )
 
-actual class FirebaseFirestore(val ios: FIRFirestore) {
+val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
+    is LocalCacheSettings.Persistent -> FIRPersistentCacheSettings(NSNumber.numberWithLong(sizeBytes))
+    is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
+        when (garbaseCollectorSettings) {
+            is MemoryGarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
+            is MemoryGarbageCollectorSettings.LRUGC -> FIRMemoryLRUGCSettings(NSNumber.numberWithLong(garbaseCollectorSettings.sizeBytes))
+        }
+    )
+}
 
-    actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReferenceWrapper(ios.collectionWithPath(collectionPath)))
+actual typealias NativeFirebaseFirestore = FIRFirestore
 
-    actual fun collectionGroup(collectionId: String) = Query(ios.collectionGroupWithID(collectionId).wrapped)
+@Suppress("UNCHECKED_CAST")
+internal actual class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
 
-    actual fun document(documentPath: String) = DocumentReference(NativeDocumentReference(ios.documentWithPath(documentPath)))
+    actual var settings: FirebaseFirestoreSettings = firestoreSettings { }.also {
+        native.settings = it.ios
+    }
+        set(value) {
+            field = value
+            native.settings = value.ios
+        }
 
-    actual fun batch() = WriteBatch(NativeWriteBatchWrapper(ios.batch()))
+    actual fun collection(collectionPath: String) = native.collectionWithPath(collectionPath)
+
+    actual fun collectionGroup(collectionId: String) = native.collectionGroupWithID(collectionId)
+
+    actual fun document(documentPath: String) = NativeDocumentReference(native.documentWithPath(documentPath))
+
+    actual fun batch() = native.batch()
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =
         FIRFirestore.enableLogging(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
-        awaitResult<Any?> { ios.runTransactionWithBlock({ transaction, _ -> runBlocking { Transaction(NativeTransactionWrapper(transaction!!)).func() } }, it) } as T
+    actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
+        awaitResult<Any?> { native.runTransactionWithBlock({ transaction, _ -> runBlocking { transaction!!.func() } }, it) } as T
 
     actual suspend fun clearPersistence() =
-        await { ios.clearPersistenceWithCompletion(it) }
+        await { native.clearPersistenceWithCompletion(it) }
 
     actual fun useEmulator(host: String, port: Int) {
-        ios.settings = ios.settings.apply {
+        native.useEmulatorWithHost(host, port.toLong())
+        settings = firestoreSettings(settings) {
             this.host = "$host:$port"
-            persistenceEnabled = false
+            cacheSettings = memoryCacheSettings {  }
             sslEnabled = false
         }
     }
 
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        ios.settings = FIRFirestoreSettings().also { settings ->
-            persistenceEnabled?.let { settings.persistenceEnabled = it }
-            sslEnabled?.let { settings.sslEnabled = it }
-            host?.let { settings.host = it }
-            cacheSizeBytes?.let { settings.cacheSizeBytes = it }
-        }
-    }
-
     actual suspend fun disableNetwork() {
-        await { ios.disableNetworkWithCompletion(it) }
+        await { native.disableNetworkWithCompletion(it) }
     }
 
     actual suspend fun enableNetwork() {
-        await { ios.enableNetworkWithCompletion(it) }
+        await { native.enableNetworkWithCompletion(it) }
     }
 }
+
+val FirebaseFirestore.ios get() = native
+
+actual data class FirebaseFirestoreSettings(
+    actual val sslEnabled: Boolean,
+    actual val host: String,
+    actual val cacheSettings: LocalCacheSettings,
+    val dispatchQueue: dispatch_queue_t,
+) {
+
+    actual companion object {
+        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+        internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
+        internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
+        internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 100 * 1024 * 1024
+    }
+
+    actual class Builder(
+        actual var sslEnabled: Boolean,
+        actual var host: String,
+        actual var cacheSettings: LocalCacheSettings,
+        var dispatchQueue: dispatch_queue_t,
+    ) {
+
+        actual constructor() : this(
+            true,
+            DEFAULT_HOST,
+            persistentCacheSettings {  },
+            dispatch_get_main_queue(),
+        )
+
+        actual constructor(settings: FirebaseFirestoreSettings) : this(
+            settings.sslEnabled,
+            settings.host,
+            settings.cacheSettings,
+            settings.dispatchQueue,
+        )
+
+        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
+    }
+
+    val ios: FIRFirestoreSettings get() = FIRFirestoreSettings().apply {
+        cacheSettings = this@FirebaseFirestoreSettings.cacheSettings.ios
+        sslEnabled = this@FirebaseFirestoreSettings.sslEnabled
+        host = this@FirebaseFirestoreSettings.host
+        dispatchQueue = this@FirebaseFirestoreSettings.dispatchQueue
+    }
+}
+
+actual fun firestoreSettings(
+    settings: FirebaseFirestoreSettings?,
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
+    settings?.let {
+        sslEnabled = it.sslEnabled
+        host = it.host
+        cacheSettings = it.cacheSettings
+        dispatchQueue = it.dispatchQueue
+    }
+}.apply(builder).build()
 
 actual typealias NativeWriteBatch = FIRWriteBatch
 
@@ -165,7 +242,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val listener = ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
-            snapshot?.let { trySend(NativeDocumentSnapshotWrapper(snapshot)) }
+            snapshot?.let { trySend(snapshot) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
@@ -183,10 +260,10 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         get() = NativeCollectionReferenceWrapper(ios.parent)
 
 
-    actual fun collection(collectionPath: String) = NativeCollectionReferenceWrapper(ios.collectionWithPath(collectionPath))
+    actual fun collection(collectionPath: String) = ios.collectionWithPath(collectionPath)
 
-    actual suspend fun get() =
-        NativeDocumentSnapshotWrapper(awaitResult { ios.getDocumentWithCompletion(it) })
+    actual suspend fun get(source: Source) =
+        awaitResult { ios.getDocumentWithSource(source.toIosSource(), it) }
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) = await {
         when (setOptions) {
@@ -211,9 +288,9 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual suspend fun delete() = await { ios.deleteDocumentWithCompletion(it) }
 
-    actual val snapshots get() = callbackFlow<NativeDocumentSnapshotWrapper> {
+    actual val snapshots get() = callbackFlow<NativeDocumentSnapshot> {
         val listener = ios.addSnapshotListener { snapshot, error ->
-            snapshot?.let { trySend(NativeDocumentSnapshotWrapper(snapshot)) }
+            snapshot?.let { trySend(snapshot) }
             error?.let { close(error.toException()) }
         }
         awaitClose { listener.remove() }
@@ -231,9 +308,10 @@ actual typealias NativeQuery = FIRQuery
 
 @PublishedApi
 internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: NativeQuery)  {
-    actual suspend fun get() = QuerySnapshot(awaitResult { native.getDocumentsWithCompletion(it) })
 
-    actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong()).wrapped
+    actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())
+
+    actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(),it) })
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = native.addSnapshotListener { snapshot, error ->
@@ -251,7 +329,7 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
         awaitClose { listener.remove() }
     }
 
-    actual fun where(filter: Filter) = native.queryWhereFilter(filter.toFIRFilter()).wrapped
+    actual fun where(filter: Filter) = native.queryWhereFilter(filter.toFIRFilter())
 
     private fun Filter.toFIRFilter(): FIRFilter = when (this) {
         is Filter.And -> FIRFilter.andFilterWithFilters(filters.map { it.toFIRFilter() })
@@ -282,23 +360,21 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
         }
     }
 
-    actual fun orderBy(field: String, direction: Direction) = native.queryOrderedByField(field, direction == Direction.DESCENDING).wrapped
-    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = native.queryOrderedByFieldPath(field, direction == Direction.DESCENDING).wrapped
+    actual fun orderBy(field: String, direction: Direction) = native.queryOrderedByField(field, direction == Direction.DESCENDING)
+    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = native.queryOrderedByFieldPath(field, direction == Direction.DESCENDING)
 
-    actual fun startAfter(document: NativeDocumentSnapshot) = native.queryStartingAfterDocument(document).wrapped
-    actual fun startAfter(vararg fieldValues: Any) = native.queryStartingAfterValues(fieldValues.asList()).wrapped
-    actual fun startAt(document: NativeDocumentSnapshot) = native.queryStartingAtDocument(document).wrapped
-    actual fun startAt(vararg fieldValues: Any) = native.queryStartingAtValues(fieldValues.asList()).wrapped
+    actual fun startAfter(document: NativeDocumentSnapshot) = native.queryStartingAfterDocument(document)
+    actual fun startAfter(vararg fieldValues: Any) = native.queryStartingAfterValues(fieldValues.asList())
+    actual fun startAt(document: NativeDocumentSnapshot) = native.queryStartingAtDocument(document)
+    actual fun startAt(vararg fieldValues: Any) = native.queryStartingAtValues(fieldValues.asList())
 
-    actual fun endBefore(document: NativeDocumentSnapshot) = native.queryEndingBeforeDocument(document).wrapped
-    actual fun endBefore(vararg fieldValues: Any) = native.queryEndingBeforeValues(fieldValues.asList()).wrapped
-    actual fun endAt(document: NativeDocumentSnapshot) = native.queryEndingAtDocument(document).wrapped
-    actual fun endAt(vararg fieldValues: Any) = native.queryEndingAtValues(fieldValues.asList()).wrapped
+    actual fun endBefore(document: NativeDocumentSnapshot) = native.queryEndingBeforeDocument(document)
+    actual fun endBefore(vararg fieldValues: Any) = native.queryEndingBeforeValues(fieldValues.asList())
+    actual fun endAt(document: NativeDocumentSnapshot) = native.queryEndingAtDocument(document)
+    actual fun endAt(vararg fieldValues: Any) = native.queryEndingAtValues(fieldValues.asList())
 }
 
 val Query.ios get() = native
-
-internal val FIRQuery.wrapped get() = NativeQueryWrapper(this)
 
 actual typealias NativeCollectionReference = FIRCollectionReference
 
@@ -489,4 +565,10 @@ suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     }
     job.await()
     return result
+}
+
+private fun Source.toIosSource() = when (this) {
+    Source.CACHE -> FIRFirestoreSource.FIRFirestoreSourceCache
+    Source.SERVER -> FIRFirestoreSource.FIRFirestoreSourceServer
+    Source.DEFAULT -> FIRFirestoreSource.FIRFirestoreSourceDefault
 }

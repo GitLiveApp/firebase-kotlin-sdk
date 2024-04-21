@@ -39,6 +39,9 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
 import platform.Foundation.allObjects
+import platform.darwin.dispatch_queue_t
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 actual val Firebase.database
         by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -64,6 +67,10 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun setPersistenceEnabled(enabled: Boolean) {
         ios.persistenceEnabled = enabled
+    }
+
+    actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
+        ios.setPersistenceCacheSizeBytes(cacheSizeInBytes.toULong())
     }
 
     actual fun setLoggingEnabled(enabled: Boolean) =

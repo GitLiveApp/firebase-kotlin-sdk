@@ -68,7 +68,19 @@ external fun getDoc(
     options: Any? = definedExternally
 ): Promise<DocumentSnapshot>
 
+external fun getDocFromCache(
+    reference: DocumentReference,
+): Promise<DocumentSnapshot>
+
+external fun getDocFromServer(
+    reference: DocumentReference,
+): Promise<DocumentSnapshot>
+
 external fun getDocs(query: Query): Promise<QuerySnapshot>
+
+external fun getDocsFromCache(query: Query): Promise<QuerySnapshot>
+
+external fun getDocsFromServer(query: Query): Promise<QuerySnapshot>
 
 external fun getFirestore(app: FirebaseApp? = definedExternally): Firestore
 
@@ -291,11 +303,32 @@ external interface FirestoreLocalCache {
     val kind: String
 }
 
+external interface MemoryLocalCache : FirestoreLocalCache
+external interface PersistentLocalCache : FirestoreLocalCache
+
+external interface MemoryCacheSettings {
+    val garbageCollector: MemoryGarbageCollector
+}
+
+external interface MemoryGarbageCollector {
+    val kind: String
+}
+
+external interface MemoryLruGarbageCollector : MemoryGarbageCollector
+external interface MemoryEagerGarbageCollector : MemoryGarbageCollector
+
+external interface PersistentCacheSettings {
+    val cacheSizeBytes: Int
+    val tabManager: PersistentTabManager
+}
+
 external interface PersistentTabManager {
     val kind: String
 }
 
-external fun memoryLocalCache(): FirestoreLocalCache
-external fun persistentLocalCache(settings: dynamic = definedExternally): FirestoreLocalCache
+external fun memoryLocalCache(settings: MemoryCacheSettings): MemoryLocalCache
+external fun memoryEagerGarbageCollector(): MemoryEagerGarbageCollector
+external fun memoryLruGarbageCollector(settings: dynamic = definedExternally): MemoryLruGarbageCollector
+external fun persistentLocalCache(settings: PersistentCacheSettings): PersistentLocalCache
 external fun persistentSingleTabManager(settings: dynamic = definedExternally): PersistentTabManager
 external fun persistentMultipleTabManager(): PersistentTabManager

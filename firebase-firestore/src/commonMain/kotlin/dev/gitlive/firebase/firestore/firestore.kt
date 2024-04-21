@@ -25,19 +25,97 @@ expect val Firebase.firestore: FirebaseFirestore
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
 expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
 
-expect class FirebaseFirestore {
-    fun collection(collectionPath: String): CollectionReference
-    fun collectionGroup(collectionId: String): Query
-    fun document(documentPath: String): DocumentReference
-    fun batch(): WriteBatch
+expect class NativeFirebaseFirestore
+
+internal expect class NativeFirebaseFirestoreWrapper internal constructor(native: NativeFirebaseFirestore) {
+    val native: NativeFirebaseFirestore
+    var settings: FirebaseFirestoreSettings
+
+    fun collection(collectionPath: String): NativeCollectionReference
+    fun collectionGroup(collectionId: String): NativeQuery
+    fun document(documentPath: String): NativeDocumentReference
+    fun batch(): NativeWriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
     suspend fun clearPersistence()
-    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T
+    suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T
     fun useEmulator(host: String, port: Int)
-    fun setSettings(persistenceEnabled: Boolean? = null, sslEnabled: Boolean? = null, host: String? = null, cacheSizeBytes: Long? = null)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
 }
+
+class FirebaseFirestore internal constructor(private val wrapper: NativeFirebaseFirestoreWrapper) {
+
+    constructor(native: NativeFirebaseFirestore) : this(NativeFirebaseFirestoreWrapper(native))
+
+    // Important to leave this as a get property since on JS it is initialized lazily
+    val native get() = wrapper.native
+    var settings: FirebaseFirestoreSettings
+        get() = wrapper.settings
+        set(value) {
+            wrapper.settings = value
+        }
+
+    fun collection(collectionPath: String): CollectionReference = CollectionReference(wrapper.collection(collectionPath))
+    fun collectionGroup(collectionId: String): Query = Query(wrapper.collectionGroup(collectionId))
+    fun document(documentPath: String): DocumentReference = DocumentReference(wrapper.document(documentPath))
+    fun batch(): WriteBatch = WriteBatch(wrapper.batch())
+    fun setLoggingEnabled(loggingEnabled: Boolean) = wrapper.setLoggingEnabled(loggingEnabled)
+    suspend fun clearPersistence() = wrapper.clearPersistence()
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = wrapper.runTransaction {  func(Transaction(this)) }
+    fun useEmulator(host: String, port: Int) = wrapper.useEmulator(host, port)
+    @Deprecated("Use settings instead", replaceWith = ReplaceWith("settings = firestoreSettings{}"))
+    fun setSettings(
+        persistenceEnabled: Boolean? = null,
+        sslEnabled: Boolean? = null,
+        host: String? = null,
+        cacheSizeBytes: Long? = null,
+    ) {
+        settings = firestoreSettings {
+            this.sslEnabled = sslEnabled ?: true
+            this.host = host ?: FirebaseFirestoreSettings.DEFAULT_HOST
+            this.cacheSettings = if (persistenceEnabled != false) {
+                LocalCacheSettings.Persistent(cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            } else {
+                val cacheSize = cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED
+                val garbageCollectionSettings = if (cacheSize == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED) {
+                    MemoryGarbageCollectorSettings.Eager
+                } else {
+                    MemoryGarbageCollectorSettings.LRUGC(cacheSize)
+                }
+                LocalCacheSettings.Memory(garbageCollectionSettings)
+            }
+        }
+    }
+    suspend fun disableNetwork() = wrapper.disableNetwork()
+    suspend fun enableNetwork() = wrapper.enableNetwork()
+}
+
+expect class FirebaseFirestoreSettings {
+
+    companion object {
+        val CACHE_SIZE_UNLIMITED: Long
+        internal val DEFAULT_HOST: String
+        internal val MINIMUM_CACHE_BYTES: Long
+        internal val DEFAULT_CACHE_SIZE_BYTES: Long
+    }
+
+    class Builder constructor() {
+
+        constructor(settings: FirebaseFirestoreSettings)
+
+        var sslEnabled: Boolean
+        var host: String
+        var cacheSettings: LocalCacheSettings
+
+        fun build(): FirebaseFirestoreSettings
+    }
+
+    val sslEnabled: Boolean
+    val host: String
+    val cacheSettings: LocalCacheSettings
+}
+
+expect fun firestoreSettings(settings: FirebaseFirestoreSettings? = null, builder: FirebaseFirestoreSettings.Builder.() -> Unit): FirebaseFirestoreSettings
 
 @PublishedApi
 internal sealed class SetOptions {
@@ -146,25 +224,25 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
 
     open val native: NativeQuery
 
-    fun limit(limit: Number): NativeQueryWrapper
+    fun limit(limit: Number): NativeQuery
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
-    suspend fun get(): QuerySnapshot
+    suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot
 
-    fun where(filter: Filter): NativeQueryWrapper
+    fun where(filter: Filter): NativeQuery
 
-    fun orderBy(field: String, direction: Direction): NativeQueryWrapper
-    fun orderBy(field: EncodedFieldPath, direction: Direction): NativeQueryWrapper
+    fun orderBy(field: String, direction: Direction): NativeQuery
+    fun orderBy(field: EncodedFieldPath, direction: Direction): NativeQuery
 
-    fun startAfter(document: NativeDocumentSnapshot): NativeQueryWrapper
-    fun startAfter(vararg fieldValues: Any): NativeQueryWrapper
-    fun startAt(document: NativeDocumentSnapshot): NativeQueryWrapper
-    fun startAt(vararg fieldValues: Any): NativeQueryWrapper
+    fun startAfter(document: NativeDocumentSnapshot): NativeQuery
+    fun startAfter(vararg fieldValues: Any): NativeQuery
+    fun startAt(document: NativeDocumentSnapshot): NativeQuery
+    fun startAt(vararg fieldValues: Any): NativeQuery
 
-    fun endBefore(document: NativeDocumentSnapshot): NativeQueryWrapper
-    fun endBefore(vararg fieldValues: Any): NativeQueryWrapper
-    fun endAt(document: NativeDocumentSnapshot): NativeQueryWrapper
-    fun endAt(vararg fieldValues: Any): NativeQueryWrapper
+    fun endBefore(document: NativeDocumentSnapshot): NativeQuery
+    fun endBefore(vararg fieldValues: Any): NativeQuery
+    fun endAt(document: NativeDocumentSnapshot): NativeQuery
+    fun endAt(vararg fieldValues: Any): NativeQuery
 }
 
 open class Query internal constructor(internal val nativeQuery: NativeQueryWrapper) {
@@ -176,7 +254,7 @@ open class Query internal constructor(internal val nativeQuery: NativeQueryWrapp
     fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
     val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
-    suspend fun get(): QuerySnapshot = nativeQuery.get()
+    suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
 
     fun where(builder: FilterBuilder.() -> Filter?) = builder(FilterBuilder())?.let { Query(nativeQuery.where(it)) } ?: this
 
@@ -359,12 +437,12 @@ internal expect class NativeDocumentReference(nativeValue: NativeDocumentReferen
     val nativeValue: NativeDocumentReferenceType
     val id: String
     val path: String
-    val snapshots: Flow<NativeDocumentSnapshotWrapper>
+    val snapshots: Flow<NativeDocumentSnapshot>
     val parent: NativeCollectionReferenceWrapper
-    fun snapshots(includeMetadataChanges: Boolean = false): Flow<NativeDocumentSnapshotWrapper>
+    fun snapshots(includeMetadataChanges: Boolean = false): Flow<NativeDocumentSnapshot>
 
-    fun collection(collectionPath: String): NativeCollectionReferenceWrapper
-    suspend fun get(): NativeDocumentSnapshotWrapper
+    fun collection(collectionPath: String): NativeCollectionReference
+    suspend fun get(source: Source = Source.DEFAULT): NativeDocumentSnapshot
     suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions)
     suspend fun updateEncoded(encodedData: EncodedObject)
     suspend fun updateEncodedFieldsAndValues(encodedFieldsAndValues: List<Pair<String, Any?>>)
@@ -385,7 +463,7 @@ data class DocumentReference internal constructor(@PublishedApi internal val nat
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
 
     fun collection(collectionPath: String): CollectionReference = CollectionReference(native.collection(collectionPath))
-    suspend fun get(): DocumentSnapshot = DocumentSnapshot(native.get())
+    suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(native.get(source))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(data, merge) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, merge: Boolean = false) = set(data, merge) {
@@ -622,3 +700,9 @@ expect class FieldPath(vararg fieldNames: String) {
 }
 
 expect class EncodedFieldPath
+
+enum class Source {
+    CACHE,
+    SERVER,
+    DEFAULT
+}

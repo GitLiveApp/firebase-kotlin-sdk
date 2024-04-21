@@ -2,6 +2,7 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("databaseAndroid")
 package dev.gitlive.firebase.database
 
 import com.google.android.gms.tasks.Task
@@ -17,7 +18,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.database.FirebaseDatabase.Companion.FirebaseDatabase
 import dev.gitlive.firebase.internal.android
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.reencodeTransformation
@@ -52,23 +52,23 @@ suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T =
         .first()
 
 actual val Firebase.database
-        by lazy { FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance()) }
+        by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }
 
 actual fun Firebase.database(url: String) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(url))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(url))
 
 actual fun Firebase.database(app: FirebaseApp) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
 
 actual fun Firebase.database(app: FirebaseApp, url: String) =
-    FirebaseDatabase(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-actual class FirebaseDatabase private constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
 
     companion object {
         private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
 
-        internal fun FirebaseDatabase(
+        internal fun getInstance(
             android: com.google.firebase.database.FirebaseDatabase
         ) = instances.getOrPut(android) { dev.gitlive.firebase.database.FirebaseDatabase(android) }
     }
@@ -81,8 +81,14 @@ actual class FirebaseDatabase private constructor(val android: com.google.fireba
     actual fun reference() =
         DatabaseReference(NativeDatabaseReference(android.reference, persistenceEnabled))
 
-    actual fun setPersistenceEnabled(enabled: Boolean) =
-        android.setPersistenceEnabled(enabled).also { persistenceEnabled = enabled }
+    actual fun setPersistenceEnabled(enabled: Boolean) {
+        android.setPersistenceEnabled(enabled)
+        persistenceEnabled = enabled
+    }
+
+    actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
+        android.setPersistenceCacheSizeBytes(cacheSizeInBytes)
+    }
 
     actual fun setLoggingEnabled(enabled: Boolean) =
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)

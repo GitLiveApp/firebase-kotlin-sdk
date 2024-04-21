@@ -5,19 +5,33 @@
 @file:JvmName("android")
 package dev.gitlive.firebase.firestore
 
+import com.google.android.gms.tasks.TaskExecutors
+import com.google.firebase.firestore.MemoryCacheSettings
+import com.google.firebase.firestore.MemoryEagerGcSettings
+import com.google.firebase.firestore.MemoryLruGcSettings
 import com.google.firebase.firestore.MetadataChanges
 import dev.gitlive.firebase.internal.EncodedObject
+import com.google.firebase.firestore.PersistentCacheSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import kotlinx.coroutines.channels.ProducerScope
+import dev.gitlive.firebase.firestore.Source.*
 import dev.gitlive.firebase.internal.android
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executor
 import com.google.firebase.firestore.FieldPath as AndroidFieldPath
 import com.google.firebase.firestore.Filter as AndroidFilter
 import com.google.firebase.firestore.Query as AndroidQuery
+import com.google.firebase.firestore.firestoreSettings as androidFirestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings as androidMemoryCacheSettings
+import com.google.firebase.firestore.memoryEagerGcSettings as androidMemoryEagerGcSettings
+import com.google.firebase.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
+import com.google.firebase.firestore.persistentCacheSettings as androidPersistentCacheSettings
 
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
@@ -25,48 +39,142 @@ actual val Firebase.firestore get() =
 actual fun Firebase.firestore(app: FirebaseApp) =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
-actual class FirebaseFirestore(val android: com.google.firebase.firestore.FirebaseFirestore) {
+val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
+    is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {
+        setSizeBytes(sizeBytes)
+    }
+    is LocalCacheSettings.Memory -> androidMemoryCacheSettings {
+        setGcSettings(
+            when (garbaseCollectorSettings) {
+                is MemoryGarbageCollectorSettings.Eager -> androidMemoryEagerGcSettings {  }
+                is MemoryGarbageCollectorSettings.LRUGC -> androidMemoryLruGcSettings {
+                    setSizeBytes(garbaseCollectorSettings.sizeBytes)
+                }
+            }
+        )
+    }
+}
 
-    actual fun collection(collectionPath: String) = CollectionReference(NativeCollectionReferenceWrapper(android.collection(collectionPath)))
+// Since on iOS Callback threads are set as settings, we store the settings explicitly here as well
+private val callbackExecutorMap = ConcurrentHashMap<com.google.firebase.firestore.FirebaseFirestore, Executor>()
 
-    actual fun collectionGroup(collectionId: String) = Query(android.collectionGroup(collectionId).wrapped)
+actual typealias NativeFirebaseFirestore = com.google.firebase.firestore.FirebaseFirestore
+internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual val native: NativeFirebaseFirestore) {
 
-    actual fun document(documentPath: String) = DocumentReference(NativeDocumentReference(android.document(documentPath)))
+    actual var settings: FirebaseFirestoreSettings
+        get() = with(native.firestoreSettings) {
+            FirebaseFirestoreSettings(
+                isSslEnabled,
+                host,
+                cacheSettings?.let { localCacheSettings ->
+                    when (localCacheSettings) {
+                        is MemoryCacheSettings -> {
+                            val garbageCollectionSettings = when (val settings = localCacheSettings.garbageCollectorSettings) {
+                                is MemoryEagerGcSettings -> MemoryGarbageCollectorSettings.Eager
+                                is MemoryLruGcSettings -> MemoryGarbageCollectorSettings.LRUGC(settings.sizeBytes)
+                                else -> throw IllegalArgumentException("Existing settings does not have valid GarbageCollectionSettings")
+                            }
+                            LocalCacheSettings.Memory(garbageCollectionSettings)
+                        }
 
-    actual fun batch() = WriteBatch(NativeWriteBatchWrapper(android.batch()))
+                        is PersistentCacheSettings -> LocalCacheSettings.Persistent(localCacheSettings.sizeBytes)
+                        else -> throw IllegalArgumentException("Existing settings is not of a valid type")
+                    }
+                } ?: kotlin.run {
+                    @Suppress("DEPRECATION")
+                    when {
+                        isPersistenceEnabled -> LocalCacheSettings.Persistent(cacheSizeBytes)
+                        cacheSizeBytes == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED -> LocalCacheSettings.Memory(MemoryGarbageCollectorSettings.Eager)
+                        else -> LocalCacheSettings.Memory(MemoryGarbageCollectorSettings.LRUGC(cacheSizeBytes))
+                    }
+                },
+                callbackExecutorMap[native] ?: TaskExecutors.MAIN_THREAD
+            )
+        }
+        set(value) {
+            native.firestoreSettings = androidFirestoreSettings {
+                isSslEnabled = value.sslEnabled
+                host = value.host
+                setLocalCacheSettings(value.cacheSettings.android)
+            }
+            callbackExecutorMap[native] = value.callbackExecutor
+        }
+
+    actual fun collection(collectionPath: String) = native.collection(collectionPath)
+
+    actual fun collectionGroup(collectionId: String) = native.collectionGroup(collectionId)
+
+    actual fun document(documentPath: String) = NativeDocumentReference(native.document(documentPath))
+
+    actual fun batch() = native.batch()
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         com.google.firebase.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
 
-    actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T =
-        android.runTransaction { runBlocking { Transaction(NativeTransactionWrapper(it)).func() } }.await()
+    actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T =
+        native.runTransaction { runBlocking { it.func() } }.await()
 
     actual suspend fun clearPersistence() =
-        android.clearPersistence().await().run { }
+        native.clearPersistence().await().run { }
 
     actual fun useEmulator(host: String, port: Int) {
-        android.useEmulator(host, port)
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
-    }
-
-    actual fun setSettings(persistenceEnabled: Boolean?, sslEnabled: Boolean?, host: String?, cacheSizeBytes: Long?) {
-        android.firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder().also { builder ->
-            persistenceEnabled?.let { builder.setPersistenceEnabled(it) }
-            sslEnabled?.let { builder.isSslEnabled = it }
-            host?.let { builder.host = it }
-            cacheSizeBytes?.let { builder.cacheSizeBytes = it }
-        }.build()
+        native.useEmulator(host, port)
     }
 
     actual suspend fun disableNetwork() =
-        android.disableNetwork().await().run { }
+        native.disableNetwork().await().run { }
 
     actual suspend fun enableNetwork() =
-        android.enableNetwork().await().run { }
+        native.enableNetwork().await().run { }
 
 }
+
+val FirebaseFirestore.android get() = native
+
+actual data class FirebaseFirestoreSettings(
+    actual val sslEnabled: Boolean,
+    actual val host: String,
+    actual val cacheSettings: LocalCacheSettings,
+    val callbackExecutor: Executor,
+) {
+
+    actual companion object {
+        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+        internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
+        internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
+        internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 100 * 1024 * 1024
+    }
+
+    actual class Builder internal constructor(
+        actual var sslEnabled: Boolean,
+        actual var host: String,
+        actual var cacheSettings: LocalCacheSettings,
+        var callbackExecutor: Executor,
+    ) {
+
+        actual constructor() : this(
+            true,
+            DEFAULT_HOST,
+            persistentCacheSettings {  },
+            TaskExecutors.MAIN_THREAD
+        )
+        actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings, settings.callbackExecutor)
+
+        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings, callbackExecutor)
+    }
+}
+
+actual fun firestoreSettings(
+    settings: FirebaseFirestoreSettings?,
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
+        settings?.let {
+            sslEnabled = it.sslEnabled
+            host = it.host
+            cacheSettings = it.cacheSettings
+            callbackExecutor = it.callbackExecutor
+        }
+    }.apply(builder).build()
 
 internal val SetOptions.android: com.google.firebase.firestore.SetOptions? get() = when (this) {
     is SetOptions.Merge -> com.google.firebase.firestore.SetOptions.merge()
@@ -172,10 +280,10 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual val parent: NativeCollectionReferenceWrapper
         get() = NativeCollectionReferenceWrapper(android.parent)
 
-    actual fun collection(collectionPath: String) = NativeCollectionReferenceWrapper(android.collection(collectionPath))
+    actual fun collection(collectionPath: String) = android.collection(collectionPath)
 
-    actual suspend fun get() =
-        NativeDocumentSnapshotWrapper(android.get().await())
+    actual suspend fun get(source: Source) =
+        android.get(source.toAndroidSource()).await()
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) {
         val task = (setOptions.android?.let {
@@ -205,21 +313,29 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         android.delete().await()
     }
 
-    actual val snapshots: Flow<NativeDocumentSnapshotWrapper> get() = snapshots()
+    actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
-        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
-        val listener = android.addSnapshotListener(metadataChanges) { snapshot, exception ->
-            snapshot?.let { trySend(NativeDocumentSnapshotWrapper(snapshot)) }
-            exception?.let { close(exception) }
-        }
-        awaitClose { listener.remove() }
+    actual fun snapshots(includeMetadataChanges: Boolean) = addSnapshotListener(includeMetadataChanges) { snapshot, exception ->
+        snapshot?.let { trySend(snapshot) }
+        exception?.let { close(exception) }
     }
 
     override fun equals(other: Any?): Boolean =
         this === other || other is NativeDocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
+
+    private fun addSnapshotListener(
+        includeMetadataChanges: Boolean = false,
+        listener: ProducerScope<NativeDocumentSnapshot>.(com.google.firebase.firestore.DocumentSnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+    ) = callbackFlow {
+        val executor = callbackExecutorMap[android.firestore] ?: TaskExecutors.MAIN_THREAD
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val registration = android.addSnapshotListener(executor, metadataChanges) { snapshots, exception ->
+            listener(snapshots, exception)
+        }
+        awaitClose { registration.remove() }
+    }
 }
 
 val DocumentReference.android get() = native.android
@@ -228,9 +344,8 @@ actual typealias NativeQuery = AndroidQuery
 
 @PublishedApi
 internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: AndroidQuery) {
-    actual suspend fun get() = QuerySnapshot(native.get().await())
 
-    actual fun limit(limit: Number) = native.limit(limit.toLong()).wrapped
+    actual fun limit(limit: Number) = native.limit(limit.toLong())
 
     actual val snapshots get() = callbackFlow<QuerySnapshot> {
         val listener = native.addSnapshotListener { snapshot, exception ->
@@ -241,7 +356,8 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
     }
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
-        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val metadataChanges =
+            if (includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = native.addSnapshotListener(metadataChanges) { snapshot, exception ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
@@ -249,7 +365,9 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
         awaitClose { listener.remove() }
     }
 
-    actual fun where(filter: Filter) = native.where(filter.toAndroidFilter()).wrapped
+    actual suspend fun get(source: Source): QuerySnapshot = QuerySnapshot(native.get(source.toAndroidSource()).await())
+
+    actual fun where(filter: Filter) = native.where(filter.toAndroidFilter())
 
     private fun Filter.toAndroidFilter(): AndroidFilter = when (this) {
         is Filter.And -> AndroidFilter.and(*filters.map { it.toAndroidFilter() }.toTypedArray())
@@ -314,23 +432,33 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
         }
     }
 
-    actual fun orderBy(field: String, direction: Direction) = native.orderBy(field, direction).wrapped
-    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = native.orderBy(field, direction).wrapped
+    actual fun orderBy(field: String, direction: Direction) = native.orderBy(field, direction)
+    actual fun orderBy(field: EncodedFieldPath, direction: Direction) = native.orderBy(field, direction)
 
-    actual fun startAfter(document: NativeDocumentSnapshot) = native.startAfter(document).wrapped
-    actual fun startAfter(vararg fieldValues: Any) = native.startAfter(*fieldValues).wrapped
-    actual fun startAt(document: NativeDocumentSnapshot) = native.startAt(document).wrapped
-    actual fun startAt(vararg fieldValues: Any) = native.startAt(*fieldValues).wrapped
+    actual fun startAfter(document: NativeDocumentSnapshot) = native.startAfter(document)
+    actual fun startAfter(vararg fieldValues: Any) = native.startAfter(*fieldValues)
+    actual fun startAt(document: NativeDocumentSnapshot) = native.startAt(document)
+    actual fun startAt(vararg fieldValues: Any) = native.startAt(*fieldValues)
 
-    actual fun endBefore(document: NativeDocumentSnapshot) = native.endBefore(document).wrapped
-    actual fun endBefore(vararg fieldValues: Any) = native.endBefore(*fieldValues).wrapped
-    actual fun endAt(document: NativeDocumentSnapshot) = native.endAt(document).wrapped
-    actual fun endAt(vararg fieldValues: Any) = native.endAt(*fieldValues).wrapped
+    actual fun endBefore(document: NativeDocumentSnapshot) = native.endBefore(document)
+    actual fun endBefore(vararg fieldValues: Any) = native.endBefore(*fieldValues)
+    actual fun endAt(document: NativeDocumentSnapshot) = native.endAt(document)
+    actual fun endAt(vararg fieldValues: Any) = native.endAt(*fieldValues)
+
+    private fun addSnapshotListener(
+        includeMetadataChanges: Boolean = false,
+        listener: ProducerScope<QuerySnapshot>.(com.google.firebase.firestore.QuerySnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+    ) = callbackFlow {
+        val executor = callbackExecutorMap[native.firestore] ?: TaskExecutors.MAIN_THREAD
+        val metadataChanges = if(includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
+        val registration = native.addSnapshotListener(executor, metadataChanges) { snapshots, exception ->
+            listener(snapshots, exception)
+        }
+        awaitClose { registration.remove() }
+    }
 }
 
 val Query.android get() = native
-
-internal val AndroidQuery.wrapped get() = NativeQueryWrapper(this)
 
 actual typealias Direction = com.google.firebase.firestore.Query.Direction
 actual typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
@@ -434,3 +562,11 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 }
 
 actual typealias EncodedFieldPath = com.google.firebase.firestore.FieldPath
+
+internal typealias NativeSource = com.google.firebase.firestore.Source
+
+private fun Source.toAndroidSource() = when(this) {
+    CACHE -> NativeSource.CACHE
+    SERVER -> NativeSource.SERVER
+    DEFAULT -> NativeSource.DEFAULT
+}
