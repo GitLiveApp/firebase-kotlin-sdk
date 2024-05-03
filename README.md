@@ -268,6 +268,17 @@ These properties are only accessible from the equivalent target's source set. Fo
           .build()
 ```
 
+### Running on iOS
+
+On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) in not linked as a transtive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+
+Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
+```kotlin
+cocoapods {
+   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
+}
+```
+
 ## Contributing
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
