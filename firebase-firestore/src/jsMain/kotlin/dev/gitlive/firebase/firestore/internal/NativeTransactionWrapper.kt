@@ -12,7 +12,7 @@ import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.await
 
 @PublishedApi
-internal actual class NativeTransactionWrapper actual internal constructor(actual val native: NativeTransaction) {
+internal actual class NativeTransactionWrapper internal actual constructor(actual val native: NativeTransaction) {
 
     constructor(js: Transaction) : this(NativeTransaction(js))
 

@@ -7,6 +7,7 @@ package dev.gitlive.firebase.storage
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.js
 import dev.gitlive.firebase.storage.externals.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.cancel
@@ -21,7 +22,9 @@ actual val Firebase.storage
 actual fun Firebase.storage(app: FirebaseApp) =
     FirebaseStorage(getStorage(app.js))
 
-actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.FirebaseStorage) {
+val FirebaseStorage.js get() = js
+
+actual class FirebaseStorage(internal val js: dev.gitlive.firebase.storage.externals.FirebaseStorage) {
     actual val maxOperationRetryTimeMillis = js.maxOperationRetryTime.toLong()
     actual val maxUploadRetryTimeMillis = js.maxUploadRetryTime.toLong()
 
@@ -43,7 +46,9 @@ actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.Fire
 
 }
 
-actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.StorageReference) {
+val StorageReference.js get() = js
+
+actual class StorageReference(internal val js: dev.gitlive.firebase.storage.externals.StorageReference) {
     actual val path: String get() = js.fullPath
     actual val name: String get() = js.name
     actual val bucket: String get() = js.bucket

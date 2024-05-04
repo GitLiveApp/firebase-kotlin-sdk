@@ -15,10 +15,12 @@ import dev.gitlive.firebase.functions.externals.getFunctions
 import dev.gitlive.firebase.functions.externals.httpsCallable
 import dev.gitlive.firebase.functions.externals.invoke
 import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
+import dev.gitlive.firebase.functions.js as publicJs
 
 actual val Firebase.functions: FirebaseFunctions
     get() = rethrow { FirebaseFunctions(getFunctions()) }
@@ -32,7 +34,9 @@ actual fun Firebase.functions(app: FirebaseApp) =
 actual fun Firebase.functions(app: FirebaseApp, region: String) =
     rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
 
-actual class FirebaseFunctions internal constructor(val js: Functions) {
+val FirebaseFunctions.js get() = js
+
+actual class FirebaseFunctions internal constructor(internal val js: Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
         rethrow { HttpsCallableReference( httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
 
@@ -51,13 +55,15 @@ internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
 
 val HttpsCallableReference.js: HttpsCallable get() = native.js
 
-actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
+val HttpsCallableResult.js: JsHttpsCallableResult get() = js
+
+actual class HttpsCallableResult(internal val js: JsHttpsCallableResult) {
 
     actual inline fun <reified T> data() =
-        rethrow { decode<T>(value = js.data) }
+        rethrow { decode<T>(value = publicJs.data) }
 
     actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
-        rethrow { decode(strategy, js.data, buildSettings) }
+        rethrow { decode(strategy, publicJs.data, buildSettings) }
 
 }
 
