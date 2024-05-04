@@ -7,13 +7,15 @@ package dev.gitlive.firebase.database
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
 import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
-import dev.gitlive.firebase.encode
+import dev.gitlive.firebase.internal.encode
+import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
@@ -39,6 +41,10 @@ expect class FirebaseDatabase {
     fun setPersistenceEnabled(enabled: Boolean)
     fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long)
     fun useEmulator(host: String, port: Int)
+
+    fun goOffline()
+
+    fun goOnline()
 }
 
 data class ChildEvent internal constructor(
@@ -80,7 +86,7 @@ internal expect class NativeDatabaseReference : NativeQuery {
     val key: String?
     fun push(): NativeDatabaseReference
     suspend fun setValueEncoded(encodedValue: Any?)
-    suspend fun updateEncodedChildren(encodedUpdate: Any?)
+    suspend fun updateEncodedChildren(encodedUpdate: EncodedObject)
     fun child(path: String): NativeDatabaseReference
     fun onDisconnect(): NativeOnDisconnect
 
@@ -116,7 +122,7 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.updateEncodedChildren(
-        encode(update, buildSettings))
+        encodeAsObject(update, buildSettings))
 
     suspend fun removeValue() = nativeReference.removeValue()
 
@@ -142,7 +148,7 @@ internal expect class NativeOnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
     suspend fun setValue(encodedValue: Any?)
-    suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>)
+    suspend fun updateEncodedChildren(encodedUpdate: EncodedObject)
 }
 
 class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
@@ -158,7 +164,9 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
         setValue(strategy, value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValue(encode(strategy, value, buildSettings))
 
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(update.mapValues { (_, it) -> encode(it, buildSettings) })
+    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(
+        encodeAsObject(update, buildSettings)
+    )
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
         this.encodeDefaults = encodeDefaults

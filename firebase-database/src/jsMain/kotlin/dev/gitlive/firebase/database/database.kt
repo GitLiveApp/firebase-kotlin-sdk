@@ -27,8 +27,10 @@ import dev.gitlive.firebase.database.externals.ref
 import dev.gitlive.firebase.database.externals.remove
 import dev.gitlive.firebase.database.externals.set
 import dev.gitlive.firebase.database.externals.update
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.js
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -46,6 +48,8 @@ import dev.gitlive.firebase.database.externals.OnDisconnect as JsOnDisconnect
 import dev.gitlive.firebase.database.externals.Query as JsQuery
 import dev.gitlive.firebase.database.externals.endAt as jsEndAt
 import dev.gitlive.firebase.database.externals.equalTo as jsEqualTo
+import dev.gitlive.firebase.database.externals.goOffline as jsGoOffline
+import dev.gitlive.firebase.database.externals.goOnline as jsGoOnline
 import dev.gitlive.firebase.database.externals.limitToFirst as jsLimitToFirst
 import dev.gitlive.firebase.database.externals.limitToLast as jsLimitToLast
 import dev.gitlive.firebase.database.externals.orderByChild as jsOrderByChild
@@ -74,6 +78,10 @@ actual class FirebaseDatabase internal constructor(val js: Database) {
     actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {}
     actual fun setLoggingEnabled(enabled: Boolean) = rethrow { enableLogging(enabled) }
     actual fun useEmulator(host: String, port: Int) = rethrow { connectDatabaseEmulator(js, host, port) }
+
+    actual fun goOffline() = rethrow { jsGoOffline(js) }
+
+    actual fun goOnline() = rethrow { jsGoOnline(js) }
 }
 
 internal actual open class NativeQuery(
@@ -157,7 +165,6 @@ actual open class Query internal actual constructor(
     actual fun equalTo(value: Boolean, key: String?) = Query(query(js, jsEqualTo(value, key ?: undefined)), database)
 
     override fun toString() = js.toString()
-
 }
 
 @PublishedApi
@@ -178,8 +185,8 @@ internal actual class NativeDatabaseReference internal constructor(
         set(js, encodedValue).awaitWhileOnline(database)
     }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        rethrow { update(js, encodedUpdate ?: json()).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        rethrow { update(js, encodedUpdate.js).awaitWhileOnline(database) }
 
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -230,8 +237,8 @@ internal actual class NativeOnDisconnect internal constructor(
     actual suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
-        rethrow { js.update(encodedUpdate).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        rethrow { js.update(encodedUpdate.js).awaitWhileOnline(database) }
 
 }
 

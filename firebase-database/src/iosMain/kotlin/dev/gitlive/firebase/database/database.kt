@@ -23,8 +23,10 @@ import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
 import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.ios
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -76,6 +78,10 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
 
     actual fun useEmulator(host: String, port: Int) =
         ios.useEmulatorWithHost(host, port.toLong())
+
+    actual fun goOffline() = ios.goOffline()
+
+    actual fun goOnline() = ios.goOnline()
 }
 
 fun Type.toEventType() = when(this) {
@@ -171,9 +177,8 @@ internal actual class NativeDatabaseReference internal constructor(
         ios.await(persistenceEnabled) { setValue(encodedValue, it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
     }
 
     actual suspend fun removeValue() {
@@ -202,7 +207,6 @@ internal actual class NativeDatabaseReference internal constructor(
 
 val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
 
-@Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val ios: FIRDataSnapshot,
     private val persistenceEnabled: Boolean
@@ -244,9 +248,8 @@ internal actual class NativeOnDisconnect internal constructor(
         ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate as Map<Any?, *>, it) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
     }
 }
 

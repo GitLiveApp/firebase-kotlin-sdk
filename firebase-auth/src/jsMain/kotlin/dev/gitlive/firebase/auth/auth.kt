@@ -4,8 +4,10 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.FirebaseNetworkException
 import dev.gitlive.firebase.auth.externals.*
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose

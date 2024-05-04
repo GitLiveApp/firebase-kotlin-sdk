@@ -7,7 +7,7 @@ package dev.gitlive.firebase.functions
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.decode
+import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit

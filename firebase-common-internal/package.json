@@ -1,0 +1,32 @@
+{
+  "name": "@gitlive/firebase-common-internal",
+  "version": "1.12.0",
+  "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
+  "main": "firebase-common-internal.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GitLiveApp/firebase-kotlin-sdk.git"
+  },
+  "keywords": [
+    "kotlin",
+    "multiplatform",
+    "kotlin-js",
+    "firebase"
+  ],
+  "author": "dev.gitlive",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk/issues"
+  },
+  "homepage": "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk",
+  "dependencies": {
+    "@gitlive/firebase-common": "1.12.0",
+    "firebase": "9.19.1",
+    "kotlin": "1.8.20",
+    "kotlinx-coroutines-core": "1.6.4",
+    "kotlinx-serialization-kotlinx-serialization-runtime": "1.3.2"
+  }
+}

@@ -4,11 +4,19 @@
 
 package dev.gitlive.firebase.functions
 
-import dev.gitlive.firebase.*
-import dev.gitlive.firebase.functions.externals.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.functions.externals.Functions
+import dev.gitlive.firebase.functions.externals.HttpsCallable
+import dev.gitlive.firebase.functions.externals.connectFunctionsEmulator
+import dev.gitlive.firebase.functions.externals.getFunctions
+import dev.gitlive.firebase.functions.externals.httpsCallable
+import dev.gitlive.firebase.functions.externals.invoke
+import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerializationStrategy
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 

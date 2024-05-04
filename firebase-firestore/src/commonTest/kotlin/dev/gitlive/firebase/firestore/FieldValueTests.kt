@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.firebaseSerializer
+import dev.gitlive.firebase.internal.firebaseSerializer
 import dev.gitlive.firebase.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

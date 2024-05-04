@@ -1,5 +1,7 @@
 package dev.gitlive.firebase.firestore
 
+import dev.gitlive.firebase.firestore.internal.safeValue
+
 sealed interface WhereConstraint {
 
     sealed interface ForNullableObject : WhereConstraint {

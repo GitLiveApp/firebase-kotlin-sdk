@@ -15,7 +15,7 @@ actual fun runBlockingTest(action: suspend CoroutineScope.() -> Unit) {
 }
 
 actual fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any = json(*pairs.map { (key, value) -> ((key as? String) ?: JSON.stringify(key)) to value }.toTypedArray())
-actual fun nativeListOf(vararg elements: Any): Any = elements
+actual fun nativeListOf(vararg elements: Any?): Any = elements
 actual fun nativeAssertEquals(expected: Any?, actual: Any?) {
     kotlin.test.assertEquals(JSON.stringify(expected), JSON.stringify(actual))
 }

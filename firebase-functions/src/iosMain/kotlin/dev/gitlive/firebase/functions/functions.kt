@@ -7,10 +7,13 @@ package dev.gitlive.firebase.functions
 import cocoapods.FirebaseFunctions.FIRFunctions
 import cocoapods.FirebaseFunctions.FIRHTTPSCallable
 import cocoapods.FirebaseFunctions.FIRHTTPSCallableResult
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.DecodeSettings
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerializationStrategy
 import platform.Foundation.NSError
 
 actual val Firebase.functions

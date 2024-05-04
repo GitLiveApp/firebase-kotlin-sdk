@@ -1,6 +1,16 @@
 {
   "rules": {
     ".read": true,
-    ".write": true
+    ".write": true,
+    "FirebaseRealtimeDatabaseTest": {
+      "lastActivity": {
+        ".validate": "!newData.exists() || newData.isNumber()"
+      },
+      "nested": {
+        "lastActivity": {
+          ".validate": "!newData.exists() || newData.isNumber()"
+        }
+      }
+    }
   }
 }

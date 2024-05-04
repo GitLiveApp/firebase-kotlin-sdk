@@ -3,7 +3,7 @@
 
 package dev.gitlive.firebase.database.externals
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Unsubscribe
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 

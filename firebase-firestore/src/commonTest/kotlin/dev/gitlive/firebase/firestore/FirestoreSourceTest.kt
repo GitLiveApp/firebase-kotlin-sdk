@@ -62,7 +62,7 @@ class FirestoreSourceTest {
         setDoc()
         val doc = firestore.collection("testFirestoreQuerying").document("one").get(Source.SERVER)
         assertTrue(doc.exists)
-        assertFalse(doc.native.metadata.isFromCache)
+        assertFalse(doc.metadata.isFromCache)
     }
 
     @Test
@@ -71,7 +71,7 @@ class FirestoreSourceTest {
         setDoc()
         val doc = firestore.collection("testFirestoreQuerying").document("one").get(Source.SERVER)
         assertTrue(doc.exists)
-        assertFalse(doc.native.metadata.isFromCache)
+        assertFalse(doc.metadata.isFromCache)
     }
 
     @Test
@@ -83,7 +83,7 @@ class FirestoreSourceTest {
 
         val cachedDoc = firestore.collection("testFirestoreQuerying").document("one").get(Source.CACHE)
         assertTrue(cachedDoc.exists)
-        assertTrue(cachedDoc.native.metadata.isFromCache)
+        assertTrue(cachedDoc.metadata.isFromCache)
     }
 
     @Test
@@ -100,14 +100,14 @@ class FirestoreSourceTest {
         initializeFirebase(persistenceEnabled = false)
         val doc = firestore.collection("testFirestoreQuerying").document("one").get(Source.DEFAULT)
         assertTrue(doc.exists)
-        assertFalse(doc.native.metadata.isFromCache)
+        assertFalse(doc.metadata.isFromCache)
     }
     @Test
     fun testGet() = runTest {
         initializeFirebase(persistenceEnabled = false)
         val doc = firestore.collection("testFirestoreQuerying").document("one").get()
         assertTrue(doc.exists)
-        assertFalse(doc.native.metadata.isFromCache)
+        assertFalse(doc.metadata.isFromCache)
     }
 
     @Test
@@ -117,7 +117,7 @@ class FirestoreSourceTest {
         val doc = firestore.collection("testFirestoreQuerying").document("one").get(Source.DEFAULT)
         assertTrue(doc.exists)
         // Firebase defaults to first fetching from server
-        assertFalse(doc.native.metadata.isFromCache)
+        assertFalse(doc.metadata.isFromCache)
     }
 
 }

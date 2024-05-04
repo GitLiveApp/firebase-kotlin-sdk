@@ -14,11 +14,13 @@ import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
+import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.reencodeTransformation
+import dev.gitlive.firebase.internal.android
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.reencodeTransformation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -93,6 +95,10 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
 
     actual fun useEmulator(host: String, port: Int) =
         android.useEmulator(host, port)
+
+    actual fun goOffline() = android.goOffline()
+
+    actual fun goOnline() = android.goOnline()
 }
 
 internal actual open class NativeQuery(
@@ -207,9 +213,8 @@ internal actual class NativeDatabaseReference internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    @Suppress("UNCHECKED_CAST")
-    actual suspend fun updateEncodedChildren(encodedUpdate: Any?) =
-        android.updateChildren(encodedUpdate as Map<String, Any?>)
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 
@@ -255,7 +260,6 @@ internal actual class NativeDatabaseReference internal constructor(
 
 val DatabaseReference.android get() = nativeReference.android
 
-@Suppress("UNCHECKED_CAST")
 actual class DataSnapshot internal constructor(
     val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean
@@ -299,8 +303,8 @@ internal actual class NativeOnDisconnect internal constructor(
         .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
         .run { Unit }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: Map<String, Any?>) =
-        android.updateChildren(encodedUpdate)
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+        android.updateChildren(encodedUpdate.android)
             .run { if(persistenceEnabled) await() else awaitWhileOnline(database) }
             .run { Unit }
 }
