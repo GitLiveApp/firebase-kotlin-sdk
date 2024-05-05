@@ -128,6 +128,7 @@ external interface DataSnapshot {
     val size: Int
     val ref: DatabaseReference
     fun `val`(): Any
+    fun exportVal(): Any
     fun exists(): Boolean
     fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
     fun child(path: String): DataSnapshot

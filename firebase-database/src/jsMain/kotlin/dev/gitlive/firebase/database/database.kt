@@ -170,10 +170,10 @@ actual class DataSnapshot internal constructor(
     }
 
     actual inline fun <reified T> value() =
-        rethrow { decode<T>(value = js.`val`()) }
+        rethrow { decode<T>(value = js.exportVal()) }
 
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        rethrow { decode(strategy, js.`val`()) }
+        rethrow { decode(strategy, js.exportVal()) }
 
     actual val exists get() = rethrow { js.exists() }
     actual val key get() = rethrow { js.key }

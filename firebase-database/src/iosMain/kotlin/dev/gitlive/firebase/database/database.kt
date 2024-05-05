@@ -193,10 +193,10 @@ actual class DataSnapshot internal constructor(
     actual val value get() = ios.value
 
     actual inline fun <reified T> value() =
-        decode<T>(value = ios.value)
+        decode<T>(value = ios.valueInExportFormat())
 
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        decode(strategy, ios.value)
+        decode(strategy, ios.valueInExportFormat())
 
     actual fun child(path: String) = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
     actual val hasChildren get() = ios.hasChildren()

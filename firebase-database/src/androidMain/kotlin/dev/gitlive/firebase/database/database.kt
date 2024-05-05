@@ -227,13 +227,15 @@ actual class DataSnapshot internal constructor(
 
     actual val ref: DatabaseReference get() = DatabaseReference(android.ref, persistenceEnabled)
 
-    actual val value get() = android.value
-
+    actual val value get(): Any? {
+        check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }
+        return android.value
+    }
     actual inline fun <reified T> value() =
-        decode<T>(value = android.value)
+        decode<T>(value = android.getValue(true))
 
     actual fun <T> value(strategy: DeserializationStrategy<T>) =
-        decode(strategy, android.value)
+        decode(strategy, android.getValue(true))
 
     actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
     actual val hasChildren get() = android.hasChildren()
