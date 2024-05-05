@@ -73,7 +73,7 @@ actual class FirebaseFirestore(jsFirestore: Firestore) {
     actual fun batch() = rethrow { WriteBatch(writeBatch(js)) }
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
-        rethrow { setLogLevel( if(loggingEnabled) "error" else "silent") }
+        rethrow { setLogLevel( if(loggingEnabled) "debug" else "silent") }
 
     actual suspend fun <T> runTransaction(func: suspend Transaction.() -> T) =
         rethrow { runTransaction(js, { GlobalScope.promise { Transaction(it).func() } } ).await() }
