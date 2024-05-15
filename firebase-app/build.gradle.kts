@@ -81,13 +81,13 @@ kotlin {
         iosSimulatorArm64()
 
         cocoapods {
-            ios.deploymentTarget = "10.0"
+            ios.deploymentTarget = "12.0"
             framework {
                 baseName = "FirebaseApp"
             }
             noPodspec()
             pod("FirebaseCore") {
-                version = "10.23.0"
+                version = "10.25.0"
             }
         }
     }
