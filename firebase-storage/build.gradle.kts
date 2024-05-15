@@ -84,13 +84,13 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "11.0"
+            ios.deploymentTarget = "12.0"
             framework {
                 baseName = "FirebaseStorage"
             }
             noPodspec()
             pod("FirebaseStorage") {
-                version = "10.23.0"
+                version = "10.25.0"
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
