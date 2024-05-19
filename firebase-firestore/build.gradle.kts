@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
@@ -129,6 +130,29 @@ kotlin {
                         useMocha {
                             timeout = "180s"
                         }
+                    }
+                }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        useCommonJs()
+        nodejs {
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            )
+        }
+        browser {
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
                     }
                 }
             )
