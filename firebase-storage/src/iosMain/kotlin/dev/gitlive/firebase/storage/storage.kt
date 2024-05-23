@@ -151,13 +151,10 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
 
 fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
     val metadata = FIRStorageMetadata()
-    val customMetadata: Map<Any?, String>? = this.customMetadata?.let {
-        it.mapKeys { entry ->
-            entry.key as Any to entry.value
-        }
-    }
-
-    metadata.setCustomMetadata(customMetadata)
+    val mappedMetadata: Map<Any?, String>? = this.customMetadata?.map {
+        it.key to it.value
+    }?.toMap()
+    metadata.setCustomMetadata(mappedMetadata)
     metadata.setCacheControl(this.cacheControl)
     metadata.setContentDisposition(this.contentDisposition)
     metadata.setContentEncoding(this.contentEncoding)
