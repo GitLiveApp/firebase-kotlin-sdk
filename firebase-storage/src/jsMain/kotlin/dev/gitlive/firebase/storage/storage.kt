@@ -59,10 +59,10 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
 
     actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).await()) }
 
-    actual suspend fun putFile(file: File): Unit = rethrow { uploadBytes(js, file).await() }
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata).await() }
 
-    actual fun putFileResumable(file: File): ProgressFlow = rethrow {
-        val uploadTask = uploadBytesResumable(js, file)
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
+        val uploadTask = uploadBytesResumable(js, file, metadata)
 
         val flow = callbackFlow {
             val unsubscribe = uploadTask.on(

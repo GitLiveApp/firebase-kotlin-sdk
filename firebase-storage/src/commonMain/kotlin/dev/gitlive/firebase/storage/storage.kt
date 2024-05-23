@@ -40,9 +40,9 @@ expect class StorageReference {
 
     suspend fun listAll(): ListResult
 
-    suspend fun putFile(file: File)
+    suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
 
-    fun putFileResumable(file: File): ProgressFlow
+    fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
 }
 
 expect class ListResult {
@@ -66,3 +66,13 @@ interface ProgressFlow : Flow<Progress> {
 
 
 expect class FirebaseStorageException : FirebaseException
+
+data class FirebaseStorageMetadata(
+    val md5Hash: String? = null,
+    val cacheControl: String? = null,
+    val contentDisposition: String? = null,
+    val contentEncoding: String? = null,
+    val contentLanguage: String? = null,
+    val contentType: String? = null,
+    val customMetadata: Map<String, String>? = null
+)

@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.storage.OnPausedListener
 import com.google.firebase.storage.OnProgressListener
+import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -65,10 +66,20 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
 
     actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
-    actual suspend fun putFile(file: File) = android.putFile(file.uri).await().run {}
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
+        if (metadata != null) {
+            android.putFile(file.uri, metadata.toStorageMetadata()).await().run {}
+        } else {
+            android.putFile(file.uri).await().run {}
+        }
+    }
 
-    actual fun putFileResumable(file: File): ProgressFlow {
-        val android = android.putFile(file.uri)
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val android = if (metadata != null) {
+            android.putFile(file.uri, metadata.toStorageMetadata())
+        } else {
+            android.putFile(file.uri)
+        }
 
         val flow = callbackFlow {
             val onCanceledListener = OnCanceledListener { cancel() }
@@ -105,3 +116,18 @@ actual class ListResult(android: com.google.firebase.storage.ListResult) {
 actual class File(val uri: Uri)
 
 actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
+
+
+fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
+    return StorageMetadata.Builder()
+        .setCacheControl(this.cacheControl)
+        .setContentDisposition(this.contentDisposition)
+        .setContentEncoding(this.contentEncoding)
+        .setContentLanguage(this.contentLanguage)
+        .setContentType(this.contentType)
+        .apply {
+            customMetadata?.entries?.forEach {
+                (key, value) -> setCustomMetadata(key, value)
+            }
+        }.build()
+}

@@ -6,6 +6,7 @@ package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageListResult
+import cocoapods.FirebaseStorage.FIRStorageMetadata
 import cocoapods.FirebaseStorage.FIRStorageReference
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
@@ -76,10 +77,10 @@ actual class StorageReference(val ios: FIRStorageReference) {
         }
     }
 
-    actual suspend fun putFile(file: File) = ios.awaitResult { putFile(file.url, null, completion = it) }.run {}
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) = ios.awaitResult { putFile(file.url, metadata?.toFIRMetadata(), completion = it) }.run {}
 
-    actual fun putFileResumable(file: File): ProgressFlow {
-        val ios = ios.putFile(file.url)
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val ios = ios.putFile(file.url, metadata?.toFIRMetadata())
 
         val flow = callbackFlow {
             ios.observeStatus(FIRStorageTaskStatusProgress) {
@@ -146,4 +147,21 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
         }
     }
     return job.await() as R
+}
+
+fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
+    val metadata = FIRStorageMetadata()
+    val customMetadata: Map<Any?, String>? = this.customMetadata?.let {
+        it.mapKeys { entry ->
+            entry.key as Any to entry.value
+        }
+    }
+
+    metadata.setCustomMetadata(customMetadata)
+    metadata.setCacheControl(this.cacheControl)
+    metadata.setContentDisposition(this.contentDisposition)
+    metadata.setContentEncoding(this.contentEncoding)
+    metadata.setContentLanguage(this.contentLanguage)
+    metadata.setContentType(this.contentType)
+    return metadata
 }

@@ -66,11 +66,11 @@ actual class StorageReference {
         TODO("Not yet implemented")
     }
 
-    actual fun putFileResumable(file: File): ProgressFlow {
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         TODO("Not yet implemented")
     }
 
-    actual suspend fun putFile(file: File) {
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
     }
 
 }

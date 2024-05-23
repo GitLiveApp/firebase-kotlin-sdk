@@ -4,6 +4,7 @@
 package dev.gitlive.firebase.storage.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp
+import dev.gitlive.firebase.storage.FirebaseStorageMetadata
 import kotlin.js.Promise
 
 external fun getStorage(app: FirebaseApp? = definedExternally): FirebaseStorage
@@ -13,9 +14,9 @@ external fun ref(ref: StorageReference, url: String? = definedExternally): Stora
 
 external fun getDownloadURL(ref: StorageReference): Promise<String>
 
-external fun uploadBytes(ref: StorageReference, file: dynamic): Promise<Unit>
+external fun uploadBytes(ref: StorageReference, file: dynamic, metadata: FirebaseStorageMetadata?): Promise<Unit>
 
-external fun uploadBytesResumable(ref: StorageReference, data: dynamic): UploadTask
+external fun uploadBytesResumable(ref: StorageReference, data: dynamic, metadata: FirebaseStorageMetadata?): UploadTask
 
 external fun deleteObject(ref: StorageReference): Promise<Unit>;
 
