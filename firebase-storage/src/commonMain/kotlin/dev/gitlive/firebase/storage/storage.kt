@@ -64,15 +64,26 @@ interface ProgressFlow : Flow<Progress> {
     fun cancel()
 }
 
-
 expect class FirebaseStorageException : FirebaseException
 
 data class FirebaseStorageMetadata(
-    val md5Hash: String? = null,
-    val cacheControl: String? = null,
-    val contentDisposition: String? = null,
-    val contentEncoding: String? = null,
-    val contentLanguage: String? = null,
-    val contentType: String? = null,
-    val customMetadata: Map<String, String>? = null
-)
+    var md5Hash: String? = null,
+    var cacheControl: String? = null,
+    var contentDisposition: String? = null,
+    var contentEncoding: String? = null,
+    var contentLanguage: String? = null,
+    var contentType: String? = null,
+    var customMetadata: MutableMap<String, String> = mutableMapOf()
+) {
+    fun setCustomMetadata(key: String, value: String?) {
+        value?.let {
+            customMetadata[key] = it
+        }
+    }
+}
+
+fun storageMetadata(init: FirebaseStorageMetadata.() -> Unit): FirebaseStorageMetadata {
+    val metadata = FirebaseStorageMetadata()
+    metadata.init()
+    return metadata
+}

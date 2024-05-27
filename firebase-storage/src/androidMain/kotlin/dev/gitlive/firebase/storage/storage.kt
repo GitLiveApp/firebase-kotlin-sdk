@@ -126,7 +126,7 @@ fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
         .setContentLanguage(this.contentLanguage)
         .setContentType(this.contentType)
         .apply {
-            customMetadata?.entries?.forEach {
+            customMetadata.entries.forEach {
                 (key, value) -> setCustomMetadata(key, value)
             }
         }.build()
