@@ -32,6 +32,8 @@ expect class StorageReference {
     val root: StorageReference
     val storage: FirebaseStorage
 
+    suspend fun getMetadata(): FirebaseStorageMetadata?
+
     fun child(path: String): StorageReference
 
     suspend fun delete()

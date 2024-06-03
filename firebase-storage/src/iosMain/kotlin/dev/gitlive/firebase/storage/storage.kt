@@ -65,6 +65,16 @@ actual class StorageReference(val ios: FIRStorageReference) {
 
     actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? = ios.awaitResult {
+        metadataWithCompletion { metadata, error ->
+            if (error == null) {
+                it.invoke(metadata?.toFirebaseStorageMetadata(), null)
+            } else {
+                it.invoke(null, error)
+            }
+        }
+    }
+
     actual suspend fun delete() = await { ios.deleteWithCompletion(it) }
 
     actual suspend fun getDownloadUrl(): String = ios.awaitResult {
@@ -161,4 +171,19 @@ fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
     metadata.setContentLanguage(this.contentLanguage)
     metadata.setContentType(this.contentType)
     return metadata
+}
+
+fun FIRStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash()
+        cacheControl = sdkMetadata.cacheControl()
+        contentDisposition = sdkMetadata.contentDisposition()
+        contentEncoding = sdkMetadata.contentEncoding()
+        contentLanguage = sdkMetadata.contentLanguage()
+        contentType = sdkMetadata.contentType()
+        sdkMetadata.customMetadata()?.forEach {
+            setCustomMetadata(it.key.toString(), it.value.toString())
+        }
+    }
 }

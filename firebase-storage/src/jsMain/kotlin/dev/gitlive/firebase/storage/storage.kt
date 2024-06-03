@@ -51,6 +51,8 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
     actual val root: StorageReference get() = StorageReference(js.root)
     actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).await().toFirebaseStorageMetadata() }
+
     actual fun child(path: String): StorageReference = StorageReference(ref(js, path))
 
     actual suspend fun delete() = rethrow { deleteObject(js).await() }
@@ -59,10 +61,10 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
 
     actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).await()) }
 
-    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata).await() }
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata?.toStorageMetadata()).await() }
 
     actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
-        val uploadTask = uploadBytesResumable(js, file, metadata)
+        val uploadTask = uploadBytesResumable(js, file, metadata?.toStorageMetadata())
 
         val flow = callbackFlow {
             val unsubscribe = uploadTask.on(
@@ -124,3 +126,30 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
             }
         }
     }
+
+
+fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash
+        cacheControl = sdkMetadata.cacheControl
+        contentDisposition = sdkMetadata.contentDisposition
+        contentEncoding = sdkMetadata.contentEncoding
+        contentLanguage = sdkMetadata.contentLanguage
+        contentType = sdkMetadata.contentType
+        sdkMetadata.customMetadata?.entries?.forEach {
+            setCustomMetadata(it.key, it.value)
+        }
+    }
+}
+
+fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
+    val metadata = StorageMetadata()
+    metadata.cacheControl = cacheControl
+    metadata.contentDisposition = contentDisposition
+    metadata.contentEncoding = contentEncoding
+    metadata.contentLanguage = contentLanguage
+    metadata.contentType = contentType
+    metadata.customMetadata = customMetadata
+    return metadata
+}

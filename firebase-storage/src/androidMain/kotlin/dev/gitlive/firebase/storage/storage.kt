@@ -8,6 +8,7 @@ package dev.gitlive.firebase.storage
 import android.net.Uri
 import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.OnPausedListener
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageMetadata
@@ -57,6 +58,8 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
     actual val parent: StorageReference? get() = android.parent?.let { StorageReference(it) }
     actual val root: StorageReference get() = StorageReference(android.root)
     actual val storage: FirebaseStorage get() = FirebaseStorage(android.storage)
+
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
 
     actual fun child(path: String): StorageReference = StorageReference(android.child(path))
 
@@ -117,7 +120,6 @@ actual class File(val uri: Uri)
 
 actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 
-
 fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
     return StorageMetadata.Builder()
         .setCacheControl(this.cacheControl)
@@ -130,4 +132,19 @@ fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
                 (key, value) -> setCustomMetadata(key, value)
             }
         }.build()
+}
+
+fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash
+        cacheControl = sdkMetadata.cacheControl
+        contentDisposition = sdkMetadata.contentDisposition
+        contentEncoding = sdkMetadata.contentEncoding
+        contentLanguage = sdkMetadata.contentLanguage
+        contentType = sdkMetadata.contentType
+        sdkMetadata.customMetadataKeys.forEach {
+            setCustomMetadata(it, sdkMetadata.getCustomMetadata(it))
+        }
+    }
 }

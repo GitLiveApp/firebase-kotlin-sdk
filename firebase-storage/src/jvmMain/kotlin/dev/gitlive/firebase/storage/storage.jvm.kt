@@ -51,6 +51,10 @@ actual class StorageReference {
     actual val storage: FirebaseStorage
         get() = TODO("Not yet implemented")
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? {
+        TODO("Not yet implemented")
+    }
+
     actual fun child(path: String): StorageReference {
         TODO("Not yet implemented")
     }
