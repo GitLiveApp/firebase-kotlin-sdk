@@ -19,7 +19,7 @@ actual val Firebase.analytics: FirebaseAnalytics
 actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
     actual fun logEvent(
         name: String,
-        parameters: Map<String, String>
+        parameters: Map<String, String>?
     ) {
         jsLogEvent(js, name, parameters)
     }

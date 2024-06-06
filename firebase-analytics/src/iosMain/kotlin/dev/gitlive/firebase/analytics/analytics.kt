@@ -11,10 +11,10 @@ actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(FIRAnalytics)
 
 actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
-    actual fun logEvent(name: String, parameters: Map<String, String>) {
-        val mappedParameters: Map<Any?, String> = parameters.map {
+    actual fun logEvent(name: String, parameters: Map<String, String>?) {
+        val mappedParameters: Map<Any?, String>? = parameters?.map {
             it.key to it.value
-        }.toMap()
+        }?.toMap()
         ios.logEventWithName(name, mappedParameters)
     }
     actual fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit) {

@@ -28,6 +28,8 @@ jobs:
         run: ./gradlew :updateVersions
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Publish Firebase Analytics
+        run: ./gradlew :firebase-analytics:publish
       - name: Publish Firebase App
         run: ./gradlew :firebase-app:publish
       - name: Publish Firebase Auth

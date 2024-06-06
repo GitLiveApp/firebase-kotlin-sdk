@@ -7,7 +7,7 @@ actual val Firebase.analytics: FirebaseAnalytics
     get() = TODO("Not yet implemented")
 
 actual class FirebaseAnalytics {
-    actual fun logEvent(name: String, parameters: Map<String, String>) {}
+    actual fun logEvent(name: String, parameters: Map<String, String>?) {}
     actual fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit) {}
     actual fun setUserProperty(name: String, value: String) {}
     actual fun setUserId(id: String) {}

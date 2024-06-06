@@ -8,7 +8,11 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
+import dev.gitlive.firebase.runBlockingTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 expect val emulatorHost: String
 expect val context: Any
@@ -34,5 +38,22 @@ class FirebaseAnalyticsTest {
         )
 
         analytics = Firebase.analytics
+    }
+
+    @AfterTest
+    fun deinitializeFirebase() = runBlockingTest {
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
+    }
+
+    @Test
+    fun testAnalyticsShouldNotCrash() {
+        assertNotNull(analytics)
+
+        // This should not crash, otherwise the test will fail
+        analytics.logEvent("test") {
+            param("key", "value")
+        }
     }
 }

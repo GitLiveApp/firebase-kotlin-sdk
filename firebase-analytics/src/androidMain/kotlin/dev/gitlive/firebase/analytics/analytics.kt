@@ -9,8 +9,8 @@ actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
 actual class FirebaseAnalytics(val android: com.google.firebase.analytics.FirebaseAnalytics) {
-    actual fun logEvent(name: String, parameters: Map<String, String>) {
-        android.logEvent(name, parameters.toBundle())
+    actual fun logEvent(name: String, parameters: Map<String, String>?) {
+        android.logEvent(name, parameters?.toBundle())
     }
     actual fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit) {
         val params = FirebaseAnalyticsParameters()
