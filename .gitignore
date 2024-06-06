@@ -1,5 +1,5 @@
 # Project exclude paths
-/.gradle/
+/**/.gradle/
 /**/build/
 /.idea/
 local.properties
