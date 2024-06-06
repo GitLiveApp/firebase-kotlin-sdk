@@ -20,7 +20,10 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 actual val Firebase.storage get() =
@@ -77,6 +80,14 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
         }
     }
 
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) {
+        if (metadata != null) {
+            android.putBytes(data.data, metadata.toStorageMetadata()).await().run {}
+        } else {
+            android.putBytes(data.data).await().run {}
+        }
+    }
+
     actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val android = if (metadata != null) {
             android.putFile(file.uri, metadata.toStorageMetadata())
@@ -117,6 +128,8 @@ actual class ListResult(android: com.google.firebase.storage.ListResult) {
 }
 
 actual class File(val uri: Uri)
+
+actual class Data(val data: ByteArray)
 
 actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 

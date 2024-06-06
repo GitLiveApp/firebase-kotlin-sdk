@@ -4,6 +4,9 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
 expect val Firebase.storage: FirebaseStorage
@@ -44,6 +47,8 @@ expect class StorageReference {
 
     suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
 
+    suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
+
     fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
 }
 
@@ -54,6 +59,8 @@ expect class ListResult {
 }
 
 expect class File
+
+expect class Data
 
 sealed class Progress(val bytesTransferred: Number, val totalByteCount: Number) {
     class Running internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)

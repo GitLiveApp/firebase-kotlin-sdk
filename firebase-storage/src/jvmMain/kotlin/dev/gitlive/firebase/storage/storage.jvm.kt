@@ -77,6 +77,8 @@ actual class StorageReference {
     actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
     }
 
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) {
+    }
 }
 
 actual class ListResult {
@@ -90,3 +92,4 @@ actual class ListResult {
 
 actual class File
 actual class FirebaseStorageException internal constructor(message: String) : FirebaseException(message)
+actual class Data

@@ -63,6 +63,8 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
 
     actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata?.toStorageMetadata()).await() }
 
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, data.data, metadata?.toStorageMetadata()).await() }
+
     actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
         val uploadTask = uploadBytesResumable(js, file, metadata?.toStorageMetadata())
 
@@ -101,6 +103,7 @@ actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListResult) {
 }
 
 actual typealias File = org.w3c.files.File
+actual class Data(val data: org.khronos.webgl.Uint8Array)
 
 actual open class FirebaseStorageException(code: String, cause: Throwable) :
     FirebaseException(code, cause)

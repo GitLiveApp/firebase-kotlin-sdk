@@ -23,6 +23,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
@@ -87,7 +88,13 @@ actual class StorageReference(val ios: FIRStorageReference) {
         }
     }
 
-    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) = ios.awaitResult { putFile(file.url, metadata?.toFIRMetadata(), completion = it) }.run {}
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) = ios.awaitResult { callback ->
+        putFile(file.url, metadata?.toFIRMetadata(), callback)
+    }.run {}
+
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) = ios.awaitResult { callback ->
+        putData(data.data, metadata?.toFIRMetadata(), callback)
+    }.run {}
 
     actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val ios = ios.putFile(file.url, metadata?.toFIRMetadata())
@@ -132,6 +139,8 @@ actual class ListResult(ios: FIRStorageListResult) {
 }
 
 actual class File(val url: NSURL)
+
+actual class Data(val data: NSData)
 
 actual class FirebaseStorageException(message: String): FirebaseException(message)
 
