@@ -118,7 +118,7 @@ subprojects {
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.2")
+                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.3")
                 "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
                     exclude("com.google.android.gms")
                 }
