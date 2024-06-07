@@ -6,13 +6,24 @@ import kotlin.js.Promise
 
 external fun getAnalytics(app: FirebaseApp? = definedExternally): FirebaseAnalytics
 
-external fun jsLogEvent(app: FirebaseAnalytics, name: String, parameters: Map<String, String>?)
-external fun jsSetUserProperty(app: FirebaseAnalytics, name: String, value: String)
-external fun jsSetUserId(app: FirebaseAnalytics, id: String)
-external fun jsResetAnalyticsData(app: FirebaseAnalytics)
-external fun jsSetDefaultEventParameters(app: FirebaseAnalytics, parameters: Map<String, String>)
-external fun jsSetAnalyticsCollectionEnabled(app: FirebaseAnalytics, enabled: Boolean)
-external fun jsSetSessionTimeoutInterval(app: FirebaseAnalytics, sessionTimeoutInterval: Long)
-external fun jsGetSessionId(app: FirebaseAnalytics): Promise<Long?>
+external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Map<String, String>?)
+external fun setUserProperty(app: FirebaseAnalytics, name: String, value: String)
+external fun setUserId(app: FirebaseAnalytics, id: String)
+external fun resetAnalyticsData(app: FirebaseAnalytics)
+external fun setDefaultEventParameters(app: FirebaseAnalytics, parameters: Map<String, String>)
+external fun setAnalyticsCollectionEnabled(app: FirebaseAnalytics, enabled: Boolean)
+external fun setSessionTimeoutInterval(app: FirebaseAnalytics, sessionTimeoutInterval: Long)
+external fun getSessionId(app: FirebaseAnalytics): Promise<Long?>
+external fun setConsent(app: FirebaseAnalytics, consentSettings: ConsentSettings)
 
 external interface FirebaseAnalytics
+
+external class ConsentSettings() {
+    var ad_personalization: String?
+    var ad_storage: String?
+    var ad_user_data: String?
+    var analytics_storage: String?
+    var functionality_storage: String?
+    var personalization_storage: String?
+    var security_storage: String?
+}

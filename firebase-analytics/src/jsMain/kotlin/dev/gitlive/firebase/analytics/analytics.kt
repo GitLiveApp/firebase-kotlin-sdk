@@ -21,7 +21,7 @@ actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.
         name: String,
         parameters: Map<String, String>?
     ) {
-        jsLogEvent(js, name, parameters)
+        dev.gitlive.firebase.analytics.externals.logEvent(js, name, parameters)
     }
 
     actual fun logEvent(
@@ -34,29 +34,54 @@ actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.
     }
 
     actual fun setUserProperty(name: String, value: String) {
-        jsSetUserProperty(js, name, value)
+        dev.gitlive.firebase.analytics.externals.setUserProperty(js, name, value)
     }
 
     actual fun setUserId(id: String) {
-        jsSetUserId(js, id)
+        dev.gitlive.firebase.analytics.externals.setUserId(js, id)
     }
 
     actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
-        jsSetAnalyticsCollectionEnabled(js, enabled)
+        dev.gitlive.firebase.analytics.externals.setAnalyticsCollectionEnabled(js, enabled)
     }
 
     actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
-        jsSetSessionTimeoutInterval(js, sessionTimeoutInterval)
+        dev.gitlive.firebase.analytics.externals.setSessionTimeoutInterval(js, sessionTimeoutInterval)
     }
 
-    actual suspend fun getSessionId(): Long? = rethrow { jsGetSessionId(js).await() }
+    actual suspend fun getSessionId(): Long? = rethrow { dev.gitlive.firebase.analytics.externals.getSessionId(js).await() }
 
     actual fun resetAnalyticsData() {
-        jsResetAnalyticsData(js)
+        dev.gitlive.firebase.analytics.externals.resetAnalyticsData(js)
     }
 
     actual fun setDefaultEventParameters(parameters: Map<String, String>) {
-        jsSetDefaultEventParameters(js, parameters)
+        dev.gitlive.firebase.analytics.externals.setDefaultEventParameters(js, parameters)
+    }
+
+    actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+        val consent = dev.gitlive.firebase.analytics.externals.ConsentSettings()
+        consentSettings.forEach {
+            when (it.key) {
+                ConsentType.AD_PERSONALIZATION -> consent.ad_personalization = it.value.name
+                ConsentType.AD_STORAGE -> consent.ad_storage = it.value.name
+                ConsentType.AD_USER_DATA -> consent.ad_user_data = it.value.name
+                ConsentType.ANALYTICS_STORAGE -> consent.analytics_storage = it.value.name
+            }
+        }
+        dev.gitlive.firebase.analytics.externals.setConsent(js, consent)
+    }
+
+    actual enum class ConsentType {
+        AD_PERSONALIZATION,
+        AD_STORAGE,
+        AD_USER_DATA,
+        ANALYTICS_STORAGE
+    }
+
+    actual enum class ConsentStatus {
+        GRANTED,
+        DENIED
     }
 }
 

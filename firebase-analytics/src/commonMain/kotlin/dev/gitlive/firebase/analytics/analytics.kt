@@ -14,6 +14,19 @@ expect class FirebaseAnalytics {
     suspend fun getSessionId(): Long?
     fun resetAnalyticsData()
     fun setDefaultEventParameters(parameters: Map<String, String>)
+    fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>)
+
+    enum class ConsentType {
+        AD_PERSONALIZATION,
+        AD_STORAGE,
+        AD_USER_DATA,
+        ANALYTICS_STORAGE
+    }
+
+    enum class ConsentStatus {
+        GRANTED,
+        DENIED
+    }
 }
 
 expect class FirebaseAnalyticsException

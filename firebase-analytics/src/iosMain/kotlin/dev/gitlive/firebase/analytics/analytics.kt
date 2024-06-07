@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.analytics
 
 import cocoapods.FirebaseAnalytics.FIRAnalytics
+import cocoapods.FirebaseAnalytics.setConsent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
@@ -47,6 +48,25 @@ actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
             it.key to it.value
         }.toMap()
         ios.setDefaultEventParameters(mappedParameters)
+    }
+
+    actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+        val mappedConsentSettings: Map<Any?, *> = consentSettings.map {
+            it.key.name to it.value.name
+        }.toMap()
+        ios.setConsent(mappedConsentSettings)
+    }
+
+    actual enum class ConsentType {
+        AD_PERSONALIZATION,
+        AD_STORAGE,
+        AD_USER_DATA,
+        ANALYTICS_STORAGE
+    }
+
+    actual enum class ConsentStatus {
+        GRANTED,
+        DENIED
     }
 }
 
