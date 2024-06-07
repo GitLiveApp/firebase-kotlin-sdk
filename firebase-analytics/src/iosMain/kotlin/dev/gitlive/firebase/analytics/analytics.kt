@@ -18,11 +18,6 @@ actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
         }?.toMap()
         ios.logEventWithName(name, mappedParameters)
     }
-    actual fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit) {
-        val params = FirebaseAnalyticsParameters()
-        params.block()
-        logEvent(name, params.parameters)
-    }
     actual fun setUserProperty(name: String, value: String) {
         ios.setUserPropertyString(value, name)
     }

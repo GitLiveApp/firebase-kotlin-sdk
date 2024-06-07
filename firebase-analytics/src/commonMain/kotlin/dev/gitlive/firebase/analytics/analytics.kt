@@ -6,7 +6,6 @@ expect val Firebase.analytics: FirebaseAnalytics
 
 expect class FirebaseAnalytics {
     fun logEvent(name: String, parameters: Map<String, String>? = null)
-    fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit)
     fun setUserProperty(name: String, value: String)
     fun setUserId(id: String)
     fun setAnalyticsCollectionEnabled(enabled: Boolean)
@@ -29,6 +28,18 @@ expect class FirebaseAnalytics {
     }
 }
 
+fun FirebaseAnalytics.setConsent(builder: FirebaseAnalyticsConsentBuilder.() -> Unit) {
+    val consentBuilder = FirebaseAnalyticsConsentBuilder()
+    consentBuilder.builder()
+    setConsent(consentBuilder.consentSettings)
+}
+
+fun FirebaseAnalytics.logEvent(name: String, builder: FirebaseAnalyticsParameters.() -> Unit) {
+    val params = FirebaseAnalyticsParameters()
+    params.builder()
+    logEvent(name, params.parameters)
+}
+
 expect class FirebaseAnalyticsException
 
 data class FirebaseAnalyticsParameters(
@@ -37,4 +48,40 @@ data class FirebaseAnalyticsParameters(
     fun param(key: String, value: String) {
         parameters[key] = value
     }
+}
+
+data class FirebaseAnalyticsConsentBuilder(
+    val consentSettings: MutableMap<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus> = mutableMapOf()
+) {
+    var adPersonalization: FirebaseAnalytics.ConsentStatus?
+        get() = consentSettings[FirebaseAnalytics.ConsentType.AD_PERSONALIZATION]
+        set(value) {
+            value?.let {
+                consentSettings[FirebaseAnalytics.ConsentType.AD_PERSONALIZATION] = it
+            }
+        }
+
+    var adStorage: FirebaseAnalytics.ConsentStatus?
+        get() = consentSettings[FirebaseAnalytics.ConsentType.AD_STORAGE]
+        set(value) {
+            value?.let {
+                consentSettings[FirebaseAnalytics.ConsentType.AD_STORAGE] = it
+            }
+        }
+
+    var adUserData: FirebaseAnalytics.ConsentStatus?
+        get() = consentSettings[FirebaseAnalytics.ConsentType.AD_USER_DATA]
+        set(value) {
+            value?.let {
+                consentSettings[FirebaseAnalytics.ConsentType.AD_USER_DATA] = it
+            }
+        }
+
+    var analyticsStorage: FirebaseAnalytics.ConsentStatus?
+        get() = consentSettings[FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE]
+        set(value) {
+            value?.let {
+                consentSettings[FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE] = it
+            }
+        }
 }

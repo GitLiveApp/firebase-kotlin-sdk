@@ -3,14 +3,6 @@ package dev.gitlive.firebase.analytics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
-import dev.gitlive.firebase.analytics.externals.jsGetSessionId
-import dev.gitlive.firebase.analytics.externals.jsLogEvent
-import dev.gitlive.firebase.analytics.externals.jsResetAnalyticsData
-import dev.gitlive.firebase.analytics.externals.jsSetAnalyticsCollectionEnabled
-import dev.gitlive.firebase.analytics.externals.jsSetDefaultEventParameters
-import dev.gitlive.firebase.analytics.externals.jsSetSessionTimeoutInterval
-import dev.gitlive.firebase.analytics.externals.jsSetUserId
-import dev.gitlive.firebase.analytics.externals.jsSetUserProperty
 import kotlinx.coroutines.await
 
 actual val Firebase.analytics: FirebaseAnalytics
@@ -22,15 +14,6 @@ actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.
         parameters: Map<String, String>?
     ) {
         dev.gitlive.firebase.analytics.externals.logEvent(js, name, parameters)
-    }
-
-    actual fun logEvent(
-        name: String,
-        block: FirebaseAnalyticsParameters.() -> Unit
-    ) {
-        val params = FirebaseAnalyticsParameters()
-        params.block()
-        logEvent(name, params.parameters)
     }
 
     actual fun setUserProperty(name: String, value: String) {

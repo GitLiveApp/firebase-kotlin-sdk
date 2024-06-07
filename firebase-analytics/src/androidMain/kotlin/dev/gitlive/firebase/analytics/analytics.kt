@@ -13,11 +13,6 @@ actual class FirebaseAnalytics(val android: com.google.firebase.analytics.Fireba
     actual fun logEvent(name: String, parameters: Map<String, String>?) {
         android.logEvent(name, parameters?.toBundle())
     }
-    actual fun logEvent(name: String, block: FirebaseAnalyticsParameters.() -> Unit) {
-        val params = FirebaseAnalyticsParameters()
-        params.block()
-        logEvent(name, params.parameters)
-    }
     actual fun setUserProperty(name: String, value: String) {
         android.setUserProperty(name, value)
     }
@@ -52,16 +47,16 @@ actual class FirebaseAnalytics(val android: com.google.firebase.analytics.Fireba
                 androidConsentSettings.entries.forEach {
                     when (it.key) {
                         ConsentType.AD_PERSONALIZATION ->
-                            this.adUserData = it.value
+                            this.adPersonalization = it.value
 
                         ConsentType.AD_STORAGE ->
-                            this.adUserData = it.value
+                            this.adStorage = it.value
 
                         ConsentType.AD_USER_DATA ->
                             this.adUserData = it.value
 
                         ConsentType.ANALYTICS_STORAGE ->
-                            this.adUserData = it.value
+                            this.analyticsStorage = it.value
                     }
                 }
 
