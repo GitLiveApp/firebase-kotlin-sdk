@@ -1,3 +1,4 @@
+@file:JvmName("analyticsAndroid")
 package dev.gitlive.firebase.analytics
 
 import android.os.Bundle
@@ -84,7 +85,7 @@ actual class FirebaseAnalytics(val android: com.google.firebase.analytics.Fireba
 
 actual class FirebaseAnalyticsException(message: String): Exception(message)
 
-fun Map<String, Any>.toBundle() = Bundle().apply {
+private fun Map<String, Any>.toBundle() = Bundle().apply {
     forEach { (key, value) ->
         when(value::class) {
             String::class -> putString(key, value as String)
