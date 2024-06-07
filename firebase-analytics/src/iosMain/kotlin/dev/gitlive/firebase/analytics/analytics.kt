@@ -12,10 +12,8 @@ actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(FIRAnalytics)
 
 actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
-    actual fun logEvent(name: String, parameters: Map<String, String>?) {
-        val mappedParameters: Map<Any?, String>? = parameters?.map {
-            it.key to it.value
-        }?.toMap()
+    actual fun logEvent(name: String, parameters: Map<String, Any>?) {
+        val mappedParameters: Map<Any?, Any>? = parameters?.map { it.key to it.value }?.toMap()
         ios.logEventWithName(name, mappedParameters)
     }
     actual fun setUserProperty(name: String, value: String) {
@@ -39,16 +37,12 @@ actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
     actual suspend fun getSessionId(): Long? = ios.awaitResult { sessionIDWithCompletion(it) }
 
     actual fun setDefaultEventParameters(parameters: Map<String, String>) {
-        val mappedParameters: Map<Any?, String> = parameters.map {
-            it.key to it.value
-        }.toMap()
+        val mappedParameters: Map<Any?, String> = parameters.map { it.key to it.value }.toMap()
         ios.setDefaultEventParameters(mappedParameters)
     }
 
     actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
-        val mappedConsentSettings: Map<Any?, *> = consentSettings.map {
-            it.key.name to it.value.name
-        }.toMap()
+        val mappedConsentSettings: Map<Any?, *> = consentSettings.map { it.key.name to it.value.name }.toMap()
         ios.setConsent(mappedConsentSettings)
     }
 

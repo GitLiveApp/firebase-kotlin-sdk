@@ -1,16 +1,21 @@
 package dev.gitlive.firebase.analytics
 
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Parcelable
+import android.util.Size
+import android.util.SizeF
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.setConsent
 import dev.gitlive.firebase.Firebase
 import kotlinx.coroutines.tasks.await
+import java.io.Serializable
 
 actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
 actual class FirebaseAnalytics(val android: com.google.firebase.analytics.FirebaseAnalytics) {
-    actual fun logEvent(name: String, parameters: Map<String, String>?) {
+    actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         android.logEvent(name, parameters?.toBundle())
     }
     actual fun setUserProperty(name: String, value: String) {
@@ -79,6 +84,15 @@ actual class FirebaseAnalytics(val android: com.google.firebase.analytics.Fireba
 
 actual class FirebaseAnalyticsException(message: String): Exception(message)
 
-fun Map<String, String>.toBundle() = Bundle().apply {
-    forEach { (key, value) -> putString(key, value) }
+fun Map<String, Any>.toBundle() = Bundle().apply {
+    forEach { (key, value) ->
+        when(value::class) {
+            String::class -> putString(key, value as String)
+            Int::class -> putInt(key, value as Int)
+            Long::class -> putLong(key, value as Long)
+            Double::class -> putDouble(key, value as Double)
+            Boolean::class -> putBoolean(key, value as Boolean)
+        }
+
+    }
 }

@@ -5,7 +5,7 @@ import dev.gitlive.firebase.Firebase
 expect val Firebase.analytics: FirebaseAnalytics
 
 expect class FirebaseAnalytics {
-    fun logEvent(name: String, parameters: Map<String, String>? = null)
+    fun logEvent(name: String, parameters: Map<String, Any>? = null)
     fun setUserProperty(name: String, value: String)
     fun setUserId(id: String)
     fun setAnalyticsCollectionEnabled(enabled: Boolean)
@@ -43,9 +43,25 @@ fun FirebaseAnalytics.logEvent(name: String, builder: FirebaseAnalyticsParameter
 expect class FirebaseAnalyticsException
 
 data class FirebaseAnalyticsParameters(
-    val parameters: MutableMap<String, String> = mutableMapOf()
+    val parameters: MutableMap<String, Any> = mutableMapOf()
 ) {
     fun param(key: String, value: String) {
+        parameters[key] = value
+    }
+
+    fun param(key: String, value: Double) {
+        parameters[key] = value
+    }
+
+    fun param(key: String, value: Long) {
+        parameters[key] = value
+    }
+
+    fun param(key: String, value: Int) {
+        parameters[key] = value
+    }
+
+    fun param(key: String, value: Boolean) {
         parameters[key] = value
     }
 }

@@ -6,7 +6,7 @@ import kotlin.js.Promise
 
 external fun getAnalytics(app: FirebaseApp? = definedExternally): FirebaseAnalytics
 
-external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Map<String, String>?)
+external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Map<String, Any>?)
 external fun setUserProperty(app: FirebaseAnalytics, name: String, value: String)
 external fun setUserId(app: FirebaseAnalytics, id: String)
 external fun resetAnalyticsData(app: FirebaseAnalytics)
