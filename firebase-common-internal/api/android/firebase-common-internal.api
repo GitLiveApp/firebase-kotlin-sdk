@@ -1,0 +1,244 @@
+public final class dev/gitlive/firebase/internal/AndroidEncodedObject {
+	public static final fun asNativeMap (Ljava/lang/Object;)Ljava/util/Map;
+	public static final fun getAndroid (Ldev/gitlive/firebase/internal/EncodedObject;)Ljava/util/Map;
+}
+
+public final class dev/gitlive/firebase/internal/DecodeSettingsImpl : dev/gitlive/firebase/DecodeSettings {
+	public fun <init> ()V
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+}
+
+public final class dev/gitlive/firebase/internal/DecodeSettingsImpl$Builder : dev/gitlive/firebase/DecodeSettings$Builder {
+	public fun <init> ()V
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+}
+
+public final class dev/gitlive/firebase/internal/DecodersKt {
+	public static final fun decode (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun decode (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Ldev/gitlive/firebase/DecodeSettings;)Ljava/lang/Object;
+	public static final fun decode (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/internal/EncodeDecodeSettingsBuilderImpl : dev/gitlive/firebase/EncodeDecodeSettingsBuilder {
+	public fun <init> ()V
+	public fun getEncodeDefaults ()Z
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun setEncodeDefaults (Z)V
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+}
+
+public final class dev/gitlive/firebase/internal/EncodeDecodeSettingsKt {
+	public static final fun buildDecodeSettings (Ldev/gitlive/firebase/DecodeSettings$Builder;)Ldev/gitlive/firebase/DecodeSettings;
+	public static final fun buildEncodeSettings (Ldev/gitlive/firebase/EncodeSettings$Builder;)Ldev/gitlive/firebase/EncodeSettings;
+}
+
+public final class dev/gitlive/firebase/internal/EncodeSettingsImpl : dev/gitlive/firebase/EncodeSettings {
+	public final fun component1 ()Z
+	public final fun component2 ()Lkotlinx/serialization/modules/SerializersModule;
+	public final fun copy (ZLkotlinx/serialization/modules/SerializersModule;)Ldev/gitlive/firebase/internal/EncodeSettingsImpl;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/internal/EncodeSettingsImpl;ZLkotlinx/serialization/modules/SerializersModule;ILjava/lang/Object;)Ldev/gitlive/firebase/internal/EncodeSettingsImpl;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEncodeDefaults ()Z
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/internal/EncodeSettingsImpl$Builder : dev/gitlive/firebase/EncodeSettings$Builder {
+	public fun <init> ()V
+	public fun getEncodeDefaults ()Z
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun setEncodeDefaults (Z)V
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+}
+
+public abstract interface class dev/gitlive/firebase/internal/EncodedObject {
+}
+
+public final class dev/gitlive/firebase/internal/EncodedObjectImpl : dev/gitlive/firebase/internal/EncodedObject {
+	public static final synthetic fun box-impl (Ljava/util/Map;)Ldev/gitlive/firebase/internal/EncodedObjectImpl;
+	public static fun constructor-impl (Ljava/util/Map;)Ljava/util/Map;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/Map;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/Map;Ljava/util/Map;)Z
+	public final fun getRaw ()Ljava/util/Map;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/Map;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/Map;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/Map;
+}
+
+public final class dev/gitlive/firebase/internal/EncodedObjectKt {
+	public static final fun asEncodedObject (Ljava/util/Map;)Ldev/gitlive/firebase/internal/EncodedObject;
+}
+
+public final class dev/gitlive/firebase/internal/EncodersKt {
+	public static final fun encode (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Ldev/gitlive/firebase/EncodeSettings;)Ljava/lang/Object;
+	public static final fun encode (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun encode (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z)Ljava/lang/Object;
+	public static final fun encodeAsObject (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/internal/EncodedObject;
+	public static synthetic fun encodeAsObject$default (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/internal/EncodedObject;
+	public static final fun withSerializer (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/internal/FirebaseClassDecoder : dev/gitlive/firebase/internal/FirebaseCompositeDecoder {
+	public fun <init> (ILdev/gitlive/firebase/DecodeSettings;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
+	public fun decodeElementIndex (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeSequentially ()Z
+}
+
+public class dev/gitlive/firebase/internal/FirebaseCompositeDecoder : kotlinx/serialization/encoding/CompositeDecoder {
+	public fun <init> (ILdev/gitlive/firebase/DecodeSettings;Lkotlin/jvm/functions/Function2;)V
+	public fun decodeBooleanElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Z
+	public fun decodeByteElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)B
+	public fun decodeCharElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)C
+	public fun decodeCollectionSize (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeDoubleElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)D
+	public fun decodeElementIndex (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloatElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)F
+	public fun decodeInlineElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeIntElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)I
+	public fun decodeLongElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)J
+	public fun decodeNullableSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun decodeSequentially ()Z
+	public fun decodeSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun decodeShortElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)S
+	public fun decodeStringElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Ljava/lang/String;
+	public fun endStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+}
+
+public class dev/gitlive/firebase/internal/FirebaseCompositeEncoder : kotlinx/serialization/encoding/CompositeEncoder {
+	public fun <init> (Ldev/gitlive/firebase/EncodeSettings;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)V
+	public synthetic fun <init> (Ldev/gitlive/firebase/EncodeSettings;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun encodeBooleanElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IZ)V
+	public fun encodeByteElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IB)V
+	public fun encodeCharElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IC)V
+	public fun encodeDoubleElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ID)V
+	public fun encodeFloatElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IF)V
+	public fun encodeInlineElement (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lkotlinx/serialization/encoding/Encoder;
+	public fun encodeIntElement (Lkotlinx/serialization/descriptors/SerialDescriptor;II)V
+	public fun encodeLongElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IJ)V
+	public fun encodeNullableSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public final fun encodeObject (Lkotlinx/serialization/descriptors/SerialDescriptor;ILjava/lang/Object;)V
+	public final fun encodePolymorphicClassDiscriminator (Ljava/lang/String;Ljava/lang/String;)V
+	public fun encodeSerializableElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public fun encodeShortElement (Lkotlinx/serialization/descriptors/SerialDescriptor;IS)V
+	public fun encodeStringElement (Lkotlinx/serialization/descriptors/SerialDescriptor;ILjava/lang/String;)V
+	public fun endStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun shouldEncodeElementDefault (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Z
+}
+
+public final class dev/gitlive/firebase/internal/FirebaseDecoder : kotlinx/serialization/encoding/Decoder {
+	public fun <init> (Ljava/lang/Object;)V
+	public fun <init> (Ljava/lang/Object;Ldev/gitlive/firebase/DecodeSettings;)V
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeDecoder;
+	public fun decodeBoolean ()Z
+	public fun decodeByte ()B
+	public fun decodeChar ()C
+	public fun decodeDouble ()D
+	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
+	public fun decodeFloat ()F
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Ldev/gitlive/firebase/internal/FirebaseDecoder;
+	public synthetic fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInt ()I
+	public fun decodeLong ()J
+	public fun decodeNotNullMark ()Z
+	public fun decodeNull ()Ljava/lang/Void;
+	public fun decodeNullableSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeSerializableValue (Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public fun decodeShort ()S
+	public fun decodeString ()Ljava/lang/String;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public final fun getValue ()Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/internal/FirebaseEncoder : kotlinx/serialization/encoding/Encoder {
+	public fun <init> (Ldev/gitlive/firebase/EncodeSettings;)V
+	public fun <init> (Z)V
+	public fun beginCollection (Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lkotlinx/serialization/encoding/CompositeEncoder;
+	public fun beginStructure (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/CompositeEncoder;
+	public fun encodeBoolean (Z)V
+	public fun encodeByte (B)V
+	public fun encodeChar (C)V
+	public fun encodeDouble (D)V
+	public fun encodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;I)V
+	public fun encodeFloat (F)V
+	public fun encodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Encoder;
+	public fun encodeInt (I)V
+	public fun encodeLong (J)V
+	public fun encodeNotNullMark ()V
+	public fun encodeNull ()V
+	public fun encodeNullableSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public fun encodeSerializableValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public fun encodeShort (S)V
+	public fun encodeString (Ljava/lang/String;)V
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public final fun getValue ()Ljava/lang/Object;
+	public final fun setValue (Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/internal/FirebaseListSerializer : kotlinx/serialization/KSerializer {
+	public field list Ljava/util/List;
+	public fun <init> ()V
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/util/List;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun getList ()Ljava/util/List;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Iterable;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun setList (Ljava/util/List;)V
+}
+
+public final class dev/gitlive/firebase/internal/FirebaseMapSerializer : kotlinx/serialization/KSerializer {
+	public field keys Ljava/util/List;
+	public field map Ljava/util/Map;
+	public fun <init> ()V
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/util/Map;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun getKeys ()Ljava/util/List;
+	public final fun getMap ()Ljava/util/Map;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/util/Map;)V
+	public final fun setKeys (Ljava/util/List;)V
+	public final fun setMap (Ljava/util/Map;)V
+}
+
+public final class dev/gitlive/firebase/internal/ReencodeTransformationKt {
+	public static final fun reencodeTransformation (Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun reencodeTransformation$default (Lkotlinx/serialization/KSerializer;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/internal/SpecialValueSerializer : kotlinx/serialization/KSerializer {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/internal/ValueWithSerializer {
+	public fun <init> (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Lkotlinx/serialization/SerializationStrategy;
+	public final fun copy (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ldev/gitlive/firebase/internal/ValueWithSerializer;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/internal/ValueWithSerializer;Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;ILjava/lang/Object;)Ldev/gitlive/firebase/internal/ValueWithSerializer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSerializer ()Lkotlinx/serialization/SerializationStrategy;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/internal/_decodersKt {
+	public static final fun getPolymorphicType (Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;
+	public static final fun structureDecoder (Ldev/gitlive/firebase/internal/FirebaseDecoder;Lkotlinx/serialization/descriptors/SerialDescriptor;Z)Lkotlinx/serialization/encoding/CompositeDecoder;
+}
+
+public final class dev/gitlive/firebase/internal/_encodersKt {
+	public static final fun structureEncoder (Ldev/gitlive/firebase/internal/FirebaseEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)Ldev/gitlive/firebase/internal/FirebaseCompositeEncoder;
+}
+

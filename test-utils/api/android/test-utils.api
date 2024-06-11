@@ -1,0 +1,8 @@
+public final class dev/gitlive/firebase/TestUtilsAndroid {
+	public static final fun nativeAssertEquals (Ljava/lang/Object;Ljava/lang/Object;)V
+	public static final fun nativeListOf ([Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun nativeMapOf ([Lkotlin/Pair;)Ljava/lang/Object;
+	public static final fun runBlockingTest (Lkotlin/jvm/functions/Function2;)V
+	public static final fun runTest (Lkotlin/jvm/functions/Function2;)V
+}
+

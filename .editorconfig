@@ -1,0 +1,14 @@
+root = true
+
+[*.{kt,kts}]
+ktlint_code_style = intellij_idea
+ktlint_ignore_back_ticked_identifier = true
+
+ktlint_standard = enabled
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_filename = disabled
+ktlint_standard_import-ordering = disabled
+ktlint_standard_function-naming = disabled
+
+ktlint_experimental = disabled
+

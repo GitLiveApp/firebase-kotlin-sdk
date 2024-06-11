@@ -11,6 +11,8 @@ plugins {
     kotlin("native.cocoapods") apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.51.0"
+    id("org.jmailen.kotlinter") version "4.3.0" apply false
+    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.15.0-Beta.2"
 }
 
 buildscript {
@@ -54,6 +56,7 @@ subprojects {
     group = "dev.gitlive"
     
     apply(plugin = "com.adarshr.test-logger")
+    apply(plugin = "org.jmailen.kotlinter")
 
     repositories {
         mavenLocal()
