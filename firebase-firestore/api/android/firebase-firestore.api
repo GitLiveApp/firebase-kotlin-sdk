@@ -125,7 +125,7 @@ public final class dev/gitlive/firebase/firestore/DocumentSnapshot {
 
 public final class dev/gitlive/firebase/firestore/DoubleAsTimestampSerializer : kotlinx/serialization/KSerializer {
 	public static final field INSTANCE Ldev/gitlive/firebase/firestore/DoubleAsTimestampSerializer;
-	public static final field serverTimestamp D
+	public static final field SERVER_TIMESTAMP D
 	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Double;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;

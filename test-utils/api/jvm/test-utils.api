@@ -1,4 +1,5 @@
-public final class dev/gitlive/firebase/TestUtilsAndroid {
+public final class dev/gitlive/firebase/TestUtilsJvm {
+	public static final fun getTestContext ()Landroid/app/Application;
 	public static final fun nativeAssertEquals (Ljava/lang/Object;Ljava/lang/Object;)V
 	public static final fun nativeListOf ([Ljava/lang/Object;)Ljava/lang/Object;
 	public static final fun nativeMapOf ([Lkotlin/Pair;)Ljava/lang/Object;
