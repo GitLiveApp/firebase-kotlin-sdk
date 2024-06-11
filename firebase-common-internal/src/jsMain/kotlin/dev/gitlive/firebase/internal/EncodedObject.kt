@@ -13,7 +13,7 @@ internal actual fun Any.asNativeMap(): Map<*, *>? {
         is String -> null
         is Map<*, *> -> {
             if (keys.all { it is String }) {
-                this as Json
+                json(*mapKeys { (key, _) -> key as String }.toList().toTypedArray())
             } else {
                 null
             }
@@ -21,12 +21,13 @@ internal actual fun Any.asNativeMap(): Map<*, *>? {
         is Collection<*> -> null
         is Array<*> -> null
         else -> {
+            @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
             this as Json
         }
     } ?: return null
     val mutableMap = mutableMapOf<String, Any?>()
     for (key in js("Object").keys(json)) {
-        mutableMap[key] = json[key]
+        mutableMap[key as String] = json[key as String]
     }
     return mutableMap.toMap()
 }

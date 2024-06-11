@@ -1,6 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 repositories {
     google()
@@ -11,7 +10,7 @@ plugins {
     kotlin("multiplatform") apply false
     kotlin("native.cocoapods") apply false
     id("base")
-    id("com.github.ben-manes.versions") version "0.42.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 buildscript {

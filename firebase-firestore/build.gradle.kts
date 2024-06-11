@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /*
@@ -27,8 +30,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -50,10 +53,20 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
-
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
@@ -62,25 +75,9 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
 
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        compilations.getByName("test") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvm()
 
     if (supportIosTarget) {
         iosArm64()
@@ -95,10 +92,10 @@ kotlin {
             // As of Firebase 10.17 Firestore has moved all ObjC headers to FirebaseFirestoreInternal and the kotlin cocoapods plugin does not handle this well
             // Adding it manually seems to resolve the issue
             pod("FirebaseFirestoreInternal") {
-                version = "10.23.0"
+                version = "10.27.0"
             }
             pod("FirebaseFirestore") {
-                version = "10.23.0"
+                version = "10.27.0"
                 extraOpts += listOf("-compiler-option", "-fmodules")
                 useInteropBindingFrom("FirebaseFirestoreInternal")
             }
@@ -108,30 +105,26 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
-                        useMocha {
-                            timeout = "180s"
-                        }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                    useMocha {
+                        timeout = "180s"
                     }
                 }
-            )
+            }
         }
         browser {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                        // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
-                        useMocha {
-                            timeout = "180s"
-                        }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    // Explicitly specify Mocha here since it seems to be throwing random errors otherwise
+                    useMocha {
+                        timeout = "180s"
                     }
                 }
-            )
+            }
         }
     }
 

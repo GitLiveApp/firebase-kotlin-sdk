@@ -220,7 +220,7 @@ private fun decodeShort(value: Any?) = when(value) {
 private fun decodeBoolean(value: Any?) = value as Boolean
 
 private fun decodeChar(value: Any?) = when(value) {
-    is Number -> value.toChar()
+    is Number -> value.toInt().toChar()
     is String -> value[0]
     else -> throw SerializationException("Expected $value to be char")
 }

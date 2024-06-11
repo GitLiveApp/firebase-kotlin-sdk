@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /*
@@ -26,8 +29,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -61,10 +64,20 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
-
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
@@ -73,12 +86,9 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
+
+    jvm()
 
     if (supportIosTarget) {
         iosArm64()
@@ -91,7 +101,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseAuth") {
-                version = "10.25.0"
+                version = "10.27.0"
             }
         }
     }
@@ -99,29 +109,17 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
+            }
         }
         browser {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
-        }
-    }
-
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
             }
         }
     }

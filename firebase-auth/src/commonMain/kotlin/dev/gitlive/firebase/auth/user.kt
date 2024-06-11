@@ -28,6 +28,7 @@ expect class FirebaseUser {
     suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
     suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
     suspend fun unlink(provider: String): FirebaseUser?
+    @Deprecated("Use verifyBeforeUpdateEmail instead", replaceWith = ReplaceWith("verifyBeforeUpdateEmail(email)"))
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)

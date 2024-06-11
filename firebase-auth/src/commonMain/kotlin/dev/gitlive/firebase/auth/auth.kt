@@ -24,6 +24,7 @@ expect class FirebaseAuth {
     suspend fun <T: ActionCodeResult> checkActionCode(code: String): T
     suspend fun confirmPasswordReset(code: String, newPassword: String)
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
+    @Deprecated("Migrating off of this method is recommended as a security best-practice. Learn more in the Identity Platform documentation for [Email Enumeration Protection](https://cloud.google.com/identity-platform/docs/admin/email-enumeration-protection).")
     suspend fun fetchSignInMethodsForEmail(email: String): List<String>
     suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
     suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)

@@ -43,13 +43,15 @@ actual class FirebaseUser internal constructor(val android: com.google.firebase.
         request.await()
     }
     actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
+
+    @Suppress("DEPRECATION")
     actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
     actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = UserProfileChangeRequest.Builder()
             .apply { if(displayName !== UNCHANGED) setDisplayName(displayName) }
-            .apply { if(photoUrl !== UNCHANGED) setPhotoUri(photoUrl?.let { Uri.parse(it) }) }
+            .apply { if(photoUrl !== UNCHANGED) photoUri = photoUrl?.let { Uri.parse(it) } }
             .build()
         android.updateProfile(request).await()
     }

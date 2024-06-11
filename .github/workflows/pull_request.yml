@@ -85,7 +85,7 @@ jobs:
           name: "Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
       - name: Cocoapods cache
@@ -100,13 +100,13 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: Run iOS Tests
-        run: ./gradlew cleanTest iosX64Test
+        run: ./gradlew cleanTest iosSimulatorArm64Test
       - name: Upload iOS test artifact
         uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: "iOS Test Report HTML"
-          path: "**/build/reports/tests/iosX64Test/"
+          path: "**/build/reports/tests/iosSimulatorArm64Test/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v3
         if: failure()
