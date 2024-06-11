@@ -5,7 +5,9 @@
 @file:JvmName("tests")
 package dev.gitlive.firebase.remoteconfig
 
-actual val context: Any = Unit
+import dev.gitlive.firebase.testContext
+
+actual val context: Any = testContext
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

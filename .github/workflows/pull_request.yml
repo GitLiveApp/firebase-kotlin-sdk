@@ -113,3 +113,25 @@ jobs:
         with:
           name: "Firebase Debug Log"
           path: "**/firebase-debug.log"
+  build-jvm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+        timeout-minutes: 10
+      - name: Run JVM Tests
+        run: ./gradlew cleanTest jvmTest
+      - name: Upload JVM test artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "JVM Test Report HTML"
+          path: |
+            **/build/reports/tests/jvmTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: "Firebase Debug Log"
+          path: "**/firebase-debug.log"

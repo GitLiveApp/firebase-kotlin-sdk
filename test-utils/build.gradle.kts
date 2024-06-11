@@ -109,13 +109,16 @@ kotlin {
             }
         }
 
-        getByName("jvmMain") {
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
-
         getByName("jsMain") {
             dependencies {
                 implementation(kotlin("test-js"))
+            }
+        }
+
+        getByName("jvmMain") {
+            dependencies {
+                val coroutinesVersion: String by project
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
             }
         }
     }
