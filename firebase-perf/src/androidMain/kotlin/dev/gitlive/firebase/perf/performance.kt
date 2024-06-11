@@ -11,7 +11,7 @@ actual val Firebase.performance get() =
 actual fun Firebase.performance(app: FirebaseApp) =
     FirebasePerformance(app.android.get(com.google.firebase.perf.FirebasePerformance::class.java))
 
-actual class FirebasePerformance(val android: com.google.firebase.perf.FirebasePerformance){
+actual class FirebasePerformance(val android: com.google.firebase.perf.FirebasePerformance) {
 
     actual fun newTrace(traceName: String): Trace = Trace(android.newTrace(traceName))
 

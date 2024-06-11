@@ -33,7 +33,7 @@ actual class FirebaseUser internal constructor(val js: User) {
     actual suspend fun reload() = rethrow { js.reload().await() }
     actual suspend fun getIdToken(forceRefresh: Boolean): String? = rethrow { js.getIdToken(forceRefresh).await() }
     actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = rethrow { AuthTokenResult(getIdTokenResult(js, forceRefresh).await()) }
-    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow { AuthResult( linkWithCredential(js, credential.js).await()) }
+    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = rethrow { AuthResult(linkWithCredential(js, credential.js).await()) }
     actual suspend fun reauthenticate(credential: AuthCredential) = rethrow {
         reauthenticateWithCredential(js, credential.js).await()
         Unit
@@ -48,7 +48,7 @@ actual class FirebaseUser internal constructor(val js: User) {
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?): Unit = rethrow {
         val request = listOfNotNull(
             displayName.takeUnless { it === UNCHANGED }?.let { "displayName" to it },
-            photoUrl.takeUnless { it === UNCHANGED }?.let { "photoURL" to it }
+            photoUrl.takeUnless { it === UNCHANGED }?.let { "photoURL" to it },
         )
         updateProfile(js, json(*request.toTypedArray())).await()
     }
@@ -72,7 +72,7 @@ actual class UserInfo(val js: JsUserInfo) {
 
 actual class UserMetaData(val js: UserMetadata) {
     actual val creationTime: Double?
-        get() = rethrow {js.creationTime?.let { (Date(it).getTime() / 1000.0) } }
+        get() = rethrow { js.creationTime?.let { (Date(it).getTime() / 1000.0) } }
     actual val lastSignInTime: Double?
-        get() = rethrow {js.lastSignInTime?.let { (Date(it).getTime() / 1000.0) } }
+        get() = rethrow { js.lastSignInTime?.let { (Date(it).getTime() / 1000.0) } }
 }

@@ -50,7 +50,7 @@ sealed class SealedClass {
 
 @Serializable
 data class GenericClass<T>(
-    val inner: T
+    val inner: T,
 )
 
 @Serializable
@@ -72,7 +72,7 @@ data class NestedClass(
     val abstractList: List<AbstractClass>,
     val testDataMap: Map<TestData, TestData>,
     val sealedMap: Map<SealedClass, SealedClass>,
-    val abstractMap: Map<AbstractClass, AbstractClass>
+    val abstractMap: Map<AbstractClass, AbstractClass>,
 )
 
 class EncodersTest {
@@ -88,6 +88,7 @@ class EncodersTest {
         assertEncode(6.65f)
         assertEncode("Test")
     }
+
     @Test
     fun encodeDecodeList() {
         val list = listOf("One", "Two", "Three")
@@ -249,9 +250,9 @@ class EncodersTest {
                 "abstractList" to nativeListOf(abstractEncoded),
                 "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
                 "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
-                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
+                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded),
             ),
-            encoded
+            encoded,
         )
 
         val decoded = decode(NestedClass.serializer(), encoded) {
@@ -292,7 +293,7 @@ class EncodersTest {
     fun reencodeTransformationValueClass() {
         val reencoded = reencodeTransformation<ValueClass>(
             42,
-            { encodeDefaults = false }
+            { encodeDefaults = false },
         ) {
             assertEquals(ValueClass(42), it)
             ValueClass(23)
@@ -305,7 +306,7 @@ class EncodersTest {
     fun reencodeTransformationClass() {
         val reencoded = reencodeTransformation<TestData>(
             nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to true, "valueClass" to 42),
-            { encodeDefaults = false }
+            { encodeDefaults = false },
         ) {
             assertEquals(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = true, ValueClass(42)), it)
             it.copy(map = mapOf("newKey" to "newValue"), nullableBool = null)
@@ -318,7 +319,7 @@ class EncodersTest {
     fun reencodeTransformationNullableValue() {
         val reencoded = reencodeTransformation<TestData?>(
             nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to true, "valueClass" to 42),
-            { encodeDefaults = false }
+            { encodeDefaults = false },
         ) {
             assertEquals(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = true, valueClass = ValueClass(42)), it)
             null
@@ -332,11 +333,11 @@ class EncodersTest {
         val reencoded = reencodeTransformation(
             GenericClass.serializer(TestData.serializer()),
             nativeMapOf("inner" to nativeMapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "nullableBool" to false, "valueClass" to 42)),
-            { encodeDefaults = false }
+            { encodeDefaults = false },
         ) {
             assertEquals(
                 GenericClass(TestData(mapOf("key" to "value"), mapOf(1 to 1), bool = true, nullableBool = false, valueClass = ValueClass(42))),
-                it
+                it,
             )
             GenericClass(it.inner.copy(map = mapOf("newKey" to "newValue"), nullableBool = null))
         }
@@ -367,7 +368,7 @@ class EncodersTest {
             nativeMapOf("type" to "implemented", "abstractValue" to "value", "otherValue" to true),
             builder = {
                 serializersModule = module
-            }
+            },
         ) {
             assertEquals(ImplementedClass("value", true), it)
             ImplementedClass("new-${it.abstractValue}", false)
@@ -414,9 +415,9 @@ class EncodersTest {
                 "abstractList" to nativeListOf(abstractEncoded),
                 "testDataMap" to nativeMapOf(testDataEncoded to testDataEncoded),
                 "sealedMap" to nativeMapOf(sealedEncoded to sealedEncoded),
-                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded)
+                "abstractMap" to nativeMapOf(abstractEncoded to abstractEncoded),
             ),
-            reencoded
+            reencoded,
         )
     }
 
@@ -425,7 +426,7 @@ class EncodersTest {
         val testDataClass = TestData(mapOf("key" to "value"), mapOf(1 to 1), true, null, ValueClass(42))
         val encodedObject = encodeAsObject(
             TestData.serializer(),
-            testDataClass
+            testDataClass,
         ) { encodeDefaults = false }
 
         nativeAssertEquals(mapOf("map" to nativeMapOf("key" to "value"), "otherMap" to nativeMapOf(1 to 1), "bool" to true, "valueClass" to 42), encodedObject.getRaw())
@@ -437,7 +438,7 @@ class EncodersTest {
 
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                true
+                true,
             )
         }
         assertFailsWith<IllegalArgumentException> { encodeAsObject(42) }
@@ -445,33 +446,33 @@ class EncodersTest {
         assertFailsWith<IllegalArgumentException> { encodeAsObject(Int.MAX_VALUE.toLong() + 3) }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                0x03F
+                0x03F,
             )
         }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                3.33
+                3.33,
             )
         }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                6.65f
+                6.65f,
             )
         }
         assertFailsWith<IllegalArgumentException> { encodeAsObject("Test") }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                ValueClass(2)
+                ValueClass(2),
             )
         }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                mapOf(1 to "one")
+                mapOf(1 to "one"),
             )
         }
         assertFailsWith<IllegalArgumentException> {
             encodeAsObject(
-                listOf("one")
+                listOf("one"),
             )
         }
     }

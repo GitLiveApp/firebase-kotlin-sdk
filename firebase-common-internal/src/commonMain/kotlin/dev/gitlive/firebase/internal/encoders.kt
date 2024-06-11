@@ -12,7 +12,6 @@ import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
-
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(strategy, value) { encodeDefaults = shouldEncodeElementDefault }"))
 fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncodeElementDefault: Boolean): Any? = encode(strategy, value) {
     this.encodeDefaults = shouldEncodeElementDefault
@@ -84,11 +83,11 @@ data class ValueWithSerializer<T>(val value: T, val serializer: SerializationStr
 expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder
 
 class FirebaseEncoder(
-    internal val settings: EncodeSettings
+    internal val settings: EncodeSettings,
 ) : Encoder {
 
     constructor(shouldEncodeElementDefault: Boolean) : this(
-        EncodeSettingsImpl.Builder().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings()
+        EncodeSettingsImpl.Builder().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings(),
     )
 
     var value: Any? = null
@@ -140,7 +139,7 @@ class FirebaseEncoder(
     }
 
     override fun encodeNotNullMark() {
-        //no-op
+        // no-op
     }
 
     override fun encodeNull() {
@@ -169,7 +168,7 @@ open class FirebaseCompositeEncoder constructor(
     private val end: () -> Unit = {},
     private val setPolymorphicType: (String, String) -> Unit = { _, _ -> },
     private val set: (descriptor: SerialDescriptor, index: Int, value: Any?) -> Unit,
-): CompositeEncoder {
+) : CompositeEncoder {
 
 //    private fun <T> SerializationStrategy<T>.toFirebase(): SerializationStrategy<T> = when(descriptor.kind) {
 //        StructureKind.MAP -> FirebaseMapSerializer<Any>(descriptor.getElementDescriptor(1)) as SerializationStrategy<T>
@@ -187,7 +186,7 @@ open class FirebaseCompositeEncoder constructor(
         descriptor: SerialDescriptor,
         index: Int,
         serializer: SerializationStrategy<T>,
-        value: T?
+        value: T?,
     ) = set(
         descriptor,
         index,
@@ -195,20 +194,20 @@ open class FirebaseCompositeEncoder constructor(
             FirebaseEncoder(settings).apply {
                 encodeSerializableValue(serializer, value)
             }.value
-        }
+        },
     )
 
     override fun <T> encodeSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
         serializer: SerializationStrategy<T>,
-        value: T
+        value: T,
     ) = set(
         descriptor,
         index,
         FirebaseEncoder(settings).apply {
             encodeSerializableValue(serializer, value)
-        }.value
+        }.value,
     )
 
     fun <T> encodeObject(descriptor: SerialDescriptor, index: Int, value: T) = set(descriptor, index, value)

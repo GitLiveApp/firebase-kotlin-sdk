@@ -101,6 +101,8 @@ jobs:
           key: cocoapods-cache-v2
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
+      - name: ktLint
+        run: ./gradlew lintKotlin
       - name: Run iOS Tests
         run: ./gradlew cleanTest iosSimulatorArm64Test
       - name: Upload iOS test artifact

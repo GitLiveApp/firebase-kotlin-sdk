@@ -25,7 +25,6 @@ actual class FirebasePerformance {
 
     actual fun setPerformanceCollectionEnabled(enable: Boolean) {
     }
-
 }
 
 actual open class FirebasePerformanceException internal constructor(message: String) : FirebaseException(message)

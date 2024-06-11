@@ -3,6 +3,7 @@
  */
 
 @file:JvmName("tests")
+
 package dev.gitlive.firebase.crashlytics
 
 import androidx.test.platform.app.InstrumentationRegistry

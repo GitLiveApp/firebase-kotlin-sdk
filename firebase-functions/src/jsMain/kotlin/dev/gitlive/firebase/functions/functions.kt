@@ -34,7 +34,7 @@ actual fun Firebase.functions(app: FirebaseApp, region: String) =
 
 actual class FirebaseFunctions internal constructor(val js: Functions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        rethrow { HttpsCallableReference( httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
+        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
 
     actual fun useEmulator(host: String, port: Int) = connectFunctionsEmulator(js, host, port)
 }
@@ -58,7 +58,6 @@ actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
 
     actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
         rethrow { decode(strategy, js.data, buildSettings) }
-
 }
 
 actual class FirebaseFunctionsException(cause: Throwable, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(cause.message, cause)
@@ -84,7 +83,7 @@ actual enum class FunctionsExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.functions.rethrow { function() }
@@ -94,7 +93,7 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
+    } catch (e: dynamic) {
         throw errorToException(e)
     }
 }

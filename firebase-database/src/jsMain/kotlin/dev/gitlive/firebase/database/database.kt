@@ -86,11 +86,11 @@ actual class FirebaseDatabase internal constructor(val js: Database) {
 
 internal actual open class NativeQuery(
     open val js: JsQuery,
-    val database: Database
+    val database: Database,
 )
 
 actual open class Query internal actual constructor(
-    nativeQuery: NativeQuery
+    nativeQuery: NativeQuery,
 ) {
 
     internal constructor(js: JsQuery, database: Database) : this(NativeQuery(js, database))
@@ -108,7 +108,7 @@ actual open class Query internal actual constructor(
                 onValue(
                     query = js,
                     callback = { trySend(DataSnapshot(it, database)) },
-                    cancelCallback = { close(DatabaseException(it)).run { } }
+                    cancelCallback = { close(DatabaseException(it)).run { } },
                 )
             }
             awaitClose { rethrow { unsubscribe() } }
@@ -122,8 +122,8 @@ actual open class Query internal actual constructor(
                         ChildEvent(
                             DataSnapshot(snapshot, database),
                             type,
-                            previousChildName
-                        )
+                            previousChildName,
+                        ),
                     )
                 }
 
@@ -170,7 +170,7 @@ actual open class Query internal actual constructor(
 @PublishedApi
 internal actual class NativeDatabaseReference internal constructor(
     override val js: JsDatabaseReference,
-    database: Database
+    database: Database,
 ) : NativeQuery(js, database) {
 
     actual val key get() = rethrow { js.key }
@@ -188,17 +188,19 @@ internal actual class NativeDatabaseReference internal constructor(
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
         rethrow { update(js, encodedUpdate.js).awaitWhileOnline(database) }
 
-
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
-        return DataSnapshot(jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
-            reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
-        }).awaitWhileOnline(database).snapshot, database)
+        return DataSnapshot(
+            jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+                reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
+            }).awaitWhileOnline(database).snapshot,
+            database,
+        )
     }
 }
 
 actual class DataSnapshot internal constructor(
     val js: JsDataSnapshot,
-    val database: Database
+    val database: Database,
 ) {
     actual val value get(): Any? {
         check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }
@@ -217,29 +219,30 @@ actual class DataSnapshot internal constructor(
     actual val hasChildren get() = js.hasChildren()
     actual val children: Iterable<DataSnapshot> = rethrow {
         ArrayList<DataSnapshot>(js.size).also {
-            js.forEach { snapshot -> it.add(DataSnapshot(snapshot, database)); false /* don't cancel enumeration */ }
+            js.forEach { snapshot ->
+                it.add(DataSnapshot(snapshot, database))
+                false // don't cancel enumeration
+            }
         }
     }
     actual val ref: DatabaseReference
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
-
 }
 
 @PublishedApi
 internal actual class NativeOnDisconnect internal constructor(
     val js: JsOnDisconnect,
-    val database: Database
+    val database: Database,
 ) {
 
     actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
-    actual suspend fun cancel() =  rethrow { js.cancel().awaitWhileOnline(database) }
+    actual suspend fun cancel() = rethrow { js.cancel().awaitWhileOnline(database) }
 
     actual suspend fun setValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
         rethrow { js.update(encodedUpdate.js).awaitWhileOnline(database) }
-
 }
 
 val OnDisconnect.js get() = native.js
@@ -262,7 +265,6 @@ inline fun <R> rethrow(function: () -> R): R {
 }
 
 suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineScope {
-
     val notConnected = FirebaseDatabase(database)
         .reference(".info/connected")
         .valueEvents
@@ -273,5 +275,4 @@ suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineSc
         this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
         notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
-
 }

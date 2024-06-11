@@ -26,7 +26,7 @@ expect class FirebaseRemoteConfig {
 @Suppress("IMPLICIT_CAST_TO_ANY")
 inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
     val configValue = getValue(key)
-    return when(T::class) {
+    return when (T::class) {
         Boolean::class -> configValue.asBoolean()
         Double::class -> configValue.asDouble()
         Long::class -> configValue.asLong()

@@ -1,6 +1,5 @@
 package dev.gitlive.firebase
 
-import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
 /**
@@ -25,7 +24,6 @@ interface EncodeSettings : EncodeDecodeSettings {
     interface Builder {
         var encodeDefaults: Boolean
         var serializersModule: SerializersModule
-
     }
 }
 

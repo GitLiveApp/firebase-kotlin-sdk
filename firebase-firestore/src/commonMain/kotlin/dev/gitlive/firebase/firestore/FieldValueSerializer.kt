@@ -11,5 +11,5 @@ object FieldValueSerializer : KSerializer<FieldValue> by SpecialValueSerializer(
     toNativeValue = FieldValue::nativeValue,
     fromNativeValue = { raw ->
         raw?.let(::FieldValue) ?: throw SerializationException("Cannot deserialize $raw")
-    }
+    },
 )

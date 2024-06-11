@@ -4,7 +4,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue as AndroidFirebaseRemoteConfigValue
 
 actual class FirebaseRemoteConfigValue internal constructor(
-    private val android: AndroidFirebaseRemoteConfigValue
+    private val android: AndroidFirebaseRemoteConfigValue,
 ) {
     actual fun asBoolean(): Boolean = android.asBoolean()
     actual fun asByteArray(): ByteArray = android.asByteArray()

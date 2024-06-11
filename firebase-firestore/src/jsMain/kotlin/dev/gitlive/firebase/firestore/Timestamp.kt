@@ -12,8 +12,8 @@ actual typealias NativeTimestamp = dev.gitlive.firebase.firestore.externals.Time
 /** A class representing a Firebase Timestamp. */
 @Serializable(with = TimestampSerializer::class)
 actual class Timestamp internal actual constructor(
-    internal actual val nativeValue: NativeTimestamp
-): BaseTimestamp() {
+    internal actual val nativeValue: NativeTimestamp,
+) : BaseTimestamp() {
     actual constructor(seconds: Long, nanoseconds: Int) : this(NativeTimestamp(seconds.toDouble(), nanoseconds.toDouble()))
 
     actual val seconds: Long = nativeValue.seconds.toLong()
@@ -30,5 +30,5 @@ actual class Timestamp internal actual constructor(
 
     /** A server time timestamp. */
     @Serializable(with = ServerTimestampSerializer::class)
-    actual object ServerTimestamp: BaseTimestamp()
+    actual object ServerTimestamp : BaseTimestamp()
 }

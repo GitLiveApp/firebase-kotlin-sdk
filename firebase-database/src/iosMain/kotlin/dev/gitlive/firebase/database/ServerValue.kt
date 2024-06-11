@@ -9,10 +9,11 @@ private typealias NativeServerValue = FIRServerValue
 /** Represents a Firebase ServerValue. */
 @Serializable(with = ServerValueSerializer::class)
 actual class ServerValue internal actual constructor(
-    internal actual val nativeValue: Any
-){
+    internal actual val nativeValue: Any,
+) {
     actual companion object {
         actual val TIMESTAMP: ServerValue get() = ServerValue(NativeServerValue.timestamp())
+
         @Suppress("CAST_NEVER_SUCCEEDS")
         actual fun increment(delta: Double): ServerValue = ServerValue(NativeServerValue.increment(delta as NSNumber))
     }

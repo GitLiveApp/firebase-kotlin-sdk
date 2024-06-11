@@ -22,7 +22,7 @@ actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
-    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
+    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
@@ -31,7 +31,7 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
         when (garbaseCollectorSettings) {
             is MemoryGarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
             is MemoryGarbageCollectorSettings.LRUGC -> FIRMemoryLRUGCSettings(NSNumber.numberWithLong(garbaseCollectorSettings.sizeBytes))
-        }
+        },
     )
 }
 
@@ -63,7 +63,7 @@ actual data class FirebaseFirestoreSettings(
         actual constructor() : this(
             true,
             DEFAULT_HOST,
-            persistentCacheSettings {  },
+            persistentCacheSettings { },
             dispatch_get_main_queue(),
         )
 
@@ -87,7 +87,7 @@ actual data class FirebaseFirestoreSettings(
 
 actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
-    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
     settings?.let {
         sslEnabled = it.sslEnabled
@@ -139,22 +139,22 @@ actual enum class FirestoreExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
 
 actual enum class Direction {
     ASCENDING,
-    DESCENDING
+    DESCENDING,
 }
 
 actual enum class ChangeType(internal val ios: FIRDocumentChangeType) {
     ADDED(FIRDocumentChangeTypeAdded),
     MODIFIED(FIRDocumentChangeTypeModified),
-    REMOVED(FIRDocumentChangeTypeRemoved)
+    REMOVED(FIRDocumentChangeTypeRemoved),
 }
 
-fun NSError.toException() = when(domain) {
-    FIRFirestoreErrorDomain -> when(code) {
+fun NSError.toException() = when (domain) {
+    FIRFirestoreErrorDomain -> when (code) {
         FIRFirestoreErrorCodeOK -> FirestoreExceptionCode.OK
         FIRFirestoreErrorCodeCancelled -> FirestoreExceptionCode.CANCELLED
         FIRFirestoreErrorCodeUnknown -> FirestoreExceptionCode.UNKNOWN
@@ -222,7 +222,7 @@ actual typealias EncodedFieldPath = FIRFieldPath
 suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())
@@ -234,7 +234,7 @@ suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -
 suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     val job = CompletableDeferred<Unit>()
     val result = function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())

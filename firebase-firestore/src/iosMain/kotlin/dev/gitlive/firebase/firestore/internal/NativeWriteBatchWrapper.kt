@@ -14,7 +14,7 @@ internal actual class NativeWriteBatchWrapper actual constructor(actual val nati
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: EncodedObject,
-        setOptions: SetOptions
+        setOptions: SetOptions,
     ): NativeWriteBatchWrapper = when (setOptions) {
         is SetOptions.Merge -> native.setData(encodedData.ios, documentRef.ios, true)
         is SetOptions.Overwrite -> native.setData(encodedData.ios, documentRef.ios, false)
@@ -26,18 +26,18 @@ internal actual class NativeWriteBatchWrapper actual constructor(actual val nati
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
     ): NativeWriteBatchWrapper = native.updateData(
         encodedFieldsAndValues.toMap(),
-        documentRef.ios
+        documentRef.ios,
     ).let { this }
 
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>,
     ): NativeWriteBatchWrapper = native.updateData(
         encodedFieldsAndValues.toMap(),
-        documentRef.ios
+        documentRef.ios,
     ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =

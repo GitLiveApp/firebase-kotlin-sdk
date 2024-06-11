@@ -46,9 +46,9 @@ actual fun Firebase.apps(context: Any?) = FIRApp.allApps()
     .map { FirebaseApp(it as FIRApp) }
 
 private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
-        APIKey = this@toIos.apiKey
-        databaseURL = this@toIos.databaseUrl
-        trackingID = this@toIos.gaTrackingId
-        storageBucket = this@toIos.storageBucket
-        projectID = this@toIos.projectId
-    }
+    APIKey = this@toIos.apiKey
+    databaseURL = this@toIos.databaseUrl
+    trackingID = this@toIos.gaTrackingId
+    storageBucket = this@toIos.storageBucket
+    projectID = this@toIos.projectId
+}

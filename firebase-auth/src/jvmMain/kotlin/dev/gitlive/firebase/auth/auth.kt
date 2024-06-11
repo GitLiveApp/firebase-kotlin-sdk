@@ -3,6 +3,7 @@
  */
 
 @file:JvmName("android")
+
 package dev.gitlive.firebase.auth
 
 import com.google.firebase.auth.ActionCodeEmailInfo
@@ -48,8 +49,9 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
 
     actual var languageCode: String
         get() = android.languageCode.orEmpty()
-        set(value) { android.setLanguageCode(value) }
-
+        set(value) {
+            android.setLanguageCode(value)
+        }
 
     actual suspend fun applyActionCode(code: String) = android.applyActionCode(code).await().run { Unit }
     actual suspend fun confirmPasswordReset(code: String, newPassword: String) = android.confirmPasswordReset(code, newPassword).await().run { Unit }
@@ -89,7 +91,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
         val result = android.checkActionCode(code).await()
         @Suppress("UNCHECKED_CAST")
-        return when(result.operation) {
+        return when (result.operation) {
             SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
             VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
             PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
@@ -120,6 +122,7 @@ actual class AuthTokenResult(val android: com.google.firebase.auth.GetTokenResul
 //        get() = android.authTimestamp
     actual val claims: Map<String, Any>
         get() = android.claims
+
     //    actual val expirationTimestamp: Long
 //        get() = android.expirationTimestamp
 //    actual val issuedAtTimestamp: Long

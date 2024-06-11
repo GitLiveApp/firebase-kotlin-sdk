@@ -34,7 +34,6 @@ actual class FirebaseStorage {
     actual fun reference(location: String): StorageReference {
         TODO("Not yet implemented")
     }
-
 }
 
 actual class StorageReference {
@@ -72,7 +71,6 @@ actual class StorageReference {
 
     actual suspend fun putFile(file: File) {
     }
-
 }
 
 actual class ListResult {

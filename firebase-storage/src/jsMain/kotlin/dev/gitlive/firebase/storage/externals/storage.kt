@@ -17,15 +17,15 @@ external fun uploadBytes(ref: StorageReference, file: dynamic): Promise<Unit>
 
 external fun uploadBytesResumable(ref: StorageReference, data: dynamic): UploadTask
 
-external fun deleteObject(ref: StorageReference): Promise<Unit>;
+external fun deleteObject(ref: StorageReference): Promise<Unit>
 
-external fun listAll(ref: StorageReference): Promise<ListResult>;
+external fun listAll(ref: StorageReference): Promise<ListResult>
 
 external fun connectFirestoreEmulator(
     storage: FirebaseStorage,
     host: String,
     port: Double,
-    options: Any? = definedExternally
+    options: Any? = definedExternally,
 )
 
 external interface FirebaseStorage {
@@ -42,7 +42,7 @@ external interface StorageReference {
     val storage: FirebaseStorage
 }
 
-external open class ListResult {
+open external class ListResult {
     val items: Array<StorageReference>
     val nextPageToken: String
     val prefixes: Array<StorageReference>
@@ -59,9 +59,9 @@ external interface UploadTaskSnapshot {
 }
 
 external class UploadTask : Promise<UploadTaskSnapshot> {
-    fun cancel(): Boolean;
+    fun cancel(): Boolean
     fun on(event: String, next: (snapshot: UploadTaskSnapshot) -> Unit, error: (a: StorageError) -> Unit, complete: () -> Unit): () -> Unit
-    fun pause(): Boolean;
-    fun resume(): Boolean;
+    fun pause(): Boolean
+    fun resume(): Boolean
     val snapshot: UploadTaskSnapshot
 }

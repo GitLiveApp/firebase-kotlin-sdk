@@ -21,7 +21,7 @@ external interface FirebaseApp {
 
 external interface FirebaseOptions {
     val apiKey: String
-    val appId : String
+    val appId: String
     val authDomain: String?
     val databaseURL: String?
     val measurementId: String?

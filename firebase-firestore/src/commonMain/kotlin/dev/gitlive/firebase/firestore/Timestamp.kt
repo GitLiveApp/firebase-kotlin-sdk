@@ -16,7 +16,7 @@ expect sealed class BaseTimestamp
 
 /** A class representing a Firebase Timestamp. */
 @Serializable(with = TimestampSerializer::class)
-expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseTimestamp {
+expect class Timestamp internal constructor(nativeValue: NativeTimestamp) : BaseTimestamp {
     constructor(seconds: Long, nanoseconds: Int)
     val seconds: Long
     val nanoseconds: Int
@@ -27,9 +27,10 @@ expect class Timestamp internal constructor(nativeValue: NativeTimestamp): BaseT
         /** @return a local time timestamp. */
         fun now(): Timestamp
     }
+
     /** A server time timestamp. */
     @Serializable(with = ServerTimestampSerializer::class)
-    object ServerTimestamp: BaseTimestamp
+    object ServerTimestamp : BaseTimestamp
 }
 
 fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp =

@@ -20,7 +20,7 @@ actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
 actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
-    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp)
+    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp),
 )
 
 actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
@@ -46,7 +46,7 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
                     ?.let { it.toLong() * 1000 }
                     ?.takeIf { it > 0 }
                     ?: -1L,
-                lastFetchStatus = ios.lastFetchStatus.asCommon()
+                lastFetchStatus = ios.lastFetchStatus.asCommon(),
             )
         }
 
@@ -114,7 +114,7 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
 }
 
 private suspend inline fun <T, reified R> T.awaitResult(
-    function: T.(callback: (R?, NSError?) -> Unit) -> Unit
+    function: T.(callback: (R?, NSError?) -> Unit) -> Unit,
 ): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
@@ -139,16 +139,15 @@ private suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit
     job.await()
 }
 
-
 private fun NSError.toException() = when (domain) {
     FIRRemoteConfigErrorDomain -> {
         when (code) {
             FIRRemoteConfigErrorThrottled -> FirebaseRemoteConfigFetchThrottledException(
-                localizedDescription
+                localizedDescription,
             )
 
             FIRRemoteConfigErrorInternalError -> FirebaseRemoteConfigServerException(
-                localizedDescription
+                localizedDescription,
             )
 
             else -> FirebaseRemoteConfigClientException(localizedDescription)
@@ -157,7 +156,6 @@ private fun NSError.toException() = when (domain) {
 
     else -> FirebaseException(localizedDescription)
 }
-
 
 actual open class FirebaseRemoteConfigException(message: String) : FirebaseException(message)
 

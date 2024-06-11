@@ -21,7 +21,6 @@ expect class FirebaseStorage {
 
     val reference: StorageReference
     fun reference(location: String): StorageReference
-
 }
 
 expect class StorageReference {
@@ -54,8 +53,8 @@ expect class ListResult {
 expect class File
 
 sealed class Progress(val bytesTransferred: Number, val totalByteCount: Number) {
-    class Running internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)
-    class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)
+    class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
+    class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
 }
 
 interface ProgressFlow : Flow<Progress> {
@@ -63,6 +62,5 @@ interface ProgressFlow : Flow<Progress> {
     fun resume()
     fun cancel()
 }
-
 
 expect class FirebaseStorageException : FirebaseException

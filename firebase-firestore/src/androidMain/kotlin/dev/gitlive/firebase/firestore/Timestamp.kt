@@ -1,4 +1,5 @@
 @file:JvmName("androidTimestamp")
+
 package dev.gitlive.firebase.firestore
 
 import kotlinx.serialization.Serializable
@@ -13,8 +14,8 @@ actual sealed class BaseTimestamp
 /** A class representing a Firebase Timestamp. */
 @Serializable(with = TimestampSerializer::class)
 actual class Timestamp internal actual constructor(
-    internal actual val nativeValue: NativeTimestamp
-): BaseTimestamp() {
+    internal actual val nativeValue: NativeTimestamp,
+) : BaseTimestamp() {
     actual constructor(seconds: Long, nanoseconds: Int) : this(NativeTimestamp(seconds, nanoseconds))
 
     actual val seconds: Long = nativeValue.seconds
@@ -31,5 +32,5 @@ actual class Timestamp internal actual constructor(
 
     /** A server time timestamp. */
     @Serializable(with = ServerTimestampSerializer::class)
-    actual object ServerTimestamp: BaseTimestamp()
+    actual object ServerTimestamp : BaseTimestamp()
 }

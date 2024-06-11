@@ -17,18 +17,18 @@ internal actual class NativeCollectionReferenceWrapper internal actual construct
     override val js: CollectionReference = native.js
 
     actual val path: String
-        get() =  rethrow { js.path }
+        get() = rethrow { js.path }
 
     actual val document get() = rethrow { NativeDocumentReference(doc(js)) }
 
-    actual val parent get() = rethrow { js.parent?.let{ NativeDocumentReference(it) } }
+    actual val parent get() = rethrow { js.parent?.let { NativeDocumentReference(it) } }
 
     actual fun document(documentPath: String) = rethrow {
         NativeDocumentReference(
             doc(
                 js,
-                documentPath
-            )
+                documentPath,
+            ),
         )
     }
 

@@ -13,5 +13,5 @@ object GeoPointSerializer : KSerializer<GeoPoint> by SpecialValueSerializer(
             is NativeGeoPoint -> GeoPoint(value)
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 )

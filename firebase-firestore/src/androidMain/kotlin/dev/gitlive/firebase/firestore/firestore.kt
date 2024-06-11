@@ -3,6 +3,7 @@
  */
 
 @file:JvmName("android")
+
 package dev.gitlive.firebase.firestore
 
 import com.google.android.gms.tasks.TaskExecutors
@@ -29,11 +30,11 @@ val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings
     is LocalCacheSettings.Memory -> androidMemoryCacheSettings {
         setGcSettings(
             when (garbaseCollectorSettings) {
-                is MemoryGarbageCollectorSettings.Eager -> androidMemoryEagerGcSettings {  }
+                is MemoryGarbageCollectorSettings.Eager -> androidMemoryEagerGcSettings { }
                 is MemoryGarbageCollectorSettings.LRUGC -> androidMemoryLruGcSettings {
                     setSizeBytes(garbaseCollectorSettings.sizeBytes)
                 }
-            }
+            },
         )
     }
 }
@@ -66,8 +67,8 @@ actual data class FirebaseFirestoreSettings(
         actual constructor() : this(
             true,
             DEFAULT_HOST,
-            persistentCacheSettings {  },
-            TaskExecutors.MAIN_THREAD
+            persistentCacheSettings { },
+            TaskExecutors.MAIN_THREAD,
         )
         actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings, settings.callbackExecutor)
 
@@ -77,15 +78,15 @@ actual data class FirebaseFirestoreSettings(
 
 actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
-    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
-        settings?.let {
-            sslEnabled = it.sslEnabled
-            host = it.host
-            cacheSettings = it.cacheSettings
-            callbackExecutor = it.callbackExecutor
-        }
-    }.apply(builder).build()
+    settings?.let {
+        sslEnabled = it.sslEnabled
+        host = it.host
+        cacheSettings = it.cacheSettings
+        callbackExecutor = it.callbackExecutor
+    }
+}.apply(builder).build()
 
 actual typealias NativeWriteBatch = com.google.firebase.firestore.WriteBatch
 
@@ -153,8 +154,8 @@ actual class FieldPath private constructor(val android: com.google.firebase.fire
 
     actual constructor(vararg fieldNames: String) : this(
         com.google.firebase.firestore.FieldPath.of(
-            *fieldNames
-        )
+            *fieldNames,
+        ),
     )
 
     actual val documentId: FieldPath get() = FieldPath.documentId

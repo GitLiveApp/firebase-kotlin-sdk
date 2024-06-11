@@ -40,7 +40,6 @@ actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.Fire
     actual val reference: StorageReference get() = StorageReference(ref(js))
 
     actual fun reference(location: String) = rethrow { StorageReference(ref(js, location)) }
-
 }
 
 actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.StorageReference) {
@@ -68,7 +67,7 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
             val unsubscribe = uploadTask.on(
                 "state_changed",
                 {
-                    when(it.state) {
+                    when (it.state) {
                         "paused" -> trySend(Progress.Paused(it.bytesTransferred, it.totalBytes))
                         "running" -> trySend(Progress.Running(it.bytesTransferred, it.totalBytes))
                         "canceled" -> cancel()
@@ -77,7 +76,7 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
                     }
                 },
                 { close(errorToException(it)) },
-                { close() }
+                { close() },
             )
             awaitClose { unsubscribe() }
         }
@@ -89,7 +88,6 @@ actual class StorageReference(val js: dev.gitlive.firebase.storage.externals.Sto
             override fun cancel() = uploadTask.cancel().run {}
         }
     }
-
 }
 
 actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListResult) {

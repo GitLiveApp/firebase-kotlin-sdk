@@ -17,13 +17,13 @@ actual class OAuthCredential(override val ios: FIROAuthCredential) : AuthCredent
 actual object EmailAuthProvider {
     actual fun credential(
         email: String,
-        password: String
+        password: String,
     ): AuthCredential =
         AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, password = password))
 
     actual fun credentialWithLink(
         email: String,
-        emailLink: String
+        emailLink: String,
     ): AuthCredential =
         AuthCredential(FIREmailAuthProvider.credentialWithEmail(email = email, link = emailLink))
 }
@@ -50,7 +50,7 @@ actual class OAuthProvider(val ios: FIROAuthProvider) {
         provider: String,
         scopes: List<String>,
         customParameters: Map<String, String>,
-        auth: FirebaseAuth
+        auth: FirebaseAuth,
     ) : this(FIROAuthProvider.providerWithProviderID(provider, auth.ios)) {
         ios.setScopes(scopes)
         @Suppress("UNCHECKED_CAST")

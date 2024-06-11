@@ -3,6 +3,7 @@
  */
 
 @file:JvmName("android")
+
 package dev.gitlive.firebase.storage
 
 import android.net.Uri
@@ -45,8 +46,7 @@ actual class FirebaseStorage(val android: com.google.firebase.storage.FirebaseSt
 
     actual val reference get() = StorageReference(android.reference)
 
-    actual fun reference(location: String )= StorageReference(android.getReference(location))
-
+    actual fun reference(location: String) = StorageReference(android.getReference(location))
 }
 
 actual class StorageReference(val android: com.google.firebase.storage.StorageReference) {

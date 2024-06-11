@@ -50,13 +50,13 @@ expect class FirebaseDatabase {
 data class ChildEvent internal constructor(
     val snapshot: DataSnapshot,
     val type: Type,
-    val previousChildName: String?
+    val previousChildName: String?,
 ) {
     enum class Type {
         ADDED,
         CHANGED,
         MOVED,
-        REMOVED
+        REMOVED,
     }
 }
 
@@ -122,7 +122,8 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.updateEncodedChildren(
-        encodeAsObject(update, buildSettings))
+        encodeAsObject(update, buildSettings),
+    )
 
     suspend fun removeValue() = nativeReference.removeValue()
 
@@ -154,19 +155,22 @@ internal expect class NativeOnDisconnect {
 class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
     suspend fun removeValue() = native.removeValue()
     suspend fun cancel() = native.cancel()
+
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) =
         setValue(value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
         native.setValue(encode(value, buildSettings))
+
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
         setValue(strategy, value) { this.encodeDefaults = encodeDefaults }
     suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValue(encode(strategy, value, buildSettings))
 
     suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(
-        encodeAsObject(update, buildSettings)
+        encodeAsObject(update, buildSettings),
     )
+
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
     suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
         this.encodeDefaults = encodeDefaults

@@ -13,7 +13,7 @@ external fun connectDatabaseEmulator(
     db: Database,
     host: String,
     port: Int,
-    options: Any? = definedExternally
+    options: Any? = definedExternally,
 )
 
 external fun enableLogging(enabled: Boolean?, persistent: Boolean? = definedExternally)
@@ -28,7 +28,7 @@ external fun get(query: Query): Promise<DataSnapshot>
 
 external fun getDatabase(
     app: FirebaseApp? = definedExternally,
-    url: String? = definedExternally
+    url: String? = definedExternally,
 ): Database
 
 external fun increment(delta: Double): Any
@@ -102,7 +102,7 @@ external fun update(ref: DatabaseReference, values: Any): Promise<Unit>
 external fun <T> runTransaction(
     ref: DatabaseReference,
     transactionUpdate: (currentData: T) -> T,
-    options: Any? = definedExternally
+    options: Any? = definedExternally,
 ): Promise<TransactionResult>
 
 external interface Database {
@@ -131,7 +131,7 @@ external interface DataSnapshot {
     fun exists(): Boolean
     fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
     fun child(path: String): DataSnapshot
-    fun hasChildren(): Boolean;
+    fun hasChildren(): Boolean
 }
 
 external interface OnDisconnect {

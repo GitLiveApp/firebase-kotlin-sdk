@@ -19,7 +19,7 @@ external fun connectAuthEmulator(auth: Auth, url: String, options: Any? = define
 external fun createUserWithEmailAndPassword(
     auth: Auth,
     email: String,
-    password: String
+    password: String,
 ): Promise<AuthResult>
 
 external fun deleteUser(user: User): Promise<Unit>
@@ -48,7 +48,7 @@ external fun sendEmailVerification(user: User, actionCodeSettings: Any?): Promis
 
 external fun reauthenticateWithCredential(
     user: User,
-    credential: AuthCredential
+    credential: AuthCredential,
 ): Promise<AuthResult>
 
 external fun reload(user: User): Promise<Unit>
@@ -56,13 +56,13 @@ external fun reload(user: User): Promise<Unit>
 external fun sendPasswordResetEmail(
     auth: Auth,
     email: String,
-    actionCodeSettings: Any?
+    actionCodeSettings: Any?,
 ): Promise<Unit>
 
 external fun sendSignInLinkToEmail(
     auth: Auth,
     email: String,
-    actionCodeSettings: Any?
+    actionCodeSettings: Any?,
 ): Promise<Unit>
 
 external fun signInAnonymously(auth: Auth): Promise<AuthResult>
@@ -74,7 +74,7 @@ external fun signInWithCustomToken(auth: Auth, token: String): Promise<AuthResul
 external fun signInWithEmailAndPassword(
     auth: Auth,
     email: String,
-    password: String
+    password: String,
 ): Promise<AuthResult>
 
 external fun signInWithEmailLink(auth: Auth, email: String, link: String): Promise<AuthResult>
@@ -102,7 +102,7 @@ external fun updateProfile(user: User, profile: Json): Promise<Unit>
 external fun verifyBeforeUpdateEmail(
     user: User,
     newEmail: String,
-    actionCodeSettings: Any?
+    actionCodeSettings: Any?,
 ): Promise<Unit>
 
 external fun verifyPasswordResetCode(auth: Auth, code: String): Promise<String>
@@ -268,13 +268,13 @@ external class PhoneAuthProvider(auth: Auth?) : AuthProvider {
     companion object {
         fun credential(
             verificationId: String,
-            verificationCode: String
+            verificationCode: String,
         ): AuthCredential
     }
 
     fun verifyPhoneNumber(
         phoneInfoOptions: String,
-        applicationVerifier: ApplicationVerifier
+        applicationVerifier: ApplicationVerifier,
     ): Promise<String>
 }
 
@@ -296,4 +296,4 @@ external val browserSessionPersistence: Persistence
 external val indexedDBLocalPersistence: Persistence
 external val inMemoryPersistence: Persistence
 
-external fun setPersistence(auth: Auth, persistence: Persistence): Promise<Unit>;
+external fun setPersistence(auth: Auth, persistence: Persistence): Promise<Unit>

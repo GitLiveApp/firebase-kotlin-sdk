@@ -10,19 +10,12 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.externals.getApp
 import dev.gitlive.firebase.firestore.externals.MemoryCacheSettings
 import dev.gitlive.firebase.firestore.externals.PersistentCacheSettings
-import dev.gitlive.firebase.firestore.externals.getDoc
-import dev.gitlive.firebase.firestore.externals.getDocFromCache
-import dev.gitlive.firebase.firestore.externals.getDocFromServer
-import dev.gitlive.firebase.firestore.externals.getDocs
-import dev.gitlive.firebase.firestore.externals.getDocsFromCache
-import dev.gitlive.firebase.firestore.externals.getDocsFromServer
 import dev.gitlive.firebase.firestore.externals.memoryEagerGarbageCollector
 import dev.gitlive.firebase.firestore.externals.memoryLocalCache
 import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
 import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
-import dev.gitlive.firebase.firestore.internal.SetOptions
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
@@ -58,6 +51,7 @@ actual data class FirebaseFirestoreSettings(
         actual val CACHE_SIZE_UNLIMITED: Long = -1L
         internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
         internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
+
         // According to documentation, default JS Firestore cache size is 40MB, not 100MB
         internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 40 * 1024 * 1024
     }
@@ -71,7 +65,7 @@ actual data class FirebaseFirestoreSettings(
         actual constructor() : this(
             true,
             DEFAULT_HOST,
-            persistentCacheSettings {  },
+            persistentCacheSettings { },
         )
         actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings)
 
@@ -82,27 +76,29 @@ actual data class FirebaseFirestoreSettings(
     val js: Json get() = json().apply {
         set("ssl", sslEnabled)
         set("host", host)
-        set("localCache",
-        when (cacheSettings) {
-            is LocalCacheSettings.Persistent -> persistentLocalCache(
-                json(
-                    "cacheSizeBytes" to cacheSettings.sizeBytes
-                ).asDynamic() as PersistentCacheSettings
-            )
-            is LocalCacheSettings.Memory -> {
-                val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
-                    is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
-                    is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
+        set(
+            "localCache",
+            when (cacheSettings) {
+                is LocalCacheSettings.Persistent -> persistentLocalCache(
+                    json(
+                        "cacheSizeBytes" to cacheSettings.sizeBytes,
+                    ).asDynamic() as PersistentCacheSettings,
+                )
+                is LocalCacheSettings.Memory -> {
+                    val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                        is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
+                        is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
+                    }
+                    memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
                 }
-                memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
-            }
-        })
+            },
+        )
     }
 }
 
 actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
-    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
     settings?.let {
         sslEnabled = it.sslEnabled
@@ -171,9 +167,11 @@ actual class FieldPath private constructor(val js: JsFieldPath) {
     actual companion object {
         actual val documentId = FieldPath(jsDocumentId())
     }
-    actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
-        JsFieldPath(*fieldNames)
-    })
+    actual constructor(vararg fieldNames: String) : this(
+        dev.gitlive.firebase.firestore.rethrow {
+            JsFieldPath(*fieldNames)
+        },
+    )
     actual val documentId: FieldPath get() = FieldPath.documentId
     actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
@@ -200,18 +198,18 @@ actual enum class FirestoreExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
 
-actual enum class Direction(internal val jsString : String) {
+actual enum class Direction(internal val jsString: String) {
     ASCENDING("asc"),
-    DESCENDING("desc");
+    DESCENDING("desc"),
 }
 
-actual enum class ChangeType(internal val jsString : String) {
+actual enum class ChangeType(internal val jsString: String) {
     ADDED("added"),
     MODIFIED("modified"),
-    REMOVED("removed");
+    REMOVED("removed"),
 }
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
@@ -221,7 +219,7 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
+    } catch (e: dynamic) {
         throw errorToException(e)
     }
 }

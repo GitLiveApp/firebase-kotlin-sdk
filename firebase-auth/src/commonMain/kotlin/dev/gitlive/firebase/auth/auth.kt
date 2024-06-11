@@ -21,9 +21,10 @@ expect class FirebaseAuth {
     val idTokenChanged: Flow<FirebaseUser?>
     var languageCode: String
     suspend fun applyActionCode(code: String)
-    suspend fun <T: ActionCodeResult> checkActionCode(code: String): T
+    suspend fun <T : ActionCodeResult> checkActionCode(code: String): T
     suspend fun confirmPasswordReset(code: String, newPassword: String)
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
+
     @Deprecated("Migrating off of this method is recommended as a security best-practice. Learn more in the Identity Platform documentation for [Email Enumeration Protection](https://cloud.google.com/identity-platform/docs/admin/email-enumeration-protection).")
     suspend fun fetchSignInMethodsForEmail(email: String): List<String>
     suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
@@ -47,6 +48,7 @@ expect class AuthResult {
 expect class AuthTokenResult {
 //    val authTimestamp: Long
     val claims: Map<String, Any>
+
 //    val expirationTimestamp: Long
 //    val issuedAtTimestamp: Long
     val signInProvider: String?
@@ -67,22 +69,22 @@ data class ActionCodeSettings(
     val androidPackageName: AndroidPackageName? = null,
     val dynamicLinkDomain: String? = null,
     val canHandleCodeInApp: Boolean = false,
-    val iOSBundleId: String? = null
+    val iOSBundleId: String? = null,
 )
 
 data class AndroidPackageName(
     val packageName: String,
     val installIfNotAvailable: Boolean = true,
-    val minimumVersion: String? = null
+    val minimumVersion: String? = null,
 )
 
 expect open class FirebaseAuthException : FirebaseException
 expect class FirebaseAuthActionCodeException : FirebaseAuthException
 expect class FirebaseAuthEmailException : FirebaseAuthException
 expect open class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
-expect class FirebaseAuthWeakPasswordException: FirebaseAuthInvalidCredentialsException
+expect class FirebaseAuthWeakPasswordException : FirebaseAuthInvalidCredentialsException
 expect class FirebaseAuthInvalidUserException : FirebaseAuthException
-expect class FirebaseAuthMultiFactorException: FirebaseAuthException
+expect class FirebaseAuthMultiFactorException : FirebaseAuthException
 expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
 expect class FirebaseAuthUserCollisionException : FirebaseAuthException
 expect class FirebaseAuthWebException : FirebaseAuthException

@@ -11,7 +11,7 @@ actual val Firebase.crashlytics get() =
 actual fun Firebase.crashlytics(app: FirebaseApp) =
     FirebaseCrashlytics(app.android.get(com.google.firebase.crashlytics.FirebaseCrashlytics::class.java))
 
-actual class FirebaseCrashlytics internal constructor(val android: com.google.firebase.crashlytics.FirebaseCrashlytics){
+actual class FirebaseCrashlytics internal constructor(val android: com.google.firebase.crashlytics.FirebaseCrashlytics) {
 
     actual fun recordException(exception: Throwable) = android.recordException(exception)
     actual fun log(message: String) = android.log(message)
@@ -39,7 +39,7 @@ actual class FirebaseCrashlytics internal constructor(val android: com.google.fi
                         is Long -> putLong(key, value)
                     }
                 }
-            }.build()
+            }.build(),
         )
 }
 

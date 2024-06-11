@@ -1,4 +1,5 @@
 @file:JvmName("android")
+
 package dev.gitlive.firebase.remoteconfig
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
@@ -69,7 +70,7 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
         return FirebaseRemoteConfigInfo(
             configSettings = configSettings.asCommon(),
             fetchTimeMillis = fetchTimeMillis,
-            lastFetchStatus = lastFetchStatus
+            lastFetchStatus = lastFetchStatus,
         )
     }
 }

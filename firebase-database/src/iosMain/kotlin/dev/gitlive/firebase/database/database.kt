@@ -39,22 +39,21 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
 import platform.Foundation.allObjects
-import platform.darwin.dispatch_queue_t
 import kotlin.collections.component1
 import kotlin.collections.component2
 
 actual val Firebase.database
-        by lazy { FirebaseDatabase(FIRDatabase.database()) }
+    by lazy { FirebaseDatabase(FIRDatabase.database()) }
 
 actual fun Firebase.database(url: String) =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
 actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp)
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url)
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url),
 )
 
 actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
@@ -84,7 +83,7 @@ actual class FirebaseDatabase internal constructor(val ios: FIRDatabase) {
     actual fun goOnline() = ios.goOnline()
 }
 
-fun Type.toEventType() = when(this) {
+fun Type.toEventType() = when (this) {
     ADDED -> FIRDataEventTypeChildAdded
     CHANGED -> FIRDataEventTypeChildChanged
     MOVED -> FIRDataEventTypeChildMoved
@@ -93,11 +92,11 @@ fun Type.toEventType() = when(this) {
 
 internal actual open class NativeQuery(
     open val ios: FIRDatabaseQuery,
-    val persistenceEnabled: Boolean
+    val persistenceEnabled: Boolean,
 )
 
 actual open class Query internal actual constructor(
-    nativeQuery: NativeQuery
+    nativeQuery: NativeQuery,
 ) {
 
     internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
@@ -138,7 +137,7 @@ actual open class Query internal actual constructor(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
                 trySend(DataSnapshot(snapShot!!, persistenceEnabled))
-            }
+            },
         ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
@@ -149,7 +148,7 @@ actual open class Query internal actual constructor(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
                     trySend(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
-                }
+                },
             ) { close(DatabaseException(it.toString(), null)) }
         }
         awaitClose {
@@ -163,8 +162,8 @@ actual open class Query internal actual constructor(
 @PublishedApi
 internal actual class NativeDatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
-    persistenceEnabled: Boolean
-): NativeQuery(ios, persistenceEnabled) {
+    persistenceEnabled: Boolean,
+) : NativeQuery(ios, persistenceEnabled) {
 
     actual val key get() = ios.key
 
@@ -199,7 +198,7 @@ internal actual class NativeDatabaseReference internal constructor(
                     deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                 }
             },
-            withLocalEvents = false
+            withLocalEvents = false,
         )
         return deferred.await()
     }
@@ -209,7 +208,7 @@ val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
 
 actual class DataSnapshot internal constructor(
     val ios: FIRDataSnapshot,
-    private val persistenceEnabled: Boolean
+    private val persistenceEnabled: Boolean,
 ) {
 
     actual val exists get() = ios.exists()
@@ -234,7 +233,7 @@ actual class DataSnapshot internal constructor(
 @PublishedApi
 internal actual class NativeOnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
-    val persistenceEnabled: Boolean
+    val persistenceEnabled: Boolean,
 ) {
     actual suspend fun removeValue() {
         ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
@@ -261,30 +260,29 @@ actual class DatabaseException actual constructor(message: String?, cause: Throw
 private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { error, result ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
     }
-    return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
+    return job.run { if (whileOnline) awaitWhileOnline() else await() } as R
 }
 
 suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
     }
-    job.run { if(whileOnline) awaitWhileOnline() else await() }
+    job.run { if (whileOnline) awaitWhileOnline() else await() }
 }
 
 @FlowPreview
 suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
-
     val notConnected = Firebase.database
         .reference(".info/connected")
         .valueEvents

@@ -34,7 +34,7 @@ expect class OAuthProvider constructor(
     provider: String,
     scopes: List<String> = emptyList(),
     customParameters: Map<String, String> = emptyMap(),
-    auth: FirebaseAuth = Firebase.auth
+    auth: FirebaseAuth = Firebase.auth,
 ) {
     companion object {
         fun credential(providerId: String, accessToken: String? = null, idToken: String? = null, rawNonce: String? = null): OAuthCredential

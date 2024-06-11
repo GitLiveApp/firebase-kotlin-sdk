@@ -15,23 +15,48 @@ actual fun Firebase.crashlytics(app: FirebaseApp) =
 
 actual class FirebaseCrashlytics internal constructor(val ios: FIRCrashlytics) {
 
-    actual fun recordException(exception: Throwable) { ios.recordError(exception.asNSError()) }
-    actual fun log(message: String) { ios.log(message) }
-    actual fun setUserId(userId: String) { ios.setUserID(userId) }
-    actual fun setCrashlyticsCollectionEnabled(enabled: Boolean) { ios.setCrashlyticsCollectionEnabled(enabled) }
-    actual fun sendUnsentReports() { ios.sendUnsentReports() }
-    actual fun deleteUnsentReports() { ios.deleteUnsentReports() }
+    actual fun recordException(exception: Throwable) {
+        ios.recordError(exception.asNSError())
+    }
+    actual fun log(message: String) {
+        ios.log(message)
+    }
+    actual fun setUserId(userId: String) {
+        ios.setUserID(userId)
+    }
+    actual fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
+        ios.setCrashlyticsCollectionEnabled(enabled)
+    }
+    actual fun sendUnsentReports() {
+        ios.sendUnsentReports()
+    }
+    actual fun deleteUnsentReports() {
+        ios.deleteUnsentReports()
+    }
     actual fun didCrashOnPreviousExecution(): Boolean = ios.didCrashDuringPreviousExecution()
     actual fun setCustomKey(key: String, value: String) {
         ios.setCustomValue(key, value)
     }
-    actual fun setCustomKey(key: String, value: Boolean) { ios.setCustomValue(key, value.toString()) }
-    actual fun setCustomKey(key: String, value: Double) { ios.setCustomValue(key, value.toString()) }
-    actual fun setCustomKey(key: String, value: Float) { ios.setCustomValue(key, value.toString()) }
-    actual fun setCustomKey(key: String, value: Int) { ios.setCustomValue(key, value.toString()) }
-    actual fun setCustomKey(key: String, value: Long) { ios.setCustomValue(key, value.toString()) }
+    actual fun setCustomKey(key: String, value: Boolean) {
+        ios.setCustomValue(key, value.toString())
+    }
+    actual fun setCustomKey(key: String, value: Double) {
+        ios.setCustomValue(key, value.toString())
+    }
+    actual fun setCustomKey(key: String, value: Float) {
+        ios.setCustomValue(key, value.toString())
+    }
+    actual fun setCustomKey(key: String, value: Int) {
+        ios.setCustomValue(key, value.toString())
+    }
+    actual fun setCustomKey(key: String, value: Long) {
+        ios.setCustomValue(key, value.toString())
+    }
+
     @Suppress("UNCHECKED_CAST")
-    actual fun setCustomKeys(customKeys: Map<String, Any>) { ios.setCustomKeysAndValues(customKeys as Map<Any?, *>) }
+    actual fun setCustomKeys(customKeys: Map<String, Any>) {
+        ios.setCustomKeysAndValues(customKeys as Map<Any?, *>)
+    }
 }
 
 actual open class FirebaseCrashlyticsException internal constructor(message: String) : FirebaseException(message)

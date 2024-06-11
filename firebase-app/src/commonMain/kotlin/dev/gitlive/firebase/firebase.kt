@@ -4,6 +4,7 @@
 
 @file:JvmMultifileClass
 @file:JvmName("CommonKt")
+
 package dev.gitlive.firebase
 
 import kotlin.jvm.JvmMultifileClass
@@ -52,7 +53,7 @@ data class FirebaseOptions(
     val storageBucket: String? = null,
     val projectId: String? = null,
     val gcmSenderId: String? = null,
-    val authDomain: String? = null
+    val authDomain: String? = null,
 )
 
 expect open class FirebaseException : Exception
@@ -62,4 +63,3 @@ expect class FirebaseNetworkException : FirebaseException
 expect open class FirebaseTooManyRequestsException : FirebaseException
 
 expect open class FirebaseApiNotAvailableException : FirebaseException
-

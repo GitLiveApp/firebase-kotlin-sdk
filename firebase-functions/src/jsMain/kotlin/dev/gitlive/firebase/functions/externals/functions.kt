@@ -10,7 +10,7 @@ external fun connectFunctionsEmulator(functions: Functions, host: String, port: 
 
 external fun getFunctions(
     app: FirebaseApp? = definedExternally,
-    regionOrCustomDomain: String? = definedExternally
+    regionOrCustomDomain: String? = definedExternally,
 ): Functions
 
 external fun httpsCallable(functions: Functions, name: String, options: Json?): HttpsCallable

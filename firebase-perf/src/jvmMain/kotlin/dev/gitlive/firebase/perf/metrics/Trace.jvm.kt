@@ -16,5 +16,4 @@ actual class Trace {
 
     actual fun putMetric(metricName: String, value: Long) {
     }
-
 }

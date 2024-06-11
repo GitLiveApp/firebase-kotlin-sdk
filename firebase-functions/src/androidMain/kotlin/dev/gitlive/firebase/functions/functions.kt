@@ -32,7 +32,7 @@ actual data class FirebaseFunctions internal constructor(val android: com.google
 }
 
 @PublishedApi
-internal actual data class NativeHttpsCallableReference(val android: com.google.firebase.functions.HttpsCallableReference){
+internal actual data class NativeHttpsCallableReference(val android: com.google.firebase.functions.HttpsCallableReference) {
     actual suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(android.call(encodedData).await())
     actual suspend fun invoke(): HttpsCallableResult = HttpsCallableResult(android.call().await())
 }

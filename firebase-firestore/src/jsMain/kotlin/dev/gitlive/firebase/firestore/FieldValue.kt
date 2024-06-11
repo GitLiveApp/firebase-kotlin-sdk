@@ -18,7 +18,7 @@ actual class FieldValue internal actual constructor(internal actual val nativeVa
     }
     override fun equals(other: Any?): Boolean =
         this === other || other is FieldValue &&
-                (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
+            (nativeValue as NativeFieldValue).isEqual(other.nativeValue as NativeFieldValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
 

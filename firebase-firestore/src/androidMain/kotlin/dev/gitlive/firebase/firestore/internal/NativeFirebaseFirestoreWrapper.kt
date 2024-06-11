@@ -29,7 +29,7 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
                                 when (val settings = localCacheSettings.garbageCollectorSettings) {
                                     is MemoryEagerGcSettings -> MemoryGarbageCollectorSettings.Eager
                                     is MemoryLruGcSettings -> MemoryGarbageCollectorSettings.LRUGC(
-                                        settings.sizeBytes
+                                        settings.sizeBytes,
                                     )
 
                                     else -> throw IllegalArgumentException("Existing settings does not have valid GarbageCollectionSettings")
@@ -38,7 +38,7 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
                         }
 
                         is PersistentCacheSettings -> LocalCacheSettings.Persistent(
-                            localCacheSettings.sizeBytes
+                            localCacheSettings.sizeBytes,
                         )
 
                         else -> throw IllegalArgumentException("Existing settings is not of a valid type")
@@ -48,17 +48,17 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
                     when {
                         isPersistenceEnabled -> LocalCacheSettings.Persistent(cacheSizeBytes)
                         cacheSizeBytes == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED -> LocalCacheSettings.Memory(
-                            MemoryGarbageCollectorSettings.Eager
+                            MemoryGarbageCollectorSettings.Eager,
                         )
 
                         else -> LocalCacheSettings.Memory(
                             MemoryGarbageCollectorSettings.LRUGC(
-                                cacheSizeBytes
-                            )
+                                cacheSizeBytes,
+                            ),
                         )
                     }
                 },
-                callbackExecutorMap[native] ?: TaskExecutors.MAIN_THREAD
+                callbackExecutorMap[native] ?: TaskExecutors.MAIN_THREAD,
             )
         }
         set(value) {
@@ -97,5 +97,4 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
 
     actual suspend fun enableNetwork() =
         native.enableNetwork().await().run { }
-
 }

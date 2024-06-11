@@ -32,8 +32,8 @@ class TraceTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         performance = Firebase.performance(app)
@@ -54,7 +54,7 @@ class TraceTest {
         trace.start()
         trace.putMetric("Get Long Metric Test", 1L)
 
-        assertEquals(1L,  trace.getLongMetric("Get Long Metric Test"))
+        assertEquals(1L, trace.getLongMetric("Get Long Metric Test"))
         trace.stop()
     }
 
@@ -66,7 +66,7 @@ class TraceTest {
 
         trace.incrementMetric("Get Increment Metric Test", 1L)
 
-        assertEquals(2L,  trace.getLongMetric("Get Increment Metric Test"))
+        assertEquals(2L, trace.getLongMetric("Get Increment Metric Test"))
         trace.stop()
     }
 
@@ -76,7 +76,7 @@ class TraceTest {
         trace.start()
         trace.putMetric("Get Put Metric Test", 1L)
 
-        assertEquals(1L,  trace.getLongMetric("Get Put Metric Test"))
+        assertEquals(1L, trace.getLongMetric("Get Put Metric Test"))
         trace.stop()
     }
 }

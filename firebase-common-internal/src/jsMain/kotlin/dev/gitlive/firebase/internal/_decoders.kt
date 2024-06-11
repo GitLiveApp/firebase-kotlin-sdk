@@ -17,15 +17,21 @@ actual fun FirebaseDecoder.structureDecoder(descriptor: SerialDescriptor, polymo
     StructureKind.MAP -> (js("Object").entries(value) as Array<Array<Any>>).let {
         FirebaseCompositeDecoder(
             it.size,
-            settings
-        ) { desc, index -> it[index / 2].run { if (index % 2 == 0) {
-            val key = get(0) as String
-            if (desc.getElementDescriptor(index).kind == PrimitiveKind.STRING) {
-                key
-            } else {
-                JSON.parse(key)
+            settings,
+        ) { desc, index ->
+            it[index / 2].run {
+                if (index % 2 == 0) {
+                    val key = get(0) as String
+                    if (desc.getElementDescriptor(index).kind == PrimitiveKind.STRING) {
+                        key
+                    } else {
+                        JSON.parse(key)
+                    }
+                } else {
+                    get(1)
+                }
             }
-        } else get(1) } }
+        }
     }
 
     is PolymorphicKind -> decodeAsMap(polymorphicIsNested)
@@ -39,6 +45,7 @@ actual fun getPolymorphicType(value: Any?, discriminator: String): String =
 private fun FirebaseDecoder.decodeAsList(): CompositeDecoder = (value as Array<*>).let {
     FirebaseCompositeDecoder(it.size, settings) { _, index -> it[index] }
 }
+
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 private fun FirebaseDecoder.decodeAsMap(isNestedPolymorphic: Boolean): CompositeDecoder = (value as Json).let { json ->
     FirebaseClassDecoder(js("Object").keys(value).length as Int, settings, { json[it] != undefined }) { desc, index ->

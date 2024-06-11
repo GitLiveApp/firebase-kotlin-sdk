@@ -54,8 +54,9 @@ class FirebaseFirestore internal constructor(private val wrapper: NativeFirebase
     fun batch(): WriteBatch = WriteBatch(wrapper.batch())
     fun setLoggingEnabled(loggingEnabled: Boolean) = wrapper.setLoggingEnabled(loggingEnabled)
     suspend fun clearPersistence() = wrapper.clearPersistence()
-    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = wrapper.runTransaction {  func(Transaction(this)) }
+    suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = wrapper.runTransaction { func(Transaction(this)) }
     fun useEmulator(host: String, port: Int) = wrapper.useEmulator(host, port)
+
     @Deprecated("Use settings instead", replaceWith = ReplaceWith("settings = firestoreSettings{}"))
     fun setSettings(
         persistenceEnabled: Boolean? = null,
@@ -124,7 +125,6 @@ data class Transaction internal constructor(@PublishedApi internal val nativeWra
     }
     inline fun set(documentRef: DocumentReference, data: Any, merge: Boolean = false, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = setEncoded(documentRef, encodeAsObject(data, buildSettings), if (merge) SetOptions.Merge else SetOptions.Overwrite)
 
-
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(documentRef, data, mergeFields) { this.encodeDefaults = encodeDefaults }"))
     fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, vararg mergeFields: String) = set(documentRef, data, *mergeFields) {
         this.encodeDefaults = encodeDefaults
@@ -172,6 +172,7 @@ data class Transaction internal constructor(@PublishedApi internal val nativeWra
 
     @JvmName("updateFields")
     inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+
     @JvmName("updateFieldPaths")
     inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
@@ -233,8 +234,8 @@ fun Query.where(field: String, lessThan: Any? = null, greaterThan: Any? = null, 
         *listOfNotNull(
             lessThan?.let { field lessThan it },
             greaterThan?.let { field greaterThan it },
-            arrayContains?.let { field contains it }
-        ).toTypedArray()
+            arrayContains?.let { field contains it },
+        ).toTypedArray(),
     )
 }
 
@@ -244,8 +245,8 @@ fun Query.where(path: FieldPath, lessThan: Any? = null, greaterThan: Any? = null
         *listOfNotNull(
             lessThan?.let { path lessThan it },
             greaterThan?.let { path greaterThan it },
-            arrayContains?.let { path contains it }
-        ).toTypedArray()
+            arrayContains?.let { path contains it },
+        ).toTypedArray(),
     )
 }
 
@@ -254,8 +255,8 @@ fun Query.where(field: String, inArray: List<Any>? = null, arrayContainsAny: Lis
     all(
         *listOfNotNull(
             inArray?.let { field inArray it },
-            arrayContainsAny?.let { field containsAny  it },
-        ).toTypedArray()
+            arrayContainsAny?.let { field containsAny it },
+        ).toTypedArray(),
     )
 }
 
@@ -264,8 +265,8 @@ fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContainsAny: L
     all(
         *listOfNotNull(
             inArray?.let { path inArray it },
-            arrayContainsAny?.let { path containsAny  it },
-        ).toTypedArray()
+            arrayContainsAny?.let { path containsAny it },
+        ).toTypedArray(),
     )
 }
 
@@ -306,7 +307,7 @@ data class WriteBatch internal constructor(@PublishedApi internal val nativeWrap
         setEncoded(documentRef, encodeAsObject(strategy, data, buildSettings), if (merge) SetOptions.Merge else SetOptions.Overwrite)
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(documentRef, strategy, data, mergeFields) { this.encodeDefaults = encodeDefaults }"))
-    fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) = set(documentRef, strategy, data, *mergeFields){
+    fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) = set(documentRef, strategy, data, *mergeFields) {
         this.encodeDefaults = encodeDefaults
     }
     inline fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
@@ -338,6 +339,7 @@ data class WriteBatch internal constructor(@PublishedApi internal val nativeWrap
 
     @JvmName("updateField")
     inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+
     @JvmName("updateFieldPath")
     inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
@@ -377,42 +379,54 @@ data class DocumentReference internal constructor(@PublishedApi internal val nat
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <reified T : Any> set(data: T, merge: Boolean = false, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(data, buildSettings), if (merge) SetOptions.Merge else SetOptions.Overwrite)
+        encodeAsObject(data, buildSettings),
+        if (merge) SetOptions.Merge else SetOptions.Overwrite,
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(data, mergeFields) { this.encodeDefaults = encodeDefaults }"))
-    suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) = set(data, *mergeFields)  {
+    suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, vararg mergeFields: String) = set(data, *mergeFields) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <reified T : Any> set(data: T, vararg mergeFields: String, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(data, buildSettings), SetOptions.MergeFields(mergeFields.asList()))
+        encodeAsObject(data, buildSettings),
+        SetOptions.MergeFields(mergeFields.asList()),
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(data, mergeFieldPaths) { this.encodeDefaults = encodeDefaults }"))
-    suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) = set(data, *mergeFieldPaths)  {
+    suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) = set(data, *mergeFieldPaths) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <reified T : Any> set(data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
+        encodeAsObject(data, buildSettings),
+        SetOptions.MergeFieldPaths(mergeFieldPaths.asList()),
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(strategy, data, merge) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, merge: Boolean = false) = set(strategy, data, merge) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, merge: Boolean = false, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(strategy, data, buildSettings), if (merge) SetOptions.Merge else SetOptions.Overwrite)
+        encodeAsObject(strategy, data, buildSettings),
+        if (merge) SetOptions.Merge else SetOptions.Overwrite,
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(strategy, data, mergeFields) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFields: String) = set(strategy, data, *mergeFields) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFields: String, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFields(mergeFields.asList()))
+        encodeAsObject(strategy, data, buildSettings),
+        SetOptions.MergeFields(mergeFields.asList()),
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(strategy, data, mergeFieldPaths) { this.encodeDefaults = encodeDefaults }"))
     suspend fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean, vararg mergeFieldPaths: FieldPath) = set(strategy, data, *mergeFieldPaths) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <T : Any> set(strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.setEncoded(
-        encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
+        encodeAsObject(strategy, data, buildSettings),
+        SetOptions.MergeFieldPaths(mergeFieldPaths.asList()),
+    )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(data) { this.encodeDefaults = encodeDefaults }"))
     suspend inline fun <reified T : Any> update(data: T, encodeDefaults: Boolean) = update(data) {
@@ -421,11 +435,11 @@ data class DocumentReference internal constructor(@PublishedApi internal val nat
     suspend inline fun <reified T : Any> update(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncoded(encodeAsObject(data, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(strategy, data) { this.encodeDefaults = encodeDefaults }"))
-    suspend fun <T : Any> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) = update(strategy, data)  {
+    suspend fun <T : Any> update(strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean) = update(strategy, data) {
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <T : Any> update(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncoded(
-        encodeAsObject(strategy, data, buildSettings)
+        encodeAsObject(strategy, data, buildSettings),
     )
 
     @JvmName("updateFields")
@@ -456,7 +470,7 @@ data class CollectionReference internal constructor(@PublishedApi internal val n
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <reified T : Any> add(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = addEncoded(
-        encodeAsObject(data, buildSettings)
+        encodeAsObject(data, buildSettings),
     )
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("add(strategy, data) { this.encodeDefaults = encodeDefaults }"))
@@ -464,7 +478,7 @@ data class CollectionReference internal constructor(@PublishedApi internal val n
         this.encodeDefaults = encodeDefaults
     }
     suspend inline fun <T : Any> add(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = addEncoded(
-        encodeAsObject(strategy, data, buildSettings)
+        encodeAsObject(strategy, data, buildSettings),
     )
 
     @PublishedApi
@@ -493,12 +507,12 @@ expect enum class FirestoreExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
 
 expect enum class Direction {
     ASCENDING,
-    DESCENDING
+    DESCENDING,
 }
 
 expect class QuerySnapshot {
@@ -508,9 +522,9 @@ expect class QuerySnapshot {
 }
 
 expect enum class ChangeType {
-    ADDED ,
+    ADDED,
     MODIFIED,
-    REMOVED
+    REMOVED,
 }
 
 expect class DocumentChange {
@@ -548,7 +562,6 @@ data class DocumentSnapshot internal constructor(@PublishedApi internal val nati
     @PublishedApi
     internal fun getEncoded(fieldPath: FieldPath, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = nativeWrapper.getEncoded(fieldPath.encoded, serverTimestampBehavior)
 
-
     inline fun <reified T> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(encodedData(serverTimestampBehavior), buildSettings)
     inline fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, encodedData(serverTimestampBehavior), buildSettings)
 
@@ -559,7 +572,7 @@ data class DocumentSnapshot internal constructor(@PublishedApi internal val nati
 enum class ServerTimestampBehavior {
     ESTIMATE,
     NONE,
-    PREVIOUS
+    PREVIOUS,
 }
 
 expect class SnapshotMetadata {
@@ -571,6 +584,7 @@ expect class FieldPath(vararg fieldNames: String) {
     companion object {
         val documentId: FieldPath
     }
+
     @Deprecated("Use companion object instead", replaceWith = ReplaceWith("FieldPath.documentId"))
     val documentId: FieldPath
     val encoded: EncodedFieldPath
@@ -581,5 +595,5 @@ expect class EncodedFieldPath
 enum class Source {
     CACHE,
     SERVER,
-    DEFAULT
+    DEFAULT,
 }

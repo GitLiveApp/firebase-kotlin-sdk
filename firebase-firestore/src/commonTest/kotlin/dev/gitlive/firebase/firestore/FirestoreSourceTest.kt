@@ -33,15 +33,15 @@ class FirestoreSourceTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         firestore = Firebase.firestore(app).apply {
             useEmulator(emulatorHost, 8080)
             settings = firestoreSettings(settings) {
                 cacheSettings = if (persistenceEnabled) {
-                    persistentCacheSettings {  }
+                    persistentCacheSettings { }
                 } else {
                     memoryCacheSettings { }
                 }
@@ -102,6 +102,7 @@ class FirestoreSourceTest {
         assertTrue(doc.exists)
         assertFalse(doc.metadata.isFromCache)
     }
+
     @Test
     fun testGet() = runTest {
         initializeFirebase(persistenceEnabled = false)
@@ -119,5 +120,4 @@ class FirestoreSourceTest {
         // Firebase defaults to first fetching from server
         assertFalse(doc.metadata.isFromCache)
     }
-
 }

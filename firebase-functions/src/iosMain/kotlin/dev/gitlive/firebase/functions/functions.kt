@@ -24,7 +24,7 @@ actual fun Firebase.functions(region: String) =
 
 @Suppress("CAST_NEVER_SUCCEEDS")
 actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp)
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 @Suppress("CAST_NEVER_SUCCEEDS")
@@ -32,12 +32,12 @@ actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region)
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
 )
 
 actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
     actual fun httpsCallable(name: String, timeout: Long?) =
-        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } }.native)
+        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it / 1000.0) } }.native)
 
     actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
 }
@@ -84,10 +84,11 @@ actual enum class FunctionsExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
-//todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
-fun NSError.toException() = when(domain) {
+
+// todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
+fun NSError.toException() = when (domain) {
 //    FIRFunctionsErrorDomain -> when(code) {
 //        FIRFunctionsErrorCodeOK -> FunctionsExceptionCode.OK
 //        FIRFunctionsErrorCodeCancelled -> FunctionsExceptionCode.CANCELLED
@@ -109,12 +110,18 @@ fun NSError.toException() = when(domain) {
 //        else -> FunctionsExceptionCode.UNKNOWN
 //    }
     else -> FunctionsExceptionCode.UNKNOWN
-}.let { FirebaseFunctionsException(description!!, it, null/*userInfo[FIRFunctionsErrorDetails]*/) }
+}.let {
+    FirebaseFunctionsException(
+        description!!,
+        it,
+        null, // userInfo[FIRFunctionsErrorDetails
+    )
+}
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
@@ -126,7 +133,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
 suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())

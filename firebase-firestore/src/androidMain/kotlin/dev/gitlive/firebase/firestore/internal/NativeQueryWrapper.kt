@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 @PublishedApi
-internal actual open class NativeQueryWrapper actual internal constructor(actual open val native: Query) {
+internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: Query) {
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
 
@@ -45,10 +45,14 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
     actual fun where(filter: Filter) = native.where(filter.toAndroidFilter())
 
     private fun Filter.toAndroidFilter(): com.google.firebase.firestore.Filter = when (this) {
-        is Filter.And -> com.google.firebase.firestore.Filter.and(*filters.map { it.toAndroidFilter() }
-            .toTypedArray())
-        is Filter.Or -> com.google.firebase.firestore.Filter.or(*filters.map { it.toAndroidFilter() }
-            .toTypedArray())
+        is Filter.And -> com.google.firebase.firestore.Filter.and(
+            *filters.map { it.toAndroidFilter() }
+                .toTypedArray(),
+        )
+        is Filter.Or -> com.google.firebase.firestore.Filter.or(
+            *filters.map { it.toAndroidFilter() }
+                .toTypedArray(),
+        )
         is Filter.Field -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
@@ -124,7 +128,7 @@ internal actual open class NativeQueryWrapper actual internal constructor(actual
 
     private fun addSnapshotListener(
         includeMetadataChanges: Boolean = false,
-        listener: ProducerScope<QuerySnapshot>.(com.google.firebase.firestore.QuerySnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+        listener: ProducerScope<QuerySnapshot>.(com.google.firebase.firestore.QuerySnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit,
     ) = callbackFlow {
         val executor = callbackExecutorMap[native.firestore] ?: TaskExecutors.MAIN_THREAD
         val metadataChanges =

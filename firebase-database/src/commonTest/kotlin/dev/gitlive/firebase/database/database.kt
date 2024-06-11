@@ -8,7 +8,6 @@ import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
@@ -48,8 +47,8 @@ class FirebaseDatabaseTest {
                 databaseUrl = "https://fir-kotlin-sdk-default-rtdb.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk-default-rtdb",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         database = Firebase.database(app).apply {
@@ -105,7 +104,7 @@ class FirebaseDatabaseTest {
         assertEquals(data.likes, userDocBefore.likes)
 
         // Run transaction
-        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1)  }
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1) }
         val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
 
         // Check the database after transaction

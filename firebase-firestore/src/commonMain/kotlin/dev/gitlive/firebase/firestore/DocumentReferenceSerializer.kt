@@ -17,5 +17,5 @@ object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialVa
             is NativeDocumentReferenceType -> DocumentReference(NativeDocumentReference(value))
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 )

@@ -35,7 +35,6 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual val parent: NativeCollectionReferenceWrapper
         get() = NativeCollectionReferenceWrapper(ios.parent)
 
-
     actual fun collection(collectionPath: String) = ios.collectionWithPath(collectionPath)
 
     actual suspend fun get(source: Source) =
@@ -49,7 +48,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
             is SetOptions.MergeFieldPaths -> ios.setData(
                 encodedData.ios,
                 setOptions.encodedFieldPaths,
-                it
+                it,
             )
         }
     }

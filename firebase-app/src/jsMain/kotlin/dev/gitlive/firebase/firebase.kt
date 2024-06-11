@@ -49,7 +49,7 @@ private fun FirebaseOptions.toJson() = json(
     "projectId" to (projectId ?: undefined),
     "gaTrackingId" to (gaTrackingId ?: undefined),
     "messagingSenderId" to (gcmSenderId ?: undefined),
-    "authDomain" to (authDomain ?: undefined)
+    "authDomain" to (authDomain ?: undefined),
 )
 
 actual open class FirebaseException(code: String?, cause: Throwable) : Exception("$code: ${cause.message}", cause)

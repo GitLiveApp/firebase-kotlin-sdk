@@ -3,7 +3,7 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.EncodeSettings
 import kotlin.jvm.JvmName
 
-//** Helper method to perform an update operation. */
+// ** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")
 @PublishedApi
 internal inline fun encodeFieldAndValue(
@@ -24,15 +24,15 @@ internal inline fun encodeFieldAndValue(
 internal inline fun <T, K> encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<T, Any?>>,
     encodeField: (T) -> K,
-    encodeValue: (Any?) -> Any?
-) : List<Pair<K, Any?>>? =
+    encodeValue: (Any?) -> Any?,
+): List<Pair<K, Any?>>? =
     fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
         ?.map { (field, value) -> encodeField(field) to value?.let { encodeValue(it) } }
 
 internal fun <K, R> List<Pair<K, Any?>>.performUpdate(
-    update: (K, Any?, Array<Any?>) -> R
+    update: (K, Any?, Array<Any?>) -> R,
 ) = update(
     this[0].first,
     this[0].second,
-    this.drop(1).flatMap { (field, value) -> listOf(field, value) }.toTypedArray()
+    this.drop(1).flatMap { (field, value) -> listOf(field, value) }.toTypedArray(),
 )

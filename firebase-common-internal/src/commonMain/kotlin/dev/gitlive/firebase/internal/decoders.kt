@@ -79,7 +79,7 @@ class FirebaseClassDecoder(
     size: Int,
     settings: DecodeSettings,
     private val containsKey: (name: String) -> Boolean,
-    get: (descriptor: SerialDescriptor, index: Int) -> Any?
+    get: (descriptor: SerialDescriptor, index: Int) -> Any?,
 ) : FirebaseCompositeDecoder(size, settings, get) {
     private var index: Int = 0
 
@@ -99,7 +99,7 @@ open class FirebaseCompositeDecoder(
     private val size: Int,
     internal val settings: DecodeSettings,
     private val get: (descriptor: SerialDescriptor, index: Int) -> Any?,
-): CompositeDecoder {
+) : CompositeDecoder {
 
     override val serializersModule: SerializersModule = settings.serializersModule
 
@@ -113,7 +113,7 @@ open class FirebaseCompositeDecoder(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T>,
-        previousValue: T?
+        previousValue: T?,
     ) = decodeElement(descriptor, index) {
         deserializer.deserialize(FirebaseDecoder(it, settings))
     }
@@ -143,7 +143,7 @@ open class FirebaseCompositeDecoder(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T?>,
-        previousValue: T?
+        previousValue: T?,
     ): T? {
         val isNullabilitySupported = deserializer.descriptor.isNullable
         return if (isNullabilitySupported || decodeElement(descriptor, index, ::decodeNotNullMark)) {
@@ -173,7 +173,7 @@ open class FirebaseCompositeDecoder(
         } catch (e: Exception) {
             throw SerializationException(
                 message = "Exception during decoding ${descriptor.serialName} ${descriptor.getElementName(index)}",
-                cause = e
+                cause = e,
             )
         }
     }
@@ -181,37 +181,37 @@ open class FirebaseCompositeDecoder(
 
 private fun decodeString(value: Any?) = value.toString()
 
-private fun decodeDouble(value: Any?) = when(value) {
+private fun decodeDouble(value: Any?) = when (value) {
     is Number -> value.toDouble()
     is String -> value.toDouble()
     else -> throw SerializationException("Expected $value to be double")
 }
 
-private fun decodeLong(value: Any?) = when(value) {
+private fun decodeLong(value: Any?) = when (value) {
     is Number -> value.toLong()
     is String -> value.toLong()
     else -> throw SerializationException("Expected $value to be long")
 }
 
-private fun decodeByte(value: Any?) = when(value) {
+private fun decodeByte(value: Any?) = when (value) {
     is Number -> value.toByte()
     is String -> value.toByte()
     else -> throw SerializationException("Expected $value to be byte")
 }
 
-private fun decodeFloat(value: Any?) = when(value) {
+private fun decodeFloat(value: Any?) = when (value) {
     is Number -> value.toFloat()
     is String -> value.toFloat()
     else -> throw SerializationException("Expected $value to be float")
 }
 
-private fun decodeInt(value: Any?) = when(value) {
+private fun decodeInt(value: Any?) = when (value) {
     is Number -> value.toInt()
     is String -> value.toInt()
     else -> throw SerializationException("Expected $value to be int")
 }
 
-private fun decodeShort(value: Any?) = when(value) {
+private fun decodeShort(value: Any?) = when (value) {
     is Number -> value.toShort()
     is String -> value.toShort()
     else -> throw SerializationException("Expected $value to be short")
@@ -219,23 +219,24 @@ private fun decodeShort(value: Any?) = when(value) {
 
 private fun decodeBoolean(value: Any?) = value as Boolean
 
-private fun decodeChar(value: Any?) = when(value) {
+private fun decodeChar(value: Any?) = when (value) {
     is Number -> value.toInt().toChar()
     is String -> value[0]
     else -> throw SerializationException("Expected $value to be char")
 }
 
-private fun decodeEnum(value: Any?, enumDescriptor: SerialDescriptor) = when(value) {
+private fun decodeEnum(value: Any?, enumDescriptor: SerialDescriptor) = when (value) {
     is Number -> value.toInt()
     is String -> enumDescriptor.getElementIndexOrThrow(value)
     else -> throw SerializationException("Expected $value to be enum")
 }
 
-//Made internal after 1.0 stabilization
+// Made internal after 1.0 stabilization
 internal fun SerialDescriptor.getElementIndexOrThrow(name: String): Int {
     val index = getElementIndex(name)
-    if (index == CompositeDecoder.UNKNOWN_NAME)
+    if (index == CompositeDecoder.UNKNOWN_NAME) {
         throw SerializationException("$serialName does not contain element with name '$name'")
+    }
     return index
 }
 

@@ -3,8 +3,8 @@
  */
 
 @file:JvmName("tests")
-package dev.gitlive.firebase.auth
 
+package dev.gitlive.firebase.auth
 
 actual val emulatorHost: String = "10.0.2.2"
 

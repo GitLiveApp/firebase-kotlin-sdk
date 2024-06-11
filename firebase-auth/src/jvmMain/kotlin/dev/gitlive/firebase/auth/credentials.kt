@@ -26,12 +26,12 @@ actual class OAuthCredential(override val android: com.google.firebase.auth.OAut
 actual object EmailAuthProvider {
     actual fun credential(
         email: String,
-        password: String
+        password: String,
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
 
     actual fun credentialWithLink(
         email: String,
-        emailLink: String
+        emailLink: String,
     ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredentialWithLink(email, emailLink))
 }
 
@@ -58,13 +58,13 @@ actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) 
         provider: String,
         scopes: List<String>,
         customParameters: Map<String, String>,
-        auth: FirebaseAuth
+        auth: FirebaseAuth,
     ) : this(
         com.google.firebase.auth.OAuthProvider
             .newBuilder(provider, auth.android)
             .setScopes(scopes)
             .addCustomParameters(customParameters)
-            .build()
+            .build(),
     )
 
     actual companion object {
@@ -72,7 +72,7 @@ actual class OAuthProvider(val android: com.google.firebase.auth.OAuthProvider) 
             val builder = OAuthProvider.newCredentialBuilder(providerId)
             accessToken?.let { builder.setAccessToken(it) }
             idToken?.let { builder.setIdToken(it) }
-            rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it)  }
+            rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it) }
             return OAuthCredential(builder.build() as com.google.firebase.auth.OAuthCredential)
         }
     }
@@ -113,7 +113,6 @@ actual class PhoneAuthProvider(val android: com.google.firebase.auth.PhoneAuthPr
             override fun onVerificationFailed(error: FirebaseException) {
                 response.complete(Result.failure(error))
             }
-
         }
         android.verifyPhoneNumber(phoneNumber, verificationProvider.timeout, verificationProvider.unit, verificationProvider.activity, callback)
 

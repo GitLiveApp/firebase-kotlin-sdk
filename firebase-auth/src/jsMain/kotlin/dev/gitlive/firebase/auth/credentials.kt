@@ -26,7 +26,7 @@ actual object EmailAuthProvider {
 
     actual fun credentialWithLink(
         email: String,
-        emailLink: String
+        emailLink: String,
     ): AuthCredential = AuthCredential(EmailAuthProvider.credentialWithLink(email, emailLink))
 }
 
@@ -55,7 +55,7 @@ actual class OAuthProvider(val js: JsOAuthProvider) {
         provider: String,
         scopes: List<String>,
         customParameters: Map<String, String>,
-        auth: FirebaseAuth
+        auth: FirebaseAuth,
     ) : this(JsOAuthProvider(provider)) {
         rethrow {
             scopes.forEach { js.addScope(it) }
@@ -69,9 +69,9 @@ actual class OAuthProvider(val js: JsOAuthProvider) {
                     json(
                         "accessToken" to (accessToken ?: undefined),
                         "idToken" to (idToken ?: undefined),
-                        "rawNonce" to (rawNonce ?: undefined)
+                        "rawNonce" to (rawNonce ?: undefined),
                     ),
-                    accessToken ?: undefined
+                    accessToken ?: undefined,
                 )
                 .let { OAuthCredential(it) }
         }

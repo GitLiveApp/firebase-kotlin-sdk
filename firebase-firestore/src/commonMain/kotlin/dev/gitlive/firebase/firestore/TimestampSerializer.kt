@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.internal.SpecialValueSerializer
-import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.serverTimestamp
+import dev.gitlive.firebase.firestore.DoubleAsTimestampSerializer.SERVER_TIMESTAMP
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 
@@ -21,7 +21,7 @@ object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialValueSeria
             FieldValue.serverTimestamp.nativeValue -> Timestamp.ServerTimestamp
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 )
 
 /** A serializer for [Timestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
@@ -33,7 +33,7 @@ object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
             is NativeTimestamp -> Timestamp(value)
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 )
 
 /** A serializer for [Timestamp.ServerTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
@@ -45,26 +45,26 @@ object ServerTimestampSerializer : KSerializer<Timestamp.ServerTimestamp> by Spe
             FieldValue.serverTimestamp.nativeValue -> Timestamp.ServerTimestamp
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 )
 
 /** A serializer for a Double field which is stored as a Timestamp. */
 object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { value ->
-        when(value) {
-            serverTimestamp -> FieldValue.serverTimestamp.nativeValue
+        when (value) {
+            SERVER_TIMESTAMP -> FieldValue.serverTimestamp.nativeValue
             else -> Timestamp.fromMilliseconds(value).nativeValue
         }
     },
     fromNativeValue = { value ->
-        when(value) {
-            FieldValue.serverTimestamp.nativeValue -> serverTimestamp
+        when (value) {
+            FieldValue.serverTimestamp.nativeValue -> SERVER_TIMESTAMP
             is NativeTimestamp -> Timestamp(value).toMilliseconds()
             is Double -> value
             else -> throw SerializationException("Cannot deserialize $value")
         }
-    }
+    },
 ) {
-    const val serverTimestamp = Double.POSITIVE_INFINITY
+    const val SERVER_TIMESTAMP = Double.POSITIVE_INFINITY
 }

@@ -8,7 +8,7 @@ inline fun <reified T> reencodeTransformation(value: Any?, builder: EncodeDecode
     val oldValue: T = decode(value, encodeDecodeSettingsBuilder.buildDecodeSettings())
     return encode(
         transform(oldValue),
-        encodeDecodeSettingsBuilder.buildEncodeSettings()
+        encodeDecodeSettingsBuilder.buildEncodeSettings(),
     )
 }
 
@@ -18,6 +18,6 @@ inline fun <T> reencodeTransformation(strategy: KSerializer<T>, value: Any?, bui
     return encode(
         strategy,
         transform(oldValue),
-        encodeDecodeSettingsBuilder.buildEncodeSettings()
+        encodeDecodeSettingsBuilder.buildEncodeSettings(),
     )
 }

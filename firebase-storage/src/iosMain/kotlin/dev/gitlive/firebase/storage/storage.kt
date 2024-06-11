@@ -25,12 +25,11 @@ import kotlinx.coroutines.flow.emitAll
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
-
 actual val Firebase.storage get() =
     FirebaseStorage(FIRStorage.storage())
 
 actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp)
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 actual class FirebaseStorage(val ios: FIRStorage) {
@@ -96,8 +95,9 @@ actual class StorageReference(val ios: FIRStorageReference) {
             }
             ios.observeStatus(FIRStorageTaskStatusSuccess) { close(FirebaseStorageException(it!!.error().toString())) }
             ios.observeStatus(FIRStorageTaskStatusFailure) {
-                when(it!!.error()!!.code) {
-                    /*FIRStorageErrorCodeCancelled = */ -13040L -> cancel(it.error()!!.localizedDescription)
+                when (it!!.error()!!.code) {
+                    /*FIRStorageErrorCodeCancelled = */
+                    -13040L -> cancel(it.error()!!.localizedDescription)
                     else -> close(FirebaseStorageException(it.error().toString()))
                 }
             }
@@ -111,7 +111,6 @@ actual class StorageReference(val ios: FIRStorageReference) {
             override fun cancel() = ios.cancel()
         }
     }
-
 }
 
 actual class ListResult(ios: FIRStorageListResult) {
@@ -122,12 +121,12 @@ actual class ListResult(ios: FIRStorageListResult) {
 
 actual class File(val url: NSURL)
 
-actual class FirebaseStorageException(message: String): FirebaseException(message)
+actual class FirebaseStorageException(message: String) : FirebaseException(message)
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(FirebaseStorageException(error.toString()))
@@ -139,7 +138,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
 suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(FirebaseStorageException(error.toString()))

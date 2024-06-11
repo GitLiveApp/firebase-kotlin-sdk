@@ -22,7 +22,7 @@ actual class FirebaseInstallations internal constructor(val js: Installations) {
         rethrow { getToken(js, forceRefresh).await() }
 }
 
-actual open class FirebaseInstallationsException(code: String?, cause: Throwable): FirebaseException(code, cause)
+actual open class FirebaseInstallationsException(code: String?, cause: Throwable) : FirebaseException(code, cause)
 
 inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.installations.rethrow { function() }
 
@@ -31,7 +31,7 @@ inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
+    } catch (e: dynamic) {
         throw FirebaseInstallationsException(e.code as String?, e)
     }
 }

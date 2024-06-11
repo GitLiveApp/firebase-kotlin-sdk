@@ -26,7 +26,7 @@ internal expect class NativeHttpsCallableReference {
 
 class HttpsCallableReference internal constructor(
     @PublishedApi
-    internal val native: NativeHttpsCallableReference
+    internal val native: NativeHttpsCallableReference,
 ) {
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { this.encodeDefaults = encodeDefaults }"))
     suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean) = invoke(data) {
@@ -59,7 +59,7 @@ expect fun Firebase.functions(app: FirebaseApp): FirebaseFunctions
 /** Returns the [FirebaseFunctions] instance of a given [FirebaseApp] and [region]. */
 expect fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions
 
-expect class FirebaseFunctionsException: FirebaseException
+expect class FirebaseFunctionsException : FirebaseException
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 expect val FirebaseFunctionsException.code: FunctionsExceptionCode
@@ -84,5 +84,5 @@ expect enum class FunctionsExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }

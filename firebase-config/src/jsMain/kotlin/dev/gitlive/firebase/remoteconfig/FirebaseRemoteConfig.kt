@@ -23,7 +23,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: RemoteConfig) {
             FirebaseRemoteConfigInfo(
                 configSettings = js.settings.toFirebaseRemoteConfigSettings(),
                 fetchTimeMillis = js.fetchTimeMillis,
-                lastFetchStatus = js.lastFetchStatus.toFetchStatus()
+                lastFetchStatus = js.lastFetchStatus.toFetchStatus(),
             )
         }
 
@@ -67,7 +67,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: RemoteConfig) {
     private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings {
         return FirebaseRemoteConfigSettings(
             fetchTimeoutInSeconds = fetchTimeoutMillis.toLong() / 1000,
-            minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000
+            minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000,
         )
     }
 
@@ -93,7 +93,6 @@ actual class FirebaseRemoteConfigFetchThrottledException(code: String, cause: Th
 
 actual class FirebaseRemoteConfigServerException(code: String, cause: Throwable) :
     FirebaseRemoteConfigException(code, cause)
-
 
 internal inline fun <R> rethrow(function: () -> R): R {
     try {
