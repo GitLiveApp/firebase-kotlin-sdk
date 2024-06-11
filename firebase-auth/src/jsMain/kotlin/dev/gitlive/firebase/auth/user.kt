@@ -46,9 +46,9 @@ actual class FirebaseUser internal constructor(val js: User) {
     actual suspend fun updatePassword(password: String) = rethrow { updatePassword(js, password).await() }
     actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = rethrow { updatePhoneNumber(js, credential.js).await() }
     actual suspend fun updateProfile(displayName: String?, photoUrl: String?): Unit = rethrow {
-        val request = listOfNotNull(
-            displayName.takeUnless { it === UNCHANGED }?.let { "displayName" to it },
-            photoUrl.takeUnless { it === UNCHANGED }?.let { "photoURL" to it }
+        val request = listOf(
+            "displayName" to displayName,
+            "photoURL" to photoUrl,
         )
         updateProfile(js, json(*request.toTypedArray())).await()
     }
