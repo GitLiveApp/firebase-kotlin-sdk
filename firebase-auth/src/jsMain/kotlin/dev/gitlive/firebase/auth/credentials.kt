@@ -83,7 +83,7 @@ actual class PhoneAuthProvider(val js: PhoneAuthProvider) {
     actual constructor(auth: FirebaseAuth) : this(PhoneAuthProvider(auth.js))
 
     actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
-    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
+    actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): PhoneAuthCredential = rethrow {
         val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)
         credential(verificationId, verificationCode)

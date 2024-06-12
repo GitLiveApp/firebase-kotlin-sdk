@@ -43,7 +43,7 @@ expect class OAuthProvider constructor(
 
 expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
     fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
-    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
+    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): PhoneAuthCredential
 }
 
 expect interface PhoneVerificationProvider
