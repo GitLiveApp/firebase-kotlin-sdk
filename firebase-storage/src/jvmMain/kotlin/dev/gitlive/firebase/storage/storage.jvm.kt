@@ -51,6 +51,10 @@ actual class StorageReference {
     actual val storage: FirebaseStorage
         get() = TODO("Not yet implemented")
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? {
+        TODO("Not yet implemented")
+    }
+
     actual fun child(path: String): StorageReference {
         TODO("Not yet implemented")
     }
@@ -66,13 +70,15 @@ actual class StorageReference {
         TODO("Not yet implemented")
     }
 
-    actual fun putFileResumable(file: File): ProgressFlow {
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         TODO("Not yet implemented")
     }
 
-    actual suspend fun putFile(file: File) {
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
     }
 
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) {
+    }
 }
 
 actual class ListResult {
@@ -86,3 +92,4 @@ actual class ListResult {
 
 actual class File
 actual class FirebaseStorageException internal constructor(message: String) : FirebaseException(message)
+actual class Data
