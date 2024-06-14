@@ -44,6 +44,8 @@ jobs:
         run: ./gradlew :firebase-firestore:publish
       - name: Publish Firebase Functions
         run: ./gradlew :firebase-functions:publish
+      - name: Publish Firebase Messaging
+        run: ./gradlew :firebase-messaging:publish
       - name: Publish Firebase Storage
         run: ./gradlew :firebase-storage:publish
       - name: Publish Firebase Installations
