@@ -23,7 +23,7 @@ external fun deleteObject(ref: StorageReference): Promise<Unit>;
 
 external fun listAll(ref: StorageReference): Promise<ListResult>;
 
-external fun connectFirestoreEmulator(
+external fun connectStorageEmulator(
     storage: FirebaseStorage,
     host: String,
     port: Double,

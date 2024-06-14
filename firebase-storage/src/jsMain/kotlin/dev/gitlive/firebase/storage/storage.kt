@@ -34,7 +34,7 @@ actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.Fire
     }
 
     actual fun useEmulator(host: String, port: Int) {
-        connectFirestoreEmulator(js, host, port.toDouble())
+        connectStorageEmulator(js, host, port.toDouble())
     }
 
     actual val reference: StorageReference get() = StorageReference(ref(js))
