@@ -9,11 +9,15 @@ import android.util.SizeF
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.setConsent
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
 import java.io.Serializable
 
 actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
+
+actual fun Firebase.analytics(app: FirebaseApp) =
+    FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
 actual class FirebaseAnalytics(val android: com.google.firebase.analytics.FirebaseAnalytics) {
     actual fun logEvent(name: String, parameters: Map<String, Any>?) {

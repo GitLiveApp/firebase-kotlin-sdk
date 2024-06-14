@@ -37,7 +37,7 @@ class FirebaseAnalyticsTest {
             )
         )
 
-        analytics = Firebase.analytics
+        analytics = Firebase.analytics(app)
     }
 
     @AfterTest

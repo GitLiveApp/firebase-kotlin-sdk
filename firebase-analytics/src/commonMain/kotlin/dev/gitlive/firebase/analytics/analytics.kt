@@ -1,8 +1,12 @@
 package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 
 expect val Firebase.analytics: FirebaseAnalytics
+
+/** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
+expect fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics
 
 expect class FirebaseAnalytics {
     fun logEvent(name: String, parameters: Map<String, Any>? = null)

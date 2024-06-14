@@ -3,6 +3,7 @@ package dev.gitlive.firebase.analytics
 import cocoapods.FirebaseAnalytics.FIRAnalytics
 import cocoapods.FirebaseAnalytics.setConsent
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
@@ -10,6 +11,8 @@ import platform.Foundation.NSTimeInterval
 
 actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(FIRAnalytics)
+
+actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(FIRAnalytics)
 
 actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
     actual fun logEvent(name: String, parameters: Map<String, Any>?) {

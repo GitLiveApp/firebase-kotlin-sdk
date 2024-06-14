@@ -1,3 +1,6 @@
+@file:JsModule("firebase/analytics")
+@file:JsNonModule
+
 package dev.gitlive.firebase.analytics.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp

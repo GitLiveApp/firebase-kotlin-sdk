@@ -1,12 +1,16 @@
 package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
 import kotlinx.coroutines.await
 
 actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(getAnalytics())
+
+actual fun Firebase.analytics(app: FirebaseApp) =
+    FirebaseAnalytics(getAnalytics(app.js))
 
 actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
     actual fun logEvent(

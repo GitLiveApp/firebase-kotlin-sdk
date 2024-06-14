@@ -1,10 +1,15 @@
 package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 
 actual val Firebase.analytics: FirebaseAnalytics
     get() = TODO("Not yet implemented")
+
+actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics {
+    TODO("Not yetimplemented")
+}
 
 actual class FirebaseAnalytics {
     actual fun setUserProperty(name: String, value: String) {}
