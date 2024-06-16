@@ -6,6 +6,7 @@ package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageListResult
+import cocoapods.FirebaseStorage.FIRStorageMetadata
 import cocoapods.FirebaseStorage.FIRStorageReference
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
@@ -22,6 +23,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
@@ -64,6 +66,16 @@ actual class StorageReference(val ios: FIRStorageReference) {
 
     actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? = ios.awaitResult {
+        metadataWithCompletion { metadata, error ->
+            if (error == null) {
+                it.invoke(metadata?.toFirebaseStorageMetadata(), null)
+            } else {
+                it.invoke(null, error)
+            }
+        }
+    }
+
     actual suspend fun delete() = await { ios.deleteWithCompletion(it) }
 
     actual suspend fun getDownloadUrl(): String = ios.awaitResult {
@@ -76,10 +88,16 @@ actual class StorageReference(val ios: FIRStorageReference) {
         }
     }
 
-    actual suspend fun putFile(file: File) = ios.awaitResult { putFile(file.url, null, completion = it) }.run {}
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) = ios.awaitResult { callback ->
+        putFile(file.url, metadata?.toFIRMetadata(), callback)
+    }.run {}
 
-    actual fun putFileResumable(file: File): ProgressFlow {
-        val ios = ios.putFile(file.url)
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) = ios.awaitResult { callback ->
+        putData(data.data, metadata?.toFIRMetadata(), callback)
+    }.run {}
+
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val ios = ios.putFile(file.url, metadata?.toFIRMetadata())
 
         val flow = callbackFlow {
             ios.observeStatus(FIRStorageTaskStatusProgress) {
@@ -122,6 +140,8 @@ actual class ListResult(ios: FIRStorageListResult) {
 
 actual class File(val url: NSURL)
 
+actual class Data(val data: NSData)
+
 actual class FirebaseStorageException(message: String): FirebaseException(message)
 
 suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
@@ -146,4 +166,33 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
         }
     }
     return job.await() as R
+}
+
+fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
+    val metadata = FIRStorageMetadata()
+    val mappedMetadata: Map<Any?, String> = this.customMetadata.map {
+        it.key to it.value
+    }.toMap()
+    metadata.setCustomMetadata(mappedMetadata)
+    metadata.setCacheControl(this.cacheControl)
+    metadata.setContentDisposition(this.contentDisposition)
+    metadata.setContentEncoding(this.contentEncoding)
+    metadata.setContentLanguage(this.contentLanguage)
+    metadata.setContentType(this.contentType)
+    return metadata
+}
+
+fun FIRStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash()
+        cacheControl = sdkMetadata.cacheControl()
+        contentDisposition = sdkMetadata.contentDisposition()
+        contentEncoding = sdkMetadata.contentEncoding()
+        contentLanguage = sdkMetadata.contentLanguage()
+        contentType = sdkMetadata.contentType()
+        sdkMetadata.customMetadata()?.forEach {
+            setCustomMetadata(it.key.toString(), it.value.toString())
+        }
+    }
 }

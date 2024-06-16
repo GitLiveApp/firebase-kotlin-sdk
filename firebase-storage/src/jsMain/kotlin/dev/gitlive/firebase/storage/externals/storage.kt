@@ -13,15 +13,17 @@ external fun ref(ref: StorageReference, url: String? = definedExternally): Stora
 
 external fun getDownloadURL(ref: StorageReference): Promise<String>
 
-external fun uploadBytes(ref: StorageReference, file: dynamic): Promise<Unit>
+external fun getMetadata(ref: StorageReference): Promise<StorageMetadata>
 
-external fun uploadBytesResumable(ref: StorageReference, data: dynamic): UploadTask
+external fun uploadBytes(ref: StorageReference, file: dynamic, metadata: StorageMetadata?): Promise<Unit>
+
+external fun uploadBytesResumable(ref: StorageReference, data: dynamic, metadata: StorageMetadata?): UploadTask
 
 external fun deleteObject(ref: StorageReference): Promise<Unit>;
 
 external fun listAll(ref: StorageReference): Promise<ListResult>;
 
-external fun connectFirestoreEmulator(
+external fun connectStorageEmulator(
     storage: FirebaseStorage,
     host: String,
     port: Double,
@@ -56,6 +58,25 @@ external interface UploadTaskSnapshot {
     val state: String
     val task: UploadTask
     val totalBytes: Number
+}
+
+external class StorageMetadata {
+    val bucket: String?
+    var cacheControl: String?
+    var contentDisposition: String?
+    var contentEncoding: String?
+    var contentLanguage: String?
+    var contentType: String?
+    var customMetadata: Map<String, String>?
+    val fullPath: String?
+    val generation: String?
+    val md5Hash: String?
+    val metageneration: String?
+    val name: String?
+    val size: Number?
+    val timeCreated: String?
+    val updated: String?
+
 }
 
 external class UploadTask : Promise<UploadTaskSnapshot> {

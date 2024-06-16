@@ -4,6 +4,9 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
 expect val Firebase.storage: FirebaseStorage
@@ -32,6 +35,8 @@ expect class StorageReference {
     val root: StorageReference
     val storage: FirebaseStorage
 
+    suspend fun getMetadata(): FirebaseStorageMetadata?
+
     fun child(path: String): StorageReference
 
     suspend fun delete()
@@ -40,9 +45,11 @@ expect class StorageReference {
 
     suspend fun listAll(): ListResult
 
-    suspend fun putFile(file: File)
+    suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
 
-    fun putFileResumable(file: File): ProgressFlow
+    suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
+
+    fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
 }
 
 expect class ListResult {
@@ -52,6 +59,8 @@ expect class ListResult {
 }
 
 expect class File
+
+expect class Data
 
 sealed class Progress(val bytesTransferred: Number, val totalByteCount: Number) {
     class Running internal constructor(bytesTransferred: Number, totalByteCount: Number): Progress(bytesTransferred, totalByteCount)
@@ -64,5 +73,26 @@ interface ProgressFlow : Flow<Progress> {
     fun cancel()
 }
 
-
 expect class FirebaseStorageException : FirebaseException
+
+data class FirebaseStorageMetadata(
+    var md5Hash: String? = null,
+    var cacheControl: String? = null,
+    var contentDisposition: String? = null,
+    var contentEncoding: String? = null,
+    var contentLanguage: String? = null,
+    var contentType: String? = null,
+    var customMetadata: MutableMap<String, String> = mutableMapOf()
+) {
+    fun setCustomMetadata(key: String, value: String?) {
+        value?.let {
+            customMetadata[key] = it
+        }
+    }
+}
+
+fun storageMetadata(init: FirebaseStorageMetadata.() -> Unit): FirebaseStorageMetadata {
+    val metadata = FirebaseStorageMetadata()
+    metadata.init()
+    return metadata
+}
