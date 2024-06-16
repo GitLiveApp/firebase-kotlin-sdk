@@ -73,7 +73,8 @@ subprojects {
             if (this.names.contains("jsMain")) {
                 named("jsMain") {
                     perPackageOption {
-                        matchingRegex.set(".*.externals.*") // proper setting
+                        // External files for JS should not be documented since they will not be available
+                        matchingRegex.set(".*.externals.*")
                         suppress.set(true)
                     }
                 }
