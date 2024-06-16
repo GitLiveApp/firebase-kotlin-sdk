@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 
 repositories {
@@ -65,6 +66,10 @@ subprojects {
 
     this.tasks.withType<DokkaTaskPartial>().configureEach {
         dokkaSourceSets {
+            configureEach {
+                documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
+                includes.setFrom("documentation.md")
+            }
             if (this.names.contains("jsMain")) {
                 named("jsMain") {
                     perPackageOption {
