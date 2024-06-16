@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
@@ -93,6 +94,29 @@ kotlin {
     }
 
     js(IR) {
+        useCommonJs()
+        nodejs {
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            )
+        }
+        browser {
+            testTask(
+                Action {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
         useCommonJs()
         nodejs {
             testTask(

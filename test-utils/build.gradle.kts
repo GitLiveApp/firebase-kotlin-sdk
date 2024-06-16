@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 /*
  * Copyright (c) 2023 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -79,6 +81,13 @@ kotlin {
     }
 
     js(IR) {
+        useCommonJs()
+        nodejs()
+        browser()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
         useCommonJs()
         nodejs()
         browser()
