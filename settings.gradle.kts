@@ -1,4 +1,5 @@
 include(
+    "firebase-analytics",
     "firebase-app",
     "firebase-auth",
     "firebase-common",
