@@ -54,3 +54,20 @@ jobs:
         run: ./gradlew :firebase-perf:publish
       - name: Publish Firebase Crashlytics
         run: ./gradlew :firebase-crashlytics:publish
+  documentation:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: gradle/gradle-build-action@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Generate documentation
+        run: ./gradlew dokkaHtmlMultiModule
+      # TODO: deploy generated html somewhere (for example github pages)
+      # Can be found under ./build/htmlMultiModule/
+      # everything should work automatically so just copying the files would suffice
