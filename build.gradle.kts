@@ -36,6 +36,7 @@ val minSdkVersion by extra(23)
 tasks {
     register("updateVersions") {
         dependsOn(
+            "firebase-analytics:updateVersion", "firebase-analytics:updateDependencyVersion",
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
