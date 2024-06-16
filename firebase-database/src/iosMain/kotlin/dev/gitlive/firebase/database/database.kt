@@ -258,7 +258,7 @@ val OnDisconnect.persistenceEnabled get() = native.persistenceEnabled
 
 actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
-private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
+internal suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { error, result ->
         if(error == null) {
@@ -270,7 +270,7 @@ private suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, fu
     return job.run { if(whileOnline) awaitWhileOnline() else await() } as R
 }
 
-suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
         if(error == null) {
@@ -283,7 +283,7 @@ suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSE
 }
 
 @FlowPreview
-suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
+internal suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
 
     val notConnected = Firebase.database
         .reference(".info/connected")

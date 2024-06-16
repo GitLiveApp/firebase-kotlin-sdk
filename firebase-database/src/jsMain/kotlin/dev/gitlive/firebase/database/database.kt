@@ -249,9 +249,9 @@ actual class DatabaseException actual constructor(message: String?, cause: Throw
     constructor(error: dynamic) : this("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())
 }
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.database.rethrow { function() }
+internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.database.rethrow { function() }
 
-inline fun <R> rethrow(function: () -> R): R {
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
@@ -261,7 +261,7 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineScope {
+internal suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineScope {
 
     val notConnected = FirebaseDatabase(database)
         .reference(".info/connected")

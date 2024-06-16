@@ -1,6 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 
 repositories {
     google()
@@ -12,6 +12,7 @@ plugins {
     kotlin("native.cocoapods") apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 buildscript {
@@ -55,7 +56,26 @@ tasks {
 subprojects {
 
     group = "dev.gitlive"
-    
+
+    val nonDocumentationList = listOf("test-utils", "firebase-common", "firebase-common-internal")
+    val skipDocumentation = nonDocumentationList.contains(project.name)
+    if (!skipDocumentation) {
+        apply(plugin = "org.jetbrains.dokka")
+    }
+
+    this.tasks.withType<DokkaTaskPartial>().configureEach {
+        dokkaSourceSets {
+            if (this.names.contains("jsMain")) {
+                named("jsMain") {
+                    perPackageOption {
+                        matchingRegex.set(".*.externals.*") // proper setting
+                        suppress.set(true)
+                    }
+                }
+            }
+        }
+    }
+
     apply(plugin = "com.adarshr.test-logger")
 
     repositories {

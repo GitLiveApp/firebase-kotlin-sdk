@@ -39,7 +39,7 @@ internal actual data class NativeHttpsCallableReference(val android: com.google.
 
 internal val com.google.firebase.functions.HttpsCallableReference.native get() = NativeHttpsCallableReference(this)
 
-val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
+internal val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
 
 actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
 
