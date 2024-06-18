@@ -14,8 +14,12 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") apply false
-    kotlin("native.cocoapods") apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlinx.serialization) apply false
+    alias(libs.plugins.multiplatform) apply false
+    alias(libs.plugins.native.cocoapods) apply false
+    alias(libs.plugins.test.logger.plugin) apply false
+    alias(libs.plugins.ben.manes.versions) apply false
     id("base")
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.jetbrains.dokka") version "1.9.20"
@@ -166,31 +170,27 @@ subprojects {
     }
 
     afterEvaluate  {
-
-        val coroutinesVersion: String by project
-        val firebaseBoMVersion: String by project
-
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
+            "commonMainImplementation"(libs.kotlinx.coroutines.core)
+            "androidMainImplementation"(libs.kotlinx.coroutines.play.services)
+            "androidMainImplementation"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.3")
-                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
+                "jvmMainApi"(libs.gitlive.firebase.java.sdk)
+                "jvmMainApi"(libs.kotlinx.coroutines.play.services) {
                     exclude("com.google.android.gms")
                 }
                 "jsTestImplementation"(kotlin("test-js"))
                 "jvmTestImplementation"(kotlin("test-junit"))
-                "jvmTestImplementation"("junit:junit:4.13.2")
+                "jvmTestImplementation"(libs.junit)
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
             "androidUnitTestImplementation"(kotlin("test-junit"))
-            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
-            "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
-            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
-            "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
+            "androidInstrumentedTestImplementation"(libs.junit)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.core)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.junit)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.runner)
         }
     }
 
