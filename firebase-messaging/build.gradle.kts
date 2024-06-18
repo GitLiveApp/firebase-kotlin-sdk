@@ -120,10 +120,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 if (name.lowercase().contains("ios")) {
@@ -148,7 +146,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-messaging")
+                api(libs.google.firebase.messaging)
             }
         }
     }
