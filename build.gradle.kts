@@ -4,14 +4,8 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.AbstractDokkaTask
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import java.net.URL
-
-repositories {
-    google()
-    mavenCentral()
-}
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -20,14 +14,13 @@ plugins {
     alias(libs.plugins.native.cocoapods) apply false
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
+    alias(libs.plugins.dokka)
     id("base")
-    id("com.github.ben-manes.versions") version "0.42.0"
-    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-base:1.9.20")
+        classpath(libs.dokka.base)
     }
 }
 
