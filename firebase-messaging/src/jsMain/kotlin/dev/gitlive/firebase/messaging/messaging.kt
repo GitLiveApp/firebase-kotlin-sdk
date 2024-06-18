@@ -13,11 +13,13 @@ actual class FirebaseMessaging(val js: Messaging) {
     actual fun subscribeToTopic(topic: String) {
         // This is not supported in the JS SDK
         // https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging
+        throw NotImplementedError("Subscribing to topics is not supported in the JS SDK")
     }
 
     actual fun unsubscribeFromTopic(topic: String) {
         // This is not supported in the JS SDK
         // https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging
+        throw NotImplementedError("Unsubscribing from topics is not supported in the JS SDK")
     }
 
     actual suspend fun getToken(): String = dev.gitlive.firebase.messaging.externals.getToken(js).await()
