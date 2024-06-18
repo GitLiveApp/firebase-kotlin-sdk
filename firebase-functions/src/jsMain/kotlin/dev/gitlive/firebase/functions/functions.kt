@@ -47,9 +47,10 @@ internal actual data class NativeHttpsCallableReference(val js: HttpsCallable) {
     actual suspend fun invoke(): HttpsCallableResult = rethrow { HttpsCallableResult(js().await()) }
 }
 
+@PublishedApi
 internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
 
-internal val HttpsCallableReference.js: HttpsCallable get() = native.js
+val HttpsCallableReference.js: HttpsCallable get() = native.js
 
 actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
 
@@ -86,9 +87,10 @@ actual enum class FunctionsExceptionCode {
     DATA_LOSS,
     UNAUTHENTICATED
 }
-
+@PublishedApi
 internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.functions.rethrow { function() }
 
+@PublishedApi
 internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
@@ -99,6 +101,7 @@ internal inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
+@PublishedApi
 internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .toString()
     .lowercase()
