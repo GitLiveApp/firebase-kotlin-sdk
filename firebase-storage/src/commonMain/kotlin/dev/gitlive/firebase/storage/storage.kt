@@ -114,11 +114,11 @@ expect class StorageReference {
      * Returns a new instance of [StorageReference] pointing to the parent location or null if
      * this instance references the root location. For example:
      *
-     * <pre>{@code
+     * ```
      * path = foo/bar/baz   parent = foo/bar
      * path = foo           parent = (root)
      * path = (root)        parent = (null)
-     * }</pre>
+     * ```
      *
      * @return the parent [StorageReference].
      */
@@ -150,11 +150,11 @@ expect class StorageReference {
      * reference. All leading and trailing slashes will be removed, and consecutive slashes will be
      * compressed to single slashes. For example:
      *
-     * <pre>{@code
+     * ```
      * child = /foo/bar     path = foo/bar
      * child = foo/bar/     path = foo/bar
      * child = foo///bar    path = foo/bar
-     * }</pre>
+     * ```
      *
      * @param pathString The relative path from this reference.
      * @return the child [StorageReference].
