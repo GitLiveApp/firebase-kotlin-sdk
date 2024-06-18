@@ -1,7 +1,12 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.AbstractDokkaTask
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import java.net.URL
 
 repositories {
     google()
@@ -29,6 +34,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:${project.extra["gradlePluginVersion"]}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
         classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
+        classpath("org.jetbrains.dokka:dokka-base:1.9.20")
     }
 }
 
@@ -54,6 +60,22 @@ tasks {
     }
 }
 
+private val dokkaCopyrightMessage = "© 2024 GitLive Ltd."
+private val dokkaHomepageUrl = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
+
+tasks.withType<AbstractDokkaTask>().configureEach {
+    val version = project.property("firebase-app.version") as String
+    moduleVersion.set(version)
+    moduleName.set("Firebase Kotlin SDK")
+
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        customAssets = listOf(file("documentation/gitlive-logo.png"), file("documentation/homepage.svg"))
+        customStyleSheets = listOf(file("documentation/logo-styles.css"))
+        footerMessage = dokkaCopyrightMessage
+        homepageLink = dokkaHomepageUrl
+    }
+}
+
 subprojects {
 
     group = "dev.gitlive"
@@ -65,10 +87,20 @@ subprojects {
     }
 
     this.tasks.withType<DokkaTaskPartial>().configureEach {
+        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+            footerMessage = dokkaCopyrightMessage
+            separateInheritedMembers = false
+            homepageLink = dokkaHomepageUrl
+        }
         dokkaSourceSets {
             configureEach {
                 documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
                 includes.setFrom("documentation.md")
+
+                sourceLink {
+                    localDirectory.set(projectDir.resolve("src"))
+                    remoteUrl.set(URL("$dokkaHomepageUrl/tree/master/${project.name}/src"))
+                }
             }
             if (this.names.contains("jsMain")) {
                 named("jsMain") {
