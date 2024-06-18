@@ -110,10 +110,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
@@ -122,10 +120,8 @@ kotlin {
         }
 
         getByName("commonMain") {
-            val serializationVersion: String by project
-
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+                api(libs.kotlinx.serialization.core)
             }
         }
 
@@ -137,7 +133,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-common-ktx")
+                api(libs.google.firebase.common.ktx)
             }
         }
 
