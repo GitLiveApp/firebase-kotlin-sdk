@@ -6,6 +6,7 @@ androidx-test-runner = "1.5.2"
 ben-manes-versions = "0.42.0"
 firebase-bom = "33.0.0"
 gitlive-firebase-java-sdk = "0.4.3"
+gson = "2.11.0"
 junit = "4.13.2"
 kotlin = "1.9.23"
 kotlinx-coroutines = "1.7.3"
@@ -16,6 +17,7 @@ test-logger-plugin = "3.2.0"
 dokka = "1.9.20"
 
 [libraries]
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-junit" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
@@ -33,6 +35,7 @@ google-firebase-installations-ktx = { module = "com.google.firebase:firebase-ins
 google-firebase-messaging = { module = "com.google.firebase:firebase-messaging"}
 google-firebase-perf-ktx = { module = "com.google.firebase:firebase-perf-ktx"}
 google-firebase-storage = { module = "com.google.firebase:firebase-storage"}
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
