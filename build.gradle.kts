@@ -1,5 +1,7 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import java.io.InputStream
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -9,6 +11,7 @@ plugins {
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
     id("base")
+    id("testOptionsConvention")
 }
 
 val compileSdkVersion by extra(34)
@@ -201,3 +204,50 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     reportfileName = "dependency-updates"
 }
 // check for latest dependencies - ./gradlew dependencyUpdates -Drevision=release
+
+tasks.register("devRunEmulatorTests") {
+    doLast {
+        EmulatorJobsMatrix().getTaskList(rootProject = rootProject).forEach { gradleTasks ->
+            exec {
+                executable = File(
+                    project.rootDir,
+                    if (Os.isFamily(Os.FAMILY_WINDOWS)) "gradlew.bat" else "gradlew",
+                )
+                    .also { it.setExecutable(true) }
+                    .absolutePath
+                args = gradleTasks
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+        }
+    }
+}
+
+tasks.register("ciEmulatorJobsMatrixSetup") {
+    doLast {
+        EmulatorJobsMatrix().createMatrixJsonFile(rootProject = rootProject)
+    }
+}
+
+tasks.register("ciSdkManagerLicenses") {
+    doLast {
+        val sdkDirPath = getAndroidSdkPath(rootDir = rootDir)
+        getSdkmanagerFile(rootDir = rootDir)?.let { sdkmanagerFile ->
+            val yesInputStream = object : InputStream() {
+                private val yesString = "y\n"
+                private var counter = 0
+                override fun read(): Int = yesString[counter % 2].also { counter++ }.code
+            }
+            exec {
+                executable = sdkmanagerFile.absolutePath
+                args = listOf("--list", "--sdk_root=$sdkDirPath")
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+            exec {
+                executable = sdkmanagerFile.absolutePath
+                args = listOf("--licenses", "--sdk_root=$sdkDirPath")
+                standardInput = yesInputStream
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+        }
+    }
+}

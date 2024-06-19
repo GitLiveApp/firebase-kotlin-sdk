@@ -10,6 +10,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
+    id("testOptionsConvention")
 }
 
 android {
@@ -29,11 +30,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
