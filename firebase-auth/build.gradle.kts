@@ -10,7 +10,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    //id("com.quittle.android-emulator") version "0.2.0"
+    id("testOptionsConvention")
 }
 
 android {
@@ -30,11 +30,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -44,19 +40,6 @@ android {
         abortOnError = false
     }
 }
-
-// Optional configuration
-//androidEmulator {
-//    emulator {
-//        name("givlive_emulator")
-//        sdkVersion(28)
-//        abi("x86_64")
-//        includeGoogleApis(true) // Defaults to false
-//
-//    }
-//    headless(false)
-//    logEmulatorOutput(false)
-//}
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
 

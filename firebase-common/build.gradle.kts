@@ -10,6 +10,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("testOptionsConvention")
 }
 
 android {
@@ -28,11 +29,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
 
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")

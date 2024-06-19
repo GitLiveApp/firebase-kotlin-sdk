@@ -17,6 +17,7 @@ include(
 )
 
 pluginManagement {
+    includeBuild("convention-plugin-test-option")
     repositories {
         google()
         mavenCentral()
