@@ -9,7 +9,4 @@ external fun getMessaging(
 
 external fun getToken(messaging: Messaging = definedExternally, options: dynamic = definedExternally): Promise<String>
 
-external interface Messaging {
-    fun subscribeToTopic(tokens: Array<String>, topic: String): Promise<Unit>
-    fun unsubscribeFromTopic(tokens: Array<String>, topic: String): Promise<Unit>
-}
+external interface Messaging
