@@ -38,7 +38,7 @@ jobs:
         run: chmod +x gradlew
       - name: Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
-      - name: Uploading dist
+      - name: Uploading build folder
         uses: actions/upload-artifact@v2
         with:
           name: artefact
