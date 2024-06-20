@@ -38,6 +38,11 @@ jobs:
         run: chmod +x gradlew
       - name: Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
+      - name: Uploading dist
+        uses: actions/upload-artifact@v2
+        with:
+          name: artefact
+          path: ./build/htmlMultiModule
       - name: Deploy API documentation to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
