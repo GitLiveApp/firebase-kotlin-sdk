@@ -1,0 +1,105 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/entries/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]entries.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]value-of.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]values.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/entries/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]entries.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]value-of.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]values.html
+$dokka.location:dev.gitlive.firebase.auth/AuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-auth-credential/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/AuthResult/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-auth-result/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/AuthTokenResult/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-auth-token-result/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/FirebaseAuth/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-firebase-auth/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/FirebaseUser/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-firebase-user/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/MultiFactor/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-multi-factor/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/MultiFactorAssertion/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-multi-factor-assertion/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/MultiFactorInfo/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-multi-factor-info/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/MultiFactorResolver/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-multi-factor-resolver/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/MultiFactorSession/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-multi-factor-session/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/OAuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-o-auth-credential/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/OAuthProvider/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-o-auth-provider/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneAuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-auth-credential/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/activity/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]activity.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/codeSent/#kotlin.Function1[kotlin.Unit,kotlin.Unit]/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]code-sent.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/getVerificationCode/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]get-verification-code.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/timeout/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]timeout.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/unit/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]unit.html
+$dokka.location:dev.gitlive.firebase.auth/UserInfo/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-user-info/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.auth/UserMetaData/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-user-meta-data/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.database/DataSnapshot/android/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-data-snapshot/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.database/FirebaseDatabase.Companion///PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-firebase-database/[jvm]-companion/index.html
+$dokka.location:dev.gitlive.firebase.database/FirebaseDatabase/android/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-firebase-database/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.database/Query/android/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.database/Query/persistenceEnabled/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[jvm]persistence-enabled.html
+$dokka.location:dev.gitlive.firebase.database/Query/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]equals.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/hashCode/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]hash-code.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/ChangeType/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]entries.html
+$dokka.location:dev.gitlive.firebase.firestore/ChangeType/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/ChangeType/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/Direction/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]entries.html
+$dokka.location:dev.gitlive.firebase.firestore/Direction/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/Direction/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/DocumentChange/android/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-document-change/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/android/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreException/code/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-exception/[js]code.html
+$dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings.Builder/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/-builder/[jvm]callback-executor.html
+$dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/[jvm]callback-executor.html
+$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]entries.html
+$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/QuerySnapshot/android/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-query-snapshot/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.firestore/SnapshotMetadata/android/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-snapshot-metadata/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctions/android/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/code/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]code.html
+$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/details/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]details.html
+$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/entries/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]entries.html
+$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]value-of.html
+$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/values/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]values.html
+$dokka.location:dev.gitlive.firebase.functions/HttpsCallableResult/android/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-https-callable-result/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.installations/FirebaseInstallations/android/#/PointingToDeclaration/firebase-installations/dev.gitlive.firebase.installations/-firebase-installations/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/getAttribute/#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]get-attribute.html
+$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/putAttribute/#kotlin.String#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]put-attribute.html
+$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/removeAttribute/#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]remove-attribute.html
+$dokka.location:dev.gitlive.firebase.remoteconfig/FirebaseRemoteConfig/android/#/PointingToDeclaration/firebase-config/dev.gitlive.firebase.remoteconfig/-firebase-remote-config/[jvm]android.html
+$dokka.location:dev.gitlive.firebase.storage/Data/data/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-data/[js]data.html
+$dokka.location:dev.gitlive.firebase/FirebaseApp/android/#/PointingToDeclaration/firebase-app/dev.gitlive.firebase/-firebase-app/[jvm]android.html
+module:firebase-analytics
+dev.gitlive.firebase.analytics
+module:firebase-app
+dev.gitlive.firebase
+module:firebase-auth
+dev.gitlive.firebase.auth
+module:firebase-config
+dev.gitlive.firebase.remoteconfig
+module:firebase-crashlytics
+dev.gitlive.firebase.crashlytics
+module:firebase-database
+dev.gitlive.firebase.database
+module:firebase-firestore
+dev.gitlive.firebase.firestore
+module:firebase-functions
+dev.gitlive.firebase.functions
+module:firebase-installations
+dev.gitlive.firebase.installations
+module:firebase-messaging
+dev.gitlive.firebase.messaging
+module:firebase-perf
+dev.gitlive.firebase.perf
+dev.gitlive.firebase.perf.metrics
+dev.gitlive.firebase.perf.session
+module:firebase-storage
+dev.gitlive.firebase.storage

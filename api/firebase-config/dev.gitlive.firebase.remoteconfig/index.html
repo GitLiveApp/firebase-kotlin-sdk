@@ -1,0 +1,325 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>dev.gitlive.firebase.remoteconfig</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            Firebase Kotlin SDK
+                    </a>            </div>
+            <div class="library-version">1.12.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-config:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-config:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-config:dokkaHtmlPartial/iosMain">ios</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-config:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+            <a class="navigation-controls--btn navigation-controls--homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-config::dev.gitlive.firebase.remoteconfig////PointingToDeclaration//2033003">
+  <div class="breadcrumbs"><a href="../index.html">firebase-config</a><span class="delimiter">/</span><span class="current">dev.gitlive.firebase.remoteconfig</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-1315156050%2FClasslikes%2F1412130973" anchor-label="FetchStatus" id="-1315156050%2FClasslikes%2F1412130973" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-fetch-status/index.html"><span>Fetch</span><wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1315156050%2FClasslikes%2F1412130973"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-fetch-status/index.html">FetchStatus</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-fetch-status/index.html">FetchStatus</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1263000295%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfig" id="-1263000295%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1263000295%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div><div class="brief "><p class="paragraph">Entry point for the Firebase Remote Config API.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1960685019%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfigClientException" id="-1960685019%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-client-exception/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span>Client</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1960685019%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-client-exception/index.html">FirebaseRemoteConfigClientException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigClientException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-remote-config-client-exception/index.html">FirebaseRemoteConfigClientException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div><div class="brief "><p class="paragraph">Exception that gets thrown when an operation on Firebase Remote Config fails.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-client-exception/index.html">FirebaseRemoteConfigClientException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-client-exception/index.html">FirebaseRemoteConfigClientException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-client-exception/index.html">FirebaseRemoteConfigClientException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigClientException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-779804934%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfigException" id="-779804934%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-exception/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-779804934%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigException</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a> : <a href="../../firebase-app/dev.gitlive.firebase/-firebase-exception/index.html">FirebaseException</a></div><div class="brief "><p class="paragraph">Exception that gets thrown when an operation on Firebase Remote Config fails.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a> : <a href="../../firebase-app/dev.gitlive.firebase/-firebase-exception/index.html">FirebaseException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a> : <a href="../../firebase-app/dev.gitlive.firebase/-firebase-exception/index.html">FirebaseException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigException</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1707538950%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfigFetchThrottledException" id="-1707538950%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-fetch-throttled-exception/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span>Fetch</span><wbr><span>Throttled</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1707538950%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-fetch-throttled-exception/index.html">FirebaseRemoteConfigFetchThrottledException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigFetchThrottledException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-remote-config-fetch-throttled-exception/index.html">FirebaseRemoteConfigFetchThrottledException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div><div class="brief "><p class="paragraph">Exception that gets thrown when an operation on Firebase Remote Config fails.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-fetch-throttled-exception/index.html">FirebaseRemoteConfigFetchThrottledException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-fetch-throttled-exception/index.html">FirebaseRemoteConfigFetchThrottledException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-fetch-throttled-exception/index.html">FirebaseRemoteConfigFetchThrottledException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigFetchThrottledException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-821593077%2FClasslikes%2F1412130973" anchor-label="FirebaseRemoteConfigInfo" id="-821593077%2FClasslikes%2F1412130973" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-info/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span><span>Info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-821593077%2FClasslikes%2F1412130973"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-firebase-remote-config-info/index.html">FirebaseRemoteConfigInfo</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>configSettings<span class="token operator">: </span><a href="-firebase-remote-config-settings/index.html">FirebaseRemoteConfigSettings</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fetchTimeMillis<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>lastFetchStatus<span class="token operator">: </span><a href="-fetch-status/index.html">FetchStatus</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Wraps the current state of the <a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a> singleton object.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1411166109%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfigServerException" id="1411166109%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-server-exception/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span>Server</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1411166109%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-server-exception/index.html">FirebaseRemoteConfigServerException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigServerException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-remote-config-server-exception/index.html">FirebaseRemoteConfigServerException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div><div class="brief "><p class="paragraph">Exception that gets thrown when an operation on Firebase Remote Config fails.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-server-exception/index.html">FirebaseRemoteConfigServerException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-server-exception/index.html">FirebaseRemoteConfigServerException</a> : <a href="-firebase-remote-config-exception/index.html">FirebaseRemoteConfigException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-firebase-remote-config-server-exception/index.html">FirebaseRemoteConfigServerException</a><span class="token operator"> = </span><span data-unresolved-link="com.google.firebase.remoteconfig/FirebaseRemoteConfigServerException///PointingToDeclaration/">com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1500094922%2FClasslikes%2F1412130973" anchor-label="FirebaseRemoteConfigSettings" id="-1500094922%2FClasslikes%2F1412130973" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-settings/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span><span>Settings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1500094922%2FClasslikes%2F1412130973"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-firebase-remote-config-settings/index.html">FirebaseRemoteConfigSettings</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">var </span>fetchTimeoutInSeconds<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>CONNECTION_TIMEOUT_IN_SECONDS<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">var </span>minimumFetchIntervalInSeconds<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>DEFAULT_FETCH_INTERVAL_IN_SECONDS</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Wraps the settings for <a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a> operations.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-541957096%2FClasslikes%2F2033003" anchor-label="FirebaseRemoteConfigValue" id="-541957096%2FClasslikes%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-remote-config-value/index.html"><span>Firebase</span><wbr><span>Remote</span><wbr><span>Config</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-541957096%2FClasslikes%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-value/index.html">FirebaseRemoteConfigValue</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-remote-config-value/index.html">FirebaseRemoteConfigValue</a></div><div class="brief "><p class="paragraph">Wrapper for a Remote Config parameter value, with methods to get it as different types.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-value/index.html">FirebaseRemoteConfigValue</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-value/index.html">FirebaseRemoteConfigValue</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>js<span class="token operator">: </span><span data-unresolved-link="dev.gitlive.firebase.remoteconfig.externals/Value///PointingToDeclaration/">Value</span></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-remote-config-value/index.html">FirebaseRemoteConfigValue</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-445651442%2FClasslikes%2F1412130973" anchor-label="ValueSource" id="-445651442%2FClasslikes%2F1412130973" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-value-source/index.html"><span>Value</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-445651442%2FClasslikes%2F1412130973"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-value-source/index.html">ValueSource</a> : <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-value-source/index.html">ValueSource</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1485893262%2FProperties%2F2033003" anchor-label="remoteConfig" id="-1485893262%2FProperties%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remote-config.html"><span>remote</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1485893262%2FProperties%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html">remoteConfig</a><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html">remoteConfig</a><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div><div class="brief "><p class="paragraph">Returns the <a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a> instance of the default <a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html">remoteConfig</a><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html">remoteConfig</a><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html">remoteConfig</a><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1714805408%2FFunctions%2F1412130973" anchor-label="get" id="-1714805408%2FFunctions%2F1412130973" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1714805408%2FFunctions%2F1412130973"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get.html">T</a><span class="token operator">&gt; </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a><span class="token punctuation">.</span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get.html">T</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2076676746%2FFunctions%2F2033003" anchor-label="remoteConfig" id="-2076676746%2FFunctions%2F2033003" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain,:firebase-config:dokkaHtmlPartial/androidMain,:firebase-config:dokkaHtmlPartial/iosMain,:firebase-config:dokkaHtmlPartial/jsMain,:firebase-config:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remote-config.html"><span>remote</span><wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2076676746%2FFunctions%2F2033003"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/commonMain" data-toggle=":firebase-config:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jsMain" data-toggle=":firebase-config:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-config:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html"><span class="token function">remoteConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html"><span class="token function">remoteConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div><div class="brief "><p class="paragraph">Returns the <a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a> instance of a given <a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html"><span class="token function">remoteConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html"><span class="token function">remoteConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-config:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase/index.html">Firebase</a><span class="token punctuation">.</span><a href="remote-config.html"><span class="token function">remoteConfig</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-firebase-app/index.html">FirebaseApp</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-remote-config/index.html">FirebaseRemoteConfig</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1023129796%2FFunctions%2F-567000891" anchor-label="toByteArray" id="-1023129796%2FFunctions%2F-567000891" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-byte-array.html"><span>to</span><wbr><span>Byte</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1023129796%2FFunctions%2F-567000891"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-config:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-config:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":firebase-config:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-config:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-experimental-unsigned-types/index.html"><span class="token annotation builtin">ExperimentalUnsignedTypes</span></a></div></div><span class="token keyword">fun </span><span data-unresolved-link="platform.Foundation/NSData///PointingToDeclaration/">NSData</span><span class="token punctuation">.</span><a href="to-byte-array.html"><span class="token function">toByteArray</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html">ByteArray</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 GitLive Ltd.</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

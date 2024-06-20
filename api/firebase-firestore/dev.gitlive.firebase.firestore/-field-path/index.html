@@ -1,0 +1,274 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FieldPath</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Firebase Kotlin SDK
+                    </a>            </div>
+            <div class="library-version">1.12.0
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+            <a class="navigation-controls--btn navigation-controls--homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="firebase-firestore::dev.gitlive.firebase.firestore/FieldPath///PointingToDeclaration//-624826844">
+  <div class="breadcrumbs"><a href="../../index.html">firebase-firestore</a><span class="delimiter">/</span><a href="../index.html">dev.gitlive.firebase.firestore</a><span class="delimiter">/</span><span class="current">FieldPath</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Field</span><wbr><span><span>Path</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">FieldPath</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/androidMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L148">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="index.html">FieldPath</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L570">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">FieldPath</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/iosMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L208">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">FieldPath</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/jsMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L169">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">FieldPath</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/androidMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L148">source</a>)</span></span></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-449806908%2FConstructors%2F-624826844" anchor-label="FieldPath" id="-449806908%2FConstructors%2F-624826844" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-field-path.html"><span>Field</span><wbr><span><span>Path</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-449806908%2FConstructors%2F-624826844"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldNames<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="183077078%2FClasslikes%2F-624826844" anchor-label="Companion" id="183077078%2FClasslikes%2F-624826844" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="183077078%2FClasslikes%2F-624826844"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="989796480%2FProperties%2F-308253016" anchor-label="android" id="989796480%2FProperties%2F-308253016" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]android.html"><span><span>android</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="989796480%2FProperties%2F-308253016"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[android]android.html">android</a><span class="token operator">: </span><span data-unresolved-link="com.google.firebase.firestore/FieldPath///PointingToDeclaration/">FieldPath</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[jvm]android.html">android</a><span class="token operator">: </span><span data-unresolved-link="com.google.firebase.firestore/FieldPath///PointingToDeclaration/">FieldPath</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="85696341%2FProperties%2F-624826844" anchor-label="documentId" id="85696341%2FProperties%2F-624826844" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="document-id.html"><span>document</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="85696341%2FProperties%2F-624826844"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="document-id.html">documentId</a><span class="token operator">: </span><a href="index.html">FieldPath</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="document-id.html"><strike>documentId</strike></a><span class="token operator">: </span><a href="index.html">FieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="document-id.html">documentId</a><span class="token operator">: </span><a href="index.html">FieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="document-id.html">documentId</a><span class="token operator">: </span><a href="index.html">FieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="document-id.html">documentId</a><span class="token operator">: </span><a href="index.html">FieldPath</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1595659583%2FProperties%2F-624826844" anchor-label="encoded" id="-1595659583%2FProperties%2F-624826844" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain,:firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="encoded.html"><span><span>encoded</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1595659583%2FProperties%2F-624826844"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="encoded.html">encoded</a><span class="token operator">: </span><a href="../-encoded-field-path/index.html">EncodedFieldPath</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="encoded.html">encoded</a><span class="token operator">: </span><a href="../-encoded-field-path/index.html">EncodedFieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="encoded.html">encoded</a><span class="token operator">: </span><a href="../-encoded-field-path/index.html">EncodedFieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="encoded.html">encoded</a><span class="token operator">: </span><a href="../-encoded-field-path/index.html">EncodedFieldPath</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="encoded.html">encoded</a><span class="token operator">: </span><a href="../-encoded-field-path/index.html">EncodedFieldPath</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="32972194%2FProperties%2F2020135030" anchor-label="ios" id="32972194%2FProperties%2F2020135030" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ios.html"><span><span>ios</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="32972194%2FProperties%2F2020135030"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="ios.html">ios</a><span class="token operator">: </span><span data-unresolved-link="cocoapods.FirebaseFirestoreInternal/FIRFieldPath///PointingToDeclaration/">FIRFieldPath</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1180524798%2FProperties%2F-1961305040" anchor-label="js" id="-1180524798%2FProperties%2F-1961305040" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="js.html"><span><span>js</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1180524798%2FProperties%2F-1961305040"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="js.html">js</a><span class="token operator">: </span><span data-unresolved-link="dev.gitlive.firebase.firestore.externals/FieldPath///PointingToDeclaration/">FieldPath</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="614977078%2FFunctions%2F-1859774814" anchor-label="equals" id="614977078%2FFunctions%2F-1859774814" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="614977078%2FFunctions%2F-1859774814"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="[android]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="[ios]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="[js]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="[jvm]equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1394645520%2FFunctions%2F-1859774814" anchor-label="hashCode" id="-1394645520%2FFunctions%2F-1859774814" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1394645520%2FFunctions%2F-1859774814"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[android]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[ios]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[js]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[jvm]hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1572811585%2FFunctions%2F-1859774814" anchor-label="toString" id="-1572811585%2FFunctions%2F-1859774814" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/iosMain,:firebase-firestore:dokkaHtmlPartial/jsMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1572811585%2FFunctions%2F-1859774814"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/iosMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jsMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[android]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[ios]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[js]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="[jvm]to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 GitLive Ltd.</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
