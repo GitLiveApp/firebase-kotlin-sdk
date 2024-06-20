@@ -8,10 +8,12 @@ import dev.gitlive.firebase.FirebaseException
 actual val Firebase.storage: FirebaseStorage
     get() = TODO("Not yet implemented")
 
+actual fun Firebase.storage(url: String): FirebaseStorage = TODO("Not yet implemented")
+
 /** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage {
-    TODO("Not yet implemented")
-}
+actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = TODO("Not yet implemented")
+
+actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = TODO("Not yet implemented")
 
 actual class FirebaseStorage {
     actual val maxOperationRetryTimeMillis: Long

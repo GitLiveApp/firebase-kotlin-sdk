@@ -11,8 +11,14 @@ import kotlinx.coroutines.launch
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
 expect val Firebase.storage: FirebaseStorage
 
+/** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
+expect fun Firebase.storage(url: String): FirebaseStorage
+
 /** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
 expect fun Firebase.storage(app: FirebaseApp): FirebaseStorage
+
+/** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
+expect fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage
 
 /**
  * FirebaseStorage is a service that supports uploading and downloading large objects to Google

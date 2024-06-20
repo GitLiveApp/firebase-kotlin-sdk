@@ -31,8 +31,16 @@ import platform.Foundation.NSURL
 actual val Firebase.storage get() =
     FirebaseStorage(FIRStorage.storage())
 
+actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(
+    FIRStorage.storageWithURL(url)
+)
+
 actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
     FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp)
+)
+
+actual fun Firebase.storage(app: FirebaseApp, url: String) = FirebaseStorage(
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url)
 )
 
 actual class FirebaseStorage(val ios: FIRStorage) {
