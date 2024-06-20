@@ -42,10 +42,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: artefact
-          path: ./build/htmlMultiModule
+          path: build/dokka/htmlMultiModule
       - name: Deploy API documentation to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: ./build/htmlMultiModule/dokka/html
+          folder: build/dokka/htmlMultiModule
           target-folder: api
