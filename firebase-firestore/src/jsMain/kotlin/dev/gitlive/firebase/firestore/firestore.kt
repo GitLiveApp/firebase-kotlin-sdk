@@ -214,9 +214,9 @@ actual enum class ChangeType(internal val jsString : String) {
     REMOVED("removed");
 }
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
+internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
 
-inline fun <R> rethrow(function: () -> R): R {
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
@@ -226,7 +226,7 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
+internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .toString()
     .lowercase()
     .let {
@@ -255,11 +255,11 @@ fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     }
 
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
-fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
+internal fun entriesOf(jsObject: dynamic): List<Pair<String, Any?>> =
     (js("Object.entries") as (dynamic) -> Array<Array<Any?>>)
         .invoke(jsObject)
         .map { entry -> entry[0] as String to entry[1] }
 
 // from: https://discuss.kotlinlang.org/t/how-to-access-native-js-object-as-a-map-string-any/509/8
-fun mapOf(jsObject: dynamic): Map<String, Any?> =
+internal fun mapOf(jsObject: dynamic): Map<String, Any?> =
     entriesOf(jsObject).toMap()

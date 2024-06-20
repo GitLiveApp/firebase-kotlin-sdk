@@ -131,7 +131,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
     }
 
 
-fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+internal fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     val sdkMetadata = this
     return storageMetadata {
         md5Hash = sdkMetadata.md5Hash
@@ -146,7 +146,7 @@ fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     }
 }
 
-fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
+internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
     val metadata = StorageMetadata()
     metadata.cacheControl = cacheControl
     metadata.contentDisposition = contentDisposition

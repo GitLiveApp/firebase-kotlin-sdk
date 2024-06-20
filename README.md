@@ -288,6 +288,22 @@ You can build and test the project locally.
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 
+### Testing
+To run the tests you can use the following gradle tasks:
+
+`./gradlew connectedAndroidTest` (an emulator needs to be running)
+
+`./gradlew iosSimulatorArm64Test`
+
+`./gradlew jsNodeTest`
+
+For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
+
+`firebase emulators:start`
+
+### Documentation
+For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
+
 ### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
 
 When this project began, the official Firebase Android SDK was a pure java library and the separate Kotlin extensions (KTX) module consisted of only a few extensions providing some syntactic sugar, for example `Firebase.firestore` instead of `Firebase.getInstance(),` which we naturally copied for the Firebase Kotlin SDK.

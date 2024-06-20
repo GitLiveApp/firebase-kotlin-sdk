@@ -133,7 +133,7 @@ actual class Data(val data: ByteArray)
 
 actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 
-fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
+internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
     return StorageMetadata.Builder()
         .setCacheControl(this.cacheControl)
         .setContentDisposition(this.contentDisposition)
@@ -147,7 +147,7 @@ fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
         }.build()
 }
 
-fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+internal fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     val sdkMetadata = this
     return storageMetadata {
         md5Hash = sdkMetadata.md5Hash
