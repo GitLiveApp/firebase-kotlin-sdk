@@ -48,4 +48,4 @@ jobs:
         with:
           branch: gh-pages
           folder: build/dokka/htmlMultiModule
-          target-folder: api
+          target-folder: docs
