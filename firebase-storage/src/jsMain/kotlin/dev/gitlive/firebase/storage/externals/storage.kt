@@ -6,6 +6,8 @@ package dev.gitlive.firebase.storage.externals
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 
+external fun getStorage(app: FirebaseApp? = definedExternally, url: String): FirebaseStorage
+
 external fun getStorage(app: FirebaseApp? = definedExternally): FirebaseStorage
 
 external fun ref(storage: FirebaseStorage, url: String? = definedExternally): StorageReference
