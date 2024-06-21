@@ -68,9 +68,14 @@ jobs:
         run: chmod +x gradlew
       - name: Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
+      - name: Uploading build folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: artefact
+          path: build/dokka/htmlMultiModule
       - name: Deploy API documentation to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: ./build/htmlMultiModule/dokka/html
-          target-folder: api
+          folder: build/dokka/htmlMultiModule
+          target-folder: docs
