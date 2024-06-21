@@ -303,7 +303,7 @@ For some tests you need to have the firebase emulator suite running. After insta
 
 ### Documentation
 For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
-We publish a new version of the documentation after every release and can be found [here][https://gitliveapp.github.io/firebase-kotlin-sdk/]
+We publish a new version of the documentation after every release and can be found [here](https://gitliveapp.github.io/firebase-kotlin-sdk/)
 
 ### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
 
