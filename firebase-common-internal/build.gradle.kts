@@ -153,6 +153,12 @@ if (project.property("firebase-common.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-common.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-common.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }

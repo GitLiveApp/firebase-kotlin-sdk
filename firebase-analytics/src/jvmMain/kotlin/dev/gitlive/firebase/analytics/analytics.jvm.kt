@@ -8,7 +8,7 @@ actual val Firebase.analytics: FirebaseAnalytics
     get() = TODO("Not yet implemented")
 
 actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics {
-    TODO("Not yetimplemented")
+    TODO("Not yet implemented")
 }
 
 actual class FirebaseAnalytics {

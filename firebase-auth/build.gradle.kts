@@ -148,6 +148,12 @@ if (project.property("firebase-auth.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-auth.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-auth.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }

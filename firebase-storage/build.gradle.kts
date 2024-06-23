@@ -147,6 +147,12 @@ if (project.property("firebase-storage.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-storage.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-storage.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }

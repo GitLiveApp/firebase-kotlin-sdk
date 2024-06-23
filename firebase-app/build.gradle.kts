@@ -150,6 +150,12 @@ if (project.property("firebase-app.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-app.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-app.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
