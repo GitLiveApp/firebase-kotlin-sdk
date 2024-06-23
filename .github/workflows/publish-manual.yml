@@ -1,0 +1,29 @@
+name: Publish Manual
+
+on:
+  pull_request:
+    branches: [ publish-manual ]
+
+env:
+  sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
+  sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: gradle/gradle-build-action@v2
+      - name: Setup versions
+        run: ./gradlew :updateVersions
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Publish Firebase Common Internal
+        run: ./gradlew :firebase-common-internal:publish
