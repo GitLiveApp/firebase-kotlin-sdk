@@ -54,3 +54,28 @@ jobs:
         run: ./gradlew :firebase-perf:publish
       - name: Publish Firebase Crashlytics
         run: ./gradlew :firebase-crashlytics:publish
+  documentation:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: gradle/gradle-build-action@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Generate documentation
+        run: ./gradlew dokkaHtmlMultiModule
+      - name: Uploading build folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: artefact
+          path: build/dokka/htmlMultiModule
+      - name: Deploy API documentation to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: build/dokka/htmlMultiModule
+          target-folder: docs

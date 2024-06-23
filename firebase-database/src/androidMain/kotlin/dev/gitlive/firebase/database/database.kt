@@ -39,7 +39,7 @@ import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
 
-suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T =
+internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T =
     merge(
         flow { emit(await()) },
         database

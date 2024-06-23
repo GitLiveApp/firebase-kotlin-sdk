@@ -64,14 +64,14 @@ class FirebaseStorageTest {
     @Test
     fun testUploadShouldNotCrash() = runBlockingTest {
         val data = createTestData()
-        val ref = storage.reference("test").child("testFile.txt")
+        val ref = storage.reference("test").child("testUploadShouldNotCrash.txt")
         ref.putData(data)
     }
 
     @Test
     fun testUploadMetadata() = runBlockingTest {
         val data = createTestData()
-        val ref = storage.reference("test").child("testFile.txt")
+        val ref = storage.reference("test").child("testUploadMetadata.txt")
         val metadata = storageMetadata {
             contentType = "text/plain"
         }
@@ -87,7 +87,7 @@ class FirebaseStorageTest {
     @Test
     fun testUploadCustomMetadata() = runBlockingTest {
         val data = createTestData()
-        val ref = storage.reference("test").child("testFile.txt")
+        val ref = storage.reference("test").child("testUploadCustomMetadata.txt")
         val metadata = storageMetadata {
             contentType = "text/plain"
             setCustomMetadata("key", "value")

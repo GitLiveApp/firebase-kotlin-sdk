@@ -8,46 +8,41 @@ on:
     branches: [ master ]
 
 jobs:
+  jobEmulatorMatrixSetup:
+    runs-on: ubuntu-latest
+    outputs:
+      emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: gradle
+      - name: Prepare the matrix JSON
+        run: ./gradlew ciEmulatorJobsMatrixSetup
+      - id: dataStep
+        run: echo "emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)" >> $GITHUB_OUTPUT
   build-android:
-    runs-on: macos-13
+    needs: jobEmulatorMatrixSetup
+    runs-on: ubuntu-latest
     strategy:
-      matrix:
-        api-level: [ 34 ]
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobEmulatorMatrixSetup.outputs.emulator_jobs_matrix) }}
     steps:
       - uses: actions/checkout@v3
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-${{ runner.os }}-${{ runner.arch }}
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: google_apis
-          avd-name: pixel6_API${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+      - name: Apply Android licenses
+        run: ./gradlew ciSdkManagerLicenses
       - name: Run Android Instrumented Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: google_apis
-          avd-name: pixel6_API${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedAndroidTest
+        run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload Android test artifact
         uses: actions/upload-artifact@v3
         if: failure()

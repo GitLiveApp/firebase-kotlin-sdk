@@ -31,8 +31,16 @@ import platform.Foundation.NSURL
 actual val Firebase.storage get() =
     FirebaseStorage(FIRStorage.storage())
 
+actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(
+    FIRStorage.storageWithURL(url)
+)
+
 actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
     FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp)
+)
+
+actual fun Firebase.storage(app: FirebaseApp, url: String) = FirebaseStorage(
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url)
 )
 
 actual class FirebaseStorage(val ios: FIRStorage) {
@@ -144,7 +152,7 @@ actual class Data(val data: NSData)
 
 actual class FirebaseStorageException(message: String): FirebaseException(message)
 
-suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
         if(error == null) {
@@ -156,7 +164,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
     job.await()
 }
 
-suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
         if(error == null) {
@@ -168,7 +176,7 @@ suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSEr
     return job.await() as R
 }
 
-fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
+internal fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
     val metadata = FIRStorageMetadata()
     val mappedMetadata: Map<Any?, String> = this.customMetadata.map {
         it.key to it.value
@@ -182,7 +190,7 @@ fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
     return metadata
 }
 
-fun FIRStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+internal fun FIRStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     val sdkMetadata = this
     return storageMetadata {
         md5Hash = sdkMetadata.md5Hash()

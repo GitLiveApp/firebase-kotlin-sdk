@@ -57,6 +57,7 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual suspend fun createUserWithEmailAndPassword(email: String, password: String) =
         AuthResult(android.createUserWithEmailAndPassword(email, password).await())
 
+    @Suppress("DEPRECATION")
     actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = android.fetchSignInMethodsForEmail(email).await().signInMethods.orEmpty()
 
     actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {

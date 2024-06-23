@@ -18,8 +18,11 @@ import kotlinx.coroutines.flow.emitAll
 actual val Firebase.storage
     get() = FirebaseStorage(getStorage())
 
-actual fun Firebase.storage(app: FirebaseApp) =
-    FirebaseStorage(getStorage(app.js))
+actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(null, url), )
+
+actual fun Firebase.storage(app: FirebaseApp) = FirebaseStorage(getStorage(app.js))
+
+actual fun Firebase.storage(app: FirebaseApp, url: String) = FirebaseStorage(getStorage(app.js, url))
 
 actual class FirebaseStorage(val js: dev.gitlive.firebase.storage.externals.FirebaseStorage) {
     actual val maxOperationRetryTimeMillis = js.maxOperationRetryTime.toLong()
@@ -131,7 +134,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
     }
 
 
-fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+internal fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     val sdkMetadata = this
     return storageMetadata {
         md5Hash = sdkMetadata.md5Hash
@@ -146,7 +149,7 @@ fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     }
 }
 
-fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
+internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
     val metadata = StorageMetadata()
     metadata.cacheControl = cacheControl
     metadata.contentDisposition = contentDisposition
