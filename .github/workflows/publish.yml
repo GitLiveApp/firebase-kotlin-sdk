@@ -36,6 +36,8 @@ jobs:
         run: ./gradlew :firebase-auth:publish
       - name: Publish Firebase Common
         run: ./gradlew :firebase-common:publish
+      - name: Publish Firebase Common Internal
+        run: ./gradlew :firebase-common-internal:publish
       - name: Publish Firebase Config
         run: ./gradlew :firebase-config:publish
       - name: Publish Firebase Database
