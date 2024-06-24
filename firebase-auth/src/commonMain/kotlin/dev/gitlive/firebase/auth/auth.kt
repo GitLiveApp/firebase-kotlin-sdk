@@ -11,60 +11,60 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 
-expect val Firebase.auth: FirebaseAuth
+public expect val Firebase.auth: FirebaseAuth
 
-expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
+public expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
 
-expect class FirebaseAuth {
-    val currentUser: FirebaseUser?
-    val authStateChanged: Flow<FirebaseUser?>
-    val idTokenChanged: Flow<FirebaseUser?>
-    var languageCode: String
-    suspend fun applyActionCode(code: String)
-    suspend fun <T : ActionCodeResult> checkActionCode(code: String): T
-    suspend fun confirmPasswordReset(code: String, newPassword: String)
-    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
+public expect class FirebaseAuth {
+    public val currentUser: FirebaseUser?
+    public val authStateChanged: Flow<FirebaseUser?>
+    public val idTokenChanged: Flow<FirebaseUser?>
+    public var languageCode: String
+    public suspend fun applyActionCode(code: String)
+    public suspend fun <T : ActionCodeResult> checkActionCode(code: String): T
+    public suspend fun confirmPasswordReset(code: String, newPassword: String)
+    public suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult
 
     @Deprecated("Migrating off of this method is recommended as a security best-practice. Learn more in the Identity Platform documentation for [Email Enumeration Protection](https://cloud.google.com/identity-platform/docs/admin/email-enumeration-protection).")
-    suspend fun fetchSignInMethodsForEmail(email: String): List<String>
-    suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
-    suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)
-    fun isSignInWithEmailLink(link: String): Boolean
-    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
-    suspend fun signInWithCustomToken(token: String): AuthResult
-    suspend fun signInAnonymously(): AuthResult
-    suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
-    suspend fun signInWithEmailLink(email: String, link: String): AuthResult
-    suspend fun signOut()
-    suspend fun updateCurrentUser(user: FirebaseUser)
-    suspend fun verifyPasswordResetCode(code: String): String
-    fun useEmulator(host: String, port: Int)
+    public suspend fun fetchSignInMethodsForEmail(email: String): List<String>
+    public suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings? = null)
+    public suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings)
+    public fun isSignInWithEmailLink(link: String): Boolean
+    public suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult
+    public suspend fun signInWithCustomToken(token: String): AuthResult
+    public suspend fun signInAnonymously(): AuthResult
+    public suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult
+    public suspend fun signInWithEmailLink(email: String, link: String): AuthResult
+    public suspend fun signOut()
+    public suspend fun updateCurrentUser(user: FirebaseUser)
+    public suspend fun verifyPasswordResetCode(code: String): String
+    public fun useEmulator(host: String, port: Int)
 }
 
-expect class AuthResult {
-    val user: FirebaseUser?
+public expect class AuthResult {
+    public val user: FirebaseUser?
 }
 
-expect class AuthTokenResult {
+public expect class AuthTokenResult {
 //    val authTimestamp: Long
-    val claims: Map<String, Any>
+    public val claims: Map<String, Any>
 
 //    val expirationTimestamp: Long
 //    val issuedAtTimestamp: Long
-    val signInProvider: String?
-    val token: String?
+    public val signInProvider: String?
+    public val token: String?
 }
 
-sealed class ActionCodeResult {
-    object SignInWithEmailLink : ActionCodeResult()
-    class PasswordReset internal constructor(val email: String) : ActionCodeResult()
-    class VerifyEmail internal constructor(val email: String) : ActionCodeResult()
-    class RecoverEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
-    class VerifyBeforeChangeEmail internal constructor(val email: String, val previousEmail: String) : ActionCodeResult()
-    class RevertSecondFactorAddition internal constructor(val email: String, val multiFactorInfo: MultiFactorInfo?) : ActionCodeResult()
+public sealed class ActionCodeResult {
+    public object SignInWithEmailLink : ActionCodeResult()
+    public class PasswordReset internal constructor(public val email: String) : ActionCodeResult()
+    public class VerifyEmail internal constructor(public val email: String) : ActionCodeResult()
+    public class RecoverEmail internal constructor(public val email: String, public val previousEmail: String) : ActionCodeResult()
+    public class VerifyBeforeChangeEmail internal constructor(public val email: String, public val previousEmail: String) : ActionCodeResult()
+    public class RevertSecondFactorAddition internal constructor(public val email: String, public val multiFactorInfo: MultiFactorInfo?) : ActionCodeResult()
 }
 
-data class ActionCodeSettings(
+public data class ActionCodeSettings(
     val url: String,
     val androidPackageName: AndroidPackageName? = null,
     val dynamicLinkDomain: String? = null,
@@ -72,19 +72,19 @@ data class ActionCodeSettings(
     val iOSBundleId: String? = null,
 )
 
-data class AndroidPackageName(
+public data class AndroidPackageName(
     val packageName: String,
     val installIfNotAvailable: Boolean = true,
     val minimumVersion: String? = null,
 )
 
-expect open class FirebaseAuthException : FirebaseException
-expect class FirebaseAuthActionCodeException : FirebaseAuthException
-expect class FirebaseAuthEmailException : FirebaseAuthException
-expect open class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
-expect class FirebaseAuthWeakPasswordException : FirebaseAuthInvalidCredentialsException
-expect class FirebaseAuthInvalidUserException : FirebaseAuthException
-expect class FirebaseAuthMultiFactorException : FirebaseAuthException
-expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
-expect class FirebaseAuthUserCollisionException : FirebaseAuthException
-expect class FirebaseAuthWebException : FirebaseAuthException
+public expect open class FirebaseAuthException : FirebaseException
+public expect class FirebaseAuthActionCodeException : FirebaseAuthException
+public expect class FirebaseAuthEmailException : FirebaseAuthException
+public expect open class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
+public expect class FirebaseAuthWeakPasswordException : FirebaseAuthInvalidCredentialsException
+public expect class FirebaseAuthInvalidUserException : FirebaseAuthException
+public expect class FirebaseAuthMultiFactorException : FirebaseAuthException
+public expect class FirebaseAuthRecentLoginRequiredException : FirebaseAuthException
+public expect class FirebaseAuthUserCollisionException : FirebaseAuthException
+public expect class FirebaseAuthWebException : FirebaseAuthException

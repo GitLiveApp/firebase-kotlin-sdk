@@ -9,17 +9,17 @@ import kotlinx.serialization.SerializationException
 
 /** Represents a Firebase ServerValue. */
 @Serializable(with = ServerValueSerializer::class)
-expect class ServerValue internal constructor(nativeValue: Any) {
+public expect class ServerValue internal constructor(nativeValue: Any) {
     internal val nativeValue: Any
 
-    companion object {
-        val TIMESTAMP: ServerValue
-        fun increment(delta: Double): ServerValue
+    public companion object {
+        public val TIMESTAMP: ServerValue
+        public fun increment(delta: Double): ServerValue
     }
 }
 
 /** Serializer for [ServerValue]. Must be used with [FirebaseEncoder]/[FirebaseDecoder].*/
-object ServerValueSerializer : KSerializer<ServerValue> by SpecialValueSerializer(
+public object ServerValueSerializer : KSerializer<ServerValue> by SpecialValueSerializer(
     serialName = "ServerValue",
     toNativeValue = ServerValue::nativeValue,
     fromNativeValue = { raw ->

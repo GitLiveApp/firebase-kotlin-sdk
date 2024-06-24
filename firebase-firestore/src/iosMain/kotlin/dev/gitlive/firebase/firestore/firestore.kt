@@ -18,14 +18,14 @@ import platform.Foundation.numberWithLong
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
 
-actual val Firebase.firestore get() =
+public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
+public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
     FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
 )
 
-val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
+public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
     is LocalCacheSettings.Persistent -> FIRPersistentCacheSettings(NSNumber.numberWithLong(sizeBytes))
     is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
         when (garbaseCollectorSettings) {
@@ -35,46 +35,46 @@ val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
     )
 }
 
-actual typealias NativeFirebaseFirestore = FIRFirestore
+public actual typealias NativeFirebaseFirestore = FIRFirestore
 
-val FirebaseFirestore.ios get() = native
+public val FirebaseFirestore.ios get() = native
 
-actual data class FirebaseFirestoreSettings(
+public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
     actual val host: String,
     actual val cacheSettings: LocalCacheSettings,
     val dispatchQueue: dispatch_queue_t,
 ) {
 
-    actual companion object {
-        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+    public actual companion object {
+        public actual val CACHE_SIZE_UNLIMITED: Long = -1L
         internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
         internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
         internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 100 * 1024 * 1024
     }
 
-    actual class Builder(
-        actual var sslEnabled: Boolean,
-        actual var host: String,
-        actual var cacheSettings: LocalCacheSettings,
-        var dispatchQueue: dispatch_queue_t,
+    public actual class Builder(
+        public actual var sslEnabled: Boolean,
+        public actual var host: String,
+        public actual var cacheSettings: LocalCacheSettings,
+        public var dispatchQueue: dispatch_queue_t,
     ) {
 
-        actual constructor() : this(
+        public actual constructor() : this(
             true,
             DEFAULT_HOST,
             persistentCacheSettings { },
             dispatch_get_main_queue(),
         )
 
-        actual constructor(settings: FirebaseFirestoreSettings) : this(
+        public actual constructor(settings: FirebaseFirestoreSettings) : this(
             settings.sslEnabled,
             settings.host,
             settings.cacheSettings,
             settings.dispatchQueue,
         )
 
-        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
+        public actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings, dispatchQueue)
     }
 
     val ios: FIRFirestoreSettings get() = FIRFirestoreSettings().apply {
@@ -85,7 +85,7 @@ actual data class FirebaseFirestoreSettings(
     }
 }
 
-actual fun firestoreSettings(
+public actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
     builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
@@ -97,32 +97,32 @@ actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-actual typealias NativeWriteBatch = FIRWriteBatch
+public actual typealias NativeWriteBatch = FIRWriteBatch
 
-val WriteBatch.ios get() = native
+public val WriteBatch.ios: NativeWriteBatch get() = native
 
-actual typealias NativeTransaction = FIRTransaction
+public actual typealias NativeTransaction = FIRTransaction
 
-val Transaction.ios get() = native
+public val Transaction.ios: NativeTransaction get() = native
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReferenceType = FIRDocumentReference
+public actual typealias NativeDocumentReferenceType = FIRDocumentReference
 
-val DocumentReference.ios get() = native.ios
+public val DocumentReference.ios: NativeDocumentReferenceType get() = native.ios
 
-actual typealias NativeQuery = FIRQuery
+public actual typealias NativeQuery = FIRQuery
 
-val Query.ios get() = native
+public val Query.ios: NativeQuery get() = native
 
-actual typealias NativeCollectionReference = FIRCollectionReference
+public actual typealias NativeCollectionReference = FIRCollectionReference
 
-val CollectionReference.ios get() = native
+public val CollectionReference.ios: NativeCollectionReference get() = native
 
-actual class FirebaseFirestoreException(message: String, val code: FirestoreExceptionCode) : FirebaseException(message)
+public actual class FirebaseFirestoreException(message: String, public val code: FirestoreExceptionCode) : FirebaseException(message)
 
-actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
+public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-actual enum class FirestoreExceptionCode {
+public actual enum class FirestoreExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,
@@ -142,18 +142,18 @@ actual enum class FirestoreExceptionCode {
     UNAUTHENTICATED,
 }
 
-actual enum class Direction {
+public actual enum class Direction {
     ASCENDING,
     DESCENDING,
 }
 
-actual enum class ChangeType(internal val ios: FIRDocumentChangeType) {
+public actual enum class ChangeType(internal val ios: FIRDocumentChangeType) {
     ADDED(FIRDocumentChangeTypeAdded),
     MODIFIED(FIRDocumentChangeTypeModified),
     REMOVED(FIRDocumentChangeTypeRemoved),
 }
 
-fun NSError.toException() = when (domain) {
+public fun NSError.toException(): FirebaseFirestoreException = when (domain) {
     FIRFirestoreErrorDomain -> when (code) {
         FIRFirestoreErrorCodeOK -> FirestoreExceptionCode.OK
         FIRFirestoreErrorCodeCancelled -> FirestoreExceptionCode.CANCELLED
@@ -177,47 +177,47 @@ fun NSError.toException() = when (domain) {
     else -> FirestoreExceptionCode.UNKNOWN
 }.let { FirebaseFirestoreException(description!!, it) }
 
-actual class QuerySnapshot(val ios: FIRQuerySnapshot) {
-    actual val documents
+public actual class QuerySnapshot(public val ios: FIRQuerySnapshot) {
+    public actual val documents: List<DocumentSnapshot>
         get() = ios.documents.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it as FIRDocumentSnapshot)) }
-    actual val documentChanges
+    public actual val documentChanges: List<DocumentChange>
         get() = ios.documentChanges.map { DocumentChange(it as FIRDocumentChange) }
-    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
+    public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
 }
 
-actual class DocumentChange(val ios: FIRDocumentChange) {
-    actual val document: DocumentSnapshot
+public actual class DocumentChange(public val ios: FIRDocumentChange) {
+    public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(ios.document))
-    actual val newIndex: Int
+    public actual val newIndex: Int
         get() = ios.newIndex.toInt()
-    actual val oldIndex: Int
+    public actual val oldIndex: Int
         get() = ios.oldIndex.toInt()
-    actual val type: ChangeType
-        get() = ChangeType.values().first { it.ios == ios.type }
+    public actual val type: ChangeType
+        get() = ChangeType.entries.first { it.ios == ios.type }
 }
 
-actual typealias NativeDocumentSnapshot = FIRDocumentSnapshot
+public actual typealias NativeDocumentSnapshot = FIRDocumentSnapshot
 
-val DocumentSnapshot.ios get() = native
+public val DocumentSnapshot.ios: NativeDocumentSnapshot get() = native
 
-actual class SnapshotMetadata(val ios: FIRSnapshotMetadata) {
-    actual val hasPendingWrites: Boolean get() = ios.pendingWrites
-    actual val isFromCache: Boolean get() = ios.fromCache
+public actual class SnapshotMetadata(public val ios: FIRSnapshotMetadata) {
+    public actual val hasPendingWrites: Boolean get() = ios.pendingWrites
+    public actual val isFromCache: Boolean get() = ios.fromCache
 }
 
-actual class FieldPath private constructor(val ios: FIRFieldPath) {
-    actual companion object {
-        actual val documentId = FieldPath(FIRFieldPath.documentID())
+public actual class FieldPath private constructor(public val ios: FIRFieldPath) {
+    public actual companion object {
+        public actual val documentId: FieldPath = FieldPath(FIRFieldPath.documentID())
     }
-    actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
-    actual val documentId: FieldPath get() = FieldPath.documentId
-    actual val encoded: EncodedFieldPath = ios
+    public actual constructor(vararg fieldNames: String) : this(FIRFieldPath(fieldNames.asList()))
+    public actual val documentId: FieldPath get() = FieldPath.documentId
+    public actual val encoded: EncodedFieldPath = ios
     override fun equals(other: Any?): Boolean = other is FieldPath && ios == other.ios
     override fun hashCode(): Int = ios.hashCode()
     override fun toString(): String = ios.toString()
 }
 
-actual typealias EncodedFieldPath = FIRFieldPath
+public actual typealias EncodedFieldPath = FIRFieldPath
 
 internal suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()

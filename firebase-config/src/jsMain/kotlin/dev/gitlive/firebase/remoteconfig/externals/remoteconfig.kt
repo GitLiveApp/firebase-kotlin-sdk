@@ -7,41 +7,41 @@ import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 import kotlin.js.Promise
 
-external fun activate(remoteConfig: RemoteConfig): Promise<Boolean>
+public external fun activate(remoteConfig: RemoteConfig): Promise<Boolean>
 
-external fun ensureInitialized(remoteConfig: RemoteConfig): Promise<Unit>
+public external fun ensureInitialized(remoteConfig: RemoteConfig): Promise<Unit>
 
-external fun fetchAndActivate(remoteConfig: RemoteConfig): Promise<Boolean>
+public external fun fetchAndActivate(remoteConfig: RemoteConfig): Promise<Boolean>
 
-external fun fetchConfig(remoteConfig: RemoteConfig): Promise<Unit>
+public external fun fetchConfig(remoteConfig: RemoteConfig): Promise<Unit>
 
-external fun getAll(remoteConfig: RemoteConfig): Json
+public external fun getAll(remoteConfig: RemoteConfig): Json
 
-external fun getBoolean(remoteConfig: RemoteConfig, key: String): Boolean
+public external fun getBoolean(remoteConfig: RemoteConfig, key: String): Boolean
 
-external fun getNumber(remoteConfig: RemoteConfig, key: String): Number
+public external fun getNumber(remoteConfig: RemoteConfig, key: String): Number
 
-external fun getRemoteConfig(app: FirebaseApp? = definedExternally): RemoteConfig
+public external fun getRemoteConfig(app: FirebaseApp? = definedExternally): RemoteConfig
 
-external fun getString(remoteConfig: RemoteConfig, key: String): String?
+public external fun getString(remoteConfig: RemoteConfig, key: String): String?
 
-external fun getValue(remoteConfig: RemoteConfig, key: String): Value
+public external fun getValue(remoteConfig: RemoteConfig, key: String): Value
 
-external interface RemoteConfig {
-    var defaultConfig: Any
-    var fetchTimeMillis: Long
-    var lastFetchStatus: String
-    val settings: Settings
+public external interface RemoteConfig {
+    public var defaultConfig: Any
+    public var fetchTimeMillis: Long
+    public var lastFetchStatus: String
+    public val settings: Settings
 }
 
-external interface Settings {
-    var fetchTimeoutMillis: Number
-    var minimumFetchIntervalMillis: Number
+public external interface Settings {
+    public var fetchTimeoutMillis: Number
+    public var minimumFetchIntervalMillis: Number
 }
 
-external interface Value {
-    fun asBoolean(): Boolean
-    fun asNumber(): Number
-    fun asString(): String?
-    fun getSource(): String
+public external interface Value {
+    public fun asBoolean(): Boolean
+    public fun asNumber(): Number
+    public fun asString(): String?
+    public fun getSource(): String
 }

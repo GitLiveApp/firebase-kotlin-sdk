@@ -23,54 +23,56 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.tasks.await
 
-actual val Firebase.storage get() = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
+public actual val Firebase.storage: FirebaseStorage get() = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
 
-actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(url))
+public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(url))
 
-actual fun Firebase.storage(app: FirebaseApp) = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android))
+public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android))
 
-actual fun Firebase.storage(app: FirebaseApp, url: String) = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android, url))
+public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android, url))
 
-actual class FirebaseStorage(val android: com.google.firebase.storage.FirebaseStorage) {
-    actual val maxOperationRetryTimeMillis = android.maxOperationRetryTimeMillis
-    actual val maxUploadRetryTimeMillis = android.maxUploadRetryTimeMillis
+public actual class FirebaseStorage(public val android: com.google.firebase.storage.FirebaseStorage) {
+    public actual val maxOperationRetryTimeMillis: Long = android.maxOperationRetryTimeMillis
+    public actual val maxUploadRetryTimeMillis: Long = android.maxUploadRetryTimeMillis
 
-    actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
+    public actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
         android.maxOperationRetryTimeMillis = maxOperationRetryTimeMillis
     }
 
-    actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
+    public actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
         android.maxUploadRetryTimeMillis = maxUploadRetryTimeMillis
     }
 
-    actual fun useEmulator(host: String, port: Int) {
+    public actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
     }
 
-    actual val reference get() = StorageReference(android.reference)
+    public actual val reference: StorageReference get() = StorageReference(android.reference)
 
-    actual fun reference(location: String) = StorageReference(android.getReference(location))
+    public actual fun reference(location: String): StorageReference = StorageReference(android.getReference(location))
 }
 
-actual class StorageReference(val android: com.google.firebase.storage.StorageReference) {
-    actual val name: String get() = android.name
-    actual val path: String get() = android.path
-    actual val bucket: String get() = android.bucket
-    actual val parent: StorageReference? get() = android.parent?.let { StorageReference(it) }
-    actual val root: StorageReference get() = StorageReference(android.root)
-    actual val storage: FirebaseStorage get() = FirebaseStorage(android.storage)
+public actual class StorageReference(public val android: com.google.firebase.storage.StorageReference) {
+    public actual val name: String get() = android.name
+    public actual val path: String get() = android.path
+    public actual val bucket: String get() = android.bucket
+    public actual val parent: StorageReference? get() = android.parent?.let { StorageReference(it) }
+    public actual val root: StorageReference get() = StorageReference(android.root)
+    public actual val storage: FirebaseStorage get() = FirebaseStorage(android.storage)
 
-    actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
+    public actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
 
-    actual fun child(path: String): StorageReference = StorageReference(android.child(path))
+    public actual fun child(path: String): StorageReference = StorageReference(android.child(path))
 
-    actual suspend fun delete() = android.delete().await().run { Unit }
+    public actual suspend fun delete() {
+        android.delete().await()
+    }
 
-    actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
+    public actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
 
-    actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
+    public actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
-    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
+    public actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {
         if (metadata != null) {
             android.putFile(file.uri, metadata.toStorageMetadata()).await().run {}
         } else {
@@ -78,7 +80,7 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
         }
     }
 
-    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) {
+    public actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?) {
         if (metadata != null) {
             android.putBytes(data.data, metadata.toStorageMetadata()).await().run {}
         } else {
@@ -86,7 +88,7 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
         }
     }
 
-    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
+    public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val android = if (metadata != null) {
             android.putFile(file.uri, metadata.toStorageMetadata())
         } else {
@@ -119,17 +121,17 @@ actual class StorageReference(val android: com.google.firebase.storage.StorageRe
     }
 }
 
-actual class ListResult(android: com.google.firebase.storage.ListResult) {
-    actual val prefixes: List<StorageReference> = android.prefixes.map { StorageReference(it) }
-    actual val items: List<StorageReference> = android.items.map { StorageReference(it) }
-    actual val pageToken: String? = android.pageToken
+public actual class ListResult(android: com.google.firebase.storage.ListResult) {
+    public actual val prefixes: List<StorageReference> = android.prefixes.map { StorageReference(it) }
+    public actual val items: List<StorageReference> = android.items.map { StorageReference(it) }
+    public actual val pageToken: String? = android.pageToken
 }
 
-actual class File(val uri: Uri)
+public actual class File(public val uri: Uri)
 
-actual class Data(val data: ByteArray)
+public actual class Data(public val data: ByteArray)
 
-actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
+public actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 
 internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata = StorageMetadata.Builder()
     .setCacheControl(this.cacheControl)

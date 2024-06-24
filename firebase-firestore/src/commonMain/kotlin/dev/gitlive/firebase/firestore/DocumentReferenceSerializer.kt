@@ -9,7 +9,7 @@ import kotlinx.serialization.SerializationException
 /**
  * A serializer for [DocumentReference]. If used with [FirebaseEncoder] performs serialization using native Firebase mechanisms.
  */
-object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialValueSerializer(
+public object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialValueSerializer(
     serialName = "DocumentReference",
     toNativeValue = { it.native.nativeValue },
     fromNativeValue = { value ->

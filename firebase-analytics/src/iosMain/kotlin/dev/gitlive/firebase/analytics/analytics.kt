@@ -8,60 +8,60 @@ import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 
-actual val Firebase.analytics: FirebaseAnalytics
+public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(FIRAnalytics)
 
-actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(FIRAnalytics)
+public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(FIRAnalytics)
 
-actual class FirebaseAnalytics(val ios: FIRAnalytics.Companion) {
-    actual fun logEvent(name: String, parameters: Map<String, Any>?) {
+public actual class FirebaseAnalytics(public val ios: FIRAnalytics.Companion) {
+    public actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         val mappedParameters: Map<Any?, Any>? = parameters?.map { it.key to it.value }?.toMap()
         ios.logEventWithName(name, mappedParameters)
     }
-    actual fun setUserProperty(name: String, value: String) {
+    public actual fun setUserProperty(name: String, value: String) {
         ios.setUserPropertyString(value, name)
     }
-    actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String) {
         ios.setUserID(id)
     }
-    actual fun resetAnalyticsData() {
+    public actual fun resetAnalyticsData() {
         ios.resetAnalyticsData()
     }
 
-    actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
+    public actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
         ios.setAnalyticsCollectionEnabled(enabled)
     }
 
-    actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
         ios.setSessionTimeoutInterval(sessionTimeoutInterval.toDouble())
     }
 
-    actual suspend fun getSessionId(): Long? = ios.awaitResult { sessionIDWithCompletion(it) }
+    public actual suspend fun getSessionId(): Long? = ios.awaitResult { sessionIDWithCompletion(it) }
 
-    actual fun setDefaultEventParameters(parameters: Map<String, String>) {
+    public actual fun setDefaultEventParameters(parameters: Map<String, String>) {
         val mappedParameters: Map<Any?, String> = parameters.map { it.key to it.value }.toMap()
         ios.setDefaultEventParameters(mappedParameters)
     }
 
-    actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+    public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
         val mappedConsentSettings: Map<Any?, *> = consentSettings.map { it.key.name to it.value.name }.toMap()
         ios.setConsent(mappedConsentSettings)
     }
 
-    actual enum class ConsentType {
+    public actual enum class ConsentType {
         AD_PERSONALIZATION,
         AD_STORAGE,
         AD_USER_DATA,
         ANALYTICS_STORAGE,
     }
 
-    actual enum class ConsentStatus {
+    public actual enum class ConsentStatus {
         GRANTED,
         DENIED,
     }
 }
 
-actual class FirebaseAnalyticsException(message: String) : FirebaseException(message)
+public actual class FirebaseAnalyticsException(message: String) : FirebaseException(message)
 
 internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()

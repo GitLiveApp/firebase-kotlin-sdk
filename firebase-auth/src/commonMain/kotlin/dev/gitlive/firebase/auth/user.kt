@@ -4,46 +4,46 @@
 
 package dev.gitlive.firebase.auth
 
-expect class FirebaseUser {
-    val uid: String
-    val displayName: String?
-    val email: String?
-    val phoneNumber: String?
-    val photoURL: String?
-    val isAnonymous: Boolean
-    val isEmailVerified: Boolean
-    val metaData: UserMetaData?
-    val multiFactor: MultiFactor
-    val providerData: List<UserInfo>
-    val providerId: String
-    suspend fun delete()
-    suspend fun reload()
-    suspend fun getIdToken(forceRefresh: Boolean): String?
-    suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult
-    suspend fun linkWithCredential(credential: AuthCredential): AuthResult
-    suspend fun reauthenticate(credential: AuthCredential)
-    suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
-    suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
-    suspend fun unlink(provider: String): FirebaseUser?
+public expect class FirebaseUser {
+    public val uid: String
+    public val displayName: String?
+    public val email: String?
+    public val phoneNumber: String?
+    public val photoURL: String?
+    public val isAnonymous: Boolean
+    public val isEmailVerified: Boolean
+    public val metaData: UserMetaData?
+    public val multiFactor: MultiFactor
+    public val providerData: List<UserInfo>
+    public val providerId: String
+    public suspend fun delete()
+    public suspend fun reload()
+    public suspend fun getIdToken(forceRefresh: Boolean): String?
+    public suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult
+    public suspend fun linkWithCredential(credential: AuthCredential): AuthResult
+    public suspend fun reauthenticate(credential: AuthCredential)
+    public suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
+    public suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
+    public suspend fun unlink(provider: String): FirebaseUser?
 
     @Deprecated("Use verifyBeforeUpdateEmail instead", replaceWith = ReplaceWith("verifyBeforeUpdateEmail(email)"))
-    suspend fun updateEmail(email: String)
-    suspend fun updatePassword(password: String)
-    suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
-    suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
+    public suspend fun updateEmail(email: String)
+    public suspend fun updatePassword(password: String)
+    public suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
+    public suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
+    public suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 
-expect class UserInfo {
-    val displayName: String?
-    val email: String?
-    val phoneNumber: String?
-    val photoURL: String?
-    val providerId: String
-    val uid: String
+public expect class UserInfo {
+    public val displayName: String?
+    public val email: String?
+    public val phoneNumber: String?
+    public val photoURL: String?
+    public val providerId: String
+    public val uid: String
 }
 
-expect class UserMetaData {
-    val creationTime: Double?
-    val lastSignInTime: Double?
+public expect class UserMetaData {
+    public val creationTime: Double?
+    public val lastSignInTime: Double?
 }

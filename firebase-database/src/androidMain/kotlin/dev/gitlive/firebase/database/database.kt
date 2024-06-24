@@ -52,21 +52,21 @@ internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T
     )
         .first()
 
-actual val Firebase.database
+public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }
 
-actual fun Firebase.database(url: String) =
+public actual fun Firebase.database(url: String): FirebaseDatabase =
     FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(url))
 
-actual fun Firebase.database(app: FirebaseApp) =
+public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase =
     FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
 
-actual fun Firebase.database(app: FirebaseApp, url: String) =
+public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase =
     FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-actual class FirebaseDatabase internal constructor(val android: com.google.firebase.database.FirebaseDatabase) {
+public actual class FirebaseDatabase internal constructor(public val android: com.google.firebase.database.FirebaseDatabase) {
 
-    companion object {
+    public companion object {
         private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
 
         internal fun getInstance(
@@ -76,30 +76,36 @@ actual class FirebaseDatabase internal constructor(val android: com.google.fireb
 
     private var persistenceEnabled = true
 
-    actual fun reference(path: String) =
+    public actual fun reference(path: String): DatabaseReference =
         DatabaseReference(NativeDatabaseReference(android.getReference(path), persistenceEnabled))
 
-    actual fun reference() =
+    public actual fun reference(): DatabaseReference =
         DatabaseReference(NativeDatabaseReference(android.reference, persistenceEnabled))
 
-    actual fun setPersistenceEnabled(enabled: Boolean) {
+    public actual fun setPersistenceEnabled(enabled: Boolean) {
         android.setPersistenceEnabled(enabled)
         persistenceEnabled = enabled
     }
 
-    actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
+    public actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
         android.setPersistenceCacheSizeBytes(cacheSizeInBytes)
     }
 
-    actual fun setLoggingEnabled(enabled: Boolean) =
+    public actual fun setLoggingEnabled(enabled: Boolean) {
         android.setLogLevel(Logger.Level.DEBUG.takeIf { enabled } ?: Logger.Level.NONE)
+    }
 
-    actual fun useEmulator(host: String, port: Int) =
+    public actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)
+    }
 
-    actual fun goOffline() = android.goOffline()
+    public actual fun goOffline() {
+        android.goOffline()
+    }
 
-    actual fun goOnline() = android.goOnline()
+    public actual fun goOnline() {
+        android.goOnline()
+    }
 }
 
 internal actual open class NativeQuery(
@@ -107,7 +113,7 @@ internal actual open class NativeQuery(
     val persistenceEnabled: Boolean,
 )
 
-actual open class Query internal actual constructor(
+public actual open class Query internal actual constructor(
     nativeQuery: NativeQuery,
 ) {
 
@@ -116,38 +122,38 @@ actual open class Query internal actual constructor(
         persistenceEnabled: Boolean,
     ) : this(NativeQuery(android, persistenceEnabled))
 
-    open val android: com.google.firebase.database.Query = nativeQuery.android
-    val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+    public open val android: com.google.firebase.database.Query = nativeQuery.android
+    public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
 
-    actual fun orderByKey() = Query(android.orderByKey(), persistenceEnabled)
+    public actual fun orderByKey(): Query = Query(android.orderByKey(), persistenceEnabled)
 
-    actual fun orderByValue() = Query(android.orderByValue(), persistenceEnabled)
+    public actual fun orderByValue(): Query = Query(android.orderByValue(), persistenceEnabled)
 
-    actual fun orderByChild(path: String) = Query(android.orderByChild(path), persistenceEnabled)
+    public actual fun orderByChild(path: String): Query = Query(android.orderByChild(path), persistenceEnabled)
 
-    actual fun startAt(value: String, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+    public actual fun startAt(value: String, key: String?): Query = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual fun startAt(value: Double, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+    public actual fun startAt(value: Double, key: String?): Query = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual fun startAt(value: Boolean, key: String?) = Query(android.startAt(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(android.startAt(value, key), persistenceEnabled)
 
-    actual fun endAt(value: String, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+    public actual fun endAt(value: String, key: String?): Query = Query(android.endAt(value, key), persistenceEnabled)
 
-    actual fun endAt(value: Double, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+    public actual fun endAt(value: Double, key: String?): Query = Query(android.endAt(value, key), persistenceEnabled)
 
-    actual fun endAt(value: Boolean, key: String?) = Query(android.endAt(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(android.endAt(value, key), persistenceEnabled)
 
-    actual fun limitToFirst(limit: Int) = Query(android.limitToFirst(limit), persistenceEnabled)
+    public actual fun limitToFirst(limit: Int): Query = Query(android.limitToFirst(limit), persistenceEnabled)
 
-    actual fun limitToLast(limit: Int) = Query(android.limitToLast(limit), persistenceEnabled)
+    public actual fun limitToLast(limit: Int): Query = Query(android.limitToLast(limit), persistenceEnabled)
 
-    actual fun equalTo(value: String, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+    public actual fun equalTo(value: String, key: String?): Query = Query(android.equalTo(value, key), persistenceEnabled)
 
-    actual fun equalTo(value: Double, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(android.equalTo(value, key), persistenceEnabled)
 
-    actual fun equalTo(value: Boolean, key: String?) = Query(android.equalTo(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(android.equalTo(value, key), persistenceEnabled)
 
-    actual val valueEvents: Flow<DataSnapshot>
+    public actual val valueEvents: Flow<DataSnapshot>
         get() = callbackFlow {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
@@ -162,7 +168,7 @@ actual open class Query internal actual constructor(
             awaitClose { android.removeEventListener(listener) }
         }
 
-    actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
+    public actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
         val listener = object : ChildEventListener {
 
             val moved by lazy { types.contains(Type.MOVED) }
@@ -193,7 +199,7 @@ actual open class Query internal actual constructor(
         awaitClose { android.removeEventListener(listener) }
     }
 
-    override fun toString() = android.toString()
+    override fun toString(): String = android.toString()
 }
 
 @PublishedApi
@@ -258,30 +264,30 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 }
 
-val DatabaseReference.android get() = nativeReference.android
+public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
 
-actual class DataSnapshot internal constructor(
-    val android: com.google.firebase.database.DataSnapshot,
+public actual class DataSnapshot internal constructor(
+    public val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
-    actual val exists get() = android.exists()
+    public actual val exists: Boolean get() = android.exists()
 
-    actual val key get() = android.key
+    public actual val key: String? get() = android.key
 
-    actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(android.ref, persistenceEnabled))
+    public actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(android.ref, persistenceEnabled))
 
-    actual val value get() = android.value
+    public actual val value: Any? get() = android.value
 
-    actual inline fun <reified T> value() =
+    public actual inline fun <reified T> value(): T =
         decode<T>(value = android.value)
 
-    actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
         decode(strategy, android.value, buildSettings)
 
-    actual fun child(path: String) = DataSnapshot(android.child(path), persistenceEnabled)
-    actual val hasChildren get() = android.hasChildren()
-    actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
+    public actual fun child(path: String): DataSnapshot = DataSnapshot(android.child(path), persistenceEnabled)
+    public actual val hasChildren: Boolean get() = android.hasChildren()
+    public actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
 }
 
 @PublishedApi
@@ -309,8 +315,8 @@ internal actual class NativeOnDisconnect internal constructor(
             .run { Unit }
 }
 
-val OnDisconnect.android get() = native.android
-val OnDisconnect.persistenceEnabled get() = native.persistenceEnabled
-val OnDisconnect.database get() = native.database
+public val OnDisconnect.android: com.google.firebase.database.OnDisconnect get() = native.android
+public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEnabled
+public val OnDisconnect.database: FirebaseDatabase get() = native.database
 
-actual typealias DatabaseException = com.google.firebase.database.DatabaseException
+public actual typealias DatabaseException = com.google.firebase.database.DatabaseException

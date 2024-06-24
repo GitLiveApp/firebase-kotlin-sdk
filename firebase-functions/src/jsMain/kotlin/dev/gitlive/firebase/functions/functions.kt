@@ -20,23 +20,25 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 
-actual val Firebase.functions: FirebaseFunctions
+public actual val Firebase.functions: FirebaseFunctions
     get() = rethrow { FirebaseFunctions(getFunctions()) }
 
-actual fun Firebase.functions(region: String) =
+public actual fun Firebase.functions(region: String): FirebaseFunctions =
     rethrow { FirebaseFunctions(getFunctions(regionOrCustomDomain = region)) }
 
-actual fun Firebase.functions(app: FirebaseApp) =
+public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions =
     rethrow { FirebaseFunctions(getFunctions(app.js)) }
 
-actual fun Firebase.functions(app: FirebaseApp, region: String) =
+public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions =
     rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
 
-actual class FirebaseFunctions internal constructor(val js: Functions) {
-    actual fun httpsCallable(name: String, timeout: Long?) =
+public actual class FirebaseFunctions internal constructor(public val js: Functions) {
+    public actual fun httpsCallable(name: String, timeout: Long?): HttpsCallableReference =
         rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
 
-    actual fun useEmulator(host: String, port: Int) = connectFunctionsEmulator(js, host, port)
+    public actual fun useEmulator(host: String, port: Int) {
+        connectFunctionsEmulator(js, host, port)
+    }
 }
 
 @PublishedApi
@@ -48,26 +50,26 @@ internal actual data class NativeHttpsCallableReference(val js: HttpsCallable) {
 }
 
 @PublishedApi
-internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
+internal val HttpsCallable.native: NativeHttpsCallableReference get() = NativeHttpsCallableReference(this)
 
-val HttpsCallableReference.js: HttpsCallable get() = native.js
+public val HttpsCallableReference.js: HttpsCallable get() = native.js
 
-actual class HttpsCallableResult(val js: JsHttpsCallableResult) {
+public actual class HttpsCallableResult(public val js: JsHttpsCallableResult) {
 
-    actual inline fun <reified T> data() =
+    public actual inline fun <reified T> data(): T =
         rethrow { decode<T>(value = js.data) }
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
         rethrow { decode(strategy, js.data, buildSettings) }
 }
 
-actual class FirebaseFunctionsException(cause: Throwable, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(cause.message, cause)
+public actual class FirebaseFunctionsException(cause: Throwable, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(cause.message, cause)
 
-actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 
-actual val FirebaseFunctionsException.details: Any? get() = details
+public actual val FirebaseFunctionsException.details: Any? get() = details
 
-actual enum class FunctionsExceptionCode {
+public actual enum class FunctionsExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,
@@ -102,7 +104,7 @@ internal inline fun <R> rethrow(function: () -> R): R {
 }
 
 @PublishedApi
-internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
+internal fun errorToException(e: dynamic): FirebaseFunctionsException = (e?.code ?: e?.message ?: "")
     .toString()
     .lowercase()
     .let {

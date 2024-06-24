@@ -4,31 +4,31 @@
 
 package dev.gitlive.firebase.auth
 
-expect class MultiFactor {
-    val enrolledFactors: List<MultiFactorInfo>
-    suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?)
-    suspend fun getSession(): MultiFactorSession
-    suspend fun unenroll(multiFactorInfo: MultiFactorInfo)
-    suspend fun unenroll(factorUid: String)
+public expect class MultiFactor {
+    public val enrolledFactors: List<MultiFactorInfo>
+    public suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?)
+    public suspend fun getSession(): MultiFactorSession
+    public suspend fun unenroll(multiFactorInfo: MultiFactorInfo)
+    public suspend fun unenroll(factorUid: String)
 }
 
-expect class MultiFactorInfo {
-    val displayName: String?
-    val enrollmentTime: Double
-    val factorId: String
-    val uid: String
+public expect class MultiFactorInfo {
+    public val displayName: String?
+    public val enrollmentTime: Double
+    public val factorId: String
+    public val uid: String
 }
 
-expect class MultiFactorAssertion {
-    val factorId: String
+public expect class MultiFactorAssertion {
+    public val factorId: String
 }
 
-expect class MultiFactorSession
+public expect class MultiFactorSession
 
-expect class MultiFactorResolver {
-    val auth: FirebaseAuth
-    val hints: List<MultiFactorInfo>
-    val session: MultiFactorSession
+public expect class MultiFactorResolver {
+    public val auth: FirebaseAuth
+    public val hints: List<MultiFactorInfo>
+    public val session: MultiFactorSession
 
-    suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult
+    public suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult
 }

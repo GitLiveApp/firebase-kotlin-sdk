@@ -16,30 +16,32 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
 
-actual val Firebase.functions
+public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(FIRFunctions.functions())
 
-actual fun Firebase.functions(region: String) =
+public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
+public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 @Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(
+public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
 )
 
-actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
-    actual fun httpsCallable(name: String, timeout: Long?) =
+public actual data class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
+    public actual fun httpsCallable(name: String, timeout: Long?): HttpsCallableReference =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it / 1000.0) } }.native)
 
-    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
+    public actual fun useEmulator(host: String, port: Int) {
+        ios.useEmulatorWithHost(host, port.toLong())
+    }
 }
 
 @PublishedApi
@@ -52,22 +54,22 @@ internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
 
-actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
+public actual class HttpsCallableResult constructor(public val ios: FIRHTTPSCallableResult) {
 
-    actual inline fun <reified T> data() =
+    public actual inline fun <reified T> data(): T =
         decode<T>(value = ios.data())
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
         decode(strategy, ios.data(), buildSettings)
 }
 
-actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)
+public actual class FirebaseFunctionsException(message: String, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(message)
 
-actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 
-actual val FirebaseFunctionsException.details: Any? get() = details
+public actual val FirebaseFunctionsException.details: Any? get() = details
 
-actual enum class FunctionsExceptionCode {
+public actual enum class FunctionsExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,

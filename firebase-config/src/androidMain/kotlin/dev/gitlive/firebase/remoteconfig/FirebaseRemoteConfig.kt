@@ -12,20 +12,20 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseR
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
 
-actual val Firebase.remoteConfig: FirebaseRemoteConfig
+public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance())
 
-actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
+public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
     FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
 
-actual class FirebaseRemoteConfig internal constructor(val android: AndroidFirebaseRemoteConfig) {
-    actual val all: Map<String, FirebaseRemoteConfigValue>
+public actual class FirebaseRemoteConfig internal constructor(public val android: AndroidFirebaseRemoteConfig) {
+    public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() = android.all.mapValues { FirebaseRemoteConfigValue(it.value) }
 
-    actual val info: FirebaseRemoteConfigInfo
+    public actual val info: FirebaseRemoteConfigInfo
         get() = android.info.asCommon()
 
-    actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+    public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         val androidSettings = com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(settings.minimumFetchIntervalInSeconds)
@@ -34,22 +34,26 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
         android.setConfigSettingsAsync(androidSettings).await()
     }
 
-    actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
+    public actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
         android.setDefaultsAsync(defaults.toMap()).await()
     }
 
-    actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
+    public actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
         minimumFetchIntervalInSeconds
             ?.also { android.fetch(it).await() }
             ?: run { android.fetch().await() }
     }
 
-    actual suspend fun activate(): Boolean = android.activate().await()
-    actual suspend fun ensureInitialized() = android.ensureInitialized().await().let { }
-    actual suspend fun fetchAndActivate(): Boolean = android.fetchAndActivate().await()
-    actual fun getKeysByPrefix(prefix: String): Set<String> = android.getKeysByPrefix(prefix)
-    actual fun getValue(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
-    actual suspend fun reset() = android.reset().await().let { }
+    public actual suspend fun activate(): Boolean = android.activate().await()
+    public actual suspend fun ensureInitialized() {
+        android.ensureInitialized().await()
+    }
+    public actual suspend fun fetchAndActivate(): Boolean = android.fetchAndActivate().await()
+    public actual fun getKeysByPrefix(prefix: String): Set<String> = android.getKeysByPrefix(prefix)
+    public actual fun getValue(key: String): FirebaseRemoteConfigValue = FirebaseRemoteConfigValue(android.getValue(key))
+    public actual suspend fun reset() {
+        android.reset().await()
+    }
 
     private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
         fetchTimeoutInSeconds = fetchTimeoutInSeconds,
@@ -73,7 +77,7 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     }
 }
 
-actual typealias FirebaseRemoteConfigException = com.google.firebase.remoteconfig.FirebaseRemoteConfigException
-actual typealias FirebaseRemoteConfigClientException = FirebaseRemoteConfigClientException
-actual typealias FirebaseRemoteConfigFetchThrottledException = FirebaseRemoteConfigFetchThrottledException
-actual typealias FirebaseRemoteConfigServerException = FirebaseRemoteConfigServerException
+public actual typealias FirebaseRemoteConfigException = com.google.firebase.remoteconfig.FirebaseRemoteConfigException
+public actual typealias FirebaseRemoteConfigClientException = FirebaseRemoteConfigClientException
+public actual typealias FirebaseRemoteConfigFetchThrottledException = FirebaseRemoteConfigFetchThrottledException
+public actual typealias FirebaseRemoteConfigServerException = FirebaseRemoteConfigServerException

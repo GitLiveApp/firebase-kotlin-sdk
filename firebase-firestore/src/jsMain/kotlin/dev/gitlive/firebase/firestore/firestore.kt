@@ -31,24 +31,24 @@ import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
 import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 
-actual val Firebase.firestore get() =
+public actual val Firebase.firestore: FirebaseFirestore get() =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(getApp())) }
 
-actual fun Firebase.firestore(app: FirebaseApp) =
+public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js)) }
 
-actual data class NativeFirebaseFirestore(val js: JsFirestore)
+public actual data class NativeFirebaseFirestore(val js: JsFirestore)
 
-val FirebaseFirestore.js: JsFirestore get() = native.js
+public val FirebaseFirestore.js: JsFirestore get() = native.js
 
-actual data class FirebaseFirestoreSettings(
+public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
     actual val host: String,
     actual val cacheSettings: LocalCacheSettings,
 ) {
 
-    actual companion object {
-        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+    public actual companion object {
+        public actual val CACHE_SIZE_UNLIMITED: Long = -1L
         internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
         internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
 
@@ -56,20 +56,20 @@ actual data class FirebaseFirestoreSettings(
         internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 40 * 1024 * 1024
     }
 
-    actual class Builder internal constructor(
-        actual var sslEnabled: Boolean,
-        actual var host: String,
-        actual var cacheSettings: LocalCacheSettings,
+    public actual class Builder internal constructor(
+        public actual var sslEnabled: Boolean,
+        public actual var host: String,
+        public actual var cacheSettings: LocalCacheSettings,
     ) {
 
-        actual constructor() : this(
+        public actual constructor() : this(
             true,
             DEFAULT_HOST,
             persistentCacheSettings { },
         )
-        actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings)
+        public actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings)
 
-        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings)
+        public actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings)
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
@@ -96,7 +96,7 @@ actual data class FirebaseFirestoreSettings(
     }
 }
 
-actual fun firestoreSettings(
+public actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
     builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
@@ -107,81 +107,81 @@ actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-actual data class NativeWriteBatch(val js: JsWriteBatch)
+public actual data class NativeWriteBatch(val js: JsWriteBatch)
 
-val WriteBatch.js get() = native.js
+public val WriteBatch.js: dev.gitlive.firebase.firestore.externals.WriteBatch get() = native.js
 
-actual data class NativeTransaction(val js: JsTransaction)
+public actual data class NativeTransaction(val js: JsTransaction)
 
-val Transaction.js get() = native.js
+public val Transaction.js: dev.gitlive.firebase.firestore.externals.Transaction get() = native.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReferenceType = JsDocumentReference
+public actual typealias NativeDocumentReferenceType = JsDocumentReference
 
-val DocumentReference.js get() = native.js
+public val DocumentReference.js: NativeDocumentReferenceType get() = native.js
 
-actual open class NativeQuery(open val js: JsQuery)
+public actual open class NativeQuery(public open val js: JsQuery)
 internal val JsQuery.wrapped get() = NativeQuery(this)
 
-val Query.js get() = native.js
+public val Query.js: dev.gitlive.firebase.firestore.externals.Query get() = native.js
 
-actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
+public actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
 
-val CollectionReference.js get() = native.js
+public val CollectionReference.js: dev.gitlive.firebase.firestore.externals.CollectionReference get() = native.js
 
-actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
+public actual class FirebaseFirestoreException(cause: Throwable, public val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
+public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-actual class QuerySnapshot(val js: JsQuerySnapshot) {
-    actual val documents
+public actual class QuerySnapshot(public val js: JsQuerySnapshot) {
+    public actual val documents: List<DocumentSnapshot>
         get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
-    actual val documentChanges
+    public actual val documentChanges: List<DocumentChange>
         get() = js.docChanges().map { DocumentChange(it) }
-    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
+    public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
-actual class DocumentChange(val js: JsDocumentChange) {
-    actual val document: DocumentSnapshot
+public actual class DocumentChange(public val js: JsDocumentChange) {
+    public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(js.doc))
-    actual val newIndex: Int
+    public actual val newIndex: Int
         get() = js.newIndex
-    actual val oldIndex: Int
+    public actual val oldIndex: Int
         get() = js.oldIndex
-    actual val type: ChangeType
-        get() = ChangeType.values().first { it.jsString == js.type }
+    public actual val type: ChangeType
+        get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
-actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
+public actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 
-val DocumentSnapshot.js get() = native.js
+public val DocumentSnapshot.js: dev.gitlive.firebase.firestore.externals.DocumentSnapshot get() = native.js
 
-actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
-    actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
-    actual val isFromCache: Boolean get() = js.fromCache
+public actual class SnapshotMetadata(public val js: JsSnapshotMetadata) {
+    public actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
+    public actual val isFromCache: Boolean get() = js.fromCache
 }
 
-actual class FieldPath private constructor(val js: JsFieldPath) {
+public actual class FieldPath private constructor(public val js: JsFieldPath) {
 
-    actual companion object {
-        actual val documentId = FieldPath(jsDocumentId())
+    public actual companion object {
+        public actual val documentId: FieldPath = FieldPath(jsDocumentId())
     }
-    actual constructor(vararg fieldNames: String) : this(
+    public actual constructor(vararg fieldNames: String) : this(
         dev.gitlive.firebase.firestore.rethrow {
             JsFieldPath(*fieldNames)
         },
     )
-    actual val documentId: FieldPath get() = FieldPath.documentId
-    actual val encoded: EncodedFieldPath = js
+    public actual val documentId: FieldPath get() = FieldPath.documentId
+    public actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
 }
 
-actual typealias EncodedFieldPath = JsFieldPath
+public actual typealias EncodedFieldPath = JsFieldPath
 
-actual enum class FirestoreExceptionCode {
+public actual enum class FirestoreExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,
@@ -201,12 +201,12 @@ actual enum class FirestoreExceptionCode {
     UNAUTHENTICATED,
 }
 
-actual enum class Direction(internal val jsString: String) {
+public actual enum class Direction(internal val jsString: String) {
     ASCENDING("asc"),
     DESCENDING("desc"),
 }
 
-actual enum class ChangeType(internal val jsString: String) {
+public actual enum class ChangeType(internal val jsString: String) {
     ADDED("added"),
     MODIFIED("modified"),
     REMOVED("removed"),

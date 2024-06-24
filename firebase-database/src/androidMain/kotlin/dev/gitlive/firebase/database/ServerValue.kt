@@ -6,12 +6,12 @@ private typealias NativeServerValue = com.google.firebase.database.ServerValue
 
 /** Represents a Firebase ServerValue. */
 @Serializable(with = ServerValueSerializer::class)
-actual class ServerValue internal actual constructor(
+public actual class ServerValue internal actual constructor(
     internal actual val nativeValue: Any,
 ) {
-    actual companion object {
-        actual val TIMESTAMP: ServerValue get() = ServerValue(NativeServerValue.TIMESTAMP)
-        actual fun increment(delta: Double): ServerValue = ServerValue(NativeServerValue.increment(delta))
+    public actual companion object {
+        public actual val TIMESTAMP: ServerValue get() = ServerValue(NativeServerValue.TIMESTAMP)
+        public actual fun increment(delta: Double): ServerValue = ServerValue(NativeServerValue.increment(delta))
     }
 
     override fun equals(other: Any?): Boolean =

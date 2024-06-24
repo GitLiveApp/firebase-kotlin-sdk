@@ -6,16 +6,16 @@ import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
-expect val Firebase.storage: FirebaseStorage
+public expect val Firebase.storage: FirebaseStorage
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
-expect fun Firebase.storage(url: String): FirebaseStorage
+public expect fun Firebase.storage(url: String): FirebaseStorage
 
 /** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-expect fun Firebase.storage(app: FirebaseApp): FirebaseStorage
+public expect fun Firebase.storage(app: FirebaseApp): FirebaseStorage
 
 /** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-expect fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage
+public expect fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage
 
 /**
  * FirebaseStorage is a service that supports uploading and downloading large objects to Google
@@ -27,21 +27,21 @@ expect fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage
  * [Firebase.storage]. The storage location in this case will come the JSON
  * configuration file downloaded from the web.
  */
-expect class FirebaseStorage {
+public expect class FirebaseStorage {
     /**
      * Returns the maximum time to retry operations other than upload and download if a failure
      * occurs.
      *
      * @return the maximum time in milliseconds. Defaults to 2 minutes (120,000 milliseconds).
      */
-    val maxOperationRetryTimeMillis: Long
+    public val maxOperationRetryTimeMillis: Long
 
     /**
      * Returns the maximum time to retry an upload if a failure occurs.
      *
      * @return the maximum time in milliseconds. Defaults to 10 minutes (600,000 milliseconds).
      */
-    val maxUploadRetryTimeMillis: Long
+    public val maxUploadRetryTimeMillis: Long
 
     /**
      * Sets the maximum time to retry operations other than upload and download if a failure occurs.
@@ -49,7 +49,7 @@ expect class FirebaseStorage {
      * @param maxTransferRetryMillis the maximum time in milliseconds. Defaults to 2 minutes (120,000
      *     milliseconds).
      */
-    fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long)
+    public fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long)
 
     /**
      * Sets the maximum time to retry an upload if a failure occurs.
@@ -57,7 +57,7 @@ expect class FirebaseStorage {
      * @param maxTransferRetryMillis the maximum time in milliseconds. Defaults to 10 minutes (600,000
      *     milliseconds).
      */
-    fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long)
+    public fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long)
 
     /**
      * Modifies this FirebaseStorage instance to communicate with the Storage emulator.
@@ -67,14 +67,14 @@ expect class FirebaseStorage {
      * @param host the emulator host (for example, 10.0.2.2)
      * @param port the emulator port (for example, 9000)
      */
-    fun useEmulator(host: String, port: Int)
+    public fun useEmulator(host: String, port: Int)
 
     /**
      * Creates a new [StorageReference] initialized at the root Firebase Storage location.
      *
      * @return An instance of [StorageReference].
      */
-    val reference: StorageReference
+    public val reference: StorageReference
 
     /**
      * Creates a new [StorageReference] initialized with a child Firebase Storage location.
@@ -83,34 +83,34 @@ expect class FirebaseStorage {
      *     "path/to/object"
      * @return An instance of [StorageReference] at the given child path.
      */
-    fun reference(location: String): StorageReference
+    public fun reference(location: String): StorageReference
 }
 
 /**
  * Represents a reference to a Google Cloud Storage object. Developers can upload and download
  * objects, get/set object metadata, and delete an object at a specified path.
  */
-expect class StorageReference {
+public expect class StorageReference {
     /**
      * Returns the short name of this object.
      *
      * @return the name.
      */
-    val name: String
+    public val name: String
 
     /**
      * Returns the full path to this object, not including the Google Cloud Storage bucket.
      *
      * @return the path.
      */
-    val path: String
+    public val path: String
 
     /**
      * Return the Google Cloud Storage bucket that holds this object.
      *
      * @return the bucket.
      */
-    val bucket: String
+    public val bucket: String
 
     /**
      * Returns a new instance of [StorageReference] pointing to the parent location or null if
@@ -124,28 +124,28 @@ expect class StorageReference {
      *
      * @return the parent [StorageReference].
      */
-    val parent: StorageReference?
+    public val parent: StorageReference?
 
     /**
      * Returns a new instance of {@link StorageReference} pointing to the root location.
      *
      * @return the root {@link StorageReference}.
      */
-    val root: StorageReference
+    public val root: StorageReference
 
     /**
      * Returns the [FirebaseStorage] service which created this reference.
      *
      * @return The [FirebaseStorage] service.
      */
-    val storage: FirebaseStorage
+    public val storage: FirebaseStorage
 
     /**
      * Retrieves metadata associated with an object at this [StorageReference].
      *
      * @return the metadata.
      */
-    suspend fun getMetadata(): FirebaseStorageMetadata?
+    public suspend fun getMetadata(): FirebaseStorageMetadata?
 
     /**
      * Returns a new instance of [StorageReference] pointing to a child location of the current
@@ -161,14 +161,14 @@ expect class StorageReference {
      * @param pathString The relative path from this reference.
      * @return the child [StorageReference].
      */
-    fun child(path: String): StorageReference
+    public fun child(path: String): StorageReference
 
     /**
      * Deletes the object at this {@link StorageReference}.
      *
      * @return A {@link Task} that indicates whether the operation succeeded or failed.
      */
-    suspend fun delete()
+    public suspend fun delete()
 
     /**
      * Asynchronously retrieves a long lived download URL with a revokable token. This can be used to
@@ -178,7 +178,7 @@ expect class StorageReference {
      * @return The [Uri] representing the download URL. You can feed this URL into a [URL]
      *     and download the object via URL.openStream().
      */
-    suspend fun getDownloadUrl(): String
+    public suspend fun getDownloadUrl(): String
 
     /**
      * List all items (files) and prefixes (folders) under this StorageReference.
@@ -192,7 +192,7 @@ expect class StorageReference {
      * @throws OutOfMemoryError If there are too many items at this location.
      * @return A [ListResult] that returns all items and prefixes under the current StorageReference.
      */
-    suspend fun listAll(): ListResult
+    public suspend fun listAll(): ListResult
 
     /**
      * Asynchronously uploads from a content URI to this [StorageReference].
@@ -202,7 +202,7 @@ expect class StorageReference {
      * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
      *     about the object being uploaded.
      */
-    suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
+    public suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
 
     /**
      * Asynchronously uploads byte data to this [StorageReference]. This is not recommended for
@@ -212,7 +212,7 @@ expect class StorageReference {
      * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
      *     about the object being uploaded.
      */
-    suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
+    public suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
 
     /**
      * Asynchronously uploads from a content URI to this [StorageReference].
@@ -223,56 +223,56 @@ expect class StorageReference {
      *     about the object being uploaded.
      * @return A [ProgressFlow] that can be used to monitor and manage the upload.
      */
-    fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
+    public fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
 }
 
-expect class ListResult {
-    val prefixes: List<StorageReference>
-    val items: List<StorageReference>
-    val pageToken: String?
+public expect class ListResult {
+    public val prefixes: List<StorageReference>
+    public val items: List<StorageReference>
+    public val pageToken: String?
 }
 
 /**
  * Represents a reference to a local file for all platforms. Every platform has its own constructor.
  */
-expect class File
+public expect class File
 
 /**
  * Represents a reference to data for all platforms. Every platform has its own constructor.
  */
-expect class Data
+public expect class Data
 
 /**
  * Represents the progress of an operation.
  */
-sealed class Progress(val bytesTransferred: Number, val totalByteCount: Number) {
+public sealed class Progress(public val bytesTransferred: Number, public val totalByteCount: Number) {
     /** Represents the progress of an operation that is still running. */
-    class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
+    public class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
 
     /** Represents the progress of an operation that is paused. */
-    class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
+    public class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
 }
 
 /**
  * A flow that emits [Progress] objects containing the state of an upload.
  */
-interface ProgressFlow : Flow<Progress> {
-    fun pause()
-    fun resume()
-    fun cancel()
+public interface ProgressFlow : Flow<Progress> {
+    public fun pause()
+    public fun resume()
+    public fun cancel()
 }
 
 /**
  * Exception that gets thrown when an operation on Firebase Storage fails.
  */
-expect class FirebaseStorageException : FirebaseException
+public expect class FirebaseStorageException : FirebaseException
 
 /**
  * Metadata for a [StorageReference]. Metadata stores default attributes such as size and
  * content type. You may also store custom metadata key value pairs. Metadata values may be used to
  * authorize operations using declarative validation rules.
  */
-data class FirebaseStorageMetadata(
+public data class FirebaseStorageMetadata(
     /**
      * Returns the path of the [StorageReference] object.
      *
@@ -328,7 +328,7 @@ data class FirebaseStorageMetadata(
      * @param key the key of the new value
      * @param value the value to set.
      */
-    fun setCustomMetadata(key: String, value: String?) {
+    public fun setCustomMetadata(key: String, value: String?) {
         value?.let {
             customMetadata[key] = it
         }
@@ -336,7 +336,7 @@ data class FirebaseStorageMetadata(
 }
 
 /** Returns a [FirebaseStorageMetadata] object initialized using the [init] function. */
-fun storageMetadata(init: FirebaseStorageMetadata.() -> Unit): FirebaseStorageMetadata {
+public fun storageMetadata(init: FirebaseStorageMetadata.() -> Unit): FirebaseStorageMetadata {
     val metadata = FirebaseStorageMetadata()
     metadata.init()
     return metadata

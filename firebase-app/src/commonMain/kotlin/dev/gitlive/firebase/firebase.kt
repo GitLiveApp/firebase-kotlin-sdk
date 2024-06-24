@@ -15,7 +15,7 @@ import kotlin.jvm.JvmName
  *
  * Acts as a target for extension methods provided by sdks.
  */
-object Firebase
+public object Firebase
 
 /**
  * The entry point of Firebase SDKs. It holds common configuration and state for Firebase APIs. Most
@@ -32,12 +32,12 @@ object Firebase
  * Use of Firebase in processes other than the main process is not supported and will likely cause
  * problems related to resource contention.
  */
-expect class FirebaseApp {
+public expect class FirebaseApp {
     /** Returns the unique name of this app. */
-    val name: String
+    public val name: String
 
     /** Returns the specified [FirebaseOptions]. */
-    val options: FirebaseOptions
+    public val options: FirebaseOptions
 
     /**
      * Deletes the [FirebaseApp] and all its data. All calls to this [FirebaseApp]
@@ -45,33 +45,33 @@ expect class FirebaseApp {
      *
      * A no-op if delete was called before.
      */
-    suspend fun delete()
+    public suspend fun delete()
 }
 
 /** Returns the default firebase app instance. */
-expect val Firebase.app: FirebaseApp
+public expect val Firebase.app: FirebaseApp
 
 /** Returns a named firebase app instance. */
-expect fun Firebase.app(name: String): FirebaseApp
+public expect fun Firebase.app(name: String): FirebaseApp
 
 /** Returns all firebase app instances. */
-expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
+public expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
 
 /** Initializes and returns a FirebaseApp. */
-expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
+public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
 
 /** Initializes and returns a FirebaseApp. */
-expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
+public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
 
 /** Initializes and returns a FirebaseApp. */
-expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
 
 /** Returns options of default FirebaseApp */
-val Firebase.options: FirebaseOptions
+public val Firebase.options: FirebaseOptions
     get() = Firebase.app.options
 
 /** Configurable Firebase options. */
-data class FirebaseOptions(
+public data class FirebaseOptions(
     /** The Google App ID that is used to uniquely identify an instance of an app. */
     val applicationId: String,
 
@@ -108,19 +108,19 @@ data class FirebaseOptions(
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-expect open class FirebaseException : Exception
+public expect open class FirebaseException : Exception
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-expect class FirebaseNetworkException : FirebaseException
+public expect class FirebaseNetworkException : FirebaseException
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-expect open class FirebaseTooManyRequestsException : FirebaseException
+public expect open class FirebaseTooManyRequestsException : FirebaseException
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-expect open class FirebaseApiNotAvailableException : FirebaseException
+public expect open class FirebaseApiNotAvailableException : FirebaseException

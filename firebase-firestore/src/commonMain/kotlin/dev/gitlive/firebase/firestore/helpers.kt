@@ -9,7 +9,7 @@ import kotlin.jvm.JvmName
 internal inline fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<String, Any?>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
-) = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, buildSettings) })
+): List<Pair<String, Any?>>? = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, buildSettings) })
 
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFieldPaths")
@@ -17,7 +17,7 @@ internal inline fun encodeFieldAndValue(
 internal inline fun encodeFieldAndValue(
     fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
-) = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, buildSettings) })
+): List<Pair<EncodedFieldPath, Any?>>? = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, buildSettings) })
 
 /** Helper method to perform an update operation in Android and JS. */
 @PublishedApi

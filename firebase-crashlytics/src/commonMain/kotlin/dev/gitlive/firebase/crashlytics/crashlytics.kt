@@ -5,10 +5,10 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 
 /** Returns the [FirebaseCrashlytics] instance of the default [FirebaseApp]. */
-expect val Firebase.crashlytics: FirebaseCrashlytics
+public expect val Firebase.crashlytics: FirebaseCrashlytics
 
 /** Returns the [FirebaseCrashlytics] instance of a given [FirebaseApp]. */
-expect fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics
+public expect fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics
 
 /**
  * The Firebase Crashlytics API provides methods to annotate and manage fatal crashes, non-fatal
@@ -19,13 +19,13 @@ expect fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics
  * Call [Firebase.crashlytics] to get the singleton instance of
  * [FirebaseCrashlytics].
  */
-expect class FirebaseCrashlytics {
+public expect class FirebaseCrashlytics {
     /**
      * Records a non-fatal report to send to Crashlytics.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      */
-    fun recordException(exception: Throwable)
+    public fun recordException(exception: Throwable)
 
     /**
      * Logs a message that's included in the next fatal, non-fatal, or ANR report.
@@ -38,7 +38,7 @@ expect class FirebaseCrashlytics {
      *
      * @param message the message to be logged
      */
-    fun log(message: String)
+    public fun log(message: String)
 
     /**
      * Records a user ID (identifier) that's associated with subsequent fatal, non-fatal, and ANR
@@ -50,7 +50,7 @@ expect class FirebaseCrashlytics {
      *
      * @param userId a unique identifier for the current user
      */
-    fun setUserId(userId: String)
+    public fun setUserId(userId: String)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -70,7 +70,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: String)
+    public fun setCustomKey(key: String, value: String)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -90,7 +90,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: Boolean)
+    public fun setCustomKey(key: String, value: Boolean)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -110,7 +110,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: Double)
+    public fun setCustomKey(key: String, value: Double)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -130,7 +130,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: Float)
+    public fun setCustomKey(key: String, value: Float)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -150,7 +150,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: Int)
+    public fun setCustomKey(key: String, value: Int)
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -170,7 +170,7 @@ expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    fun setCustomKey(key: String, value: Long)
+    public fun setCustomKey(key: String, value: Long)
 
     /**
      * Sets multiple custom keys and values that are associated with subsequent fatal, non-fatal, and
@@ -192,7 +192,7 @@ expect class FirebaseCrashlytics {
      *
      * @param customKeys A dictionary of keys and the values to associate with each key
      */
-    fun setCustomKeys(customKeys: Map<String, Any>)
+    public fun setCustomKeys(customKeys: Map<String, Any>)
 
     /**
      * Enables or disables the automatic data collection configuration for Crashlytics.
@@ -210,29 +210,29 @@ expect class FirebaseCrashlytics {
      *     for all app runs, add the `firebase_crashlytics_collection_enabled` flag to your
      *     app's AndroidManifest.xml.
      */
-    fun setCrashlyticsCollectionEnabled(enabled: Boolean)
+    public fun setCrashlyticsCollectionEnabled(enabled: Boolean)
 
     /**
      * Checks whether the app crashed on its previous run.
      *
      * @return true if a crash was recorded during the previous run of the app.
      */
-    fun didCrashOnPreviousExecution(): Boolean
+    public fun didCrashOnPreviousExecution(): Boolean
 
     /**
      * If automatic data collection is disabled, this method queues up all the reports on a device to
      * send to Crashlytics. Otherwise, this method is a no-op.
      */
-    fun sendUnsentReports()
+    public fun sendUnsentReports()
 
     /**
      * If automatic data collection is disabled, this method queues up all the reports on a device for
      * deletion. Otherwise, this method is a no-op.
      */
-    fun deleteUnsentReports()
+    public fun deleteUnsentReports()
 }
 
 /**
  * Exception that gets thrown when an operation on Firebase Crashlytics fails.
  */
-expect open class FirebaseCrashlyticsException : FirebaseException
+public expect open class FirebaseCrashlyticsException : FirebaseException

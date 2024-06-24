@@ -6,10 +6,10 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
 
 /** Returns the [FirebasePerformance] instance of the default [FirebaseApp]. */
-expect val Firebase.performance: FirebasePerformance
+public expect val Firebase.performance: FirebasePerformance
 
 /** Returns the [FirebasePerformance] instance of a given [FirebaseApp]. */
-expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
+public expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
 
 /**
  * The Firebase Performance Monitoring API.
@@ -19,7 +19,7 @@ expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
  * This SDK uses FirebaseInstallations to identify the app instance and periodically sends data
  * to the Firebase backend. To stop sending performance events, call [setPerformanceCollectionEnabled] with value [false].
  */
-expect class FirebasePerformance {
+public expect class FirebasePerformance {
     /**
      * Creates a Trace object with given name.
      *
@@ -27,7 +27,7 @@ expect class FirebasePerformance {
      *     underscore '_' character.
      * @return the new Trace object.
      */
-    fun newTrace(traceName: String): Trace
+    public fun newTrace(traceName: String): Trace
 
     /**
      * Determines whether performance monitoring is enabled or disabled. This respects the Firebase
@@ -38,7 +38,7 @@ expect class FirebasePerformance {
      *     disabled. This is for dynamic enable/disable state. This does not reflect whether
      *     instrumentation is enabled/disabled in Gradle properties.
      */
-    fun isPerformanceCollectionEnabled(): Boolean
+    public fun isPerformanceCollectionEnabled(): Boolean
 
     /**
      * Enables or disables performance monitoring. This setting is persisted and applied on future
@@ -62,10 +62,10 @@ expect class FirebasePerformance {
      *
      * @param enable Should performance monitoring be enabled
      */
-    fun setPerformanceCollectionEnabled(enable: Boolean)
+    public fun setPerformanceCollectionEnabled(enable: Boolean)
 }
 
 /**
  * Exception that gets thrown when an operation on Firebase Performance fails.
  */
-expect open class FirebasePerformanceException : FirebaseException
+public expect open class FirebasePerformanceException : FirebaseException

@@ -6,19 +6,19 @@ package dev.gitlive.firebase.functions.externals
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Json
 
-external fun connectFunctionsEmulator(functions: Functions, host: String, port: Int)
+public external fun connectFunctionsEmulator(functions: Functions, host: String, port: Int)
 
-external fun getFunctions(
+public external fun getFunctions(
     app: FirebaseApp? = definedExternally,
     regionOrCustomDomain: String? = definedExternally,
 ): Functions
 
-external fun httpsCallable(functions: Functions, name: String, options: Json?): HttpsCallable
+public external fun httpsCallable(functions: Functions, name: String, options: Json?): HttpsCallable
 
-external interface Functions
+public external interface Functions
 
-external interface HttpsCallableResult {
-    val data: Any?
+public external interface HttpsCallableResult {
+    public val data: Any?
 }
 
-external interface HttpsCallable
+public external interface HttpsCallable

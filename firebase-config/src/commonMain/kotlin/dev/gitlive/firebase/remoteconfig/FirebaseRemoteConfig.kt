@@ -5,10 +5,10 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 
 /** Returns the [FirebaseRemoteConfig] instance of the default [FirebaseApp]. */
-expect val Firebase.remoteConfig: FirebaseRemoteConfig
+public expect val Firebase.remoteConfig: FirebaseRemoteConfig
 
 /** Returns the [FirebaseRemoteConfig] instance of a given [FirebaseApp]. */
-expect fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig
+public expect fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig
 
 /**
  * Entry point for the Firebase Remote Config API.
@@ -18,7 +18,7 @@ expect fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig
  * parameter values available to your app. The singleton also stores values fetched from the Remote
  * Config server until they are made available for use with a call to [activate].
  */
-expect class FirebaseRemoteConfig {
+public expect class FirebaseRemoteConfig {
     /**
      * Returns a [Map] of Firebase Remote Config key value pairs.
      *
@@ -27,12 +27,12 @@ expect class FirebaseRemoteConfig {
      * - The activated value, if the last successful [activate] contained the key.
      * - The default value, if the key was set with [setDefaults].
      */
-    val all: Map<String, FirebaseRemoteConfigValue>
+    public val all: Map<String, FirebaseRemoteConfigValue>
 
     /**
      * Returns the state of this [FirebaseRemoteConfig] instance as a [FirebaseRemoteConfigInfo].
      */
-    val info: FirebaseRemoteConfigInfo
+    public val info: FirebaseRemoteConfigInfo
 
     /**
      * Asynchronously activates the most recently fetched configs, so that the fetched key value pairs
@@ -42,12 +42,12 @@ expect class FirebaseRemoteConfig {
      *     configs; if the fetched configs were already activated by a previous call, it instead
      *     returns a false result.
      */
-    suspend fun activate(): Boolean
+    public suspend fun activate(): Boolean
 
     /**
      * Ensures the last activated config are available to the app.
      */
-    suspend fun ensureInitialized()
+    public suspend fun ensureInitialized()
 
     /**
      * Starts fetching configs, adhering to the specified minimum fetch interval.
@@ -66,7 +66,7 @@ expect class FirebaseRemoteConfig {
      * @param minimumFetchIntervalInSeconds If configs in the local storage were fetched more than
      *     this many seconds ago, configs are served from the backend instead of local storage.
      */
-    suspend fun fetch(minimumFetchIntervalInSeconds: Long? = null)
+    public suspend fun fetch(minimumFetchIntervalInSeconds: Long? = null)
 
     /**
      * Asynchronously fetches and then activates the fetched configs.
@@ -81,7 +81,7 @@ expect class FirebaseRemoteConfig {
      *     configs; if no configs were fetched from the backend and the local fetched configs have
      *     already been activated, returns a [Boolean] with a false result.
      */
-    suspend fun fetchAndActivate(): Boolean
+    public suspend fun fetchAndActivate(): Boolean
 
     /**
      * Returns a [Set] of all Firebase Remote Config parameter keys with the given prefix.
@@ -89,7 +89,7 @@ expect class FirebaseRemoteConfig {
      * @param prefix The key prefix to look for. If the prefix is empty, all keys are returned.
      * @return [Set] of Remote Config parameter keys that start with the specified prefix.
      */
-    fun getKeysByPrefix(prefix: String): Set<String>
+    public fun getKeysByPrefix(prefix: String): Set<String>
 
     /**
      * Returns the parameter value for the given key as a [FirebaseRemoteConfigValue].
@@ -104,20 +104,20 @@ expect class FirebaseRemoteConfig {
      * @return [FirebaseRemoteConfigValue] representing the value of the Firebase Remote Config
      *     parameter with the given key.
      */
-    fun getValue(key: String): FirebaseRemoteConfigValue
+    public fun getValue(key: String): FirebaseRemoteConfigValue
 
     /**
      * Deletes all activated, fetched and defaults configs and resets all Firebase Remote Config
      * settings.
      */
-    suspend fun reset()
+    public suspend fun reset()
 
     /**
      * Asynchronously changes the settings for this [FirebaseRemoteConfig] instance.
      *
      * @param init A builder to set the settings.
      */
-    suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit)
+    public suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit)
 
     /**
      * Asynchronously sets default configs using the given [Map].
@@ -125,11 +125,11 @@ expect class FirebaseRemoteConfig {
      * @param defaults [Map] of key value pairs representing Firebase Remote Config parameter
      *     keys and values.
      */
-    suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
+    public suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
 }
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
-inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
+public inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
     val configValue = getValue(key)
     return when (T::class) {
         Boolean::class -> configValue.asBoolean()
@@ -144,19 +144,19 @@ inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T {
 /**
  * Exception that gets thrown when an operation on Firebase Remote Config fails.
  */
-expect open class FirebaseRemoteConfigException : FirebaseException
+public expect open class FirebaseRemoteConfigException : FirebaseException
 
 /**
  * Exception that gets thrown when an operation on Firebase Remote Config fails.
  */
-expect class FirebaseRemoteConfigClientException : FirebaseRemoteConfigException
+public expect class FirebaseRemoteConfigClientException : FirebaseRemoteConfigException
 
 /**
  * Exception that gets thrown when an operation on Firebase Remote Config fails.
  */
-expect class FirebaseRemoteConfigFetchThrottledException : FirebaseRemoteConfigException
+public expect class FirebaseRemoteConfigFetchThrottledException : FirebaseRemoteConfigException
 
 /**
  * Exception that gets thrown when an operation on Firebase Remote Config fails.
  */
-expect class FirebaseRemoteConfigServerException : FirebaseRemoteConfigException
+public expect class FirebaseRemoteConfigServerException : FirebaseRemoteConfigException

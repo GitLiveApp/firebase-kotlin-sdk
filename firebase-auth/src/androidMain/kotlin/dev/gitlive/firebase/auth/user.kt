@@ -8,75 +8,88 @@ import android.net.Uri
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
-actual class FirebaseUser internal constructor(val android: com.google.firebase.auth.FirebaseUser) {
-    actual val uid: String
+public actual class FirebaseUser internal constructor(public val android: com.google.firebase.auth.FirebaseUser) {
+    public actual val uid: String
         get() = android.uid
-    actual val displayName: String?
+    public actual val displayName: String?
         get() = android.displayName
-    actual val email: String?
+    public actual val email: String?
         get() = android.email
-    actual val phoneNumber: String?
+    public actual val phoneNumber: String?
         get() = android.phoneNumber
-    actual val photoURL: String?
+    public actual val photoURL: String?
         get() = android.photoUrl?.toString()
-    actual val isAnonymous: Boolean
+    public actual val isAnonymous: Boolean
         get() = android.isAnonymous
-    actual val isEmailVerified: Boolean
+    public actual val isEmailVerified: Boolean
         get() = android.isEmailVerified
-    actual val metaData: UserMetaData?
+    public actual val metaData: UserMetaData?
         get() = android.metadata?.let { UserMetaData(it) }
-    actual val multiFactor: MultiFactor
+    public actual val multiFactor: MultiFactor
         get() = MultiFactor(android.multiFactor)
-    actual val providerData: List<UserInfo>
+    public actual val providerData: List<UserInfo>
         get() = android.providerData.map { UserInfo(it) }
-    actual val providerId: String
+    public actual val providerId: String
         get() = android.providerId
-    actual suspend fun delete() = android.delete().await().run { Unit }
-    actual suspend fun reload() = android.reload().await().run { Unit }
-    actual suspend fun getIdToken(forceRefresh: Boolean): String? = android.getIdToken(forceRefresh).await().token
-    actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = android.getIdToken(forceRefresh).await().run { AuthTokenResult(this) }
-    actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = AuthResult(android.linkWithCredential(credential.android).await())
-    actual suspend fun reauthenticate(credential: AuthCredential) = android.reauthenticate(credential.android).await().run { Unit }
-    actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(android.reauthenticateAndRetrieveData(credential.android).await())
-    actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) {
+    public actual suspend fun delete() {
+        android.delete().await()
+    }
+    public actual suspend fun reload() {
+        android.reload().await()
+    }
+    public actual suspend fun getIdToken(forceRefresh: Boolean): String? = android.getIdToken(forceRefresh).await().token
+    public actual suspend fun getIdTokenResult(forceRefresh: Boolean): AuthTokenResult = android.getIdToken(forceRefresh).await().run { AuthTokenResult(this) }
+    public actual suspend fun linkWithCredential(credential: AuthCredential): AuthResult = AuthResult(android.linkWithCredential(credential.android).await())
+    public actual suspend fun reauthenticate(credential: AuthCredential) {
+        android.reauthenticate(credential.android).await()
+    }
+    public actual suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult = AuthResult(android.reauthenticateAndRetrieveData(credential.android).await())
+    public actual suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?) {
         val request = actionCodeSettings?.let { android.sendEmailVerification(it.toAndroid()) } ?: android.sendEmailVerification()
         request.await()
     }
-    actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
+    public actual suspend fun unlink(provider: String): FirebaseUser? = android.unlink(provider).await().user?.let { FirebaseUser(it) }
 
     @Suppress("DEPRECATION")
-    actual suspend fun updateEmail(email: String) = android.updateEmail(email).await().run { Unit }
-    actual suspend fun updatePassword(password: String) = android.updatePassword(password).await().run { Unit }
-    actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) = android.updatePhoneNumber(credential.android).await().run { Unit }
-    actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
+    public actual suspend fun updateEmail(email: String) {
+        android.updateEmail(email).await()
+    }
+    public actual suspend fun updatePassword(password: String) {
+        android.updatePassword(password).await()
+    }
+    public actual suspend fun updatePhoneNumber(credential: PhoneAuthCredential) {
+        android.updatePhoneNumber(credential.android).await()
+    }
+    public actual suspend fun updateProfile(displayName: String?, photoUrl: String?) {
         val request = UserProfileChangeRequest.Builder()
             .apply { setDisplayName(displayName) }
             .apply { photoUri = photoUrl?.let { Uri.parse(it) } }
             .build()
         android.updateProfile(request).await()
     }
-    actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) =
-        android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.toAndroid()).await().run { Unit }
+    public actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?) {
+        android.verifyBeforeUpdateEmail(newEmail, actionCodeSettings?.toAndroid()).await()
+    }
 }
 
-actual class UserInfo(val android: com.google.firebase.auth.UserInfo) {
-    actual val displayName: String?
+public actual class UserInfo(public val android: com.google.firebase.auth.UserInfo) {
+    public actual val displayName: String?
         get() = android.displayName
-    actual val email: String?
+    public actual val email: String?
         get() = android.email
-    actual val phoneNumber: String?
+    public actual val phoneNumber: String?
         get() = android.phoneNumber
-    actual val photoURL: String?
+    public actual val photoURL: String?
         get() = android.photoUrl?.toString()
-    actual val providerId: String
+    public actual val providerId: String
         get() = android.providerId
-    actual val uid: String
+    public actual val uid: String
         get() = android.uid
 }
 
-actual class UserMetaData(val android: com.google.firebase.auth.FirebaseUserMetadata) {
-    actual val creationTime: Double?
+public actual class UserMetaData(public val android: com.google.firebase.auth.FirebaseUserMetadata) {
+    public actual val creationTime: Double?
         get() = android.creationTimestamp.toDouble()
-    actual val lastSignInTime: Double?
+    public actual val lastSignInTime: Double?
         get() = android.lastSignInTimestamp.toDouble()
 }

@@ -9,40 +9,40 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
 
-actual val Firebase.analytics: FirebaseAnalytics
+public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
-actual fun Firebase.analytics(app: FirebaseApp) =
+public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics =
     FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
-actual class FirebaseAnalytics(val android: com.google.firebase.analytics.FirebaseAnalytics) {
-    actual fun logEvent(name: String, parameters: Map<String, Any>?) {
+public actual class FirebaseAnalytics(public val android: com.google.firebase.analytics.FirebaseAnalytics) {
+    public actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         android.logEvent(name, parameters?.toBundle())
     }
-    actual fun setUserProperty(name: String, value: String) {
+    public actual fun setUserProperty(name: String, value: String) {
         android.setUserProperty(name, value)
     }
-    actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String) {
         android.setUserId(id)
     }
-    actual fun resetAnalyticsData() {
+    public actual fun resetAnalyticsData() {
         android.resetAnalyticsData()
     }
-    actual fun setDefaultEventParameters(parameters: Map<String, String>) {
+    public actual fun setDefaultEventParameters(parameters: Map<String, String>) {
         android.setDefaultEventParameters(parameters.toBundle())
     }
 
-    actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
+    public actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
         android.setAnalyticsCollectionEnabled(enabled)
     }
 
-    actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
         android.setSessionTimeoutDuration(sessionTimeoutInterval)
     }
 
-    actual suspend fun getSessionId(): Long? = android.sessionId.await()
+    public actual suspend fun getSessionId(): Long? = android.sessionId.await()
 
-    actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+    public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
         consentSettings.entries.associate {
             it.key to when (it.value) {
                 ConsentStatus.GRANTED -> com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus.GRANTED
@@ -69,20 +69,20 @@ actual class FirebaseAnalytics(val android: com.google.firebase.analytics.Fireba
         }
     }
 
-    actual enum class ConsentType {
+    public actual enum class ConsentType {
         AD_PERSONALIZATION,
         AD_STORAGE,
         AD_USER_DATA,
         ANALYTICS_STORAGE,
     }
 
-    actual enum class ConsentStatus {
+    public actual enum class ConsentStatus {
         GRANTED,
         DENIED,
     }
 }
 
-actual class FirebaseAnalyticsException(message: String) : Exception(message)
+public actual class FirebaseAnalyticsException(message: String) : Exception(message)
 
 private fun Map<String, Any>.toBundle() = Bundle().apply {
     forEach { (key, value) ->

@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.remoteconfig
 
 /** Wraps the current state of the [FirebaseRemoteConfig] singleton object. */
-data class FirebaseRemoteConfigInfo(
+public data class FirebaseRemoteConfigInfo(
     /**
      * Gets the current settings of the [FirebaseRemoteConfig] singleton object.
      *
@@ -26,7 +26,7 @@ data class FirebaseRemoteConfigInfo(
     val lastFetchStatus: FetchStatus,
 )
 
-enum class FetchStatus {
+public enum class FetchStatus {
     /**
      * Indicates that the most recent fetch of parameter values from the Firebase Remote Config server
      * was completed successfully.

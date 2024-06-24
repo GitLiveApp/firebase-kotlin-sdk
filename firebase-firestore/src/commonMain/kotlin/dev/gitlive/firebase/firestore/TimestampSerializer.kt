@@ -6,7 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 
 /** A serializer for [BaseTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialValueSerializer(
+public object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { value ->
         when (value) {
@@ -25,7 +25,7 @@ object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialValueSeria
 )
 
 /** A serializer for [Timestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
+public object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = Timestamp::nativeValue,
     fromNativeValue = { value ->
@@ -37,7 +37,7 @@ object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
 )
 
 /** A serializer for [Timestamp.ServerTimestamp]. Must be used with [FirebaseEncoder]/[FirebaseDecoder]. */
-object ServerTimestampSerializer : KSerializer<Timestamp.ServerTimestamp> by SpecialValueSerializer(
+public object ServerTimestampSerializer : KSerializer<Timestamp.ServerTimestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { FieldValue.serverTimestamp.nativeValue },
     fromNativeValue = { value ->
@@ -49,7 +49,7 @@ object ServerTimestampSerializer : KSerializer<Timestamp.ServerTimestamp> by Spe
 )
 
 /** A serializer for a Double field which is stored as a Timestamp. */
-object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializer(
+public object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = { value ->
         when (value) {
@@ -66,5 +66,5 @@ object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueSerializ
         }
     },
 ) {
-    const val SERVER_TIMESTAMP = Double.POSITIVE_INFINITY
+    public const val SERVER_TIMESTAMP: Double = Double.POSITIVE_INFINITY
 }
