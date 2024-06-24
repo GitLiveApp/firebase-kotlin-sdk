@@ -219,7 +219,7 @@ private fun decodeShort(value: Any?) = when(value) {
 
 private fun decodeBoolean(value: Any?) = when (value) {
     is Boolean -> value
-    is Number -> value.toInt() != 0
+    is Number -> value != 0
     is String -> value.toBoolean()
     else -> throw SerializationException("Expected $value to be boolean")
 }
