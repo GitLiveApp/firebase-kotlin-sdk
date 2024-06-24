@@ -89,10 +89,10 @@ kotlin {
             // As of Firebase 10.17 Firestore has moved all ObjC headers to FirebaseFirestoreInternal and the kotlin cocoapods plugin does not handle this well
             // Adding it manually seems to resolve the issue
             pod("FirebaseFirestoreInternal") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
             }
             pod("FirebaseFirestore") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
                 extraOpts += listOf("-compiler-option", "-fmodules")
                 useInteropBindingFrom("FirebaseFirestoreInternal")
             }

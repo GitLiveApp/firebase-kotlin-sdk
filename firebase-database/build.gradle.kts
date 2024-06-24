@@ -90,7 +90,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseDatabase") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
             }
         }
     }

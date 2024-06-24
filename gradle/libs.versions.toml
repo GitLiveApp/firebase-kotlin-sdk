@@ -13,6 +13,7 @@ kotlinx-coroutines = "1.9.0-RC"
 kotlinx-serialization = "1.7.0"
 settings-api = "2.0"
 settings-language = "2.0"
+firebase-cocoapods = "10.28.0"
 test-logger-plugin = "3.2.0"
 dokka = "1.9.20"
 

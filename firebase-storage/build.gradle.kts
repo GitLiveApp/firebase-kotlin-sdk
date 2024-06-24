@@ -84,7 +84,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseStorage") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
