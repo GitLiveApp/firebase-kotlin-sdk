@@ -1,3 +1,8 @@
+public final class dev/gitlive/firebase/storage/Data {
+	public fun <init> ([B)V
+	public final fun getData ()[B
+}
+
 public final class dev/gitlive/firebase/storage/File {
 	public fun <init> (Landroid/net/Uri;)V
 	public final fun getUri ()Landroid/net/Uri;
@@ -13,6 +18,39 @@ public final class dev/gitlive/firebase/storage/FirebaseStorage {
 	public final fun setMaxOperationRetryTimeMillis (J)V
 	public final fun setMaxUploadRetryTimeMillis (J)V
 	public final fun useEmulator (Ljava/lang/String;I)V
+}
+
+public final class dev/gitlive/firebase/storage/FirebaseStorageMetadata {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/util/Map;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCacheControl ()Ljava/lang/String;
+	public final fun getContentDisposition ()Ljava/lang/String;
+	public final fun getContentEncoding ()Ljava/lang/String;
+	public final fun getContentLanguage ()Ljava/lang/String;
+	public final fun getContentType ()Ljava/lang/String;
+	public final fun getCustomMetadata ()Ljava/util/Map;
+	public final fun getMd5Hash ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setCacheControl (Ljava/lang/String;)V
+	public final fun setContentDisposition (Ljava/lang/String;)V
+	public final fun setContentEncoding (Ljava/lang/String;)V
+	public final fun setContentLanguage (Ljava/lang/String;)V
+	public final fun setContentType (Ljava/lang/String;)V
+	public final fun setCustomMetadata (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun setCustomMetadata (Ljava/util/Map;)V
+	public final fun setMd5Hash (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/storage/ListResult {
@@ -40,6 +78,10 @@ public abstract interface class dev/gitlive/firebase/storage/ProgressFlow : kotl
 	public abstract fun resume ()V
 }
 
+public final class dev/gitlive/firebase/storage/StorageKt {
+	public static final fun storageMetadata (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;
+}
+
 public final class dev/gitlive/firebase/storage/StorageReference {
 	public fun <init> (Lcom/google/firebase/storage/StorageReference;)V
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
@@ -47,18 +89,25 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun getAndroid ()Lcom/google/firebase/storage/StorageReference;
 	public final fun getBucket ()Ljava/lang/String;
 	public final fun getDownloadUrl (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getMetadata (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getParent ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRoot ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getStorage ()Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public final fun listAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun putFile (Ldev/gitlive/firebase/storage/File;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun putFileResumable (Ldev/gitlive/firebase/storage/File;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public final fun putData (Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun putData$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun putFile (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun putFile$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun putFileResumable (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public static synthetic fun putFileResumable$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/ProgressFlow;
 }
 
 public final class dev/gitlive/firebase/storage/android {
 	public static final fun getStorage (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 }
 

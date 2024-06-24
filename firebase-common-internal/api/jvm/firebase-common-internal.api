@@ -142,8 +142,7 @@ public final class dev/gitlive/firebase/internal/FirebaseDecoder : kotlinx/seria
 	public fun decodeDouble ()D
 	public fun decodeEnum (Lkotlinx/serialization/descriptors/SerialDescriptor;)I
 	public fun decodeFloat ()F
-	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Ldev/gitlive/firebase/internal/FirebaseDecoder;
-	public synthetic fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
+	public fun decodeInline (Lkotlinx/serialization/descriptors/SerialDescriptor;)Lkotlinx/serialization/encoding/Decoder;
 	public fun decodeInt ()I
 	public fun decodeLong ()J
 	public fun decodeNotNullMark ()Z

@@ -160,7 +160,6 @@ public final class dev/gitlive/firebase/database/ServerValueSerializer : kotlinx
 }
 
 public final class dev/gitlive/firebase/database/databaseAndroid {
-	public static final fun awaitWhileOnline (Lcom/google/android/gms/tasks/Task;Ldev/gitlive/firebase/database/FirebaseDatabase;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;

@@ -15,7 +15,6 @@ public final class dev/gitlive/firebase/functions/FunctionsKt {
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
-	public static final fun getAndroid (Ldev/gitlive/firebase/functions/HttpsCallableReference;)Lcom/google/firebase/functions/HttpsCallableReference;
 	public static final fun getCode (Lcom/google/firebase/functions/FirebaseFunctionsException;)Lcom/google/firebase/functions/FirebaseFunctionsException$Code;
 	public static final fun getDetails (Lcom/google/firebase/functions/FirebaseFunctionsException;)Ljava/lang/Object;
 	public static final fun getFunctions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
