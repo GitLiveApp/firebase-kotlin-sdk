@@ -80,7 +80,7 @@ jobs:
           name: "Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-ios:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Cocoapods cache
@@ -95,7 +95,7 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: Run iOS Tests
-        run: ./gradlew cleanTest iosX64Test
+        run: ./gradlew cleanTest iosSimulatorArm64Test
       - name: Upload iOS test artifact
         uses: actions/upload-artifact@v4
         if: failure()
