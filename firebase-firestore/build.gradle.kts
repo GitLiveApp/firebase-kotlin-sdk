@@ -14,6 +14,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("testOptionsConvention")
 }
 
 android {
@@ -34,11 +35,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -92,10 +89,10 @@ kotlin {
             // As of Firebase 10.17 Firestore has moved all ObjC headers to FirebaseFirestoreInternal and the kotlin cocoapods plugin does not handle this well
             // Adding it manually seems to resolve the issue
             pod("FirebaseFirestoreInternal") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
             }
             pod("FirebaseFirestore") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
                 extraOpts += listOf("-compiler-option", "-fmodules")
                 useInteropBindingFrom("FirebaseFirestoreInternal")
             }
@@ -131,10 +128,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
@@ -162,7 +157,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-firestore")
+                api(libs.google.firebase.firestore)
             }
         }
 
@@ -176,6 +171,12 @@ kotlin {
 if (project.property("firebase-firestore.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-firestore.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

@@ -38,4 +38,6 @@ interface DecodeSettings : EncodeDecodeSettings {
     }
 }
 
-interface EncodeDecodeSettingsBuilder : EncodeSettings.Builder, DecodeSettings.Builder
+interface EncodeDecodeSettingsBuilder :
+    EncodeSettings.Builder,
+    DecodeSettings.Builder

@@ -1,33 +1,31 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-
-repositories {
-    google()
-    mavenCentral()
-}
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.AbstractDokkaTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import java.net.URL
+import java.io.InputStream
 
 plugins {
-    kotlin("multiplatform") apply false
-    kotlin("native.cocoapods") apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlinx.serialization) apply false
+    alias(libs.plugins.multiplatform) apply false
+    alias(libs.plugins.native.cocoapods) apply false
+    alias(libs.plugins.test.logger.plugin) apply false
+    alias(libs.plugins.ben.manes.versions) apply false
+    alias(libs.plugins.kotlinter) apply false
+    alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
+    alias(libs.plugins.dokka)
     id("base")
-    id("com.github.ben-manes.versions") version "0.51.0"
-    id("org.jmailen.kotlinter") version "4.3.0" apply false
-    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.15.0-Beta.2"
+    id("testOptionsConvention")
 }
 
 buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
-    }
     dependencies {
-        classpath("com.android.tools.build:gradle:${project.extra["gradlePluginVersion"]}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${project.extra["kotlinVersion"]}")
-        classpath("com.adarshr:gradle-test-logger-plugin:3.2.0")
+        classpath(libs.dokka.base)
     }
 }
 
@@ -37,6 +35,7 @@ val minSdkVersion by extra(23)
 tasks {
     register("updateVersions") {
         dependsOn(
+            "firebase-analytics:updateVersion", "firebase-analytics:updateDependencyVersion",
             "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
             "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
             "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
@@ -44,6 +43,7 @@ tasks {
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
+            "firebase-messaging:updateVersion", "firebase-messaging:updateDependencyVersion",
             "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
             "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion",
             "firebase-storage:updateVersion", "firebase-storage:updateDependencyVersion"
@@ -51,10 +51,60 @@ tasks {
     }
 }
 
+private val dokkaCopyrightMessage = "© 2024 GitLive Ltd."
+private val dokkaHomepageUrl = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
+
+tasks.withType<AbstractDokkaTask>().configureEach {
+    val version = project.property("firebase-app.version") as String
+    moduleVersion.set(version)
+    moduleName.set("Firebase Kotlin SDK")
+
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        customAssets = listOf(file("documentation/gitlive-logo.png"), file("documentation/homepage.svg"))
+        customStyleSheets = listOf(file("documentation/logo-styles.css"))
+        footerMessage = dokkaCopyrightMessage
+        homepageLink = dokkaHomepageUrl
+    }
+}
+
 subprojects {
 
     group = "dev.gitlive"
-    
+
+    val nonDocumentationList = listOf("test-utils", "firebase-common", "firebase-common-internal")
+    val skipDocumentation = nonDocumentationList.contains(project.name)
+    if (!skipDocumentation) {
+        apply(plugin = "org.jetbrains.dokka")
+    }
+
+    this.tasks.withType<DokkaTaskPartial>().configureEach {
+        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+            footerMessage = dokkaCopyrightMessage
+            separateInheritedMembers = false
+            homepageLink = dokkaHomepageUrl
+        }
+        dokkaSourceSets {
+            configureEach {
+                documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
+                includes.setFrom("documentation.md")
+
+                sourceLink {
+                    localDirectory.set(projectDir.resolve("src"))
+                    remoteUrl.set(URL("$dokkaHomepageUrl/tree/master/${project.name}/src"))
+                }
+            }
+            if (this.names.contains("jsMain")) {
+                named("jsMain") {
+                    perPackageOption {
+                        // External files for JS should not be documented since they will not be available
+                        matchingRegex.set(".*.externals.*")
+                        suppress.set(true)
+                    }
+                }
+            }
+        }
+    }
+
     apply(plugin = "com.adarshr.test-logger")
     apply(plugin = "org.jmailen.kotlinter")
 
@@ -108,31 +158,27 @@ subprojects {
     }
 
     afterEvaluate  {
-
-        val coroutinesVersion: String by project
-        val firebaseBoMVersion: String by project
-
         dependencies {
-            "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-            "androidMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion")
-            "androidMainImplementation"(platform("com.google.firebase:firebase-bom:$firebaseBoMVersion"))
+            "commonMainImplementation"(libs.kotlinx.coroutines.core)
+            "androidMainImplementation"(libs.kotlinx.coroutines.play.services)
+            "androidMainImplementation"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"("dev.gitlive:firebase-java-sdk:0.4.3")
-                "jvmMainApi"("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion") {
+                "jvmMainApi"(libs.gitlive.firebase.java.sdk)
+                "jvmMainApi"(libs.kotlinx.coroutines.play.services) {
                     exclude("com.google.android.gms")
                 }
                 "jsTestImplementation"(kotlin("test-js"))
                 "jvmTestImplementation"(kotlin("test-junit"))
-                "jvmTestImplementation"("junit:junit:4.13.2")
+                "jvmTestImplementation"(libs.junit)
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
             "androidUnitTestImplementation"(kotlin("test-junit"))
-            "androidInstrumentedTestImplementation"("junit:junit:4.13.2")
-            "androidInstrumentedTestImplementation"("androidx.test:core:1.5.0")
-            "androidInstrumentedTestImplementation"("androidx.test.ext:junit:1.1.5")
-            "androidInstrumentedTestImplementation"("androidx.test:runner:1.5.2")
+            "androidInstrumentedTestImplementation"(libs.junit)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.core)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.junit)
+            "androidInstrumentedTestImplementation"(libs.androidx.test.runner)
         }
     }
 
@@ -224,3 +270,50 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     reportfileName = "dependency-updates"
 }
 // check for latest dependencies - ./gradlew dependencyUpdates -Drevision=release
+
+tasks.register("devRunEmulatorTests") {
+    doLast {
+        EmulatorJobsMatrix().getTaskList(rootProject = rootProject).forEach { gradleTasks ->
+            exec {
+                executable = File(
+                    project.rootDir,
+                    if (Os.isFamily(Os.FAMILY_WINDOWS)) "gradlew.bat" else "gradlew",
+                )
+                    .also { it.setExecutable(true) }
+                    .absolutePath
+                args = gradleTasks
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+        }
+    }
+}
+
+tasks.register("ciEmulatorJobsMatrixSetup") {
+    doLast {
+        EmulatorJobsMatrix().createMatrixJsonFile(rootProject = rootProject)
+    }
+}
+
+tasks.register("ciSdkManagerLicenses") {
+    doLast {
+        val sdkDirPath = getAndroidSdkPath(rootDir = rootDir)
+        getSdkmanagerFile(rootDir = rootDir)?.let { sdkmanagerFile ->
+            val yesInputStream = object : InputStream() {
+                private val yesString = "y\n"
+                private var counter = 0
+                override fun read(): Int = yesString[counter % 2].also { counter++ }.code
+            }
+            exec {
+                executable = sdkmanagerFile.absolutePath
+                args = listOf("--list", "--sdk_root=$sdkDirPath")
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+            exec {
+                executable = sdkmanagerFile.absolutePath
+                args = listOf("--licenses", "--sdk_root=$sdkDirPath")
+                standardInput = yesInputStream
+                println("exec: ${this.commandLine.joinToString(separator = " ")}")
+            }.apply { println("ExecResult: $this") }
+        }
+    }
+}

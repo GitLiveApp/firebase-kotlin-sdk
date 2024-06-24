@@ -13,6 +13,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("testOptionsConvention")
 }
 
 android {
@@ -31,11 +32,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
 
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -103,10 +100,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
@@ -115,11 +110,9 @@ kotlin {
         }
 
         getByName("commonMain") {
-            val serializationVersion: String by project
-
             dependencies {
                 implementation(project(":firebase-common"))
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+                api(libs.kotlinx.serialization.core)
             }
         }
 
@@ -131,7 +124,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-common-ktx")
+                api(libs.google.firebase.common.ktx)
             }
         }
 
@@ -157,6 +150,12 @@ kotlin {
 if (project.property("firebase-common.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-common.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

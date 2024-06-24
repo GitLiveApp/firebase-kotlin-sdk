@@ -51,12 +51,10 @@ actual class FirebaseRemoteConfig internal constructor(val android: AndroidFireb
     actual fun getValue(key: String) = FirebaseRemoteConfigValue(android.getValue(key))
     actual suspend fun reset() = android.reset().await().let { }
 
-    private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {
-        return FirebaseRemoteConfigSettings(
-            fetchTimeoutInSeconds = fetchTimeoutInSeconds,
-            minimumFetchIntervalInSeconds = minimumFetchIntervalInSeconds,
-        )
-    }
+    private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
+        fetchTimeoutInSeconds = fetchTimeoutInSeconds,
+        minimumFetchIntervalInSeconds = minimumFetchIntervalInSeconds,
+    )
 
     private fun AndroidFirebaseRemoteConfigInfo.asCommon(): FirebaseRemoteConfigInfo {
         val lastFetchStatus = when (lastFetchStatus) {

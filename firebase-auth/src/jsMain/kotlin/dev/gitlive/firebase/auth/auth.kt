@@ -117,8 +117,7 @@ actual class AuthTokenResult(val js: IdTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = js.authTime
     actual val claims: Map<String, Any>
-        get() = (js("Object").keys(js.claims) as Array<String>).mapNotNull {
-                key ->
+        get() = (js("Object").keys(js.claims) as Array<String>).mapNotNull { key ->
             js.claims[key]?.let { key to it }
         }.toMap()
 

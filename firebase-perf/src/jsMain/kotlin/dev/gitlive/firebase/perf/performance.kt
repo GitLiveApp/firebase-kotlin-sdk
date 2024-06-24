@@ -36,8 +36,7 @@ actual class FirebasePerformance internal constructor(val js: JsFirebasePerforma
     }
 }
 
-actual open class FirebasePerformanceException(code: String, cause: Throwable) :
-    FirebaseException(code, cause)
+actual open class FirebasePerformanceException(code: String, cause: Throwable) : FirebaseException(code, cause)
 
 internal inline fun <R> rethrow(function: () -> R): R {
     try {

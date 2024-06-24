@@ -135,11 +135,9 @@ class SpecialValueSerializer<T>(
         }
     }
 
-    override fun deserialize(decoder: Decoder): T {
-        return if (decoder is FirebaseDecoder) {
-            fromNativeValue(decoder.value)
-        } else {
-            throw SerializationException("This serializer must be used with FirebaseDecoder")
-        }
+    override fun deserialize(decoder: Decoder): T = if (decoder is FirebaseDecoder) {
+        fromNativeValue(decoder.value)
+    } else {
+        throw SerializationException("This serializer must be used with FirebaseDecoder")
     }
 }

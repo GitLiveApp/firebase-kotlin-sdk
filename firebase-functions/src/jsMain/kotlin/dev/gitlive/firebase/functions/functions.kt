@@ -47,6 +47,7 @@ internal actual data class NativeHttpsCallableReference(val js: HttpsCallable) {
     actual suspend fun invoke(): HttpsCallableResult = rethrow { HttpsCallableResult(js().await()) }
 }
 
+@PublishedApi
 internal val HttpsCallable.native get() = NativeHttpsCallableReference(this)
 
 val HttpsCallableReference.js: HttpsCallable get() = native.js
@@ -86,9 +87,11 @@ actual enum class FunctionsExceptionCode {
     UNAUTHENTICATED,
 }
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.functions.rethrow { function() }
+@PublishedApi
+internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.functions.rethrow { function() }
 
-inline fun <R> rethrow(function: () -> R): R {
+@PublishedApi
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
@@ -98,7 +101,8 @@ inline fun <R> rethrow(function: () -> R): R {
     }
 }
 
-fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
+@PublishedApi
+internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .toString()
     .lowercase()
     .let {

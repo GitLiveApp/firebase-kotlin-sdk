@@ -219,7 +219,7 @@ actual class FieldPath private constructor(val ios: FIRFieldPath) {
 
 actual typealias EncodedFieldPath = FIRFieldPath
 
-suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
+internal suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -> Unit) -> Unit): T {
     val job = CompletableDeferred<T?>()
     function { result, error ->
         if (error == null) {
@@ -231,7 +231,7 @@ suspend inline fun <reified T> awaitResult(function: (callback: (T?, NSError?) -
     return job.await() as T
 }
 
-suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
+internal suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -> T): T {
     val job = CompletableDeferred<Unit>()
     val result = function { error ->
         if (error == null) {

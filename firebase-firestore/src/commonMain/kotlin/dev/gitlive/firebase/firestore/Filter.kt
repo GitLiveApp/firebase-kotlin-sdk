@@ -43,85 +43,45 @@ sealed class Filter {
 
 class FilterBuilder internal constructor() {
 
-    infix fun String.equalTo(value: Any?): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.EqualTo(value))
-    }
+    infix fun String.equalTo(value: Any?): Filter.WithConstraint = Filter.Field(this, WhereConstraint.EqualTo(value))
 
-    infix fun FieldPath.equalTo(value: Any?): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.EqualTo(value))
-    }
+    infix fun FieldPath.equalTo(value: Any?): Filter.WithConstraint = Filter.Path(this, WhereConstraint.EqualTo(value))
 
-    infix fun String.notEqualTo(value: Any?): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.NotEqualTo(value))
-    }
+    infix fun String.notEqualTo(value: Any?): Filter.WithConstraint = Filter.Field(this, WhereConstraint.NotEqualTo(value))
 
-    infix fun FieldPath.notEqualTo(value: Any?): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.NotEqualTo(value))
-    }
+    infix fun FieldPath.notEqualTo(value: Any?): Filter.WithConstraint = Filter.Path(this, WhereConstraint.NotEqualTo(value))
 
-    infix fun String.lessThan(value: Any): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.LessThan(value))
-    }
+    infix fun String.lessThan(value: Any): Filter.WithConstraint = Filter.Field(this, WhereConstraint.LessThan(value))
 
-    infix fun FieldPath.lessThan(value: Any): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.LessThan(value))
-    }
+    infix fun FieldPath.lessThan(value: Any): Filter.WithConstraint = Filter.Path(this, WhereConstraint.LessThan(value))
 
-    infix fun String.greaterThan(value: Any): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.GreaterThan(value))
-    }
+    infix fun String.greaterThan(value: Any): Filter.WithConstraint = Filter.Field(this, WhereConstraint.GreaterThan(value))
 
-    infix fun FieldPath.greaterThan(value: Any): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.GreaterThan(value))
-    }
+    infix fun FieldPath.greaterThan(value: Any): Filter.WithConstraint = Filter.Path(this, WhereConstraint.GreaterThan(value))
 
-    infix fun String.lessThanOrEqualTo(value: Any): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.LessThanOrEqualTo(value))
-    }
+    infix fun String.lessThanOrEqualTo(value: Any): Filter.WithConstraint = Filter.Field(this, WhereConstraint.LessThanOrEqualTo(value))
 
-    infix fun FieldPath.lessThanOrEqualTo(value: Any): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.LessThanOrEqualTo(value))
-    }
+    infix fun FieldPath.lessThanOrEqualTo(value: Any): Filter.WithConstraint = Filter.Path(this, WhereConstraint.LessThanOrEqualTo(value))
 
-    infix fun String.greaterThanOrEqualTo(value: Any): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.GreaterThanOrEqualTo(value))
-    }
+    infix fun String.greaterThanOrEqualTo(value: Any): Filter.WithConstraint = Filter.Field(this, WhereConstraint.GreaterThanOrEqualTo(value))
 
-    infix fun FieldPath.greaterThanOrEqualTo(value: Any): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.GreaterThanOrEqualTo(value))
-    }
+    infix fun FieldPath.greaterThanOrEqualTo(value: Any): Filter.WithConstraint = Filter.Path(this, WhereConstraint.GreaterThanOrEqualTo(value))
 
-    infix fun String.contains(value: Any): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.ArrayContains(value))
-    }
+    infix fun String.contains(value: Any): Filter.WithConstraint = Filter.Field(this, WhereConstraint.ArrayContains(value))
 
-    infix fun FieldPath.contains(value: Any): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.ArrayContains(value))
-    }
+    infix fun FieldPath.contains(value: Any): Filter.WithConstraint = Filter.Path(this, WhereConstraint.ArrayContains(value))
 
-    infix fun String.containsAny(values: List<Any>): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.ArrayContainsAny(values))
-    }
+    infix fun String.containsAny(values: List<Any>): Filter.WithConstraint = Filter.Field(this, WhereConstraint.ArrayContainsAny(values))
 
-    infix fun FieldPath.containsAny(values: List<Any>): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.ArrayContainsAny(values))
-    }
+    infix fun FieldPath.containsAny(values: List<Any>): Filter.WithConstraint = Filter.Path(this, WhereConstraint.ArrayContainsAny(values))
 
-    infix fun String.inArray(values: List<Any>): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.InArray(values))
-    }
+    infix fun String.inArray(values: List<Any>): Filter.WithConstraint = Filter.Field(this, WhereConstraint.InArray(values))
 
-    infix fun FieldPath.inArray(values: List<Any>): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.InArray(values))
-    }
+    infix fun FieldPath.inArray(values: List<Any>): Filter.WithConstraint = Filter.Path(this, WhereConstraint.InArray(values))
 
-    infix fun String.notInArray(values: List<Any>): Filter.WithConstraint {
-        return Filter.Field(this, WhereConstraint.NotInArray(values))
-    }
+    infix fun String.notInArray(values: List<Any>): Filter.WithConstraint = Filter.Field(this, WhereConstraint.NotInArray(values))
 
-    infix fun FieldPath.notInArray(values: List<Any>): Filter.WithConstraint {
-        return Filter.Path(this, WhereConstraint.NotInArray(values))
-    }
+    infix fun FieldPath.notInArray(values: List<Any>): Filter.WithConstraint = Filter.Path(this, WhereConstraint.NotInArray(values))
 
     infix fun Filter.and(right: Filter): Filter.And {
         val leftList = when (this) {

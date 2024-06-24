@@ -95,21 +95,17 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
         ios.setDefaults(defaults.toMap())
     }
 
-    private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {
-        return FirebaseRemoteConfigSettings(
-            fetchTimeoutInSeconds = fetchTimeout.toLong(),
-            minimumFetchIntervalInSeconds = minimumFetchInterval.toLong(),
-        )
-    }
+    private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
+        fetchTimeoutInSeconds = fetchTimeout.toLong(),
+        minimumFetchIntervalInSeconds = minimumFetchInterval.toLong(),
+    )
 
-    private fun FIRRemoteConfigFetchStatus.asCommon(): FetchStatus {
-        return when (this) {
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusSuccess -> FetchStatus.Success
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
-            else -> FetchStatus.Failure
-        }
+    private fun FIRRemoteConfigFetchStatus.asCommon(): FetchStatus = when (this) {
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusSuccess -> FetchStatus.Success
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
+        else -> FetchStatus.Failure
     }
 }
 
@@ -159,11 +155,8 @@ private fun NSError.toException() = when (domain) {
 
 actual open class FirebaseRemoteConfigException(message: String) : FirebaseException(message)
 
-actual class FirebaseRemoteConfigClientException(message: String) :
-    FirebaseRemoteConfigException(message)
+actual class FirebaseRemoteConfigClientException(message: String) : FirebaseRemoteConfigException(message)
 
-actual class FirebaseRemoteConfigFetchThrottledException(message: String) :
-    FirebaseRemoteConfigException(message)
+actual class FirebaseRemoteConfigFetchThrottledException(message: String) : FirebaseRemoteConfigException(message)
 
-actual class FirebaseRemoteConfigServerException(message: String) :
-    FirebaseRemoteConfigException(message)
+actual class FirebaseRemoteConfigServerException(message: String) : FirebaseRemoteConfigException(message)

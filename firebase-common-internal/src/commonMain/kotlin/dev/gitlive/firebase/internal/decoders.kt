@@ -70,9 +70,7 @@ class FirebaseDecoder(val value: Any?, internal val settings: DecodeSettings) : 
 
     override fun decodeInline(descriptor: SerialDescriptor) = FirebaseDecoder(value, settings)
 
-    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return decodeSerializableValuePolymorphic(value, deserializer)
-    }
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T = decodeSerializableValuePolymorphic(value, deserializer)
 }
 
 class FirebaseClassDecoder(
@@ -85,14 +83,12 @@ class FirebaseClassDecoder(
 
     override fun decodeSequentially() = false
 
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return (index until descriptor.elementsCount)
-            .firstOrNull {
-                !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it))
-            }
-            ?.also { index = it + 1 }
-            ?: DECODE_DONE
-    }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = (index until descriptor.elementsCount)
+        .firstOrNull {
+            !descriptor.isElementOptional(it) || containsKey(descriptor.getElementName(it))
+        }
+        ?.also { index = it + 1 }
+        ?: DECODE_DONE
 }
 
 open class FirebaseCompositeDecoder(
@@ -167,15 +163,13 @@ open class FirebaseCompositeDecoder(
             FirebaseDecoder(it, settings)
         }
 
-    private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T {
-        return try {
-            decoder(get(descriptor, index))
-        } catch (e: Exception) {
-            throw SerializationException(
-                message = "Exception during decoding ${descriptor.serialName} ${descriptor.getElementName(index)}",
-                cause = e,
-            )
-        }
+    private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T = try {
+        decoder(get(descriptor, index))
+    } catch (e: Exception) {
+        throw SerializationException(
+            message = "Exception during decoding ${descriptor.serialName} ${descriptor.getElementName(index)}",
+            cause = e,
+        )
     }
 }
 

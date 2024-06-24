@@ -39,9 +39,7 @@ actual class FirebaseRemoteConfig internal constructor(val js: RemoteConfig) {
         FirebaseRemoteConfigValue(getValue(js, key))
     }
 
-    actual fun getKeysByPrefix(prefix: String): Set<String> {
-        return getAllKeys().filter { it.startsWith(prefix) }.toSet()
-    }
+    actual fun getKeysByPrefix(prefix: String): Set<String> = getAllKeys().filter { it.startsWith(prefix) }.toSet()
 
     private fun getAllKeys(): Set<String> {
         val objectKeys = js("Object.keys")
@@ -64,35 +62,27 @@ actual class FirebaseRemoteConfig internal constructor(val js: RemoteConfig) {
         js.defaultConfig = json(*defaults)
     }
 
-    private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings {
-        return FirebaseRemoteConfigSettings(
-            fetchTimeoutInSeconds = fetchTimeoutMillis.toLong() / 1000,
-            minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000,
-        )
-    }
+    private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
+        fetchTimeoutInSeconds = fetchTimeoutMillis.toLong() / 1000,
+        minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000,
+    )
 
-    private fun String.toFetchStatus(): FetchStatus {
-        return when (this) {
-            "no-fetch-yet" -> FetchStatus.NoFetchYet
-            "success" -> FetchStatus.Success
-            "failure" -> FetchStatus.Failure
-            "throttle" -> FetchStatus.Throttled
-            else -> error("Unknown FetchStatus: $this")
-        }
+    private fun String.toFetchStatus(): FetchStatus = when (this) {
+        "no-fetch-yet" -> FetchStatus.NoFetchYet
+        "success" -> FetchStatus.Success
+        "failure" -> FetchStatus.Failure
+        "throttle" -> FetchStatus.Throttled
+        else -> error("Unknown FetchStatus: $this")
     }
 }
 
-actual open class FirebaseRemoteConfigException(code: String, cause: Throwable) :
-    FirebaseException(code, cause)
+actual open class FirebaseRemoteConfigException(code: String, cause: Throwable) : FirebaseException(code, cause)
 
-actual class FirebaseRemoteConfigClientException(code: String, cause: Throwable) :
-    FirebaseRemoteConfigException(code, cause)
+actual class FirebaseRemoteConfigClientException(code: String, cause: Throwable) : FirebaseRemoteConfigException(code, cause)
 
-actual class FirebaseRemoteConfigFetchThrottledException(code: String, cause: Throwable) :
-    FirebaseRemoteConfigException(code, cause)
+actual class FirebaseRemoteConfigFetchThrottledException(code: String, cause: Throwable) : FirebaseRemoteConfigException(code, cause)
 
-actual class FirebaseRemoteConfigServerException(code: String, cause: Throwable) :
-    FirebaseRemoteConfigException(code, cause)
+actual class FirebaseRemoteConfigServerException(code: String, cause: Throwable) : FirebaseRemoteConfigException(code, cause)
 
 internal inline fun <R> rethrow(function: () -> R): R {
     try {

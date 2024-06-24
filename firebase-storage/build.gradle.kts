@@ -13,6 +13,7 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
+    id("testOptionsConvention")
 }
 
 android {
@@ -32,11 +33,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -87,7 +84,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseStorage") {
-                version = "10.27.0"
+                version = libs.versions.firebase.cocoapods.get()
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
@@ -114,10 +111,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 if (name.lowercase().contains("ios")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
@@ -140,7 +135,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-storage")
+                api(libs.google.firebase.storage)
             }
         }
     }
@@ -149,6 +144,12 @@ kotlin {
 if (project.property("firebase-storage.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-storage.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
