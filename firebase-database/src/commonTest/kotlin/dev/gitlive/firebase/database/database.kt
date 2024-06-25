@@ -32,7 +32,7 @@ class FirebaseDatabaseTest {
     lateinit var database: FirebaseDatabase
 
     @Serializable
-    data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
+    data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0, val boolean: Boolean = true)
 
     @Serializable
     data class DatabaseTest(val title: String, val likes: Int = 0)
@@ -195,6 +195,29 @@ class FirebaseDatabaseTest {
         assertTrue(valueEvents.first().exists)
         reference.updateChildren(mapOf("test" to false, "nested" to mapOf("lastActivity" to null), "lastActivity" to null))
         assertFalse(valueEvents.first().exists)
+    }
+
+    @Test
+    fun testBooleanValue() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseBooleanTest")
+        val falseRef = reference.child("false")
+        val trueRef = reference.child("true")
+        falseRef.setValue(false)
+        trueRef.setValue(true)
+        val falseValue = falseRef.valueEvents.first().value<Boolean>()
+        val trueValue = trueRef.valueEvents.first().value<Boolean>()
+        assertFalse(falseValue)
+        assertTrue(trueValue)
+    }
+
+    @Test
+    fun testBooleanValueInChild() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseBooleanInChildTest")
+        reference.setValue(FirebaseDatabaseChildTest())
+        val value = reference.valueEvents.first().value<FirebaseDatabaseChildTest>()
+        assertEquals(FirebaseDatabaseChildTest(), value)
     }
 
     // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870
