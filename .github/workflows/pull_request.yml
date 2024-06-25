@@ -39,8 +39,6 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
-      - name: run apiCheck
-        run: ./gradlew apiCheck
       - name: Apply Android licenses
         run: ./gradlew ciSdkManagerLicenses
       - name: Run Android Instrumented Tests
@@ -119,6 +117,8 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
         timeout-minutes: 10
+      - name: run apiCheck
+        run: ./gradlew apiCheck
       - name: Run JVM Tests
         run: ./gradlew cleanTest jvmTest
       - name: Upload JVM test artifact
