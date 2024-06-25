@@ -54,7 +54,7 @@ class FirebaseStorageTest {
     }
 
     @Test
-    fun testStorageNotNull() {
+    fun testStorageNotNull() = runTest {
         assertNotNull(storage)
     }
 
@@ -79,7 +79,7 @@ class FirebaseStorageTest {
 
         assertNotNull(metadataResult)
         assertNotNull(metadataResult.contentType)
-        assertEquals(metadataResult.contentType, metadata.contentType)
+        assertEquals(metadata.contentType, metadataResult.contentType)
     }
 
     @Test
@@ -95,7 +95,7 @@ class FirebaseStorageTest {
         val metadataResult = ref.getMetadata()
 
         assertNotNull(metadataResult)
-        assertEquals(metadataResult.customMetadata["key"], metadata.customMetadata["key"])
+        assertEquals(metadata.customMetadata["key"], metadataResult.customMetadata["key"])
     }
 }
 

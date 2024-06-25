@@ -14,6 +14,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlin.js.Json
+import kotlin.js.json
 
 public actual val Firebase.storage: FirebaseStorage
     get() = FirebaseStorage(getStorage())
@@ -130,7 +132,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
         }
     }
 
-internal fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+internal fun UploadMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
     val sdkMetadata = this
     return storageMetadata {
         md5Hash = sdkMetadata.md5Hash
@@ -139,19 +141,21 @@ internal fun StorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadat
         contentEncoding = sdkMetadata.contentEncoding
         contentLanguage = sdkMetadata.contentLanguage
         contentType = sdkMetadata.contentType
-        sdkMetadata.customMetadata?.entries?.forEach {
-            setCustomMetadata(it.key, it.value)
-        }
+        customMetadata = sdkMetadata.customMetadata?.let { metadata ->
+            val objectKeys = js("Object.keys")
+            objectKeys(metadata).unsafeCast<Array<String>>().associateWith { key ->
+                metadata[key]?.toString().orEmpty()
+            }
+        }.orEmpty().toMutableMap()
     }
 }
 
-internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata {
-    val metadata = StorageMetadata()
-    metadata.cacheControl = cacheControl
-    metadata.contentDisposition = contentDisposition
-    metadata.contentEncoding = contentEncoding
-    metadata.contentLanguage = contentLanguage
-    metadata.contentType = contentType
-    metadata.customMetadata = customMetadata
-    return metadata
-}
+internal fun FirebaseStorageMetadata.toStorageMetadata(): Json = json(
+    "cacheControl" to cacheControl,
+    "contentDisposition" to contentDisposition,
+    "contentEncoding" to contentEncoding,
+    "contentLanguage" to contentLanguage,
+    "contentType" to contentType,
+    "customMetadata" to json(*customMetadata.toList().toTypedArray()),
+    "md5Hash" to md5Hash,
+)

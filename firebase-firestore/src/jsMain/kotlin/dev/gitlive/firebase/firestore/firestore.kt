@@ -149,7 +149,7 @@ public actual class DocumentChange(public val js: JsDocumentChange) {
         get() = js.newIndex
     public actual val oldIndex: Int
         get() = js.oldIndex
-    public actual val type: ChangeType
+    actual val type: ChangeType
         get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
