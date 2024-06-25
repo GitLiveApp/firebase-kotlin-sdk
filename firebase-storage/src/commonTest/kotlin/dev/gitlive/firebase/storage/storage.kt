@@ -10,15 +10,9 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -66,7 +60,6 @@ class FirebaseStorageTest {
 
     @Test
     fun testUploadShouldNotCrash() = runTest {
-        println("Test")
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadShouldNotCrash.txt")
 
