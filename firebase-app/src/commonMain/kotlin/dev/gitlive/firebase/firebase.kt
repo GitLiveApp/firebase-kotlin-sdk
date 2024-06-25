@@ -67,6 +67,7 @@ public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOpt
 public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
 
 /** Returns options of default FirebaseApp */
+@Suppress("UnusedReceiverParameter")
 public val Firebase.options: FirebaseOptions
     get() = Firebase.app.options
 

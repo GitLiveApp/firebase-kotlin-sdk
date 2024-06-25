@@ -149,7 +149,7 @@ public actual class DocumentChange(public val js: JsDocumentChange) {
         get() = js.newIndex
     public actual val oldIndex: Int
         get() = js.oldIndex
-    actual val type: ChangeType
+    public actual val type: ChangeType
         get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
@@ -229,25 +229,25 @@ internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .lowercase()
     .let {
         when {
-            "cancelled" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
-            "invalid-argument" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
-            "deadline-exceeded" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
-            "not-found" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.NOT_FOUND)
-            "already-exists" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ALREADY_EXISTS)
-            "permission-denied" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.PERMISSION_DENIED)
-            "resource-exhausted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.RESOURCE_EXHAUSTED)
-            "failed-precondition" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.FAILED_PRECONDITION)
-            "aborted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ABORTED)
-            "out-of-range" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.OUT_OF_RANGE)
-            "unimplemented" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNIMPLEMENTED)
-            "internal" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INTERNAL)
-            "unavailable" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAVAILABLE)
-            "data-loss" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DATA_LOSS)
-            "unauthenticated" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAUTHENTICATED)
-            "unknown" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+            "cancelled" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.CANCELLED)
+            "invalid-argument" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INVALID_ARGUMENT)
+            "deadline-exceeded" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DEADLINE_EXCEEDED)
+            "not-found" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.NOT_FOUND)
+            "already-exists" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ALREADY_EXISTS)
+            "permission-denied" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.PERMISSION_DENIED)
+            "resource-exhausted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.RESOURCE_EXHAUSTED)
+            "failed-precondition" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.FAILED_PRECONDITION)
+            "aborted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ABORTED)
+            "out-of-range" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.OUT_OF_RANGE)
+            "unimplemented" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNIMPLEMENTED)
+            "internal" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INTERNAL)
+            "unavailable" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAVAILABLE)
+            "data-loss" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DATA_LOSS)
+            "unauthenticated" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAUTHENTICATED)
+            "unknown" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)
             else -> {
                 println("Unknown error code in ${JSON.stringify(e)}")
-                FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+                FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)
             }
         }
     }

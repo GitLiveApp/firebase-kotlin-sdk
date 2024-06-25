@@ -14,7 +14,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
-expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 

@@ -2,8 +2,6 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.Firebase
@@ -56,7 +54,7 @@ public expect class AuthTokenResult {
 }
 
 public sealed class ActionCodeResult {
-    public object SignInWithEmailLink : ActionCodeResult()
+    public data object SignInWithEmailLink : ActionCodeResult()
     public class PasswordReset internal constructor(public val email: String) : ActionCodeResult()
     public class VerifyEmail internal constructor(public val email: String) : ActionCodeResult()
     public class RecoverEmail internal constructor(public val email: String, public val previousEmail: String) : ActionCodeResult()

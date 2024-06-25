@@ -30,7 +30,7 @@ public expect object GoogleAuthProvider {
     public fun credential(idToken: String?, accessToken: String?): AuthCredential
 }
 
-public expect class OAuthProvider constructor(
+public expect class OAuthProvider(
     provider: String,
     scopes: List<String> = emptyList(),
     customParameters: Map<String, String> = emptyMap(),
@@ -41,7 +41,7 @@ public expect class OAuthProvider constructor(
     }
 }
 
-public expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
+public expect class PhoneAuthProvider(auth: FirebaseAuth = Firebase.auth) {
     public fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
     public suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
 }

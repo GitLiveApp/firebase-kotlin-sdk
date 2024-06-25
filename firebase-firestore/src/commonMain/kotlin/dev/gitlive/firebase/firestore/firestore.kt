@@ -103,8 +103,8 @@ public expect class FirebaseFirestoreSettings {
         internal val DEFAULT_CACHE_SIZE_BYTES: Long
     }
 
-    public class Builder constructor() {
-
+    public class Builder {
+        public constructor()
         public constructor(settings: FirebaseFirestoreSettings)
 
         public var sslEnabled: Boolean
@@ -547,7 +547,6 @@ public data class CollectionReference internal constructor(@PublishedApi interna
 
 public expect class FirebaseFirestoreException : FirebaseException
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public expect val FirebaseFirestoreException.code: FirestoreExceptionCode
 
 public expect enum class FirestoreExceptionCode {

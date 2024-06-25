@@ -21,10 +21,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
+@Suppress("unused")
 @Serializable
 object TestObject {
     val map = mapOf("key" to "value", "key2" to 12, "key3" to null)
-    val bool = false
+    const val BOOL = false
     val nullableBool: Boolean? = null
 }
 

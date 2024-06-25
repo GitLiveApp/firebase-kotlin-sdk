@@ -1,4 +1,4 @@
-@file:Suppress("ktlint:standard:property-naming")
+@file:Suppress("ktlint:standard:property-naming", "PropertyName")
 @file:JsModule("firebase/analytics")
 @file:JsNonModule
 

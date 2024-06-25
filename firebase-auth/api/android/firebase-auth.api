@@ -17,6 +17,9 @@ public final class dev/gitlive/firebase/auth/ActionCodeResult$RevertSecondFactor
 
 public final class dev/gitlive/firebase/auth/ActionCodeResult$SignInWithEmailLink : dev/gitlive/firebase/auth/ActionCodeResult {
 	public static final field INSTANCE Ldev/gitlive/firebase/auth/ActionCodeResult$SignInWithEmailLink;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/auth/ActionCodeResult$VerifyBeforeChangeEmail : dev/gitlive/firebase/auth/ActionCodeResult {

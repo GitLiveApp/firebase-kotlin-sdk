@@ -92,7 +92,6 @@ public class FirebaseEncoder(
 
     public var value: Any? = null
 
-    internal val shouldEncodeElementDefault = settings.encodeDefaults
     override val serializersModule: SerializersModule = settings.serializersModule
 
     private var polymorphicDiscriminator: String? = null

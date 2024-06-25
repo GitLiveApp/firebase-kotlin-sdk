@@ -21,7 +21,6 @@ import platform.Foundation.NSURL
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
 
-@Suppress("CAST_NEVER_SUCCEEDS")
 public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
     FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp),
 )
@@ -31,12 +30,12 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
     public actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
 
-    public actual val authStateChanged: Flow<FirebaseUser?> get() = callbackFlow<FirebaseUser?> {
+    public actual val authStateChanged: Flow<FirebaseUser?> get() = callbackFlow {
         val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeAuthStateDidChangeListener(handle) }
     }
 
-    public actual val idTokenChanged: Flow<FirebaseUser?> get() = callbackFlow<FirebaseUser?> {
+    public actual val idTokenChanged: Flow<FirebaseUser?> get() = callbackFlow {
         val handle = ios.addIDTokenDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
         awaitClose { ios.removeIDTokenDidChangeListener(handle) }
     }
@@ -61,7 +60,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
         ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
     }
 
-    public actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings): Unit = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }.run { Unit }
+    public actual suspend fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings): Unit = ios.await { sendSignInLinkToEmail(email, actionCodeSettings.toIos(), it) }
 
     public actual fun isSignInWithEmailLink(link: String): Boolean = ios.isSignInWithEmailLink(link)
 

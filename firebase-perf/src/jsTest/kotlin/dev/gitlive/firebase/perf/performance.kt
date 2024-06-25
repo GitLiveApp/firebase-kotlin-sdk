@@ -11,8 +11,6 @@ import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
 import kotlin.test.*
 
-actual val emulatorHost: String = "localhost"
-
 actual val context: Any = Unit
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)

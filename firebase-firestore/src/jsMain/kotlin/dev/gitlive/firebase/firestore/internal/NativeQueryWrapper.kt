@@ -139,7 +139,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         ).wrapped
     }
 
-    actual val snapshots get() = callbackFlow<QuerySnapshot> {
+    actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {
             onSnapshot(
                 js,
@@ -150,7 +150,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         awaitClose { rethrow { unsubscribe() } }
     }
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val unsubscribe = rethrow {
             onSnapshot(
                 js,

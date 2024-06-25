@@ -519,7 +519,10 @@ public final class dev/gitlive/firebase/firestore/Timestamp$Companion {
 
 public final class dev/gitlive/firebase/firestore/Timestamp$ServerTimestamp : dev/gitlive/firebase/firestore/BaseTimestamp {
 	public static final field INSTANCE Ldev/gitlive/firebase/firestore/Timestamp$ServerTimestamp;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/firestore/TimestampKt {

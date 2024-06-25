@@ -32,6 +32,6 @@ internal inline fun <R> rethrow(function: () -> R): R {
     } catch (e: Exception) {
         throw e
     } catch (e: dynamic) {
-        throw FirebaseInstallationsException(e.code as String?, e)
+        throw FirebaseInstallationsException(e.code.unsafeCast<String?>(), e.unsafeCast<Throwable>())
     }
 }

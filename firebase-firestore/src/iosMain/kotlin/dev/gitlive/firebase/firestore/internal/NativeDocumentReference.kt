@@ -2,7 +2,6 @@ package dev.gitlive.firebase.firestore.internal
 
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
-import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult
@@ -69,7 +68,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual suspend fun delete() = await { ios.deleteDocumentWithCompletion(it) }
 
-    actual val snapshots get() = callbackFlow<NativeDocumentSnapshot> {
+    actual val snapshots get() = callbackFlow {
         val listener = ios.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(snapshot) }
             error?.let { close(error.toException()) }

@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestoreInternal.*
@@ -10,7 +12,6 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
-import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
@@ -37,7 +38,7 @@ public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (t
 
 public actual typealias NativeFirebaseFirestore = FIRFirestore
 
-public val FirebaseFirestore.ios get() = native
+public val FirebaseFirestore.ios: NativeFirebaseFirestore get() = native
 
 public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,

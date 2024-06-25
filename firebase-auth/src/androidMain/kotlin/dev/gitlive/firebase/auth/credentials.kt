@@ -12,7 +12,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 public actual open class AuthCredential(public open val android: com.google.firebase.auth.AuthCredential) {
@@ -53,7 +52,7 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public actual class OAuthProvider(public val android: com.google.firebase.auth.OAuthProvider) {
+public actual class OAuthProvider(public val android: OAuthProvider) {
 
     public actual constructor(
         provider: String,
@@ -61,7 +60,7 @@ public actual class OAuthProvider(public val android: com.google.firebase.auth.O
         customParameters: Map<String, String>,
         auth: FirebaseAuth,
     ) : this(
-        com.google.firebase.auth.OAuthProvider
+        OAuthProvider
             .newBuilder(provider, auth.android)
             .setScopes(scopes)
             .addCustomParameters(customParameters)
@@ -83,7 +82,7 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
 
     public actual constructor(auth: FirebaseAuth) : this({ PhoneAuthOptions.newBuilder(auth.android) })
 
-    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, smsCode))
+    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.getCredential(verificationId, smsCode))
 
     public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
         val response = CompletableDeferred<Result<AuthCredential>>()

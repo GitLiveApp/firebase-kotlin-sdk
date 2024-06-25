@@ -41,8 +41,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
 import platform.Foundation.allObjects
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -297,7 +295,7 @@ internal suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutin
         .filter { !it.value<Boolean>() }
         .produceIn(this)
 
-    select<T> {
+    select {
         onAwait { it.also { notConnected.cancel() } }
         notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }

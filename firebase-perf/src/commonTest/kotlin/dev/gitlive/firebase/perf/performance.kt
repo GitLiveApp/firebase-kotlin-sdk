@@ -14,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlin.test.*
 import kotlin.time.Duration.Companion.seconds
 
-expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 

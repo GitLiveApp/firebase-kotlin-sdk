@@ -23,7 +23,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
     actual suspend fun get(source: Source) =
         QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
 
-    actual val snapshots get() = callbackFlow<QuerySnapshot> {
+    actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, error ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             error?.let { close(error.toException()) }
@@ -31,7 +31,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         awaitClose { listener.remove() }
     }
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val listener =
             native.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
                 snapshot?.let { trySend(QuerySnapshot(snapshot)) }

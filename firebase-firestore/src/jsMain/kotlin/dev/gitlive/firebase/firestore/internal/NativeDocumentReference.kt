@@ -54,7 +54,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     actual val snapshots: Flow<NativeDocumentSnapshot> get() = snapshots()
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<NativeDocumentSnapshot> {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val unsubscribe = onSnapshot(
             js,
             json("includeMetadataChanges" to includeMetadataChanges),

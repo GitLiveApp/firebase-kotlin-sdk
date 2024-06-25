@@ -1,3 +1,5 @@
+@file:Suppress("UnusedReceiverParameter")
+
 package dev.gitlive.firebase.analytics
 
 public val FirebaseAnalytics.Event: FirebaseAnalyticsEvents

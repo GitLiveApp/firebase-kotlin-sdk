@@ -21,7 +21,7 @@ public actual class FirebaseAnalytics {
     public actual fun setDefaultEventParameters(parameters: Map<String, String>) {}
     public actual fun logEvent(name: String, parameters: Map<String, Any>?) {}
 
-    public actual fun setConsent(consentSettings: Map<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus>) {}
+    public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {}
 
     public actual enum class ConsentType {
         AD_PERSONALIZATION,

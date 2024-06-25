@@ -21,7 +21,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
 
-    actual val snapshots get() = callbackFlow<QuerySnapshot> {
+    actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, exception ->
             snapshot?.let { trySend(QuerySnapshot(snapshot)) }
             exception?.let { close(exception) }
@@ -29,7 +29,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         awaitClose { listener.remove() }
     }
 
-    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow<QuerySnapshot> {
+    actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val metadataChanges =
             if (includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE
         val listener = native.addSnapshotListener(metadataChanges) { snapshot, exception ->

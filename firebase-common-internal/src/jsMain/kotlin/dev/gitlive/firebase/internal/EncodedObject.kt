@@ -27,7 +27,7 @@ internal actual fun Any.asNativeMap(): Map<*, *>? {
     } ?: return null
     val mutableMap = mutableMapOf<String, Any?>()
     for (key in js("Object").keys(json)) {
-        mutableMap[key as String] = json[key as String]
+        mutableMap[key.unsafeCast<String>()] = json[key.unsafeCast<String>()]
     }
     return mutableMap.toMap()
 }

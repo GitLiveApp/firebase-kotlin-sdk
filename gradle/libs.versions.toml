@@ -1,8 +1,8 @@
 [versions]
 agp = "8.2.2"
-androidx-test-core = "1.5.0"
-androidx-test-junit = "1.1.5"
-androidx-test-runner = "1.5.2"
+androidx-test-core = "1.6.0"
+androidx-test-junit = "1.2.0"
+androidx-test-runner = "1.6.0"
 ben-manes-versions = "0.51.0"
 firebase-bom = "33.1.1"
 gitlive-firebase-java-sdk = "0.4.3"

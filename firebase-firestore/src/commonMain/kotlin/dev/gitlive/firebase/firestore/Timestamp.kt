@@ -30,7 +30,7 @@ public expect class Timestamp internal constructor(nativeValue: NativeTimestamp)
 
     /** A server time timestamp. */
     @Serializable(with = ServerTimestampSerializer::class)
-    public object ServerTimestamp : BaseTimestamp
+    public data object ServerTimestamp : BaseTimestamp
 }
 
 public fun Timestamp.Companion.fromDuration(duration: Duration): Timestamp =

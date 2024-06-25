@@ -13,12 +13,4 @@ public actual class Trace internal constructor(private val js: PerformanceTrace)
     public fun getAttribute(attribute: String): String? = rethrow { js.getAttribute(attribute) }
     public fun putAttribute(attribute: String, value: String): Unit = rethrow { js.putAttribute(attribute, value) }
     public fun removeAttribute(attribute: String): Unit = rethrow { js.removeAttribute(attribute) }
-
-    internal fun primitiveHashMap(container: dynamic): HashMap<String, String> {
-        val m = HashMap<String, String>().asDynamic()
-        m.map = container
-        val keys = js("Object.keys")
-        m.`$size` = keys(container).length
-        return m
-    }
 }

@@ -32,5 +32,5 @@ public actual class Timestamp internal actual constructor(
 
     /** A server time timestamp. */
     @Serializable(with = ServerTimestampSerializer::class)
-    public actual object ServerTimestamp : BaseTimestamp()
+    public actual data object ServerTimestamp : BaseTimestamp()
 }

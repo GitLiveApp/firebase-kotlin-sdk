@@ -96,7 +96,7 @@ public actual class UserInfo(public val ios: FIRUserInfoProtocol) {
 
 public actual class UserMetaData(public val ios: FIRUserMetadata) {
     public actual val creationTime: Double?
-        get() = ios.creationDate?.timeIntervalSinceReferenceDate?.toDouble()
+        get() = ios.creationDate?.timeIntervalSinceReferenceDate
     public actual val lastSignInTime: Double?
-        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate?.toDouble()
+        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate
 }

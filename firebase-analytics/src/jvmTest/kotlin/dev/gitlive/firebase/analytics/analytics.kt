@@ -7,8 +7,6 @@ package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.testContext
 
-actual val emulatorHost: String = "10.0.2.2"
-
 actual val context: Any = testContext
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)

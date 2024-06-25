@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.DecodeSettings
@@ -109,25 +111,25 @@ internal fun errorToException(e: dynamic): FirebaseFunctionsException = (e?.code
     .lowercase()
     .let {
         when {
-            "cancelled" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.CANCELLED, e.details)
-            "invalid-argument" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.INVALID_ARGUMENT, e.details)
-            "deadline-exceeded" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.DEADLINE_EXCEEDED, e.details)
-            "not-found" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.NOT_FOUND, e.details)
-            "already-exists" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.ALREADY_EXISTS, e.details)
-            "permission-denied" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.PERMISSION_DENIED, e.details)
-            "resource-exhausted" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.RESOURCE_EXHAUSTED, e.details)
-            "failed-precondition" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.FAILED_PRECONDITION, e.details)
-            "aborted" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.ABORTED, e.details)
-            "out-of-range" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.OUT_OF_RANGE, e.details)
-            "unimplemented" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.UNIMPLEMENTED, e.details)
-            "internal" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.INTERNAL, e.details)
-            "unavailable" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.UNAVAILABLE, e.details)
-            "data-loss" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.DATA_LOSS, e.details)
-            "unauthenticated" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.UNAUTHENTICATED, e.details)
-            "unknown" in it -> FirebaseFunctionsException(e, FunctionsExceptionCode.UNKNOWN, e.details)
+            "cancelled" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.CANCELLED, e.details)
+            "invalid-argument" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.INVALID_ARGUMENT, e.details)
+            "deadline-exceeded" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.DEADLINE_EXCEEDED, e.details)
+            "not-found" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.NOT_FOUND, e.details)
+            "already-exists" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.ALREADY_EXISTS, e.details)
+            "permission-denied" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.PERMISSION_DENIED, e.details)
+            "resource-exhausted" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.RESOURCE_EXHAUSTED, e.details)
+            "failed-precondition" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.FAILED_PRECONDITION, e.details)
+            "aborted" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.ABORTED, e.details)
+            "out-of-range" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.OUT_OF_RANGE, e.details)
+            "unimplemented" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.UNIMPLEMENTED, e.details)
+            "internal" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.INTERNAL, e.details)
+            "unavailable" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.UNAVAILABLE, e.details)
+            "data-loss" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.DATA_LOSS, e.details)
+            "unauthenticated" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.UNAUTHENTICATED, e.details)
+            "unknown" in it -> FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.UNKNOWN, e.details)
             else -> {
                 println("Unknown error code in ${JSON.stringify(e)}")
-                FirebaseFunctionsException(e, FunctionsExceptionCode.UNKNOWN, e.details)
+                FirebaseFunctionsException(e.unsafeCast<Throwable>(), FunctionsExceptionCode.UNKNOWN, e.details)
             }
         }
     }

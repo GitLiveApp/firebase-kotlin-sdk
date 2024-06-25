@@ -114,6 +114,7 @@ public val CollectionReference.android: NativeCollectionReference get() = native
 
 public actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException
 
+@Suppress("ConflictingExtensionProperty")
 public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
 public actual typealias FirestoreExceptionCode = com.google.firebase.firestore.FirebaseFirestoreException.Code

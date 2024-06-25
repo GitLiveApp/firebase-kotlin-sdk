@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package dev.gitlive.firebase.functions
 
 import cocoapods.FirebaseFunctions.FIRFunctions
@@ -22,12 +24,10 @@ public actual val Firebase.functions: FirebaseFunctions
 public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
-@Suppress("CAST_NEVER_SUCCEEDS")
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
 )
 
-@Suppress("CAST_NEVER_SUCCEEDS")
 public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
@@ -54,7 +54,7 @@ internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
 
-public actual class HttpsCallableResult constructor(public val ios: FIRHTTPSCallableResult) {
+public actual class HttpsCallableResult(public val ios: FIRHTTPSCallableResult) {
 
     public actual inline fun <reified T> data(): T =
         decode<T>(value = ios.data())

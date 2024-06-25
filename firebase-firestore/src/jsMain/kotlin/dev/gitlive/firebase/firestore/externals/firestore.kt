@@ -175,7 +175,7 @@ public external interface Firestore {
     public val app: FirebaseApp
 }
 
-public external class GeoPoint constructor(latitude: Double, longitude: Double) {
+public external class GeoPoint(latitude: Double, longitude: Double) {
     public val latitude: Double
     public val longitude: Double
     public fun isEqual(other: GeoPoint): Boolean

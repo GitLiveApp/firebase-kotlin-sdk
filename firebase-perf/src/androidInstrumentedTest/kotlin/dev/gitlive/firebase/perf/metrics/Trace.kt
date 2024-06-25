@@ -23,7 +23,7 @@ class AndroidTraceTest {
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
-            dev.gitlive.firebase.perf.context,
+            context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
                 apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",

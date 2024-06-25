@@ -13,7 +13,6 @@ data class TestDataWithGeoPoint(
     val location: GeoPoint,
 )
 
-@Suppress("UNCHECKED_CAST")
 class GeoPointTests {
 
     @Test

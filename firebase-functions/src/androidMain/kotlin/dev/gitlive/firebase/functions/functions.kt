@@ -43,7 +43,7 @@ internal val com.google.firebase.functions.HttpsCallableReference.native get() =
 
 internal val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
 
-public actual class HttpsCallableResult constructor(public val android: com.google.firebase.functions.HttpsCallableResult) {
+public actual class HttpsCallableResult(public val android: com.google.firebase.functions.HttpsCallableResult) {
 
     public actual inline fun <reified T> data(): T =
         decode<T>(value = android.data)
@@ -54,8 +54,10 @@ public actual class HttpsCallableResult constructor(public val android: com.goog
 
 public actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException
 
+@Suppress("ConflictingExtensionProperty")
 public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 
+@Suppress("ConflictingExtensionProperty")
 public actual val FirebaseFunctionsException.details: Any? get() = details
 
 public actual typealias FunctionsExceptionCode = com.google.firebase.functions.FirebaseFunctionsException.Code

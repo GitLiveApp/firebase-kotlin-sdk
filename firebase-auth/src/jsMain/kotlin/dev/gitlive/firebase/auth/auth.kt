@@ -164,26 +164,26 @@ private inline fun <R> rethrow(function: () -> R): R {
 }
 
 private fun errorToException(cause: dynamic) = when (val code = cause.code?.toString()?.lowercase()) {
-    "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause)
-    "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause)
-    "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause)
-    "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause)
-    "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause)
-    "auth/network-request-failed" -> FirebaseNetworkException(code, cause)
-    "auth/timeout" -> FirebaseNetworkException(code, cause)
-    "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause)
+    "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+    "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause.unsafeCast<Throwable>())
+    "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+    "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+    "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause.unsafeCast<Throwable>())
+    "auth/network-request-failed" -> FirebaseNetworkException(code, cause.unsafeCast<Throwable>())
+    "auth/timeout" -> FirebaseNetworkException(code, cause.unsafeCast<Throwable>())
+    "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause.unsafeCast<Throwable>())
     "auth/invalid-credential",
     "auth/invalid-verification-code",
     "auth/missing-verification-code",
     "auth/invalid-verification-id",
     "auth/missing-verification-id",
-    -> FirebaseAuthInvalidCredentialsException(code, cause)
+    -> FirebaseAuthInvalidCredentialsException(code, cause.unsafeCast<Throwable>())
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use",
-    -> FirebaseAuthMultiFactorException(code, cause)
-    "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
-    "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause)
-    "auth/invalid-email" -> FirebaseAuthEmailException(code, cause)
+    -> FirebaseAuthMultiFactorException(code, cause.unsafeCast<Throwable>())
+    "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause.unsafeCast<Throwable>())
+    "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause.unsafeCast<Throwable>())
+    "auth/invalid-email" -> FirebaseAuthEmailException(code, cause.unsafeCast<Throwable>())
 //                "auth/app-deleted" ->
 //                "auth/app-not-authorized" ->
 //                "auth/argument-error" ->
@@ -193,6 +193,6 @@ private fun errorToException(cause: dynamic) = when (val code = cause.code?.toSt
 //                "auth/unauthorized-domain" ->
     else -> {
         println("Unknown error code in ${JSON.stringify(cause)}")
-        FirebaseAuthException(code, cause)
+        FirebaseAuthException(code, cause.unsafeCast<Throwable>())
     }
 }

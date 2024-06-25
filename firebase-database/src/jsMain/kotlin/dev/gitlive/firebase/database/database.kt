@@ -273,7 +273,7 @@ internal suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = co
         .filter { !it.value<Boolean>() }
         .produceIn(this)
 
-    select<T> {
+    select {
         this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
         notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }

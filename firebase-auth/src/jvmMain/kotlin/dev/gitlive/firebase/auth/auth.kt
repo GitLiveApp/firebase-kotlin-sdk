@@ -100,7 +100,6 @@ public actual class FirebaseAuth internal constructor(public val android: com.go
 
     public actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
         val result = android.checkActionCode(code).await()
-        @Suppress("UNCHECKED_CAST")
         return when (result.operation) {
             SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
             VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)

@@ -71,7 +71,7 @@ public actual class FirebaseDatabase internal constructor(public val android: co
 
         internal fun getInstance(
             android: com.google.firebase.database.FirebaseDatabase,
-        ) = instances.getOrPut(android) { dev.gitlive.firebase.database.FirebaseDatabase(android) }
+        ) = instances.getOrPut(android) { FirebaseDatabase(android) }
     }
 
     private var persistenceEnabled = true
@@ -160,7 +160,7 @@ public actual open class Query internal actual constructor(
                     trySendBlocking(DataSnapshot(snapshot, persistenceEnabled))
                 }
 
-                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
                     close(error.toException())
                 }
             }
@@ -191,7 +191,7 @@ public actual open class Query internal actual constructor(
                 if (removed) trySend(ChildEvent(DataSnapshot(snapshot, persistenceEnabled), Type.REMOVED, null))
             }
 
-            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+            override fun onCancelled(error: DatabaseError) {
                 close(error.toException())
             }
         }
@@ -216,18 +216,20 @@ internal actual class NativeDatabaseReference internal constructor(
     actual fun push() = NativeDatabaseReference(android.push(), persistenceEnabled)
     actual fun onDisconnect() = NativeOnDisconnect(android.onDisconnect(), persistenceEnabled, database)
 
-    actual suspend fun setValueEncoded(encodedValue: Any?) = android.setValue(encodedValue)
-        .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-        .run { Unit }
+    actual suspend fun setValueEncoded(encodedValue: Any?) {
+        android.setValue(encodedValue)
+            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+    }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         android.updateChildren(encodedUpdate.android)
             .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-            .run { Unit }
+    }
 
-    actual suspend fun removeValue() = android.removeValue()
-        .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-        .run { Unit }
+    actual suspend fun removeValue() {
+        android.removeValue()
+            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -297,22 +299,25 @@ internal actual class NativeOnDisconnect internal constructor(
     val database: FirebaseDatabase,
 ) {
 
-    actual suspend fun removeValue() = android.removeValue()
-        .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-        .run { Unit }
+    actual suspend fun removeValue() {
+        android.removeValue()
+            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+    }
 
-    actual suspend fun cancel() = android.cancel()
-        .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-        .run { Unit }
+    actual suspend fun cancel() {
+        android.cancel()
+            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+    }
 
-    actual suspend fun setValue(encodedValue: Any?) = android.setValue(encodedValue)
-        .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-        .run { Unit }
+    actual suspend fun setValue(encodedValue: Any?) {
+        android.setValue(encodedValue)
+            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+    }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         android.updateChildren(encodedUpdate.android)
             .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
-            .run { Unit }
+    }
 }
 
 public val OnDisconnect.android: com.google.firebase.database.OnDisconnect get() = native.android

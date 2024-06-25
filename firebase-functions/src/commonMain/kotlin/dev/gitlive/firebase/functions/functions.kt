@@ -108,7 +108,6 @@ public expect class FirebaseFunctionsException : FirebaseException
  *
  * @return [code] [FunctionsExceptionCode] that caused the exception.
  */
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public expect val FirebaseFunctionsException.code: FunctionsExceptionCode
 
 /**
@@ -116,7 +115,6 @@ public expect val FirebaseFunctionsException.code: FunctionsExceptionCode
  *
  * @return [details] message for this exception.
  */
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public expect val FirebaseFunctionsException.details: Any?
 
 /**

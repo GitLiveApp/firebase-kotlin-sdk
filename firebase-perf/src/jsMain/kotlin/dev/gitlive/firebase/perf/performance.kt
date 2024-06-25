@@ -55,7 +55,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
         when {
             else -> {
                 println("Unknown error code in ${JSON.stringify(error)}")
-                FirebasePerformanceException(code, error)
+                FirebasePerformanceException(code, error as Throwable)
             }
         }
     }

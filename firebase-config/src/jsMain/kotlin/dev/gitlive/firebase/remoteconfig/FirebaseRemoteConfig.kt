@@ -16,7 +16,7 @@ public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig 
 
 public actual class FirebaseRemoteConfig internal constructor(public val js: RemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
-        get() = rethrow { getAllKeys().map { Pair(it, getValue(it)) }.toMap() }
+        get() = rethrow { getAllKeys().associateWith { getValue(it) } }
 
     public actual val info: FirebaseRemoteConfigInfo
         get() = rethrow {
@@ -101,7 +101,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
         when {
             else -> {
                 println("Unknown error code in ${JSON.stringify(error)}")
-                FirebaseRemoteConfigException(code, error)
+                FirebaseRemoteConfigException(code, error as Throwable)
             }
         }
     }
