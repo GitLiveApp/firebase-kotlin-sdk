@@ -99,6 +99,8 @@ object FirebaseAnalyticsParam {
     const val PROMOTION_NAME: String = "promotion_name"
     const val QUANTITY: String = "quantity"
     const val SCORE: String = "score"
+    const val SCREEN_CLASS: String = "screen_class"
+    const val SCREEN_NAME: String = "screen_name"
     const val SEARCH_TERM: String = "search_term"
     const val SHIPPING: String = "shipping"
     const val SHIPPING_TIER: String = "shipping_tier"
