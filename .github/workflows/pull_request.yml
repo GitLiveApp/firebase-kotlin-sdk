@@ -47,13 +47,13 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Android Test Report HTML"
+          name: Android ${{ matrix.gradle_tasks }} Test Report HTML
           path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: Android ${{ matrix.gradle_tasks }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-js:
     runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: "JS Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-ios:
     runs-on: macos-latest
@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: "iOS Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-jvm:
     runs-on: ubuntu-latest
@@ -128,5 +128,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: "JVM Firebase Debug Log"
           path: "**/firebase-debug.log"
