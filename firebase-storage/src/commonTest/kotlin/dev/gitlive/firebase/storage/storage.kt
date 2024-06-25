@@ -9,6 +9,9 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runTest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -62,14 +65,16 @@ class FirebaseStorageTest {
     }
 
     @Test
-    fun testUploadShouldNotCrash() = runBlockingTest {
+    fun testUploadShouldNotCrash() = runTest {
+        println("Test")
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadShouldNotCrash.txt")
+
         ref.putData(data)
     }
 
     @Test
-    fun testUploadMetadata() = runBlockingTest {
+    fun testUploadMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadMetadata.txt")
         val metadata = storageMetadata {
@@ -85,7 +90,7 @@ class FirebaseStorageTest {
     }
 
     @Test
-    fun testUploadCustomMetadata() = runBlockingTest {
+    fun testUploadCustomMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadCustomMetadata.txt")
         val metadata = storageMetadata {

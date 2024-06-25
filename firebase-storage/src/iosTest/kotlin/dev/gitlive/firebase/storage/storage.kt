@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.storage
 
-actual val emulatorHost: String = "127.0.0.1"
+actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
