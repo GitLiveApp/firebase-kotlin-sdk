@@ -4,26 +4,29 @@
 package dev.gitlive.firebase.storage.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp
+import kotlin.js.Json
 import kotlin.js.Promise
+import kotlin.js.collections.JsMap
 
-external fun getStorage(app: FirebaseApp? = definedExternally, url: String): FirebaseStorage
+external fun getStorage(app: FirebaseApp? = definedExternally, bucketUrl: String): FirebaseStorage
 
 external fun getStorage(app: FirebaseApp? = definedExternally): FirebaseStorage
 
 external fun ref(storage: FirebaseStorage, url: String? = definedExternally): StorageReference
-external fun ref(ref: StorageReference, url: String? = definedExternally): StorageReference
+external fun ref(ref: StorageReference, path: String? = definedExternally): StorageReference
 
 external fun getDownloadURL(ref: StorageReference): Promise<String>
 
-external fun getMetadata(ref: StorageReference): Promise<StorageMetadata>
+external fun getMetadata(ref: StorageReference): Promise<FullMetadata>
+external fun updateMetadata(ref: StorageReference, metadata: SettableMetadata): Promise<FullMetadata>
 
-external fun uploadBytes(ref: StorageReference, file: dynamic, metadata: StorageMetadata?): Promise<Unit>
+external fun uploadBytes(ref: StorageReference, file: dynamic, metadata: Json?): Promise<UploadResult>
+external fun uploadBytesResumable(ref: StorageReference, data: dynamic, metadata: Json?): UploadTask
 
-external fun uploadBytesResumable(ref: StorageReference, data: dynamic, metadata: StorageMetadata?): UploadTask
+external fun deleteObject(ref: StorageReference): Promise<Unit>
 
-external fun deleteObject(ref: StorageReference): Promise<Unit>;
-
-external fun listAll(ref: StorageReference): Promise<ListResult>;
+external fun list(ref: StorageReference, options: ListOptions?): Promise<ListResult>
+external fun listAll(ref: StorageReference): Promise<ListResult>
 
 external fun connectStorageEmulator(
     storage: FirebaseStorage,
@@ -46,7 +49,12 @@ external interface StorageReference {
     val storage: FirebaseStorage
 }
 
-external open class ListResult {
+external interface ListOptions {
+    val maxResults: Double?
+    val pageToken: String?
+}
+
+external interface ListResult {
     val items: Array<StorageReference>
     val nextPageToken: String
     val prefixes: Array<StorageReference>
@@ -54,37 +62,50 @@ external open class ListResult {
 
 external interface StorageError
 
-external interface UploadTaskSnapshot {
-    val bytesTransferred: Number
-    val ref: StorageReference
-    val state: String
-    val task: UploadTask
-    val totalBytes: Number
+external interface SettableMetadata {
+    val cacheControl: String?
+    val contentDisposition: String?
+    val contentEncoding: String?
+    val contentLanguage: String?
+    val contentType: String?
+    val customMetadata: Json?
 }
 
-external class StorageMetadata {
-    val bucket: String?
-    var cacheControl: String?
-    var contentDisposition: String?
-    var contentEncoding: String?
-    var contentLanguage: String?
-    var contentType: String?
-    var customMetadata: Map<String, String>?
-    val fullPath: String?
-    val generation: String?
+external interface UploadMetadata : SettableMetadata {
     val md5Hash: String?
-    val metageneration: String?
-    val name: String?
-    val size: Number?
-    val timeCreated: String?
-    val updated: String?
-
 }
 
-external class UploadTask : Promise<UploadTaskSnapshot> {
+external interface FullMetadata : UploadMetadata {
+    val bucket: String
+    val downloadTokens: Array<String>?
+    val fullPath: String
+    val generation: String
+    val metageneration: String
+    val name: String
+    val ref: StorageReference?
+    val size: Double
+    val timeCreated: String
+    val updated: String
+}
+
+external interface UploadResult {
+    val metadata: FullMetadata
+    val ref: StorageReference
+}
+
+external interface UploadTask {
     fun cancel(): Boolean;
     fun on(event: String, next: (snapshot: UploadTaskSnapshot) -> Unit, error: (a: StorageError) -> Unit, complete: () -> Unit): () -> Unit
     fun pause(): Boolean;
     fun resume(): Boolean;
+    fun then(onFulfilled: ((UploadTaskSnapshot) -> Unit)?, onRejected: ((StorageError) -> Unit)?): Promise<Unit>
     val snapshot: UploadTaskSnapshot
+}
+
+external interface UploadTaskSnapshot {
+    val bytesTransferred: Double
+    val ref: StorageReference
+    val state: String
+    val task: UploadTask
+    val totalBytes: Double
 }

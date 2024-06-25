@@ -9,13 +9,10 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import dev.gitlive.firebase.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -57,19 +54,20 @@ class FirebaseStorageTest {
     }
 
     @Test
-    fun testStorageNotNull() {
+    fun testStorageNotNull() = runTest {
         assertNotNull(storage)
     }
 
     @Test
-    fun testUploadShouldNotCrash() = runBlockingTest {
+    fun testUploadShouldNotCrash() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadShouldNotCrash.txt")
+
         ref.putData(data)
     }
 
     @Test
-    fun testUploadMetadata() = runBlockingTest {
+    fun testUploadMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadMetadata.txt")
         val metadata = storageMetadata {
@@ -81,11 +79,11 @@ class FirebaseStorageTest {
 
         assertNotNull(metadataResult)
         assertNotNull(metadataResult.contentType)
-        assertEquals(metadataResult.contentType, metadata.contentType)
+        assertEquals(metadata.contentType, metadataResult.contentType)
     }
 
     @Test
-    fun testUploadCustomMetadata() = runBlockingTest {
+    fun testUploadCustomMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadCustomMetadata.txt")
         val metadata = storageMetadata {
@@ -97,7 +95,7 @@ class FirebaseStorageTest {
         val metadataResult = ref.getMetadata()
 
         assertNotNull(metadataResult)
-        assertEquals(metadataResult.customMetadata["key"], metadata.customMetadata["key"])
+        assertEquals( metadata.customMetadata["key"], metadataResult.customMetadata["key"])
     }
 }
 

@@ -11,3 +11,5 @@ Firebase*.zip
 *.log
 /kotlin-js-store/
 /kotlin-js-store/yarn.lock
+
+.kotlin/

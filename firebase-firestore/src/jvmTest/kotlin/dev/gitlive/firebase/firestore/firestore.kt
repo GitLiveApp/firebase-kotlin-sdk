@@ -1,13 +1,10 @@
-/*
- * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
- */
-
-@file:JvmName("tests")
 package dev.gitlive.firebase.firestore
 
-actual val emulatorHost: String = "10.0.2.2"
+import dev.gitlive.firebase.testContext
 
-actual val context: Any = ""
+actual val emulatorHost: String = "localhost"
+
+actual val context: Any = testContext
 
 @Suppress("UNCHECKED_CAST")
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>

@@ -5,7 +5,7 @@
 @file:JvmName("tests")
 package dev.gitlive.firebase
 
-actual val context: Any = Unit
+actual val context: Any = testContext
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

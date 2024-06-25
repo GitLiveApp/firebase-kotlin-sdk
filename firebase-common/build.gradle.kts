@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /*
@@ -25,8 +28,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions.configureTestOptions()
@@ -42,10 +45,20 @@ android {
 }
 
 kotlin {
-
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
@@ -54,25 +67,9 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
 
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        compilations.getByName("test") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvm()
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
@@ -85,22 +82,18 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
+            }
         }
         browser {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
+            }
         }
     }
 
@@ -136,7 +129,7 @@ kotlin {
 
         getByName("jsMain") {
             dependencies {
-                api(npm("firebase", "10.6.0"))
+                api(npm("firebase", "10.12.2"))
             }
         }
 
@@ -156,6 +149,12 @@ kotlin {
 if (project.property("firebase-common.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-common.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

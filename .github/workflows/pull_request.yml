@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobEmulatorMatrixSetup.outputs.emulator_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -39,33 +39,36 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
       - name: Apply Android licenses
         run: ./gradlew ciSdkManagerLicenses
       - name: Run Android Instrumented Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload Android test artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Android Test Report HTML"
+          name: Android ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: Android ${{ env.ARCHIVE_KEY }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-js:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
         timeout-minutes: 10
       - name: Run JS Tests
         run: ./gradlew cleanTest jsTest
       - name: Upload JS test artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: "JS Test Report HTML"
@@ -74,17 +77,17 @@ jobs:
             **/build/reports/tests/jsBrowserTest/
             **/build/reports/tests/jsNodeTest/
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: "JS Firebase Debug Log"
           path: "**/firebase-debug.log"
   build-ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cocoapods cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cocoapods
@@ -95,16 +98,38 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: Run iOS Tests
-        run: ./gradlew cleanTest iosX64Test
+        run: ./gradlew cleanTest iosSimulatorArm64Test
       - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: "iOS Test Report HTML"
-          path: "**/build/reports/tests/iosX64Test/"
+          path: "**/build/reports/tests/iosSimulatorArm64Test/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Firebase Debug Log"
+          name: "iOS Firebase Debug Log"
+          path: "**/firebase-debug.log"
+  build-jvm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+        timeout-minutes: 10
+      - name: Run JVM Tests
+        run: ./gradlew cleanTest jvmTest
+      - name: Upload JVM test artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: "JVM Test Report HTML"
+          path: |
+            **/build/reports/tests/jvmTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: "JVM Firebase Debug Log"
           path: "**/firebase-debug.log"

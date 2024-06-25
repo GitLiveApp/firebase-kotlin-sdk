@@ -219,13 +219,13 @@ private fun decodeShort(value: Any?) = when(value) {
 
 private fun decodeBoolean(value: Any?) = when (value) {
     is Boolean -> value
-    is Number -> value != 0
+    is Number -> value.toInt() != 0
     is String -> value.toBoolean()
     else -> throw SerializationException("Expected $value to be boolean")
 }
 
 private fun decodeChar(value: Any?) = when(value) {
-    is Number -> value.toChar()
+    is Number -> value.toInt().toChar()
     is String -> value[0]
     else -> throw SerializationException("Expected $value to be char")
 }

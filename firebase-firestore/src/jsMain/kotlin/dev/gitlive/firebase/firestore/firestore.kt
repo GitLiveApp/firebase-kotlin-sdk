@@ -154,7 +154,7 @@ actual class DocumentChange(val js: JsDocumentChange) {
     actual val oldIndex: Int
         get() = js.oldIndex
     actual val type: ChangeType
-        get() = ChangeType.values().first { it.jsString == js.type }
+        get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
 actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
