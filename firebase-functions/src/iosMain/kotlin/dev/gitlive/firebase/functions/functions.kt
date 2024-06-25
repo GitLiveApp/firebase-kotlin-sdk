@@ -50,7 +50,7 @@ internal actual data class NativeHttpsCallableReference(val ios: FIRHTTPSCallabl
 
 internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
-val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
+internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
 
 actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
 
@@ -87,7 +87,7 @@ actual enum class FunctionsExceptionCode {
     UNAUTHENTICATED
 }
 //todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
-fun NSError.toException() = when(domain) {
+internal fun NSError.toException() = when(domain) {
 //    FIRFunctionsErrorDomain -> when(code) {
 //        FIRFunctionsErrorCodeOK -> FunctionsExceptionCode.OK
 //        FIRFunctionsErrorCodeCancelled -> FunctionsExceptionCode.CANCELLED
@@ -111,7 +111,7 @@ fun NSError.toException() = when(domain) {
     else -> FunctionsExceptionCode.UNKNOWN
 }.let { FirebaseFunctionsException(description!!, it, null/*userInfo[FIRFunctionsErrorDetails]*/) }
 
-suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
         if(error == null) {
@@ -123,7 +123,7 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
     job.await()
 }
 
-suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
         if(error == null) {

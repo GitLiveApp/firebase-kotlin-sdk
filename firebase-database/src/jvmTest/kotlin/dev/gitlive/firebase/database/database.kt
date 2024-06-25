@@ -5,9 +5,13 @@
 @file:JvmName("tests")
 package dev.gitlive.firebase.database
 
-actual val emulatorHost: String = "10.0.2.2"
+import dev.gitlive.firebase.testContext
 
-actual val context: Any = Unit
+actual val emulatorHost: String = "localhost"
+
+actual val context: Any = testContext
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidTest

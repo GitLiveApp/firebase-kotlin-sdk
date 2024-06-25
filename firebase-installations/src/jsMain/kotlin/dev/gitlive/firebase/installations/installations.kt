@@ -27,9 +27,9 @@ actual class FirebaseInstallations internal constructor(internal val js: Install
 
 actual open class FirebaseInstallationsException(code: String?, cause: Throwable): FirebaseException(code, cause)
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.installations.rethrow { function() }
+internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.installations.rethrow { function() }
 
-inline fun <R> rethrow(function: () -> R): R {
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {

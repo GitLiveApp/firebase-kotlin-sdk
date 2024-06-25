@@ -15,12 +15,17 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlin.js.Json
+import kotlin.js.json
 
 actual val Firebase.storage
     get() = FirebaseStorage(getStorage())
 
-actual fun Firebase.storage(app: FirebaseApp) =
-    FirebaseStorage(getStorage(app.js))
+actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(null, url), )
+
+actual fun Firebase.storage(app: FirebaseApp) = FirebaseStorage(getStorage(app.js))
+
+actual fun Firebase.storage(app: FirebaseApp, url: String) = FirebaseStorage(getStorage(app.js, url))
 
 val FirebaseStorage.js get() = js
 
@@ -37,7 +42,7 @@ actual class FirebaseStorage(internal val js: dev.gitlive.firebase.storage.exter
     }
 
     actual fun useEmulator(host: String, port: Int) {
-        connectFirestoreEmulator(js, host, port.toDouble())
+        connectStorageEmulator(js, host, port.toDouble())
     }
 
     actual val reference: StorageReference get() = StorageReference(ref(js))
@@ -56,6 +61,8 @@ actual class StorageReference(internal val js: dev.gitlive.firebase.storage.exte
     actual val root: StorageReference get() = StorageReference(js.root)
     actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
 
+    actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).await().toFirebaseStorageMetadata() }
+
     actual fun child(path: String): StorageReference = StorageReference(ref(js, path))
 
     actual suspend fun delete() = rethrow { deleteObject(js).await() }
@@ -64,10 +71,12 @@ actual class StorageReference(internal val js: dev.gitlive.firebase.storage.exte
 
     actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).await()) }
 
-    actual suspend fun putFile(file: File): Unit = rethrow { uploadBytes(js, file).await() }
+    actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata?.toStorageMetadata()).await() }
 
-    actual fun putFileResumable(file: File): ProgressFlow = rethrow {
-        val uploadTask = uploadBytesResumable(js, file)
+    actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, data.data, metadata?.toStorageMetadata()).await() }
+
+    actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
+        val uploadTask = uploadBytesResumable(js, file, metadata?.toStorageMetadata())
 
         val flow = callbackFlow {
             val unsubscribe = uploadTask.on(
@@ -104,6 +113,7 @@ actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListResult) {
 }
 
 actual typealias File = org.w3c.files.File
+actual class Data(val data: org.khronos.webgl.Uint8Array)
 
 actual open class FirebaseStorageException(code: String, cause: Throwable) :
     FirebaseException(code, cause)
@@ -129,3 +139,32 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
             }
         }
     }
+
+
+internal fun UploadMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash
+        cacheControl = sdkMetadata.cacheControl
+        contentDisposition = sdkMetadata.contentDisposition
+        contentEncoding = sdkMetadata.contentEncoding
+        contentLanguage = sdkMetadata.contentLanguage
+        contentType = sdkMetadata.contentType
+        customMetadata = sdkMetadata.customMetadata?.let { metadata ->
+            val objectKeys = js("Object.keys")
+            objectKeys(metadata).unsafeCast<Array<String>>().associateWith { key ->
+                metadata[key]?.toString().orEmpty()
+            }
+        }.orEmpty().toMutableMap()
+    }
+}
+
+internal fun FirebaseStorageMetadata.toStorageMetadata(): Json = json(
+    "cacheControl" to cacheControl,
+    "contentDisposition" to contentDisposition,
+    "contentEncoding" to contentEncoding,
+    "contentLanguage" to contentLanguage,
+    "contentType" to contentType,
+    "customMetadata" to json(*customMetadata.toList().toTypedArray()),
+    "md5Hash" to md5Hash
+)

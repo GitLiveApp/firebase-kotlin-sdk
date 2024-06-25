@@ -4,9 +4,6 @@
 
 package dev.gitlive.firebase.auth
 
-//workaround for https://youtrack.jetbrains.com/issue/KT-48836
-internal val UNCHANGED = ""
-
 expect class FirebaseUser {
     val uid: String
     val displayName: String?
@@ -28,10 +25,11 @@ expect class FirebaseUser {
     suspend fun reauthenticateAndRetrieveData(credential: AuthCredential): AuthResult
     suspend fun sendEmailVerification(actionCodeSettings: ActionCodeSettings? = null)
     suspend fun unlink(provider: String): FirebaseUser?
+    @Deprecated("Use verifyBeforeUpdateEmail instead", replaceWith = ReplaceWith("verifyBeforeUpdateEmail(email)"))
     suspend fun updateEmail(email: String)
     suspend fun updatePassword(password: String)
     suspend fun updatePhoneNumber(credential: PhoneAuthCredential)
-    suspend fun updateProfile(displayName: String? = UNCHANGED, photoUrl: String? = UNCHANGED)
+    suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL)
     suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings? = null)
 }
 

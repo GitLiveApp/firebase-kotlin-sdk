@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.externals.setLogLevel
 import dev.gitlive.firebase.firestore.externals.writeBatch
 import dev.gitlive.firebase.firestore.firestoreSettings
 import dev.gitlive.firebase.firestore.rethrow
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
@@ -88,6 +89,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         rethrow { setLogLevel(if (loggingEnabled) "error" else "silent") }
 
+    @OptIn(DelicateCoroutinesApi::class)
     actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
         rethrow { dev.gitlive.firebase.firestore.externals.runTransaction(
             js,

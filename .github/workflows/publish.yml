@@ -15,11 +15,11 @@ env:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -28,12 +28,16 @@ jobs:
         run: ./gradlew :updateVersions
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Publish Firebase Analytics
+        run: ./gradlew :firebase-analytics:publish
       - name: Publish Firebase App
         run: ./gradlew :firebase-app:publish
       - name: Publish Firebase Auth
         run: ./gradlew :firebase-auth:publish
       - name: Publish Firebase Common
         run: ./gradlew :firebase-common:publish
+      - name: Publish Firebase Common Internal
+        run: ./gradlew :firebase-common-internal:publish
       - name: Publish Firebase Config
         run: ./gradlew :firebase-config:publish
       - name: Publish Firebase Database
@@ -42,6 +46,8 @@ jobs:
         run: ./gradlew :firebase-firestore:publish
       - name: Publish Firebase Functions
         run: ./gradlew :firebase-functions:publish
+      - name: Publish Firebase Messaging
+        run: ./gradlew :firebase-messaging:publish
       - name: Publish Firebase Storage
         run: ./gradlew :firebase-storage:publish
       - name: Publish Firebase Installations
@@ -50,3 +56,28 @@ jobs:
         run: ./gradlew :firebase-perf:publish
       - name: Publish Firebase Crashlytics
         run: ./gradlew :firebase-crashlytics:publish
+  documentation:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: gradle/gradle-build-action@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Generate documentation
+        run: ./gradlew dokkaHtmlMultiModule
+      - name: Uploading build folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: artefact
+          path: build/dokka/htmlMultiModule
+      - name: Deploy API documentation to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: build/dokka/htmlMultiModule
+          target-folder: docs

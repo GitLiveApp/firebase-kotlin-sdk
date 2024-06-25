@@ -22,7 +22,7 @@ inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSetting
     encode(strategy, value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 @PublishedApi
-internal inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
+internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
     FirebaseEncoder(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.encodeDefaults = shouldEncodeElementDefault }"))
