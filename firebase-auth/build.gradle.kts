@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
@@ -77,8 +79,8 @@ kotlin {
 
     if (supportIosTarget) {
         iosArm64()
-        iosX64()
-        iosSimulatorArm64()
+        iosX64().enableKeychainForTests()
+        iosSimulatorArm64().enableKeychainForTests()
         cocoapods {
             ios.deploymentTarget = "12.0"
             framework {
@@ -159,6 +161,29 @@ if (project.property("firebase-auth.skipJvmTests") == "true") {
 if (project.property("firebase-auth.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (supportIosTarget) {
+    tasks.create<Exec>("launchIosSimulator") {
+        commandLine("open", "-a", "Simulator")
+    }
+
+    tasks.withType<KotlinNativeSimulatorTest>().configureEach {
+        dependsOn("launchIosSimulator")
+        standalone.set(false)
+        device.set("booted")
+    }
+}
+
+fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath
+        )
     }
 }
 

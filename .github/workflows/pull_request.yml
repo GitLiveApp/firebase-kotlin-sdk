@@ -39,6 +39,9 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
       - name: Apply Android licenses
         run: ./gradlew ciSdkManagerLicenses
       - name: Run Android Instrumented Tests
@@ -47,13 +50,13 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Android ${{ matrix.gradle_tasks }} Test Report HTML
+          name: Android ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Android ${{ matrix.gradle_tasks }} Firebase Debug Log
+          name: Android ${{ env.ARCHIVE_KEY }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-js:
     runs-on: ubuntu-latest
