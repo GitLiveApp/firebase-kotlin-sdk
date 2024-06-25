@@ -48,14 +48,14 @@ jobs:
         if: failure()
         with:
           name: |
-            Android ${{ echo matrix.gradle_tasks | cut -d: -f2 }} Test Report HTML
+            Android ${{ matrix.gradle_tasks | cut -d: -f2 }} Test Report HTML
           path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: |
-            Android ${{ echo matrix.gradle_tasks | cut -d: -f2 }} Firebase Debug Log
+            Android ${{ matrix.gradle_tasks | cut -d: -f2 }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-js:
     runs-on: ubuntu-latest
