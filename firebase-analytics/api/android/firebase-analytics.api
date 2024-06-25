@@ -162,6 +162,8 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsParam {
 	public static final field PROMOTION_NAME Ljava/lang/String;
 	public static final field QUANTITY Ljava/lang/String;
 	public static final field SCORE Ljava/lang/String;
+	public static final field SCREEN_CLASS Ljava/lang/String;
+	public static final field SCREEN_NAME Ljava/lang/String;
 	public static final field SEARCH_TERM Ljava/lang/String;
 	public static final field SHIPPING Ljava/lang/String;
 	public static final field SHIPPING_TIER Ljava/lang/String;
