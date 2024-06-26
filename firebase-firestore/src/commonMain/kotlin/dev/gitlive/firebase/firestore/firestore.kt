@@ -402,7 +402,7 @@ public data class DocumentReference internal constructor(internal val native: Na
             this.encodeDefaults = encodeDefaults
         }
     }
-    public suspend inline fun <reified T : Any> set(data: T, merge: Boolean, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    public suspend inline fun <reified T : Any> set(data: T, merge: Boolean = false, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         setEncoded(
             encodeAsObject(data, buildSettings),
             if (merge) SetOptions.Merge else SetOptions.Overwrite,
