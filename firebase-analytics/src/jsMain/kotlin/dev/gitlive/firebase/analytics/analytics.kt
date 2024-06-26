@@ -4,6 +4,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 
 actual val Firebase.analytics: FirebaseAnalytics
