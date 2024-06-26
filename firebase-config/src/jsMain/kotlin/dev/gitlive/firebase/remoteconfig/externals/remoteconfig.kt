@@ -29,7 +29,7 @@ public external fun getValue(remoteConfig: RemoteConfig, key: String): Value
 
 public external interface RemoteConfig {
     public var defaultConfig: Any
-    public var fetchTimeMillis: Long
+    public var fetchTimeMillis: Double
     public var lastFetchStatus: String
     public val settings: Settings
 }
