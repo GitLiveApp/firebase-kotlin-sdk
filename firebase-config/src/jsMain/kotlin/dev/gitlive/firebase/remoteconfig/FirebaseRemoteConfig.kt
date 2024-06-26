@@ -5,6 +5,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.remoteconfig.externals.*
 import kotlinx.coroutines.await
+import kotlinx.datetime.Instant
 import kotlin.js.json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -24,7 +25,7 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
         get() = rethrow {
             FirebaseRemoteConfigInfo(
                 configSettings = js.settings.toFirebaseRemoteConfigSettings(),
-                fetchTime = js.fetchTimeMillis.milliseconds,
+                fetchTime = Instant.fromEpochMilliseconds(js.fetchTimeMillis.toLong()),
                 lastFetchStatus = js.lastFetchStatus.toFetchStatus(),
             )
         }

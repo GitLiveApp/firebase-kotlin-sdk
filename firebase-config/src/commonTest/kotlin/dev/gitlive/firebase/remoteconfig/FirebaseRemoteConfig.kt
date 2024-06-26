@@ -9,12 +9,12 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
+import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -104,7 +104,7 @@ class FirebaseRemoteConfigTest {
         assertEquals(
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
-                fetchTime = (-1).milliseconds,
+                fetchTime = Instant.fromEpochMilliseconds(-1),
                 lastFetchStatus = FetchStatus.NoFetchYet,
             ).toString(),
             remoteConfig.info.toString(),

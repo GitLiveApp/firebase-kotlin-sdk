@@ -13,10 +13,10 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toKotlinInstant
 import platform.Foundation.NSError
-import platform.Foundation.timeIntervalSince1970
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -45,10 +45,9 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
         get() {
             return FirebaseRemoteConfigInfo(
                 configSettings = ios.configSettings.asCommon(),
-                fetchTime = ios.lastFetchTime
-                    ?.timeIntervalSince1970?.seconds
-                    ?.takeIf { it > Duration.ZERO }
-                    ?: (-1L).milliseconds,
+                fetchTime = ios.lastFetchTime?.toKotlinInstant()
+                    ?.takeIf { it.toEpochMilliseconds() > 0 }
+                    ?: Instant.fromEpochMilliseconds(-1),
                 lastFetchStatus = ios.lastFetchStatus.asCommon(),
             )
         }

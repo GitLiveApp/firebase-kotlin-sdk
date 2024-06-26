@@ -8,8 +8,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
@@ -31,8 +31,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
     public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         val androidSettings = com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(settings.minimumFetchIntervalInSeconds)
-            .setFetchTimeoutInSeconds(settings.fetchTimeoutInSeconds)
+            .setMinimumFetchIntervalInSeconds(settings.minimumFetchInterval.inWholeSeconds)
+            .setFetchTimeoutInSeconds(settings.fetchTimeout.inWholeSeconds)
             .build()
         android.setConfigSettingsAsync(androidSettings).await()
     }
@@ -74,7 +74,7 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
 
         return FirebaseRemoteConfigInfo(
             configSettings = configSettings.asCommon(),
-            fetchTime = fetchTimeMillis.milliseconds,
+            fetchTime = Instant.fromEpochMilliseconds(fetchTimeMillis),
             lastFetchStatus = lastFetchStatus,
         )
     }

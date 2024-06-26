@@ -29,6 +29,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -42,6 +43,10 @@ android {
     lint {
         abortOnError = false
     }
+}
+
+dependencies {
+    coreLibraryDesugaring(libs.android.desugarjdk)
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
@@ -120,6 +125,7 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
+                api(libs.kotlinx.datetime)
             }
         }
 
