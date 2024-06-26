@@ -3,8 +3,9 @@ package dev.gitlive.firebase.perf.metrics
 import dev.gitlive.firebase.perf.externals.PerformanceTrace
 import dev.gitlive.firebase.perf.rethrow
 
+val Trace.js get() = js
 
-actual class Trace internal constructor(private val js: PerformanceTrace) {
+actual class Trace internal constructor(internal val js: PerformanceTrace) {
 
     actual fun start() = rethrow { js.start() }
     actual fun stop() = rethrow { js.stop() }

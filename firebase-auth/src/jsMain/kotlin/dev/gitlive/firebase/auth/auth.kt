@@ -8,7 +8,27 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.FirebaseNetworkException
-import dev.gitlive.firebase.auth.externals.*
+import dev.gitlive.firebase.auth.externals.Auth
+import dev.gitlive.firebase.auth.externals.getAuth
+import dev.gitlive.firebase.auth.externals.applyActionCode
+import dev.gitlive.firebase.auth.externals.confirmPasswordReset
+import dev.gitlive.firebase.auth.externals.createUserWithEmailAndPassword
+import dev.gitlive.firebase.auth.externals.sendPasswordResetEmail
+import dev.gitlive.firebase.auth.externals.fetchSignInMethodsForEmail
+import dev.gitlive.firebase.auth.externals.sendSignInLinkToEmail
+import dev.gitlive.firebase.auth.externals.isSignInWithEmailLink
+import dev.gitlive.firebase.auth.externals.signInWithEmailAndPassword
+import dev.gitlive.firebase.auth.externals.signInWithCustomToken
+import dev.gitlive.firebase.auth.externals.signInAnonymously
+import dev.gitlive.firebase.auth.externals.signInWithCredential
+import dev.gitlive.firebase.auth.externals.signInWithEmailLink
+import dev.gitlive.firebase.auth.externals.signOut
+import dev.gitlive.firebase.auth.externals.updateCurrentUser
+import dev.gitlive.firebase.auth.externals.verifyPasswordResetCode
+import dev.gitlive.firebase.auth.externals.checkActionCode
+import dev.gitlive.firebase.auth.externals.connectAuthEmulator
+import dev.gitlive.firebase.auth.externals.IdTokenResult
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,7 +41,9 @@ actual val Firebase.auth
 actual fun Firebase.auth(app: FirebaseApp) =
     rethrow { FirebaseAuth(getAuth(app.js)) }
 
-actual class FirebaseAuth internal constructor(val js: Auth) {
+val FirebaseAuth.js: Auth get() = js
+
+actual class FirebaseAuth internal constructor(internal val js: Auth) {
 
     actual val currentUser: FirebaseUser?
         get() = rethrow { js.currentUser?.let { FirebaseUser(it) } }
@@ -106,12 +128,16 @@ actual class FirebaseAuth internal constructor(val js: Auth) {
     actual fun useEmulator(host: String, port: Int) = rethrow { connectAuthEmulator(js, "http://$host:$port") }
 }
 
-actual class AuthResult internal constructor(val js: JsAuthResult) {
+val AuthResult.js: JsAuthResult get() = js
+
+actual class AuthResult internal constructor(internal val js: JsAuthResult) {
     actual val user: FirebaseUser?
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
 }
 
-actual class AuthTokenResult(val js: IdTokenResult) {
+val AuthTokenResult.js: IdTokenResult get() = js
+
+actual class AuthTokenResult(internal val js: IdTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = js.authTime
     actual val claims: Map<String, Any>

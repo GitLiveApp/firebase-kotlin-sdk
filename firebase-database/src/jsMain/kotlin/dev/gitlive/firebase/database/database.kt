@@ -27,10 +27,12 @@ import dev.gitlive.firebase.database.externals.ref
 import dev.gitlive.firebase.database.externals.remove
 import dev.gitlive.firebase.database.externals.set
 import dev.gitlive.firebase.database.externals.update
+import dev.gitlive.firebase.database.js
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
 import dev.gitlive.firebase.internal.reencodeTransformation
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -57,6 +59,7 @@ import dev.gitlive.firebase.database.externals.orderByKey as jsOrderByKey
 import dev.gitlive.firebase.database.externals.orderByValue as jsOrderByValue
 import dev.gitlive.firebase.database.externals.runTransaction as jsRunTransaction
 import dev.gitlive.firebase.database.externals.startAt as jsStartAt
+import dev.gitlive.firebase.database.js as publicJs
 
 actual val Firebase.database
     get() = rethrow { FirebaseDatabase(getDatabase()) }
@@ -70,7 +73,9 @@ actual fun Firebase.database(url: String) =
 actual fun Firebase.database(app: FirebaseApp, url: String) =
     rethrow { FirebaseDatabase(getDatabase(app = app.js, url = url)) }
 
-actual class FirebaseDatabase internal constructor(val js: Database) {
+val FirebaseDatabase.js get() = js
+
+actual class FirebaseDatabase internal constructor(internal val js: Database) {
 
     actual fun reference(path: String) = rethrow { DatabaseReference(NativeDatabaseReference(ref(js, path), js)) }
     actual fun reference() = rethrow { DatabaseReference(NativeDatabaseReference(ref(js), js)) }
@@ -89,13 +94,14 @@ internal actual open class NativeQuery(
     val database: Database
 )
 
+val Query.js: JsQuery get() = nativeQuery.js
+
 actual open class Query internal actual constructor(
-    nativeQuery: NativeQuery
+    internal val nativeQuery: NativeQuery
 ) {
 
     internal constructor(js: JsQuery, database: Database) : this(NativeQuery(js, database))
 
-    open val js: JsQuery = nativeQuery.js
     val database: Database = nativeQuery.database
 
     actual fun orderByKey() = Query(query(js, jsOrderByKey()), database)
@@ -196,8 +202,10 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 }
 
+val DataSnapshot.js: JsDataSnapshot get() = js
+
 actual class DataSnapshot internal constructor(
-    val js: JsDataSnapshot,
+    internal val js: JsDataSnapshot,
     val database: Database
 ) {
     actual val value get(): Any? {
@@ -206,10 +214,10 @@ actual class DataSnapshot internal constructor(
     }
 
     actual inline fun <reified T> value() =
-        rethrow { decode<T>(value = js.`val`()) }
+        rethrow { decode<T>(value = publicJs.`val`()) }
 
     actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
-        rethrow { decode(strategy, js.`val`(), buildSettings) }
+        rethrow { decode(strategy, publicJs.`val`(), buildSettings) }
 
     actual val exists get() = rethrow { js.exists() }
     actual val key get() = rethrow { js.key }

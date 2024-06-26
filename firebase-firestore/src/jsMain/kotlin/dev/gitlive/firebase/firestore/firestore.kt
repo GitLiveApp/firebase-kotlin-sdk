@@ -23,6 +23,7 @@ import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
 import dev.gitlive.firebase.firestore.internal.SetOptions
+import dev.gitlive.firebase.js
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
@@ -79,7 +80,7 @@ actual data class FirebaseFirestoreSettings(
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    val js: Json get() = json().apply {
+    internal val js: Json get() = json().apply {
         set("ssl", sslEnabled)
         set("host", host)
         set("localCache",
@@ -90,11 +91,11 @@ actual data class FirebaseFirestoreSettings(
                 ).asDynamic() as PersistentCacheSettings
             )
             is LocalCacheSettings.Memory -> {
-                val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
                     is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
                     is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
                 }
-                memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
+                memoryLocalCache(json("garbageCollector" to garbageCollectorSettings).asDynamic() as MemoryCacheSettings)
             }
         })
     }
@@ -138,7 +139,9 @@ actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExc
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-actual class QuerySnapshot(val js: JsQuerySnapshot) {
+val QuerySnapshot.js: JsQuerySnapshot get() = js
+
+actual class QuerySnapshot(internal val js: JsQuerySnapshot) {
     actual val documents
         get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
     actual val documentChanges
@@ -146,7 +149,9 @@ actual class QuerySnapshot(val js: JsQuerySnapshot) {
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
-actual class DocumentChange(val js: JsDocumentChange) {
+val DocumentChange.js: JsDocumentChange get() = js
+
+actual class DocumentChange(internal val js: JsDocumentChange) {
     actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(js.doc))
     actual val newIndex: Int
@@ -161,12 +166,16 @@ actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 
 val DocumentSnapshot.js get() = native.js
 
-actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
+val SnapshotMetadata.js get() = js
+
+actual class SnapshotMetadata(internal val js: JsSnapshotMetadata) {
     actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
     actual val isFromCache: Boolean get() = js.fromCache
 }
 
-actual class FieldPath private constructor(val js: JsFieldPath) {
+val FieldPath.js get() = js
+
+actual class FieldPath private constructor(internal val js: JsFieldPath) {
 
     actual companion object {
         actual val documentId = FieldPath(jsDocumentId())

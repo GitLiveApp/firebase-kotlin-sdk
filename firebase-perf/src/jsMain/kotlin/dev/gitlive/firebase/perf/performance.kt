@@ -3,6 +3,7 @@ package dev.gitlive.firebase.perf
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.js
 import dev.gitlive.firebase.perf.externals.getPerformance
 import dev.gitlive.firebase.perf.externals.trace
 import dev.gitlive.firebase.perf.metrics.Trace
@@ -17,7 +18,9 @@ actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = rethrow
     FirebasePerformance(getPerformance(app.js))
 }
 
-actual class FirebasePerformance internal constructor(val js: JsFirebasePerformance) {
+val FirebasePerformance.js get() = js
+
+actual class FirebasePerformance internal constructor(internal val js: JsFirebasePerformance) {
 
     actual fun newTrace(traceName: String): Trace = rethrow {
         Trace(trace(js, traceName))
