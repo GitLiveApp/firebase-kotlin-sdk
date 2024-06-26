@@ -8,7 +8,6 @@ import dev.gitlive.firebase.firestore.ios
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 
-@PublishedApi
 internal actual class NativeWriteBatchWrapper actual constructor(actual val native: NativeWriteBatch) {
 
     actual fun setEncoded(

@@ -4,7 +4,6 @@ import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.ServerTimestampBehavior
 import dev.gitlive.firebase.firestore.SnapshotMetadata
 
-@PublishedApi
 internal actual class NativeDocumentSnapshotWrapper internal actual constructor(actual val native: com.google.firebase.firestore.DocumentSnapshot) {
 
     actual val id get() = native.id

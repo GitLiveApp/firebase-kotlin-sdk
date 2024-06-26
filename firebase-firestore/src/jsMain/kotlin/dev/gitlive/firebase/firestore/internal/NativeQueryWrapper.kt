@@ -25,7 +25,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
 
-@PublishedApi
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     constructor(js: Query) : this(NativeQuery(js))

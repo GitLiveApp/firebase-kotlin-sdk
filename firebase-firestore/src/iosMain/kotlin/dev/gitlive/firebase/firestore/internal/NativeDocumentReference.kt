@@ -11,7 +11,6 @@ import dev.gitlive.firebase.internal.ios
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
-@PublishedApi
 internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
 
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {

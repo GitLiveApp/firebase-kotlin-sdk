@@ -9,7 +9,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.android
 import kotlinx.coroutines.tasks.await
 
-@PublishedApi
 internal actual class NativeWriteBatchWrapper internal actual constructor(actual val native: NativeWriteBatch) {
 
     actual fun setEncoded(

@@ -286,7 +286,6 @@ public expect open class Query internal constructor(nativeQuery: NativeQuery) {
     public fun equalTo(value: Boolean, key: String? = null): Query
 }
 
-@PublishedApi
 internal expect class NativeDatabaseReference : NativeQuery {
     val key: String?
     fun push(): NativeDatabaseReference
@@ -307,7 +306,7 @@ internal expect class NativeDatabaseReference : NativeQuery {
  * This class is the starting point for all Database operations. After you've initialized it with
  * a URL, you can use it to read data, write data, and to create new DatabaseReferences.
  */
-public class DatabaseReference internal constructor(@PublishedApi internal val nativeReference: NativeDatabaseReference) : Query(nativeReference) {
+public class DatabaseReference internal constructor(internal val nativeReference: NativeDatabaseReference) : Query(nativeReference) {
     /**
      * @return The last token in the location pointed to by this reference or null if this reference
      *     points to the database root
@@ -346,7 +345,7 @@ public class DatabaseReference internal constructor(@PublishedApi internal val n
         }
     }
     public suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
-        nativeReference.setValueEncoded(encode(value, buildSettings))
+        setValueEncoded(encode(value, buildSettings))
     }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
@@ -356,7 +355,12 @@ public class DatabaseReference internal constructor(@PublishedApi internal val n
         }
     }
     public suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
-        nativeReference.setValueEncoded(encode(strategy, value, buildSettings))
+        setValueEncoded(encode(strategy, value, buildSettings))
+    }
+
+    @PublishedApi
+    internal suspend fun setValueEncoded(encodedValue: Any?) {
+        nativeReference.setValueEncoded(encodedValue)
     }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
@@ -374,9 +378,14 @@ public class DatabaseReference internal constructor(@PublishedApi internal val n
      * @return The {@link Task} for this operation.
      */
     public suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
-        nativeReference.updateEncodedChildren(
+        updateEncodedChildren(
             encodeAsObject(update, buildSettings),
         )
+    }
+
+    @PublishedApi
+    internal suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        nativeReference.updateEncodedChildren(encodedUpdate)
     }
 
     /**
@@ -478,11 +487,10 @@ public expect class DataSnapshot {
  */
 public expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
 
-@PublishedApi
 internal expect class NativeOnDisconnect {
     suspend fun removeValue()
     suspend fun cancel()
-    suspend fun setValue(encodedValue: Any?)
+    suspend fun setEncodedValue(encodedValue: Any?)
     suspend fun updateEncodedChildren(encodedUpdate: EncodedObject)
 }
 
@@ -494,7 +502,7 @@ internal expect class NativeOnDisconnect {
  * Instances of this class are obtained by calling [DatabaseReference.onDisconnect]
  * on a Firebase Database ref.
  */
-public class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
+public class OnDisconnect internal constructor(internal val native: NativeOnDisconnect) {
     /**
      * Remove the value at this location when the client disconnects
      *
@@ -535,7 +543,7 @@ public class OnDisconnect internal constructor(@PublishedApi internal val native
      * @param value The value to be set when a disconnect occurs or null to delete the existing value
      */
     public suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
-        native.setValue(encode(value, buildSettings))
+        setEncodedValue(encode(value, buildSettings))
     }
 
     /**
@@ -565,13 +573,18 @@ public class OnDisconnect internal constructor(@PublishedApi internal val native
         setValue(encode(strategy, value, buildSettings))
     }
 
+    @PublishedApi
+    internal suspend fun setEncodedValue(encodedValue: Any?) {
+        native.setEncodedValue(encodedValue)
+    }
+
     /**
      * Ensure the data has the specified child values updated when the client is disconnected
      *
      * @param update The paths to update, along with their desired values
      */
     public suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
-        native.updateEncodedChildren(
+        updateEncodedChildren(
             encodeAsObject(update, buildSettings),
         )
     }
@@ -586,5 +599,10 @@ public class OnDisconnect internal constructor(@PublishedApi internal val native
         updateChildren(update) {
             this.encodeDefaults = encodeDefaults
         }
+    }
+
+    @PublishedApi
+    internal suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
+        native.updateEncodedChildren(encodedUpdate)
     }
 }

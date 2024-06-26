@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
 
-@PublishedApi
 internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
     val js: NativeDocumentReferenceType = nativeValue
 

@@ -37,8 +37,9 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js)) }
 
-public actual data class NativeFirebaseFirestore(val js: JsFirestore)
+internal actual data class NativeFirebaseFirestore(val js: JsFirestore)
 
+public operator fun FirebaseFirestore.Companion.invoke(js: JsFirestore): FirebaseFirestore = FirebaseFirestore(NativeFirebaseFirestore(js))
 public val FirebaseFirestore.js: JsFirestore get() = native.js
 
 public actual data class FirebaseFirestoreSettings(
@@ -107,26 +108,31 @@ public actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-public actual data class NativeWriteBatch(val js: JsWriteBatch)
+internal actual data class NativeWriteBatch(val js: JsWriteBatch)
 
-public val WriteBatch.js: dev.gitlive.firebase.firestore.externals.WriteBatch get() = native.js
+public operator fun WriteBatch.Companion.invoke(js: JsWriteBatch): WriteBatch = WriteBatch(NativeWriteBatch(js))
+public val WriteBatch.js: JsWriteBatch get() = native.js
 
-public actual data class NativeTransaction(val js: JsTransaction)
+internal actual data class NativeTransaction(val js: JsTransaction)
 
-public val Transaction.js: dev.gitlive.firebase.firestore.externals.Transaction get() = native.js
+public operator fun Transaction.Companion.invoke(js: JsTransaction): Transaction = Transaction(NativeTransaction(js))
+public val Transaction.js: JsTransaction get() = native.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
-public actual typealias NativeDocumentReferenceType = JsDocumentReference
+internal actual typealias NativeDocumentReferenceType = JsDocumentReference
 
+public operator fun DocumentReference.Companion.invoke(js: JsDocumentReference): DocumentReference = DocumentReference(js)
 public val DocumentReference.js: NativeDocumentReferenceType get() = native.js
 
-public actual open class NativeQuery(public open val js: JsQuery)
+internal actual open class NativeQuery(open val js: JsQuery)
 internal val JsQuery.wrapped get() = NativeQuery(this)
 
+public operator fun Query.Companion.invoke(js: JsQuery): Query = Query(js.wrapped)
 public val Query.js: dev.gitlive.firebase.firestore.externals.Query get() = native.js
 
-public actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
+internal actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
 
+public operator fun CollectionReference.Companion.invoke(js: JsCollectionReference): CollectionReference = CollectionReference(NativeCollectionReference(js))
 public val CollectionReference.js: dev.gitlive.firebase.firestore.externals.CollectionReference get() = native.js
 
 public actual class FirebaseFirestoreException(cause: Throwable, public val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
@@ -153,8 +159,9 @@ public actual class DocumentChange(public val js: JsDocumentChange) {
         get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
-public actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
+internal actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 
+public operator fun DocumentSnapshot.Companion.invoke(js: JsDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(NativeDocumentSnapshot(js))
 public val DocumentSnapshot.js: dev.gitlive.firebase.firestore.externals.DocumentSnapshot get() = native.js
 
 public actual class SnapshotMetadata(public val js: JsSnapshotMetadata) {

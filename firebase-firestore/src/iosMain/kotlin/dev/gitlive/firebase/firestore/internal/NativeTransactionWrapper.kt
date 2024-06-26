@@ -7,7 +7,6 @@ import dev.gitlive.firebase.firestore.ios
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 
-@PublishedApi
 internal actual class NativeTransactionWrapper actual constructor(actual val native: FIRTransaction) {
 
     actual fun setEncoded(

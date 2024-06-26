@@ -168,7 +168,6 @@ public actual open class Query internal actual constructor(
     override fun toString(): String = js.toString()
 }
 
-@PublishedApi
 internal actual class NativeDatabaseReference internal constructor(
     override val js: JsDatabaseReference,
     database: Database,
@@ -228,7 +227,6 @@ public actual class DataSnapshot internal constructor(
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
 }
 
-@PublishedApi
 internal actual class NativeOnDisconnect internal constructor(
     val js: JsOnDisconnect,
     val database: Database,
@@ -237,7 +235,7 @@ internal actual class NativeOnDisconnect internal constructor(
     actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
     actual suspend fun cancel() = rethrow { js.cancel().awaitWhileOnline(database) }
 
-    actual suspend fun setValue(encodedValue: Any?) =
+    actual suspend fun setEncodedValue(encodedValue: Any?) =
         rethrow { js.set(encodedValue).awaitWhileOnline(database) }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
