@@ -26,6 +26,9 @@ import kotlinx.coroutines.flow.emitAll
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 public actual val Firebase.storage: FirebaseStorage get() =
     FirebaseStorage(FIRStorage.storage())
@@ -43,15 +46,15 @@ public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStora
 )
 
 public actual class FirebaseStorage(public val ios: FIRStorage) {
-    public actual val maxOperationRetryTimeMillis: Long = ios.maxOperationRetryTime().toLong()
-    public actual val maxUploadRetryTimeMillis: Long = ios.maxUploadRetryTime().toLong()
+    public actual val maxOperationRetryTime: Duration = ios.maxOperationRetryTime().seconds
+    public actual val maxUploadRetryTime: Duration = ios.maxUploadRetryTime().seconds
 
-    public actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
-        ios.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toDouble())
+    public actual fun setMaxOperationRetryTime(maxOperationRetryTime: Duration) {
+        ios.setMaxOperationRetryTime(maxOperationRetryTime.toDouble(DurationUnit.SECONDS))
     }
 
-    public actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
-        ios.setMaxUploadRetryTime(maxUploadRetryTimeMillis.toDouble())
+    public actual fun setMaxUploadRetryTime(maxUploadRetryTime: Duration) {
+        ios.setMaxUploadRetryTime(maxUploadRetryTime.toDouble(DurationUnit.SECONDS))
     }
 
     public actual fun useEmulator(host: String, port: Int) {

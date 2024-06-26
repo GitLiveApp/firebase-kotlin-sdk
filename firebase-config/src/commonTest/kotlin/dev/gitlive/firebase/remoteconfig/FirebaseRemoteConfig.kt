@@ -14,6 +14,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
@@ -101,7 +104,7 @@ class FirebaseRemoteConfigTest {
         assertEquals(
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
-                fetchTimeMillis = -1,
+                fetchTime = (-1).milliseconds,
                 lastFetchStatus = FetchStatus.NoFetchYet,
             ).toString(),
             remoteConfig.info.toString(),
@@ -111,12 +114,12 @@ class FirebaseRemoteConfigTest {
     @Test
     fun testSetConfigSettings() = runTest {
         remoteConfig.settings {
-            fetchTimeoutInSeconds = 42
-            minimumFetchIntervalInSeconds = 42
+            fetchTimeout = 42.seconds
+            minimumFetchInterval = 42.seconds
         }
         val info = remoteConfig.info
-        assertEquals(42, info.configSettings.fetchTimeoutInSeconds)
-        assertEquals(42, info.configSettings.minimumFetchIntervalInSeconds)
+        assertEquals(42.seconds, info.configSettings.fetchTimeout)
+        assertEquals(42.seconds, info.configSettings.minimumFetchInterval)
     }
 
     // Unfortunately Firebase Remote Config is not implemented by Firebase emulator so it may be
@@ -126,7 +129,7 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetch() = runTest {
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetch()
@@ -141,7 +144,7 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetchAndActivate() = runTest {
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetchAndActivate()

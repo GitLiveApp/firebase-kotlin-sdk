@@ -6,6 +6,8 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.remoteconfig.externals.*
 import kotlinx.coroutines.await
 import kotlin.js.json
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = rethrow { FirebaseRemoteConfig(getRemoteConfig()) }
@@ -22,7 +24,7 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
         get() = rethrow {
             FirebaseRemoteConfigInfo(
                 configSettings = js.settings.toFirebaseRemoteConfigSettings(),
-                fetchTimeMillis = js.fetchTimeMillis,
+                fetchTime = js.fetchTimeMillis.milliseconds,
                 lastFetchStatus = js.lastFetchStatus.toFetchStatus(),
             )
         }
@@ -30,7 +32,7 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
     public actual suspend fun activate(): Boolean = rethrow { activate(js).await() }
     public actual suspend fun ensureInitialized(): Unit = rethrow { ensureInitialized(js).await() }
 
-    public actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?): Unit =
+    public actual suspend fun fetch(minimumFetchInterval: Duration?): Unit =
         rethrow { fetchConfig(js).await() }
 
     public actual suspend fun fetchAndActivate(): Boolean = rethrow { fetchAndActivate(js).await() }
@@ -53,8 +55,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
     public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         js.settings.apply {
-            fetchTimeoutMillis = settings.fetchTimeoutInSeconds * 1000
-            minimumFetchIntervalMillis = settings.minimumFetchIntervalInSeconds * 1000
+            fetchTimeoutMillis = settings.fetchTimeout.inWholeMilliseconds
+            minimumFetchIntervalMillis = settings.minimumFetchInterval.inWholeMilliseconds
         }
     }
 
@@ -63,8 +65,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
     }
 
     private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
-        fetchTimeoutInSeconds = fetchTimeoutMillis.toLong() / 1000,
-        minimumFetchIntervalInSeconds = minimumFetchIntervalMillis.toLong() / 1000,
+        fetchTimeout = fetchTimeoutMillis.toLong().milliseconds,
+        minimumFetchInterval = minimumFetchIntervalMillis.toLong().milliseconds,
     )
 
     private fun String.toFetchStatus(): FetchStatus = when (this) {

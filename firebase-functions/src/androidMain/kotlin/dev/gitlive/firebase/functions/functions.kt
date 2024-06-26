@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("AndroidFunctions")
+
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.DecodeSettings
@@ -11,6 +13,7 @@ import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance())
@@ -25,8 +28,8 @@ public actual fun Firebase.functions(app: FirebaseApp, region: String): Firebase
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
 
 public actual data class FirebaseFunctions internal constructor(public val android: com.google.firebase.functions.FirebaseFunctions) {
-    public actual fun httpsCallable(name: String, timeout: Long?): HttpsCallableReference =
-        HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } }.native)
+    public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
+        HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it.inWholeMilliseconds, TimeUnit.MILLISECONDS) } }.native)
 
     public actual fun useEmulator(host: String, port: Int) {
         android.useEmulator(host, port)

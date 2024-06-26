@@ -11,12 +11,12 @@ public final class dev/gitlive/firebase/storage/File {
 public final class dev/gitlive/firebase/storage/FirebaseStorage {
 	public fun <init> (Lcom/google/firebase/storage/FirebaseStorage;)V
 	public final fun getAndroid ()Lcom/google/firebase/storage/FirebaseStorage;
-	public final fun getMaxOperationRetryTimeMillis ()J
-	public final fun getMaxUploadRetryTimeMillis ()J
+	public final fun getMaxOperationRetryTime-UwyO8pc ()J
+	public final fun getMaxUploadRetryTime-UwyO8pc ()J
 	public final fun getReference ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun reference (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
-	public final fun setMaxOperationRetryTimeMillis (J)V
-	public final fun setMaxUploadRetryTimeMillis (J)V
+	public final fun setMaxOperationRetryTime-LRDsOJo (J)V
+	public final fun setMaxUploadRetryTime-LRDsOJo (J)V
 	public final fun useEmulator (Ljava/lang/String;I)V
 }
 
@@ -79,6 +79,10 @@ public abstract interface class dev/gitlive/firebase/storage/ProgressFlow : kotl
 }
 
 public final class dev/gitlive/firebase/storage/StorageKt {
+	public static final fun getMaxOperationRetryTimeMillis (Ldev/gitlive/firebase/storage/FirebaseStorage;)J
+	public static final fun getMaxUploadRetryTimeMillis (Ldev/gitlive/firebase/storage/FirebaseStorage;)J
+	public static final fun setMaxOperationRetryTimeMillis (Ldev/gitlive/firebase/storage/FirebaseStorage;J)V
+	public static final fun setMaxUploadRetryTimeMillis (Ldev/gitlive/firebase/storage/FirebaseStorage;J)V
 	public static final fun storageMetadata (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;
 }
 

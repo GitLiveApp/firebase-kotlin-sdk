@@ -1,9 +1,14 @@
 package dev.gitlive.firebase.remoteconfig
 
-private const val CONNECTION_TIMEOUT_IN_SECONDS = 60L
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+
+private val CONNECTION_TIMEOUT = 1.minutes
 
 // https://firebase.google.com/docs/remote-config/get-started?hl=en&platform=android#throttling
-private const val DEFAULT_FETCH_INTERVAL_IN_SECONDS = 12 * 3600L
+private val DEFAULT_FETCH_INTERVAL = 12.hours
 
 /** Wraps the settings for [FirebaseRemoteConfig] operations. */
 public data class FirebaseRemoteConfigSettings(
@@ -13,8 +18,23 @@ public data class FirebaseRemoteConfigSettings(
      * The timeout specifies how long the client should wait for a connection to the Firebase
      * Remote Config server.
      */
-    var fetchTimeoutInSeconds: Long = CONNECTION_TIMEOUT_IN_SECONDS,
+    var fetchTimeout: Duration = CONNECTION_TIMEOUT,
 
     /** Returns the minimum interval between successive fetches calls in seconds. */
-    var minimumFetchIntervalInSeconds: Long = DEFAULT_FETCH_INTERVAL_IN_SECONDS,
-)
+    var minimumFetchInterval: Duration = DEFAULT_FETCH_INTERVAL,
+) {
+
+    @Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("fetchTimeout"))
+    public var fetchTimeoutInSeconds: Long
+        get() = fetchTimeout.inWholeSeconds
+        set(value) {
+            fetchTimeout = value.seconds
+        }
+
+    @Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("minimumFetchInterval"))
+    public var minimumFetchIntervalInSeconds: Long
+        get() = minimumFetchInterval.inWholeSeconds
+        set(value) {
+            minimumFetchInterval = value.seconds
+        }
+}

@@ -2,6 +2,8 @@ package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 public expect val Firebase.analytics: FirebaseAnalytics
 
@@ -13,7 +15,7 @@ public expect class FirebaseAnalytics {
     public fun setUserProperty(name: String, value: String)
     public fun setUserId(id: String)
     public fun setAnalyticsCollectionEnabled(enabled: Boolean)
-    public fun setSessionTimeoutInterval(sessionTimeoutInterval: Long)
+    public fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration)
     public suspend fun getSessionId(): Long?
     public fun resetAnalyticsData()
     public fun setDefaultEventParameters(parameters: Map<String, String>)
@@ -30,6 +32,11 @@ public expect class FirebaseAnalytics {
         GRANTED,
         DENIED,
     }
+}
+
+@Deprecated("Use Kotlin Duration", replaceWith = ReplaceWith("setSessionTimeoutInterval(sessionTimeoutInterval.milliseconds)"))
+public fun FirebaseAnalytics.setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
+    setSessionTimeoutInterval(sessionTimeoutInterval.milliseconds)
 }
 
 public fun FirebaseAnalytics.setConsent(builder: FirebaseAnalyticsConsentBuilder.() -> Unit) {

@@ -7,6 +7,8 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(FIRAnalytics)
@@ -32,8 +34,8 @@ public actual class FirebaseAnalytics(public val ios: FIRAnalytics.Companion) {
         ios.setAnalyticsCollectionEnabled(enabled)
     }
 
-    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
-        ios.setSessionTimeoutInterval(sessionTimeoutInterval.toDouble())
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
+        ios.setSessionTimeoutInterval(sessionTimeoutInterval.toDouble(DurationUnit.SECONDS))
     }
 
     public actual suspend fun getSessionId(): Long? = ios.awaitResult { sessionIDWithCompletion(it) }

@@ -3,6 +3,8 @@ package dev.gitlive.firebase.remoteconfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /** Returns the [FirebaseRemoteConfig] instance of the default [FirebaseApp]. */
 public expect val Firebase.remoteConfig: FirebaseRemoteConfig
@@ -63,10 +65,10 @@ public expect class FirebaseRemoteConfig {
      * after deletion will create a new installation ID for this Firebase installation and resume the
      * periodic sync.
      *
-     * @param minimumFetchIntervalInSeconds If configs in the local storage were fetched more than
-     *     this many seconds ago, configs are served from the backend instead of local storage.
+     * @param minimumFetchInterval If configs in the local storage were fetched more than
+     *     this long ago (rounded down to seconds), configs are served from the backend instead of local storage.
      */
-    public suspend fun fetch(minimumFetchIntervalInSeconds: Long? = null)
+    public suspend fun fetch(minimumFetchInterval: Duration? = null)
 
     /**
      * Asynchronously fetches and then activates the fetched configs.
@@ -126,6 +128,11 @@ public expect class FirebaseRemoteConfig {
      *     keys and values.
      */
     public suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
+}
+
+@Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("fetch(minimumFetchIntervalInSeconds.seconds)"))
+public suspend fun FirebaseRemoteConfig.fetch(minimumFetchIntervalInSeconds: Long) {
+    fetch(minimumFetchIntervalInSeconds.seconds)
 }
 
 @Suppress("IMPLICIT_CAST_TO_ANY")

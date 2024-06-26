@@ -8,6 +8,7 @@ import com.google.firebase.analytics.setConsent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
+import kotlin.time.Duration
 
 public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
@@ -36,8 +37,8 @@ public actual class FirebaseAnalytics(public val android: com.google.firebase.an
         android.setAnalyticsCollectionEnabled(enabled)
     }
 
-    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
-        android.setSessionTimeoutDuration(sessionTimeoutInterval)
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
+        android.setSessionTimeoutDuration(sessionTimeoutInterval.inWholeMilliseconds)
     }
 
     public actual suspend fun getSessionId(): Long? = android.sessionId.await()

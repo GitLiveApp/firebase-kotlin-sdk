@@ -20,6 +20,8 @@ import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlin.js.json
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 
 public actual val Firebase.functions: FirebaseFunctions
@@ -35,8 +37,8 @@ public actual fun Firebase.functions(app: FirebaseApp, region: String): Firebase
     rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
 
 public actual class FirebaseFunctions internal constructor(public val js: Functions) {
-    public actual fun httpsCallable(name: String, timeout: Long?): HttpsCallableReference =
-        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble()) }).native) }
+    public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
+        rethrow { HttpsCallableReference(httpsCallable(js, name, timeout?.let { json("timeout" to timeout.toDouble(DurationUnit.MILLISECONDS)) }).native) }
 
     public actual fun useEmulator(host: String, port: Int) {
         connectFunctionsEmulator(js, host, port)

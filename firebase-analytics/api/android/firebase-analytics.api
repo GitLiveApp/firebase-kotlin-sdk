@@ -7,6 +7,7 @@ public final class dev/gitlive/firebase/analytics/AnalyticEventConstantsKt {
 public final class dev/gitlive/firebase/analytics/AnalyticsKt {
 	public static final fun logEvent (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public static final fun setConsent (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Lkotlin/jvm/functions/Function1;)V
+	public static final fun setSessionTimeoutInterval (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;J)V
 }
 
 public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
@@ -19,7 +20,7 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
 	public final fun setAnalyticsCollectionEnabled (Z)V
 	public final fun setConsent (Ljava/util/Map;)V
 	public final fun setDefaultEventParameters (Ljava/util/Map;)V
-	public final fun setSessionTimeoutInterval (J)V
+	public final fun setSessionTimeoutInterval-LRDsOJo (J)V
 	public final fun setUserId (Ljava/lang/String;)V
 	public final fun setUserProperty (Ljava/lang/String;Ljava/lang/String;)V
 }

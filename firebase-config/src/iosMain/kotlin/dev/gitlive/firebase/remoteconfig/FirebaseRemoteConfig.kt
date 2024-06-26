@@ -15,6 +15,10 @@ import dev.gitlive.firebase.app
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.timeIntervalSince1970
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
@@ -41,11 +45,10 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
         get() {
             return FirebaseRemoteConfigInfo(
                 configSettings = ios.configSettings.asCommon(),
-                fetchTimeMillis = ios.lastFetchTime
-                    ?.timeIntervalSince1970
-                    ?.let { it.toLong() * 1000 }
-                    ?.takeIf { it > 0 }
-                    ?: -1L,
+                fetchTime = ios.lastFetchTime
+                    ?.timeIntervalSince1970?.seconds
+                    ?.takeIf { it > Duration.ZERO }
+                    ?: (-1L).milliseconds,
                 lastFetchStatus = ios.lastFetchStatus.asCommon(),
             )
         }
@@ -55,10 +58,10 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
     public actual suspend fun ensureInitialized(): Unit =
         ios.await { ensureInitializedWithCompletionHandler(it) }
 
-    public actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
-        if (minimumFetchIntervalInSeconds != null) {
+    public actual suspend fun fetch(minimumFetchInterval: Duration?) {
+        if (minimumFetchInterval != null) {
             ios.awaitResult<FIRRemoteConfig, FIRRemoteConfigFetchStatus> {
-                fetchWithExpirationDuration(minimumFetchIntervalInSeconds.toDouble(), it)
+                fetchWithExpirationDuration(minimumFetchInterval.toDouble(DurationUnit.SECONDS), it)
             }
         } else {
             ios.awaitResult { fetchWithCompletionHandler(it) }
@@ -85,8 +88,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
     public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         val iosSettings = FIRRemoteConfigSettings().apply {
-            minimumFetchInterval = settings.minimumFetchIntervalInSeconds.toDouble()
-            fetchTimeout = settings.fetchTimeoutInSeconds.toDouble()
+            minimumFetchInterval = settings.minimumFetchInterval.toDouble(DurationUnit.SECONDS)
+            fetchTimeout = settings.fetchTimeout.toDouble(DurationUnit.SECONDS)
         }
         ios.setConfigSettings(iosSettings)
     }
@@ -96,8 +99,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
     }
 
     private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
-        fetchTimeoutInSeconds = fetchTimeout.toLong(),
-        minimumFetchIntervalInSeconds = minimumFetchInterval.toLong(),
+        fetchTimeout = fetchTimeout.seconds,
+        minimumFetchInterval = minimumFetchInterval.seconds,
     )
 
     private fun FIRRemoteConfigFetchStatus.asCommon(): FetchStatus = when (this) {
