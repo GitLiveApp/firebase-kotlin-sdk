@@ -3,7 +3,7 @@ package dev.gitlive.firebase.internal
 import kotlin.js.Json
 import kotlin.js.json
 
-val EncodedObject.js: Json get() = json(*getRaw().entries.map { (key, value) -> key to value }.toTypedArray())
+public val EncodedObject.js: Json get() = json(*getRaw().entries.map { (key, value) -> key to value }.toTypedArray())
 
 @PublishedApi
 internal actual fun Any.asNativeMap(): Map<*, *>? {
@@ -27,7 +27,7 @@ internal actual fun Any.asNativeMap(): Map<*, *>? {
     } ?: return null
     val mutableMap = mutableMapOf<String, Any?>()
     for (key in js("Object").keys(json)) {
-        mutableMap[key as String] = json[key as String]
+        mutableMap[key.unsafeCast<String>()] = json[key.unsafeCast<String>()]
     }
     return mutableMap.toMap()
 }

@@ -1,0 +1,24 @@
+public final class dev/gitlive/firebase/perf/FirebasePerformance {
+	public fun <init> ()V
+	public final fun isPerformanceCollectionEnabled ()Z
+	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
+	public final fun setPerformanceCollectionEnabled (Z)V
+}
+
+public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google/firebase/FirebaseException {
+}
+
+public final class dev/gitlive/firebase/perf/Performance_jvmKt {
+	public static final fun getPerformance (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/perf/FirebasePerformance;
+	public static final fun performance (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/perf/FirebasePerformance;
+}
+
+public final class dev/gitlive/firebase/perf/metrics/Trace {
+	public fun <init> ()V
+	public final fun getLongMetric (Ljava/lang/String;)J
+	public final fun incrementMetric (Ljava/lang/String;J)V
+	public final fun putMetric (Ljava/lang/String;J)V
+	public final fun start ()V
+	public final fun stop ()V
+}
+

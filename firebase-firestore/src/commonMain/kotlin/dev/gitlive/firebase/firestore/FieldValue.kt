@@ -4,14 +4,14 @@ import kotlinx.serialization.Serializable
 
 /** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)
-expect class FieldValue internal constructor(nativeValue: Any) {
+public expect class FieldValue internal constructor(nativeValue: Any) {
     internal val nativeValue: Any
 
-    companion object {
-        val serverTimestamp: FieldValue
-        val delete: FieldValue
-        fun increment(value: Int): FieldValue
-        fun arrayUnion(vararg elements: Any): FieldValue
-        fun arrayRemove(vararg elements: Any): FieldValue
+    public companion object {
+        public val serverTimestamp: FieldValue
+        public val delete: FieldValue
+        public fun increment(value: Int): FieldValue
+        public fun arrayUnion(vararg elements: Any): FieldValue
+        public fun arrayRemove(vararg elements: Any): FieldValue
     }
 }

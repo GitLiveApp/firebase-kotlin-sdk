@@ -6,7 +6,6 @@ package dev.gitlive.firebase
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestResult
-import kotlin.jvm.JvmName
 
 expect fun runTest(test: suspend CoroutineScope.() -> Unit): TestResult
 expect fun runBlockingTest(action: suspend CoroutineScope.() -> Unit)

@@ -21,8 +21,8 @@ class AndroidInstrumentedFirebaseMessagingTest : FirebaseMessagingTest() {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
     }
 }

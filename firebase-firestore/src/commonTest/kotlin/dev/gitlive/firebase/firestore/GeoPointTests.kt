@@ -10,10 +10,9 @@ import kotlin.test.assertEquals
 @Serializable
 data class TestDataWithGeoPoint(
     val uid: String,
-    val location: GeoPoint
+    val location: GeoPoint,
 )
 
-@Suppress("UNCHECKED_CAST")
 class GeoPointTests {
 
     @Test
@@ -23,7 +22,7 @@ class GeoPointTests {
         val encoded = encodedAsMap(
             encode<TestDataWithGeoPoint>(item) {
                 encodeDefaults = false
-            }
+            },
         )
         assertEquals("123", encoded["uid"])
         // check GeoPoint is encoded to a platform representation
@@ -35,7 +34,7 @@ class GeoPointTests {
         val geoPoint = GeoPoint(12.3, 45.6)
         val obj = mapOf(
             "uid" to "123",
-            "location" to geoPoint.nativeValue
+            "location" to geoPoint.nativeValue,
         ).asEncoded()
         val decoded: TestDataWithGeoPoint = decode(obj)
         assertEquals("123", decoded.uid)
@@ -46,6 +45,6 @@ class GeoPointTests {
     @Test
     @IgnoreJs
     fun serializers() = runTest {
-        assertEquals(GeoPointSerializer, GeoPoint(0.0,0.0).firebaseSerializer())
+        assertEquals(GeoPointSerializer, GeoPoint(0.0, 0.0).firebaseSerializer())
     }
 }

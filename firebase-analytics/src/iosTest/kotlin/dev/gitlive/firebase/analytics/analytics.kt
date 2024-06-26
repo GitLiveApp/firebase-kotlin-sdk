@@ -4,8 +4,6 @@
 
 package dev.gitlive.firebase.analytics
 
-actual val emulatorHost: String = "127.0.0.1"
-
 actual val context: Any = Unit
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)

@@ -3,6 +3,7 @@
  */
 
 @file:JvmName("tests")
+
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.testContext

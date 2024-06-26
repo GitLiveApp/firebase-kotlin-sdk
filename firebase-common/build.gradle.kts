@@ -45,6 +45,8 @@ android {
 }
 
 kotlin {
+    explicitApi()
+
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")

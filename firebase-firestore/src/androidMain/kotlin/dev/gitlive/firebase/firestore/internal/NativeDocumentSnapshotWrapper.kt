@@ -5,7 +5,7 @@ import dev.gitlive.firebase.firestore.ServerTimestampBehavior
 import dev.gitlive.firebase.firestore.SnapshotMetadata
 
 @PublishedApi
-internal actual class NativeDocumentSnapshotWrapper actual internal constructor(actual val native: com.google.firebase.firestore.DocumentSnapshot) {
+internal actual class NativeDocumentSnapshotWrapper internal actual constructor(actual val native: com.google.firebase.firestore.DocumentSnapshot) {
 
     actual val id get() = native.id
     actual val reference get() = NativeDocumentReference(native.reference)

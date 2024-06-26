@@ -293,9 +293,11 @@ To run the tests you can use the following gradle tasks:
 
 `./gradlew connectedAndroidTest` (an emulator needs to be running)
 
-`./gradlew iosSimulatorArm64Test`
+`./gradlew iosSimulatorArm64Test` (On Apple Chip) `./gradlew iosX64Test` (On Intel Chip)
 
 `./gradlew jsNodeTest`
+
+`./gradlew jvmTest`
 
 For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
 
@@ -304,6 +306,17 @@ For some tests you need to have the firebase emulator suite running. After insta
 ### Documentation
 For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
 We publish a new version of the documentation after every release and can be found [here](https://gitliveapp.github.io/firebase-kotlin-sdk/)
+
+### Validation
+To ensure changes to the public API are well documented, this library validates its binary API. If you make changes to the API, make sure to run
+
+`./gradlew apiDump`
+
+### Code style
+This library uses the [Intellij Kotlin code style](https://www.jetbrains.com/help/idea/code-style-kotlin.html). Run the linter to make sure you follow these styles.
+
+`./gradlew formatKotlin` to format to the proper style
+`./gradlew lintKotlin` to validate the correct style is used
 
 ### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
 

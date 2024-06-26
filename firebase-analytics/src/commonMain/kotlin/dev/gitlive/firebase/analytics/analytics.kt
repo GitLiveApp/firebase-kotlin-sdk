@@ -3,75 +3,75 @@ package dev.gitlive.firebase.analytics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 
-expect val Firebase.analytics: FirebaseAnalytics
+public expect val Firebase.analytics: FirebaseAnalytics
 
 /** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-expect fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics
+public expect fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics
 
-expect class FirebaseAnalytics {
-    fun logEvent(name: String, parameters: Map<String, Any>? = null)
-    fun setUserProperty(name: String, value: String)
-    fun setUserId(id: String)
-    fun setAnalyticsCollectionEnabled(enabled: Boolean)
-    fun setSessionTimeoutInterval(sessionTimeoutInterval: Long)
-    suspend fun getSessionId(): Long?
-    fun resetAnalyticsData()
-    fun setDefaultEventParameters(parameters: Map<String, String>)
-    fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>)
+public expect class FirebaseAnalytics {
+    public fun logEvent(name: String, parameters: Map<String, Any>? = null)
+    public fun setUserProperty(name: String, value: String)
+    public fun setUserId(id: String)
+    public fun setAnalyticsCollectionEnabled(enabled: Boolean)
+    public fun setSessionTimeoutInterval(sessionTimeoutInterval: Long)
+    public suspend fun getSessionId(): Long?
+    public fun resetAnalyticsData()
+    public fun setDefaultEventParameters(parameters: Map<String, String>)
+    public fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>)
 
-    enum class ConsentType {
+    public enum class ConsentType {
         AD_PERSONALIZATION,
         AD_STORAGE,
         AD_USER_DATA,
-        ANALYTICS_STORAGE
+        ANALYTICS_STORAGE,
     }
 
-    enum class ConsentStatus {
+    public enum class ConsentStatus {
         GRANTED,
-        DENIED
+        DENIED,
     }
 }
 
-fun FirebaseAnalytics.setConsent(builder: FirebaseAnalyticsConsentBuilder.() -> Unit) {
+public fun FirebaseAnalytics.setConsent(builder: FirebaseAnalyticsConsentBuilder.() -> Unit) {
     val consentBuilder = FirebaseAnalyticsConsentBuilder()
     consentBuilder.builder()
     setConsent(consentBuilder.consentSettings)
 }
 
-fun FirebaseAnalytics.logEvent(name: String, builder: FirebaseAnalyticsParameters.() -> Unit) {
+public fun FirebaseAnalytics.logEvent(name: String, builder: FirebaseAnalyticsParameters.() -> Unit) {
     val params = FirebaseAnalyticsParameters()
     params.builder()
     logEvent(name, params.parameters)
 }
 
-expect class FirebaseAnalyticsException
+public expect class FirebaseAnalyticsException
 
-data class FirebaseAnalyticsParameters(
-    val parameters: MutableMap<String, Any> = mutableMapOf()
+public data class FirebaseAnalyticsParameters(
+    val parameters: MutableMap<String, Any> = mutableMapOf(),
 ) {
-    fun param(key: String, value: String) {
+    public fun param(key: String, value: String) {
         parameters[key] = value
     }
 
-    fun param(key: String, value: Double) {
+    public fun param(key: String, value: Double) {
         parameters[key] = value
     }
 
-    fun param(key: String, value: Long) {
+    public fun param(key: String, value: Long) {
         parameters[key] = value
     }
 
-    fun param(key: String, value: Int) {
+    public fun param(key: String, value: Int) {
         parameters[key] = value
     }
 
-    fun param(key: String, value: Boolean) {
+    public fun param(key: String, value: Boolean) {
         parameters[key] = value
     }
 }
 
-data class FirebaseAnalyticsConsentBuilder(
-    val consentSettings: MutableMap<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus> = mutableMapOf()
+public data class FirebaseAnalyticsConsentBuilder(
+    val consentSettings: MutableMap<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus> = mutableMapOf(),
 ) {
     var adPersonalization: FirebaseAnalytics.ConsentStatus?
         get() = consentSettings[FirebaseAnalytics.ConsentType.AD_PERSONALIZATION]

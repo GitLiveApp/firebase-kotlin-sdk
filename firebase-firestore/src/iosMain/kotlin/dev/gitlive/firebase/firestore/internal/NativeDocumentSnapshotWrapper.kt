@@ -34,7 +34,7 @@ internal actual class NativeDocumentSnapshotWrapper actual constructor(actual va
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(native.metadata)
 
-    fun ServerTimestampBehavior.toIos() : FIRServerTimestampBehavior = when (this) {
+    fun ServerTimestampBehavior.toIos(): FIRServerTimestampBehavior = when (this) {
         ServerTimestampBehavior.ESTIMATE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorEstimate
         ServerTimestampBehavior.NONE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorNone
         ServerTimestampBehavior.PREVIOUS -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorPrevious

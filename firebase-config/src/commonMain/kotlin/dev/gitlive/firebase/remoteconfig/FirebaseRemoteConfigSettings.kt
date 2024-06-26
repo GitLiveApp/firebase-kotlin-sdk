@@ -6,7 +6,7 @@ private const val CONNECTION_TIMEOUT_IN_SECONDS = 60L
 private const val DEFAULT_FETCH_INTERVAL_IN_SECONDS = 12 * 3600L
 
 /** Wraps the settings for [FirebaseRemoteConfig] operations. */
-data class FirebaseRemoteConfigSettings(
+public data class FirebaseRemoteConfigSettings(
     /**
      * Returns the fetch timeout in seconds.
      *

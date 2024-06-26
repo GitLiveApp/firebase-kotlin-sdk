@@ -22,36 +22,36 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
-expect val Firebase.database: FirebaseDatabase
+public expect val Firebase.database: FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance for the specified [url]. */
-expect fun Firebase.database(url: String): FirebaseDatabase
+public expect fun Firebase.database(url: String): FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance of the given [FirebaseApp]. */
-expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
+public expect fun Firebase.database(app: FirebaseApp): FirebaseDatabase
 
 /** Returns the [FirebaseDatabase] instance of the given [FirebaseApp] and [url]. */
-expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
+public expect fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase
 
 /**
  * The entry point for accessing a Firebase Database. You can get an instance by calling [Firebase.database]. To access a location in the database and read or write data, use [FirebaseDatabase.reference].
  */
-expect class FirebaseDatabase {
+public expect class FirebaseDatabase {
     /**
      * Gets a DatabaseReference for the provided path.
      *
      * @param path Path to a location in your FirebaseDatabase.
      * @return A DatabaseReference pointing to the specified path.
      */
-    fun reference(path: String): DatabaseReference
+    public fun reference(path: String): DatabaseReference
 
     /**
      * Gets a DatabaseReference for the database root node.
      *
      * @return A DatabaseReference pointing to the root node.
      */
-    fun reference(): DatabaseReference
-    fun setLoggingEnabled(enabled: Boolean)
+    public fun reference(): DatabaseReference
+    public fun setLoggingEnabled(enabled: Boolean)
 
     /**
      * The Firebase Database client will cache synchronized data and keep track of all writes you've
@@ -66,7 +66,7 @@ expect class FirebaseDatabase {
      *
      * @param enabled Set to true to enable disk persistence, set to false to disable it.
      */
-    fun setPersistenceEnabled(enabled: Boolean)
+    public fun setPersistenceEnabled(enabled: Boolean)
 
     /**
      * By default Firebase Database will use up to 10MB of disk space to cache data. If the cache
@@ -81,7 +81,7 @@ expect class FirebaseDatabase {
      *
      * @param cacheSizeInBytes The new size of the cache in bytes.
      */
-    fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long)
+    public fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long)
 
     /**
      * Modifies this FirebaseDatabase instance to communicate with the Realtime Database emulator.
@@ -91,30 +91,30 @@ expect class FirebaseDatabase {
      * @param host the emulator host (for example, 10.0.2.2)
      * @param port the emulator port (for example, 9000)
      */
-    fun useEmulator(host: String, port: Int)
+    public fun useEmulator(host: String, port: Int)
 
     /**
      * Shuts down our connection to the Firebase Database backend until [goOnline] is called.
      */
-    fun goOffline()
+    public fun goOffline()
 
     /**
      * Resumes our connection to the Firebase Database backend after a previous [goOffline].
      * call.
      */
-    fun goOnline()
+    public fun goOnline()
 }
 
 /**
  * Used to emit events about changes in the child locations of a given [Query] when using the
  * [childEvents] Flow.
  */
-data class ChildEvent internal constructor(
+public data class ChildEvent internal constructor(
     val snapshot: DataSnapshot,
     val type: Type,
-    val previousChildName: String?
+    val previousChildName: String?,
 ) {
-    enum class Type {
+    public enum class Type {
         /**
          * Emitted when a new child is added to the location.
          *
@@ -153,7 +153,7 @@ data class ChildEvent internal constructor(
          *
          * @param snapshot An immutable snapshot of the data at the child that was removed.
          */
-        REMOVED
+        REMOVED,
     }
 }
 
@@ -165,23 +165,23 @@ internal expect open class NativeQuery
  *
  * Instances of Query are obtained by calling [startAt], [endAt], or [limit] on a [DatabaseReference].
  */
-expect open class Query internal constructor(nativeQuery: NativeQuery) {
-    val valueEvents: Flow<DataSnapshot>
-    fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
+public expect open class Query internal constructor(nativeQuery: NativeQuery) {
+    public val valueEvents: Flow<DataSnapshot>
+    public fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
 
     /**
      * Creates a query in which child nodes are ordered by their keys.
      *
      * @return A query with the new constraint
      */
-    fun orderByKey(): Query
+    public fun orderByKey(): Query
 
     /**
      * Creates a query in which nodes are ordered by their value
      *
      * @return A query with the new constraint
      */
-    fun orderByValue(): Query
+    public fun orderByValue(): Query
 
     /**
      * Creates a query in which child nodes are ordered by the values of the specified path.
@@ -189,7 +189,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param path The path to the child node to use for sorting
      * @return A query with the new constraint
      */
-    fun orderByChild(path: String): Query
+    public fun orderByChild(path: String): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value greater than or equal to
@@ -198,7 +198,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to start at, inclusive
      * @return A query with the new constraint
      */
-    fun startAt(value: String, key: String? = null): Query
+    public fun startAt(value: String, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value greater than or equal to
@@ -207,7 +207,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to start at, inclusive
      * @return A query with the new constraint
      */
-    fun startAt(value: Double, key: String? = null): Query
+    public fun startAt(value: Double, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value greater than or equal to
@@ -216,7 +216,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to start at, inclusive
      * @return A query with the new constraint
      */
-    fun startAt(value: Boolean, key: String? = null): Query
+    public fun startAt(value: Boolean, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value less than or equal to the
@@ -225,7 +225,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to end at, inclusive
      * @return A query with the new constraint
      */
-    fun endAt(value: String, key: String? = null): Query
+    public fun endAt(value: String, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value less than or equal to the
@@ -234,7 +234,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to end at, inclusive
      * @return A query with the new constraint
      */
-    fun endAt(value: Double, key: String? = null): Query
+    public fun endAt(value: Double, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with a value less than or equal to the
@@ -243,7 +243,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to end at, inclusive
      * @return A query with the new constraint
      */
-    fun endAt(value: Boolean, key: String? = null): Query
+    public fun endAt(value: Boolean, key: String? = null): Query
 
     /**
      * Creates a query with limit and anchor it to the start of the window.
@@ -251,7 +251,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param limit The maximum number of child nodes to return
      * @return A query with the new constraint
      */
-    fun limitToFirst(limit: Int): Query
+    public fun limitToFirst(limit: Int): Query
 
     /**
      * Creates a query with limit and anchor it to the end of the window.
@@ -259,7 +259,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param limit The maximum number of child nodes to return
      * @return A query with the new constraint
      */
-    fun limitToLast(limit: Int): Query
+    public fun limitToLast(limit: Int): Query
 
     /**
      * Creates a query constrained to only return child nodes with the given value.
@@ -267,7 +267,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to query for
      * @return A query with the new constraint
      */
-    fun equalTo(value: String, key: String? = null): Query
+    public fun equalTo(value: String, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with the given value.
@@ -275,7 +275,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to query for
      * @return A query with the new constraint
      */
-    fun equalTo(value: Double, key: String? = null): Query
+    public fun equalTo(value: Double, key: String? = null): Query
 
     /**
      * Creates a query constrained to only return child nodes with the given value.
@@ -283,7 +283,7 @@ expect open class Query internal constructor(nativeQuery: NativeQuery) {
      * @param value The value to query for
      * @return A query with the new constraint
      */
-    fun equalTo(value: Boolean, key: String? = null): Query
+    public fun equalTo(value: Boolean, key: String? = null): Query
 }
 
 @PublishedApi
@@ -307,12 +307,12 @@ internal expect class NativeDatabaseReference : NativeQuery {
  * This class is the starting point for all Database operations. After you've initialized it with
  * a URL, you can use it to read data, write data, and to create new DatabaseReferences.
  */
-class DatabaseReference internal constructor(@PublishedApi internal val nativeReference: NativeDatabaseReference) : Query(nativeReference) {
+public class DatabaseReference internal constructor(@PublishedApi internal val nativeReference: NativeDatabaseReference) : Query(nativeReference) {
     /**
      * @return The last token in the location pointed to by this reference or null if this reference
      *     points to the database root
      */
-    val key: String? = nativeReference.key
+    public val key: String? = nativeReference.key
 
     /**
      * Create a reference to an auto-generated child location. The child key is generated client-side
@@ -322,7 +322,7 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
      *
      * @return A DatabaseReference pointing to the new location
      */
-    fun push(): DatabaseReference = DatabaseReference(nativeReference.push())
+    public fun push(): DatabaseReference = DatabaseReference(nativeReference.push())
 
     /**
      * Get a reference to location relative to this one
@@ -330,33 +330,40 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
      * @param path The relative path from this reference to the new one that should be created
      * @return A new DatabaseReference to the given path
      */
-    fun child(path: String): DatabaseReference = DatabaseReference(nativeReference.child(path))
+    public fun child(path: String): DatabaseReference = DatabaseReference(nativeReference.child(path))
 
     /**
      * Provides access to disconnect operations at this location
      *
      * @return An object for managing disconnect operations at this location
      */
-    fun onDisconnect(): OnDisconnect = OnDisconnect(nativeReference.onDisconnect())
+    public fun onDisconnect(): OnDisconnect = OnDisconnect(nativeReference.onDisconnect())
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
-    suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) =
+    public suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
         setValue(value) {
             this.encodeDefaults = encodeDefaults
         }
-    suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
+    }
+    public suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         nativeReference.setValueEncoded(encode(value, buildSettings))
+    }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+    public suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
         setValue(strategy, value) {
             this.encodeDefaults = encodeDefaults
         }
-    suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.setValueEncoded(encode(strategy, value, buildSettings))
+    }
+    public suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        nativeReference.setValueEncoded(encode(strategy, value, buildSettings))
+    }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
-        this.encodeDefaults = encodeDefaults
+    public suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
+        updateChildren(update) {
+            this.encodeDefaults = encodeDefaults
+        }
     }
 
     /**
@@ -366,22 +373,27 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
      * @param update The paths to update and their new values
      * @return The {@link Task} for this operation.
      */
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = nativeReference.updateEncodedChildren(
-        encodeAsObject(update, buildSettings))
+    public suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        nativeReference.updateEncodedChildren(
+            encodeAsObject(update, buildSettings),
+        )
+    }
 
     /**
      * Set the value at this location to 'null'
      *
      * @return The {@link Task} for this operation.
      */
-    suspend fun removeValue() = nativeReference.removeValue()
+    public suspend fun removeValue() {
+        nativeReference.removeValue()
+    }
 
     /**
      * Run a transaction on the data at this location.
      *
      * @param handler An object to handle running the transaction
      */
-    suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
+    public suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
 }
 
 /**
@@ -392,26 +404,26 @@ class DatabaseReference internal constructor(@PublishedApi internal val nativeRe
  * can't be modified and will never change. To modify data at a location, use a <br>
  * [DatabaseReference] reference (e.g. with [DatabaseReference.setValue]).
  */
-expect class DataSnapshot {
+public expect class DataSnapshot {
     /**
      * Returns true if the snapshot contains a non-null value.
      *
      * @return True if the snapshot contains a non-null value, otherwise false
      */
-    val exists: Boolean
+    public val exists: Boolean
 
     /**
      * @return The key name for the source location of this snapshot or null if this snapshot points
      *     to the database root.
      */
-    val key: String?
+    public val key: String?
 
     /**
      * Used to obtain a reference to the source location for this snapshot.
      *
      * @return A DatabaseReference corresponding to the location that this snapshot came from
      */
-    val ref: DatabaseReference
+    public val ref: DatabaseReference
 
     /**
      * [value] returns the data contained in this snapshot as native types.
@@ -419,7 +431,7 @@ expect class DataSnapshot {
      * @return The data contained in this snapshot as native types or null if there is no data at this
      *     location.
      */
-    val value: Any?
+    public val value: Any?
 
     /**
      * [value] returns the data contained in this snapshot as native types.
@@ -427,7 +439,7 @@ expect class DataSnapshot {
      * @return The data contained in this snapshot as native types or null if there is no data at this
      *     location.
      */
-    inline fun <reified T> value(): T
+    public inline fun <reified T> value(): T
 
     /**
      * [value] returns the data contained in this snapshot as native types.
@@ -435,17 +447,16 @@ expect class DataSnapshot {
      * @return The data contained in this snapshot as native types or null if there is no data at this
      *     location.
      */
-    inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T
+    public inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T
 
-
-    fun child(path: String): DataSnapshot
+    public fun child(path: String): DataSnapshot
 
     /**
      * Indicates whether this snapshot has any children
      *
      * @return True if the snapshot has any children, otherwise false
      */
-    val hasChildren: Boolean
+    public val hasChildren: Boolean
 
     /**
      * Gives access to all of the immediate children of this snapshot. Can be used in native for
@@ -459,13 +470,13 @@ expect class DataSnapshot {
      *
      * @return The immediate children of this snapshot
      */
-    val children: Iterable<DataSnapshot>
+    public val children: Iterable<DataSnapshot>
 }
 
 /**
  * Exception that gets thrown when an operation on Firebase Database fails.
  */
-expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
+public expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
 
 @PublishedApi
 internal expect class NativeOnDisconnect {
@@ -483,18 +494,22 @@ internal expect class NativeOnDisconnect {
  * Instances of this class are obtained by calling [DatabaseReference.onDisconnect]
  * on a Firebase Database ref.
  */
-class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
+public class OnDisconnect internal constructor(@PublishedApi internal val native: NativeOnDisconnect) {
     /**
      * Remove the value at this location when the client disconnects
      *
      * @return The {@link Task} for this operation.
      */
-    suspend fun removeValue() = native.removeValue()
+    public suspend fun removeValue() {
+        native.removeValue()
+    }
 
     /**
      * Cancel any disconnect operations that are queued up at this location
      */
-    suspend fun cancel() = native.cancel()
+    public suspend fun cancel() {
+        native.cancel()
+    }
 
     /**
      * Ensure the data at this location is set to the specified value when the client is disconnected
@@ -506,9 +521,9 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
      * @param value The value to be set when a disconnect occurs or null to delete the existing value
      */
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
-    suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) =
+    public suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
         setValue(value) { this.encodeDefaults = encodeDefaults }
-
+    }
 
     /**
      * Ensure the data at this location is set to the specified value when the client is disconnected
@@ -519,9 +534,9 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
      *
      * @param value The value to be set when a disconnect occurs or null to delete the existing value
      */
-    suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) =
+    public suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         native.setValue(encode(value, buildSettings))
-
+    }
 
     /**
      * Ensure the data at this location is set to the specified value when the client is disconnected
@@ -533,9 +548,9 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
      * @param value The value to be set when a disconnect occurs or null to delete the existing value
      */
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(strategy, value) { this.encodeDefaults = encodeDefaults }"))
-    suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) =
+    public suspend fun <T> setValue(strategy: SerializationStrategy<T>, value: T, encodeDefaults: Boolean) {
         setValue(strategy, value) { this.encodeDefaults = encodeDefaults }
-
+    }
 
     /**
      * Ensure the data at this location is set to the specified value when the client is disconnected
@@ -546,16 +561,20 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
      *
      * @param value The value to be set when a disconnect occurs or null to delete the existing value
      */
-    suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = setValue(encode(strategy, value, buildSettings))
+    public suspend inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        setValue(encode(strategy, value, buildSettings))
+    }
 
     /**
      * Ensure the data has the specified child values updated when the client is disconnected
      *
      * @param update The paths to update, along with their desired values
      */
-    suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) = native.updateEncodedChildren(
-        encodeAsObject(update, buildSettings)
-    )
+    public suspend inline fun updateChildren(update: Map<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        native.updateEncodedChildren(
+            encodeAsObject(update, buildSettings),
+        )
+    }
 
     /**
      * Ensure the data has the specified child values updated when the client is disconnected
@@ -563,7 +582,9 @@ class OnDisconnect internal constructor(@PublishedApi internal val native: Nativ
      * @param update The paths to update, along with their desired values
      */
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("updateChildren(update) { this.encodeDefaults = encodeDefaults }"))
-    suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) = updateChildren(update) {
-        this.encodeDefaults = encodeDefaults
+    public suspend fun updateChildren(update: Map<String, Any?>, encodeDefaults: Boolean) {
+        updateChildren(update) {
+            this.encodeDefaults = encodeDefaults
+        }
     }
 }

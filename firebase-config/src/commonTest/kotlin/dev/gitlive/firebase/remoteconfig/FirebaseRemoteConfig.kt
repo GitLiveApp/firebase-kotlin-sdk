@@ -39,8 +39,8 @@ class FirebaseRemoteConfigTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         remoteConfig = Firebase.remoteConfig(app)
@@ -90,9 +90,9 @@ class FirebaseRemoteConfigTest {
                 "test_default_boolean",
                 "test_default_double",
                 "test_default_long",
-                "test_default_string"
+                "test_default_string",
             ),
-            keys
+            keys,
         )
     }
 
@@ -102,9 +102,9 @@ class FirebaseRemoteConfigTest {
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
                 fetchTimeMillis = -1,
-                lastFetchStatus = FetchStatus.NoFetchYet
+                lastFetchStatus = FetchStatus.NoFetchYet,
             ).toString(),
-            remoteConfig.info.toString()
+            remoteConfig.info.toString(),
         )
     }
 

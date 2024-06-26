@@ -37,7 +37,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal actual constructor
         awaitResult<Any?> {
             native.runTransactionWithBlock(
                 { transaction, _ -> runBlocking { transaction!!.func() } },
-                it
+                it,
             )
         } as T
 

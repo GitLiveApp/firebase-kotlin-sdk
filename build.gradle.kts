@@ -16,6 +16,8 @@ plugins {
     alias(libs.plugins.native.cocoapods) apply false
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
+    alias(libs.plugins.kotlinter) apply false
+    alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
     alias(libs.plugins.dokka)
     id("base")
     id("testOptionsConvention")
@@ -104,6 +106,7 @@ subprojects {
     }
 
     apply(plugin = "com.adarshr.test-logger")
+    apply(plugin = "org.jmailen.kotlinter")
 
     repositories {
         mavenLocal()
