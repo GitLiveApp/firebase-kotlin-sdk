@@ -170,6 +170,14 @@ external interface AuthResult {
     val credential: AuthCredential?
     val operationType: String?
     val user: User?
+    val additionalUserInfo: AdditionalUserInfo?
+}
+
+external interface AdditionalUserInfo {
+    val providerId: String?
+    val username: String?
+    val profile: Map<String, Any?>?
+    val newUser: Boolean
 }
 
 external interface AuthCredential {

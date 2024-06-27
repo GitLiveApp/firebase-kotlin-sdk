@@ -110,9 +110,28 @@ actual class FirebaseAuth internal constructor(val android: com.google.firebase.
     actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
 }
 
-actual class AuthResult internal constructor(val android: com.google.firebase.auth.AuthResult) {
+actual class AuthResult(
+    val android: com.google.firebase.auth.AuthResult,
+) {
     actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
+    actual val credential: AuthCredential?
+        get() = android.credential?.let { AuthCredential(it) }
+    actual val additionalUserInfo: AdditionalUserInfo?
+        get() = android.additionalUserInfo?.let { AdditionalUserInfo(it) }
+}
+
+actual class AdditionalUserInfo(
+    val android: com.google.firebase.auth.AdditionalUserInfo,
+) {
+    actual val providerId: String?
+        get() = android.providerId
+    actual val username: String?
+        get() = android.username
+    actual val profile: Map<String, Any?>?
+        get() = android.profile
+    actual val isNewUser: Boolean
+        get() = android.isNewUser
 }
 
 actual class AuthTokenResult(val android: com.google.firebase.auth.GetTokenResult) {
