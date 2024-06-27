@@ -6,6 +6,7 @@ package dev.gitlive.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageListResult
+import cocoapods.FirebaseStorage.FIRStorageMetadata
 import cocoapods.FirebaseStorage.FIRStorageReference
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
 import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
@@ -22,64 +23,91 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
-
-actual val Firebase.storage get() =
+public actual val Firebase.storage: FirebaseStorage get() =
     FirebaseStorage(FIRStorage.storage())
 
-actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp)
+public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(
+    FIRStorage.storageWithURL(url),
 )
 
-actual class FirebaseStorage(val ios: FIRStorage) {
-    actual val maxOperationRetryTimeMillis = ios.maxOperationRetryTime().toLong()
-    actual val maxUploadRetryTimeMillis = ios.maxUploadRetryTime().toLong()
+public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp),
+)
 
-    actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
-        ios.setMaxOperationRetryTime(maxOperationRetryTimeMillis.toDouble())
+public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url),
+)
+
+public actual class FirebaseStorage(public val ios: FIRStorage) {
+    public actual val maxOperationRetryTime: Duration = ios.maxOperationRetryTime().seconds
+    public actual val maxUploadRetryTime: Duration = ios.maxUploadRetryTime().seconds
+
+    public actual fun setMaxOperationRetryTime(maxOperationRetryTime: Duration) {
+        ios.setMaxOperationRetryTime(maxOperationRetryTime.toDouble(DurationUnit.SECONDS))
     }
 
-    actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
-        ios.setMaxUploadRetryTime(maxUploadRetryTimeMillis.toDouble())
+    public actual fun setMaxUploadRetryTime(maxUploadRetryTime: Duration) {
+        ios.setMaxUploadRetryTime(maxUploadRetryTime.toDouble(DurationUnit.SECONDS))
     }
 
-    actual fun useEmulator(host: String, port: Int) {
+    public actual fun useEmulator(host: String, port: Int) {
         ios.useEmulatorWithHost(host, port.toLong())
     }
 
-    actual val reference get() = StorageReference(ios.reference())
+    public actual val reference: StorageReference get() = StorageReference(ios.reference())
 
-    actual fun reference(location: String) = StorageReference(ios.referenceWithPath(location))
+    public actual fun reference(location: String): StorageReference = StorageReference(ios.referenceWithPath(location))
 }
 
-actual class StorageReference(val ios: FIRStorageReference) {
-    actual val name: String get() = ios.name()
-    actual val path: String get() = ios.fullPath()
-    actual val bucket: String get() = ios.bucket()
-    actual val parent: StorageReference? get() = ios.parent()?.let { StorageReference(it) }
-    actual val root: StorageReference get() = StorageReference(ios.root())
-    actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
+public actual class StorageReference(public val ios: FIRStorageReference) {
+    public actual val name: String get() = ios.name()
+    public actual val path: String get() = ios.fullPath()
+    public actual val bucket: String get() = ios.bucket()
+    public actual val parent: StorageReference? get() = ios.parent()?.let { StorageReference(it) }
+    public actual val root: StorageReference get() = StorageReference(ios.root())
+    public actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
 
-    actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
+    public actual fun child(path: String): StorageReference = StorageReference(ios.child(path))
 
-    actual suspend fun delete() = await { ios.deleteWithCompletion(it) }
+    public actual suspend fun getMetadata(): FirebaseStorageMetadata? = ios.awaitResult {
+        metadataWithCompletion { metadata, error ->
+            if (error == null) {
+                it.invoke(metadata?.toFirebaseStorageMetadata(), null)
+            } else {
+                it.invoke(null, error)
+            }
+        }
+    }
 
-    actual suspend fun getDownloadUrl(): String = ios.awaitResult {
+    public actual suspend fun delete(): Unit = await { ios.deleteWithCompletion(it) }
+
+    public actual suspend fun getDownloadUrl(): String = ios.awaitResult {
         downloadURLWithCompletion(completion = it)
     }.absoluteString()!!
 
-    actual suspend fun listAll(): ListResult = awaitResult {
+    public actual suspend fun listAll(): ListResult = awaitResult {
         ios.listAllWithCompletion { firStorageListResult, nsError ->
             it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
         }
     }
 
-    actual suspend fun putFile(file: File) = ios.awaitResult { putFile(file.url, null, completion = it) }.run {}
+    public actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = ios.awaitResult { callback ->
+        putFile(file.url, metadata?.toFIRMetadata(), callback)
+    }.run {}
 
-    actual fun putFileResumable(file: File): ProgressFlow {
-        val ios = ios.putFile(file.url)
+    public actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = ios.awaitResult { callback ->
+        putData(data.data, metadata?.toFIRMetadata(), callback)
+    }.run {}
+
+    public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val ios = ios.putFile(file.url, metadata?.toFIRMetadata())
 
         val flow = callbackFlow {
             ios.observeStatus(FIRStorageTaskStatusProgress) {
@@ -96,8 +124,9 @@ actual class StorageReference(val ios: FIRStorageReference) {
             }
             ios.observeStatus(FIRStorageTaskStatusSuccess) { close(FirebaseStorageException(it!!.error().toString())) }
             ios.observeStatus(FIRStorageTaskStatusFailure) {
-                when(it!!.error()!!.code) {
-                    /*FIRStorageErrorCodeCancelled = */ -13040L -> cancel(it.error()!!.localizedDescription)
+                when (it!!.error()!!.code) {
+                    /*FIRStorageErrorCodeCancelled = */
+                    -13040L -> cancel(it.error()!!.localizedDescription)
                     else -> close(FirebaseStorageException(it.error().toString()))
                 }
             }
@@ -111,23 +140,24 @@ actual class StorageReference(val ios: FIRStorageReference) {
             override fun cancel() = ios.cancel()
         }
     }
-
 }
 
-actual class ListResult(ios: FIRStorageListResult) {
-    actual val prefixes: List<StorageReference> = ios.prefixes().map { StorageReference(it as FIRStorageReference) }
-    actual val items: List<StorageReference> = ios.items().map { StorageReference(it as FIRStorageReference) }
-    actual val pageToken: String? = ios.pageToken()
+public actual class ListResult(ios: FIRStorageListResult) {
+    public actual val prefixes: List<StorageReference> = ios.prefixes().map { StorageReference(it as FIRStorageReference) }
+    public actual val items: List<StorageReference> = ios.items().map { StorageReference(it as FIRStorageReference) }
+    public actual val pageToken: String? = ios.pageToken()
 }
 
-actual class File(val url: NSURL)
+public actual class File(public val url: NSURL)
 
-actual class FirebaseStorageException(message: String): FirebaseException(message)
+public actual class Data(public val data: NSData)
 
-suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+public actual class FirebaseStorageException(message: String) : FirebaseException(message)
+
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(FirebaseStorageException(error.toString()))
@@ -136,14 +166,43 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
     job.await()
 }
 
-suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(FirebaseStorageException(error.toString()))
         }
     }
     return job.await() as R
+}
+
+internal fun FirebaseStorageMetadata.toFIRMetadata(): FIRStorageMetadata {
+    val metadata = FIRStorageMetadata()
+    val mappedMetadata: Map<Any?, String> = this.customMetadata.map {
+        it.key to it.value
+    }.toMap()
+    metadata.setCustomMetadata(mappedMetadata)
+    metadata.setCacheControl(this.cacheControl)
+    metadata.setContentDisposition(this.contentDisposition)
+    metadata.setContentEncoding(this.contentEncoding)
+    metadata.setContentLanguage(this.contentLanguage)
+    metadata.setContentType(this.contentType)
+    return metadata
+}
+
+internal fun FIRStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash()
+        cacheControl = sdkMetadata.cacheControl()
+        contentDisposition = sdkMetadata.contentDisposition()
+        contentEncoding = sdkMetadata.contentEncoding()
+        contentLanguage = sdkMetadata.contentLanguage()
+        contentType = sdkMetadata.contentType()
+        sdkMetadata.customMetadata()?.forEach {
+            setCustomMetadata(it.key.toString(), it.value.toString())
+        }
+    }
 }

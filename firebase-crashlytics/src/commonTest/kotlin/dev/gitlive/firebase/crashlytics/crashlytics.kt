@@ -10,12 +10,13 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
+import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
+import kotlin.time.Duration.Companion.seconds
 
-expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 
@@ -34,8 +35,8 @@ class FirebaseCrashlyticsTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         crashlytics = Firebase.crashlytics(app)
@@ -51,37 +52,57 @@ class FirebaseCrashlyticsTest {
     @Test
     fun testRecordException() = runTest {
         crashlytics.recordException(Exception("Test Exception"))
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testLog() = runTest {
         crashlytics.log("Test Log")
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testSetUserId() = runTest {
         crashlytics.setUserId("Test User Id")
 
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testSendUnsentReports() = runTest {
         crashlytics.sendUnsentReports()
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testDeleteUnsentReports() = runTest {
         crashlytics.deleteUnsentReports()
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testDidCrashOnPreviousExecution() = runTest {
         val didCrash = crashlytics.didCrashOnPreviousExecution()
         assertFalse { didCrash }
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 
     @Test
     fun testSetCrashlyticsCollectionEnabled() = runTest {
         crashlytics.setCrashlyticsCollectionEnabled(true)
+
+        // Delay to ensure Crashlytics completes
+        delay(1.seconds)
     }
 }

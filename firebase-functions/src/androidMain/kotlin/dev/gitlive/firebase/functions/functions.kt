@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("AndroidFunctions")
+
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.DecodeSettings
@@ -11,49 +13,54 @@ import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
-actual val Firebase.functions
+public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance())
 
-actual fun Firebase.functions(region: String) =
+public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(region))
 
-actual fun Firebase.functions(app: FirebaseApp) =
+public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android))
 
-actual fun Firebase.functions(app: FirebaseApp, region: String) =
+public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
 
-actual data class FirebaseFunctions internal constructor(val android: com.google.firebase.functions.FirebaseFunctions) {
-    actual fun httpsCallable(name: String, timeout: Long?) =
-        HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it, TimeUnit.MILLISECONDS) } }.native)
+public actual data class FirebaseFunctions internal constructor(public val android: com.google.firebase.functions.FirebaseFunctions) {
+    public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
+        HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it.inWholeMilliseconds, TimeUnit.MILLISECONDS) } }.native)
 
-    actual fun useEmulator(host: String, port: Int) = android.useEmulator(host, port)
+    public actual fun useEmulator(host: String, port: Int) {
+        android.useEmulator(host, port)
+    }
 }
 
 @PublishedApi
-internal actual data class NativeHttpsCallableReference(val android: com.google.firebase.functions.HttpsCallableReference){
+internal actual data class NativeHttpsCallableReference(val android: com.google.firebase.functions.HttpsCallableReference) {
     actual suspend fun invoke(encodedData: Any): HttpsCallableResult = HttpsCallableResult(android.call(encodedData).await())
     actual suspend fun invoke(): HttpsCallableResult = HttpsCallableResult(android.call().await())
 }
 
 internal val com.google.firebase.functions.HttpsCallableReference.native get() = NativeHttpsCallableReference(this)
 
-val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
+internal val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
 
-actual class HttpsCallableResult constructor(val android: com.google.firebase.functions.HttpsCallableResult) {
+public actual class HttpsCallableResult(public val android: com.google.firebase.functions.HttpsCallableResult) {
 
-    actual inline fun <reified T> data() =
+    public actual inline fun <reified T> data(): T =
         decode<T>(value = android.data)
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
         decode(strategy, android.data, buildSettings)
 }
 
-actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException
+public actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException
 
-actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+@Suppress("ConflictingExtensionProperty")
+public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 
-actual val FirebaseFunctionsException.details: Any? get() = details
+@Suppress("ConflictingExtensionProperty")
+public actual val FirebaseFunctionsException.details: Any? get() = details
 
-actual typealias FunctionsExceptionCode = com.google.firebase.functions.FirebaseFunctionsException.Code
+public actual typealias FunctionsExceptionCode = com.google.firebase.functions.FirebaseFunctionsException.Code

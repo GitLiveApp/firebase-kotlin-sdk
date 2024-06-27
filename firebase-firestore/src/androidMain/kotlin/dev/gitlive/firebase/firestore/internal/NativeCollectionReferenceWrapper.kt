@@ -15,7 +15,7 @@ internal actual class NativeCollectionReferenceWrapper internal actual construct
         get() = NativeDocumentReference(native.document())
 
     actual val parent: NativeDocumentReference?
-        get() = native.parent?.let{ NativeDocumentReference(it) }
+        get() = native.parent?.let { NativeDocumentReference(it) }
 
     actual fun document(documentPath: String) =
         NativeDocumentReference(native.document(documentPath))

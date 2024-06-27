@@ -4,4 +4,4 @@
 
 package dev.gitlive.firebase
 
-typealias Unsubscribe = () -> Unit
+public typealias Unsubscribe = () -> Unit

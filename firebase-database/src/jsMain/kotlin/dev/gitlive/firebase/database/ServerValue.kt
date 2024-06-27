@@ -6,12 +6,12 @@ import dev.gitlive.firebase.database.externals.increment as jsIncrement
 
 /** Represents a Firebase ServerValue. */
 @Serializable(with = ServerValueSerializer::class)
-actual class ServerValue internal actual constructor(
-    internal actual val nativeValue: Any
-){
-    actual companion object {
-        actual val TIMESTAMP: ServerValue get() = ServerValue(serverTimestamp())
-        actual fun increment(delta: Double): ServerValue = ServerValue(jsIncrement(delta))
+public actual class ServerValue internal actual constructor(
+    internal actual val nativeValue: Any,
+) {
+    public actual companion object {
+        public actual val TIMESTAMP: ServerValue get() = ServerValue(serverTimestamp())
+        public actual fun increment(delta: Double): ServerValue = ServerValue(jsIncrement(delta))
     }
 
     override fun equals(other: Any?): Boolean =

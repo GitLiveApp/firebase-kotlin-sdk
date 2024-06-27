@@ -15,7 +15,7 @@ import kotlinx.serialization.internal.AbstractPolymorphicSerializer
 internal fun <T> FirebaseEncoder.encodePolymorphically(
     serializer: SerializationStrategy<T>,
     value: T,
-    ifPolymorphic: (String) -> Unit
+    ifPolymorphic: (String) -> Unit,
 ) {
     // If serializer is not an AbstractPolymorphicSerializer we can just use the regular serializer
     // This will result in calling structureEncoder for complicated structures
@@ -47,7 +47,7 @@ internal fun <T> FirebaseDecoder.decodeSerializableValuePolymorphic(
     val type = getPolymorphicType(value, discriminator)
     val actualDeserializer = casted.findPolymorphicSerializerOrNull(
         structureDecoder(deserializer.descriptor, false),
-        type
+        type,
     ) as DeserializationStrategy<T>
     return actualDeserializer.deserialize(this)
 }

@@ -1,4 +1,4 @@
-<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/badge/collaborate-on%20gitlive-blueviolet?style=flat-square"></a></h1>
+<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/badge/GitLive-45_active_forks-blueviolet?style=flat-square"></a></h1>
 <img align="left" width="75px" src="https://avatars2.githubusercontent.com/u/42865805?s=200&v=4"> 
   <b>Built and maintained with 🧡 by <a href="https://git.live">GitLive</a></b><br/>
   <i>Development teams merge faster with GitLive</i><br/>
@@ -16,16 +16,17 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.12.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.12.0/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.12.0/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.12.0/pom)         | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
-| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.12.0/pom)         | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
-| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.12.0/pom)             | [![40%](https://img.shields.io/badge/-40%25-orange?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
-| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.12.0/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.12.0/pom)               | [![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
-| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.12.0/pom)                   | [![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.12.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.12.0/pom)     | [![80%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/1.13.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.13.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.13.0/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.13.0/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.13.0/pom)         | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.13.0/pom)         | [![1%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
+| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.13.0/pom)             | [![40%](https://img.shields.io/badge/-40%25-orange?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.13.0/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.13.0/pom)               | [![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.13.0/pom)                   | [![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.13.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.13.0/pom)     | [![80%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -286,6 +287,36 @@ You can build and test the project locally.
 2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
+
+### Testing
+To run the tests you can use the following gradle tasks:
+
+`./gradlew connectedAndroidTest` (an emulator needs to be running)
+
+`./gradlew iosSimulatorArm64Test` (On Apple Chip) `./gradlew iosX64Test` (On Intel Chip)
+
+`./gradlew jsNodeTest`
+
+`./gradlew jvmTest`
+
+For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
+
+`firebase emulators:start`
+
+### Documentation
+For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
+We publish a new version of the documentation after every release and can be found [here](https://gitliveapp.github.io/firebase-kotlin-sdk/)
+
+### Validation
+To ensure changes to the public API are well documented, this library validates its binary API. If you make changes to the API, make sure to run
+
+`./gradlew apiDump`
+
+### Code style
+This library uses the [Intellij Kotlin code style](https://www.jetbrains.com/help/idea/code-style-kotlin.html). Run the linter to make sure you follow these styles.
+
+`./gradlew formatKotlin` to format to the proper style
+`./gradlew lintKotlin` to validate the correct style is used
 
 ### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
 

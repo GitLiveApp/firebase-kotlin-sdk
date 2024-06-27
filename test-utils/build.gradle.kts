@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 /*
  * Copyright (c) 2023 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -25,8 +30,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     packaging {
@@ -40,35 +45,31 @@ android {
 }
 
 kotlin {
-
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
     @Suppress("OPT_IN_USAGE")
     androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
 
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        compilations.getByName("test") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvm()
 
     val supportIosTarget = project.property("skipIosTarget") != "true"
 
@@ -87,10 +88,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 if (name.lowercase().contains("ios")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
@@ -101,20 +100,21 @@ kotlin {
 
         getByName("commonMain") {
             dependencies {
-                val coroutinesVersion: String by project
                 api(kotlin("test"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+                api(libs.kotlinx.coroutines.core)
+                api(libs.kotlinx.coroutines.test)
             }
-        }
-
-        getByName("jvmMain") {
-            kotlin.srcDir("src/androidMain/kotlin")
         }
 
         getByName("jsMain") {
             dependencies {
                 implementation(kotlin("test-js"))
+            }
+        }
+
+        getByName("jvmMain") {
+            dependencies {
+                api(libs.kotlinx.coroutines.swing)
             }
         }
     }

@@ -15,13 +15,14 @@ import dev.gitlive.firebase.firestore.externals.setLogLevel
 import dev.gitlive.firebase.firestore.externals.writeBatch
 import dev.gitlive.firebase.firestore.firestoreSettings
 import dev.gitlive.firebase.firestore.rethrow
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 
 internal actual class NativeFirebaseFirestoreWrapper internal constructor(
-    private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore
-){
+    private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore,
+) {
 
     internal actual constructor(native: NativeFirebaseFirestore) : this({ native })
     internal constructor(app: FirebaseApp) : this(
@@ -31,9 +32,9 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
                     emulatorSettings?.run {
                         connectFirestoreEmulator(it, host, port)
                     }
-                }
+                },
             )
-        }
+        },
     )
 
     private data class EmulatorSettings(val host: String, val port: Int)
@@ -60,8 +61,8 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
         NativeCollectionReference(
             dev.gitlive.firebase.firestore.externals.collection(
                 js,
-                collectionPath
-            )
+                collectionPath,
+            ),
         )
     }
 
@@ -69,8 +70,8 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
         NativeQuery(
             dev.gitlive.firebase.firestore.externals.collectionGroup(
                 js,
-                collectionId
-            )
+                collectionId,
+            ),
         )
     }
 
@@ -78,8 +79,8 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
         NativeDocumentReference(
             doc(
                 js,
-                documentPath
-            )
+                documentPath,
+            ),
         )
     }
 
@@ -88,10 +89,14 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         rethrow { setLogLevel(if (loggingEnabled) "error" else "silent") }
 
+    @OptIn(DelicateCoroutinesApi::class)
     actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
-        rethrow { dev.gitlive.firebase.firestore.externals.runTransaction(
-            js,
-            { GlobalScope.promise { NativeTransaction(it).func() } }).await() }
+        rethrow {
+            dev.gitlive.firebase.firestore.externals.runTransaction(
+                js,
+                { GlobalScope.promise { NativeTransaction(it).func() } },
+            ).await()
+        }
 
     actual suspend fun clearPersistence() =
         rethrow { clearIndexedDbPersistence(js).await() }

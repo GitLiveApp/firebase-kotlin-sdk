@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /*
@@ -10,7 +13,7 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    //id("com.quittle.android-emulator") version "0.2.0"
+    id("testOptionsConvention")
 }
 
 android {
@@ -26,15 +29,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.configureTestOptions()
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -45,26 +45,29 @@ android {
     }
 }
 
-// Optional configuration
-//androidEmulator {
-//    emulator {
-//        name("givlive_emulator")
-//        sdkVersion(28)
-//        abi("x86_64")
-//        includeGoogleApis(true) // Defaults to false
-//
-//    }
-//    headless(false)
-//    logEmulatorOutput(false)
-//}
+dependencies {
+    coreLibraryDesugaring(libs.android.desugarjdk)
+}
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
+    explicitApi()
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
@@ -73,25 +76,9 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
 
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        compilations.getByName("test") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvm()
 
     if (supportIosTarget) {
         iosArm64()
@@ -104,7 +91,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseRemoteConfig") {
-                version = "10.25.0"
+                version = libs.versions.firebase.cocoapods.get()
             }
         }
     }
@@ -112,23 +99,19 @@ kotlin {
     js(IR) {
         useCommonJs()
         browser {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
+            }
         }
     }
 
     sourceSets {
         all {
             languageSettings.apply {
-                val apiVersion: String by project
-                val languageVersion: String by project
-                this.apiVersion = apiVersion
-                this.languageVersion = languageVersion
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 if (name.lowercase().contains("ios")) {
@@ -142,6 +125,7 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
+                api(libs.kotlinx.datetime)
             }
         }
 
@@ -153,7 +137,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api("com.google.firebase:firebase-config-ktx")
+                api(libs.google.firebase.config.ktx)
             }
         }
 
@@ -166,6 +150,12 @@ kotlin {
 if (project.property("firebase-config.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-config.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

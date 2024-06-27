@@ -3,11 +3,10 @@
  */
 
 @file:JvmName("tests")
+
 package dev.gitlive.firebase.crashlytics
 
 import androidx.test.platform.app.InstrumentationRegistry
-
-actual val emulatorHost: String = "10.0.2.2"
 
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 

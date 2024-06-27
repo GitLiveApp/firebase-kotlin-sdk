@@ -8,7 +8,6 @@ import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
@@ -33,7 +32,7 @@ class FirebaseDatabaseTest {
     lateinit var database: FirebaseDatabase
 
     @Serializable
-    data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0)
+    data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0, val boolean: Boolean = true)
 
     @Serializable
     data class DatabaseTest(val title: String, val likes: Int = 0)
@@ -48,8 +47,8 @@ class FirebaseDatabaseTest {
                 databaseUrl = "https://fir-kotlin-sdk-default-rtdb.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk-default-rtdb",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         database = Firebase.database(app).apply {
@@ -105,7 +104,7 @@ class FirebaseDatabaseTest {
         assertEquals(data.likes, userDocBefore.likes)
 
         // Run transaction
-        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1)  }
+        val transactionSnapshot = userRef.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1) }
         val userDocAfter = transactionSnapshot.value(DatabaseTest.serializer())
 
         // Check the database after transaction
@@ -196,6 +195,29 @@ class FirebaseDatabaseTest {
         assertTrue(valueEvents.first().exists)
         reference.updateChildren(mapOf("test" to false, "nested" to mapOf("lastActivity" to null), "lastActivity" to null))
         assertFalse(valueEvents.first().exists)
+    }
+
+    @Test
+    fun testBooleanValue() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseBooleanTest")
+        val falseRef = reference.child("false")
+        val trueRef = reference.child("true")
+        falseRef.setValue(false)
+        trueRef.setValue(true)
+        val falseValue = falseRef.valueEvents.first().value<Boolean>()
+        val trueValue = trueRef.valueEvents.first().value<Boolean>()
+        assertFalse(falseValue)
+        assertTrue(trueValue)
+    }
+
+    @Test
+    fun testBooleanValueInChild() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseBooleanInChildTest")
+        reference.setValue(FirebaseDatabaseChildTest())
+        val value = reference.valueEvents.first().value<FirebaseDatabaseChildTest>()
+        assertEquals(FirebaseDatabaseChildTest(), value)
     }
 
     // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870

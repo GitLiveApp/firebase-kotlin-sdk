@@ -12,7 +12,7 @@ import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.await
 
 @PublishedApi
-internal actual class NativeWriteBatchWrapper actual internal constructor(actual val native: NativeWriteBatch) {
+internal actual class NativeWriteBatchWrapper internal actual constructor(actual val native: NativeWriteBatch) {
 
     constructor(js: WriteBatch) : this(NativeWriteBatch(js))
 
@@ -21,7 +21,7 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: EncodedObject,
-        setOptions: SetOptions
+        setOptions: SetOptions,
     ): NativeWriteBatchWrapper = rethrow { js.set(documentRef.js, encodedData.js, setOptions.js) }.let { this }
 
     actual fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): NativeWriteBatchWrapper = rethrow { js.update(documentRef.js, encodedData.js) }
@@ -29,7 +29,7 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
     ): NativeWriteBatchWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
@@ -38,7 +38,7 @@ internal actual class NativeWriteBatchWrapper actual internal constructor(actual
 
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>,
     ): NativeWriteBatchWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
