@@ -9,7 +9,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.await
 
-@PublishedApi
 internal actual class NativeCollectionReferenceWrapper internal actual constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
 
     constructor(js: CollectionReference) : this(NativeCollectionReference(js))

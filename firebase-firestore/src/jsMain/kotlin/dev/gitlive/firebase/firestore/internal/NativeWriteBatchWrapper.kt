@@ -11,7 +11,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.await
 
-@PublishedApi
 internal actual class NativeWriteBatchWrapper internal actual constructor(actual val native: NativeWriteBatch) {
 
     constructor(js: WriteBatch) : this(NativeWriteBatch(js))

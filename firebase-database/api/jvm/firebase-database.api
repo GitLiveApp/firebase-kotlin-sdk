@@ -38,7 +38,6 @@ public final class dev/gitlive/firebase/database/DataSnapshot {
 public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive/firebase/database/Query {
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/DatabaseReference;
 	public final fun getKey ()Ljava/lang/String;
-	public final fun getNativeReference ()Ldev/gitlive/firebase/database/NativeDatabaseReference;
 	public final fun onDisconnect ()Ldev/gitlive/firebase/database/OnDisconnect;
 	public final fun push ()Ldev/gitlive/firebase/database/DatabaseReference;
 	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -47,9 +46,11 @@ public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive
 	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun setValue$default (Ldev/gitlive/firebase/database/DatabaseReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun setValueEncoded (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun updateChildren (Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun updateChildren (Ljava/util/Map;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun updateChildren$default (Ldev/gitlive/firebase/database/DatabaseReference;Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/database/FirebaseDatabase {
@@ -68,41 +69,17 @@ public final class dev/gitlive/firebase/database/FirebaseDatabase {
 public final class dev/gitlive/firebase/database/FirebaseDatabase$Companion {
 }
 
-public final class dev/gitlive/firebase/database/NativeDatabaseReference {
-	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/NativeDatabaseReference;
-	public fun getAndroid ()Lcom/google/firebase/database/DatabaseReference;
-	public synthetic fun getAndroid ()Lcom/google/firebase/database/Query;
-	public final fun getDatabase ()Ldev/gitlive/firebase/database/FirebaseDatabase;
-	public final fun getKey ()Ljava/lang/String;
-	public final fun onDisconnect ()Ldev/gitlive/firebase/database/NativeOnDisconnect;
-	public final fun push ()Ldev/gitlive/firebase/database/NativeDatabaseReference;
-	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun runTransaction (Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun runTransaction$default (Ldev/gitlive/firebase/database/NativeDatabaseReference;Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun setValueEncoded (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class dev/gitlive/firebase/database/NativeOnDisconnect {
-	public final fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAndroid ()Lcom/google/firebase/database/OnDisconnect;
-	public final fun getDatabase ()Ldev/gitlive/firebase/database/FirebaseDatabase;
-	public final fun getPersistenceEnabled ()Z
-	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun setValue (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
 public final class dev/gitlive/firebase/database/OnDisconnect {
 	public final fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getNative ()Ldev/gitlive/firebase/database/NativeOnDisconnect;
 	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setEncodedValue (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun setValue$default (Ldev/gitlive/firebase/database/OnDisconnect;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun updateChildren (Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun updateChildren (Ljava/util/Map;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun updateChildren$default (Ldev/gitlive/firebase/database/OnDisconnect;Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public class dev/gitlive/firebase/database/Query {

@@ -15,7 +15,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import platform.Foundation.NSNull
 
-@PublishedApi
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())

@@ -5,7 +5,6 @@ import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.NativeTransaction
 import dev.gitlive.firebase.internal.EncodedObject
 
-@PublishedApi
 internal expect class NativeTransactionWrapper internal constructor(native: NativeTransaction) {
 
     val native: NativeTransaction

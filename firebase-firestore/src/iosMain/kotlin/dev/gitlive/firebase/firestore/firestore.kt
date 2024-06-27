@@ -36,9 +36,10 @@ public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (t
     )
 }
 
-public actual typealias NativeFirebaseFirestore = FIRFirestore
+internal actual typealias NativeFirebaseFirestore = FIRFirestore
 
-public val FirebaseFirestore.ios: NativeFirebaseFirestore get() = native
+public operator fun FirebaseFirestore.Companion.invoke(ios: FIRFirestore): FirebaseFirestore = FirebaseFirestore(ios)
+public val FirebaseFirestore.ios: FIRFirestore get() = native
 
 public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
@@ -98,26 +99,31 @@ public actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-public actual typealias NativeWriteBatch = FIRWriteBatch
+internal actual typealias NativeWriteBatch = FIRWriteBatch
 
-public val WriteBatch.ios: NativeWriteBatch get() = native
+public operator fun WriteBatch.Companion.invoke(ios: FIRWriteBatch): WriteBatch = WriteBatch(ios)
+public val WriteBatch.ios: FIRWriteBatch get() = native
 
-public actual typealias NativeTransaction = FIRTransaction
+internal actual typealias NativeTransaction = FIRTransaction
 
-public val Transaction.ios: NativeTransaction get() = native
+public operator fun Transaction.Companion.invoke(ios: FIRTransaction): Transaction = Transaction(ios)
+public val Transaction.ios: FIRTransaction get() = native
 
 /** A class representing a platform specific Firebase DocumentReference. */
-public actual typealias NativeDocumentReferenceType = FIRDocumentReference
+internal actual typealias NativeDocumentReferenceType = FIRDocumentReference
 
-public val DocumentReference.ios: NativeDocumentReferenceType get() = native.ios
+public operator fun DocumentReference.Companion.invoke(ios: FIRDocumentReference): DocumentReference = DocumentReference(ios)
+public val DocumentReference.ios: FIRDocumentReference get() = native.ios
 
-public actual typealias NativeQuery = FIRQuery
+internal actual typealias NativeQuery = FIRQuery
 
+public operator fun Query.Companion.invoke(ios: FIRQuery): Query = Query(ios)
 public val Query.ios: NativeQuery get() = native
 
-public actual typealias NativeCollectionReference = FIRCollectionReference
+internal actual typealias NativeCollectionReference = FIRCollectionReference
 
-public val CollectionReference.ios: NativeCollectionReference get() = native
+public operator fun CollectionReference.Companion.invoke(ios: FIRCollectionReference): CollectionReference = CollectionReference(ios)
+public val CollectionReference.ios: FIRCollectionReference get() = native
 
 public actual class FirebaseFirestoreException(message: String, public val code: FirestoreExceptionCode) : FirebaseException(message)
 
@@ -197,9 +203,10 @@ public actual class DocumentChange(public val ios: FIRDocumentChange) {
         get() = ChangeType.entries.first { it.ios == ios.type }
 }
 
-public actual typealias NativeDocumentSnapshot = FIRDocumentSnapshot
+internal actual typealias NativeDocumentSnapshot = FIRDocumentSnapshot
 
-public val DocumentSnapshot.ios: NativeDocumentSnapshot get() = native
+public operator fun DocumentSnapshot.Companion.invoke(ios: FIRDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(ios)
+public val DocumentSnapshot.ios: FIRDocumentSnapshot get() = native
 
 public actual class SnapshotMetadata(public val ios: FIRSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = ios.pendingWrites

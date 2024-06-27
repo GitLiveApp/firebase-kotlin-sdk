@@ -165,7 +165,6 @@ public actual open class Query internal actual constructor(
     override fun toString(): String = ios.toString()
 }
 
-@PublishedApi
 internal actual class NativeDatabaseReference internal constructor(
     override val ios: FIRDatabaseReference,
     persistenceEnabled: Boolean,
@@ -236,7 +235,6 @@ public actual class DataSnapshot internal constructor(
     public actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
 }
 
-@PublishedApi
 internal actual class NativeOnDisconnect internal constructor(
     val ios: FIRDatabaseReference,
     val persistenceEnabled: Boolean,
@@ -249,7 +247,7 @@ internal actual class NativeOnDisconnect internal constructor(
         ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
-    actual suspend fun setValue(encodedValue: Any?) {
+    actual suspend fun setEncodedValue(encodedValue: Any?) {
         ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
     }
 
