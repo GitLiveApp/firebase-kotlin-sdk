@@ -1,5 +1,7 @@
 package dev.gitlive.firebase.remoteconfig
 
+import kotlinx.datetime.Instant
+
 /** Wraps the current state of the [FirebaseRemoteConfig] singleton object. */
 public data class FirebaseRemoteConfigInfo(
     /**
@@ -10,13 +12,13 @@ public data class FirebaseRemoteConfigInfo(
     val configSettings: FirebaseRemoteConfigSettings,
 
     /**
-     * Gets the timestamp (milliseconds since epoch) of the last successful fetch, regardless of
+     * Gets the [Instant] of the last successful fetch, regardless of
      * whether the fetch was activated or not.
      *
-     * @return -1 if no fetch attempt has been made yet. Otherwise, returns the timestamp of the last
+     * @return `Instant.fromEpochMilliseconds(-1)` if no fetch attempt has been made yet. Otherwise, returns the timestamp of the last
      *     successful fetch operation.
      */
-    val fetchTimeMillis: Long,
+    val fetchTime: Instant,
 
     /**
      * Gets the status of the most recent fetch attempt.
@@ -24,7 +26,10 @@ public data class FirebaseRemoteConfigInfo(
      * @return Will return one of [FetchStatus.Success], [FetchStatus.Failure], [FetchStatus.Throttled], or [FetchStatus.NoFetchYet]
      */
     val lastFetchStatus: FetchStatus,
-)
+) {
+    @Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("fetchTime"))
+    val fetchTimeMillis: Long get() = fetchTime.toEpochMilliseconds()
+}
 
 public enum class FetchStatus {
     /**

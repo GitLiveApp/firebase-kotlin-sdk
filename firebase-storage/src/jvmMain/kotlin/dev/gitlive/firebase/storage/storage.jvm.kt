@@ -3,6 +3,7 @@ package dev.gitlive.firebase.storage
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlin.time.Duration
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
 public actual val Firebase.storage: FirebaseStorage
@@ -16,15 +17,15 @@ public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = TODO("No
 public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = TODO("Not yet implemented")
 
 public actual class FirebaseStorage {
-    public actual val maxOperationRetryTimeMillis: Long
+    public actual val maxOperationRetryTime: Duration
         get() = TODO("Not yet implemented")
-    public actual val maxUploadRetryTimeMillis: Long
+    public actual val maxUploadRetryTime: Duration
         get() = TODO("Not yet implemented")
 
-    public actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
+    public actual fun setMaxOperationRetryTime(maxOperationRetryTime: Duration) {
     }
 
-    public actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
+    public actual fun setMaxUploadRetryTime(maxUploadRetryTime: Duration) {
     }
 
     public actual fun useEmulator(host: String, port: Int) {

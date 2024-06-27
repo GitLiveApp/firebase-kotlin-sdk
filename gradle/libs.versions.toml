@@ -12,12 +12,14 @@ kotlin = "2.0.0"
 kotlinx-coroutines = "1.9.0-RC"
 kotlinx-serialization = "1.7.0"
 kotlinx-binarycompatibilityvalidator = "0.15.0-Beta.2"
+kotlinx-datetime = "0.6.0"
 kotlinter = "4.4.0"
 settings-api = "2.0"
 settings-language = "2.0"
 firebase-cocoapods = "10.28.0"
 test-logger-plugin = "3.2.0"
 dokka = "1.9.20"
+desugar-libs = "2.0.3"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -45,7 +47,9 @@ kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-cor
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
+android-desugarjdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-libs" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

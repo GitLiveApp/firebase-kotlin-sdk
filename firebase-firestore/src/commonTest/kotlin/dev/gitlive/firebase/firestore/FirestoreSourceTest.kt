@@ -7,6 +7,7 @@ import kotlin.test.*
  * These tests are separated from other tests because
  * testing Firestore Source requires toggling persistence settings per test.
  */
+@IgnoreForAndroidUnitTest
 class FirestoreSourceTest {
     lateinit var firestore: FirebaseFirestore
 

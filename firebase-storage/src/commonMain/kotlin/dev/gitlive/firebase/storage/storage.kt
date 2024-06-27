@@ -4,6 +4,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
 public expect val Firebase.storage: FirebaseStorage
@@ -32,32 +34,32 @@ public expect class FirebaseStorage {
      * Returns the maximum time to retry operations other than upload and download if a failure
      * occurs.
      *
-     * @return the maximum time in milliseconds. Defaults to 2 minutes (120,000 milliseconds).
+     * @return the maximum time. Defaults to 2 minutes (120,000 milliseconds).
      */
-    public val maxOperationRetryTimeMillis: Long
+    public val maxOperationRetryTime: Duration
 
     /**
      * Returns the maximum time to retry an upload if a failure occurs.
      *
-     * @return the maximum time in milliseconds. Defaults to 10 minutes (600,000 milliseconds).
+     * @return the maximum time. Defaults to 10 minutes (600,000 milliseconds).
      */
-    public val maxUploadRetryTimeMillis: Long
+    public val maxUploadRetryTime: Duration
 
     /**
      * Sets the maximum time to retry operations other than upload and download if a failure occurs.
      *
-     * @param maxTransferRetryMillis the maximum time in milliseconds. Defaults to 2 minutes (120,000
+     * @param maxOperationRetryTime the maximum time. Defaults to 2 minutes (120,000
      *     milliseconds).
      */
-    public fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long)
+    public fun setMaxOperationRetryTime(maxOperationRetryTime: Duration)
 
     /**
      * Sets the maximum time to retry an upload if a failure occurs.
      *
-     * @param maxTransferRetryMillis the maximum time in milliseconds. Defaults to 10 minutes (600,000
+     * @param maxUploadRetryTime the maximum time in milliseconds. Defaults to 10 minutes (600,000
      *     milliseconds).
      */
-    public fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long)
+    public fun setMaxUploadRetryTime(maxUploadRetryTime: Duration)
 
     /**
      * Modifies this FirebaseStorage instance to communicate with the Storage emulator.
@@ -84,6 +86,22 @@ public expect class FirebaseStorage {
      * @return An instance of [StorageReference] at the given child path.
      */
     public fun reference(location: String): StorageReference
+}
+
+@Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("maxOperationRetryTime"))
+public val FirebaseStorage.maxOperationRetryTimeMillis: Long get() = maxOperationRetryTime.inWholeMilliseconds
+
+@Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("maxUploadRetryTime"))
+public val FirebaseStorage.maxUploadRetryTimeMillis: Long get() = maxUploadRetryTime.inWholeMilliseconds
+
+@Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("setMaxOperationRetryTime(maxOperationRetryTimeMillis.milliseconds)"))
+public fun FirebaseStorage.setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
+    setMaxOperationRetryTime(maxOperationRetryTimeMillis.milliseconds)
+}
+
+@Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("setMaxUploadRetryTime(maxUploadRetryTimeMillis.milliseconds)"))
+public fun FirebaseStorage.setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
+    setMaxUploadRetryTime(maxUploadRetryTimeMillis.milliseconds)
 }
 
 /**
@@ -158,7 +176,7 @@ public expect class StorageReference {
      * child = foo///bar    path = foo/bar
      * ```
      *
-     * @param pathString The relative path from this reference.
+     * @param path The relative path from this reference.
      * @return the child [StorageReference].
      */
     public fun child(path: String): StorageReference
@@ -175,8 +193,7 @@ public expect class StorageReference {
      * share the file with others, but can be revoked by a developer in the Firebase Console if
      * desired.
      *
-     * @return The [Uri] representing the download URL. You can feed this URL into a [URL]
-     *     and download the object via URL.openStream().
+     * @return The String representing the download URL.
      */
     public suspend fun getDownloadUrl(): String
 
@@ -189,7 +206,6 @@ public expect class StorageReference {
      *
      * [listAll] is only available for projects using Firebase Rules Version 2.
      *
-     * @throws OutOfMemoryError If there are too many items at this location.
      * @return A [ListResult] that returns all items and prefixes under the current StorageReference.
      */
     public suspend fun listAll(): ListResult

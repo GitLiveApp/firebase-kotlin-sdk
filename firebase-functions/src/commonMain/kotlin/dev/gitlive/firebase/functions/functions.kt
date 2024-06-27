@@ -12,11 +12,13 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.internal.encode
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /** FirebaseFunctions lets you call Cloud Functions for Firebase. */
 public expect class FirebaseFunctions {
     /** Returns a reference to the callable HTTPS trigger with the given name. */
-    public fun httpsCallable(name: String, timeout: Long? = null): HttpsCallableReference
+    public fun httpsCallable(name: String, timeout: Duration? = null): HttpsCallableReference
 
     /**
      * Modifies this FirebaseFunctions instance to communicate with the Cloud Functions emulator.
@@ -28,6 +30,9 @@ public expect class FirebaseFunctions {
      */
     public fun useEmulator(host: String, port: Int)
 }
+
+@Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("httpsCallable(name, timeout.milliseconds)"))
+public fun FirebaseFunctions.httpsCallable(name: String, timeout: Long): HttpsCallableReference = httpsCallable(name, timeout.milliseconds)
 
 @PublishedApi
 internal expect class NativeHttpsCallableReference {

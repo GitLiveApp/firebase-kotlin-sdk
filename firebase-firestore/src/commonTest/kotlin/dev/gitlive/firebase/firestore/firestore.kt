@@ -32,6 +32,8 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -216,7 +218,7 @@ class FirebaseFirestoreTest {
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
-        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100.milliseconds) // makes possible to catch pending writes snapshot
 
         doc.set(
             FirestoreTimeTest.serializer(),
@@ -256,7 +258,7 @@ class FirebaseFirestoreTest {
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
-        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100.milliseconds) // makes possible to catch pending writes snapshot
 
         doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
@@ -275,7 +277,7 @@ class FirebaseFirestoreTest {
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
-        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100.milliseconds) // makes possible to catch pending writes snapshot
 
         doc.set(FirestoreTimeTest.serializer(), FirestoreTimeTest("ServerTimestampBehavior", Timestamp.ServerTimestamp))
 
@@ -595,7 +597,7 @@ class FirebaseFirestoreTest {
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
-        nonSkippedDelay(100) // makes possible to catch pending writes snapshot
+        nonSkippedDelay(100.milliseconds) // makes possible to catch pending writes snapshot
 
         doc.set(DoubleTimestamp.serializer(), DoubleTimestamp(DoubleAsTimestampSerializer.SERVER_TIMESTAMP))
 
@@ -1053,7 +1055,7 @@ class FirebaseFirestoreTest {
         }
     }
 
-    private suspend fun nonSkippedDelay(timeout: Long) = withContext(Dispatchers.Default) {
+    private suspend fun nonSkippedDelay(timeout: Duration) = withContext(Dispatchers.Default) {
         delay(timeout)
     }
 }

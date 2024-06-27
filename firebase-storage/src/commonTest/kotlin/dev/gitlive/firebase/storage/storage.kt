@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -41,8 +42,8 @@ class FirebaseStorageTest {
 
         storage = Firebase.storage(app).apply {
             useEmulator(emulatorHost, 9199)
-            setMaxOperationRetryTimeMillis(10000)
-            setMaxUploadRetryTimeMillis(10000)
+            setMaxOperationRetryTime(10.seconds)
+            setMaxUploadRetryTime(10.seconds)
         }
     }
 

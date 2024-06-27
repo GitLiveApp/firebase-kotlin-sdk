@@ -17,6 +17,8 @@ import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(FIRFunctions.functions())
@@ -36,8 +38,8 @@ public actual fun Firebase.functions(
 )
 
 public actual data class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
-    public actual fun httpsCallable(name: String, timeout: Long?): HttpsCallableReference =
-        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it / 1000.0) } }.native)
+    public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
+        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it.toDouble(DurationUnit.SECONDS)) } }.native)
 
     public actual fun useEmulator(host: String, port: Int) {
         ios.useEmulatorWithHost(host, port.toLong())

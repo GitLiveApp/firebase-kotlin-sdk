@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlin.js.Json
 import kotlin.js.json
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 
 public actual val Firebase.storage: FirebaseStorage
     get() = FirebaseStorage(getStorage())
@@ -27,15 +30,15 @@ public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = Firebase
 public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(getStorage(app.js, url))
 
 public actual class FirebaseStorage(public val js: dev.gitlive.firebase.storage.externals.FirebaseStorage) {
-    public actual val maxOperationRetryTimeMillis: Long = js.maxOperationRetryTime.toLong()
-    public actual val maxUploadRetryTimeMillis: Long = js.maxUploadRetryTime.toLong()
+    public actual val maxOperationRetryTime: Duration = js.maxOperationRetryTime.milliseconds
+    public actual val maxUploadRetryTime: Duration = js.maxUploadRetryTime.milliseconds
 
-    public actual fun setMaxOperationRetryTimeMillis(maxOperationRetryTimeMillis: Long) {
-        js.maxOperationRetryTime = maxOperationRetryTimeMillis.toDouble()
+    public actual fun setMaxOperationRetryTime(maxOperationRetryTime: Duration) {
+        js.maxOperationRetryTime = maxOperationRetryTime.toDouble(DurationUnit.MILLISECONDS)
     }
 
-    public actual fun setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis: Long) {
-        js.maxUploadRetryTime = maxUploadRetryTimeMillis.toDouble()
+    public actual fun setMaxUploadRetryTime(maxUploadRetryTime: Duration) {
+        js.maxUploadRetryTime = maxUploadRetryTime.toDouble(DurationUnit.MILLISECONDS)
     }
 
     public actual fun useEmulator(host: String, port: Int) {

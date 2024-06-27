@@ -8,6 +8,9 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
@@ -28,8 +31,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
     public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         val androidSettings = com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(settings.minimumFetchIntervalInSeconds)
-            .setFetchTimeoutInSeconds(settings.fetchTimeoutInSeconds)
+            .setMinimumFetchIntervalInSeconds(settings.minimumFetchInterval.inWholeSeconds)
+            .setFetchTimeoutInSeconds(settings.fetchTimeout.inWholeSeconds)
             .build()
         android.setConfigSettingsAsync(androidSettings).await()
     }
@@ -38,9 +41,9 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
         android.setDefaultsAsync(defaults.toMap()).await()
     }
 
-    public actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
-        minimumFetchIntervalInSeconds
-            ?.also { android.fetch(it).await() }
+    public actual suspend fun fetch(minimumFetchInterval: Duration?) {
+        minimumFetchInterval
+            ?.also { android.fetch(it.inWholeSeconds).await() }
             ?: run { android.fetch().await() }
     }
 
@@ -56,8 +59,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
     }
 
     private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
-        fetchTimeoutInSeconds = fetchTimeoutInSeconds,
-        minimumFetchIntervalInSeconds = minimumFetchIntervalInSeconds,
+        fetchTimeout = fetchTimeoutInSeconds.seconds,
+        minimumFetchInterval = minimumFetchIntervalInSeconds.seconds,
     )
 
     private fun AndroidFirebaseRemoteConfigInfo.asCommon(): FirebaseRemoteConfigInfo {
@@ -71,7 +74,7 @@ public actual class FirebaseRemoteConfig internal constructor(public val android
 
         return FirebaseRemoteConfigInfo(
             configSettings = configSettings.asCommon(),
-            fetchTimeMillis = fetchTimeMillis,
+            fetchTime = Instant.fromEpochMilliseconds(fetchTimeMillis),
             lastFetchStatus = lastFetchStatus,
         )
     }
