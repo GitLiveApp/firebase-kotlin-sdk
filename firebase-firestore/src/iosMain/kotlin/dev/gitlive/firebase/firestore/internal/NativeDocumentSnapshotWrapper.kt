@@ -7,7 +7,6 @@ import dev.gitlive.firebase.firestore.ServerTimestampBehavior
 import dev.gitlive.firebase.firestore.SnapshotMetadata
 import platform.Foundation.NSNull
 
-@PublishedApi
 internal actual class NativeDocumentSnapshotWrapper actual constructor(actual val native: NativeDocumentSnapshot) {
 
     actual val id get() = native.documentID

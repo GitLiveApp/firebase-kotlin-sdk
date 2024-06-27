@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-@PublishedApi
 internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
     val android: NativeDocumentReferenceType by ::nativeValue
     actual val id: String

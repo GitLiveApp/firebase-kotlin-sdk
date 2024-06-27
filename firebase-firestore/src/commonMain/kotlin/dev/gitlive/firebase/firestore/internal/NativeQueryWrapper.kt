@@ -9,7 +9,6 @@ import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.Source
 import kotlinx.coroutines.flow.Flow
 
-@PublishedApi
 internal expect open class NativeQueryWrapper internal constructor(native: NativeQuery) {
 
     open val native: NativeQuery

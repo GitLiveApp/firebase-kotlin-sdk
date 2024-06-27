@@ -11,19 +11,32 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import java.util.concurrent.Executor
+import com.google.firebase.firestore.CollectionReference as AndroidCollectionReference
+import com.google.firebase.firestore.DocumentChange as AndroidDocumentChange
+import com.google.firebase.firestore.DocumentReference as AndroidDocumentReference
+import com.google.firebase.firestore.DocumentSnapshot as AndroidDocumentSnapshot
+import com.google.firebase.firestore.FieldPath as AndroidFieldPath
+import com.google.firebase.firestore.FirebaseFirestore as AndroidFirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException as AndroidFirebaseFirestoreException
+import com.google.firebase.firestore.LocalCacheSettings as AndroidLocalCacheSettings
 import com.google.firebase.firestore.Query as AndroidQuery
+import com.google.firebase.firestore.QuerySnapshot as AndroidQuerySnapshot
+import com.google.firebase.firestore.SnapshotMetadata as AndroidSnapshotMetadata
+import com.google.firebase.firestore.Source as AndroidSource
+import com.google.firebase.firestore.Transaction as AndroidTransaction
+import com.google.firebase.firestore.WriteBatch as AndroidWriteBatch
 import com.google.firebase.firestore.memoryCacheSettings as androidMemoryCacheSettings
 import com.google.firebase.firestore.memoryEagerGcSettings as androidMemoryEagerGcSettings
 import com.google.firebase.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
 import com.google.firebase.firestore.persistentCacheSettings as androidPersistentCacheSettings
 
 public actual val Firebase.firestore: FirebaseFirestore get() =
-    FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+    FirebaseFirestore(AndroidFirebaseFirestore.getInstance())
 
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
-    FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
+    FirebaseFirestore(AndroidFirebaseFirestore.getInstance(app.android))
 
-public val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheSettings get() = when (this) {
+public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (this) {
     is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {
         setSizeBytes(sizeBytes)
     }
@@ -39,9 +52,10 @@ public val LocalCacheSettings.android: com.google.firebase.firestore.LocalCacheS
     }
 }
 
-public actual typealias NativeFirebaseFirestore = com.google.firebase.firestore.FirebaseFirestore
+internal actual typealias NativeFirebaseFirestore = AndroidFirebaseFirestore
 
-public val FirebaseFirestore.android: NativeFirebaseFirestore get() = native
+public operator fun FirebaseFirestore.Companion.invoke(android: AndroidFirebaseFirestore): FirebaseFirestore = FirebaseFirestore(android)
+public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = native
 
 public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
@@ -88,38 +102,43 @@ public actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-public actual typealias NativeWriteBatch = com.google.firebase.firestore.WriteBatch
+internal actual typealias NativeWriteBatch = AndroidWriteBatch
 
-public val WriteBatch.android: NativeWriteBatch get() = native
+public operator fun WriteBatch.Companion.invoke(android: AndroidWriteBatch): WriteBatch = WriteBatch(android)
+public val WriteBatch.android: AndroidWriteBatch get() = native
 
-public actual typealias NativeTransaction = com.google.firebase.firestore.Transaction
+internal actual typealias NativeTransaction = AndroidTransaction
 
-public val Transaction.android: NativeTransaction get() = native
+public operator fun Transaction.Companion.invoke(android: AndroidTransaction): Transaction = Transaction(android)
+public val Transaction.android: AndroidTransaction get() = native
 
 /** A class representing a platform specific Firebase DocumentReference. */
-public actual typealias NativeDocumentReferenceType = com.google.firebase.firestore.DocumentReference
+internal actual typealias NativeDocumentReferenceType = AndroidDocumentReference
 
-public val DocumentReference.android: NativeDocumentReferenceType get() = native.android
+public operator fun DocumentReference.Companion.invoke(android: AndroidDocumentReference): DocumentReference = DocumentReference(android)
+public val DocumentReference.android: AndroidDocumentReference get() = native.android
 
-public actual typealias NativeQuery = AndroidQuery
+internal actual typealias NativeQuery = AndroidQuery
 
-public val Query.android: NativeQuery get() = native
+public operator fun Query.Companion.invoke(android: AndroidQuery): Query = Query(android)
+public val Query.android: AndroidQuery get() = native
 
-public actual typealias Direction = com.google.firebase.firestore.Query.Direction
-public actual typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
+public actual typealias Direction = AndroidQuery.Direction
+public actual typealias ChangeType = AndroidDocumentChange.Type
 
-public actual typealias NativeCollectionReference = com.google.firebase.firestore.CollectionReference
+internal actual typealias NativeCollectionReference = AndroidCollectionReference
 
-public val CollectionReference.android: NativeCollectionReference get() = native
+public operator fun CollectionReference.Companion.invoke(android: AndroidCollectionReference): CollectionReference = CollectionReference(android)
+public val CollectionReference.android: AndroidCollectionReference get() = native
 
-public actual typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException
+public actual typealias FirebaseFirestoreException = AndroidFirebaseFirestoreException
 
 @Suppress("ConflictingExtensionProperty")
 public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-public actual typealias FirestoreExceptionCode = com.google.firebase.firestore.FirebaseFirestoreException.Code
+public actual typealias FirestoreExceptionCode = AndroidFirebaseFirestoreException.Code
 
-public actual class QuerySnapshot(public val android: com.google.firebase.firestore.QuerySnapshot) {
+public actual class QuerySnapshot(public val android: AndroidQuerySnapshot) {
     public actual val documents: List<DocumentSnapshot>
         get() = android.documents.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
     public actual val documentChanges: List<DocumentChange>
@@ -127,7 +146,7 @@ public actual class QuerySnapshot(public val android: com.google.firebase.firest
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
 }
 
-public actual class DocumentChange(public val android: com.google.firebase.firestore.DocumentChange) {
+public actual class DocumentChange(public val android: AndroidDocumentChange) {
     public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(android.document))
     public actual val newIndex: Int
@@ -138,23 +157,24 @@ public actual class DocumentChange(public val android: com.google.firebase.fires
         get() = android.type
 }
 
-public actual typealias NativeDocumentSnapshot = com.google.firebase.firestore.DocumentSnapshot
+internal actual typealias NativeDocumentSnapshot = AndroidDocumentSnapshot
 
-public val DocumentSnapshot.android: NativeDocumentSnapshot get() = native
+public operator fun DocumentSnapshot.Companion.invoke(android: AndroidDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(android)
+public val DocumentSnapshot.android: AndroidDocumentSnapshot get() = native
 
-public actual class SnapshotMetadata(public val android: com.google.firebase.firestore.SnapshotMetadata) {
+public actual class SnapshotMetadata(public val android: AndroidSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = android.hasPendingWrites()
     public actual val isFromCache: Boolean get() = android.isFromCache
 }
 
-public actual class FieldPath private constructor(public val android: com.google.firebase.firestore.FieldPath) {
+public actual class FieldPath private constructor(public val android: AndroidFieldPath) {
 
     public actual companion object {
-        public actual val documentId: FieldPath = FieldPath(com.google.firebase.firestore.FieldPath.documentId())
+        public actual val documentId: FieldPath = FieldPath(AndroidFieldPath.documentId())
     }
 
     public actual constructor(vararg fieldNames: String) : this(
-        com.google.firebase.firestore.FieldPath.of(
+        AndroidFieldPath.of(
             *fieldNames,
         ),
     )
@@ -166,6 +186,6 @@ public actual class FieldPath private constructor(public val android: com.google
     override fun toString(): String = android.toString()
 }
 
-public actual typealias EncodedFieldPath = com.google.firebase.firestore.FieldPath
+public actual typealias EncodedFieldPath = AndroidFieldPath
 
-internal typealias NativeSource = com.google.firebase.firestore.Source
+internal typealias NativeSource = AndroidSource

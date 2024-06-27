@@ -5,7 +5,6 @@ import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 
-@PublishedApi
 internal actual class NativeCollectionReferenceWrapper internal actual constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
 
     actual val path: String

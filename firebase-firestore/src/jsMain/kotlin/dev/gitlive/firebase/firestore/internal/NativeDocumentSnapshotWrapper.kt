@@ -8,7 +8,6 @@ import dev.gitlive.firebase.firestore.externals.DocumentSnapshot
 import dev.gitlive.firebase.firestore.rethrow
 import kotlin.js.json
 
-@PublishedApi
 internal actual class NativeDocumentSnapshotWrapper internal actual constructor(actual val native: NativeDocumentSnapshot) {
 
     constructor(js: DocumentSnapshot) : this(NativeDocumentSnapshot(js))

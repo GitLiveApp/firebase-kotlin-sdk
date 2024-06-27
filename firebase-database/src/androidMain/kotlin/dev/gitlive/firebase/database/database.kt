@@ -202,7 +202,6 @@ public actual open class Query internal actual constructor(
     override fun toString(): String = android.toString()
 }
 
-@PublishedApi
 internal actual class NativeDatabaseReference internal constructor(
     override val android: com.google.firebase.database.DatabaseReference,
     persistenceEnabled: Boolean,
@@ -292,7 +291,6 @@ public actual class DataSnapshot internal constructor(
     public actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
 }
 
-@PublishedApi
 internal actual class NativeOnDisconnect internal constructor(
     val android: com.google.firebase.database.OnDisconnect,
     val persistenceEnabled: Boolean,
@@ -309,7 +307,7 @@ internal actual class NativeOnDisconnect internal constructor(
             .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
     }
 
-    actual suspend fun setValue(encodedValue: Any?) {
+    actual suspend fun setEncodedValue(encodedValue: Any?) {
         android.setValue(encodedValue)
             .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
     }
