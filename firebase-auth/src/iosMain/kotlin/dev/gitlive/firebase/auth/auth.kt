@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
-import kotlin.coroutines.suspendCoroutine
 
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
