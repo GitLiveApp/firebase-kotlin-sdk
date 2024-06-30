@@ -127,6 +127,21 @@ class FirebaseAuthTest {
         assertEquals("password", credential.providerId)
     }
 
+    @Test
+    fun testAuthResultStructure() = runTest {
+        val uid = getTestUid("test@test.com", "test123")
+        val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
+        assertNotNull(result.user)
+        assertEquals(uid, result.user!!.uid)
+        assertNotNull(result.credential)
+        assertNotNull(result.credential!!.providerId)
+        assertNotNull(result.additionalUserInfo)
+        assertNotNull(result.additionalUserInfo!!.providerId)
+        assertNotNull(result.additionalUserInfo!!.username)
+        assertNotNull(result.additionalUserInfo!!.profile)
+        assertNotNull(result.additionalUserInfo!!.isNewUser)
+    }
+
     private suspend fun getTestUid(email: String, password: String): String {
         val uid = auth.let {
             val user = try {
