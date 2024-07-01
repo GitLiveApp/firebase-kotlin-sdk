@@ -17,11 +17,6 @@ plugins {
     id("testOptionsConvention")
 }
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 android {
     val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
