@@ -16,6 +16,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.Flow
 import platform.Foundation.NSError
+import platform.Foundation.NSString
 import platform.Foundation.NSURL
 
 public actual val Firebase.auth: FirebaseAuth
@@ -102,9 +103,36 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
     public actual fun useEmulator(host: String, port: Int): Unit = ios.useEmulatorWithHost(host, port.toLong())
 }
 
-public actual class AuthResult internal constructor(public val ios: FIRAuthDataResult) {
+public actual class AuthResult(
+    public val ios: FIRAuthDataResult,
+) {
     public actual val user: FirebaseUser?
         get() = FirebaseUser(ios.user)
+    public actual val credential: AuthCredential?
+        get() = ios.credential?.let { AuthCredential(it) }
+    public actual val additionalUserInfo: AdditionalUserInfo?
+        get() = ios.additionalUserInfo?.let { AdditionalUserInfo(it) }
+}
+
+public actual class AdditionalUserInfo(
+    public val ios: FIRAdditionalUserInfo,
+) {
+    public actual val providerId: String?
+        get() = ios.providerID
+    public actual val username: String?
+        get() = ios.username
+    public actual val profile: Map<String, Any?>?
+        get() = ios.profile
+            ?.mapNotNull { (key, value) ->
+                if (key is NSString && value != null) {
+                    key.toString() to value
+                } else {
+                    null
+                }
+            }
+            ?.toMap()
+    public actual val isNewUser: Boolean
+        get() = ios.newUser
 }
 
 public actual class AuthTokenResult(public val ios: FIRAuthTokenResult) {
