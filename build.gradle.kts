@@ -43,8 +43,8 @@ tasks {
             "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
             "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
             "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-messaging:updateVersion", "firebase-messaging:updateDependencyVersion",
             "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
+            "firebase-messaging:updateVersion", "firebase-messaging:updateDependencyVersion",
             "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion",
             "firebase-storage:updateVersion", "firebase-storage:updateDependencyVersion"
         )
@@ -271,9 +271,15 @@ tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 }
 // check for latest dependencies - ./gradlew dependencyUpdates -Drevision=release
 
-tasks.register("devRunEmulatorTests") {
+tasks.register("devRunAllTests") {
     doLast {
-        EmulatorJobsMatrix().getTaskList(rootProject = rootProject).forEach { gradleTasks ->
+        val gradleTasks = mutableListOf<List<String>>()
+        gradleTasks.addAll(EmulatorJobsMatrix().getJvmTestTaskList(rootProject = rootProject))
+        gradleTasks.addAll(EmulatorJobsMatrix().getJsTestTaskList(rootProject = rootProject))
+        gradleTasks.addAll(EmulatorJobsMatrix().getIosTestTaskList(rootProject = rootProject))
+        gradleTasks.add(listOf("ciSdkManagerLicenses"))
+        gradleTasks.addAll(EmulatorJobsMatrix().getEmulatorTaskList(rootProject = rootProject))
+        gradleTasks.forEach {
             exec {
                 executable = File(
                     project.rootDir,
@@ -281,16 +287,16 @@ tasks.register("devRunEmulatorTests") {
                 )
                     .also { it.setExecutable(true) }
                     .absolutePath
-                args = gradleTasks
+                args = it
                 println("exec: ${this.commandLine.joinToString(separator = " ")}")
             }.apply { println("ExecResult: $this") }
         }
     }
 }
 
-tasks.register("ciEmulatorJobsMatrixSetup") {
+tasks.register("ciJobsMatrixSetup") {
     doLast {
-        EmulatorJobsMatrix().createMatrixJsonFile(rootProject = rootProject)
+        EmulatorJobsMatrix().createMatrixJsonFiles(rootProject = rootProject)
     }
 }
 

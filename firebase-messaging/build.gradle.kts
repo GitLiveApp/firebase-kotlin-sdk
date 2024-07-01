@@ -144,24 +144,6 @@ kotlin {
     }
 }
 
-if (project.property("firebase-messaging.skipIosTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-messaging.skipJvmTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-messaging.skipJsTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
 signing {
     val signingKey: String? by project
     val signingPassword: String? by project
