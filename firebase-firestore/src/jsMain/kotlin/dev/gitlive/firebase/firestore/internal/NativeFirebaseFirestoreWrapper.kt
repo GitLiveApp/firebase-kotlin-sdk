@@ -23,15 +23,17 @@ import kotlinx.coroutines.promise
 
 // There is currently no way to check whether Firestore was already initialized for a given app without actually initializing it
 // Therefore we keep track of this internally
-private val appsWithFirestore = mutableListOf<FirebaseApp>()
+private val appsWithFirestore = mutableMapOf<FirebaseApp, FirebaseFirestoreSettings>()
 
 internal actual class NativeFirebaseFirestoreWrapper internal constructor(
+    initialSettings: FirebaseFirestoreSettings,
     private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore,
     private val canUpdateSettings: () -> Boolean,
 ) {
 
-    internal actual constructor(native: NativeFirebaseFirestore) : this({ native }, { false })
+    internal actual constructor(native: NativeFirebaseFirestore) : this(native.settings, { native }, { false })
     internal constructor(app: FirebaseApp) : this(
+        appsWithFirestore[app] ?: FirebaseFirestoreSettings.Builder().build(),
         {
             NativeFirebaseFirestore(
                 if (appsWithFirestore.contains(app)) {
@@ -41,9 +43,10 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
                         emulatorSettings?.run {
                             connectFirestoreEmulator(it, host, port)
                         }
-                        appsWithFirestore.add(app)
+                        appsWithFirestore[app] = settings
                     }
                 },
+                settings,
             )
         },
         {
@@ -53,7 +56,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
 
     private data class EmulatorSettings(val host: String, val port: Int)
 
-    actual var settings: FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().build()
+    actual var settings: FirebaseFirestoreSettings = initialSettings
         set(value) {
             if (lazyNative.isInitialized() || !canUpdateSettings()) {
                 throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
