@@ -50,7 +50,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
             )
         },
         {
-            !appsWithFirestore.contains(app)
+            !appsWithFirestore.containsKey(app)
         },
     )
 
