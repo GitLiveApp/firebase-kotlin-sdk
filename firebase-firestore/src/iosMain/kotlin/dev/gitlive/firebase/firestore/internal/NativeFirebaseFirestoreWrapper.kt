@@ -12,7 +12,6 @@ import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult
 import dev.gitlive.firebase.firestore.firestoreSettings
 import dev.gitlive.firebase.firestore.memoryCacheSettings
-import dev.gitlive.firebase.firestore.memoryEagerGcSettings
 import dev.gitlive.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.runBlocking
 
