@@ -10,6 +10,7 @@ import dev.gitlive.firebase.firestore.NativeWriteBatch
 import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.getFirestore
 import dev.gitlive.firebase.firestore.externals.initializeFirestore
 import dev.gitlive.firebase.firestore.externals.setLogLevel
 import dev.gitlive.firebase.firestore.externals.writeBatch
@@ -20,20 +21,33 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 
+// There is currently no way to check whether Firestore was already initialized for a given app without actually initializing it
+// Therefore we keep track of this internally
+private val appsWithFirestore = mutableListOf<FirebaseApp>()
+
 internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore,
+    private val canUpdateSettings: () -> Boolean,
 ) {
 
-    internal actual constructor(native: NativeFirebaseFirestore) : this({ native })
+    internal actual constructor(native: NativeFirebaseFirestore) : this({ native }, { false })
     internal constructor(app: FirebaseApp) : this(
         {
             NativeFirebaseFirestore(
-                initializeFirestore(app, settings.js).also {
-                    emulatorSettings?.run {
-                        connectFirestoreEmulator(it, host, port)
+                if (appsWithFirestore.contains(app)) {
+                    getFirestore(app)
+                } else {
+                    initializeFirestore(app, settings.js).also {
+                        emulatorSettings?.run {
+                            connectFirestoreEmulator(it, host, port)
+                        }
+                        appsWithFirestore.add(app)
                     }
                 },
             )
+        },
+        {
+            !appsWithFirestore.contains(app)
         },
     )
 
@@ -41,7 +55,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
 
     actual var settings: FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().build()
         set(value) {
-            if (lazyNative.isInitialized()) {
+            if (lazyNative.isInitialized() || !canUpdateSettings()) {
                 throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
             } else {
                 field = value
