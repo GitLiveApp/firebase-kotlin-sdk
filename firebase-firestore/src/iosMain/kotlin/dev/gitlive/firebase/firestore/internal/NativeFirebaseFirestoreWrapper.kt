@@ -1,23 +1,52 @@
 package dev.gitlive.firebase.firestore.internal
 
 import cocoapods.FirebaseFirestoreInternal.FIRFirestore
+import cocoapods.FirebaseFirestoreInternal.FIRMemoryCacheSettings
+import cocoapods.FirebaseFirestoreInternal.FIRPersistentCacheSettings
 import dev.gitlive.firebase.firestore.FirebaseFirestoreSettings
+import dev.gitlive.firebase.firestore.LocalCacheSettings
+import dev.gitlive.firebase.firestore.MemoryGarbageCollectorSettings
 import dev.gitlive.firebase.firestore.NativeFirebaseFirestore
 import dev.gitlive.firebase.firestore.NativeTransaction
 import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult
 import dev.gitlive.firebase.firestore.firestoreSettings
 import dev.gitlive.firebase.firestore.memoryCacheSettings
+import dev.gitlive.firebase.firestore.memoryEagerGcSettings
+import dev.gitlive.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.runBlocking
 
 @Suppress("UNCHECKED_CAST")
 internal actual class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
 
-    actual var settings: FirebaseFirestoreSettings = firestoreSettings { }.also {
-        native.settings = it.ios
-    }
+    actual var settings: FirebaseFirestoreSettings
+        get() = firestoreSettings {
+            host = native.settings.host
+            sslEnabled = native.settings.sslEnabled
+            dispatchQueue = native.settings.dispatchQueue
+            @Suppress("SENSELESS_NULL_IN_WHEN")
+            cacheSettings = when (val nativeCacheSettings = native.settings.cacheSettings) {
+                is FIRPersistentCacheSettings -> persistentCacheSettings {
+                    // SizeBytes cannot be determined
+                }
+                is FIRMemoryCacheSettings -> memoryCacheSettings {
+                    // Garbage collection settings cannot be determined
+                }
+                null -> when {
+                    native.settings.persistenceEnabled -> LocalCacheSettings.Persistent(native.settings.cacheSizeBytes)
+                    native.settings.cacheSizeBytes == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED -> LocalCacheSettings.Memory(
+                        MemoryGarbageCollectorSettings.Eager,
+                    )
+                    else -> LocalCacheSettings.Memory(
+                        MemoryGarbageCollectorSettings.LRUGC(
+                            native.settings.cacheSizeBytes,
+                        ),
+                    )
+                }
+                else -> error("Unknown cache settings $nativeCacheSettings")
+            }
+        }
         set(value) {
-            field = value
             native.settings = value.ios
         }
 
