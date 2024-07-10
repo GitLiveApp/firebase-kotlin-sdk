@@ -258,6 +258,7 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder {
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
 	public static final field Companion Ldev/gitlive/firebase/firestore/FirebaseFirestore$Companion;
+	public final fun applySettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
 	public final fun batch ()Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun clearPersistence (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun collection (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/CollectionReference;
@@ -265,11 +266,10 @@ public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
 	public final fun disableNetwork (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun document (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/DocumentReference;
 	public final fun enableNetwork (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getSettings ()Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public final fun runTransaction (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setLoggingEnabled (Z)V
-	public final fun setSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
 	public final fun setSettings (Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;)V
+	public final fun setSettings (Lkotlin/jvm/functions/Function1;)V
 	public static synthetic fun setSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestore;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;ILjava/lang/Object;)V
 	public final fun useEmulator (Ljava/lang/String;I)V
 }
