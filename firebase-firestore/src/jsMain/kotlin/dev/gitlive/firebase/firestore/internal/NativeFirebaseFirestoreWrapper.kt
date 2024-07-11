@@ -10,6 +10,7 @@ import dev.gitlive.firebase.firestore.NativeWriteBatch
 import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
 import dev.gitlive.firebase.firestore.externals.doc
+import dev.gitlive.firebase.firestore.externals.getFirestore
 import dev.gitlive.firebase.firestore.externals.initializeFirestore
 import dev.gitlive.firebase.firestore.externals.setLogLevel
 import dev.gitlive.firebase.firestore.externals.writeBatch
@@ -21,38 +22,45 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.promise
 
 internal actual class NativeFirebaseFirestoreWrapper internal constructor(
-    private val createNative: NativeFirebaseFirestoreWrapper.() -> NativeFirebaseFirestore,
+    private val createNative: NativeFirebaseFirestoreWrapper.(FirebaseFirestoreSettings?) -> NativeFirebaseFirestore,
 ) {
 
-    internal actual constructor(native: NativeFirebaseFirestore) : this({ native })
+    internal actual constructor(native: NativeFirebaseFirestore) : this(
+        { settings ->
+            settings?.let {
+                NativeFirebaseFirestore(initializeFirestore(native.js.app, settings))
+            } ?: native
+        },
+    )
     internal constructor(app: FirebaseApp) : this(
-        {
+        { settings ->
             NativeFirebaseFirestore(
-                initializeFirestore(app, settings.js).also {
-                    emulatorSettings?.run {
-                        connectFirestoreEmulator(it, host, port)
+                settings?.let {
+                    initializeFirestore(app, it.js).also {
+                        emulatorSettings?.run {
+                            connectFirestoreEmulator(it, host, port)
+                        }
                     }
-                },
+                } ?: getFirestore(app),
             )
         },
     )
 
     private data class EmulatorSettings(val host: String, val port: Int)
 
-    actual var settings: FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().build()
+    private var settings: FirebaseFirestoreSettings? = null
         set(value) {
             if (lazyNative.isInitialized()) {
-                throw IllegalStateException("FirebaseFirestore has already been started and its settings can no longer be changed. You can only call setFirestoreSettings() before calling any other methods on a FirebaseFirestore object.")
-            } else {
-                field = value
+                createNative(value) // Call initialize again to ensure native crash occurs if settings have changed
             }
+            field = value
         }
     private var emulatorSettings: EmulatorSettings? = null
 
     // initializeFirestore must be called before any call, including before `getFirestore()`
     // To allow settings to be updated, we defer creating the wrapper until the first call to `native`
     private val lazyNative = lazy {
-        createNative()
+        createNative(settings)
     }
     actual val native: NativeFirebaseFirestore by lazyNative
     private val js get() = native.js
@@ -89,6 +97,10 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     actual fun setLoggingEnabled(loggingEnabled: Boolean) =
         rethrow { setLogLevel(if (loggingEnabled) "error" else "silent") }
 
+    actual fun applySettings(settings: FirebaseFirestoreSettings) {
+        this.settings = settings
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
         rethrow {
@@ -102,8 +114,10 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
         rethrow { clearIndexedDbPersistence(js).await() }
 
     actual fun useEmulator(host: String, port: Int) = rethrow {
-        settings = firestoreSettings(settings) {
-            this.host = "$host:$port"
+        if (settings != null) {
+            settings = firestoreSettings(settings) {
+                this.host = "$host:$port"
+            }
         }
         emulatorSettings = EmulatorSettings(host, port)
     }

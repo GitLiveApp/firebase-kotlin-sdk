@@ -6,20 +6,10 @@ import dev.gitlive.firebase.firestore.NativeFirebaseFirestore
 import dev.gitlive.firebase.firestore.NativeTransaction
 import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult
-import dev.gitlive.firebase.firestore.firestoreSettings
-import dev.gitlive.firebase.firestore.memoryCacheSettings
 import kotlinx.coroutines.runBlocking
 
 @Suppress("UNCHECKED_CAST")
 internal actual class NativeFirebaseFirestoreWrapper internal actual constructor(actual val native: NativeFirebaseFirestore) {
-
-    actual var settings: FirebaseFirestoreSettings = firestoreSettings { }.also {
-        native.settings = it.ios
-    }
-        set(value) {
-            field = value
-            native.settings = value.ios
-        }
 
     actual fun collection(collectionPath: String) = native.collectionWithPath(collectionPath)
 
@@ -32,6 +22,10 @@ internal actual class NativeFirebaseFirestoreWrapper internal actual constructor
 
     actual fun setLoggingEnabled(loggingEnabled: Boolean): Unit =
         FIRFirestore.enableLogging(loggingEnabled)
+
+    actual fun applySettings(settings: FirebaseFirestoreSettings) {
+        native.settings = settings.ios
+    }
 
     actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T) =
         awaitResult<Any?> {
@@ -46,10 +40,8 @@ internal actual class NativeFirebaseFirestoreWrapper internal actual constructor
 
     actual fun useEmulator(host: String, port: Int) {
         native.useEmulatorWithHost(host, port.toLong())
-        settings = firestoreSettings(settings) {
-            this.host = "$host:$port"
-            cacheSettings = memoryCacheSettings { }
-            sslEnabled = false
+        native.settings = native.settings.apply {
+            this.sslEnabled = false
         }
     }
 

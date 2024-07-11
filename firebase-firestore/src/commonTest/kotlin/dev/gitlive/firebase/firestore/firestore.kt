@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.internal.decode
@@ -85,6 +86,7 @@ class FirebaseFirestoreTest {
         )
     }
 
+    lateinit var firebaseApp: FirebaseApp
     lateinit var firestore: FirebaseFirestore
 
     @BeforeTest
@@ -100,14 +102,15 @@ class FirebaseFirestoreTest {
                 gcmSenderId = "846484016111",
             ),
         )
+        firebaseApp = app
 
         firestore = Firebase.firestore(app).apply {
-            useEmulator(emulatorHost, 8080)
-            settings = firestoreSettings(settings) {
+            settings = firestoreSettings {
                 cacheSettings = memoryCacheSettings {
                     gcSettings = memoryEagerGcSettings { }
                 }
             }
+            useEmulator(emulatorHost, 8080)
         }
     }
 
@@ -1029,6 +1032,12 @@ class FirebaseFirestoreTest {
             .collection("testFirestoreQuerying")
             .where { FieldPath.documentId equalTo "one" }
         fieldQuery.assertDocuments(FirestoreTest.serializer(), testOne)
+    }
+
+    @Test
+    fun testMultiple() = runTest {
+        Firebase.firestore(firebaseApp).disableNetwork()
+        Firebase.firestore(firebaseApp).enableNetwork()
     }
 
     private suspend fun setupFirestoreData(
