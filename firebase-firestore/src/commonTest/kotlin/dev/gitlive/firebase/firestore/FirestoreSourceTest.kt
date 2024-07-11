@@ -39,7 +39,7 @@ class FirestoreSourceTest {
         )
 
         firestore = Firebase.firestore(app).apply {
-            setSettings {
+            settings = firestoreSettings {
                 cacheSettings = if (persistenceEnabled) {
                     persistentCacheSettings { }
                 } else {

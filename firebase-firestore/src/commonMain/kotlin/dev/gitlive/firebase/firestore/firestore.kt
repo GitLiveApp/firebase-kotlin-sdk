@@ -45,6 +45,13 @@ public class FirebaseFirestore internal constructor(private val wrapper: NativeF
     // Important to leave this as a get property since on JS it is initialized lazily
     internal val native: NativeFirebaseFirestore get() = wrapper.native
 
+    public var settings: FirebaseFirestoreSettings
+        @Deprecated("Property can only be written.", level = DeprecationLevel.ERROR)
+        get() = throw NotImplementedError()
+        set(value) {
+            wrapper.applySettings(value)
+        }
+
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(wrapper.collection(collectionPath))
     public fun collectionGroup(collectionId: String): Query = Query(wrapper.collectionGroup(collectionId))
     public fun document(documentPath: String): DocumentReference = DocumentReference(wrapper.document(documentPath))
@@ -60,35 +67,32 @@ public class FirebaseFirestore internal constructor(private val wrapper: NativeF
         wrapper.useEmulator(host, port)
     }
 
-    @Deprecated("Use SettingsBuilder instead", replaceWith = ReplaceWith("setSettings { }"))
+    @Deprecated("Use SettingsBuilder instead", replaceWith = ReplaceWith("settings = firestoreSettings { }", "dev.gitlive.firebase.firestore.firestoreSettings"))
     public fun setSettings(
         persistenceEnabled: Boolean? = null,
         sslEnabled: Boolean? = null,
         host: String? = null,
         cacheSizeBytes: Long? = null,
-    ): Unit = setSettings {
-        this.sslEnabled = sslEnabled ?: true
-        this.host = host ?: FirebaseFirestoreSettings.DEFAULT_HOST
-        this.cacheSettings = if (persistenceEnabled != false) {
-            LocalCacheSettings.Persistent(cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-        } else {
-            val cacheSize = cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED
-            val garbageCollectionSettings = if (cacheSize == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED) {
-                MemoryGarbageCollectorSettings.Eager
+    ) {
+        settings = firestoreSettings {
+            this.sslEnabled = sslEnabled ?: true
+            this.host = host ?: FirebaseFirestoreSettings.DEFAULT_HOST
+            this.cacheSettings = if (persistenceEnabled != false) {
+                LocalCacheSettings.Persistent(
+                    cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED,
+                )
             } else {
-                MemoryGarbageCollectorSettings.LRUGC(cacheSize)
+                val cacheSize = cacheSizeBytes ?: FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED
+                val garbageCollectionSettings =
+                    if (cacheSize == FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED) {
+                        MemoryGarbageCollectorSettings.Eager
+                    } else {
+                        MemoryGarbageCollectorSettings.LRUGC(cacheSize)
+                    }
+                LocalCacheSettings.Memory(garbageCollectionSettings)
             }
-            LocalCacheSettings.Memory(garbageCollectionSettings)
         }
     }
-
-    public fun applySettings(settings: FirebaseFirestoreSettings) {
-        wrapper.applySettings(settings)
-    }
-
-    public fun setSettings(builder: FirebaseFirestoreSettings.Builder.() -> Unit): Unit = wrapper.applySettings(
-        firestoreSettings(builder = builder),
-    )
 
     public suspend fun disableNetwork() {
         wrapper.disableNetwork()

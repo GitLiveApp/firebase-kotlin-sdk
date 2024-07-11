@@ -105,7 +105,7 @@ class FirebaseFirestoreTest {
         firebaseApp = app
 
         firestore = Firebase.firestore(app).apply {
-            setSettings {
+            settings = firestoreSettings {
                 cacheSettings = memoryCacheSettings {
                     gcSettings = memoryEagerGcSettings { }
                 }
