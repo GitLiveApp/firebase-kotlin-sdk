@@ -39,7 +39,9 @@ public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
 
 internal actual data class NativeFirebaseFirestore(val js: JsFirestore)
 
-public operator fun FirebaseFirestore.Companion.invoke(js: JsFirestore): FirebaseFirestore = FirebaseFirestore(NativeFirebaseFirestore(js))
+public operator fun FirebaseFirestore.Companion.invoke(js: JsFirestore): FirebaseFirestore = FirebaseFirestore(
+    NativeFirebaseFirestore(js),
+)
 public val FirebaseFirestore.js: JsFirestore get() = native.js
 
 public actual data class FirebaseFirestoreSettings(
