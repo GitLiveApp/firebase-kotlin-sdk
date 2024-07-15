@@ -131,15 +131,15 @@ class FirebaseAuthTest {
     fun testAuthResultStructure() = runTest {
         val uid = getTestUid("test@test.com", "test123")
         val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
-        assertNotNull(result.user)
-        assertEquals(uid, result.user!!.uid)
-        assertNotNull(result.credential)
-        assertNotNull(result.credential!!.providerId)
-        assertNotNull(result.additionalUserInfo)
-        assertNotNull(result.additionalUserInfo!!.providerId)
-        assertNotNull(result.additionalUserInfo!!.username)
-        assertNotNull(result.additionalUserInfo!!.profile)
-        assertNotNull(result.additionalUserInfo!!.isNewUser)
+        assertNotNull(result.user, "User does not exist.")
+        assertEquals(uid, result.user!!.uid, "uid does not match.")
+        assertNotNull(result.credential, "Credential does not exist.")
+        assertNotNull(result.credential!!.providerId, "Credential providerId does not exist.")
+        assertNotNull(result.additionalUserInfo, "AdditionalUserInfo does not exist.")
+        assertNotNull(result.additionalUserInfo!!.providerId, "AdditionalUserInfo providerId does not exist.")
+        assertNotNull(result.additionalUserInfo!!.username, "AdditionalUserInfo username does not exist.")
+        assertNotNull(result.additionalUserInfo!!.profile, "AdditionalUserInfo profile does not exist.")
+        assertNotNull(result.additionalUserInfo!!.isNewUser, "AdditionalUserInfo isNewUser does not exist.")
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
