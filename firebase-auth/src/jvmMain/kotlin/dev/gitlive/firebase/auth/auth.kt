@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-public actual val Firebase.auth
+public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
-public actual fun Firebase.auth(app: FirebaseApp) =
+public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth =
     FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
 
 public actual class FirebaseAuth internal constructor(public val android: com.google.firebase.auth.FirebaseAuth) {
