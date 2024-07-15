@@ -129,20 +129,20 @@ public actual class AuthResult(
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
     public actual val credential: AuthCredential?
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
     public actual val additionalUserInfo: AdditionalUserInfo?
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
 }
 
 public actual class AdditionalUserInfo {
     public actual val providerId: String?
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
     public actual val username: String?
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
     public actual val profile: Map<String, Any?>?
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
     public actual val isNewUser: Boolean
-        get() { throw NotImplementedError() }
+        get() = throw NotImplementedError()
 }
 
 public actual class AuthTokenResult(public val android: com.google.firebase.auth.GetTokenResult) {
