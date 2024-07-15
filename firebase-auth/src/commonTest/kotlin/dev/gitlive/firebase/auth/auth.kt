@@ -133,13 +133,13 @@ class FirebaseAuthTest {
         val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
         assertNotNull(result.user, "User does not exist.")
         assertEquals(uid, result.user!!.uid, "uid does not match.")
-        assertNotNull(result.credential, "Credential does not exist.")
-        assertNotNull(result.credential!!.providerId, "Credential providerId does not exist.")
-        assertNotNull(result.additionalUserInfo, "AdditionalUserInfo does not exist.")
-        assertNotNull(result.additionalUserInfo!!.providerId, "AdditionalUserInfo providerId does not exist.")
-        assertNotNull(result.additionalUserInfo!!.username, "AdditionalUserInfo username does not exist.")
-        assertNotNull(result.additionalUserInfo!!.profile, "AdditionalUserInfo profile does not exist.")
-        assertNotNull(result.additionalUserInfo!!.isNewUser, "AdditionalUserInfo isNewUser does not exist.")
+        assertNull(result.credential, "Credential throws.")
+        assertNull(result.credential!!.providerId, "Credential providerId throws.")
+        assertNull(result.additionalUserInfo, "AdditionalUserInfo throws.")
+        assertNull(result.additionalUserInfo!!.providerId, "AdditionalUserInfo providerId throws.")
+        assertNull(result.additionalUserInfo!!.username, "AdditionalUserInfo username throws.")
+        assertNull(result.additionalUserInfo!!.profile, "AdditionalUserInfo profile throws.")
+        assertNull(result.additionalUserInfo!!.isNewUser, "AdditionalUserInfo isNewUser throws.")
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
