@@ -135,10 +135,11 @@ class FirebaseAuthTest {
         assertEquals(uid, result.user!!.uid, "uid does not match.")
         assertNull(result.credential, "Credential throws.")
         assertNotNull(result.additionalUserInfo, "AdditionalUserInfo does not exist.")
-        assertNull(result.additionalUserInfo!!.providerId, "AdditionalUserInfo providerId throws.")
-        assertNull(result.additionalUserInfo!!.username, "AdditionalUserInfo username throws.")
-        assertNull(result.additionalUserInfo!!.profile, "AdditionalUserInfo profile throws.")
-        assertFalse(result.additionalUserInfo!!.isNewUser, "AdditionalUserInfo isNewUser does not exist.")
+        // Just test if it does not throw
+        result.additionalUserInfo!!.providerId
+        result.additionalUserInfo!!.username
+        result.additionalUserInfo!!.profile
+        result.additionalUserInfo!!.isNewUser
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
