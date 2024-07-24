@@ -23,7 +23,7 @@ public actual class FirebaseAnalytics(public val android: com.google.firebase.an
     public actual fun setUserProperty(name: String, value: String) {
         android.setUserProperty(name, value)
     }
-    public actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String?) {
         android.setUserId(id)
     }
     public actual fun resetAnalyticsData() {

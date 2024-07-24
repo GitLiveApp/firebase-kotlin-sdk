@@ -23,7 +23,7 @@ public actual class FirebaseAnalytics(public val ios: FIRAnalytics.Companion) {
     public actual fun setUserProperty(name: String, value: String) {
         ios.setUserPropertyString(value, name)
     }
-    public actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String?) {
         ios.setUserID(id)
     }
     public actual fun resetAnalyticsData() {
