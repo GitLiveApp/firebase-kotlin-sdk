@@ -5,7 +5,8 @@ import kotlinx.serialization.modules.SerializersModule
 /**
  * Settings used to configure encoding/decoding
  */
-public sealed interface EncodeDecodeSettings {
+public sealed interface EncodeDecodeSettings
+{
 
     /**
      * The [SerializersModule] to use for serialization. This allows for polymorphic serialization on runtime
