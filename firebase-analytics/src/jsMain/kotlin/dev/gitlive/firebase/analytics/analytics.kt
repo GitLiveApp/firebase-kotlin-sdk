@@ -25,7 +25,7 @@ public actual class FirebaseAnalytics(public val js: dev.gitlive.firebase.analyt
         dev.gitlive.firebase.analytics.externals.setUserProperty(js, name, value)
     }
 
-    public actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String?) {
         dev.gitlive.firebase.analytics.externals.setUserId(js, id)
     }
 
