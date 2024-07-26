@@ -22,4 +22,8 @@ public actual class FirebaseMessaging(public val js: Messaging) {
     }
 
     public actual suspend fun getToken(): String = dev.gitlive.firebase.messaging.externals.getToken(js).await()
+
+    public actual suspend fun deleteToken() {
+        dev.gitlive.firebase.messaging.externals.deleteToken(js).await()
+    }
 }

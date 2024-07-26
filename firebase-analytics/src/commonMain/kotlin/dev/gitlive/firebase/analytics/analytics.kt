@@ -13,7 +13,7 @@ public expect fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics
 public expect class FirebaseAnalytics {
     public fun logEvent(name: String, parameters: Map<String, Any>? = null)
     public fun setUserProperty(name: String, value: String)
-    public fun setUserId(id: String)
+    public fun setUserId(id: String?)
     public fun setAnalyticsCollectionEnabled(enabled: Boolean)
     public fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration)
     public suspend fun getSessionId(): Long?

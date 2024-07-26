@@ -9,4 +9,6 @@ public external fun getMessaging(
 
 public external fun getToken(messaging: Messaging = definedExternally, options: dynamic = definedExternally): Promise<String>
 
+public external fun deleteToken(messaging: Messaging = definedExternally): Promise<Boolean>
+
 public external interface Messaging
