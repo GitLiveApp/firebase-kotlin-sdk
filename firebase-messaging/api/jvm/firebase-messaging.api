@@ -1,5 +1,6 @@
 public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
 	public fun <init> ()V
+	public final fun deleteToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun subscribeToTopic (Ljava/lang/String;)V
 	public final fun unsubscribeFromTopic (Ljava/lang/String;)V

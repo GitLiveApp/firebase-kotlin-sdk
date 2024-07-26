@@ -18,6 +18,10 @@ public actual class FirebaseMessaging(public val ios: FIRMessaging) {
     }
 
     public actual suspend fun getToken(): String = awaitResult { ios.tokenWithCompletion(it) }
+
+    public actual suspend fun deleteToken() {
+        await { ios.deleteTokenWithCompletion(it) }
+    }
 }
 
 public suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {

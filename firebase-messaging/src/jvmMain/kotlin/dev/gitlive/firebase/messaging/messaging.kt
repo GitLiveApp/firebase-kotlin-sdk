@@ -19,4 +19,8 @@ public actual class FirebaseMessaging {
     public actual suspend fun getToken(): String {
         TODO("Not yet implemented")
     }
+
+    public actual suspend fun deleteToken() {
+        TODO("Not yet implemented")
+    }
 }

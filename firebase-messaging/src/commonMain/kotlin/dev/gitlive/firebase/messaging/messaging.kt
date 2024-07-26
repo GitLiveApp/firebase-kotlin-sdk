@@ -28,4 +28,9 @@ public expect class FirebaseMessaging {
      * @return [String] FCM token
      */
     public suspend fun getToken(): String
+
+    /**
+     * Delete FCM token for client
+     */
+    public suspend fun deleteToken()
 }
