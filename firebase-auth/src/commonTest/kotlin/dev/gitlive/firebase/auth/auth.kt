@@ -127,6 +127,21 @@ class FirebaseAuthTest {
         assertEquals("password", credential.providerId)
     }
 
+    @Test
+    fun testAuthResultStructure() = runTest {
+        val uid = getTestUid("test@test.com", "test123")
+        val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
+        assertNotNull(result.user, "User does not exist.")
+        assertEquals(uid, result.user!!.uid, "uid does not match.")
+        assertNull(result.credential, "Credential throws.")
+        assertNotNull(result.additionalUserInfo, "AdditionalUserInfo does not exist.")
+        // Just test if it does not throw
+        result.additionalUserInfo!!.providerId
+        result.additionalUserInfo!!.username
+        result.additionalUserInfo!!.profile
+        result.additionalUserInfo!!.isNewUser
+    }
+
     private suspend fun getTestUid(email: String, password: String): String {
         val uid = auth.let {
             val user = try {

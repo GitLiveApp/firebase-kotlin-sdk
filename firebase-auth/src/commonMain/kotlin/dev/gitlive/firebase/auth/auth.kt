@@ -41,6 +41,15 @@ public expect class FirebaseAuth {
 
 public expect class AuthResult {
     public val user: FirebaseUser?
+    public val credential: AuthCredential?
+    public val additionalUserInfo: AdditionalUserInfo?
+}
+
+public expect class AdditionalUserInfo {
+    public val providerId: String?
+    public val username: String?
+    public val profile: Map<String, Any?>?
+    public val isNewUser: Boolean
 }
 
 public expect class AuthTokenResult {

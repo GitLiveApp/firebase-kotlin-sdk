@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-public actual val Firebase.auth
+public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
-public actual fun Firebase.auth(app: FirebaseApp) =
+public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth =
     FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
 
 public actual class FirebaseAuth internal constructor(public val android: com.google.firebase.auth.FirebaseAuth) {
@@ -123,9 +123,26 @@ public actual class FirebaseAuth internal constructor(public val android: com.go
     }
 }
 
-public actual class AuthResult internal constructor(public val android: com.google.firebase.auth.AuthResult) {
+public actual class AuthResult(
+    public val android: com.google.firebase.auth.AuthResult,
+) {
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
+    public actual val credential: AuthCredential?
+        get() = throw NotImplementedError()
+    public actual val additionalUserInfo: AdditionalUserInfo?
+        get() = throw NotImplementedError()
+}
+
+public actual class AdditionalUserInfo {
+    public actual val providerId: String?
+        get() = throw NotImplementedError()
+    public actual val username: String?
+        get() = throw NotImplementedError()
+    public actual val profile: Map<String, Any?>?
+        get() = throw NotImplementedError()
+    public actual val isNewUser: Boolean
+        get() = throw NotImplementedError()
 }
 
 public actual class AuthTokenResult(public val android: com.google.firebase.auth.GetTokenResult) {

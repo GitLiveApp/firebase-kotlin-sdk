@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.js.json
 import dev.gitlive.firebase.auth.externals.AuthResult as JsAuthResult
+import dev.gitlive.firebase.auth.externals.AdditionalUserInfo as JsAdditionalUserInfo
 
 public actual val Firebase.auth: FirebaseAuth
     get() = rethrow { FirebaseAuth(getAuth()) }
@@ -109,9 +110,28 @@ public actual class FirebaseAuth internal constructor(public val js: Auth) {
     public actual fun useEmulator(host: String, port: Int): Unit = rethrow { connectAuthEmulator(js, "http://$host:$port") }
 }
 
-public actual class AuthResult internal constructor(public val js: JsAuthResult) {
+public actual class AuthResult(
+    public val js: JsAuthResult,
+) {
     public actual val user: FirebaseUser?
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
+    public actual val credential: AuthCredential?
+        get() = rethrow { js.credential?.let { AuthCredential(it) } }
+    public actual val additionalUserInfo: AdditionalUserInfo?
+        get() = js.additionalUserInfo?.let { AdditionalUserInfo(it) }
+}
+
+public actual class AdditionalUserInfo(
+    public val js: JsAdditionalUserInfo,
+) {
+    public actual val providerId: String?
+        get() = js.providerId
+    public actual val username: String?
+        get() = js.username
+    public actual val profile: Map<String, Any?>?
+        get() = js.profile
+    public actual val isNewUser: Boolean
+        get() = js.newUser
 }
 
 public actual class AuthTokenResult(public val js: IdTokenResult) {
