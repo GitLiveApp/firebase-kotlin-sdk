@@ -3,6 +3,7 @@ package dev.gitlive.firebase.remoteconfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.js
 import dev.gitlive.firebase.remoteconfig.externals.*
 import kotlinx.coroutines.await
 import kotlinx.datetime.Instant
@@ -17,7 +18,9 @@ public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig 
     FirebaseRemoteConfig(getRemoteConfig(app.js))
 }
 
-public actual class FirebaseRemoteConfig internal constructor(public val js: RemoteConfig) {
+public val FirebaseRemoteConfig.js get() = js
+
+public actual class FirebaseRemoteConfig internal constructor(internal val js: RemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() = rethrow { getAllKeys().associateWith { getValue(it) } }
 

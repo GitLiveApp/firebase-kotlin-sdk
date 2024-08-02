@@ -5,14 +5,16 @@ import dev.gitlive.firebase.auth.externals.EmailAuthProvider
 import dev.gitlive.firebase.auth.externals.FacebookAuthProvider
 import dev.gitlive.firebase.auth.externals.GithubAuthProvider
 import dev.gitlive.firebase.auth.externals.GoogleAuthProvider
-import dev.gitlive.firebase.auth.externals.PhoneAuthProvider
+import dev.gitlive.firebase.auth.externals.PhoneAuthProvider as JsPhoneAuthProvider
 import dev.gitlive.firebase.auth.externals.TwitterAuthProvider
 import kotlinx.coroutines.await
 import kotlin.js.json
 import dev.gitlive.firebase.auth.externals.AuthCredential as JsAuthCredential
 import dev.gitlive.firebase.auth.externals.OAuthProvider as JsOAuthProvider
 
-public actual open class AuthCredential(public val js: JsAuthCredential) {
+public val AuthCredential.js: JsAuthCredential get() = js
+
+public actual open class AuthCredential(internal val js: JsAuthCredential) {
     public actual val providerId: String
         get() = js.providerId
 }
@@ -49,7 +51,9 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public actual class OAuthProvider(public val js: JsOAuthProvider) {
+public val OAuthProvider.js: JsOAuthProvider get() = js
+
+public actual class OAuthProvider(internal val js: JsOAuthProvider) {
 
     public actual constructor(
         provider: String,
@@ -78,11 +82,13 @@ public actual class OAuthProvider(public val js: JsOAuthProvider) {
     }
 }
 
-public actual class PhoneAuthProvider(public val js: PhoneAuthProvider) {
+public val PhoneAuthProvider.js: JsPhoneAuthProvider get() = js
 
-    public actual constructor(auth: FirebaseAuth) : this(PhoneAuthProvider(auth.js))
+public actual class PhoneAuthProvider(internal val js: JsPhoneAuthProvider) {
 
-    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
+    public actual constructor(auth: FirebaseAuth) : this(JsPhoneAuthProvider(auth.js))
+
+    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(JsPhoneAuthProvider.credential(verificationId, smsCode))
     public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
         val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)

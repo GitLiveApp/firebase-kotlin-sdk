@@ -8,7 +8,9 @@ import dev.gitlive.firebase.auth.externals.MultiFactorInfo as JsMultiFactorInfo
 import dev.gitlive.firebase.auth.externals.MultiFactorResolver as JsMultiFactorResolver
 import dev.gitlive.firebase.auth.externals.MultiFactorSession as JsMultiFactorSession
 
-public actual class MultiFactor(public val js: MultiFactorUser) {
+public val MultiFactor.js get() = js
+
+public actual class MultiFactor(internal val js: MultiFactorUser) {
     public actual val enrolledFactors: List<MultiFactorInfo>
         get() = rethrow { js.enrolledFactors.map { MultiFactorInfo(it) } }
     public actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?): Unit =
@@ -21,7 +23,9 @@ public actual class MultiFactor(public val js: MultiFactorUser) {
         rethrow { js.unenroll(factorUid).await() }
 }
 
-public actual class MultiFactorInfo(public val js: JsMultiFactorInfo) {
+public val MultiFactorInfo.js get() = js
+
+public actual class MultiFactorInfo(internal val js: JsMultiFactorInfo) {
     public actual val displayName: String?
         get() = rethrow { js.displayName }
     public actual val enrollmentTime: Double
@@ -32,14 +36,20 @@ public actual class MultiFactorInfo(public val js: JsMultiFactorInfo) {
         get() = rethrow { js.uid }
 }
 
-public actual class MultiFactorAssertion(public val js: JsMultiFactorAssertion) {
+public val MultiFactorAssertion.js get() = js
+
+public actual class MultiFactorAssertion(internal val js: JsMultiFactorAssertion) {
     public actual val factorId: String
         get() = rethrow { js.factorId }
 }
 
-public actual class MultiFactorSession(public val js: JsMultiFactorSession)
+public val MultiFactorSession.js get() = js
 
-public actual class MultiFactorResolver(public val js: JsMultiFactorResolver) {
+public actual class MultiFactorSession(internal val js: JsMultiFactorSession)
+
+public val MultiFactorResolver.js get() = js
+
+public actual class MultiFactorResolver(internal val js: JsMultiFactorResolver) {
     public actual val auth: FirebaseAuth = rethrow { FirebaseAuth(js.auth) }
     public actual val hints: List<MultiFactorInfo> = rethrow { js.hints.map { MultiFactorInfo(it) } }
     public actual val session: MultiFactorSession = rethrow { MultiFactorSession(js.session) }
