@@ -21,7 +21,6 @@ public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = 
 public val FirebasePerformance.js get() = js
 
 public actual class FirebasePerformance internal constructor(internal val js: JsFirebasePerformance) {
-public actual class FirebasePerformance internal constructor(public val js: JsFirebasePerformance) {
 
     public actual fun newTrace(traceName: String): Trace = rethrow {
         Trace(trace(js, traceName))
