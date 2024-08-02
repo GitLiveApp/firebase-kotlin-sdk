@@ -88,11 +88,11 @@ public actual data class FirebaseFirestoreSettings(
                     ).asDynamic() as PersistentCacheSettings,
                 )
                 is LocalCacheSettings.Memory -> {
-                val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
                         is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
                         is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
                     }
-                memoryLocalCache(json("garbageCollector" to garbageCollectorSettings).asDynamic() as MemoryCacheSettings)
+                    memoryLocalCache(json("garbageCollector" to garbageCollectorSettings).asDynamic() as MemoryCacheSettings)
                 }
             },
         )

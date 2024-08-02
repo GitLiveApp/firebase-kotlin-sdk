@@ -27,7 +27,6 @@ import dev.gitlive.firebase.database.externals.ref
 import dev.gitlive.firebase.database.externals.remove
 import dev.gitlive.firebase.database.externals.set
 import dev.gitlive.firebase.database.externals.update
-import dev.gitlive.firebase.database.js
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
@@ -98,7 +97,7 @@ internal actual open class NativeQuery(
 public val Query.js: JsQuery get() = nativeQuery.js
 
 public actual open class Query internal actual constructor(
-    internal val nativeQuery: NativeQuery
+    internal val nativeQuery: NativeQuery,
 ) {
 
     internal constructor(js: JsQuery, database: Database) : this(NativeQuery(js, database))
@@ -206,7 +205,7 @@ public val DataSnapshot.js: JsDataSnapshot get() = js
 
 public actual class DataSnapshot internal constructor(
     internal val js: JsDataSnapshot,
-    val database: Database
+    val database: Database,
 ) {
     public actual val value: Any? get() {
         check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }

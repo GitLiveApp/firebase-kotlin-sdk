@@ -5,7 +5,6 @@ import dev.gitlive.firebase.auth.externals.EmailAuthProvider
 import dev.gitlive.firebase.auth.externals.FacebookAuthProvider
 import dev.gitlive.firebase.auth.externals.GithubAuthProvider
 import dev.gitlive.firebase.auth.externals.GoogleAuthProvider
-import dev.gitlive.firebase.auth.externals.IdTokenResult
 import dev.gitlive.firebase.auth.externals.PhoneAuthProvider as JsPhoneAuthProvider
 import dev.gitlive.firebase.auth.externals.TwitterAuthProvider
 import kotlinx.coroutines.await
