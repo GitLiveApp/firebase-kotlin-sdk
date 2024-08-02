@@ -15,7 +15,7 @@ import dev.gitlive.firebase.auth.externals.OAuthProvider as JsOAuthProvider
 public val AuthCredential.js: JsAuthCredential get() = js
 
 public actual open class AuthCredential(internal val js: JsAuthCredential) {
-    actual val providerId: String
+    public actual val providerId: String
         get() = js.providerId
 }
 
@@ -86,9 +86,9 @@ public val PhoneAuthProvider.js: JsPhoneAuthProvider get() = js
 
 public actual class PhoneAuthProvider(internal val js: JsPhoneAuthProvider) {
 
-    public actual constructor(auth: FirebaseAuth) : this(PhoneAuthProvider(auth.js))
+    public actual constructor(auth: FirebaseAuth) : this(JsPhoneAuthProvider(auth.js))
 
-    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.credential(verificationId, smsCode))
+    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(JsPhoneAuthProvider.credential(verificationId, smsCode))
     public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = rethrow {
         val verificationId = js.verifyPhoneNumber(phoneNumber, verificationProvider.verifier).await()
         val verificationCode = verificationProvider.getVerificationCode(verificationId)

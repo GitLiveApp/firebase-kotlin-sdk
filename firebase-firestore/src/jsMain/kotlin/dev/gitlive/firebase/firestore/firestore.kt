@@ -16,6 +16,7 @@ import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
 import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
+import dev.gitlive.firebase.js
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
@@ -170,14 +171,14 @@ internal actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 public operator fun DocumentSnapshot.Companion.invoke(js: JsDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(NativeDocumentSnapshot(js))
 public val DocumentSnapshot.js: dev.gitlive.firebase.firestore.externals.DocumentSnapshot get() = native.js
 
-public val SnapshotMetadata.js get() = js
+public val SnapshotMetadata.js: dev.gitlive.firebase.firestore.externals.SnapshotMetadata get() = js
 
 public actual class SnapshotMetadata(internal val js: JsSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
     public actual val isFromCache: Boolean get() = js.fromCache
 }
 
-public val FieldPath.js get() = js
+public val FieldPath.js: dev.gitlive.firebase.firestore.externals.FieldPath get() = js
 
 public actual class FieldPath private constructor(internal val js: JsFieldPath) {
 

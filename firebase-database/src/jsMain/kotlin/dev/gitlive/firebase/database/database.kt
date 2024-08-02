@@ -104,15 +104,15 @@ public actual open class Query internal actual constructor(
 
     public val database: Database = nativeQuery.database
 
-    public actual fun orderByKey(): Query = Query(query(js, jsOrderByKey()), database)
-    public actual fun orderByValue(): Query = Query(query(js, jsOrderByValue()), database)
-    public actual fun orderByChild(path: String): Query = Query(query(js, jsOrderByChild(path)), database)
+    public actual fun orderByKey(): Query = Query(query(publicJs, jsOrderByKey()), database)
+    public actual fun orderByValue(): Query = Query(query(publicJs, jsOrderByValue()), database)
+    public actual fun orderByChild(path: String): Query = Query(query(publicJs, jsOrderByChild(path)), database)
 
     public actual val valueEvents: Flow<DataSnapshot>
         get() = callbackFlow {
             val unsubscribe = rethrow {
                 onValue(
-                    query = js,
+                    query = publicJs,
                     callback = { trySend(DataSnapshot(it, database)) },
                     cancelCallback = { close(DatabaseException(it)).run { } },
                 )
@@ -138,39 +138,39 @@ public actual open class Query internal actual constructor(
                 }
 
                 when (type) {
-                    ChildEvent.Type.ADDED -> onChildAdded(js, callback, cancelCallback)
-                    ChildEvent.Type.CHANGED -> onChildChanged(js, callback, cancelCallback)
-                    ChildEvent.Type.MOVED -> onChildMoved(js, callback, cancelCallback)
-                    ChildEvent.Type.REMOVED -> onChildRemoved(js, callback, cancelCallback)
+                    ChildEvent.Type.ADDED -> onChildAdded(publicJs, callback, cancelCallback)
+                    ChildEvent.Type.CHANGED -> onChildChanged(publicJs, callback, cancelCallback)
+                    ChildEvent.Type.MOVED -> onChildMoved(publicJs, callback, cancelCallback)
+                    ChildEvent.Type.REMOVED -> onChildRemoved(publicJs, callback, cancelCallback)
                 }
             }
         }
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }
     }
 
-    public actual fun startAt(value: String, key: String?): Query = Query(query(js, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(query(js, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: Double, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(query(js, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(query(js, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: String, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(query(js, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: Double, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(query(js, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
-    public actual fun limitToFirst(limit: Int): Query = Query(query(js, jsLimitToFirst(limit)), database)
+    public actual fun limitToFirst(limit: Int): Query = Query(query(publicJs, jsLimitToFirst(limit)), database)
 
-    public actual fun limitToLast(limit: Int): Query = Query(query(js, jsLimitToLast(limit)), database)
+    public actual fun limitToLast(limit: Int): Query = Query(query(publicJs, jsLimitToLast(limit)), database)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(query(js, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: String, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(query(js, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(query(js, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
-    override fun toString(): String = js.toString()
+    override fun toString(): String = publicJs.toString()
 }
 
 internal actual class NativeDatabaseReference internal constructor(
@@ -205,7 +205,7 @@ public val DataSnapshot.js: JsDataSnapshot get() = js
 
 public actual class DataSnapshot internal constructor(
     internal val js: JsDataSnapshot,
-    val database: Database,
+    public val database: Database,
 ) {
     public actual val value: Any? get() {
         check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }
