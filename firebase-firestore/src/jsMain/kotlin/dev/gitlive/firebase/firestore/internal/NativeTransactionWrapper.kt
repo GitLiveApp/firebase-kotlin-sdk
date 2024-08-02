@@ -11,7 +11,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.js
 import kotlinx.coroutines.await
 
-@PublishedApi
 internal actual class NativeTransactionWrapper internal actual constructor(actual val native: NativeTransaction) {
 
     constructor(js: Transaction) : this(NativeTransaction(js))
@@ -21,7 +20,7 @@ internal actual class NativeTransactionWrapper internal actual constructor(actua
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: EncodedObject,
-        setOptions: SetOptions
+        setOptions: SetOptions,
     ): NativeTransactionWrapper = rethrow {
         js.set(documentRef.js, encodedData.js, setOptions.js)
     }
@@ -32,7 +31,7 @@ internal actual class NativeTransactionWrapper internal actual constructor(actua
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
     ): NativeTransactionWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)
@@ -41,7 +40,7 @@ internal actual class NativeTransactionWrapper internal actual constructor(actua
 
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>,
     ): NativeTransactionWrapper = rethrow {
         encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
             js.update(documentRef.js, field, value, *moreFieldsAndValues)

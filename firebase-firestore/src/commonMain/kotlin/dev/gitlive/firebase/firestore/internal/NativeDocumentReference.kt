@@ -8,7 +8,6 @@ import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.internal.EncodedObject
 import kotlinx.coroutines.flow.Flow
 
-@PublishedApi
 internal expect class NativeDocumentReference(nativeValue: NativeDocumentReferenceType) {
     val nativeValue: NativeDocumentReferenceType
     val id: String

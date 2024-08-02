@@ -17,7 +17,6 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.time.Duration.Companion.seconds
 
-expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 
@@ -36,8 +35,8 @@ class FirebaseCrashlyticsTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         crashlytics = Firebase.crashlytics(app)

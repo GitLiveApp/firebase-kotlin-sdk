@@ -17,11 +17,6 @@ plugins {
     id("testOptionsConvention")
 }
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 android {
     val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
@@ -53,6 +48,8 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
+    explicitApi()
+
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")

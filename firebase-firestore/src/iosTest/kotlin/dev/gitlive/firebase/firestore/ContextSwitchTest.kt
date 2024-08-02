@@ -27,6 +27,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 private val backgroundContext = newSingleThreadContext("background")
+
 /**
  * This function performs is intended to test object sharing across several threads.
  * @param create a block for object creation
@@ -47,13 +48,12 @@ fun <T> runTestWithContextSwitch(create: suspend CoroutineScope.() -> T, test: s
         while (testRun.isActive) {
             NSRunLoop.mainRunLoop.runMode(
                 NSDefaultRunLoopMode,
-                beforeDate = NSDate.create(timeInterval = 1.0, sinceDate = NSDate())
+                beforeDate = NSDate.create(timeInterval = 1.0, sinceDate = NSDate()),
             )
             yield()
         }
         testRun.await()
     }
-
 
 class ContextSwitchTest {
 
@@ -69,8 +69,8 @@ class ContextSwitchTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         firestore = Firebase.firestore(app).apply {
@@ -87,11 +87,11 @@ class ContextSwitchTest {
 
     private data class TestFieldValuesOps(
         val initial: List<Int>,
-        val updates: List<Update>
+        val updates: List<Update>,
     ) {
         data class Update(
             val op: Pair<FieldPath, Any>,
-            val expected: List<Int>?
+            val expected: List<Int>?,
         )
     }
 
@@ -106,19 +106,19 @@ class ContextSwitchTest {
                 updates = listOf(
                     TestFieldValuesOps.Update(
                         FieldPath(TestData::values.name) to FieldValue.arrayUnion(2),
-                        listOf(1, 2)
+                        listOf(1, 2),
                     ),
                     TestFieldValuesOps.Update(
                         FieldPath(TestData::values.name) to FieldValue.arrayRemove(1),
-                        listOf(2)
+                        listOf(2),
                     ),
                     TestFieldValuesOps.Update(
                         FieldPath(TestData::values.name) to FieldValue.delete,
-                        null
-                    )
-                )
+                        null,
+                    ),
+                ),
             )
-        }
+        },
     ) { data ->
 
         fun getDocument() = firestore.collection("fieldValuesOps")

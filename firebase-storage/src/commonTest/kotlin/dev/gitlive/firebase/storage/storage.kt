@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
 expect val context: Any
@@ -35,14 +36,14 @@ class FirebaseStorageTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         storage = Firebase.storage(app).apply {
             useEmulator(emulatorHost, 9199)
-            setMaxOperationRetryTimeMillis(10000)
-            setMaxUploadRetryTimeMillis(10000)
+            setMaxOperationRetryTime(10.seconds)
+            setMaxUploadRetryTime(10.seconds)
         }
     }
 
@@ -95,7 +96,7 @@ class FirebaseStorageTest {
         val metadataResult = ref.getMetadata()
 
         assertNotNull(metadataResult)
-        assertEquals( metadata.customMetadata["key"], metadataResult.customMetadata["key"])
+        assertEquals(metadata.customMetadata["key"], metadataResult.customMetadata["key"])
     }
 }
 

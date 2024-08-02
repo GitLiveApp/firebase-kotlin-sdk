@@ -8,13 +8,12 @@ import dev.gitlive.firebase.firestore.performUpdate
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.android
 
-@PublishedApi
-internal actual class NativeTransactionWrapper actual internal constructor(actual val native: NativeTransaction) {
+internal actual class NativeTransactionWrapper internal actual constructor(actual val native: NativeTransaction) {
 
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: EncodedObject,
-        setOptions: SetOptions
+        setOptions: SetOptions,
     ): NativeTransactionWrapper {
         setOptions.android?.let {
             native.set(documentRef.android, encodedData.android, it)
@@ -26,14 +25,14 @@ internal actual class NativeTransactionWrapper actual internal constructor(actua
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
     ) = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
         native.update(documentRef.android, field, value, *moreFieldsAndValues)
     }.let { this }
 
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>,
     ) = encodedFieldsAndValues.performUpdate { field, value, moreFieldsAndValues ->
         native.update(documentRef.android, field, value, *moreFieldsAndValues)
     }.let { this }

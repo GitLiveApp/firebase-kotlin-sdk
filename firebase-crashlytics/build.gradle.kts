@@ -48,6 +48,8 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
+    explicitApi()
+
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -131,6 +133,18 @@ kotlin {
 if (project.property("firebase-crashlytics.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-crashlytics.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-crashlytics.skipJsTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

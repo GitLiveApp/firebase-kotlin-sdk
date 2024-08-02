@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package dev.gitlive.firebase.functions
 
 import cocoapods.FirebaseFunctions.FIRFunctions
@@ -15,31 +17,33 @@ import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
-actual val Firebase.functions
+public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(FIRFunctions.functions())
 
-actual fun Firebase.functions(region: String) =
+public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
-@Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp)
+public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
 )
 
-@Suppress("CAST_NEVER_SUCCEEDS")
-actual fun Firebase.functions(
+public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region)
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
 )
 
-actual data class FirebaseFunctions internal constructor(val ios: FIRFunctions) {
-    actual fun httpsCallable(name: String, timeout: Long?) =
-        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it/1000.0) } }.native)
+public actual data class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
+    public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
+        HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it.toDouble(DurationUnit.SECONDS)) } }.native)
 
-    actual fun useEmulator(host: String, port: Int) = ios.useEmulatorWithHost(host, port.toLong())
+    public actual fun useEmulator(host: String, port: Int) {
+        ios.useEmulatorWithHost(host, port.toLong())
+    }
 }
 
 @PublishedApi
@@ -52,22 +56,22 @@ internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
 
-actual class HttpsCallableResult constructor(val ios: FIRHTTPSCallableResult) {
+public actual class HttpsCallableResult(public val ios: FIRHTTPSCallableResult) {
 
-    actual inline fun <reified T> data() =
+    public actual inline fun <reified T> data(): T =
         decode<T>(value = ios.data())
 
-    actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit) =
+    public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
         decode(strategy, ios.data(), buildSettings)
 }
 
-actual class FirebaseFunctionsException(message: String, val code: FunctionsExceptionCode, val details: Any?) : FirebaseException(message)
+public actual class FirebaseFunctionsException(message: String, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(message)
 
-actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
+public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 
-actual val FirebaseFunctionsException.details: Any? get() = details
+public actual val FirebaseFunctionsException.details: Any? get() = details
 
-actual enum class FunctionsExceptionCode {
+public actual enum class FunctionsExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,
@@ -84,10 +88,11 @@ actual enum class FunctionsExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
-//todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
-internal fun NSError.toException() = when(domain) {
+
+// todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
+internal fun NSError.toException() = when (domain) {
 //    FIRFunctionsErrorDomain -> when(code) {
 //        FIRFunctionsErrorCodeOK -> FunctionsExceptionCode.OK
 //        FIRFunctionsErrorCodeCancelled -> FunctionsExceptionCode.CANCELLED
@@ -109,12 +114,18 @@ internal fun NSError.toException() = when(domain) {
 //        else -> FunctionsExceptionCode.UNKNOWN
 //    }
     else -> FunctionsExceptionCode.UNKNOWN
-}.let { FirebaseFunctionsException(description!!, it, null/*userInfo[FIRFunctionsErrorDetails]*/) }
+}.let {
+    FirebaseFunctionsException(
+        description!!,
+        it,
+        null, // userInfo[FIRFunctionsErrorDetails
+    )
+}
 
 internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(error.toException())
@@ -126,7 +137,7 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
 internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(error.toException())

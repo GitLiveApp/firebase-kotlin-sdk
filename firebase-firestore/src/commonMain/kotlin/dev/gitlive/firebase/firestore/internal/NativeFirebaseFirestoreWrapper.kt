@@ -9,13 +9,13 @@ import dev.gitlive.firebase.firestore.NativeWriteBatch
 
 internal expect class NativeFirebaseFirestoreWrapper internal constructor(native: NativeFirebaseFirestore) {
     val native: NativeFirebaseFirestore
-    var settings: FirebaseFirestoreSettings
 
     fun collection(collectionPath: String): NativeCollectionReference
     fun collectionGroup(collectionId: String): NativeQuery
     fun document(documentPath: String): NativeDocumentReference
     fun batch(): NativeWriteBatch
     fun setLoggingEnabled(loggingEnabled: Boolean)
+    fun applySettings(settings: FirebaseFirestoreSettings)
     suspend fun clearPersistence()
     suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T
     fun useEmulator(host: String, port: Int)

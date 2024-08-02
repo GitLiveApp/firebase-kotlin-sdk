@@ -4,8 +4,6 @@
 
 package dev.gitlive.firebase.crashlytics
 
-actual val emulatorHost: String = "localhost"
-
 actual val context: Any = Unit
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)

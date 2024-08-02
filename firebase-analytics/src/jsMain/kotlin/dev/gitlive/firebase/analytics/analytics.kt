@@ -6,48 +6,49 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
 import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
+import kotlin.time.Duration
 
-actual val Firebase.analytics: FirebaseAnalytics
+public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(getAnalytics())
 
-actual fun Firebase.analytics(app: FirebaseApp) =
+public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics =
     FirebaseAnalytics(getAnalytics(app.js))
 
-actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
-    actual fun logEvent(
+public actual class FirebaseAnalytics(public val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
+    public actual fun logEvent(
         name: String,
-        parameters: Map<String, Any>?
+        parameters: Map<String, Any>?,
     ) {
         dev.gitlive.firebase.analytics.externals.logEvent(js, name, parameters)
     }
 
-    actual fun setUserProperty(name: String, value: String) {
+    public actual fun setUserProperty(name: String, value: String) {
         dev.gitlive.firebase.analytics.externals.setUserProperty(js, name, value)
     }
 
-    actual fun setUserId(id: String) {
+    public actual fun setUserId(id: String?) {
         dev.gitlive.firebase.analytics.externals.setUserId(js, id)
     }
 
-    actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
+    public actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {
         dev.gitlive.firebase.analytics.externals.setAnalyticsCollectionEnabled(js, enabled)
     }
 
-    actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {
-        dev.gitlive.firebase.analytics.externals.setSessionTimeoutInterval(js, sessionTimeoutInterval)
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
+        dev.gitlive.firebase.analytics.externals.setSessionTimeoutInterval(js, sessionTimeoutInterval.inWholeMilliseconds)
     }
 
-    actual suspend fun getSessionId(): Long? = rethrow { dev.gitlive.firebase.analytics.externals.getSessionId(js).await() }
+    public actual suspend fun getSessionId(): Long? = rethrow { dev.gitlive.firebase.analytics.externals.getSessionId(js).await() }
 
-    actual fun resetAnalyticsData() {
+    public actual fun resetAnalyticsData() {
         dev.gitlive.firebase.analytics.externals.resetAnalyticsData(js)
     }
 
-    actual fun setDefaultEventParameters(parameters: Map<String, String>) {
+    public actual fun setDefaultEventParameters(parameters: Map<String, String>) {
         dev.gitlive.firebase.analytics.externals.setDefaultEventParameters(js, parameters)
     }
 
-    actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+    public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
         val consent = dev.gitlive.firebase.analytics.externals.ConsentSettings()
         consentSettings.forEach {
             when (it.key) {
@@ -60,20 +61,20 @@ actual class FirebaseAnalytics(val js: dev.gitlive.firebase.analytics.externals.
         dev.gitlive.firebase.analytics.externals.setConsent(js, consent)
     }
 
-    actual enum class ConsentType {
+    public actual enum class ConsentType {
         AD_PERSONALIZATION,
         AD_STORAGE,
         AD_USER_DATA,
-        ANALYTICS_STORAGE
+        ANALYTICS_STORAGE,
     }
 
-    actual enum class ConsentStatus {
+    public actual enum class ConsentStatus {
         GRANTED,
-        DENIED
+        DENIED,
     }
 }
 
-actual open class FirebaseAnalyticsException(code: String, cause: Throwable): FirebaseException(code, cause)
+public actual open class FirebaseAnalyticsException(code: String, cause: Throwable) : FirebaseException(code, cause)
 
 internal inline fun <R> rethrow(function: () -> R): R {
     try {
@@ -92,7 +93,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
         when {
             else -> {
                 println("Unknown error code in ${JSON.stringify(error)}")
-                FirebaseAnalyticsException(code, error)
+                FirebaseAnalyticsException(code, error.unsafeCast<Throwable>())
             }
         }
     }

@@ -3,10 +3,12 @@ package dev.gitlive.firebase.messaging.externals
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 
-external fun getMessaging(
+public external fun getMessaging(
     app: FirebaseApp? = definedExternally,
 ): Messaging
 
-external fun getToken(messaging: Messaging = definedExternally, options: dynamic = definedExternally): Promise<String>
+public external fun getToken(messaging: Messaging = definedExternally, options: dynamic = definedExternally): Promise<String>
 
-external interface Messaging
+public external fun deleteToken(messaging: Messaging = definedExternally): Promise<Boolean>
+
+public external interface Messaging

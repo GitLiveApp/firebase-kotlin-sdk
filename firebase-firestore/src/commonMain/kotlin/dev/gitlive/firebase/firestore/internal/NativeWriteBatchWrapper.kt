@@ -5,7 +5,6 @@ import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.NativeWriteBatch
 import dev.gitlive.firebase.internal.EncodedObject
 
-@PublishedApi
 internal expect class NativeWriteBatchWrapper internal constructor(native: NativeWriteBatch) {
     val native: NativeWriteBatch
     fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): NativeWriteBatchWrapper

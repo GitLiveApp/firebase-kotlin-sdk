@@ -1,0 +1,35 @@
+public abstract interface class dev/gitlive/firebase/DecodeSettings : dev/gitlive/firebase/EncodeDecodeSettings {
+}
+
+public abstract interface class dev/gitlive/firebase/DecodeSettings$Builder {
+	public abstract fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public abstract fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+}
+
+public abstract interface class dev/gitlive/firebase/EncodeDecodeSettings {
+	public abstract fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+}
+
+public abstract interface class dev/gitlive/firebase/EncodeDecodeSettingsBuilder : dev/gitlive/firebase/DecodeSettings$Builder, dev/gitlive/firebase/EncodeSettings$Builder {
+}
+
+public abstract interface class dev/gitlive/firebase/EncodeSettings : dev/gitlive/firebase/EncodeDecodeSettings {
+	public abstract fun getEncodeDefaults ()Z
+}
+
+public abstract interface class dev/gitlive/firebase/EncodeSettings$Builder {
+	public abstract fun getEncodeDefaults ()Z
+	public abstract fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public abstract fun setEncodeDefaults (Z)V
+	public abstract fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+}
+
+public abstract interface annotation class dev/gitlive/firebase/FirebaseClassDiscriminator : java/lang/annotation/Annotation {
+	public abstract fun discriminator ()Ljava/lang/String;
+}
+
+public synthetic class dev/gitlive/firebase/FirebaseClassDiscriminator$Impl : dev/gitlive/firebase/FirebaseClassDiscriminator {
+	public fun <init> (Ljava/lang/String;)V
+	public final synthetic fun discriminator ()Ljava/lang/String;
+}
+

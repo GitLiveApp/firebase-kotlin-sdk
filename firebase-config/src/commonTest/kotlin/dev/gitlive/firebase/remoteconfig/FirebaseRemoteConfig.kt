@@ -9,11 +9,14 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
+import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
@@ -39,8 +42,8 @@ class FirebaseRemoteConfigTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         remoteConfig = Firebase.remoteConfig(app)
@@ -90,9 +93,9 @@ class FirebaseRemoteConfigTest {
                 "test_default_boolean",
                 "test_default_double",
                 "test_default_long",
-                "test_default_string"
+                "test_default_string",
             ),
-            keys
+            keys,
         )
     }
 
@@ -101,22 +104,22 @@ class FirebaseRemoteConfigTest {
         assertEquals(
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
-                fetchTimeMillis = -1,
-                lastFetchStatus = FetchStatus.NoFetchYet
+                fetchTime = Instant.fromEpochMilliseconds(-1),
+                lastFetchStatus = FetchStatus.NoFetchYet,
             ).toString(),
-            remoteConfig.info.toString()
+            remoteConfig.info.toString(),
         )
     }
 
     @Test
     fun testSetConfigSettings() = runTest {
         remoteConfig.settings {
-            fetchTimeoutInSeconds = 42
-            minimumFetchIntervalInSeconds = 42
+            fetchTimeout = 42.seconds
+            minimumFetchInterval = 42.seconds
         }
         val info = remoteConfig.info
-        assertEquals(42, info.configSettings.fetchTimeoutInSeconds)
-        assertEquals(42, info.configSettings.minimumFetchIntervalInSeconds)
+        assertEquals(42.seconds, info.configSettings.fetchTimeout)
+        assertEquals(42.seconds, info.configSettings.minimumFetchInterval)
     }
 
     // Unfortunately Firebase Remote Config is not implemented by Firebase emulator so it may be
@@ -126,7 +129,7 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetch() = runTest {
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetch()
@@ -141,7 +144,7 @@ class FirebaseRemoteConfigTest {
     @Ignore
     fun testFetchAndActivate() = runTest {
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetchAndActivate()

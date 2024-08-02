@@ -6,41 +6,41 @@ package dev.gitlive.firebase
 
 import android.content.Context
 
-actual typealias FirebaseException = com.google.firebase.FirebaseException
+public actual typealias FirebaseException = com.google.firebase.FirebaseException
 
-actual typealias FirebaseNetworkException = com.google.firebase.FirebaseNetworkException
+public actual typealias FirebaseNetworkException = com.google.firebase.FirebaseNetworkException
 
-actual typealias FirebaseTooManyRequestsException = com.google.firebase.FirebaseTooManyRequestsException
+public actual typealias FirebaseTooManyRequestsException = com.google.firebase.FirebaseTooManyRequestsException
 
-actual typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
+public actual typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
 
-actual val Firebase.app: FirebaseApp
+public actual val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.FirebaseApp.getInstance())
 
-actual fun Firebase.app(name: String): FirebaseApp =
+public actual fun Firebase.app(name: String): FirebaseApp =
     FirebaseApp(com.google.firebase.FirebaseApp.getInstance(name))
 
-actual fun Firebase.initialize(context: Any?): FirebaseApp? =
+public actual fun Firebase.initialize(context: Any?): FirebaseApp? =
     com.google.firebase.FirebaseApp.initializeApp(context as Context)?.let { FirebaseApp(it) }
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp =
     FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid(), name))
 
-actual fun Firebase.initialize(context: Any?, options: FirebaseOptions) =
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp =
     FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid()))
 
-actual data class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
+public actual data class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
     actual val name: String
         get() = android.name
     actual val options: FirebaseOptions
         get() = android.options.run { FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId) }
 
-    actual suspend fun delete() {
+    public actual suspend fun delete() {
         android.delete()
     }
 }
 
-actual fun Firebase.apps(context: Any?) = com.google.firebase.FirebaseApp.getApps(context as Context)
+public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = com.google.firebase.FirebaseApp.getApps(context as Context)
     .map { FirebaseApp(it) }
 
 private fun FirebaseOptions.toAndroid() = com.google.firebase.FirebaseOptions.Builder()
