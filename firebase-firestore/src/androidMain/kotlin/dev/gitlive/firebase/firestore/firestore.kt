@@ -30,6 +30,8 @@ import com.google.firebase.firestore.memoryEagerGcSettings as androidMemoryEager
 import com.google.firebase.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
 import com.google.firebase.firestore.persistentCacheSettings as androidPersistentCacheSettings
 
+public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = AndroidFirebaseFirestore.getInstance()
+
 public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(AndroidFirebaseFirestore.getInstance())
 
@@ -55,7 +57,6 @@ public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (t
 internal actual typealias NativeFirebaseFirestore = AndroidFirebaseFirestore
 
 public operator fun FirebaseFirestore.Companion.invoke(android: AndroidFirebaseFirestore): FirebaseFirestore = FirebaseFirestore(android)
-public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = native
 
 public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,

@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
+public val FirebaseAuth.ios: FIRAuth get() = FIRAuth.auth()
+
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
 

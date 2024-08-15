@@ -7,6 +7,8 @@ import dev.gitlive.firebase.FirebaseException
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.*
 
+public val FirebaseInstallations.ios: FIRInstallations get() = FIRInstallations.installations()
+
 public actual val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(FIRInstallations.installations())
 

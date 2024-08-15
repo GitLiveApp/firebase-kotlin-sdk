@@ -2,8 +2,11 @@ package dev.gitlive.firebase.crashlytics
 
 import com.google.firebase.FirebaseException
 import com.google.firebase.crashlytics.CustomKeysAndValues.Builder
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+
+public val FirebaseCrashlytics.android: com.google.firebase.crashlytics.FirebaseCrashlytics get() = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
 
 public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
     FirebaseCrashlytics(com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance())

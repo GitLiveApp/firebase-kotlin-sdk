@@ -30,6 +30,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+public val FirebaseStorage.ios: FIRStorage get() = FIRStorage.storage()
+
 public actual val Firebase.storage: FirebaseStorage get() =
     FirebaseStorage(FIRStorage.storage())
 

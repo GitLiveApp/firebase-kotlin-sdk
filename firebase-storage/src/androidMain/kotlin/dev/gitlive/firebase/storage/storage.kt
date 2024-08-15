@@ -15,6 +15,8 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.perf.FirebasePerformance
+import dev.gitlive.firebase.storage.storage
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -24,6 +26,8 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+
+public val FirebaseStorage.android: com.google.firebase.storage.FirebaseStorage get() = com.google.firebase.storage.FirebaseStorage.getInstance()
 
 public actual val Firebase.storage: FirebaseStorage get() = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
 

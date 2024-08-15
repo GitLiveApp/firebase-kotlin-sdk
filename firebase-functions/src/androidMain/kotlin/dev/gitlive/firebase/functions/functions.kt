@@ -15,6 +15,8 @@ import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
+public val FirebaseFunctions.android: com.google.firebase.functions.FirebaseFunctions get() = com.google.firebase.functions.FirebaseFunctions.getInstance()
+
 public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance())
 

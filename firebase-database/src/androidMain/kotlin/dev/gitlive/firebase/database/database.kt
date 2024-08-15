@@ -40,6 +40,8 @@ import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
 
+public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
+
 internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T =
     merge(
         flow { emit(await()) },

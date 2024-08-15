@@ -7,6 +7,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 
+public val FirebaseCrashlytics.ios: FIRCrashlytics get() = FIRCrashlytics.crashlytics()
+
 public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
     FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 

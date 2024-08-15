@@ -4,6 +4,8 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import kotlinx.coroutines.tasks.await
 
+public val FirebaseInstallations.android: com.google.firebase.installations.FirebaseInstallations get() = com.google.firebase.installations.FirebaseInstallations.getInstance()
+
 public actual val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(com.google.firebase.installations.FirebaseInstallations.getInstance())
 

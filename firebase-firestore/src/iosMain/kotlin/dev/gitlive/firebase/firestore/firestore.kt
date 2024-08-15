@@ -8,6 +8,7 @@ package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestoreInternal.*
 import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
+import com.google.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -18,6 +19,8 @@ import platform.Foundation.NSNumber
 import platform.Foundation.numberWithLong
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
+
+public val FirebaseFirestore.ios: FIRFirestore get() = FIRFirestore.firestore()
 
 public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
@@ -39,7 +42,6 @@ public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (t
 internal actual typealias NativeFirebaseFirestore = FIRFirestore
 
 public operator fun FirebaseFirestore.Companion.invoke(ios: FIRFirestore): FirebaseFirestore = FirebaseFirestore(ios)
-public val FirebaseFirestore.ios: FIRFirestore get() = native
 
 public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,

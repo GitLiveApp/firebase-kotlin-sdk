@@ -5,6 +5,8 @@ import dev.gitlive.firebase.Firebase
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 
+public val FirebaseMessaging.ios: FIRMessaging get() = FIRMessaging.messaging()
+
 public actual val Firebase.messaging: FirebaseMessaging
     get() = FirebaseMessaging(FIRMessaging.messaging())
 
