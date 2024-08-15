@@ -2,7 +2,6 @@ package dev.gitlive.firebase.crashlytics
 
 import com.google.firebase.FirebaseException
 import com.google.firebase.crashlytics.CustomKeysAndValues.Builder
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 

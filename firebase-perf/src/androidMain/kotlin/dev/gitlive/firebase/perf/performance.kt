@@ -3,8 +3,6 @@ package dev.gitlive.firebase.perf
 import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.messaging.FirebaseMessaging
-import dev.gitlive.firebase.messaging.messaging
 import dev.gitlive.firebase.perf.metrics.Trace
 
 public val FirebasePerformance.android: com.google.firebase.perf.FirebasePerformance get() = com.google.firebase.perf.FirebasePerformance.getInstance()
