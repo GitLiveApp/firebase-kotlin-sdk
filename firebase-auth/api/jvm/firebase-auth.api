@@ -103,7 +103,6 @@ public final class dev/gitlive/firebase/auth/FirebaseAuth {
 	public final fun confirmPasswordReset (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun createUserWithEmailAndPassword (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun fetchSignInMethodsForEmail (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAndroid ()Lcom/google/firebase/auth/FirebaseAuth;
 	public final fun getAuthStateChanged ()Lkotlinx/coroutines/flow/Flow;
 	public final fun getCurrentUser ()Ldev/gitlive/firebase/auth/FirebaseUser;
 	public final fun getIdTokenChanged ()Lkotlinx/coroutines/flow/Flow;
