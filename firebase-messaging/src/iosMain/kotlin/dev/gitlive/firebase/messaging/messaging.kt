@@ -10,7 +10,7 @@ public val FirebaseMessaging.ios: FIRMessaging get() = FIRMessaging.messaging()
 public actual val Firebase.messaging: FirebaseMessaging
     get() = FirebaseMessaging(FIRMessaging.messaging())
 
-public actual class FirebaseMessaging(public val ios: FIRMessaging) {
+public actual class FirebaseMessaging(internal val ios: FIRMessaging) {
     public actual fun subscribeToTopic(topic: String) {
         ios.subscribeToTopic(topic)
     }

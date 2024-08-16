@@ -16,6 +16,7 @@ import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.publicIos
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -40,14 +41,14 @@ public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStora
 )
 
 public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp),
+    FIRStorage.storageForApp(app.publicIos as objcnames.classes.FIRApp),
 )
 
 public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url),
+    FIRStorage.storageForApp(app.publicIos as objcnames.classes.FIRApp, url),
 )
 
-public actual class FirebaseStorage(public val ios: FIRStorage) {
+public actual class FirebaseStorage(internal val ios: FIRStorage) {
     public actual val maxOperationRetryTime: Duration = ios.maxOperationRetryTime().seconds
     public actual val maxUploadRetryTime: Duration = ios.maxUploadRetryTime().seconds
 
@@ -68,7 +69,9 @@ public actual class FirebaseStorage(public val ios: FIRStorage) {
     public actual fun reference(location: String): StorageReference = StorageReference(ios.referenceWithPath(location))
 }
 
-public actual class StorageReference(public val ios: FIRStorageReference) {
+public val StorageReference.ios: FIRStorageReference get() = ios
+
+public actual class StorageReference(internal val ios: FIRStorageReference) {
     public actual val name: String get() = ios.name()
     public actual val path: String get() = ios.fullPath()
     public actual val bucket: String get() = ios.bucket()
@@ -144,7 +147,9 @@ public actual class StorageReference(public val ios: FIRStorageReference) {
     }
 }
 
-public actual class ListResult(ios: FIRStorageListResult) {
+public val ListResult.ios: FIRStorageListResult get() = ios
+
+public actual class ListResult(internal val ios: FIRStorageListResult) {
     public actual val prefixes: List<StorageReference> = ios.prefixes().map { StorageReference(it as FIRStorageReference) }
     public actual val items: List<StorageReference> = ios.items().map { StorageReference(it as FIRStorageReference) }
     public actual val pageToken: String? = ios.pageToken()

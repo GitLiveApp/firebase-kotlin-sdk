@@ -4,6 +4,7 @@ import cocoapods.FirebaseInstallations.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.publicIos
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.*
 
@@ -13,10 +14,10 @@ public actual val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(FIRInstallations.installations())
 
 public actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(
-    FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp),
+    FIRInstallations.installationsWithApp(app.publicIos as objcnames.classes.FIRApp),
 )
 
-public actual class FirebaseInstallations internal constructor(public val ios: FIRInstallations) {
+public actual class FirebaseInstallations internal constructor(internal val ios: FIRInstallations) {
 
     public actual suspend fun delete(): Unit = ios.await { deleteWithCompletion(completion = it) }
 

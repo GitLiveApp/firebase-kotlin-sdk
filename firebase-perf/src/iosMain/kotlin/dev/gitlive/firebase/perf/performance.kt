@@ -14,7 +14,7 @@ public actual val Firebase.performance: FirebasePerformance get() =
 public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance =
     FirebasePerformance(FIRPerformance.sharedInstance())
 
-public actual class FirebasePerformance(public val ios: FIRPerformance) {
+public actual class FirebasePerformance(internal val ios: FIRPerformance) {
 
     public actual fun newTrace(traceName: String): Trace = Trace(ios.traceWithName(traceName))
 

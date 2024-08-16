@@ -14,6 +14,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.publicIos
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
@@ -29,17 +30,17 @@ public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
+    FIRFunctions.functionsForApp(app.publicIos as objcnames.classes.FIRApp),
 )
 
 public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
+    FIRFunctions.functionsForApp(app.publicIos as objcnames.classes.FIRApp, region = region),
 )
 
-public actual data class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
+public actual data class FirebaseFunctions internal constructor(internal val ios: FIRFunctions) {
     public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it.toDouble(DurationUnit.SECONDS)) } }.native)
 
@@ -57,14 +58,15 @@ internal actual data class NativeHttpsCallableReference(val ios: FIRHTTPSCallabl
 internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
+public val HttpsCallableResult.publicIos: FIRHTTPSCallableResult get() = ios
 
-public actual class HttpsCallableResult(public val ios: FIRHTTPSCallableResult) {
+public actual class HttpsCallableResult(internal val ios: FIRHTTPSCallableResult) {
 
     public actual inline fun <reified T> data(): T =
-        decode<T>(value = ios.data())
+        decode<T>(value = publicIos.data())
 
     public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-        decode(strategy, ios.data(), buildSettings)
+        decode(strategy, publicIos.data(), buildSettings)
 }
 
 public actual class FirebaseFunctionsException(message: String, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(message)

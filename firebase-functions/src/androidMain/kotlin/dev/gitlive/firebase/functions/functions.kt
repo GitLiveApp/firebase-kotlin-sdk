@@ -10,6 +10,7 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.publicAndroid
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit
@@ -24,12 +25,12 @@ public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(region))
 
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions =
-    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android))
+    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.publicAndroid))
 
 public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions =
-    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
+    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.publicAndroid, region))
 
-public actual data class FirebaseFunctions internal constructor(public val android: com.google.firebase.functions.FirebaseFunctions) {
+public actual data class FirebaseFunctions internal constructor(internal val android: com.google.firebase.functions.FirebaseFunctions) {
     public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
         HttpsCallableReference(android.getHttpsCallable(name).apply { timeout?.let { setTimeout(it.inWholeMilliseconds, TimeUnit.MILLISECONDS) } }.native)
 
@@ -47,14 +48,15 @@ internal actual data class NativeHttpsCallableReference(val android: com.google.
 internal val com.google.firebase.functions.HttpsCallableReference.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
+public val HttpsCallableResult.publicAndroid: com.google.firebase.functions.HttpsCallableResult get() = android
 
-public actual class HttpsCallableResult(public val android: com.google.firebase.functions.HttpsCallableResult) {
+public actual class HttpsCallableResult(internal val android: com.google.firebase.functions.HttpsCallableResult) {
 
     public actual inline fun <reified T> data(): T =
-        decode<T>(value = android.data)
+        decode<T>(value = publicAndroid.data)
 
     public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-        decode(strategy, android.data, buildSettings)
+        decode(strategy, publicAndroid.data, buildSettings)
 }
 
 public actual typealias FirebaseFunctionsException = com.google.firebase.functions.FirebaseFunctionsException

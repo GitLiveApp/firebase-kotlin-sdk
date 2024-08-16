@@ -15,7 +15,7 @@ public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
 public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics =
     FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 
-public actual class FirebaseCrashlytics internal constructor(public val ios: FIRCrashlytics) {
+public actual class FirebaseCrashlytics internal constructor(internal val ios: FIRCrashlytics) {
 
     public actual fun recordException(exception: Throwable) {
         ios.recordError(exception.asNSError())

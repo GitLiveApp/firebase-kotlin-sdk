@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.TaskExecutors
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
+import dev.gitlive.firebase.publicAndroid
 import java.util.concurrent.Executor
 import com.google.firebase.firestore.CollectionReference as AndroidCollectionReference
 import com.google.firebase.firestore.DocumentChange as AndroidDocumentChange
@@ -36,7 +37,7 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(AndroidFirebaseFirestore.getInstance())
 
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
-    FirebaseFirestore(AndroidFirebaseFirestore.getInstance(app.android))
+    FirebaseFirestore(AndroidFirebaseFirestore.getInstance(app.publicAndroid))
 
 public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (this) {
     is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {
@@ -139,7 +140,9 @@ public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() 
 
 public actual typealias FirestoreExceptionCode = AndroidFirebaseFirestoreException.Code
 
-public actual class QuerySnapshot(public val android: AndroidQuerySnapshot) {
+public val QuerySnapshot.android: AndroidQuerySnapshot get() = android
+
+public actual class QuerySnapshot(internal val android: AndroidQuerySnapshot) {
     public actual val documents: List<DocumentSnapshot>
         get() = android.documents.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
     public actual val documentChanges: List<DocumentChange>
@@ -147,7 +150,9 @@ public actual class QuerySnapshot(public val android: AndroidQuerySnapshot) {
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(android.metadata)
 }
 
-public actual class DocumentChange(public val android: AndroidDocumentChange) {
+public val DocumentChange.android: AndroidDocumentChange get() = android
+
+public actual class DocumentChange(internal val android: AndroidDocumentChange) {
     public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(android.document))
     public actual val newIndex: Int
@@ -163,12 +168,16 @@ internal actual typealias NativeDocumentSnapshot = AndroidDocumentSnapshot
 public operator fun DocumentSnapshot.Companion.invoke(android: AndroidDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(android)
 public val DocumentSnapshot.android: AndroidDocumentSnapshot get() = native
 
-public actual class SnapshotMetadata(public val android: AndroidSnapshotMetadata) {
+public val SnapshotMetadata.android: AndroidSnapshotMetadata get() = android
+
+public actual class SnapshotMetadata(internal val android: AndroidSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = android.hasPendingWrites()
     public actual val isFromCache: Boolean get() = android.isFromCache
 }
 
-public actual class FieldPath private constructor(public val android: AndroidFieldPath) {
+public val FieldPath.android: AndroidFieldPath get() = android
+
+public actual class FieldPath private constructor(internal val android: AndroidFieldPath) {
 
     public actual companion object {
         public actual val documentId: FieldPath = FieldPath(AndroidFieldPath.documentId())

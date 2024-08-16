@@ -12,6 +12,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
+import dev.gitlive.firebase.publicIos
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
@@ -25,7 +26,7 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
-    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
+    FIRFirestore.firestoreForApp(app.publicIos as objcnames.classes.FIRApp),
 )
 
 public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
@@ -155,6 +156,8 @@ public actual enum class Direction {
     DESCENDING,
 }
 
+public val ChangeType.ios: FIRDocumentChangeType get() = ios
+
 public actual enum class ChangeType(internal val ios: FIRDocumentChangeType) {
     ADDED(FIRDocumentChangeTypeAdded),
     MODIFIED(FIRDocumentChangeTypeModified),
@@ -185,7 +188,9 @@ public fun NSError.toException(): FirebaseFirestoreException = when (domain) {
     else -> FirestoreExceptionCode.UNKNOWN
 }.let { FirebaseFirestoreException(description!!, it) }
 
-public actual class QuerySnapshot(public val ios: FIRQuerySnapshot) {
+public val QuerySnapshot.ios: FIRQuerySnapshot get() = ios
+
+public actual class QuerySnapshot(internal val ios: FIRQuerySnapshot) {
     public actual val documents: List<DocumentSnapshot>
         get() = ios.documents.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it as FIRDocumentSnapshot)) }
     public actual val documentChanges: List<DocumentChange>
@@ -193,7 +198,9 @@ public actual class QuerySnapshot(public val ios: FIRQuerySnapshot) {
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
 }
 
-public actual class DocumentChange(public val ios: FIRDocumentChange) {
+public val DocumentChange.ios: FIRDocumentChange get() = ios
+
+public actual class DocumentChange(internal val ios: FIRDocumentChange) {
     public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(ios.document))
     public actual val newIndex: Int
@@ -209,12 +216,16 @@ internal actual typealias NativeDocumentSnapshot = FIRDocumentSnapshot
 public operator fun DocumentSnapshot.Companion.invoke(ios: FIRDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(ios)
 public val DocumentSnapshot.ios: FIRDocumentSnapshot get() = native
 
-public actual class SnapshotMetadata(public val ios: FIRSnapshotMetadata) {
+public val SnapshotMetadata.ios: FIRSnapshotMetadata get() = ios
+
+public actual class SnapshotMetadata(internal val ios: FIRSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = ios.pendingWrites
     public actual val isFromCache: Boolean get() = ios.fromCache
 }
 
-public actual class FieldPath private constructor(public val ios: FIRFieldPath) {
+public val FieldPath.ios: FIRFieldPath get() = ios
+
+public actual class FieldPath private constructor(internal val ios: FIRFieldPath) {
     public actual companion object {
         public actual val documentId: FieldPath = FieldPath(FIRFieldPath.documentID())
     }
