@@ -141,6 +141,7 @@ public final class dev/gitlive/firebase/database/databaseAndroid {
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/DatabaseReference;)Lcom/google/firebase/database/DatabaseReference;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/FirebaseDatabase;)Lcom/google/firebase/database/FirebaseDatabase;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/OnDisconnect;)Lcom/google/firebase/database/OnDisconnect;
 	public static final fun getDatabase (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun getDatabase (Ldev/gitlive/firebase/database/OnDisconnect;)Ldev/gitlive/firebase/database/FirebaseDatabase;
