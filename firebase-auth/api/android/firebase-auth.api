@@ -272,6 +272,7 @@ public final class dev/gitlive/firebase/auth/UserMetaData {
 
 public final class dev/gitlive/firebase/auth/android {
 	public static final fun auth (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/auth/FirebaseAuth;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/FirebaseAuth;)Lcom/google/firebase/auth/FirebaseAuth;
 	public static final fun getAuth (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/auth/FirebaseAuth;
 }
 

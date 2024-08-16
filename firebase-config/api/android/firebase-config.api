@@ -83,6 +83,7 @@ public final class dev/gitlive/firebase/remoteconfig/ValueSource : java/lang/Enu
 }
 
 public final class dev/gitlive/firebase/remoteconfig/android {
+	public static final fun getAndroid (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;)Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;
 	public static final fun getRemoteConfig (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
 	public static final fun remoteConfig (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
 }

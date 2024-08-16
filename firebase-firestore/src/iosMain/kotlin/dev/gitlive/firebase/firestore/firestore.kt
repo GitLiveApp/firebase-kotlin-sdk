@@ -8,7 +8,6 @@ package dev.gitlive.firebase.firestore
 
 import cocoapods.FirebaseFirestoreInternal.*
 import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
-import com.google.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

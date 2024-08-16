@@ -6,6 +6,7 @@ public final class dev/gitlive/firebase/installations/FirebaseInstallations {
 }
 
 public final class dev/gitlive/firebase/installations/InstallationsKt {
+	public static final fun getAndroid (Ldev/gitlive/firebase/installations/FirebaseInstallations;)Lcom/google/firebase/installations/FirebaseInstallations;
 	public static final fun getInstallations (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
 	public static final fun installations (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
 }

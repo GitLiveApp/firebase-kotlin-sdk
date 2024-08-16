@@ -8,6 +8,7 @@ public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
 }
 
 public final class dev/gitlive/firebase/messaging/android {
+	public static final fun getAndroid (Ldev/gitlive/firebase/messaging/FirebaseMessaging;)Lcom/google/firebase/messaging/FirebaseMessaging;
 	public static final fun getMessaging (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/messaging/FirebaseMessaging;
 }
 
