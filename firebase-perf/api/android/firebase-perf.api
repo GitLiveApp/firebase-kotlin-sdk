@@ -1,6 +1,5 @@
 public final class dev/gitlive/firebase/perf/FirebasePerformance {
 	public fun <init> (Lcom/google/firebase/perf/FirebasePerformance;)V
-	public final fun getAndroid ()Lcom/google/firebase/perf/FirebasePerformance;
 	public final fun isPerformanceCollectionEnabled ()Z
 	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
 	public final fun setPerformanceCollectionEnabled (Z)V

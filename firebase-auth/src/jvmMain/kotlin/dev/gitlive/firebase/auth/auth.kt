@@ -12,6 +12,7 @@ import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.publicAndroid
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,9 +22,9 @@ public actual val Firebase.auth
     get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
 public actual fun Firebase.auth(app: FirebaseApp) =
-    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
+    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.publicAndroid))
 
-public actual class FirebaseAuth internal constructor(public val android: com.google.firebase.auth.FirebaseAuth) {
+public actual class FirebaseAuth internal constructor(internal val android: com.google.firebase.auth.FirebaseAuth) {
     public actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 

@@ -15,7 +15,6 @@ public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig {
 	public static synthetic fun fetch-dnQKTGw$default (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;Lkotlin/time/Duration;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun fetchAndActivate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAll ()Ljava/util/Map;
-	public final fun getAndroid ()Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;
 	public final fun getInfo ()Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigInfo;
 	public final fun getKeysByPrefix (Ljava/lang/String;)Ljava/util/Set;
 	public final fun getValue (Ljava/lang/String;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigValue;

@@ -74,13 +74,11 @@ public class dev/gitlive/firebase/auth/AuthCredential {
 }
 
 public final class dev/gitlive/firebase/auth/AuthResult {
-	public final fun getAndroid ()Lcom/google/firebase/auth/AuthResult;
 	public final fun getUser ()Ldev/gitlive/firebase/auth/FirebaseUser;
 }
 
 public final class dev/gitlive/firebase/auth/AuthTokenResult {
 	public fun <init> (Lcom/google/firebase/auth/GetTokenResult;)V
-	public final fun getAndroid ()Lcom/google/firebase/auth/GetTokenResult;
 	public final fun getClaims ()Ljava/util/Map;
 	public final fun getSignInProvider ()Ljava/lang/String;
 	public final fun getToken ()Ljava/lang/String;
@@ -103,7 +101,6 @@ public final class dev/gitlive/firebase/auth/FirebaseAuth {
 	public final fun confirmPasswordReset (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun createUserWithEmailAndPassword (Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun fetchSignInMethodsForEmail (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAndroid ()Lcom/google/firebase/auth/FirebaseAuth;
 	public final fun getAuthStateChanged ()Lkotlinx/coroutines/flow/Flow;
 	public final fun getCurrentUser ()Ldev/gitlive/firebase/auth/FirebaseUser;
 	public final fun getIdTokenChanged ()Lkotlinx/coroutines/flow/Flow;
@@ -272,6 +269,8 @@ public final class dev/gitlive/firebase/auth/UserMetaData {
 
 public final class dev/gitlive/firebase/auth/android {
 	public static final fun auth (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/auth/FirebaseAuth;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthResult;)Lcom/google/firebase/auth/AuthResult;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthTokenResult;)Lcom/google/firebase/auth/GetTokenResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/FirebaseAuth;)Lcom/google/firebase/auth/FirebaseAuth;
 	public static final fun getAuth (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/auth/FirebaseAuth;
 }
