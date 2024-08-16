@@ -18,4 +18,8 @@ public actual class FirebaseMessaging(public val android: com.google.firebase.me
     }
 
     public actual suspend fun getToken(): String = android.token.await()
+
+    public actual suspend fun deleteToken() {
+        android.deleteToken().await()
+    }
 }

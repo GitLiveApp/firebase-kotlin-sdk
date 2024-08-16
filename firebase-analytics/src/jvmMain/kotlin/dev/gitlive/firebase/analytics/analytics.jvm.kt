@@ -14,7 +14,7 @@ public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics {
 
 public actual class FirebaseAnalytics {
     public actual fun setUserProperty(name: String, value: String) {}
-    public actual fun setUserId(id: String) {}
+    public actual fun setUserId(id: String?) {}
     public actual fun resetAnalyticsData() {}
     public actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {}
     public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {}
