@@ -3,6 +3,7 @@
 package dev.gitlive.firebase.messaging
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.messaging.messaging
 import kotlinx.coroutines.tasks.await
 
 public val FirebaseMessaging.android: com.google.firebase.messaging.FirebaseMessaging get() = com.google.firebase.messaging.FirebaseMessaging.getInstance()
