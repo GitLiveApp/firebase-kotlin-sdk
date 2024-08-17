@@ -4,7 +4,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.crashlytics.CustomKeysAndValues.Builder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.publicAndroid
+import dev.gitlive.firebase.android
 
 public val FirebaseCrashlytics.android: com.google.firebase.crashlytics.FirebaseCrashlytics get() = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
 
@@ -12,7 +12,7 @@ public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
     FirebaseCrashlytics(com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance())
 
 public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics =
-    FirebaseCrashlytics(app.publicAndroid.get(com.google.firebase.crashlytics.FirebaseCrashlytics::class.java))
+    FirebaseCrashlytics(app.android.get(com.google.firebase.crashlytics.FirebaseCrashlytics::class.java))
 
 public actual class FirebaseCrashlytics internal constructor(internal val android: com.google.firebase.crashlytics.FirebaseCrashlytics) {
 

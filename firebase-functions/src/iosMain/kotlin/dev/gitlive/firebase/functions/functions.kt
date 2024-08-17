@@ -14,7 +14,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.internal.decode
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
@@ -30,14 +30,14 @@ public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.publicIos as objcnames.classes.FIRApp),
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.publicIos as objcnames.classes.FIRApp, region = region),
+    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
 )
 
 public actual data class FirebaseFunctions internal constructor(internal val ios: FIRFunctions) {

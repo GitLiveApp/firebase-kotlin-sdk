@@ -9,8 +9,8 @@ package dev.gitlive.firebase.firestore
 import com.google.android.gms.tasks.TaskExecutors
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
-import dev.gitlive.firebase.publicAndroid
 import java.util.concurrent.Executor
 import com.google.firebase.firestore.CollectionReference as AndroidCollectionReference
 import com.google.firebase.firestore.DocumentChange as AndroidDocumentChange
@@ -37,7 +37,7 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(AndroidFirebaseFirestore.getInstance())
 
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
-    FirebaseFirestore(AndroidFirebaseFirestore.getInstance(app.publicAndroid))
+    FirebaseFirestore(AndroidFirebaseFirestore.getInstance(app.android))
 
 public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (this) {
     is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {

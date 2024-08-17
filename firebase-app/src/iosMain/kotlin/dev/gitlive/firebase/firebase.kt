@@ -12,7 +12,7 @@ public actual open class FirebaseNetworkException(message: String) : FirebaseExc
 public actual open class FirebaseTooManyRequestsException(message: String) : FirebaseException(message)
 public actual open class FirebaseApiNotAvailableException(message: String) : FirebaseException(message)
 
-public val FirebaseApp.publicIos: FIRApp get() = ios
+public val FirebaseApp.ios: FIRApp get() = ios
 
 public actual val Firebase.app: FirebaseApp
     get() = FirebaseApp(FIRApp.defaultApp()!!)

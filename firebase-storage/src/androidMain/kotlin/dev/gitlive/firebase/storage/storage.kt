@@ -15,7 +15,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.publicAndroid
+import dev.gitlive.firebase.android as publicAndroid
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking

@@ -18,11 +18,11 @@ import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.internal.android
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.reencodeTransformation
-import dev.gitlive.firebase.publicAndroid
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -62,10 +62,10 @@ public actual fun Firebase.database(url: String): FirebaseDatabase =
     FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(url))
 
 public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase =
-    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.publicAndroid))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
 
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase =
-    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.publicAndroid, url))
+    FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
 public actual class FirebaseDatabase internal constructor(internal val android: com.google.firebase.database.FirebaseDatabase) {
 

@@ -4,7 +4,7 @@ import cocoapods.FirebaseInstallations.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios as publicIos
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.*
 

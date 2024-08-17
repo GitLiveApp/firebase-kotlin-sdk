@@ -28,7 +28,7 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.ios
 import dev.gitlive.firebase.internal.reencodeTransformation
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -52,11 +52,11 @@ public actual fun Firebase.database(url: String): FirebaseDatabase =
     FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
 public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.publicIos as objcnames.classes.FIRApp),
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.publicIos as objcnames.classes.FIRApp, url),
+    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url),
 )
 
 public actual class FirebaseDatabase internal constructor(internal val ios: FIRDatabase) {

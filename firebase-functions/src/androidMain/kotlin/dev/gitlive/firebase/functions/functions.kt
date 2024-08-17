@@ -9,8 +9,8 @@ package dev.gitlive.firebase.functions
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android
 import dev.gitlive.firebase.internal.decode
-import dev.gitlive.firebase.publicAndroid
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import java.util.concurrent.TimeUnit
@@ -25,10 +25,10 @@ public actual fun Firebase.functions(region: String): FirebaseFunctions =
     FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(region))
 
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions =
-    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.publicAndroid))
+    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android))
 
 public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions =
-    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.publicAndroid, region))
+    FirebaseFunctions(com.google.firebase.functions.FirebaseFunctions.getInstance(app.android, region))
 
 public actual data class FirebaseFunctions internal constructor(internal val android: com.google.firebase.functions.FirebaseFunctions) {
     public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =

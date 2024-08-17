@@ -10,7 +10,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.FirebaseNetworkException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -25,7 +25,7 @@ public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
 
 public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
-    FIRAuth.authWithApp(app.publicIos as objcnames.classes.FIRApp),
+    FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth) {

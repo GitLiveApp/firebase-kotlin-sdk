@@ -14,7 +14,7 @@ public actual typealias FirebaseTooManyRequestsException = com.google.firebase.F
 
 public actual typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
 
-public val FirebaseApp.publicAndroid: com.google.firebase.FirebaseApp get() = com.google.firebase.FirebaseApp.getInstance()
+public val FirebaseApp.android: com.google.firebase.FirebaseApp get() = android
 
 public actual val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.FirebaseApp.getInstance())

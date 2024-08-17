@@ -12,7 +12,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
@@ -26,7 +26,7 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
-    FIRFirestore.firestoreForApp(app.publicIos as objcnames.classes.FIRApp),
+    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {

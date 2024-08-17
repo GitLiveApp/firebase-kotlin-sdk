@@ -16,7 +16,7 @@ import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.publicIos
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -41,11 +41,11 @@ public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStora
 )
 
 public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.publicIos as objcnames.classes.FIRApp),
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.publicIos as objcnames.classes.FIRApp, url),
+    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url),
 )
 
 public actual class FirebaseStorage(internal val ios: FIRStorage) {
