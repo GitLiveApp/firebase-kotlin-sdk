@@ -137,6 +137,7 @@ public final class dev/gitlive/firebase/database/databaseAndroid {
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/DataSnapshot;)Lcom/google/firebase/database/DataSnapshot;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/DatabaseReference;)Lcom/google/firebase/database/DatabaseReference;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/FirebaseDatabase;)Lcom/google/firebase/database/FirebaseDatabase;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/OnDisconnect;)Lcom/google/firebase/database/OnDisconnect;
@@ -144,6 +145,5 @@ public final class dev/gitlive/firebase/database/databaseAndroid {
 	public static final fun getDatabase (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun getDatabase (Ldev/gitlive/firebase/database/OnDisconnect;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun getPersistenceEnabled (Ldev/gitlive/firebase/database/OnDisconnect;)Z
-	public static final fun getPublicAndroid (Ldev/gitlive/firebase/database/DataSnapshot;)Lcom/google/firebase/database/DataSnapshot;
 }
 

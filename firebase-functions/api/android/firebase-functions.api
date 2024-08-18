@@ -3,10 +3,10 @@ public final class dev/gitlive/firebase/functions/AndroidFunctions {
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun getAndroid (Ldev/gitlive/firebase/functions/FirebaseFunctions;)Lcom/google/firebase/functions/FirebaseFunctions;
+	public static final fun getAndroid (Ldev/gitlive/firebase/functions/HttpsCallableResult;)Lcom/google/firebase/functions/HttpsCallableResult;
 	public static final fun getCode (Lcom/google/firebase/functions/FirebaseFunctionsException;)Lcom/google/firebase/functions/FirebaseFunctionsException$Code;
 	public static final fun getDetails (Lcom/google/firebase/functions/FirebaseFunctionsException;)Ljava/lang/Object;
 	public static final fun getFunctions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
-	public static final fun getPublicAndroid (Ldev/gitlive/firebase/functions/HttpsCallableResult;)Lcom/google/firebase/functions/HttpsCallableResult;
 }
 
 public final class dev/gitlive/firebase/functions/FirebaseFunctions {
