@@ -20,6 +20,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
 import dev.gitlive.firebase.database.ChildEvent.Type
+import dev.gitlive.firebase.database.android as publicAndroid
 import dev.gitlive.firebase.internal.android
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.reencodeTransformation
@@ -271,7 +272,7 @@ internal actual class NativeDatabaseReference internal constructor(
 }
 
 public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
-public val DataSnapshot.publicAndroid: com.google.firebase.database.DataSnapshot get() = android
+public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = android
 
 public actual class DataSnapshot internal constructor(
     internal val android: com.google.firebase.database.DataSnapshot,

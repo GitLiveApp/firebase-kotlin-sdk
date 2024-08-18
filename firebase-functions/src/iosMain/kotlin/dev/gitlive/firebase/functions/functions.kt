@@ -13,6 +13,7 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.functions.ios as publicIos
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
@@ -58,7 +59,7 @@ internal actual data class NativeHttpsCallableReference(val ios: FIRHTTPSCallabl
 internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
-public val HttpsCallableResult.publicIos: FIRHTTPSCallableResult get() = ios
+public val HttpsCallableResult.ios: FIRHTTPSCallableResult get() = ios
 
 public actual class HttpsCallableResult(internal val ios: FIRHTTPSCallableResult) {
 

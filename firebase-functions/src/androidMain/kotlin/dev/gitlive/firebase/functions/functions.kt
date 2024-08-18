@@ -10,6 +10,7 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
+import dev.gitlive.firebase.functions.android as publicAndroid
 import dev.gitlive.firebase.internal.decode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
@@ -48,7 +49,7 @@ internal actual data class NativeHttpsCallableReference(val android: com.google.
 internal val com.google.firebase.functions.HttpsCallableReference.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = native.android
-public val HttpsCallableResult.publicAndroid: com.google.firebase.functions.HttpsCallableResult get() = android
+public val HttpsCallableResult.android: com.google.firebase.functions.HttpsCallableResult get() = android
 
 public actual class HttpsCallableResult(internal val android: com.google.firebase.functions.HttpsCallableResult) {
 
