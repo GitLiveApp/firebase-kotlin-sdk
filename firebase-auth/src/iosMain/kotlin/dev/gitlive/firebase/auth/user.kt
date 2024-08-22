@@ -10,7 +10,9 @@ import cocoapods.FirebaseAuth.FIRUserInfoProtocol
 import cocoapods.FirebaseAuth.FIRUserMetadata
 import platform.Foundation.NSURL
 
-public actual class FirebaseUser internal constructor(public val ios: FIRUser) {
+public val FirebaseUser.ios: FIRUser get() = ios
+
+public actual class FirebaseUser internal constructor(internal val ios: FIRUser) {
     public actual val uid: String
         get() = ios.uid
     public actual val displayName: String?
@@ -79,7 +81,9 @@ public actual class FirebaseUser internal constructor(public val ios: FIRUser) {
     }
 }
 
-public actual class UserInfo(public val ios: FIRUserInfoProtocol) {
+public val UserInfo.ios: FIRUserInfoProtocol get() = ios
+
+public actual class UserInfo(internal val ios: FIRUserInfoProtocol) {
     public actual val displayName: String?
         get() = ios.displayName
     public actual val email: String?
@@ -94,7 +98,9 @@ public actual class UserInfo(public val ios: FIRUserInfoProtocol) {
         get() = ios.uid
 }
 
-public actual class UserMetaData(public val ios: FIRUserMetadata) {
+public val UserMetaData.ios: FIRUserMetadata get() = ios
+
+public actual class UserMetaData(internal val ios: FIRUserMetadata) {
     public actual val creationTime: Double?
         get() = ios.creationDate?.timeIntervalSinceReferenceDate
     public actual val lastSignInTime: Double?

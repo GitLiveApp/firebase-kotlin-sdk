@@ -29,6 +29,9 @@ public final class dev/gitlive/firebase/perf/metrics/Trace {
 }
 
 public final class dev/gitlive/firebase/perf/session/PerfSession {
-	public final fun getAndroid ()Lcom/google/firebase/perf/session/PerfSession;
+}
+
+public final class dev/gitlive/firebase/perf/session/PerfSessionKt {
+	public static final fun getAndroid (Lcom/google/firebase/perf/session/PerfSession;)Lcom/google/firebase/perf/session/PerfSession;
 }
 

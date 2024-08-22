@@ -124,12 +124,16 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
     }
 }
 
-public actual class AuthResult internal constructor(public val android: com.google.firebase.auth.AuthResult) {
+public val AuthResult.android: com.google.firebase.auth.AuthResult get() = android
+
+public actual class AuthResult internal constructor(internal val android: com.google.firebase.auth.AuthResult) {
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
 }
 
-public actual class AuthTokenResult(public val android: com.google.firebase.auth.GetTokenResult) {
+public val AuthTokenResult.android: com.google.firebase.auth.GetTokenResult get() = android
+
+public actual class AuthTokenResult(internal val android: com.google.firebase.auth.GetTokenResult) {
     //    actual val authTimestamp: Long
 //        get() = android.authTimestamp
     public actual val claims: Map<String, Any>

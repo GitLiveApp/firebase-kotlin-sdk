@@ -2,7 +2,9 @@ package dev.gitlive.firebase.perf.metrics
 
 import cocoapods.FirebasePerformance.FIRTrace
 
-public actual class Trace internal constructor(public val ios: FIRTrace?) {
+public val Trace.ios: FIRTrace? get() = ios
+
+public actual class Trace internal constructor(internal val ios: FIRTrace?) {
 
     public actual fun start() {
         ios?.start()

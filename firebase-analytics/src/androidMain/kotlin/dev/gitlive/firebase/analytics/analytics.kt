@@ -16,7 +16,9 @@ public actual val Firebase.analytics: FirebaseAnalytics
 public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics =
     FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
-public actual class FirebaseAnalytics(public val android: com.google.firebase.analytics.FirebaseAnalytics) {
+public val FirebaseAnalytics.android: com.google.firebase.analytics.FirebaseAnalytics get() = android
+
+public actual class FirebaseAnalytics(internal val android: com.google.firebase.analytics.FirebaseAnalytics) {
     public actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         android.logEvent(name, parameters?.toBundle())
     }
