@@ -8,7 +8,9 @@ import android.net.Uri
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
-public actual class FirebaseUser internal constructor(public val android: com.google.firebase.auth.FirebaseUser) {
+public val FirebaseUser.android: com.google.firebase.auth.FirebaseUser get() = android
+
+public actual class FirebaseUser internal constructor(internal val android: com.google.firebase.auth.FirebaseUser) {
     public actual val uid: String
         get() = android.uid
     public actual val displayName: String?
@@ -72,7 +74,9 @@ public actual class FirebaseUser internal constructor(public val android: com.go
     }
 }
 
-public actual class UserInfo(public val android: com.google.firebase.auth.UserInfo) {
+public val UserInfo.android: com.google.firebase.auth.UserInfo get() = android
+
+public actual class UserInfo(internal val android: com.google.firebase.auth.UserInfo) {
     public actual val displayName: String?
         get() = android.displayName
     public actual val email: String?
@@ -87,7 +91,9 @@ public actual class UserInfo(public val android: com.google.firebase.auth.UserIn
         get() = android.uid
 }
 
-public actual class UserMetaData(public val android: com.google.firebase.auth.FirebaseUserMetadata) {
+public val UserMetaData.android: com.google.firebase.auth.FirebaseUserMetadata get() = android
+
+public actual class UserMetaData(internal val android: com.google.firebase.auth.FirebaseUserMetadata) {
     public actual val creationTime: Double?
         get() = android.creationTimestamp.toDouble()
     public actual val lastSignInTime: Double?

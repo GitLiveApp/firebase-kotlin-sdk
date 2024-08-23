@@ -10,7 +10,6 @@ public final class dev/gitlive/firebase/storage/File {
 
 public final class dev/gitlive/firebase/storage/FirebaseStorage {
 	public fun <init> (Lcom/google/firebase/storage/FirebaseStorage;)V
-	public final fun getAndroid ()Lcom/google/firebase/storage/FirebaseStorage;
 	public final fun getMaxOperationRetryTime-UwyO8pc ()J
 	public final fun getMaxUploadRetryTime-UwyO8pc ()J
 	public final fun getReference ()Ldev/gitlive/firebase/storage/StorageReference;
@@ -90,7 +89,6 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public fun <init> (Lcom/google/firebase/storage/StorageReference;)V
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getAndroid ()Lcom/google/firebase/storage/StorageReference;
 	public final fun getBucket ()Ljava/lang/String;
 	public final fun getDownloadUrl (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getMetadata (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -109,6 +107,9 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 }
 
 public final class dev/gitlive/firebase/storage/android {
+	public static final fun getAndroid (Ldev/gitlive/firebase/storage/FirebaseStorage;)Lcom/google/firebase/storage/FirebaseStorage;
+	public static final fun getAndroid (Ldev/gitlive/firebase/storage/ListResult;)Lcom/google/firebase/storage/ListResult;
+	public static final fun getAndroid (Ldev/gitlive/firebase/storage/StorageReference;)Lcom/google/firebase/storage/StorageReference;
 	public static final fun getStorage (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/storage/FirebaseStorage;

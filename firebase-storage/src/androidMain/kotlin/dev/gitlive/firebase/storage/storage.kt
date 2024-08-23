@@ -15,6 +15,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.UploadTask
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android as publicAndroid
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -25,15 +26,17 @@ import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+public val FirebaseStorage.android: com.google.firebase.storage.FirebaseStorage get() = com.google.firebase.storage.FirebaseStorage.getInstance()
+
 public actual val Firebase.storage: FirebaseStorage get() = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
 
 public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(url))
 
-public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android))
+public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.publicAndroid))
 
-public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.android, url))
+public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance(app.publicAndroid, url))
 
-public actual class FirebaseStorage(public val android: com.google.firebase.storage.FirebaseStorage) {
+public actual class FirebaseStorage(internal val android: com.google.firebase.storage.FirebaseStorage) {
     public actual val maxOperationRetryTime: Duration = android.maxOperationRetryTimeMillis.milliseconds
     public actual val maxUploadRetryTime: Duration = android.maxUploadRetryTimeMillis.milliseconds
 
@@ -54,7 +57,9 @@ public actual class FirebaseStorage(public val android: com.google.firebase.stor
     public actual fun reference(location: String): StorageReference = StorageReference(android.getReference(location))
 }
 
-public actual class StorageReference(public val android: com.google.firebase.storage.StorageReference) {
+public val StorageReference.android: com.google.firebase.storage.StorageReference get() = android
+
+public actual class StorageReference(internal val android: com.google.firebase.storage.StorageReference) {
     public actual val name: String get() = android.name
     public actual val path: String get() = android.path
     public actual val bucket: String get() = android.bucket
@@ -123,7 +128,9 @@ public actual class StorageReference(public val android: com.google.firebase.sto
     }
 }
 
-public actual class ListResult(android: com.google.firebase.storage.ListResult) {
+public val ListResult.android: com.google.firebase.storage.ListResult get() = android
+
+public actual class ListResult(internal val android: com.google.firebase.storage.ListResult) {
     public actual val prefixes: List<StorageReference> = android.prefixes.map { StorageReference(it) }
     public actual val items: List<StorageReference> = android.items.map { StorageReference(it) }
     public actual val pageToken: String? = android.pageToken

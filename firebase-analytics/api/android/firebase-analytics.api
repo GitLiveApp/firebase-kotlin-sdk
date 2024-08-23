@@ -12,7 +12,6 @@ public final class dev/gitlive/firebase/analytics/AnalyticsKt {
 
 public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
 	public fun <init> (Lcom/google/firebase/analytics/FirebaseAnalytics;)V
-	public final fun getAndroid ()Lcom/google/firebase/analytics/FirebaseAnalytics;
 	public final fun getSessionId (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun logEvent (Ljava/lang/String;Ljava/util/Map;)V
 	public static synthetic fun logEvent$default (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)V
@@ -207,5 +206,6 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsUserProperty 
 public final class dev/gitlive/firebase/analytics/analyticsAndroid {
 	public static final fun analytics (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics;
 	public static final fun getAnalytics (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics;
+	public static final fun getAndroid (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;)Lcom/google/firebase/analytics/FirebaseAnalytics;
 }
 

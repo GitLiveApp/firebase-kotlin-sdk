@@ -10,6 +10,7 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.FirebaseNetworkException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
+import dev.gitlive.firebase.ios
 import kotlinx.cinterop.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.Flow
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 
+public val FirebaseAuth.ios: FIRAuth get() = FIRAuth.auth()
+
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
 
@@ -25,7 +28,7 @@ public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
     FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp),
 )
 
-public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
+public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth) {
 
     public actual val currentUser: FirebaseUser?
         get() = ios.currentUser?.let { FirebaseUser(it) }
@@ -101,13 +104,15 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
 
     public actual fun useEmulator(host: String, port: Int): Unit = ios.useEmulatorWithHost(host, port.toLong())
 }
+public val AuthResult.ios: FIRAuthDataResult get() = ios
 
-public actual class AuthResult internal constructor(public val ios: FIRAuthDataResult) {
+public actual class AuthResult internal constructor(internal val ios: FIRAuthDataResult) {
     public actual val user: FirebaseUser?
         get() = FirebaseUser(ios.user)
 }
 
-public actual class AuthTokenResult(public val ios: FIRAuthTokenResult) {
+public val AuthTokenResult.ios: FIRAuthTokenResult get() = ios
+public actual class AuthTokenResult(internal val ios: FIRAuthTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = ios.authDate
     public actual val claims: Map<String, Any>

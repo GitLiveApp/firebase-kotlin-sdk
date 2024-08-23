@@ -12,18 +12,21 @@ import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android as publicAndroid
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
+public val FirebaseAuth.android: com.google.firebase.auth.FirebaseAuth get() = com.google.firebase.auth.FirebaseAuth.getInstance()
+
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
 public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth =
-    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
+    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.publicAndroid))
 
-public actual class FirebaseAuth internal constructor(public val android: com.google.firebase.auth.FirebaseAuth) {
+public actual class FirebaseAuth internal constructor(internal val android: com.google.firebase.auth.FirebaseAuth) {
     public actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
@@ -113,12 +116,16 @@ public actual class FirebaseAuth internal constructor(public val android: com.go
     public actual fun useEmulator(host: String, port: Int): Unit = android.useEmulator(host, port)
 }
 
-public actual class AuthResult internal constructor(public val android: com.google.firebase.auth.AuthResult) {
+public val AuthResult.android: com.google.firebase.auth.AuthResult get() = android
+
+public actual class AuthResult internal constructor(internal val android: com.google.firebase.auth.AuthResult) {
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
 }
 
-public actual class AuthTokenResult(public val android: com.google.firebase.auth.GetTokenResult) {
+public val AuthTokenResult.android: com.google.firebase.auth.GetTokenResult get() = android
+
+public actual class AuthTokenResult(internal val android: com.google.firebase.auth.GetTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = android.authTimestamp
     public actual val claims: Map<String, Any>

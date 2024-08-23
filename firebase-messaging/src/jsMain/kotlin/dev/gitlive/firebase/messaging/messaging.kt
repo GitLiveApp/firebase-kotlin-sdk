@@ -8,7 +8,9 @@ import kotlinx.coroutines.await
 public actual val Firebase.messaging: FirebaseMessaging
     get() = FirebaseMessaging(getMessaging())
 
-public actual class FirebaseMessaging(public val js: Messaging) {
+public val FirebaseMessaging.js: Messaging get() = js
+
+public actual class FirebaseMessaging(internal val js: Messaging) {
     public actual fun subscribeToTopic(topic: String) {
         // This is not supported in the JS SDK
         // https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging

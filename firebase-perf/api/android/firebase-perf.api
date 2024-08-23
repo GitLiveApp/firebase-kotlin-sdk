@@ -1,6 +1,5 @@
 public final class dev/gitlive/firebase/perf/FirebasePerformance {
 	public fun <init> (Lcom/google/firebase/perf/FirebasePerformance;)V
-	public final fun getAndroid ()Lcom/google/firebase/perf/FirebasePerformance;
 	public final fun isPerformanceCollectionEnabled ()Z
 	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
 	public final fun setPerformanceCollectionEnabled (Z)V
@@ -11,6 +10,7 @@ public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google
 }
 
 public final class dev/gitlive/firebase/perf/PerformanceKt {
+	public static final fun getAndroid (Ldev/gitlive/firebase/perf/FirebasePerformance;)Lcom/google/firebase/perf/FirebasePerformance;
 	public static final fun getPerformance (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/perf/FirebasePerformance;
 	public static final fun performance (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/perf/FirebasePerformance;
 }
@@ -29,6 +29,9 @@ public final class dev/gitlive/firebase/perf/metrics/Trace {
 }
 
 public final class dev/gitlive/firebase/perf/session/PerfSession {
-	public final fun getAndroid ()Lcom/google/firebase/perf/session/PerfSession;
+}
+
+public final class dev/gitlive/firebase/perf/session/PerfSessionKt {
+	public static final fun getAndroid (Lcom/google/firebase/perf/session/PerfSession;)Lcom/google/firebase/perf/session/PerfSession;
 }
 

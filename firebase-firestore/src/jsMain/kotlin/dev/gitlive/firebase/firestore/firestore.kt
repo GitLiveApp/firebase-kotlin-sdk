@@ -16,6 +16,7 @@ import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
 import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
+import dev.gitlive.firebase.js
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
@@ -76,7 +77,7 @@ public actual data class FirebaseFirestoreSettings(
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    val js: Json get() = json().apply {
+    internal val js: Json get() = json().apply {
         set("ssl", sslEnabled)
         set("host", host)
         set(
@@ -88,11 +89,11 @@ public actual data class FirebaseFirestoreSettings(
                     ).asDynamic() as PersistentCacheSettings,
                 )
                 is LocalCacheSettings.Memory -> {
-                    val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                    val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
                         is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
                         is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
                     }
-                    memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
+                    memoryLocalCache(json("garbageCollector" to garbageCollectorSettings).asDynamic() as MemoryCacheSettings)
                 }
             },
         )
@@ -142,7 +143,9 @@ public actual class FirebaseFirestoreException(cause: Throwable, public val code
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-public actual class QuerySnapshot(public val js: JsQuerySnapshot) {
+public val QuerySnapshot.js: JsQuerySnapshot get() = js
+
+public actual class QuerySnapshot(internal val js: JsQuerySnapshot) {
     public actual val documents: List<DocumentSnapshot>
         get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
     public actual val documentChanges: List<DocumentChange>
@@ -150,7 +153,9 @@ public actual class QuerySnapshot(public val js: JsQuerySnapshot) {
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
-public actual class DocumentChange(public val js: JsDocumentChange) {
+public val DocumentChange.js: JsDocumentChange get() = js
+
+public actual class DocumentChange(internal val js: JsDocumentChange) {
     public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(js.doc))
     public actual val newIndex: Int
@@ -166,12 +171,16 @@ internal actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 public operator fun DocumentSnapshot.Companion.invoke(js: JsDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(NativeDocumentSnapshot(js))
 public val DocumentSnapshot.js: dev.gitlive.firebase.firestore.externals.DocumentSnapshot get() = native.js
 
-public actual class SnapshotMetadata(public val js: JsSnapshotMetadata) {
+public val SnapshotMetadata.js: dev.gitlive.firebase.firestore.externals.SnapshotMetadata get() = js
+
+public actual class SnapshotMetadata(internal val js: JsSnapshotMetadata) {
     public actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
     public actual val isFromCache: Boolean get() = js.fromCache
 }
 
-public actual class FieldPath private constructor(public val js: JsFieldPath) {
+public val FieldPath.js: dev.gitlive.firebase.firestore.externals.FieldPath get() = js
+
+public actual class FieldPath private constructor(internal val js: JsFieldPath) {
 
     public actual companion object {
         public actual val documentId: FieldPath = FieldPath(jsDocumentId())

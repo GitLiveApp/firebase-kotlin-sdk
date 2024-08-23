@@ -15,7 +15,9 @@ public actual val Firebase.analytics: FirebaseAnalytics
 
 public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(FIRAnalytics)
 
-public actual class FirebaseAnalytics(public val ios: FIRAnalytics.Companion) {
+public val FirebaseAnalytics.ios: FIRAnalytics.Companion get() = ios
+
+public actual class FirebaseAnalytics(internal val ios: FIRAnalytics.Companion) {
     public actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         val mappedParameters: Map<Any?, Any>? = parameters?.map { it.key to it.value }?.toMap()
         ios.logEventWithName(name, mappedParameters)

@@ -14,6 +14,8 @@ public actual typealias FirebaseTooManyRequestsException = com.google.firebase.F
 
 public actual typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
 
+public val FirebaseApp.android: com.google.firebase.FirebaseApp get() = android
+
 public actual val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.FirebaseApp.getInstance())
 
@@ -29,7 +31,7 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, n
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp =
     FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid()))
 
-public actual data class FirebaseApp internal constructor(val android: com.google.firebase.FirebaseApp) {
+public actual data class FirebaseApp internal constructor(internal val android: com.google.firebase.FirebaseApp) {
     actual val name: String
         get() = android.name
     actual val options: FirebaseOptions

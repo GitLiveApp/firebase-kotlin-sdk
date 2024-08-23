@@ -4,6 +4,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.installations.externals.*
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 
 public actual val Firebase.installations: FirebaseInstallations
@@ -12,7 +13,9 @@ public actual val Firebase.installations: FirebaseInstallations
 public actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations =
     rethrow { FirebaseInstallations(getInstallations(app.js)) }
 
-public actual class FirebaseInstallations internal constructor(public val js: Installations) {
+public val FirebaseInstallations.js get() = js
+
+public actual class FirebaseInstallations internal constructor(internal val js: Installations) {
 
     public actual suspend fun delete(): Unit = rethrow { delete(js).await() }
 
