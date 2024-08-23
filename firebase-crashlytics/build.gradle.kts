@@ -81,7 +81,7 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseCrashlytics"
             }

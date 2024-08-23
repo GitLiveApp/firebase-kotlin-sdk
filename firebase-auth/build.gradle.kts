@@ -82,13 +82,14 @@ kotlin {
         iosX64().enableKeychainForTests()
         iosSimulatorArm64().enableKeychainForTests()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseAuth"
             }
             noPodspec()
             pod("FirebaseAuth") {
                 version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }

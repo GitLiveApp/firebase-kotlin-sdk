@@ -80,13 +80,14 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseMessaging"
             }
             noPodspec()
             pod("FirebaseMessaging") {
-                version = "10.25.0"
+                version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }
