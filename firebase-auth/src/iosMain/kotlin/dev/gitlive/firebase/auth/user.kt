@@ -14,27 +14,27 @@ public val FirebaseUser.ios: FIRUser get() = ios
 
 public actual class FirebaseUser internal constructor(internal val ios: FIRUser) {
     public actual val uid: String
-        get() = ios.uid
+        get() = ios.uid()
     public actual val displayName: String?
-        get() = ios.displayName
+        get() = ios.displayName()
     public actual val email: String?
-        get() = ios.email
+        get() = ios.email()
     public actual val phoneNumber: String?
-        get() = ios.phoneNumber
+        get() = ios.phoneNumber()
     public actual val photoURL: String?
-        get() = ios.photoURL?.absoluteString
+        get() = ios.photoURL()?.absoluteString
     public actual val isAnonymous: Boolean
-        get() = ios.anonymous
+        get() = ios.anonymous()
     public actual val isEmailVerified: Boolean
-        get() = ios.emailVerified
+        get() = ios.emailVerified()
     public actual val metaData: UserMetaData?
-        get() = UserMetaData(ios.metadata)
+        get() = UserMetaData(ios.metadata())
     public actual val multiFactor: MultiFactor
-        get() = MultiFactor(ios.multiFactor)
+        get() = MultiFactor(ios.multiFactor())
     public actual val providerData: List<UserInfo>
-        get() = ios.providerData.mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
+        get() = ios.providerData().mapNotNull { provider -> (provider as? FIRUserInfoProtocol)?.let { UserInfo(it) } }
     public actual val providerId: String
-        get() = ios.providerID
+        get() = ios.providerID()
 
     public actual suspend fun delete(): Unit = ios.await { deleteWithCompletion(it) }
 
@@ -85,24 +85,24 @@ public val UserInfo.ios: FIRUserInfoProtocol get() = ios
 
 public actual class UserInfo(internal val ios: FIRUserInfoProtocol) {
     public actual val displayName: String?
-        get() = ios.displayName
+        get() = ios.displayName()
     public actual val email: String?
-        get() = ios.email
+        get() = ios.email()
     public actual val phoneNumber: String?
-        get() = ios.phoneNumber
+        get() = ios.phoneNumber()
     public actual val photoURL: String?
-        get() = ios.photoURL?.absoluteString
+        get() = ios.photoURL()?.absoluteString
     public actual val providerId: String
-        get() = ios.providerID
+        get() = ios.providerID()
     public actual val uid: String
-        get() = ios.uid
+        get() = ios.uid()
 }
 
 public val UserMetaData.ios: FIRUserMetadata get() = ios
 
 public actual class UserMetaData(internal val ios: FIRUserMetadata) {
     public actual val creationTime: Double?
-        get() = ios.creationDate?.timeIntervalSinceReferenceDate
+        get() = ios.creationDate()?.timeIntervalSinceReferenceDate
     public actual val lastSignInTime: Double?
-        get() = ios.lastSignInDate?.timeIntervalSinceReferenceDate
+        get() = ios.lastSignInDate()?.timeIntervalSinceReferenceDate
 }
