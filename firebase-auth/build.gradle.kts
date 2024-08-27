@@ -19,14 +19,13 @@ plugins {
 }
 
 android {
-    val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
 
     compileSdk = compileSdkVersion
     namespace = "dev.gitlive.firebase.auth"
 
     defaultConfig {
-        minSdk = minSdkVersion
+        minSdk = 23 // Auth has a MinSDK of 23. See https://github.com/firebase/firebase-android-sdk/issues/5927#issuecomment-2093466572
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -35,7 +34,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions.configureTestOptions()
+    testOptions.configureTestOptions(project)
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
