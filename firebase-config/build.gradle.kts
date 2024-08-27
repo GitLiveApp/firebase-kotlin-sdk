@@ -85,13 +85,14 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseConfig"
             }
             noPodspec()
             pod("FirebaseRemoteConfig") {
                 version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }

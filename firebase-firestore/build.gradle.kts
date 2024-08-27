@@ -83,7 +83,7 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseFirestore"
             }
@@ -92,6 +92,7 @@ kotlin {
             // Adding it manually seems to resolve the issue
             pod("FirebaseFirestoreInternal") {
                 version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
             pod("FirebaseFirestore") {
                 version = libs.versions.firebase.cocoapods.get()
