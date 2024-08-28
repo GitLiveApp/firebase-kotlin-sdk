@@ -61,7 +61,7 @@ public actual class OAuthProvider(internal val android: com.google.firebase.auth
         customParameters: Map<String, String>,
         auth: FirebaseAuth,
     ) : this(
-        OAuthProvider
+        com.google.firebase.auth.OAuthProvider
             .newBuilder(provider, auth.android)
             .setScopes(scopes)
             .addCustomParameters(customParameters)
@@ -70,7 +70,7 @@ public actual class OAuthProvider(internal val android: com.google.firebase.auth
 
     public actual companion object {
         public actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
-            val builder = OAuthProvider.newCredentialBuilder(providerId)
+            val builder = com.google.firebase.auth.OAuthProvider.newCredentialBuilder(providerId)
             accessToken?.let { builder.setAccessToken(it) }
             idToken?.let { builder.setIdToken(it) }
             rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it) }

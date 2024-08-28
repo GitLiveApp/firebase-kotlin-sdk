@@ -85,7 +85,7 @@ public final class dev/gitlive/firebase/auth/AuthTokenResult {
 }
 
 public final class dev/gitlive/firebase/auth/CredentialsKt {
-	public static final fun getAndroid (Lcom/google/firebase/auth/OAuthProvider;)Lcom/google/firebase/auth/OAuthProvider;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/OAuthProvider;)Lcom/google/firebase/auth/OAuthProvider;
 }
 
 public final class dev/gitlive/firebase/auth/EmailAuthProvider {
