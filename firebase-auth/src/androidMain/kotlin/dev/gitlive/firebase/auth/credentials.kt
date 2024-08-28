@@ -6,7 +6,6 @@ package dev.gitlive.firebase.auth
 
 import android.app.Activity
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
@@ -52,9 +51,9 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public val OAuthProvider.android: OAuthProvider get() = android
+public val OAuthProvider.android: com.google.firebase.auth.OAuthProvider get() = android
 
-public actual class OAuthProvider(internal val android: OAuthProvider) {
+public actual class OAuthProvider(internal val android: com.google.firebase.auth.OAuthProvider) {
 
     public actual constructor(
         provider: String,
