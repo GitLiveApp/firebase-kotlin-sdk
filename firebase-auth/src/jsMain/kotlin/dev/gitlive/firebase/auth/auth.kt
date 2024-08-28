@@ -118,7 +118,7 @@ public actual class AuthResult(
     public actual val credential: AuthCredential?
         get() = rethrow { js.credential?.let { AuthCredential(it) } }
     public actual val additionalUserInfo: AdditionalUserInfo?
-        get() = js.additionalUserInfo?.let { AdditionalUserInfo(it) }
+        get() = rethrow { js.additionalUserInfo?.let { AdditionalUserInfo(it) } }
 }
 
 public actual class AdditionalUserInfo(
@@ -129,7 +129,13 @@ public actual class AdditionalUserInfo(
     public actual val username: String?
         get() = js.username
     public actual val profile: Map<String, Any?>?
-        get() = js.profile
+        get() = rethrow {
+            val profile = js.profile ?: return@rethrow null
+            val entries = js("Object.entries") as (dynamic) -> Array<Array<Any?>>
+            return@rethrow entries
+                .invoke(profile)
+                .associate { entry -> entry[0] as String to entry[1] }
+        }
     public actual val isNewUser: Boolean
         get() = js.newUser
 }

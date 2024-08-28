@@ -176,7 +176,7 @@ public external interface AuthResult {
 public external interface AdditionalUserInfo {
     public val providerId: String?
     public val username: String?
-    public val profile: Map<String, Any?>?
+    public val profile: dynamic
     public val newUser: Boolean
 }
 
