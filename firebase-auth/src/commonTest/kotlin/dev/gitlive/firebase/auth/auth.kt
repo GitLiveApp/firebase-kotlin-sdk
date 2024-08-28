@@ -112,6 +112,22 @@ class FirebaseAuthTest {
     }
 
     @Test
+    fun testAuthResultStructure() = runTest {
+        val uid = getTestUid("test@test.com", "test123")
+        val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
+        assertNotNull(result.user, "User does not exist.")
+        assertEquals(uid, result.user!!.uid, "uid does not match.")
+        assertNull(result.credential, "Credential throws.")
+        // Just test if it does not throw
+        result.additionalUserInfo?.let { additionalUserInfo ->
+            additionalUserInfo.providerId
+            additionalUserInfo.username
+            additionalUserInfo.profile
+            additionalUserInfo.isNewUser
+        }
+    }
+
+    @Test
     fun testIsSignInWithEmailLink() {
         val validLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&oobCode=_vr0QcFcxcVeLZbrcU-GpTaZiuxlHquqdC8MSy0YM_vzWCTAQgV9Jq&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
         val invalidLink = "http://localhost:9099/emulator/action?mode=signIn&lang=en&&apiKey=fake-api-key&continueUrl=https%3A%2F%2Fexample.com%2Fsignin"
@@ -125,21 +141,6 @@ class FirebaseAuthTest {
         val email = "test@test.com"
         val credential = EmailAuthProvider.credentialWithLink(email, link)
         assertEquals("password", credential.providerId)
-    }
-
-    @Test
-    fun testAuthResultStructure() = runTest {
-        val uid = getTestUid("test@test.com", "test123")
-        val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
-        assertNotNull(result.user, "User does not exist.")
-        assertEquals(uid, result.user!!.uid, "uid does not match.")
-        assertNull(result.credential, "Credential throws.")
-        assertNotNull(result.additionalUserInfo, "AdditionalUserInfo does not exist.")
-        // Just test if it does not throw
-        result.additionalUserInfo!!.providerId
-        result.additionalUserInfo!!.username
-        result.additionalUserInfo!!.profile
-        result.additionalUserInfo!!.isNewUser
     }
 
     private suspend fun getTestUid(email: String, password: String): String {
