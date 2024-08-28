@@ -13,6 +13,7 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.auth.externals.AuthResult as JsAuthResult
 import dev.gitlive.firebase.auth.externals.AdditionalUserInfo as JsAdditionalUserInfo
@@ -131,7 +132,7 @@ public actual class AdditionalUserInfo(
     public actual val profile: Map<String, Any?>?
         get() = rethrow {
             val profile = js.profile ?: return@rethrow null
-            val entries = js("Object.entries") as (dynamic) -> Array<Array<Any?>>
+            val entries = js("Object.entries") as (Json) -> Array<Array<Any?>>
             return@rethrow entries
                 .invoke(profile)
                 .associate { entry -> entry[0] as String to entry[1] }
