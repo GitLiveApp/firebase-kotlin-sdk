@@ -1,6 +1,5 @@
 package dev.gitlive.firebase.perf
 
-import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android as publicAndroid
@@ -25,4 +24,4 @@ public actual class FirebasePerformance(internal val android: com.google.firebas
     }
 }
 
-public actual open class FirebasePerformanceException(message: String) : FirebaseException(message)
+public actual open class FirebasePerformanceException(message: String) : com.google.firebase.FirebaseException(message)

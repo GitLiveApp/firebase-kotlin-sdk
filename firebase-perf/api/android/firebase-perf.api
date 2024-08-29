@@ -28,10 +28,14 @@ public final class dev/gitlive/firebase/perf/metrics/Trace {
 	public final fun updateSession (Ldev/gitlive/firebase/perf/session/PerfSession;)V
 }
 
+public final class dev/gitlive/firebase/perf/metrics/TraceKt {
+	public static final fun getAndroid (Ldev/gitlive/firebase/perf/metrics/Trace;)Lcom/google/firebase/perf/metrics/Trace;
+}
+
 public final class dev/gitlive/firebase/perf/session/PerfSession {
 }
 
 public final class dev/gitlive/firebase/perf/session/PerfSessionKt {
-	public static final fun getAndroid (Lcom/google/firebase/perf/session/PerfSession;)Lcom/google/firebase/perf/session/PerfSession;
+	public static final fun getAndroid (Ldev/gitlive/firebase/perf/session/PerfSession;)Lcom/google/firebase/perf/session/PerfSession;
 }
 

@@ -6,7 +6,7 @@ package dev.gitlive.firebase.auth
 
 import android.app.Activity
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.OAuthProvider as AndroidOAuthProvider
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
@@ -52,9 +52,9 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public val OAuthProvider.android: OAuthProvider get() = android
+public val OAuthProvider.android: AndroidOAuthProvider get() = android
 
-public actual class OAuthProvider(internal val android: OAuthProvider) {
+public actual class OAuthProvider(internal val android: AndroidOAuthProvider) {
 
     public actual constructor(
         provider: String,
@@ -62,7 +62,7 @@ public actual class OAuthProvider(internal val android: OAuthProvider) {
         customParameters: Map<String, String>,
         auth: FirebaseAuth,
     ) : this(
-        OAuthProvider
+        AndroidOAuthProvider
             .newBuilder(provider, auth.android)
             .setScopes(scopes)
             .addCustomParameters(customParameters)
@@ -71,7 +71,7 @@ public actual class OAuthProvider(internal val android: OAuthProvider) {
 
     public actual companion object {
         public actual fun credential(providerId: String, accessToken: String?, idToken: String?, rawNonce: String?): OAuthCredential {
-            val builder = OAuthProvider.newCredentialBuilder(providerId)
+            val builder = AndroidOAuthProvider.newCredentialBuilder(providerId)
             accessToken?.let { builder.setAccessToken(it) }
             idToken?.let { builder.setIdToken(it) }
             rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it) }
