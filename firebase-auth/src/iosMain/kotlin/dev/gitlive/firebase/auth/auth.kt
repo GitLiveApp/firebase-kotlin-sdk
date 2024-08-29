@@ -105,6 +105,7 @@ public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth)
 
     public actual fun useEmulator(host: String, port: Int): Unit = ios.useEmulatorWithHost(host, port.toLong())
 }
+
 public val AuthResult.ios: FIRAuthDataResult get() = ios
 
 public actual class AuthResult(internal val ios: FIRAuthDataResult) {
