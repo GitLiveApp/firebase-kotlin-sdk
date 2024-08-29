@@ -117,8 +117,10 @@ public actual class AuthResult(internal val ios: FIRAuthDataResult) {
         get() = ios.additionalUserInfo?.let { AdditionalUserInfo(it) }
 }
 
+public val AdditionalUserInfo.ios: FIRAdditionalUserInfo get() = ios
+
 public actual class AdditionalUserInfo(
-    public val ios: FIRAdditionalUserInfo,
+    internal val ios: FIRAdditionalUserInfo,
 ) {
     public actual val providerId: String?
         get() = ios.providerID

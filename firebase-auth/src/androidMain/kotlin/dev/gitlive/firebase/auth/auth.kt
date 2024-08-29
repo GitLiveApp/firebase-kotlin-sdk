@@ -127,8 +127,11 @@ public actual class AuthResult(internal val android: com.google.firebase.auth.Au
         get() = android.additionalUserInfo?.let { AdditionalUserInfo(it) }
 }
 
+public val AdditionalUserInfo.android: com.google.firebase.auth.AdditionalUserInfo
+    get() = android
+
 public actual class AdditionalUserInfo(
-    public val android: com.google.firebase.auth.AdditionalUserInfo,
+    internal val android: com.google.firebase.auth.AdditionalUserInfo,
 ) {
     public actual val providerId: String?
         get() = android.providerId

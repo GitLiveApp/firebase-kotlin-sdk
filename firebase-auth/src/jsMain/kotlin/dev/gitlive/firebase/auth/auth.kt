@@ -144,8 +144,10 @@ public actual class AuthResult(internal val js: JsAuthResult) {
         get() = rethrow { js.additionalUserInfo?.let { AdditionalUserInfo(it) } }
 }
 
+public val AdditionalUserInfo.js: JsAdditionalUserInfo get() = js
+
 public actual class AdditionalUserInfo(
-    public val js: JsAdditionalUserInfo,
+    internal val js: JsAdditionalUserInfo,
 ) {
     public actual val providerId: String?
         get() = js.providerId

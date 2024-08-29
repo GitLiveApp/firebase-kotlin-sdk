@@ -53,7 +53,6 @@ public final class dev/gitlive/firebase/auth/ActionCodeSettings {
 
 public final class dev/gitlive/firebase/auth/AdditionalUserInfo {
 	public fun <init> (Lcom/google/firebase/auth/AdditionalUserInfo;)V
-	public final fun getAndroid ()Lcom/google/firebase/auth/AdditionalUserInfo;
 	public final fun getProfile ()Ljava/util/Map;
 	public final fun getProviderId ()Ljava/lang/String;
 	public final fun getUsername ()Ljava/lang/String;
@@ -290,6 +289,7 @@ public final class dev/gitlive/firebase/auth/UserMetaData {
 
 public final class dev/gitlive/firebase/auth/android {
 	public static final fun auth (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/auth/FirebaseAuth;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AdditionalUserInfo;)Lcom/google/firebase/auth/AdditionalUserInfo;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthResult;)Lcom/google/firebase/auth/AuthResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthTokenResult;)Lcom/google/firebase/auth/GetTokenResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/FirebaseAuth;)Lcom/google/firebase/auth/FirebaseAuth;
