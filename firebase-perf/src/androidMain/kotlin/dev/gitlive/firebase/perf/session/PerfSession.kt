@@ -1,5 +1,7 @@
 package dev.gitlive.firebase.perf.session
 
-public val PerfSession.android: com.google.firebase.perf.session.PerfSession get() = android
+import com.google.firebase.perf.session.PerfSession as AndroidPerfSession
 
-public class PerfSession internal constructor(internal val android: com.google.firebase.perf.session.PerfSession)
+public val PerfSession.android: AndroidPerfSession get() = android
+
+public class PerfSession internal constructor(internal val android: AndroidPerfSession)
