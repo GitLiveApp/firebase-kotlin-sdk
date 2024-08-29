@@ -33,3 +33,38 @@ public synthetic class dev/gitlive/firebase/FirebaseClassDiscriminator$Impl : de
 	public final synthetic fun discriminator ()Ljava/lang/String;
 }
 
+public abstract interface class dev/gitlive/firebase/FirebaseDecoder : kotlinx/serialization/encoding/Decoder {
+}
+
+public final class dev/gitlive/firebase/FirebaseDecoder$DefaultImpls {
+	public static fun decodeNullableSerializableValue (Ldev/gitlive/firebase/FirebaseDecoder;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public static fun decodeSerializableValue (Ldev/gitlive/firebase/FirebaseDecoder;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+}
+
+public abstract interface class dev/gitlive/firebase/FirebaseEncoder : kotlinx/serialization/encoding/Encoder {
+}
+
+public final class dev/gitlive/firebase/FirebaseEncoder$DefaultImpls {
+	public static fun beginCollection (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lkotlinx/serialization/encoding/CompositeEncoder;
+	public static fun encodeNotNullMark (Ldev/gitlive/firebase/FirebaseEncoder;)V
+	public static fun encodeNullableSerializableValue (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public static fun encodeSerializableValue (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/ValueWithSerializer {
+	public fun <init> (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Lkotlinx/serialization/SerializationStrategy;
+	public final fun copy (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ldev/gitlive/firebase/ValueWithSerializer;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/ValueWithSerializer;Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;ILjava/lang/Object;)Ldev/gitlive/firebase/ValueWithSerializer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSerializer ()Lkotlinx/serialization/SerializationStrategy;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/ValueWithSerializerKt {
+	public static final fun withSerializer (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ljava/lang/Object;
+}
+

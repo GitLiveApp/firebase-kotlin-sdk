@@ -5,6 +5,8 @@
 package dev.gitlive.firebase.internal
 
 import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.FirebaseEncoder
+import dev.gitlive.firebase.ValueWithSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -22,7 +24,7 @@ public inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, build
 
 @PublishedApi
 internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
-    FirebaseEncoder(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
+    FirebaseEncoderImpl(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.encodeDefaults = shouldEncodeElementDefault }"))
 public inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value) {
@@ -60,7 +62,7 @@ public inline fun <reified T : Any> encodeAsObject(value: T, buildSettings: Enco
 
 @PublishedApi
 internal inline fun <reified T> encode(value: T, encodeSettings: EncodeSettings): Any? = value?.let {
-    FirebaseEncoder(encodeSettings).apply {
+    FirebaseEncoderImpl(encodeSettings).apply {
         if (it is ValueWithSerializer<*> && it.value is T) {
             @Suppress("UNCHECKED_CAST")
             (it as ValueWithSerializer<T>).let {
@@ -72,19 +74,12 @@ internal inline fun <reified T> encode(value: T, encodeSettings: EncodeSettings)
     }.value
 }
 
-/**
- * An extension which which serializer to use for value. Handy in updating fields by name or path
- * where using annotation is not possible
- * @return a value with a custom serializer.
- */
-public fun <T> T.withSerializer(serializer: SerializationStrategy<T>): Any = ValueWithSerializer(this, serializer)
-public data class ValueWithSerializer<T>(val value: T, val serializer: SerializationStrategy<T>)
+internal expect fun FirebaseEncoderImpl.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder
 
-public expect fun FirebaseEncoder.structureEncoder(descriptor: SerialDescriptor): FirebaseCompositeEncoder
-
-public class FirebaseEncoder(
+@PublishedApi
+internal class FirebaseEncoderImpl(
     internal val settings: EncodeSettings,
-) : Encoder {
+) : FirebaseEncoder {
 
     public constructor(shouldEncodeElementDefault: Boolean) : this(
         EncodeSettingsImpl.Builder().apply { this.encodeDefaults = shouldEncodeElementDefault }.buildEncodeSettings(),
@@ -162,7 +157,7 @@ public class FirebaseEncoder(
     }
 }
 
-public open class FirebaseCompositeEncoder(
+internal open class FirebaseCompositeEncoder(
     private val settings: EncodeSettings,
     private val end: () -> Unit = {},
     private val setPolymorphicType: (String, String) -> Unit = { _, _ -> },
@@ -190,7 +185,7 @@ public open class FirebaseCompositeEncoder(
         descriptor,
         index,
         value?.let {
-            FirebaseEncoder(settings).apply {
+            FirebaseEncoderImpl(settings).apply {
                 encodeSerializableValue(serializer, value)
             }.value
         },
@@ -204,7 +199,7 @@ public open class FirebaseCompositeEncoder(
     ): Unit = set(
         descriptor,
         index,
-        FirebaseEncoder(settings).apply {
+        FirebaseEncoderImpl(settings).apply {
             encodeSerializableValue(serializer, value)
         }.value,
     )
@@ -231,7 +226,7 @@ public open class FirebaseCompositeEncoder(
 
     @ExperimentalSerializationApi
     override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder =
-        FirebaseEncoder(settings)
+        FirebaseEncoderImpl(settings)
 
     public fun encodePolymorphicClassDiscriminator(discriminator: String, type: String) {
         setPolymorphicType(discriminator, type)

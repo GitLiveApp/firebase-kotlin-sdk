@@ -12,7 +12,7 @@ import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import dev.gitlive.firebase.internal.withSerializer
+import dev.gitlive.firebase.withSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
