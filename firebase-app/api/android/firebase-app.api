@@ -7,8 +7,6 @@ public final class dev/gitlive/firebase/Firebase {
 }
 
 public final class dev/gitlive/firebase/FirebaseApp {
-	public final fun copy (Lcom/google/firebase/FirebaseApp;)Ldev/gitlive/firebase/FirebaseApp;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/FirebaseApp;Lcom/google/firebase/FirebaseApp;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getName ()Ljava/lang/String;
