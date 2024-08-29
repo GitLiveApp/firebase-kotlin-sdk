@@ -36,8 +36,6 @@ public final class dev/gitlive/firebase/internal/EncodeDecodeSettingsKt {
 public final class dev/gitlive/firebase/internal/EncodeSettingsImpl : dev/gitlive/firebase/EncodeSettings {
 	public final fun component1 ()Z
 	public final fun component2 ()Lkotlinx/serialization/modules/SerializersModule;
-	public final fun copy (ZLkotlinx/serialization/modules/SerializersModule;)Ldev/gitlive/firebase/internal/EncodeSettingsImpl;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/internal/EncodeSettingsImpl;ZLkotlinx/serialization/modules/SerializersModule;ILjava/lang/Object;)Ldev/gitlive/firebase/internal/EncodeSettingsImpl;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getEncodeDefaults ()Z
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;

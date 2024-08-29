@@ -10,8 +10,6 @@ public final class dev/gitlive/firebase/functions/AndroidFunctions {
 }
 
 public final class dev/gitlive/firebase/functions/FirebaseFunctions {
-	public final fun copy (Lcom/google/firebase/functions/FirebaseFunctions;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/functions/FirebaseFunctions;Lcom/google/firebase/functions/FirebaseFunctions;ILjava/lang/Object;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public final fun httpsCallable-6Au4x4Y (Ljava/lang/String;Lkotlin/time/Duration;)Ldev/gitlive/firebase/functions/HttpsCallableReference;
