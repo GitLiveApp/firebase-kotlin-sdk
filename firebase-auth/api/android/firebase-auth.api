@@ -85,7 +85,6 @@ public class dev/gitlive/firebase/auth/AuthCredential {
 public final class dev/gitlive/firebase/auth/AuthResult {
 	public fun <init> (Lcom/google/firebase/auth/AuthResult;)V
 	public final fun getAdditionalUserInfo ()Ldev/gitlive/firebase/auth/AdditionalUserInfo;
-	public final fun getAndroid ()Lcom/google/firebase/auth/AuthResult;
 	public final fun getCredential ()Ldev/gitlive/firebase/auth/AuthCredential;
 	public final fun getUser ()Ldev/gitlive/firebase/auth/FirebaseUser;
 }
