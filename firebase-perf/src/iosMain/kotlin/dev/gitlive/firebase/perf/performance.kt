@@ -6,13 +6,15 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
 
+public val FirebasePerformance.ios: FIRPerformance get() = FIRPerformance.sharedInstance()
+
 public actual val Firebase.performance: FirebasePerformance get() =
     FirebasePerformance(FIRPerformance.sharedInstance())
 
 public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance =
     FirebasePerformance(FIRPerformance.sharedInstance())
 
-public actual class FirebasePerformance(public val ios: FIRPerformance) {
+public actual class FirebasePerformance(internal val ios: FIRPerformance) {
 
     public actual fun newTrace(traceName: String): Trace = Trace(ios.traceWithName(traceName))
 

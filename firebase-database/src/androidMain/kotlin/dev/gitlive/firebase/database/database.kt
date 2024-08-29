@@ -18,7 +18,9 @@ import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android
 import dev.gitlive.firebase.database.ChildEvent.Type
+import dev.gitlive.firebase.database.android as publicAndroid
 import dev.gitlive.firebase.internal.android
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.reencodeTransformation
@@ -39,6 +41,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
+
+public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
 
 internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T =
     merge(
@@ -64,7 +68,7 @@ public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase =
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase =
     FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-public actual class FirebaseDatabase internal constructor(public val android: com.google.firebase.database.FirebaseDatabase) {
+public actual class FirebaseDatabase internal constructor(internal val android: com.google.firebase.database.FirebaseDatabase) {
 
     public companion object {
         private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
@@ -113,8 +117,10 @@ internal actual open class NativeQuery(
     val persistenceEnabled: Boolean,
 )
 
+public val Query.android: com.google.firebase.database.Query get() = nativeQuery.android
+
 public actual open class Query internal actual constructor(
-    nativeQuery: NativeQuery,
+    internal val nativeQuery: NativeQuery,
 ) {
 
     internal constructor(
@@ -122,7 +128,7 @@ public actual open class Query internal actual constructor(
         persistenceEnabled: Boolean,
     ) : this(NativeQuery(android, persistenceEnabled))
 
-    public open val android: com.google.firebase.database.Query = nativeQuery.android
+    internal open val android: com.google.firebase.database.Query = nativeQuery.android
     public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
 
     public actual fun orderByKey(): Query = Query(android.orderByKey(), persistenceEnabled)
@@ -266,9 +272,10 @@ internal actual class NativeDatabaseReference internal constructor(
 }
 
 public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
+public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = android
 
 public actual class DataSnapshot internal constructor(
-    public val android: com.google.firebase.database.DataSnapshot,
+    internal val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
@@ -281,10 +288,10 @@ public actual class DataSnapshot internal constructor(
     public actual val value: Any? get() = android.value
 
     public actual inline fun <reified T> value(): T =
-        decode<T>(value = android.value)
+        decode<T>(value = publicAndroid.value)
 
     public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-        decode(strategy, android.value, buildSettings)
+        decode(strategy, publicAndroid.value, buildSettings)
 
     public actual fun child(path: String): DataSnapshot = DataSnapshot(android.child(path), persistenceEnabled)
     public actual val hasChildren: Boolean get() = android.hasChildren()

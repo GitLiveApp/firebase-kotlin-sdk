@@ -52,7 +52,9 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public actual class OAuthProvider(public val android: OAuthProvider) {
+public val OAuthProvider.android: OAuthProvider get() = android
+
+public actual class OAuthProvider(internal val android: OAuthProvider) {
 
     public actual constructor(
         provider: String,

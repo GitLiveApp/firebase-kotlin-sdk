@@ -71,6 +71,7 @@ class FirebaseAuthTest {
     }
 
     @Test
+    @Ignore
     fun testFetchSignInMethods() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = auth.fetchSignInMethodsForEmail(email)

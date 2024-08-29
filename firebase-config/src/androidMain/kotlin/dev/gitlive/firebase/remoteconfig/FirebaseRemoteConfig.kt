@@ -7,6 +7,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledExcept
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android
 import kotlinx.coroutines.tasks.await
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -15,13 +16,15 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseR
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
 
+public val FirebaseRemoteConfig.android: AndroidFirebaseRemoteConfig get() = AndroidFirebaseRemoteConfig.getInstance()
+
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance())
 
 public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
     FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
 
-public actual class FirebaseRemoteConfig internal constructor(public val android: AndroidFirebaseRemoteConfig) {
+public actual class FirebaseRemoteConfig internal constructor(internal val android: AndroidFirebaseRemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() = android.all.mapValues { FirebaseRemoteConfigValue(it.value) }
 

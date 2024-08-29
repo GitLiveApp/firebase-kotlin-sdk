@@ -32,7 +32,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions.configureTestOptions()
+    testOptions.configureTestOptions(project)
 
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -50,6 +50,7 @@ kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
+        freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
     }
     targets.configureEach {
         compilations.configureEach {

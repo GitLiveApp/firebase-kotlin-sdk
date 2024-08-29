@@ -12,6 +12,8 @@ public actual open class FirebaseNetworkException(message: String) : FirebaseExc
 public actual open class FirebaseTooManyRequestsException(message: String) : FirebaseException(message)
 public actual open class FirebaseApiNotAvailableException(message: String) : FirebaseException(message)
 
+public val FirebaseApp.ios: FIRApp get() = ios
+
 public actual val Firebase.app: FirebaseApp
     get() = FirebaseApp(FIRApp.defaultApp()!!)
 
@@ -27,7 +29,7 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, n
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp =
     FIRApp.configureWithOptions(options.toIos()).let { app }
 
-public actual data class FirebaseApp internal constructor(val ios: FIRApp) {
+public actual data class FirebaseApp internal constructor(internal val ios: FIRApp) {
     actual val name: String
         get() = ios.name
     actual val options: FirebaseOptions

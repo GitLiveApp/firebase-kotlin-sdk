@@ -21,8 +21,6 @@ public final class dev/gitlive/firebase/firestore/CollectionReference : dev/gitl
 	public final fun add (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun add$default (Ldev/gitlive/firebase/firestore/CollectionReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun addEncoded (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun copy (Ldev/gitlive/firebase/firestore/internal/NativeCollectionReferenceWrapper;)Ldev/gitlive/firebase/firestore/CollectionReference;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/CollectionReference;Ldev/gitlive/firebase/firestore/internal/NativeCollectionReferenceWrapper;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/CollectionReference;
 	public final fun document (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/DocumentReference;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDocument ()Ldev/gitlive/firebase/firestore/DocumentReference;
@@ -38,7 +36,6 @@ public final class dev/gitlive/firebase/firestore/CollectionReference$Companion 
 
 public final class dev/gitlive/firebase/firestore/DocumentChange {
 	public fun <init> (Lcom/google/firebase/firestore/DocumentChange;)V
-	public final fun getAndroid ()Lcom/google/firebase/firestore/DocumentChange;
 	public final fun getDocument ()Ldev/gitlive/firebase/firestore/DocumentSnapshot;
 	public final fun getNewIndex ()I
 	public final fun getOldIndex ()I
@@ -48,8 +45,6 @@ public final class dev/gitlive/firebase/firestore/DocumentChange {
 public final class dev/gitlive/firebase/firestore/DocumentReference {
 	public static final field Companion Ldev/gitlive/firebase/firestore/DocumentReference$Companion;
 	public final fun collection (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/CollectionReference;
-	public final fun copy (Ldev/gitlive/firebase/firestore/internal/NativeDocumentReference;)Ldev/gitlive/firebase/firestore/DocumentReference;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/firestore/internal/NativeDocumentReference;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/DocumentReference;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -102,8 +97,6 @@ public final class dev/gitlive/firebase/firestore/DocumentSnapshot {
 	public static final field Companion Ldev/gitlive/firebase/firestore/DocumentSnapshot$Companion;
 	public final fun contains (Ldev/gitlive/firebase/firestore/FieldPath;)Z
 	public final fun contains (Ljava/lang/String;)Z
-	public final fun copy (Ldev/gitlive/firebase/firestore/internal/NativeDocumentSnapshotWrapper;)Ldev/gitlive/firebase/firestore/DocumentSnapshot;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ldev/gitlive/firebase/firestore/internal/NativeDocumentSnapshotWrapper;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/DocumentSnapshot;
 	public final fun data (Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static synthetic fun data$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun encodedData (Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;)Ljava/lang/Object;
@@ -142,7 +135,6 @@ public final class dev/gitlive/firebase/firestore/FieldPath {
 	public static final field Companion Ldev/gitlive/firebase/firestore/FieldPath$Companion;
 	public fun <init> ([Ljava/lang/String;)V
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAndroid ()Lcom/google/firebase/firestore/FieldPath;
 	public final fun getDocumentId ()Ldev/gitlive/firebase/firestore/FieldPath;
 	public final fun getEncoded ()Lcom/google/firebase/firestore/FieldPath;
 	public fun hashCode ()I
@@ -183,8 +175,6 @@ public abstract class dev/gitlive/firebase/firestore/Filter {
 
 public final class dev/gitlive/firebase/firestore/Filter$And : dev/gitlive/firebase/firestore/Filter {
 	public final fun component1 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$And;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/Filter$And;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$And;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getFilters ()Ljava/util/List;
 	public fun hashCode ()I
@@ -194,8 +184,6 @@ public final class dev/gitlive/firebase/firestore/Filter$And : dev/gitlive/fireb
 public final class dev/gitlive/firebase/firestore/Filter$Field : dev/gitlive/firebase/firestore/Filter$WithConstraint {
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ldev/gitlive/firebase/firestore/WhereConstraint;
-	public final fun copy (Ljava/lang/String;Ldev/gitlive/firebase/firestore/WhereConstraint;)Ldev/gitlive/firebase/firestore/Filter$Field;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/Filter$Field;Ljava/lang/String;Ldev/gitlive/firebase/firestore/WhereConstraint;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$Field;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
 	public final fun getField ()Ljava/lang/String;
@@ -205,8 +193,6 @@ public final class dev/gitlive/firebase/firestore/Filter$Field : dev/gitlive/fir
 
 public final class dev/gitlive/firebase/firestore/Filter$Or : dev/gitlive/firebase/firestore/Filter {
 	public final fun component1 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$Or;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/Filter$Or;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$Or;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getFilters ()Ljava/util/List;
 	public fun hashCode ()I
@@ -216,8 +202,6 @@ public final class dev/gitlive/firebase/firestore/Filter$Or : dev/gitlive/fireba
 public final class dev/gitlive/firebase/firestore/Filter$Path : dev/gitlive/firebase/firestore/Filter$WithConstraint {
 	public final fun component1 ()Ldev/gitlive/firebase/firestore/FieldPath;
 	public final fun component2 ()Ldev/gitlive/firebase/firestore/WhereConstraint;
-	public final fun copy (Ldev/gitlive/firebase/firestore/FieldPath;Ldev/gitlive/firebase/firestore/WhereConstraint;)Ldev/gitlive/firebase/firestore/Filter$Path;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/Filter$Path;Ldev/gitlive/firebase/firestore/FieldPath;Ldev/gitlive/firebase/firestore/WhereConstraint;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$Path;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
 	public final fun getPath ()Ldev/gitlive/firebase/firestore/FieldPath;
@@ -361,8 +345,6 @@ public abstract interface class dev/gitlive/firebase/firestore/LocalCacheSetting
 public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Memory : dev/gitlive/firebase/firestore/LocalCacheSettings {
 	public static final field Companion Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Companion;
 	public final fun component1 ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;
-	public final fun copy (Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory;Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getGarbaseCollectorSettings ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;
 	public fun hashCode ()I
@@ -382,8 +364,6 @@ public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Comp
 public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Persistent : dev/gitlive/firebase/firestore/LocalCacheSettings {
 	public static final field Companion Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent$Companion;
 	public final fun component1 ()J
-	public final fun copy (J)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent;JILjava/lang/Object;)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getSizeBytes ()J
 	public fun hashCode ()I
@@ -425,8 +405,6 @@ public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings
 public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC : dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings {
 	public static final field Companion Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC$Companion;
 	public final fun component1 ()J
-	public final fun copy (J)Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC;JILjava/lang/Object;)Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getSizeBytes ()J
 	public fun hashCode ()I
@@ -471,7 +449,6 @@ public final class dev/gitlive/firebase/firestore/Query$Companion {
 
 public final class dev/gitlive/firebase/firestore/QuerySnapshot {
 	public fun <init> (Lcom/google/firebase/firestore/QuerySnapshot;)V
-	public final fun getAndroid ()Lcom/google/firebase/firestore/QuerySnapshot;
 	public final fun getDocumentChanges ()Ljava/util/List;
 	public final fun getDocuments ()Ljava/util/List;
 	public final fun getMetadata ()Ldev/gitlive/firebase/firestore/SnapshotMetadata;
@@ -497,7 +474,6 @@ public final class dev/gitlive/firebase/firestore/ServerTimestampSerializer : ko
 
 public final class dev/gitlive/firebase/firestore/SnapshotMetadata {
 	public fun <init> (Lcom/google/firebase/firestore/SnapshotMetadata;)V
-	public final fun getAndroid ()Lcom/google/firebase/firestore/SnapshotMetadata;
 	public final fun getHasPendingWrites ()Z
 	public final fun isFromCache ()Z
 }
@@ -552,8 +528,6 @@ public final class dev/gitlive/firebase/firestore/TimestampSerializer : kotlinx/
 
 public final class dev/gitlive/firebase/firestore/Transaction {
 	public static final field Companion Ldev/gitlive/firebase/firestore/Transaction$Companion;
-	public final fun copy (Ldev/gitlive/firebase/firestore/internal/NativeTransactionWrapper;)Ldev/gitlive/firebase/firestore/Transaction;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/internal/NativeTransactionWrapper;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
 	public final fun delete (Ldev/gitlive/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/Transaction;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -603,8 +577,6 @@ public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint {
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContains : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContains;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContains;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContains;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -614,8 +586,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContains 
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public final fun component1 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValues ()Ljava/util/List;
 	public fun getValues ()Ljava/util/List;
@@ -625,8 +595,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsA
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$EqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$EqualTo;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$EqualTo;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$EqualTo;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -663,8 +631,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ForObject$Defa
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThan;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThan;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThan;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -674,8 +640,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThan : 
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -685,8 +649,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrE
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$InArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public final fun component1 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/WhereConstraint$InArray;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$InArray;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$InArray;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValues ()Ljava/util/List;
 	public fun getValues ()Ljava/util/List;
@@ -696,8 +658,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$InArray : dev/
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$LessThan;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$LessThan;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$LessThan;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -707,8 +667,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThan : dev
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -718,8 +676,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqua
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
 	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValue ()Ljava/lang/Object;
 	public fun getValue ()Ljava/lang/Object;
@@ -729,8 +685,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo : d
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$NotInArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public final fun component1 ()Ljava/util/List;
-	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/WhereConstraint$NotInArray;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WhereConstraint$NotInArray;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WhereConstraint$NotInArray;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getSafeValues ()Ljava/util/List;
 	public fun getValues ()Ljava/util/List;
@@ -741,8 +695,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$NotInArray : d
 public final class dev/gitlive/firebase/firestore/WriteBatch {
 	public static final field Companion Ldev/gitlive/firebase/firestore/WriteBatch$Companion;
 	public final fun commit (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun copy (Ldev/gitlive/firebase/firestore/internal/NativeWriteBatchWrapper;)Ldev/gitlive/firebase/firestore/WriteBatch;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/internal/NativeWriteBatchWrapper;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun delete (Ldev/gitlive/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
@@ -782,11 +734,15 @@ public final class dev/gitlive/firebase/firestore/android {
 	public static final fun firestoreSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public static synthetic fun firestoreSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/CollectionReference;)Lcom/google/firebase/firestore/CollectionReference;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentChange;)Lcom/google/firebase/firestore/DocumentChange;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentReference;)Lcom/google/firebase/firestore/DocumentReference;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Lcom/google/firebase/firestore/DocumentSnapshot;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/FieldPath;)Lcom/google/firebase/firestore/FieldPath;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/FirebaseFirestore;)Lcom/google/firebase/firestore/FirebaseFirestore;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/LocalCacheSettings;)Lcom/google/firebase/firestore/LocalCacheSettings;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/Query;)Lcom/google/firebase/firestore/Query;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/QuerySnapshot;)Lcom/google/firebase/firestore/QuerySnapshot;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/SnapshotMetadata;)Lcom/google/firebase/firestore/SnapshotMetadata;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/Transaction;)Lcom/google/firebase/firestore/Transaction;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/WriteBatch;)Lcom/google/firebase/firestore/WriteBatch;
 	public static final fun getCode (Lcom/google/firebase/firestore/FirebaseFirestoreException;)Lcom/google/firebase/firestore/FirebaseFirestoreException$Code;

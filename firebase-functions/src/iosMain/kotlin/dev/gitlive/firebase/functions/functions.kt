@@ -13,12 +13,16 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.functions.ios as publicIos
 import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.DeserializationStrategy
 import platform.Foundation.NSError
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+
+public val FirebaseFunctions.ios: FIRFunctions get() = FIRFunctions.functions()
 
 public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(FIRFunctions.functions())
@@ -37,7 +41,7 @@ public actual fun Firebase.functions(
     FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
 )
 
-public actual data class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
+public actual data class FirebaseFunctions internal constructor(internal val ios: FIRFunctions) {
     public actual fun httpsCallable(name: String, timeout: Duration?): HttpsCallableReference =
         HttpsCallableReference(ios.HTTPSCallableWithName(name).apply { timeout?.let { setTimeoutInterval(it.toDouble(DurationUnit.SECONDS)) } }.native)
 
@@ -55,14 +59,15 @@ internal actual data class NativeHttpsCallableReference(val ios: FIRHTTPSCallabl
 internal val FIRHTTPSCallable.native get() = NativeHttpsCallableReference(this)
 
 internal val HttpsCallableReference.ios: FIRHTTPSCallable get() = native.ios
+public val HttpsCallableResult.ios: FIRHTTPSCallableResult get() = ios
 
-public actual class HttpsCallableResult(public val ios: FIRHTTPSCallableResult) {
+public actual class HttpsCallableResult(internal val ios: FIRHTTPSCallableResult) {
 
     public actual inline fun <reified T> data(): T =
-        decode<T>(value = ios.data())
+        decode<T>(value = publicIos.data())
 
     public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
-        decode(strategy, ios.data(), buildSettings)
+        decode(strategy, publicIos.data(), buildSettings)
 }
 
 public actual class FirebaseFunctionsException(message: String, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(message)

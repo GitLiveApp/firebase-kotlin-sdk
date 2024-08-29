@@ -7,12 +7,8 @@ public final class dev/gitlive/firebase/Firebase {
 }
 
 public final class dev/gitlive/firebase/FirebaseApp {
-	public final fun component1 ()Lcom/google/firebase/FirebaseApp;
-	public final fun copy (Lcom/google/firebase/FirebaseApp;)Ldev/gitlive/firebase/FirebaseApp;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/FirebaseApp;Lcom/google/firebase/FirebaseApp;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAndroid ()Lcom/google/firebase/FirebaseApp;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getOptions ()Ldev/gitlive/firebase/FirebaseOptions;
 	public fun hashCode ()I
@@ -23,6 +19,7 @@ public final class dev/gitlive/firebase/FirebaseKt {
 	public static final fun app (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/FirebaseApp;
 	public static final fun apps (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;
 	public static synthetic fun apps$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ljava/util/List;
+	public static final fun getAndroid (Ldev/gitlive/firebase/FirebaseApp;)Lcom/google/firebase/FirebaseApp;
 	public static final fun getApp (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/FirebaseApp;
 	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
 	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;)Ldev/gitlive/firebase/FirebaseApp;

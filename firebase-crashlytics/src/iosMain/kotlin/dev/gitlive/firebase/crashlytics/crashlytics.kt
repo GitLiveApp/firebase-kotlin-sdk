@@ -7,13 +7,15 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 
+public val FirebaseCrashlytics.ios: FIRCrashlytics get() = FIRCrashlytics.crashlytics()
+
 public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
     FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 
 public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics =
     FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 
-public actual class FirebaseCrashlytics internal constructor(public val ios: FIRCrashlytics) {
+public actual class FirebaseCrashlytics internal constructor(internal val ios: FIRCrashlytics) {
 
     public actual fun recordException(exception: Throwable) {
         ios.recordError(exception.asNSError())

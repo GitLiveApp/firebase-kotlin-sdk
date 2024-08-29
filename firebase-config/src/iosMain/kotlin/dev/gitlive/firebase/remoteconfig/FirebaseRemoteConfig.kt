@@ -12,6 +12,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinInstant
@@ -20,6 +21,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = FIRRemoteConfig.remoteConfig()
+
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
@@ -27,7 +30,7 @@ public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig 
     FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp),
 )
 
-public actual class FirebaseRemoteConfig internal constructor(public val ios: FIRRemoteConfig) {
+public actual class FirebaseRemoteConfig internal constructor(internal val ios: FIRRemoteConfig) {
     @Suppress("UNCHECKED_CAST")
     public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() {

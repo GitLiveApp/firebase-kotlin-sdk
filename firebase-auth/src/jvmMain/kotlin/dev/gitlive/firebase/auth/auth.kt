@@ -12,6 +12,7 @@ import com.google.firebase.auth.ActionCodeResult.*
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.android as publicAndroid
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -20,10 +21,10 @@ import kotlinx.coroutines.tasks.await
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance())
 
-public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth =
-    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.android))
+public actual fun Firebase.auth(app: FirebaseApp) =
+    FirebaseAuth(com.google.firebase.auth.FirebaseAuth.getInstance(app.publicAndroid))
 
-public actual class FirebaseAuth internal constructor(public val android: com.google.firebase.auth.FirebaseAuth) {
+public actual class FirebaseAuth internal constructor(internal val android: com.google.firebase.auth.FirebaseAuth) {
     public actual val currentUser: FirebaseUser?
         get() = android.currentUser?.let { FirebaseUser(it) }
 
@@ -100,6 +101,7 @@ public actual class FirebaseAuth internal constructor(public val android: com.go
 
     public actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
         val result = android.checkActionCode(code).await()
+        @Suppress("UNCHECKED_CAST")
         return when (result.operation) {
             SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
             VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
@@ -123,9 +125,9 @@ public actual class FirebaseAuth internal constructor(public val android: com.go
     }
 }
 
-public actual class AuthResult(
-    public val android: com.google.firebase.auth.AuthResult,
-) {
+public val AuthResult.android: com.google.firebase.auth.AuthResult get() = android
+
+public actual class AuthResult(internal val android: com.google.firebase.auth.AuthResult) {
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
     public actual val credential: AuthCredential?
@@ -145,7 +147,9 @@ public actual class AdditionalUserInfo {
         get() = throw NotImplementedError()
 }
 
-public actual class AuthTokenResult(public val android: com.google.firebase.auth.GetTokenResult) {
+public val AuthTokenResult.android: com.google.firebase.auth.GetTokenResult get() = android
+
+public actual class AuthTokenResult(internal val android: com.google.firebase.auth.GetTokenResult) {
     //    actual val authTimestamp: Long
 //        get() = android.authTimestamp
     public actual val claims: Map<String, Any>

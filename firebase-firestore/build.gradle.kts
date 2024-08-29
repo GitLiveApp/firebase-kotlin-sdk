@@ -35,7 +35,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions.configureTestOptions()
+    testOptions.configureTestOptions(project)
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -55,6 +55,7 @@ kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
+        freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
     }
     targets.configureEach {
         compilations.configureEach {
@@ -83,7 +84,7 @@ kotlin {
         iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseFirestore"
             }
@@ -92,6 +93,7 @@ kotlin {
             // Adding it manually seems to resolve the issue
             pod("FirebaseFirestoreInternal") {
                 version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
             pod("FirebaseFirestore") {
                 version = libs.versions.firebase.cocoapods.get()

@@ -4,6 +4,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 import kotlin.time.Duration
 
@@ -13,7 +14,9 @@ public actual val Firebase.analytics: FirebaseAnalytics
 public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics =
     FirebaseAnalytics(getAnalytics(app.js))
 
-public actual class FirebaseAnalytics(public val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
+public val FirebaseAnalytics.js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics get() = js
+
+public actual class FirebaseAnalytics(internal val js: dev.gitlive.firebase.analytics.externals.FirebaseAnalytics) {
     public actual fun logEvent(
         name: String,
         parameters: Map<String, Any>?,
