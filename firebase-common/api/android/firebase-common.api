@@ -51,20 +51,3 @@ public final class dev/gitlive/firebase/FirebaseEncoder$DefaultImpls {
 	public static fun encodeSerializableValue (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 }
 
-public final class dev/gitlive/firebase/ValueWithSerializer {
-	public fun <init> (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)V
-	public final fun component1 ()Ljava/lang/Object;
-	public final fun component2 ()Lkotlinx/serialization/SerializationStrategy;
-	public final fun copy (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ldev/gitlive/firebase/ValueWithSerializer;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/ValueWithSerializer;Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;ILjava/lang/Object;)Ldev/gitlive/firebase/ValueWithSerializer;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getSerializer ()Lkotlinx/serialization/SerializationStrategy;
-	public final fun getValue ()Ljava/lang/Object;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class dev/gitlive/firebase/ValueWithSerializerKt {
-	public static final fun withSerializer (Ljava/lang/Object;Lkotlinx/serialization/SerializationStrategy;)Ljava/lang/Object;
-}
-

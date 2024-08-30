@@ -190,10 +190,24 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public inline fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateFields")
-    public inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = update(
+        documentRef,
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldsWithEncodableValue")
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
     @JvmName("updateFieldPaths")
-    public inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = update(
+        documentRef,
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldPathsWithEncodableValue")
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
     @PublishedApi
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, encodedData))
@@ -229,14 +243,26 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING): Query = Query(nativeQuery.orderBy(field.encoded, direction))
 
     public fun startAfter(document: DocumentSnapshot): Query = Query(nativeQuery.startAfter(document.native))
-    public fun startAfter(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAfter(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
+    public fun startAfter(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = startAfter(*fieldValues.map { it.encodable() }.toTypedArray(), buildSettings = buildSettings)
+
+    @JvmName("startAfterWithEncodableValue")
+    public fun startAfter(vararg fieldValues: EncodableValue, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAfter(*(fieldValues.map { it.encoded(buildSettings)!! }.toTypedArray())))
     public fun startAt(document: DocumentSnapshot): Query = Query(nativeQuery.startAt(document.native))
-    public fun startAt(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAt(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
+    public fun startAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = startAt(*fieldValues.map { it.encodable() }.toTypedArray(), buildSettings = buildSettings)
+
+    @JvmName("startAtWithEncodableValue")
+    public fun startAt(vararg fieldValues: EncodableValue, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAt(*(fieldValues.map { it.encoded(buildSettings)!! }.toTypedArray())))
 
     public fun endBefore(document: DocumentSnapshot): Query = Query(nativeQuery.endBefore(document.native))
-    public fun endBefore(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endBefore(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
+    public fun endBefore(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = endBefore(*fieldValues.map { it.encodable() }.toTypedArray(), buildSettings = buildSettings)
+
+    @JvmName("endBeforeWithEncodableValue")
+    public fun endBefore(vararg fieldValues: EncodableValue, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endBefore(*(fieldValues.map { it.encoded(buildSettings)!! }.toTypedArray())))
     public fun endAt(document: DocumentSnapshot): Query = Query(nativeQuery.endAt(document.native))
-    public fun endAt(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endAt(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
+    public fun endAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = endAt(*fieldValues.map { it.encodable() }.toTypedArray(), buildSettings = buildSettings)
+
+    @JvmName("endAtWithEncodableValue")
+    public fun endAt(vararg fieldValues: EncodableValue, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endAt(*(fieldValues.map { it.encoded(buildSettings)!! }.toTypedArray())))
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
@@ -361,10 +387,24 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateField")
-    public inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = update(
+        documentRef,
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldWithEncodableValues")
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncodedFieldsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
     @JvmName("updateFieldPath")
-    public inline fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = update(
+        documentRef,
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldPathWithEncodableValues")
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncodedFieldPathsAndValues(documentRef, encodeFieldAndValue(fieldsAndValues, buildSettings).orEmpty())
 
     @PublishedApi
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): WriteBatch = WriteBatch(nativeWrapper.updateEncoded(documentRef, encodedData))
@@ -512,7 +552,13 @@ public data class DocumentReference internal constructor(internal val native: Na
     }
 
     @JvmName("updateFields")
-    public suspend inline fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = update(
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldsWithEncodableValues")
+    public suspend fun update(vararg fieldsAndValues: Pair<String, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         updateEncodedFieldsAndValues(
             encodeFieldAndValue(
                 fieldsAndValues,
@@ -527,7 +573,13 @@ public data class DocumentReference internal constructor(internal val native: Na
     }
 
     @JvmName("updateFieldPaths")
-    public suspend inline fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = update(
+        *fieldsAndValues.map { (key, value) -> key to value.encodable() }.toTypedArray(),
+        buildSettings = buildSettings,
+    )
+
+    @JvmName("updateFieldPathsWithEncodableValue")
+    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, EncodableValue>, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         updateEncodedFieldPathsAndValues(
             encodeFieldAndValue(
                 fieldsAndValues,

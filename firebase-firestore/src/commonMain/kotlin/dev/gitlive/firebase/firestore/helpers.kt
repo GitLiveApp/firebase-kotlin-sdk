@@ -6,28 +6,28 @@ import kotlin.jvm.JvmName
 // ** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")
 @PublishedApi
-internal inline fun encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<String, Any?>>,
+internal fun encodeFieldAndValue(
+    fieldsAndValues: Array<out Pair<String, EncodableValue>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
-): List<Pair<String, Any?>>? = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, encodeValue = { encode(it, buildSettings) })
+): List<Pair<String, Any?>>? = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, buildSettings)
 
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFieldPaths")
 @PublishedApi
-internal inline fun encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<FieldPath, Any?>>,
+internal fun encodeFieldAndValue(
+    fieldsAndValues: Array<out Pair<FieldPath, EncodableValue>>,
     buildSettings: EncodeSettings.Builder.() -> Unit,
-): List<Pair<EncodedFieldPath, Any?>>? = encodeFieldAndValue(fieldsAndValues, { it.encoded }, { encode(it, buildSettings) })
+): List<Pair<EncodedFieldPath, Any?>>? = encodeFieldAndValue(fieldsAndValues, { it.encoded }, buildSettings)
 
 /** Helper method to perform an update operation in Android and JS. */
 @PublishedApi
 internal inline fun <T, K> encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<T, Any?>>,
+    fieldsAndValues: Array<out Pair<T, EncodableValue>>,
     encodeField: (T) -> K,
-    encodeValue: (Any?) -> Any?,
+    noinline buildSettings: EncodeSettings.Builder.() -> Unit,
 ): List<Pair<K, Any?>>? =
     fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-        ?.map { (field, value) -> encodeField(field) to value?.let { encodeValue(it) } }
+        ?.map { (field, value) -> encodeField(field) to value.encoded(buildSettings) }
 
 internal fun <K, R> List<Pair<K, Any?>>.performUpdate(
     update: (K, Any?, Array<Any?>) -> R,

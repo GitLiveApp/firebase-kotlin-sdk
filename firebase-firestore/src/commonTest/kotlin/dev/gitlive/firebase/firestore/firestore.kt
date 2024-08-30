@@ -12,7 +12,6 @@ import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
-import dev.gitlive.firebase.withSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -67,7 +66,7 @@ class FirebaseFirestoreTest {
 
     @Serializable
     data class NestedObject(
-        val prop2: String
+        val prop2: String,
     )
 
     companion object {
@@ -730,7 +729,7 @@ class FirebaseFirestoreTest {
         // update data
         val updatedData = DataWithDocumentReference(documentRef2)
         getDocument().update(
-            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.withSerializer(DocumentReferenceSerializer),
+            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.encodableWithStrategy(DocumentReferenceSerializer),
         )
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
