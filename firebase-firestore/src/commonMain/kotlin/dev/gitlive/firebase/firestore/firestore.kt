@@ -18,7 +18,6 @@ import dev.gitlive.firebase.firestore.internal.NativeQueryWrapper
 import dev.gitlive.firebase.firestore.internal.NativeTransactionWrapper
 import dev.gitlive.firebase.firestore.internal.NativeWriteBatchWrapper
 import dev.gitlive.firebase.firestore.internal.SetOptions
-import dev.gitlive.firebase.firestore.internal.safeValue
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
@@ -230,14 +229,14 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING): Query = Query(nativeQuery.orderBy(field.encoded, direction))
 
     public fun startAfter(document: DocumentSnapshot): Query = Query(nativeQuery.startAfter(document.native))
-    public fun startAfter(vararg fieldValues: Any): Query = Query(nativeQuery.startAfter(*(fieldValues.map { it.safeValue }.toTypedArray())))
+    public fun startAfter(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAfter(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
     public fun startAt(document: DocumentSnapshot): Query = Query(nativeQuery.startAt(document.native))
-    public fun startAt(vararg fieldValues: Any): Query = Query(nativeQuery.startAt(*(fieldValues.map { it.safeValue }.toTypedArray())))
+    public fun startAt(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.startAt(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
 
     public fun endBefore(document: DocumentSnapshot): Query = Query(nativeQuery.endBefore(document.native))
-    public fun endBefore(vararg fieldValues: Any): Query = Query(nativeQuery.endBefore(*(fieldValues.map { it.safeValue }.toTypedArray())))
+    public fun endBefore(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endBefore(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
     public fun endAt(document: DocumentSnapshot): Query = Query(nativeQuery.endAt(document.native))
-    public fun endAt(vararg fieldValues: Any): Query = Query(nativeQuery.endAt(*(fieldValues.map { it.safeValue }.toTypedArray())))
+    public fun endAt(vararg fieldValues: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Query = Query(nativeQuery.endAt(*(fieldValues.map { encode(it, buildSettings)!! }.toTypedArray())))
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))

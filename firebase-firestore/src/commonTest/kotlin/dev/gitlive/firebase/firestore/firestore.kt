@@ -55,12 +55,19 @@ class FirebaseFirestoreTest {
         val count: Int = 0,
         val list: List<String> = emptyList(),
         val optional: String? = null,
+        val nested: NestedObject? = null,
+        val nestedList: List<NestedObject> = emptyList(),
     )
 
     @Serializable
     data class FirestoreTimeTest(
         val prop1: String,
         val time: BaseTimestamp?,
+    )
+
+    @Serializable
+    data class NestedObject(
+        val prop2: String
     )
 
     companion object {
@@ -70,12 +77,17 @@ class FirebaseFirestoreTest {
             1,
             listOf("a", "aa", "aaa"),
             "notNull",
+            NestedObject("ddd"),
+            listOf(NestedObject("l1"), NestedObject("l2"), NestedObject("l3")),
         )
         val testTwo = FirestoreTest(
             "bbb",
             0.0,
             2,
             listOf("b", "bb", "ccc"),
+            null,
+            NestedObject("eee"),
+            listOf(NestedObject("l2"), NestedObject("l4"), NestedObject("l5")),
         )
         val testThree = FirestoreTest(
             "ccc",
@@ -83,6 +95,8 @@ class FirebaseFirestoreTest {
             3,
             listOf("c", "cc", "ccc"),
             "notNull",
+            NestedObject("fff"),
+            listOf(NestedObject("l6"), NestedObject("l7"), NestedObject("l8")),
         )
     }
 
@@ -828,7 +842,7 @@ class FirebaseFirestoreTest {
 
         val nullableQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { FieldPath(FirestoreTest::optional.name) equalTo null }
+            .where { FieldPath(FirestoreTest::optional.name).isNull }
 
         nullableQuery.assertDocuments(FirestoreTest.serializer(), testTwo)
     }
@@ -851,7 +865,7 @@ class FirebaseFirestoreTest {
 
         val nullableQuery = firestore
             .collection("testFirestoreQuerying")
-            .where { FieldPath(FirestoreTest::optional.name) notEqualTo null }
+            .where { FieldPath(FirestoreTest::optional.name).isNotNull }
 
         nullableQuery.assertDocuments(FirestoreTest.serializer(), testOne, testThree)
     }
