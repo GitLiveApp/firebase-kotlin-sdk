@@ -51,6 +51,14 @@ public final class dev/gitlive/firebase/auth/ActionCodeSettings {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class dev/gitlive/firebase/auth/AdditionalUserInfo {
+	public fun <init> (Lcom/google/firebase/auth/AdditionalUserInfo;)V
+	public final fun getProfile ()Ljava/util/Map;
+	public final fun getProviderId ()Ljava/lang/String;
+	public final fun getUsername ()Ljava/lang/String;
+	public final fun isNewUser ()Z
+}
+
 public final class dev/gitlive/firebase/auth/AndroidPackageName {
 	public fun <init> (Ljava/lang/String;ZLjava/lang/String;)V
 	public synthetic fun <init> (Ljava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -74,6 +82,9 @@ public class dev/gitlive/firebase/auth/AuthCredential {
 }
 
 public final class dev/gitlive/firebase/auth/AuthResult {
+	public fun <init> (Lcom/google/firebase/auth/AuthResult;)V
+	public final fun getAdditionalUserInfo ()Ldev/gitlive/firebase/auth/AdditionalUserInfo;
+	public final fun getCredential ()Ldev/gitlive/firebase/auth/AuthCredential;
 	public final fun getUser ()Ldev/gitlive/firebase/auth/FirebaseUser;
 }
 
@@ -278,6 +289,7 @@ public final class dev/gitlive/firebase/auth/UserMetaData {
 
 public final class dev/gitlive/firebase/auth/android {
 	public static final fun auth (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/auth/FirebaseAuth;
+	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AdditionalUserInfo;)Lcom/google/firebase/auth/AdditionalUserInfo;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthResult;)Lcom/google/firebase/auth/AuthResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthTokenResult;)Lcom/google/firebase/auth/GetTokenResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/FirebaseAuth;)Lcom/google/firebase/auth/FirebaseAuth;

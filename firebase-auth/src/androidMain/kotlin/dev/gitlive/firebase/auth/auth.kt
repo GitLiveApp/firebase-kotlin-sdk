@@ -118,9 +118,29 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
 
 public val AuthResult.android: com.google.firebase.auth.AuthResult get() = android
 
-public actual class AuthResult internal constructor(internal val android: com.google.firebase.auth.AuthResult) {
+public actual class AuthResult(internal val android: com.google.firebase.auth.AuthResult) {
     public actual val user: FirebaseUser?
         get() = android.user?.let { FirebaseUser(it) }
+    public actual val credential: AuthCredential?
+        get() = android.credential?.let { AuthCredential(it) }
+    public actual val additionalUserInfo: AdditionalUserInfo?
+        get() = android.additionalUserInfo?.let { AdditionalUserInfo(it) }
+}
+
+public val AdditionalUserInfo.android: com.google.firebase.auth.AdditionalUserInfo
+    get() = android
+
+public actual class AdditionalUserInfo(
+    internal val android: com.google.firebase.auth.AdditionalUserInfo,
+) {
+    public actual val providerId: String?
+        get() = android.providerId
+    public actual val username: String?
+        get() = android.username
+    public actual val profile: Map<String, Any?>?
+        get() = android.profile
+    public actual val isNewUser: Boolean
+        get() = android.isNewUser
 }
 
 public val AuthTokenResult.android: com.google.firebase.auth.GetTokenResult get() = android
