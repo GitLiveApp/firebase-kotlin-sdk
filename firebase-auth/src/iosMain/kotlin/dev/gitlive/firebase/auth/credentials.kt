@@ -8,7 +8,7 @@ import cocoapods.FirebaseAuth.*
 
 public actual open class AuthCredential(public open val ios: FIRAuthCredential) {
     public actual val providerId: String
-        get() = ios.provider
+        get() = ios.provider()
 }
 
 public actual class PhoneAuthCredential(override val ios: FIRPhoneAuthCredential) : AuthCredential(ios)

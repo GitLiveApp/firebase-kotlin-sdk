@@ -31,7 +31,7 @@ public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
 public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth) {
 
     public actual val currentUser: FirebaseUser?
-        get() = ios.currentUser?.let { FirebaseUser(it) }
+        get() = ios.currentUser()?.let { FirebaseUser(it) }
 
     public actual val authStateChanged: Flow<FirebaseUser?> get() = callbackFlow {
         val handle = ios.addAuthStateDidChangeListener { _, user -> trySend(user?.let { FirebaseUser(it) }) }
@@ -44,7 +44,7 @@ public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth)
     }
 
     public actual var languageCode: String
-        get() = ios.languageCode ?: ""
+        get() = ios.languageCode() ?: ""
         set(value) {
             ios.setLanguageCode(value)
         }
@@ -90,15 +90,15 @@ public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth)
     public actual suspend fun <T : ActionCodeResult> checkActionCode(code: String): T {
         val result: FIRActionCodeInfo = ios.awaitResult { checkActionCode(code, it) }
         @Suppress("UNCHECKED_CAST")
-        return when (result.operation) {
+        return when (result.operation()) {
             FIRActionCodeOperationEmailLink -> SignInWithEmailLink
-            FIRActionCodeOperationVerifyEmail -> VerifyEmail(result.email!!)
-            FIRActionCodeOperationPasswordReset -> PasswordReset(result.email!!)
-            FIRActionCodeOperationRecoverEmail -> RecoverEmail(result.email!!, result.previousEmail!!)
-            FIRActionCodeOperationVerifyAndChangeEmail -> VerifyBeforeChangeEmail(result.email!!, result.previousEmail!!)
-            FIRActionCodeOperationRevertSecondFactorAddition -> RevertSecondFactorAddition(result.email!!, null)
-            FIRActionCodeOperationUnknown -> throw UnsupportedOperationException(result.operation.toString())
-            else -> throw UnsupportedOperationException(result.operation.toString())
+            FIRActionCodeOperationVerifyEmail -> VerifyEmail(result.email())
+            FIRActionCodeOperationPasswordReset -> PasswordReset(result.email())
+            FIRActionCodeOperationRecoverEmail -> RecoverEmail(result.email(), result.previousEmail()!!)
+            FIRActionCodeOperationVerifyAndChangeEmail -> VerifyBeforeChangeEmail(result.email(), result.previousEmail()!!)
+            FIRActionCodeOperationRevertSecondFactorAddition -> RevertSecondFactorAddition(result.email(), null)
+            FIRActionCodeOperationUnknown -> throw UnsupportedOperationException(result.operation().toString())
+            else -> throw UnsupportedOperationException(result.operation().toString())
         } as T
     }
 
@@ -108,7 +108,7 @@ public val AuthResult.ios: FIRAuthDataResult get() = ios
 
 public actual class AuthResult internal constructor(internal val ios: FIRAuthDataResult) {
     public actual val user: FirebaseUser?
-        get() = FirebaseUser(ios.user)
+        get() = FirebaseUser(ios.user())
 }
 
 public val AuthTokenResult.ios: FIRAuthTokenResult get() = ios
@@ -116,23 +116,23 @@ public actual class AuthTokenResult(internal val ios: FIRAuthTokenResult) {
 //    actual val authTimestamp: Long
 //        get() = ios.authDate
     public actual val claims: Map<String, Any>
-        get() = ios.claims.map { it.key.toString() to it.value as Any }.toMap()
+        get() = ios.claims().map { it.key.toString() to it.value as Any }.toMap()
 
 //    actual val expirationTimestamp: Long
 //        get() = ios.expirationDate
 //    actual val issuedAtTimestamp: Long
 //        get() = ios.issuedAtDate
     public actual val signInProvider: String?
-        get() = ios.signInProvider
+        get() = ios.signInProvider()
     public actual val token: String?
-        get() = ios.token
+        get() = ios.token()
 }
 
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
-    it.URL = NSURL.URLWithString(url)
+    it.setURL(NSURL.URLWithString(url))
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
-    it.dynamicLinkDomain = dynamicLinkDomain
-    it.handleCodeInApp = canHandleCodeInApp
+    it.setDynamicLinkDomain(dynamicLinkDomain)
+    it.setHandleCodeInApp(canHandleCodeInApp)
     iOSBundleId?.run { it.setIOSBundleID(this) }
 }
 
@@ -184,47 +184,55 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
 }
 
 private fun NSError.toException() = when (domain) {
+    // codes from AuthErrors.swift: https://github.com/firebase/firebase-ios-sdk/blob/
+    // 2f6ac4c2c61cd57c7ea727009e187b7e1163d613/FirebaseAuth/Sources/Swift/Utilities/
+    // AuthErrors.swift#L51
     FIRAuthErrorDomain -> when (code) {
-        FIRAuthErrorCodeInvalidActionCode,
-        FIRAuthErrorCodeExpiredActionCode,
+        17030L, // AuthErrorCode.invalidActionCode
+        17029L, // AuthErrorCode.expiredActionCode
         -> FirebaseAuthActionCodeException(toString())
 
-        FIRAuthErrorCodeInvalidEmail -> FirebaseAuthEmailException(toString())
+        17008L, // AuthErrorCode.invalidEmail
+        -> FirebaseAuthEmailException(toString())
 
-        FIRAuthErrorCodeCaptchaCheckFailed,
-        FIRAuthErrorCodeInvalidPhoneNumber,
-        FIRAuthErrorCodeMissingPhoneNumber,
-        FIRAuthErrorCodeInvalidVerificationID,
-        FIRAuthErrorCodeInvalidVerificationCode,
-        FIRAuthErrorCodeMissingVerificationID,
-        FIRAuthErrorCodeMissingVerificationCode,
-        FIRAuthErrorCodeUserTokenExpired,
-        FIRAuthErrorCodeInvalidCredential,
+        17056L, // AuthErrorCode.captchaCheckFailed
+        17042L, // AuthErrorCode.invalidPhoneNumber
+        17041L, // AuthErrorCode.missingPhoneNumber
+        17046L, // AuthErrorCode.invalidVerificationID
+        17044L, // AuthErrorCode.invalidVerificationCode
+        17045L, // AuthErrorCode.missingVerificationID
+        17043L, // AuthErrorCode.missingVerificationCode
+        17021L, // AuthErrorCode.userTokenExpired
+        17004L, // AuthErrorCode.invalidCredential
         -> FirebaseAuthInvalidCredentialsException(toString())
 
-        FIRAuthErrorCodeWeakPassword -> FirebaseAuthWeakPasswordException(toString())
+        17026L, // AuthErrorCode.weakPassword
+        -> FirebaseAuthWeakPasswordException(toString())
 
-        FIRAuthErrorCodeInvalidUserToken -> FirebaseAuthInvalidUserException(toString())
+        17017L, // AuthErrorCode.invalidUserToken
+        -> FirebaseAuthInvalidUserException(toString())
 
-        FIRAuthErrorCodeRequiresRecentLogin -> FirebaseAuthRecentLoginRequiredException(toString())
+        17014L, // AuthErrorCode.requiresRecentLogin
+        -> FirebaseAuthRecentLoginRequiredException(toString())
 
-        FIRAuthErrorCodeSecondFactorAlreadyEnrolled,
-        FIRAuthErrorCodeSecondFactorRequired,
-        FIRAuthErrorCodeMaximumSecondFactorCountExceeded,
-        FIRAuthErrorCodeMultiFactorInfoNotFound,
+        17087L, // AuthErrorCode.secondFactorAlreadyEnrolled
+        17078L, // AuthErrorCode.secondFactorRequired
+        17088L, // AuthErrorCode.maximumSecondFactorCountExceeded
+        17084L, // AuthErrorCode.multiFactorInfoNotFound
         -> FirebaseAuthMultiFactorException(toString())
 
-        FIRAuthErrorCodeEmailAlreadyInUse,
-        FIRAuthErrorCodeAccountExistsWithDifferentCredential,
-        FIRAuthErrorCodeCredentialAlreadyInUse,
+        17007L, // AuthErrorCode.emailAlreadyInUse
+        17012L, // AuthErrorCode.accountExistsWithDifferentCredential
+        17025L, // AuthErrorCode.credentialAlreadyInUse
         -> FirebaseAuthUserCollisionException(toString())
 
-        FIRAuthErrorCodeWebContextAlreadyPresented,
-        FIRAuthErrorCodeWebContextCancelled,
-        FIRAuthErrorCodeWebInternalError,
+        17057L, // AuthErrorCode.webContextAlreadyPresented
+        17058L, // AuthErrorCode.webContextCancelled
+        17062L, // AuthErrorCode.webInternalError
         -> FirebaseAuthWebException(toString())
 
-        FIRAuthErrorCodeNetworkError -> FirebaseNetworkException(toString())
+        17020L, // AuthErrorCode.networkError
+        -> FirebaseNetworkException(toString())
 
         else -> FirebaseAuthException(toString())
     }
