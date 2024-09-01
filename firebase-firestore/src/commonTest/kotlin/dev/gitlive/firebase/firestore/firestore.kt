@@ -728,9 +728,12 @@ class FirebaseFirestoreTest {
 
         // update data
         val updatedData = DataWithDocumentReference(documentRef2)
-        getDocument().update(
-            FieldPath(DataWithDocumentReference::documentReference.name) to updatedData.documentReference.encodableWithStrategy(DocumentReferenceSerializer),
-        )
+        getDocument().update(fieldsAndValuesBuilder = {
+            FieldPath(DataWithDocumentReference::documentReference.name).to(
+                DocumentReferenceSerializer,
+                updatedData.documentReference,
+            )
+        })
         // verify update
         val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
         assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)

@@ -1,38 +1,39 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.EncodeSettings
-import kotlin.jvm.JvmName
+import dev.gitlive.firebase.firestore.internal.FieldAndValue
 
-// ** Helper method to perform an update operation. */
-@JvmName("performUpdateFields")
-@PublishedApi
-internal fun encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<String, EncodableValue>>,
-    buildSettings: EncodeSettings.Builder.() -> Unit,
-): List<Pair<String, Any?>>? = encodeFieldAndValue(fieldsAndValues, encodeField = { it }, buildSettings)
+internal fun <R> List<FieldAndValue>.performUpdate(
+    updateAsField: (String, Any?, Array<Any?>) -> R,
+    updateAsFieldPath: (EncodedFieldPath, Any?, Array<Any?>) -> R,
+): R {
+    val first = first()
+    val remaining = drop(1).flatMap { fieldAndValue ->
+        listOf(
+            when (fieldAndValue) {
+                is FieldAndValue.WithFieldPath -> fieldAndValue.path.encoded
+                is FieldAndValue.WithStringField -> fieldAndValue.field
+            },
+            fieldAndValue.value,
+        )
+    }
+    return when (first) {
+        is FieldAndValue.WithFieldPath -> updateAsFieldPath(
+            first.path.encoded,
+            first.value,
+            remaining.toTypedArray(),
+        )
 
-/** Helper method to perform an update operation. */
-@JvmName("performUpdateFieldPaths")
-@PublishedApi
-internal fun encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<FieldPath, EncodableValue>>,
-    buildSettings: EncodeSettings.Builder.() -> Unit,
-): List<Pair<EncodedFieldPath, Any?>>? = encodeFieldAndValue(fieldsAndValues, { it.encoded }, buildSettings)
+        is FieldAndValue.WithStringField -> updateAsField(
+            first.field,
+            first.value,
+            remaining.toTypedArray(),
+        )
+    }
+}
 
-/** Helper method to perform an update operation in Android and JS. */
-@PublishedApi
-internal inline fun <T, K> encodeFieldAndValue(
-    fieldsAndValues: Array<out Pair<T, EncodableValue>>,
-    encodeField: (T) -> K,
-    noinline buildSettings: EncodeSettings.Builder.() -> Unit,
-): List<Pair<K, Any?>>? =
-    fieldsAndValues.takeUnless { fieldsAndValues.isEmpty() }
-        ?.map { (field, value) -> encodeField(field) to value.encoded(buildSettings) }
-
-internal fun <K, R> List<Pair<K, Any?>>.performUpdate(
-    update: (K, Any?, Array<Any?>) -> R,
-) = update(
-    this[0].first,
-    this[0].second,
-    this.drop(1).flatMap { (field, value) -> listOf(field, value) }.toTypedArray(),
-)
+internal fun List<FieldAndValue>.toEncodedMap(): Map<Any?, Any?> = associate { fieldAndValue ->
+    when (fieldAndValue) {
+        is FieldAndValue.WithStringField -> fieldAndValue.field to fieldAndValue.value
+        is FieldAndValue.WithFieldPath -> fieldAndValue.path.encoded to fieldAndValue.value
+    }
+}
