@@ -33,8 +33,10 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.auth.externals.AuthResult as JsAuthResult
+import dev.gitlive.firebase.auth.externals.AdditionalUserInfo as JsAdditionalUserInfo
 
 public actual val Firebase.auth: FirebaseAuth
     get() = rethrow { FirebaseAuth(getAuth()) }
@@ -133,9 +135,34 @@ public actual class FirebaseAuth internal constructor(internal val js: Auth) {
 
 public val AuthResult.js: JsAuthResult get() = js
 
-public actual class AuthResult internal constructor(internal val js: JsAuthResult) {
+public actual class AuthResult(internal val js: JsAuthResult) {
     public actual val user: FirebaseUser?
         get() = rethrow { js.user?.let { FirebaseUser(it) } }
+    public actual val credential: AuthCredential?
+        get() = rethrow { js.credential?.let { AuthCredential(it) } }
+    public actual val additionalUserInfo: AdditionalUserInfo?
+        get() = rethrow { js.additionalUserInfo?.let { AdditionalUserInfo(it) } }
+}
+
+public val AdditionalUserInfo.js: JsAdditionalUserInfo get() = js
+
+public actual class AdditionalUserInfo(
+    internal val js: JsAdditionalUserInfo,
+) {
+    public actual val providerId: String?
+        get() = js.providerId
+    public actual val username: String?
+        get() = js.username
+    public actual val profile: Map<String, Any?>?
+        get() = rethrow {
+            val profile = js.profile ?: return@rethrow null
+            val entries = js("Object.entries") as (Json) -> Array<Array<Any?>>
+            return@rethrow entries
+                .invoke(profile)
+                .associate { entry -> entry[0] as String to entry[1] }
+        }
+    public actual val isNewUser: Boolean
+        get() = js.newUser
 }
 
 public val AuthTokenResult.js: IdTokenResult get() = js
