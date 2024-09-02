@@ -68,16 +68,15 @@ public final class dev/gitlive/firebase/firestore/DocumentReference {
 	public final fun snapshots (Z)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun snapshots$default (Ldev/gitlive/firebase/firestore/DocumentReference;ZILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public fun toString ()Ljava/lang/String;
-	public final fun update (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun update (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun update (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun updateEncoded (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun updateEncodedFieldPathsAndValues (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun updateFieldPaths ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun updateFieldPaths$default (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun updateFields ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun updateFields$default (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateWithBuilder (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/firestore/DocumentReference$Companion {
@@ -582,7 +581,6 @@ public final class dev/gitlive/firebase/firestore/Transaction {
 	public fun toString ()Ljava/lang/String;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/Transaction;
-	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/Transaction;
 	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
@@ -592,6 +590,7 @@ public final class dev/gitlive/firebase/firestore/Transaction {
 	public static synthetic fun updateFieldPaths$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
 	public final fun updateFields (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
 	public static synthetic fun updateFields$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateWithBuilder (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
 }
 
 public final class dev/gitlive/firebase/firestore/Transaction$Companion {
@@ -720,17 +719,15 @@ public final class dev/gitlive/firebase/firestore/WriteBatch {
 	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun setEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;Ldev/gitlive/firebase/firestore/internal/SetOptions;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public fun toString ()Ljava/lang/String;
-	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun updateEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;)Ldev/gitlive/firebase/firestore/WriteBatch;
-	public final fun updateEncodedFieldPathsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/WriteBatch;
-	public final fun updateEncodedFieldsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun updateField (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public static synthetic fun updateField$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public final fun updateFieldPath (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
 	public static synthetic fun updateFieldPath$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateWithBuilder (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
 }
 
 public final class dev/gitlive/firebase/firestore/WriteBatch$Companion {

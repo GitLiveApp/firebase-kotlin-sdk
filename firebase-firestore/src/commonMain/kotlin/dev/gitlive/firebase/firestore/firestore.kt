@@ -10,7 +10,6 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.firestore.internal.FieldAndValue
 import dev.gitlive.firebase.firestore.internal.NativeCollectionReferenceWrapper
 import dev.gitlive.firebase.firestore.internal.NativeDocumentReference
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
@@ -191,28 +190,26 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public inline fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateFields")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = update(
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateWithBuilder(
         documentRef,
-        fieldsAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
-        },
-    )
+    ) {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
+        }
+    }
 
     @JvmName("updateFieldPaths")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = update(
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateWithBuilder(
         documentRef,
-        fieldsAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
-        },
-    )
+    ) {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
+        }
+    }
 
-    public fun update(
+    public fun updateWithBuilder(
         documentRef: DocumentReference,
         fieldsAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
     ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues))
@@ -411,43 +408,37 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateField")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = update(
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateWithBuilder(
         documentRef,
-        fieldAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
-        },
-    )
+    ) {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
+        }
+    }
 
     @JvmName("updateFieldPath")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = update(
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateWithBuilder(
         documentRef,
-        fieldAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (path, value) ->
-                path to value
-            }
-        },
-    )
+    ) {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (path, value) ->
+            path to value
+        }
+    }
 
-    public fun update(
+    public fun updateWithBuilder(
         documentRef: DocumentReference,
         fieldAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
-    ): WriteBatch = updateEncodedFieldPathsAndValues(
-        documentRef,
-        FieldsAndValuesBuilder().apply(fieldAndValuesBuilder).fieldAndValues,
+    ): WriteBatch = WriteBatch(
+        nativeWrapper.updateEncoded(
+            documentRef,
+            FieldsAndValuesBuilder().apply(fieldAndValuesBuilder).fieldAndValues,
+        ),
     )
 
     @PublishedApi
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): WriteBatch = WriteBatch(nativeWrapper.updateEncoded(documentRef, encodedData))
-
-    @PublishedApi
-    internal fun updateEncodedFieldsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<FieldAndValue>): WriteBatch = WriteBatch(nativeWrapper.updateEncoded(documentRef, encodedFieldsAndValues))
-
-    @PublishedApi
-    internal fun updateEncodedFieldPathsAndValues(documentRef: DocumentReference, encodedFieldsAndValues: List<FieldAndValue>): WriteBatch = WriteBatch(nativeWrapper.updateEncoded(documentRef, encodedFieldsAndValues))
 
     public fun delete(documentRef: DocumentReference): WriteBatch = WriteBatch(nativeWrapper.delete(documentRef))
     public suspend fun commit() {
@@ -586,34 +577,25 @@ public data class DocumentReference internal constructor(internal val native: Na
     }
 
     @JvmName("updateFields")
-    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = update(
-        fieldsAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
-        },
-    )
-
-    @JvmName("updateFieldPaths")
-    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = update(
-        fieldsAndValuesBuilder = {
-            this.buildSettings = buildSettings
-            fieldsAndValues.forEach { (fieldPath, value) ->
-                fieldPath to value
-            }
-        },
-    )
-
-    public suspend fun update(
-        fieldsAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
-    ) {
-        updateEncodedFieldPathsAndValues(FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues)
+    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = updateWithBuilder {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
+        }
     }
 
-    @PublishedApi
-    internal suspend fun updateEncodedFieldPathsAndValues(encodedFieldsAndValues: List<FieldAndValue>) {
-        native.updateEncoded(encodedFieldsAndValues)
+    @JvmName("updateFieldPaths")
+    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Unit = updateWithBuilder {
+        this.buildSettings = buildSettings
+        fieldsAndValues.forEach { (fieldPath, value) ->
+            fieldPath to value
+        }
+    }
+
+    public suspend fun updateWithBuilder(
+        fieldsAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
+    ) {
+        native.updateEncoded(FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues)
     }
 
     public suspend fun delete() {
