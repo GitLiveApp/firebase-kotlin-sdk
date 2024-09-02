@@ -12,11 +12,7 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
         .collection("testServerTestSetBatch")
 
     @Test
-    fun testSetBatch() = runTest {
-        val doc1 = collection
-            .document("test1")
-        val doc2 = collection
-            .document("test2")
+    fun testSetBatch() = testBatch { doc1, doc2 ->
         val batch = firestore.batch()
         batch.set(
             documentRef = doc1,
@@ -41,11 +37,7 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testSetBatchDoesNotEncodeEmptyValues() = runTest {
-        val doc1 = collection
-            .document("test1")
-        val doc2 = collection
-            .document("test2")
+    fun testSetBatchDoesNotEncodeEmptyValues() = testBatch { doc1, doc2 ->
         val batch = firestore.batch()
         batch.set(
             documentRef = doc1,
@@ -72,25 +64,19 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testUpdateBatch() = runTest {
-        val doc1 = collection
-            .document("test1").apply {
-                set(
-                    FirestoreTest(
-                        prop1 = "prop1",
-                        time = 123.0,
-                    ),
-                )
-            }
-        val doc2 = collection
-            .document("test2").apply {
-                set(
-                    FirestoreTest(
-                        prop1 = "prop2",
-                        time = 456.0,
-                    ),
-                )
-            }
+    fun testUpdateBatch() = testBatch { doc1, doc2 ->
+        doc1.set(
+            FirestoreTest(
+                prop1 = "prop1",
+                time = 123.0,
+            ),
+        )
+        doc2.set(
+            FirestoreTest(
+                prop1 = "prop2",
+                time = 456.0,
+            ),
+        )
 
         val batch = firestore.batch()
         batch.update(
@@ -120,25 +106,19 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testUpdateBatchDoesNotEncodeEmptyValues() = runTest {
-        val doc1 = collection
-            .document("test1").apply {
-                set(
-                    FirestoreTest(
-                        prop1 = "prop1",
-                        time = 123.0,
-                    ),
-                )
-            }
-        val doc2 = collection
-            .document("test2").apply {
-                set(
-                    FirestoreTest(
-                        prop1 = "prop2",
-                        time = 456.0,
-                    ),
-                )
-            }
+    fun testUpdateBatchDoesNotEncodeEmptyValues() = testBatch { doc1, doc2 ->
+        doc1.set(
+            FirestoreTest(
+                prop1 = "prop1",
+                time = 123.0,
+            ),
+        )
+        doc2.set(
+            FirestoreTest(
+                prop1 = "prop2",
+                time = 456.0,
+            ),
+        )
         val batch = firestore.batch()
         batch.update(
             documentRef = doc1,
@@ -169,38 +149,34 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testUpdateFieldValuesBatch() = runTest {
-        val doc1 = collection.document("test1").apply {
-            set(
-                FirestoreTest(
-                    prop1 = "prop1",
-                    time = 123.0,
-                    duration = 800.milliseconds,
-                ),
-            )
-        }
+    fun testUpdateFieldValuesBatch() = testBatch { doc1, doc2 ->
+        doc1.set(
+            FirestoreTest(
+                prop1 = "prop1",
+                time = 123.0,
+                duration = 800.milliseconds,
+            ),
+        )
 
-        val doc2 = collection.document("test2").apply {
-            set(
-                FirestoreTest(
-                    prop1 = "prop2",
-                    time = 456.0,
-                    duration = 700.milliseconds,
-                ),
-            )
-        }
+        doc2.set(
+            FirestoreTest(
+                prop1 = "prop2",
+                time = 456.0,
+                duration = 700.milliseconds,
+            ),
+        )
 
         val batch = firestore.batch()
         batch.update(doc1) {
             FirestoreTest::prop1.name to "prop1-updated"
             FieldPath(FirestoreTest::optional.name) to "notNull"
-            FirestoreTest::duration.name.to(DurationAsLongSerializer(), 300.milliseconds)
+            FirestoreTest::duration.name.to(DurationAsIntSerializer(), 300.milliseconds)
             FieldPath(FirestoreTest::nested.name).to(NestedObject.serializer(), NestedObject("nested"))
         }
         batch.update(doc2) {
             FirestoreTest::prop1.name to "prop2-updated"
             FieldPath(FirestoreTest::optional.name) to "alsoNotNull"
-            FirestoreTest::duration.name.to(DurationAsLongSerializer(), 200.milliseconds)
+            FirestoreTest::duration.name.to(DurationAsIntSerializer(), 200.milliseconds)
             FieldPath(FirestoreTest::nested.name).to(NestedObject.serializer(), NestedObject("alsoNested"))
         }
         batch.commit()
@@ -216,5 +192,19 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
         assertEquals("alsoNotNull", updatedDoc2.optional)
         assertEquals(200.milliseconds, updatedDoc2.duration)
         assertEquals(NestedObject("alsoNested"), updatedDoc2.nested)
+    }
+
+    private fun testBatch(block: suspend (DocumentReference, DocumentReference) -> Unit) = runTest {
+        val doc1 = collection
+            .document("test1")
+        val doc2 = collection
+            .document("test2")
+
+        try {
+            block(doc1, doc2)
+        } finally {
+            doc1.delete()
+            doc2.delete()
+        }
     }
 }

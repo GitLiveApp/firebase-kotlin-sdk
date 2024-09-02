@@ -2,6 +2,7 @@ package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.runTest
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -90,10 +91,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testServerTimestampFieldValue() = runTest {
-        val doc = firestore
+    fun testServerTimestampFieldValue() = testDocument(
+        firestore
             .collection("testServerTimestampFieldValue")
-            .document("test")
+            .document("test"),
+    ) { doc ->
         doc.set(
             FirestoreTimeTest.serializer(),
             FirestoreTimeTest("ServerTimestamp", Timestamp(123, 0)),
@@ -107,11 +109,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testServerTimestampBehaviorNone() = runTest {
-        val doc = firestore
+    fun testServerTimestampBehaviorNone() = testDocument(
+        firestore
             .collection("testServerTimestampBehaviorNone")
-            .document("test${Random.nextInt()}")
-
+            .document("test${Random.nextInt()}"),
+    ) { doc ->
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
@@ -128,11 +130,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testServerTimestampBehaviorEstimate() = runTest {
-        val doc = firestore
+    fun testServerTimestampBehaviorEstimate() = testDocument(
+        firestore
             .collection("testServerTimestampBehaviorEstimate")
-            .document("test${Random.nextInt()}")
-
+            .document("test${Random.nextInt()}"),
+    ) { doc ->
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
@@ -147,11 +149,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testServerTimestampBehaviorPrevious() = runTest {
-        val doc = firestore
+    fun testServerTimestampBehaviorPrevious() = testDocument(
+        firestore
             .collection("testServerTimestampBehaviorPrevious")
-            .document("test${Random.nextInt()}")
-
+            .document("test${Random.nextInt()}"),
+    ) { doc ->
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
         }
@@ -165,10 +167,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testDocumentAutoId() = runTest {
-        val doc = firestore
+    fun testDocumentAutoId() = testDocument(
+        firestore
             .collection("testDocumentAutoId")
-            .document
+            .document,
+    ) { doc ->
 
         doc.set(FirestoreTest.serializer(), FirestoreTest("AutoId"))
 
@@ -182,12 +185,20 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testUpdateValues() = runTest {
-        val doc = firestore
+    fun testUpdateValues() = testDocument(
+        firestore
             .collection("testFirestoreUpdateMultipleValues")
-            .document("test1")
-
-        doc.set(FirestoreTest.serializer(), FirestoreTest("property", count = 0, nested = NestedObject("nested"), duration = 600.milliseconds))
+            .document("test1"),
+    ) { doc ->
+        doc.set(
+            FirestoreTest.serializer(),
+            FirestoreTest(
+                "property",
+                count = 0,
+                nested = NestedObject("nested"),
+                duration = 600.milliseconds,
+            ),
+        )
         val dataBefore = doc.get().data(FirestoreTest.serializer())
         assertEquals(0, dataBefore.count)
         assertNull(dataBefore.optional)
@@ -197,8 +208,14 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
         doc.update {
             FirestoreTest::count.name to 5
             FieldPath(FirestoreTest::optional.name) to "notNull"
-            FirestoreTest::nested.name.to(NestedObject.serializer(), NestedObject("newProperty"))
-            FieldPath(FirestoreTest::duration.name).to(DurationAsLongSerializer(), 700.milliseconds)
+            FirestoreTest::nested.name.to(
+                NestedObject.serializer(),
+                NestedObject("newProperty"),
+            )
+            FieldPath(FirestoreTest::duration.name).to(
+                DurationAsIntSerializer(),
+                700.milliseconds,
+            )
         }
         val dataAfter = doc.get().data(FirestoreTest.serializer())
         assertEquals(5, dataAfter.count)
@@ -208,11 +225,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testIncrementFieldValue() = runTest {
-        val doc = firestore
+    fun testIncrementFieldValue() = testDocument(
+        firestore
             .collection("testFirestoreIncrementFieldValue")
-            .document("test1")
-
+            .document("test1"),
+    ) { doc ->
         doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", count = 0))
         val dataBefore = doc.get().data(FirestoreTest.serializer())
         assertEquals(0, dataBefore.count)
@@ -223,11 +240,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testArrayUnion() = runTest {
-        val doc = firestore
+    fun testArrayUnion() = testDocument(
+        firestore
             .collection("testFirestoreArrayUnion")
-            .document("test1")
-
+            .document("test1"),
+    ) { doc ->
         doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first")))
         val dataBefore = doc.get().data(FirestoreTest.serializer())
         assertEquals(listOf("first"), dataBefore.list)
@@ -238,11 +255,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testArrayRemove() = runTest {
-        val doc = firestore
+    fun testArrayRemove() = testDocument(
+        firestore
             .collection("testFirestoreArrayRemove")
-            .document("test1")
-
+            .document("test1"),
+    ) { doc ->
         doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", list = listOf("first", "second")))
         val dataBefore = doc.get().data(FirestoreTest.serializer())
         assertEquals(listOf("first", "second"), dataBefore.list)
@@ -253,16 +270,16 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testLegacyDoubleTimestamp() = runTest {
+    fun testLegacyDoubleTimestamp() = testDocument(
+        firestore
+            .collection("testLegacyDoubleTimestamp")
+            .document("test${Random.nextInt()}"),
+    ) { doc ->
         @Serializable
         data class DoubleTimestamp(
             @Serializable(with = DoubleAsTimestampSerializer::class)
             val time: Double?,
         )
-
-        val doc = firestore
-            .collection("testLegacyDoubleTimestamp")
-            .document("test${Random.nextInt()}")
 
         val deferredPendingWritesSnapshot = async {
             doc.snapshots.filter { it.exists }.first()
@@ -278,7 +295,11 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testLegacyDoubleTimestampWriteNewFormatRead() = runTest {
+    fun testLegacyDoubleTimestampWriteNewFormatRead() = testDocument(
+        firestore
+            .collection("testLegacyDoubleTimestampEncodeDecode")
+            .document("testLegacy"),
+    ) { doc ->
         @Serializable
         data class LegacyDocument(
             @Serializable(with = DoubleAsTimestampSerializer::class)
@@ -290,10 +311,6 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
             val time: Timestamp,
         )
 
-        val doc = firestore
-            .collection("testLegacyDoubleTimestampEncodeDecode")
-            .document("testLegacy")
-
         val ms = 12345678.0
 
         doc.set(LegacyDocument.serializer(), LegacyDocument(time = ms))
@@ -303,25 +320,25 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
-    fun testGeoPointSerialization() = runTest {
+    fun testGeoPointSerialization() = testDocument(
+        firestore.collection("geoPointSerialization")
+            .document("geoPointSerialization"),
+    ) { doc ->
         @Serializable
         data class DataWithGeoPoint(val geoPoint: GeoPoint)
 
-        fun getDocument() = firestore.collection("geoPointSerialization")
-            .document("geoPointSerialization")
-
         val data = DataWithGeoPoint(GeoPoint(12.34, 56.78))
         // store geo point
-        getDocument().set(DataWithGeoPoint.serializer(), data)
+        doc.set(DataWithGeoPoint.serializer(), data)
         // restore data
-        val savedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        val savedData = doc.get().data(DataWithGeoPoint.serializer())
         assertEquals(data.geoPoint, savedData.geoPoint)
 
         // update data
         val updatedData = DataWithGeoPoint(GeoPoint(87.65, 43.21))
-        getDocument().update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
+        doc.update(FieldPath(DataWithGeoPoint::geoPoint.name) to updatedData.geoPoint)
         // verify update
-        val updatedSavedData = getDocument().get().data(DataWithGeoPoint.serializer())
+        val updatedSavedData = doc.get().data(DataWithGeoPoint.serializer())
         assertEquals(updatedData.geoPoint, updatedSavedData.geoPoint)
     }
 
@@ -332,66 +349,82 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
             val documentReference: DocumentReference,
         )
 
-        fun getCollection() = firestore.collection("documentReferenceSerialization")
-        fun getDocument() = getCollection()
+        val collection = firestore.collection("documentReferenceSerialization")
+        val document = collection
             .document("documentReferenceSerialization")
-        val documentRef1 = getCollection().document("refDoc1").apply {
-            set(mapOf("value" to 1))
-        }
-        val documentRef2 = getCollection().document("refDoc2").apply {
-            set(mapOf("value" to 2))
-        }
+        val documentRef1 = collection.document("refDoc1")
+        val documentRef2 = collection.document("refDoc2")
 
-        val data = DataWithDocumentReference(documentRef1)
-        // store reference
-        getDocument().set(DataWithDocumentReference.serializer(), data)
-        // restore data
-        val savedData = getDocument().get().data(DataWithDocumentReference.serializer())
-        assertEquals(data.documentReference.path, savedData.documentReference.path)
+        try {
+            documentRef1.set(mapOf("value" to 1))
+            documentRef2.set(mapOf("value" to 2))
+            val data = DataWithDocumentReference(documentRef1)
+            // store reference
+            document.set(DataWithDocumentReference.serializer(), data)
+            // restore data
+            val savedData = document.get().data(DataWithDocumentReference.serializer())
+            assertEquals(data.documentReference.path, savedData.documentReference.path)
 
-        // update data
-        val updatedData = DataWithDocumentReference(documentRef2)
-        getDocument().update {
-            FieldPath(DataWithDocumentReference::documentReference.name).to(
-                DocumentReferenceSerializer,
-                updatedData.documentReference,
+            // update data
+            val updatedData = DataWithDocumentReference(documentRef2)
+            document.update {
+                FieldPath(DataWithDocumentReference::documentReference.name).to(
+                    DocumentReferenceSerializer,
+                    updatedData.documentReference,
+                )
+            }
+            // verify update
+            val updatedSavedData = document.get().data(DataWithDocumentReference.serializer())
+            assertEquals(
+                updatedData.documentReference.path,
+                updatedSavedData.documentReference.path,
             )
+        } finally {
+            document.delete()
+            documentRef1.delete()
+            documentRef2.delete()
         }
-        // verify update
-        val updatedSavedData = getDocument().get().data(DataWithDocumentReference.serializer())
-        assertEquals(updatedData.documentReference.path, updatedSavedData.documentReference.path)
     }
 
     @Test
-    fun testFieldValuesOps() = runTest {
+    fun testFieldValuesOps() = testDocument(
+        firestore.collection("fieldValuesOps")
+            .document("fieldValuesOps"),
+    ) { doc ->
         @Serializable
         data class TestData(val values: List<Int>)
-        fun getDocument() = firestore.collection("fieldValuesOps")
-            .document("fieldValuesOps")
 
         val data = TestData(listOf(1))
         // store
-        getDocument().set(TestData.serializer(), data)
+        doc.set(TestData.serializer(), data)
         // append & verify
-        getDocument().update(FieldPath(TestData::values.name) to FieldValue.arrayUnion(2))
+        doc.update(FieldPath(TestData::values.name) to FieldValue.arrayUnion(2))
 
-        var savedData = getDocument().get().data(TestData.serializer())
+        var savedData = doc.get().data(TestData.serializer())
         assertEquals(listOf(1, 2), savedData.values)
 
         // remove & verify
-        getDocument().update(FieldPath(TestData::values.name) to FieldValue.arrayRemove(1))
-        savedData = getDocument().get().data(TestData.serializer())
+        doc.update(FieldPath(TestData::values.name) to FieldValue.arrayRemove(1))
+        savedData = doc.get().data(TestData.serializer())
         assertEquals(listOf(2), savedData.values)
 
-        val list = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        val list = doc.get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
         assertEquals(listOf(2), list)
         // delete & verify
-        getDocument().update(FieldPath(TestData::values.name) to FieldValue.delete)
-        val deletedList = getDocument().get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
+        doc.update(FieldPath(TestData::values.name) to FieldValue.delete)
+        val deletedList = doc.get().get(TestData::values.name, ListSerializer(Int.serializer()).nullable)
         assertNull(deletedList)
     }
 
     private suspend fun nonSkippedDelay(timeout: Duration) = withContext(Dispatchers.Default) {
         delay(timeout)
+    }
+
+    private fun testDocument(document: DocumentReference, block: suspend CoroutineScope.(DocumentReference) -> Unit) = runTest {
+        try {
+            block(document)
+        } finally {
+            document.delete()
+        }
     }
 }

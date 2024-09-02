@@ -45,7 +45,7 @@ abstract class BaseFirebaseFirestoreTest {
         val optional: String? = null,
         val nested: NestedObject? = null,
         val nestedList: List<NestedObject> = emptyList(),
-        @Serializable(with = DurationAsLongSerializer::class)
+        @Serializable(with = DurationAsIntSerializer::class)
         val duration: Duration = Duration.ZERO,
     )
 
@@ -54,15 +54,16 @@ abstract class BaseFirebaseFirestoreTest {
         val prop2: String,
     )
 
-    class DurationAsLongSerializer : KSerializer<Duration> {
+    // Long would be better but JS does not seem to support it on the Firebase level https://stackoverflow.com/questions/31930406/storing-long-type-in-firebase
+    class DurationAsIntSerializer : KSerializer<Duration> {
 
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("millisecondsSinceEpoch", PrimitiveKind.LONG)
+        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("millisecondsSinceEpoch", PrimitiveKind.INT)
 
         override fun serialize(encoder: Encoder, value: Duration) {
-            encoder.encodeLong(value.inWholeMilliseconds)
+            encoder.encodeInt(value.inWholeMilliseconds.toInt())
         }
 
-        override fun deserialize(decoder: Decoder): Duration = decoder.decodeLong().milliseconds
+        override fun deserialize(decoder: Decoder): Duration = decoder.decodeInt().milliseconds
     }
 
     lateinit var firebaseApp: FirebaseApp

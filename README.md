@@ -241,6 +241,15 @@ citiesRef.where {
 }
 ```
 
+Similar methods exist for `update` methods in the Firestore module:
+
+```kotlin
+documentRef.update {
+    "field" to "value"
+    "otherField".to(IntAsStringSerializer(), 1)
+}
+```
+
 <h3><a href="https://kotlinlang.org/docs/reference/operator-overloading.html">Operator overloading</a></h3>
 
 In cases where it makes sense, such as Firebase Functions HTTPS Callable, operator overloading is used:

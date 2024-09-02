@@ -177,12 +177,12 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         pathQuery.assertDocuments(FirestoreTest.serializer(), testOne)
 
         val serializeFieldQuery = collection.where {
-            "duration".lessThan(DurationAsLongSerializer(), testThree.duration)
+            "duration".lessThan(DurationAsIntSerializer(), testThree.duration)
         }
         serializeFieldQuery.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
 
         val serializePathQuery = collection.where {
-            FieldPath(FirestoreTest::duration.name).lessThan(DurationAsLongSerializer(), testTwo.duration)
+            FieldPath(FirestoreTest::duration.name).lessThan(DurationAsIntSerializer(), testTwo.duration)
         }
         serializePathQuery.assertDocuments(FirestoreTest.serializer(), testOne)
     }
@@ -200,12 +200,12 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         pathQuery.assertDocuments(FirestoreTest.serializer(), testThree)
 
         val serializeFieldQuery = collection.where {
-            "duration".greaterThan(DurationAsLongSerializer(), testOne.duration)
+            "duration".greaterThan(DurationAsIntSerializer(), testOne.duration)
         }
         serializeFieldQuery.assertDocuments(FirestoreTest.serializer(), testTwo, testThree)
 
         val serializePathQuery = collection.where {
-            FieldPath(FirestoreTest::duration.name).greaterThan(DurationAsLongSerializer(), testTwo.duration)
+            FieldPath(FirestoreTest::duration.name).greaterThan(DurationAsIntSerializer(), testTwo.duration)
         }
         serializePathQuery.assertDocuments(FirestoreTest.serializer(), testThree)
     }
@@ -223,12 +223,12 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         pathQuery.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
 
         val serializeFieldQuery = collection.where {
-            "duration".lessThanOrEqualTo(DurationAsLongSerializer(), testOne.duration)
+            "duration".lessThanOrEqualTo(DurationAsIntSerializer(), testOne.duration)
         }
         serializeFieldQuery.assertDocuments(FirestoreTest.serializer(), testOne)
 
         val serializePathQuery = collection.where {
-            FieldPath(FirestoreTest::duration.name).lessThanOrEqualTo(DurationAsLongSerializer(), testTwo.duration)
+            FieldPath(FirestoreTest::duration.name).lessThanOrEqualTo(DurationAsIntSerializer(), testTwo.duration)
         }
         serializePathQuery.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
     }
@@ -246,12 +246,12 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         pathQuery.assertDocuments(FirestoreTest.serializer(), testTwo, testThree)
 
         val serializeFieldQuery = collection.where {
-            "duration".greaterThanOrEqualTo(DurationAsLongSerializer(), testTwo.duration)
+            "duration".greaterThanOrEqualTo(DurationAsIntSerializer(), testTwo.duration)
         }
         serializeFieldQuery.assertDocuments(FirestoreTest.serializer(), testTwo, testThree)
 
         val serializePathQuery = collection.where {
-            FieldPath(FirestoreTest::duration.name).greaterThanOrEqualTo(DurationAsLongSerializer(), testThree.duration)
+            FieldPath(FirestoreTest::duration.name).greaterThanOrEqualTo(DurationAsIntSerializer(), testThree.duration)
         }
         serializePathQuery.assertDocuments(FirestoreTest.serializer(), testThree)
     }
@@ -397,20 +397,25 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         val pastTimestamp = Timestamp(timestamp.seconds - 60, 12345000) // note: iOS truncates 3 last digits of nanoseconds due to internal conversions
         val futureTimestamp = Timestamp(timestamp.seconds + 60, 78910000)
 
-        collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(pastTimestamp))
-        collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(futureTimestamp))
+        val doc1 = collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(pastTimestamp))
+        val doc2 = collection.add(DocumentWithTimestamp.serializer(), DocumentWithTimestamp(futureTimestamp))
 
-        val equalityQueryResult = collection.where {
-            FieldPath(DocumentWithTimestamp::time.name) equalTo pastTimestamp
-        }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+        try {
+            val equalityQueryResult = collection.where {
+                FieldPath(DocumentWithTimestamp::time.name) equalTo pastTimestamp
+            }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
 
-        assertEquals(setOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
+            assertEquals(setOf(DocumentWithTimestamp(pastTimestamp)), equalityQueryResult)
 
-        val gtQueryResult = collection.where {
-            FieldPath(DocumentWithTimestamp::time.name) greaterThan timestamp
-        }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
+            val gtQueryResult = collection.where {
+                FieldPath(DocumentWithTimestamp::time.name) greaterThan timestamp
+            }.get().documents.map { it.data(DocumentWithTimestamp.serializer()) }.toSet()
 
-        assertEquals(setOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
+            assertEquals(setOf(DocumentWithTimestamp(futureTimestamp)), gtQueryResult)
+        } finally {
+            doc1.delete()
+            doc2.delete()
+        }
     }
 
     @Test
