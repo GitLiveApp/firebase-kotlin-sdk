@@ -12,7 +12,7 @@ class FirestoreSourceTest {
     lateinit var firestore: FirebaseFirestore
 
     companion object {
-        val testDoc = FirebaseFirestoreTest.FirestoreTest(
+        val testDoc = BaseFirebaseFirestoreTest.FirestoreTest(
             "aaa",
             0.0,
             1,

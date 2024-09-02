@@ -28,7 +28,7 @@ internal actual fun FirebaseEncoderImpl.structureEncoder(descriptor: SerialDescr
     else -> TODO("The firebase-kotlin-sdk does not support $descriptor for serialization yet")
 }
 
-private fun FirebaseEncoderImpl.encodeAsList(descriptor: SerialDescriptor): FirebaseCompositeEncoder = Array<Any?>(descriptor.elementsCount) { null }
+private fun FirebaseEncoderImpl.encodeAsList(descriptor: SerialDescriptor): FirebaseCompositeEncoder = Array<Any?>(descriptor.elementsCount - 1) { null }
     .also { value = it }
     .let { FirebaseCompositeEncoder(settings) { _, index, value -> it[index] = value } }
 private fun FirebaseEncoderImpl.encodeAsMap(descriptor: SerialDescriptor): FirebaseCompositeEncoder = json()

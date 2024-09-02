@@ -136,7 +136,7 @@ public class FilterBuilder internal constructor() {
     )
     public fun <T : Any> FieldPath.lessThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings)!!),
+        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings)!!),
     )
 
     public inline infix fun <reified T : Any> String.greaterThanOrEqualTo(value: T): Filter.WithConstraint = Filter.Field(
@@ -154,7 +154,7 @@ public class FilterBuilder internal constructor() {
     )
     public fun <T : Any> FieldPath.greaterThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings)!!),
+        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings)!!),
     )
 
     public inline infix fun <reified T : Any> String.contains(value: T): Filter.WithConstraint = Filter.Field(
