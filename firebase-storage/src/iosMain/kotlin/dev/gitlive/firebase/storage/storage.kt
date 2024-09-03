@@ -67,6 +67,8 @@ public actual class FirebaseStorage(internal val ios: FIRStorage) {
     public actual val reference: StorageReference get() = StorageReference(ios.reference())
 
     public actual fun reference(location: String): StorageReference = StorageReference(ios.referenceWithPath(location))
+
+    public actual fun getReferenceFromUrl(fullUrl: String): StorageReference = StorageReference(ios.referenceForURL(fullUrl))
 }
 
 public val StorageReference.ios: FIRStorageReference get() = ios
