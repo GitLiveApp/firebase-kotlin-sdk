@@ -51,6 +51,8 @@ public actual class FirebaseStorage(internal val js: dev.gitlive.firebase.storag
     public actual val reference: StorageReference get() = StorageReference(ref(js))
 
     public actual fun reference(location: String): StorageReference = rethrow { StorageReference(ref(js, location)) }
+
+    public actual fun getReferenceFromUrl(fullUrl: String): StorageReference = rethrow { StorageReference(ref(js, fullUrl)) }
 }
 
 public val StorageReference.js get() = js

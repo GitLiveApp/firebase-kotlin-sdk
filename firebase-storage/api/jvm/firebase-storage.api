@@ -11,6 +11,7 @@ public final class dev/gitlive/firebase/storage/FirebaseStorage {
 	public final fun getMaxOperationRetryTime-UwyO8pc ()J
 	public final fun getMaxUploadRetryTime-UwyO8pc ()J
 	public final fun getReference ()Ldev/gitlive/firebase/storage/StorageReference;
+	public final fun getReferenceFromUrl (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun reference (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun setMaxOperationRetryTime-LRDsOJo (J)V
 	public final fun setMaxUploadRetryTime-LRDsOJo (J)V
