@@ -20,7 +20,6 @@ firebase-cocoapods = "11.1.0"
 ios-deploymentTarget = "13.0"
 test-logger-plugin = "4.0.0"
 dokka = "1.9.20"
-desugar-libs = "2.1.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -50,7 +49,6 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
-android-desugarjdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-libs" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
