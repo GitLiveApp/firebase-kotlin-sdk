@@ -37,6 +37,10 @@ public actual class FirebaseStorage {
     public actual fun reference(location: String): StorageReference {
         TODO("Not yet implemented")
     }
+
+    public actual fun getReferenceFromUrl(fullUrl: String): StorageReference {
+        TODO("Not yet implemented")
+    }
 }
 
 public actual class StorageReference {
