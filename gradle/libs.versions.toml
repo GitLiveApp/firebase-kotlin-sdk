@@ -20,7 +20,7 @@ firebase-cocoapods = "11.1.0"
 ios-deploymentTarget = "13.0"
 test-logger-plugin = "4.0.0"
 dokka = "1.9.20"
-desugar-libs = "2.1.0"
+desugar-libs = "2.1.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
