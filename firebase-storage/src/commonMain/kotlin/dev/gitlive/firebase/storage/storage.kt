@@ -86,6 +86,16 @@ public expect class FirebaseStorage {
      * @return An instance of [StorageReference] at the given child path.
      */
     public fun reference(location: String): StorageReference
+
+    /**
+     * Creates a [StorageReference] given a gs:// or https:// URL pointing to a Firebase Storage location.
+     *
+     * @param fullUrl A gs:// or http[s]:// URL used to initialize the reference. For example, you can pass
+     *     in a download URL retrieved from getDownloadUrl or the uri retrieved from toString An error is
+     *     thrown if fullUrl is not associated with the FirebaseApp used to initialize this FirebaseStorage.
+     * @return An instance of [StorageReference] at the given url.
+     */
+    public fun getReferenceFromUrl(fullUrl: String): StorageReference
 }
 
 @Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("maxOperationRetryTime"))
