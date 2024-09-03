@@ -3,24 +3,16 @@ package dev.gitlive.firebase.perf.metrics
 import dev.gitlive.firebase.perf.externals.PerformanceTrace
 import dev.gitlive.firebase.perf.rethrow
 
+public val Trace.js get() = js
 
-actual class Trace internal constructor(private val js: PerformanceTrace) {
+public actual class Trace internal constructor(internal val js: PerformanceTrace) {
 
-    actual fun start() = rethrow { js.start() }
-    actual fun stop() = rethrow { js.stop() }
-    actual fun getLongMetric(metricName: String) = rethrow { js.getMetric(metricName).toLong() }
-    actual fun incrementMetric(metricName: String, incrementBy: Long) = rethrow { js.incrementMetric(metricName, incrementBy.toInt()) }
-    actual fun putMetric(metricName: String, value: Long) = rethrow { js.putMetric(metricName, value.toInt()) }
-    fun getAttribute(attribute: String): String? = rethrow { js.getAttribute(attribute) }
-    fun putAttribute(attribute: String, value: String) = rethrow { js.putAttribute(attribute, value) }
-    fun removeAttribute(attribute: String) = rethrow { js.removeAttribute(attribute) }
-
-    fun primitiveHashMap(container: dynamic): HashMap<String, String> {
-        val m = HashMap<String, String>().asDynamic()
-        m.map = container
-        val keys = js("Object.keys")
-        m.`$size` = keys(container).length
-        return m
-    }
-
+    public actual fun start(): Unit = rethrow { js.start() }
+    public actual fun stop(): Unit = rethrow { js.stop() }
+    public actual fun getLongMetric(metricName: String): Long = rethrow { js.getMetric(metricName).toLong() }
+    public actual fun incrementMetric(metricName: String, incrementBy: Long): Unit = rethrow { js.incrementMetric(metricName, incrementBy.toInt()) }
+    public actual fun putMetric(metricName: String, value: Long): Unit = rethrow { js.putMetric(metricName, value.toInt()) }
+    public fun getAttribute(attribute: String): String? = rethrow { js.getAttribute(attribute) }
+    public fun putAttribute(attribute: String, value: String): Unit = rethrow { js.putAttribute(attribute, value) }
+    public fun removeAttribute(attribute: String): Unit = rethrow { js.removeAttribute(attribute) }
 }

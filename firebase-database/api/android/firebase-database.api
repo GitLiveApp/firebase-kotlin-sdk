@@ -1,0 +1,147 @@
+public final class dev/gitlive/firebase/database/ChildEvent {
+	public final fun component1 ()Ldev/gitlive/firebase/database/DataSnapshot;
+	public final fun component2 ()Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public final fun component3 ()Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPreviousChildName ()Ljava/lang/String;
+	public final fun getSnapshot ()Ldev/gitlive/firebase/database/DataSnapshot;
+	public final fun getType ()Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/database/ChildEvent$Type : java/lang/Enum {
+	public static final field ADDED Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public static final field CHANGED Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public static final field MOVED Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public static final field REMOVED Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/database/ChildEvent$Type;
+	public static fun values ()[Ldev/gitlive/firebase/database/ChildEvent$Type;
+}
+
+public final class dev/gitlive/firebase/database/DataSnapshot {
+	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/DataSnapshot;
+	public final fun getChildren ()Ljava/lang/Iterable;
+	public final fun getExists ()Z
+	public final fun getHasChildren ()Z
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getRef ()Ldev/gitlive/firebase/database/DatabaseReference;
+	public final fun getValue ()Ljava/lang/Object;
+	public final fun value (Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun value$default (Ldev/gitlive/firebase/database/DataSnapshot;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive/firebase/database/Query {
+	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/DatabaseReference;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun onDisconnect ()Ldev/gitlive/firebase/database/OnDisconnect;
+	public final fun push ()Ldev/gitlive/firebase/database/DatabaseReference;
+	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun runTransaction (Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun runTransaction$default (Ldev/gitlive/firebase/database/DatabaseReference;Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun setValue$default (Ldev/gitlive/firebase/database/DatabaseReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun setValueEncoded (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateChildren (Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateChildren (Ljava/util/Map;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun updateChildren$default (Ldev/gitlive/firebase/database/DatabaseReference;Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/database/FirebaseDatabase {
+	public static final field Companion Ldev/gitlive/firebase/database/FirebaseDatabase$Companion;
+	public final fun goOffline ()V
+	public final fun goOnline ()V
+	public final fun reference ()Ldev/gitlive/firebase/database/DatabaseReference;
+	public final fun reference (Ljava/lang/String;)Ldev/gitlive/firebase/database/DatabaseReference;
+	public final fun setLoggingEnabled (Z)V
+	public final fun setPersistenceCacheSizeBytes (J)V
+	public final fun setPersistenceEnabled (Z)V
+	public final fun useEmulator (Ljava/lang/String;I)V
+}
+
+public final class dev/gitlive/firebase/database/FirebaseDatabase$Companion {
+}
+
+public final class dev/gitlive/firebase/database/OnDisconnect {
+	public final fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setEncodedValue (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun setValue$default (Ldev/gitlive/firebase/database/OnDisconnect;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateChildren (Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateChildren (Ljava/util/Map;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun updateChildren$default (Ldev/gitlive/firebase/database/OnDisconnect;Ljava/util/Map;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public class dev/gitlive/firebase/database/Query {
+	public final fun childEvents ([Ldev/gitlive/firebase/database/ChildEvent$Type;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun childEvents$default (Ldev/gitlive/firebase/database/Query;[Ldev/gitlive/firebase/database/ChildEvent$Type;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public final fun endAt (DLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun endAt (Ljava/lang/String;Ljava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun endAt (ZLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun endAt$default (Ldev/gitlive/firebase/database/Query;DLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun endAt$default (Ldev/gitlive/firebase/database/Query;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun endAt$default (Ldev/gitlive/firebase/database/Query;ZLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public final fun equalTo (DLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun equalTo (Ljava/lang/String;Ljava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun equalTo (ZLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;DLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;ZLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public final fun getPersistenceEnabled ()Z
+	public final fun getValueEvents ()Lkotlinx/coroutines/flow/Flow;
+	public final fun limitToFirst (I)Ldev/gitlive/firebase/database/Query;
+	public final fun limitToLast (I)Ldev/gitlive/firebase/database/Query;
+	public final fun orderByChild (Ljava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun orderByKey ()Ldev/gitlive/firebase/database/Query;
+	public final fun orderByValue ()Ldev/gitlive/firebase/database/Query;
+	public final fun startAt (DLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun startAt (Ljava/lang/String;Ljava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public final fun startAt (ZLjava/lang/String;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun startAt$default (Ldev/gitlive/firebase/database/Query;DLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun startAt$default (Ldev/gitlive/firebase/database/Query;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public static synthetic fun startAt$default (Ldev/gitlive/firebase/database/Query;ZLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/database/ServerValue {
+	public static final field Companion Ldev/gitlive/firebase/database/ServerValue$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/database/ServerValue$Companion {
+	public final fun getTIMESTAMP ()Ldev/gitlive/firebase/database/ServerValue;
+	public final fun increment (D)Ldev/gitlive/firebase/database/ServerValue;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/database/ServerValueSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/database/ServerValueSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/database/ServerValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/database/ServerValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/database/databaseAndroid {
+	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun database (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/DataSnapshot;)Lcom/google/firebase/database/DataSnapshot;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/DatabaseReference;)Lcom/google/firebase/database/DatabaseReference;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/FirebaseDatabase;)Lcom/google/firebase/database/FirebaseDatabase;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/OnDisconnect;)Lcom/google/firebase/database/OnDisconnect;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/Query;)Lcom/google/firebase/database/Query;
+	public static final fun getDatabase (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun getDatabase (Ldev/gitlive/firebase/database/OnDisconnect;)Ldev/gitlive/firebase/database/FirebaseDatabase;
+	public static final fun getPersistenceEnabled (Ldev/gitlive/firebase/database/OnDisconnect;)Z
+}
+

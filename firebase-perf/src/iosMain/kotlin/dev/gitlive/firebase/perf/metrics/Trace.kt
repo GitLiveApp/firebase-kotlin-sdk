@@ -2,23 +2,25 @@ package dev.gitlive.firebase.perf.metrics
 
 import cocoapods.FirebasePerformance.FIRTrace
 
-actual class Trace internal constructor(val ios: FIRTrace?) {
+public val Trace.ios: FIRTrace? get() = ios
 
-    actual fun start() {
+public actual class Trace internal constructor(internal val ios: FIRTrace?) {
+
+    public actual fun start() {
         ios?.start()
     }
 
-    actual fun stop() {
+    public actual fun stop() {
         ios?.stop()
     }
 
-    actual fun getLongMetric(metricName: String): Long = ios?.valueForIntMetric(metricName) ?: 0L
+    public actual fun getLongMetric(metricName: String): Long = ios?.valueForIntMetric(metricName) ?: 0L
 
-    actual fun incrementMetric(metricName: String, incrementBy: Long) {
+    public actual fun incrementMetric(metricName: String, incrementBy: Long) {
         ios?.incrementMetric(metricName, incrementBy)
     }
 
-    actual fun putMetric(metricName: String, value: Long) {
+    public actual fun putMetric(metricName: String, value: Long) {
         ios?.setIntValue(value, metricName)
     }
 }

@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
@@ -8,25 +13,28 @@ plugins {
     id("com.android.library")
     kotlin("native.cocoapods")
     kotlin("multiplatform")
+    id("testOptionsConvention")
 }
 
 android {
-    compileSdk = property("targetSdkVersion") as Int
+    val minSdkVersion: Int by project
+    val compileSdkVersion: Int by project
+
+    compileSdk = compileSdkVersion
+    namespace = "dev.gitlive.firebase.installations"
+
     defaultConfig {
-        minSdk = property("minSdkVersion") as Int
-        targetSdk = property("targetSdkVersion") as Int
+        minSdk = minSdkVersion
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    testOptions {
-        unitTests.apply {
-            isIncludeAndroidResources = true
-        }
-    }
-    packagingOptions {
+
+    testOptions.configureTestOptions(project)
+    packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
         resources.pickFirsts.add("META-INF/LGPL2.1")
@@ -39,40 +47,52 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
+    explicitApi()
 
-    android {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
+        }
+    }
+
+    @Suppress("OPT_IN_USAGE")
+    androidTarget {
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
     }
 
-    jvm {
-        val main by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-        val test by compilations.getting {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvm()
 
     if (supportIosTarget) {
-        ios()
+        iosArm64()
+        iosX64()
         iosSimulatorArm64()
         cocoapods {
-            ios.deploymentTarget = "11.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseInstallations"
             }
             noPodspec()
             pod("FirebaseInstallations") {
-                version = "10.7.0"
+                version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }
 
-    js {
+    js(IR) {
         useCommonJs()
         nodejs {
             testTask {
@@ -93,45 +113,49 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                apiVersion = "1.8"
-                languageVersion = "1.8"
+                this.apiVersion = libs.versions.settings.api.get()
+                this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("ios")) {
+                    optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                }
             }
         }
 
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 api(project(":firebase-app"))
                 implementation(project(":firebase-common"))
             }
         }
 
-        val androidMain by getting {
+        getByName("commonTest") {
             dependencies {
-                api("com.google.firebase:firebase-installations")
+                implementation(project(":test-utils"))
             }
         }
 
-        val jvmMain by getting {
+        getByName("androidMain") {
+            dependencies {
+                api(libs.google.firebase.installations.ktx)
+            }
+        }
+
+        getByName("jvmMain") {
             kotlin.srcDir("src/androidMain/kotlin")
         }
-
-        if (supportIosTarget) {
-            val iosMain by getting
-            val iosSimulatorArm64Main by getting
-            iosSimulatorArm64Main.dependsOn(iosMain)
-            val iosTest by sourceSets.getting
-            val iosSimulatorArm64Test by getting
-            iosSimulatorArm64Test.dependsOn(iosTest)
-        }
-
-        val jsMain by getting
     }
 }
 
 if (project.property("firebase-installations.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-installations.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

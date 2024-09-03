@@ -3,41 +3,43 @@ package dev.gitlive.firebase.perf
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.js
 import dev.gitlive.firebase.perf.externals.getPerformance
 import dev.gitlive.firebase.perf.externals.trace
 import dev.gitlive.firebase.perf.metrics.Trace
 import dev.gitlive.firebase.perf.externals.FirebasePerformance as JsFirebasePerformance
 
-actual val Firebase.performance: FirebasePerformance
+public actual val Firebase.performance: FirebasePerformance
     get() = rethrow {
         FirebasePerformance(getPerformance())
     }
 
-actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = rethrow {
+public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = rethrow {
     FirebasePerformance(getPerformance(app.js))
 }
 
-actual class FirebasePerformance internal constructor(val js: JsFirebasePerformance) {
+public val FirebasePerformance.js get() = js
 
-    actual fun newTrace(traceName: String): Trace = rethrow {
+public actual class FirebasePerformance internal constructor(internal val js: JsFirebasePerformance) {
+
+    public actual fun newTrace(traceName: String): Trace = rethrow {
         Trace(trace(js, traceName))
     }
 
-    actual fun isPerformanceCollectionEnabled(): Boolean = js.dataCollectionEnabled
+    public actual fun isPerformanceCollectionEnabled(): Boolean = js.dataCollectionEnabled
 
-    actual fun setPerformanceCollectionEnabled(enable: Boolean) {
+    public actual fun setPerformanceCollectionEnabled(enable: Boolean) {
         js.dataCollectionEnabled = enable
     }
 
-    fun isInstrumentationEnabled(): Boolean = js.instrumentationEnabled
+    public fun isInstrumentationEnabled(): Boolean = js.instrumentationEnabled
 
-    fun setInstrumentationEnabled(enable: Boolean) {
+    public fun setInstrumentationEnabled(enable: Boolean) {
         js.instrumentationEnabled = enable
     }
 }
 
-actual open class FirebasePerformanceException(code: String, cause: Throwable) :
-    FirebaseException(code, cause)
+public actual open class FirebasePerformanceException(code: String, cause: Throwable) : FirebaseException(code, cause)
 
 internal inline fun <R> rethrow(function: () -> R): R {
     try {
@@ -56,7 +58,7 @@ internal fun errorToException(error: dynamic) = (error?.code ?: error?.message ?
         when {
             else -> {
                 println("Unknown error code in ${JSON.stringify(error)}")
-                FirebasePerformanceException(code, error)
+                FirebasePerformanceException(code, error as Throwable)
             }
         }
     }

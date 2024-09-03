@@ -1,0 +1,32 @@
+name: 'Setup Tests'
+description: 'Prepares to run tests on Firebase emulator'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        cache: gradle
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '21.x'
+    - name: Upgrade packages
+      shell: bash
+      run: npm update
+    - name: Gradle cache
+      uses: gradle/actions/setup-gradle@v4
+    - name: Grant execute permission for gradlew
+      shell: bash
+      run: chmod +x gradlew
+    - name: Install Firebase tools
+      shell: bash
+      run: npm install -g firebase-tools wait-on
+    - name: Start Firebase emulator
+      shell: bash
+      run: |
+        firebase emulators:start --config=./test/firebase.json &
+        wait-on http://127.0.0.1:9099

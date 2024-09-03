@@ -1,4 +1,4 @@
-<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/badge/collaborate-on%20gitlive-blueviolet?style=flat-square"></a></h1>
+<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/badge/GitLive-45_active_forks-blueviolet?style=flat-square"></a></h1>
 <img align="left" width="75px" src="https://avatars2.githubusercontent.com/u/42865805?s=200&v=4"> 
   <b>Built and maintained with 🧡 by <a href="https://git.live">GitLive</a></b><br/>
   <i>Development teams merge faster with GitLive</i><br/>
@@ -14,18 +14,19 @@ Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multipla
 
 The following libraries are available for the various Firebase products.
 
-| Service or Product	                                                             | Gradle Dependency                                                                                                            | API Coverage                                                                                                                                                             |
-|---------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/1.10.4/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-database/1.10.4/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/1.10.4/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/1.10.4/pom)         | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
-| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/1.10.4/pom)         | ![0%](https://img.shields.io/badge/-0%25-lightgrey?style=flat-square)                                                                                                    |
-| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/1.10.4/pom)             | [![40%](https://img.shields.io/badge/-40%25-orange?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
-| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/1.10.4/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-config/1.10.4/pom)               | [![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
-| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/1.10.4/pom)                   | [![1%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:1.10.4`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/1.10.4/pom)     | [![80%](https://img.shields.io/badge/-1%25-orange?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
+|---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/2.1.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.1.0/pom)                   | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.1.0/pom)           | [![70%](https://img.shields.io/badge/-70%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.1.0/pom)         | [![60%](https://img.shields.io/badge/-60%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.1.0/pom)         | [![80%](https://img.shields.io/badge/-80%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/2.1.0/pom)         | [![1%](https://img.shields.io/badge/-10%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
+| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/2.1.0/pom)             | [![40%](https://img.shields.io/badge/-40%25-orange?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/2.1.0/pom) | [![90%](https://img.shields.io/badge/-90%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/2.1.0/pom)               | [![20%](https://img.shields.io/badge/-20%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/2.1.0/pom)                   | [![1%](https://img.shields.io/badge/-10%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.1.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.1.0/pom)     | [![80%](https://img.shields.io/badge/-10%25-orange?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -173,7 +174,14 @@ The listener is removed once the flow [completes](https://kotlinlang.org/docs/re
 
 The official Firebase SDKs use different platform-specific ways to support writing data with and without custom classes in [Cloud Firestore](https://firebase.google.com/docs/firestore/manage-data/add-data#custom_objects), [Realtime Database](https://firebase.google.com/docs/database/android/read-and-write#basic_write) and [Functions](https://firebase.google.com/docs/functions/callable).
 
-The Firebase Kotlin SDK uses Kotlin serialization to read and write custom classes for Firebase. To use Kotlin serialization in your project, follow the instructions in the installation for the Kotlin serialization
+The Firebase Kotlin SDK uses Kotlin serialization to read and write custom classes to Firebase. To use Kotlin serialization in your project add the plugin to your gradle file:
+
+```groovy
+plugins {
+    kotlin("multiplatform") version "1.9.20" // or kotlin("jvm") or any other kotlin plugin
+    kotlin("plugin.serialization") version "1.9.20"
+}
+```
 
 Then mark your custom classes `@Serializable`:
 
@@ -185,13 +193,43 @@ data class City(val name: String)
 Instances of these classes can now be passed [along with their serializer](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#introduction-to-serializers) to the SDK:
 
 ```kotlin
-db.collection("cities").document("LA").set(City.serializer(), city, encodeDefaults = true)
+db.collection("cities").document("LA").set(City.serializer(), city) { encodeDefaults = true }
 ```
 
-The `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to their default values.
+The `buildSettings` closure is optional and allows for configuring serialization behaviour. 
+
+Setting the `encodeDefaults` parameter is optional and defaults to `true`, set this to false to omit writing optional properties if they are equal to their default values.
 Using [@EncodeDefault](https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-core/kotlinx.serialization/-encode-default/) on properties is a recommended way to locally override the behavior set with `encodeDefaults`.
 
-You can also omit the serializer but this is discouraged due to a [current limitation on Kotlin/JS and Kotlin/Native](https://github.com/Kotlin/kotlinx.serialization/issues/1116#issuecomment-704342452)
+You can also omit the serializer if it can be inferred using `serializer<KType>()`. 
+To support [contextual serialization](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/serializers.md#contextual-serialization) or [open polymorphism](https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/polymorphism.md#open-polymorphism) the `serializersModule` can be overridden in the `buildSettings` closure:
+
+```kotlin
+@Serializable
+abstract class AbstractCity {
+    abstract val name: String
+}
+
+@Serializable
+@SerialName("capital")
+data class Capital(override val name: String, val isSeatOfGovernment: Boolean) : AbstractCity()
+
+val module = SerializersModule {
+    polymorphic(AbstractCity::class, AbstractCity.serializer()) {
+        subclass(Capital::class, Capital.serializer())
+    }
+}
+
+val city = Capital("London", true)
+db.collection("cities").document("UK").set(AbstractCity.serializer(), city) { 
+    encodeDefaults = true
+    serializersModule = module
+    
+}
+val storedCity = db.collection("cities").document("UK").get().data(AbstractCity.serializer()) {
+    serializersModule = module
+}
+```
 
 <h4><a href="https://firebase.google.com/docs/firestore/manage-data/add-data#server_timestamp">Server Timestamp</a></h3>
 
@@ -261,35 +299,53 @@ To reduce boilerplate, default arguments are used in the places where the Fireba
 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
         .setDisplayName("Jane Q. User")
         .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
-        .build();
+        .build()
 
 user.updateProfile(profileUpdates)
         .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "User profile updated.");
+                    Log.d(TAG, "User profile updated.")
                 }
             }
-        });
+        })
 
 //...becomes...
 
-user.updateProfile(displayName = "state", photoURL = "CA")
+user.updateProfile(displayName = "Jane Q. User", photoURL = "https://example.com/jane-q-user/profile.jpg")
 ```
 
-<h3><a href="https://kotlinlang.org/docs/reference/functions.html#named-arguments">Named arguments</a></h3>
 
-To improve readability functions such as the Cloud Firestore query operators use named arguments:
+
+<h3><a href="https://kotlinlang.org/docs/functions.html#infix-notation">Infix notation</a></h3>
+
+To improve readability and reduce boilerplate for functions such as the Cloud Firestore query operators are built with infix notation:
 
 ```kotlin
 citiesRef.whereEqualTo("state", "CA")
 citiesRef.whereArrayContains("regions", "west_coast")
+citiesRef.where(Filter.and(
+    Filter.equalTo("state", "CA"),
+    Filter.or(
+        Filter.equalTo("capital", true),
+        Filter.greaterThanOrEqualTo("population", 1000000)
+    )
+))
 
 //...becomes...
 
-citiesRef.where("state", equalTo = "CA")
-citiesRef.where("regions", arrayContains = "west_coast")
+citiesRef.where { "state" equalTo "CA" }
+citiesRef.where { "regions" contains "west_coast" }
+citiesRef.where {
+    all(
+        "state" equalTo "CA",
+        any(
+            "capital" equalTo true,
+            "population" greaterThanOrEqualTo 1000000
+        )
+    )
+}
 ```
 
 <h3><a href="https://kotlinlang.org/docs/reference/operator-overloading.html">Operator overloading</a></h3>
@@ -306,7 +362,7 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 
 The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android*, and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
 
-It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target.
+It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target. The library requires [additional initialization](https://github.com/GitLiveApp/firebase-java-sdk?tab=readme-ov-file#initializing-the-sdk) compared to the official Firebase SDKs.
 
 ### Accessing the underlying Firebase SDK
 
@@ -320,6 +376,21 @@ These properties are only accessible from the equivalent target's source set. Fo
           .build()
 ```
 
+### Running on Android
+
+On android, some modules (`config`) require you to enable [Core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) if you have a *minSDK lower than API 26*.
+
+### Running on iOS
+
+On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) in not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+
+Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
+```kotlin
+cocoapods {
+   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
+}
+```
+
 ## Contributing
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
@@ -327,3 +398,45 @@ You can build and test the project locally.
 2. Install Cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync run `publishToMavenLocal`
+
+### Testing
+To run the tests you can use the following gradle tasks:
+
+`./gradlew connectedAndroidTest` (an emulator needs to be running)
+
+`./gradlew iosSimulatorArm64Test` (On Apple Chip) `./gradlew iosX64Test` (On Intel Chip)
+
+`./gradlew jsNodeTest`
+
+`./gradlew jvmTest`
+
+For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
+
+`firebase emulators:start`
+
+### Documentation
+For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
+We publish a new version of the documentation after every release and can be found [here](https://gitliveapp.github.io/firebase-kotlin-sdk/)
+
+### Validation
+To ensure changes to the public API are well documented, this library validates its binary API. If you make changes to the API, make sure to run
+
+`./gradlew apiDump`
+
+### Code style
+This library uses the [Intellij Kotlin code style](https://www.jetbrains.com/help/idea/code-style-kotlin.html). Run the linter to make sure you follow these styles.
+
+`./gradlew formatKotlin` to format to the proper style
+`./gradlew lintKotlin` to validate the correct style is used
+
+### Compatibility with the official [Firebase Android SDK](https://github.com/firebase/firebase-android-sdk)
+
+When this project began, the official Firebase Android SDK was a pure java library and the separate Kotlin extensions (KTX) module consisted of only a few extensions providing some syntactic sugar, for example `Firebase.firestore` instead of `Firebase.getInstance(),` which we naturally copied for the Firebase Kotlin SDK.
+
+But with the majority of the Android SDK being designed for Java, the Kotlin SDK was primarily guided by our [Kotlin-first design](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#kotlin-first-design) principles.
+
+More recently, with the official SDK for Android providing better support for Kotlin and the inclusion of the new Kotlin-friendly features direct in the main modules, the API differences between the official SDK and this project are likely to start to blur. Therefore, in particular for developers porting android code to multiplatform, one of our goals going forward will be API compatibility with the Android SDK where possible.
+
+For contributors this means following these points when adding new code to the public API of this project:
+- **Match the [Android SDKs API](https://firebase.google.com/docs/reference/kotlin/packages).** When adding new API coverage use the Android SDK as the guide on what the public API should be in regard to naming, parameters etc. The goal here is *near binary compatibility*, meaning code consuming the Android SDK compiles *as is* with the Kotlin SDK after just changing the package imports from `com.google` to `dev.gitlive`.
+- **Follow our [Kotlin-first design](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#kotlin-first-design) principles when needed.** If the API you are adding coverage for is new, and it's Kotlin-first in the Android SDK, then you can simply just match the Android SDKs API as described in the first point, but if it's an older Java-first API then ideally we would include an identical API for API compatibility *plus* a Kotlin-first overload. A good example for this is where the Builder pattern is employed in the Android SDK, here we can follow [this Kotlin-first design principle](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#default-arguments) and provide both methods, one taking the options created with the builder and an overload with default arguments to avoid the builder boilerplate for developers not porting an existing android code base.

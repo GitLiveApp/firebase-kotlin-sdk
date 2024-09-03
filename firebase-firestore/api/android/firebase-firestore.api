@@ -1,0 +1,798 @@
+public abstract class dev/gitlive/firebase/firestore/BaseTimestamp {
+	public static final field Companion Ldev/gitlive/firebase/firestore/BaseTimestamp$Companion;
+}
+
+public final class dev/gitlive/firebase/firestore/BaseTimestamp$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/firestore/BaseTimestampSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/BaseTimestampSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/BaseTimestamp;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/BaseTimestamp;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/CollectionReference : dev/gitlive/firebase/firestore/Query {
+	public static final field Companion Ldev/gitlive/firebase/firestore/CollectionReference$Companion;
+	public final fun add (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun add (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun add$default (Ldev/gitlive/firebase/firestore/CollectionReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun addEncoded (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun document (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/DocumentReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDocument ()Ldev/gitlive/firebase/firestore/DocumentReference;
+	public synthetic fun getNative$firebase_firestore_release ()Lcom/google/firebase/firestore/Query;
+	public final fun getParent ()Ldev/gitlive/firebase/firestore/DocumentReference;
+	public final fun getPath ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/CollectionReference$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentChange {
+	public fun <init> (Lcom/google/firebase/firestore/DocumentChange;)V
+	public final fun getDocument ()Ldev/gitlive/firebase/firestore/DocumentSnapshot;
+	public final fun getNewIndex ()I
+	public final fun getOldIndex ()I
+	public final fun getType ()Lcom/google/firebase/firestore/DocumentChange$Type;
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentReference {
+	public static final field Companion Ldev/gitlive/firebase/firestore/DocumentReference$Companion;
+	public final fun collection (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/CollectionReference;
+	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getParent ()Ldev/gitlive/firebase/firestore/CollectionReference;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getSnapshots ()Lkotlinx/coroutines/flow/Flow;
+	public fun hashCode ()I
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun set (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun setEncoded (Ldev/gitlive/firebase/internal/EncodedObject;Ldev/gitlive/firebase/firestore/internal/SetOptions;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun snapshots (Z)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun snapshots$default (Ldev/gitlive/firebase/firestore/DocumentReference;ZILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public fun toString ()Ljava/lang/String;
+	public final fun update (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun update (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateEncoded (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateEncodedFieldPathsAndValues (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateEncodedFieldsAndValues (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun updateFieldPaths ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun updateFieldPaths$default (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun updateFields ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun updateFields$default (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentReference$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentReferenceSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/DocumentReferenceSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/DocumentReference;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/DocumentReference;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentSnapshot {
+	public static final field Companion Ldev/gitlive/firebase/firestore/DocumentSnapshot$Companion;
+	public final fun contains (Ldev/gitlive/firebase/firestore/FieldPath;)Z
+	public final fun contains (Ljava/lang/String;)Z
+	public final fun data (Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun data$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun encodedData (Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;)Ljava/lang/Object;
+	public static synthetic fun encodedData$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;ILjava/lang/Object;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun get (Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ljava/lang/String;Lkotlinx/serialization/DeserializationStrategy;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;)Ljava/lang/Object;
+	public final fun getEncoded (Ljava/lang/String;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;)Ljava/lang/Object;
+	public static synthetic fun getEncoded$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ldev/gitlive/firebase/firestore/FieldPath;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun getEncoded$default (Ldev/gitlive/firebase/firestore/DocumentSnapshot;Ljava/lang/String;Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getExists ()Z
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMetadata ()Ldev/gitlive/firebase/firestore/SnapshotMetadata;
+	public final fun getReference ()Ldev/gitlive/firebase/firestore/DocumentReference;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/DocumentSnapshot$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/DoubleAsTimestampSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/DoubleAsTimestampSerializer;
+	public static final field SERVER_TIMESTAMP D
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Double;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;D)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/FieldPath {
+	public static final field Companion Ldev/gitlive/firebase/firestore/FieldPath$Companion;
+	public fun <init> ([Ljava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDocumentId ()Ldev/gitlive/firebase/firestore/FieldPath;
+	public final fun getEncoded ()Lcom/google/firebase/firestore/FieldPath;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/FieldPath$Companion {
+	public final fun getDocumentId ()Ldev/gitlive/firebase/firestore/FieldPath;
+}
+
+public final class dev/gitlive/firebase/firestore/FieldValue {
+	public static final field Companion Ldev/gitlive/firebase/firestore/FieldValue$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/FieldValue$Companion {
+	public final fun arrayRemove ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun arrayUnion ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun getDelete ()Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun getServerTimestamp ()Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun increment (I)Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/firestore/FieldValueSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/FieldValueSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/FieldValue;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/FieldValue;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public abstract class dev/gitlive/firebase/firestore/Filter {
+}
+
+public final class dev/gitlive/firebase/firestore/Filter$And : dev/gitlive/firebase/firestore/Filter {
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFilters ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/Filter$Field : dev/gitlive/firebase/firestore/Filter$WithConstraint {
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ldev/gitlive/firebase/firestore/WhereConstraint;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
+	public final fun getField ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/Filter$Or : dev/gitlive/firebase/firestore/Filter {
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFilters ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/Filter$Path : dev/gitlive/firebase/firestore/Filter$WithConstraint {
+	public final fun component1 ()Ldev/gitlive/firebase/firestore/FieldPath;
+	public final fun component2 ()Ldev/gitlive/firebase/firestore/WhereConstraint;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
+	public final fun getPath ()Ldev/gitlive/firebase/firestore/FieldPath;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class dev/gitlive/firebase/firestore/Filter$WithConstraint : dev/gitlive/firebase/firestore/Filter {
+	public abstract fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
+}
+
+public final class dev/gitlive/firebase/firestore/FilterBuilder {
+	public final fun all ([Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter;
+	public final fun and (Ldev/gitlive/firebase/firestore/Filter;Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter$And;
+	public final fun any ([Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter;
+	public final fun contains (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun contains (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun containsAny (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun containsAny (Ljava/lang/String;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun equalTo (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun equalTo (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun greaterThan (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun greaterThan (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun greaterThanOrEqualTo (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun greaterThanOrEqualTo (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun inArray (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun inArray (Ljava/lang/String;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun lessThan (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun lessThan (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun lessThanOrEqualTo (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun lessThanOrEqualTo (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun notEqualTo (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun notEqualTo (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun notInArray (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun notInArray (Ljava/lang/String;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun or (Ldev/gitlive/firebase/firestore/Filter;Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter$Or;
+}
+
+public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
+	public static final field Companion Ldev/gitlive/firebase/firestore/FirebaseFirestore$Companion;
+	public final fun batch ()Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun clearPersistence (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun collection (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/CollectionReference;
+	public final fun collectionGroup (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun disableNetwork (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun document (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/DocumentReference;
+	public final fun enableNetwork (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getSettings ()Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public final fun runTransaction (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun setLoggingEnabled (Z)V
+	public final fun setSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
+	public final fun setSettings (Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;)V
+	public static synthetic fun setSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestore;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;ILjava/lang/Object;)V
+	public final fun useEmulator (Ljava/lang/String;I)V
+}
+
+public final class dev/gitlive/firebase/firestore/FirebaseFirestore$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/FirebaseFirestoreSettings {
+	public static final field Companion Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings$Companion;
+	public fun <init> (ZLjava/lang/String;Ldev/gitlive/firebase/firestore/LocalCacheSettings;Ljava/util/concurrent/Executor;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ldev/gitlive/firebase/firestore/LocalCacheSettings;
+	public final fun component4 ()Ljava/util/concurrent/Executor;
+	public final fun copy (ZLjava/lang/String;Ldev/gitlive/firebase/firestore/LocalCacheSettings;Ljava/util/concurrent/Executor;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;ZLjava/lang/String;Ldev/gitlive/firebase/firestore/LocalCacheSettings;Ljava/util/concurrent/Executor;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCacheSettings ()Ldev/gitlive/firebase/firestore/LocalCacheSettings;
+	public final fun getCallbackExecutor ()Ljava/util/concurrent/Executor;
+	public final fun getHost ()Ljava/lang/String;
+	public final fun getSslEnabled ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/FirebaseFirestoreSettings$Builder {
+	public fun <init> ()V
+	public fun <init> (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
+	public final fun build ()Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public final fun getCacheSettings ()Ldev/gitlive/firebase/firestore/LocalCacheSettings;
+	public final fun getCallbackExecutor ()Ljava/util/concurrent/Executor;
+	public final fun getHost ()Ljava/lang/String;
+	public final fun getSslEnabled ()Z
+	public final fun setCacheSettings (Ldev/gitlive/firebase/firestore/LocalCacheSettings;)V
+	public final fun setCallbackExecutor (Ljava/util/concurrent/Executor;)V
+	public final fun setHost (Ljava/lang/String;)V
+	public final fun setSslEnabled (Z)V
+}
+
+public final class dev/gitlive/firebase/firestore/FirebaseFirestoreSettings$Companion {
+	public final fun getCACHE_SIZE_UNLIMITED ()J
+}
+
+public final class dev/gitlive/firebase/firestore/FirestoreKt {
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun where$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun where$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun where$default (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun where$default (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+}
+
+public final class dev/gitlive/firebase/firestore/GeoPoint {
+	public static final field Companion Ldev/gitlive/firebase/firestore/GeoPoint$Companion;
+	public fun <init> (DD)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLatitude ()D
+	public final fun getLongitude ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/GeoPoint$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/firestore/GeoPointSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/GeoPointSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/GeoPoint;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/GeoPoint;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/HelpersKt {
+	public static final fun encodeFieldAndValue ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun performUpdateFieldPaths ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun performUpdateFields ([Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/LocalCacheSettings {
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Memory : dev/gitlive/firebase/firestore/LocalCacheSettings {
+	public static final field Companion Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Companion;
+	public final fun component1 ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getGarbaseCollectorSettings ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Builder {
+	public final fun build ()Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory;
+	public final fun getGcSettings ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;
+	public final fun setGcSettings (Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings;)V
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Companion {
+	public final fun newBuilder ()Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory$Builder;
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Persistent : dev/gitlive/firebase/firestore/LocalCacheSettings {
+	public static final field Companion Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent$Companion;
+	public final fun component1 ()J
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSizeBytes ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Persistent$Builder {
+	public final fun build ()Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent;
+	public final fun getSizeBytes ()J
+	public final fun setSizeBytes (J)V
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettings$Persistent$Companion {
+	public final fun newBuilder ()Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent$Builder;
+}
+
+public final class dev/gitlive/firebase/firestore/LocalCacheSettingsKt {
+	public static final fun memoryCacheSettings (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Memory;
+	public static final fun memoryEagerGcSettings (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager;
+	public static final fun memoryLruGcSettings (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC;
+	public static final fun persistentCacheSettings (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/LocalCacheSettings$Persistent;
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings {
+}
+
+public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager : dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun newBuilder ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager$Builder;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager$Builder {
+	public final fun build ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$Eager;
+}
+
+public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC : dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings {
+	public static final field Companion Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC$Companion;
+	public final fun component1 ()J
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSizeBytes ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC$Builder {
+	public final fun build ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC;
+	public final fun getSizeBytes ()J
+	public final fun setSizeBytes (J)V
+}
+
+public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC$Companion {
+	public final fun newBuilder ()Ldev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings$LRUGC$Builder;
+}
+
+public class dev/gitlive/firebase/firestore/Query {
+	public static final field Companion Ldev/gitlive/firebase/firestore/Query$Companion;
+	public final fun endAt (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun endAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun endBefore (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun endBefore ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun get (Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getSnapshots ()Lkotlinx/coroutines/flow/Flow;
+	public final fun limit (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun orderBy (Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun orderBy (Ljava/lang/String;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun orderBy$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public static synthetic fun orderBy$default (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Lcom/google/firebase/firestore/Query$Direction;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun snapshots (Z)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun snapshots$default (Ldev/gitlive/firebase/firestore/Query;ZILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public final fun startAfter (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun startAfter ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun startAt (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun startAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun where (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
+}
+
+public final class dev/gitlive/firebase/firestore/Query$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/QuerySnapshot {
+	public fun <init> (Lcom/google/firebase/firestore/QuerySnapshot;)V
+	public final fun getDocumentChanges ()Ljava/util/List;
+	public final fun getDocuments ()Ljava/util/List;
+	public final fun getMetadata ()Ldev/gitlive/firebase/firestore/SnapshotMetadata;
+}
+
+public final class dev/gitlive/firebase/firestore/ServerTimestampBehavior : java/lang/Enum {
+	public static final field ESTIMATE Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;
+	public static final field NONE Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;
+	public static final field PREVIOUS Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;
+	public static fun values ()[Ldev/gitlive/firebase/firestore/ServerTimestampBehavior;
+}
+
+public final class dev/gitlive/firebase/firestore/ServerTimestampSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/ServerTimestampSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/Timestamp$ServerTimestamp;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/Timestamp$ServerTimestamp;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/SnapshotMetadata {
+	public fun <init> (Lcom/google/firebase/firestore/SnapshotMetadata;)V
+	public final fun getHasPendingWrites ()Z
+	public final fun isFromCache ()Z
+}
+
+public final class dev/gitlive/firebase/firestore/Source : java/lang/Enum {
+	public static final field CACHE Ldev/gitlive/firebase/firestore/Source;
+	public static final field DEFAULT Ldev/gitlive/firebase/firestore/Source;
+	public static final field SERVER Ldev/gitlive/firebase/firestore/Source;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/Source;
+	public static fun values ()[Ldev/gitlive/firebase/firestore/Source;
+}
+
+public final class dev/gitlive/firebase/firestore/Timestamp : dev/gitlive/firebase/firestore/BaseTimestamp {
+	public static final field Companion Ldev/gitlive/firebase/firestore/Timestamp$Companion;
+	public fun <init> (JI)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNanoseconds ()I
+	public final fun getSeconds ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/Timestamp$Companion {
+	public final fun now ()Ldev/gitlive/firebase/firestore/Timestamp;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class dev/gitlive/firebase/firestore/Timestamp$ServerTimestamp : dev/gitlive/firebase/firestore/BaseTimestamp {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/Timestamp$ServerTimestamp;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/TimestampKt {
+	public static final fun fromDuration-HG0u8IE (Ldev/gitlive/firebase/firestore/Timestamp$Companion;J)Ldev/gitlive/firebase/firestore/Timestamp;
+	public static final fun fromMilliseconds (Ldev/gitlive/firebase/firestore/Timestamp$Companion;D)Ldev/gitlive/firebase/firestore/Timestamp;
+	public static final fun toDuration (Ldev/gitlive/firebase/firestore/Timestamp;)J
+	public static final fun toMilliseconds (Ldev/gitlive/firebase/firestore/Timestamp;)D
+}
+
+public final class dev/gitlive/firebase/firestore/TimestampSerializer : kotlinx/serialization/KSerializer {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/TimestampSerializer;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ldev/gitlive/firebase/firestore/Timestamp;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Ldev/gitlive/firebase/firestore/Timestamp;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+}
+
+public final class dev/gitlive/firebase/firestore/Transaction {
+	public static final field Companion Ldev/gitlive/firebase/firestore/Transaction$Companion;
+	public final fun delete (Ldev/gitlive/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/Transaction;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun get (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;ZZ)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Z[Ldev/gitlive/firebase/firestore/FieldPath;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Z[Ljava/lang/String;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZ)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ldev/gitlive/firebase/firestore/FieldPath;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ljava/lang/String;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;ZZILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun setEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;Ldev/gitlive/firebase/firestore/internal/SetOptions;)Ldev/gitlive/firebase/firestore/Transaction;
+	public fun toString ()Ljava/lang/String;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateEncodedFieldPathsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateEncodedFieldsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateFieldPaths (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun updateFieldPaths$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+	public final fun updateFields (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static synthetic fun updateFields$default (Ldev/gitlive/firebase/firestore/Transaction;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Transaction;
+}
+
+public final class dev/gitlive/firebase/firestore/Transaction$Companion {
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint {
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContains : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValues ()Ljava/util/List;
+	public fun getValues ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$EqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForArray : dev/gitlive/firebase/firestore/WhereConstraint {
+	public abstract fun getSafeValues ()Ljava/util/List;
+	public abstract fun getValues ()Ljava/util/List;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$ForArray$DefaultImpls {
+	public static fun getSafeValues (Ldev/gitlive/firebase/firestore/WhereConstraint$ForArray;)Ljava/util/List;
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject : dev/gitlive/firebase/firestore/WhereConstraint {
+	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public abstract fun getValue ()Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject$DefaultImpls {
+	public static fun getSafeValue (Ldev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject;)Ljava/lang/Object;
+}
+
+public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForObject : dev/gitlive/firebase/firestore/WhereConstraint {
+	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public abstract fun getValue ()Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$ForObject$DefaultImpls {
+	public static fun getSafeValue (Ldev/gitlive/firebase/firestore/WhereConstraint$ForObject;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$InArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValues ()Ljava/util/List;
+	public fun getValues ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
+	public final fun component1 ()Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WhereConstraint$NotInArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getSafeValues ()Ljava/util/List;
+	public fun getValues ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/WriteBatch {
+	public static final field Companion Ldev/gitlive/firebase/firestore/WriteBatch$Companion;
+	public final fun commit (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun delete (Ldev/gitlive/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZ)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ldev/gitlive/firebase/firestore/FieldPath;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z[Ljava/lang/String;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun set (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;ZZILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun set$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;[Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun setEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;Ldev/gitlive/firebase/firestore/internal/SetOptions;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public fun toString ()Ljava/lang/String;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun update (Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Z)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun update$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateEncoded (Ldev/gitlive/firebase/firestore/DocumentReference;Ldev/gitlive/firebase/internal/EncodedObject;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateEncodedFieldPathsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateEncodedFieldsAndValues (Ldev/gitlive/firebase/firestore/DocumentReference;Ljava/util/List;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateField (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun updateField$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public final fun updateFieldPath (Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/WriteBatch;
+	public static synthetic fun updateFieldPath$default (Ldev/gitlive/firebase/firestore/WriteBatch;Ldev/gitlive/firebase/firestore/DocumentReference;[Lkotlin/Pair;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/WriteBatch;
+}
+
+public final class dev/gitlive/firebase/firestore/WriteBatch$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/_encodersKt {
+	public static final fun isSpecialValue (Ljava/lang/Object;)Z
+}
+
+public final class dev/gitlive/firebase/firestore/android {
+	public static final fun firestore (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static final fun firestoreSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public static synthetic fun firestoreSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/CollectionReference;)Lcom/google/firebase/firestore/CollectionReference;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentChange;)Lcom/google/firebase/firestore/DocumentChange;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentReference;)Lcom/google/firebase/firestore/DocumentReference;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Lcom/google/firebase/firestore/DocumentSnapshot;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/FieldPath;)Lcom/google/firebase/firestore/FieldPath;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/FirebaseFirestore;)Lcom/google/firebase/firestore/FirebaseFirestore;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/LocalCacheSettings;)Lcom/google/firebase/firestore/LocalCacheSettings;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/Query;)Lcom/google/firebase/firestore/Query;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/QuerySnapshot;)Lcom/google/firebase/firestore/QuerySnapshot;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/SnapshotMetadata;)Lcom/google/firebase/firestore/SnapshotMetadata;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/Transaction;)Lcom/google/firebase/firestore/Transaction;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/WriteBatch;)Lcom/google/firebase/firestore/WriteBatch;
+	public static final fun getCode (Lcom/google/firebase/firestore/FirebaseFirestoreException;)Lcom/google/firebase/firestore/FirebaseFirestoreException$Code;
+	public static final fun getFirestore (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/CollectionReference$Companion;Lcom/google/firebase/firestore/CollectionReference;)Ldev/gitlive/firebase/firestore/CollectionReference;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/DocumentReference$Companion;Lcom/google/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/DocumentReference;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/DocumentSnapshot$Companion;Lcom/google/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/DocumentSnapshot;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/FirebaseFirestore$Companion;Lcom/google/firebase/firestore/FirebaseFirestore;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/Query$Companion;Lcom/google/firebase/firestore/Query;)Ldev/gitlive/firebase/firestore/Query;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/Transaction$Companion;Lcom/google/firebase/firestore/Transaction;)Ldev/gitlive/firebase/firestore/Transaction;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/WriteBatch$Companion;Lcom/google/firebase/firestore/WriteBatch;)Ldev/gitlive/firebase/firestore/WriteBatch;
+}
+
+public abstract class dev/gitlive/firebase/firestore/internal/SetOptions {
+}
+
+public final class dev/gitlive/firebase/firestore/internal/SetOptions$Merge : dev/gitlive/firebase/firestore/internal/SetOptions {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/internal/SetOptions$Merge;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/internal/SetOptions$MergeFieldPaths : dev/gitlive/firebase/firestore/internal/SetOptions {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFieldPaths;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFieldPaths;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFieldPaths;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEncodedFieldPaths ()Ljava/util/List;
+	public final fun getFieldPaths ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/internal/SetOptions$MergeFields : dev/gitlive/firebase/firestore/internal/SetOptions {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFields;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFields;Ljava/util/List;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/internal/SetOptions$MergeFields;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/internal/SetOptions$Overwrite : dev/gitlive/firebase/firestore/internal/SetOptions {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/internal/SetOptions$Overwrite;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

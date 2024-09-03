@@ -1,27 +1,43 @@
 package dev.gitlive.firebase.perf.metrics
 
-import com.google.firebase.perf.metrics.Trace
+import com.google.firebase.perf.metrics.Trace as AndroidTrace
 import dev.gitlive.firebase.perf.session.PerfSession
 
-actual class Trace internal constructor(private val android: Trace) {
+public val Trace.android: AndroidTrace get() = android
 
-    actual fun start() = android.start()
+public actual class Trace internal constructor(internal val android: AndroidTrace) {
 
-    actual fun stop() = android.stop()
+    public actual fun start() {
+        android.start()
+    }
 
-    actual fun getLongMetric(metricName: String): Long = android.getLongMetric(metricName)
+    public actual fun stop() {
+        android.stop()
+    }
 
-    actual fun incrementMetric(metricName: String, incrementBy: Long) = android.incrementMetric(metricName, incrementBy)
+    public actual fun getLongMetric(metricName: String): Long = android.getLongMetric(metricName)
 
-    actual fun putMetric(metricName: String, value: Long) = android.putMetric(metricName, value)
+    public actual fun incrementMetric(metricName: String, incrementBy: Long) {
+        android.incrementMetric(metricName, incrementBy)
+    }
 
-    fun getAttributes(): Map<String, String> = android.attributes
+    public actual fun putMetric(metricName: String, value: Long) {
+        android.putMetric(metricName, value)
+    }
 
-    fun getAttribute(attribute: String): String? = android.getAttribute(attribute)
+    public fun getAttributes(): Map<String, String> = android.attributes
 
-    fun putAttribute(attribute: String, value: String) = android.putAttribute(attribute, value)
+    public fun getAttribute(attribute: String): String? = android.getAttribute(attribute)
 
-    fun removeAttribute(attribute: String) = android.removeAttribute(attribute)
+    public fun putAttribute(attribute: String, value: String) {
+        android.putAttribute(attribute, value)
+    }
 
-    fun updateSession(session: PerfSession) = android.updateSession(session.android)
+    public fun removeAttribute(attribute: String) {
+        android.removeAttribute(attribute)
+    }
+
+    public fun updateSession(session: PerfSession) {
+        android.updateSession(session.android)
+    }
 }

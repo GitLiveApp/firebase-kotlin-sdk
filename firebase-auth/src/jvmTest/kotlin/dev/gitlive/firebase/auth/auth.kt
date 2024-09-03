@@ -3,11 +3,14 @@
  */
 
 @file:JvmName("tests")
+
 package dev.gitlive.firebase.auth
 
+import dev.gitlive.firebase.testContext
 
 actual val emulatorHost: String = "10.0.2.2"
 
-actual val context: Any = Unit
+actual val context: Any = testContext
 
-actual fun runTest(test: suspend () -> Unit) = kotlinx.coroutines.test.runTest { test() }
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+actual annotation class IgnoreForAndroidUnitTest

@@ -8,86 +8,171 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: ktLint
+        run: ./gradlew lintKotlin
+      - name: run apiCheck
+        run: ./gradlew apiCheck
+  jobMatrixSetup:
+    runs-on: ubuntu-latest
+    outputs:
+      emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
+      ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
+      js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
+      jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: gradle
+      - name: Prepare the matrix JSON
+        run: ./gradlew ciJobsMatrixSetup
+      - id: dataStep
+        run: |
+          echo "
+          emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)
+          ios_test_jobs_matrix=$(jq -c . < ./build/ios_test_jobs_matrix.json)
+          js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
+          jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
+          " >> $GITHUB_OUTPUT
+  build-android:
+    needs: jobMatrixSetup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
+      - name: Apply Android licenses
+        run: ./gradlew ciSdkManagerLicenses
+      - name: Run Android Instrumented Tests
+        run: ./gradlew ${{ matrix.gradle_tasks }}
+      - name: Upload Android test artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Android ${{ env.ARCHIVE_KEY }} Test Report HTML
+          path: "**/build/reports/androidTests/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Android ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          path: "**/firebase-debug.log"
+  build-js:
+    needs: jobMatrixSetup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+        timeout-minutes: 10
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
+      - name: Run JS Tests
+        run: ./gradlew ${{ matrix.gradle_tasks }}
+      - name: Upload JS test artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: JS ${{ env.ARCHIVE_KEY }} Test Report HTML
+          path: |
+            **/build/reports/tests/jsTest/
+            **/build/reports/tests/jsBrowserTest/
+            **/build/reports/tests/jsNodeTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: JS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          path: "**/firebase-debug.log"
+  build-ios:
+    needs: jobMatrixSetup
     runs-on: macos-latest
     strategy:
-      matrix:
-        api-level: [ 29 ]
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cocoapods cache
-        uses: actions/cache@v3
-        id: cocoapods-cache
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cocoapods
             ~/Library/Caches/CocoaPods
             */build/cocoapods
             */build/classes
-          key: cocoapods-cache
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-          cache: gradle
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Install Firebase tools
-        run: npm install -g firebase-tools
-      - name: Start Firebase emulator
-        run: "firebase emulators:start --config=./test/firebase.json &"
-      - name: Assemble
-        run: ./gradlew assemble
-      - name: Run JS Tests
-        run: ./gradlew cleanTest jsLegacyTest
-      - name: Upload JS test artifact
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: "JS Test Report HTML"
-          path: |
-            **/build/reports/tests/jsLegacyTest/
-            **/build/reports/tests/jsLegacyBrowserTest/
-            **/build/reports/tests/jsLegacyNodeTest/
+          key: cocoapods-cache-v2
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
       - name: Run iOS Tests
-        run: ./gradlew cleanTest iosX64Test
+        run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "iOS Test Report HTML"
-          path: "**/build/reports/tests/iosX64Test/"
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
+          name: iOS ${{ env.ARCHIVE_KEY }} Test Report HTML
+          path: "**/build/reports/tests/iosSimulatorArm64Test/"
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
+          name: iOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          path: "**/firebase-debug.log"
+  build-jvm:
+    needs: jobMatrixSetup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup test environment
+        uses: ./.github/actions/setup_test_action
+        timeout-minutes: 10
+      - name: Set Artifact Name
+        run: |
+          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
+      - name: Run JVM Tests
+        run: ./gradlew ${{ matrix.gradle_tasks }}
+      - name: Upload JVM test artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: JVM ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-      - name: Run Android Instrumented Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedAndroidTest
-      - name: Upload Android test artifact
-        uses: actions/upload-artifact@v3
+            **/build/reports/tests/jvmTest/
+      - name: Upload Firebase Debug Log
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: "Android Test Report HTML"
-          path: "**/build/reports/androidTests/"
+          name: JVM ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          path: "**/firebase-debug.log"

@@ -1,35 +1,40 @@
 package dev.gitlive.firebase.installations
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.installations.externals.*
+import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 
-actual val Firebase.installations
+public actual val Firebase.installations: FirebaseInstallations
     get() = rethrow { FirebaseInstallations(getInstallations()) }
 
-actual fun Firebase.installations(app: FirebaseApp) =
+public actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations =
     rethrow { FirebaseInstallations(getInstallations(app.js)) }
 
-actual class FirebaseInstallations internal constructor(val js: Installations) {
+public val FirebaseInstallations.js get() = js
 
-    actual suspend fun delete() = rethrow { delete(js).await() }
+public actual class FirebaseInstallations internal constructor(internal val js: Installations) {
 
-    actual suspend fun getId(): String = rethrow { getId(js).await() }
+    public actual suspend fun delete(): Unit = rethrow { delete(js).await() }
 
-    actual suspend fun getToken(forceRefresh: Boolean): String =
+    public actual suspend fun getId(): String = rethrow { getId(js).await() }
+
+    public actual suspend fun getToken(forceRefresh: Boolean): String =
         rethrow { getToken(js, forceRefresh).await() }
 }
 
-actual open class FirebaseInstallationsException(code: String?, cause: Throwable): FirebaseException(code, cause)
+public actual open class FirebaseInstallationsException(code: String?, cause: Throwable) : FirebaseException(code, cause)
 
-inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.installations.rethrow { function() }
+internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.installations.rethrow { function() }
 
-inline fun <R> rethrow(function: () -> R): R {
+internal inline fun <R> rethrow(function: () -> R): R {
     try {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
-        throw FirebaseInstallationsException(e.code as String?, e)
+    } catch (e: dynamic) {
+        throw FirebaseInstallationsException(e.code.unsafeCast<String?>(), e.unsafeCast<Throwable>())
     }
 }

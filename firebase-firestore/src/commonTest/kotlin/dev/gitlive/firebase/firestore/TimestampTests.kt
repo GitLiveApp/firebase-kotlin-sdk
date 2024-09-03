@@ -1,21 +1,25 @@
 package dev.gitlive.firebase.firestore
 
-import dev.gitlive.firebase.decode
-import dev.gitlive.firebase.encode
-import dev.gitlive.firebase.firebaseSerializer
+import dev.gitlive.firebase.internal.decode
+import dev.gitlive.firebase.internal.encode
+import dev.gitlive.firebase.internal.firebaseSerializer
 import dev.gitlive.firebase.nativeAssertEquals
 import dev.gitlive.firebase.nativeMapOf
+import dev.gitlive.firebase.runTest
 import kotlinx.serialization.Serializable
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 
 @Serializable
 data class TestData(
     val uid: String,
     val createdAt: Timestamp,
     var updatedAt: BaseTimestamp,
-    val deletedAt: BaseTimestamp?
+    val deletedAt: BaseTimestamp?,
 )
 
 class TimestampTests {
@@ -38,9 +42,9 @@ class TimestampTests {
                 "uid" to "uid123",
                 "createdAt" to timestamp.nativeValue,
                 "updatedAt" to timestamp.nativeValue,
-                "deletedAt" to null
+                "deletedAt" to null,
             ),
-            encode(item, shouldEncodeElementDefault = false)
+            encode<TestData>(item) { encodeDefaults = false },
         )
     }
 
@@ -53,9 +57,9 @@ class TimestampTests {
                 "uid" to "uid123",
                 "createdAt" to timestamp.nativeValue,
                 "updatedAt" to FieldValue.serverTimestamp.nativeValue,
-                "deletedAt" to FieldValue.serverTimestamp.nativeValue
+                "deletedAt" to FieldValue.serverTimestamp.nativeValue,
             ),
-            encode(item, shouldEncodeElementDefault = false)
+            encode<TestData>(item) { encodeDefaults = false },
         )
     }
 
@@ -66,7 +70,7 @@ class TimestampTests {
             "uid" to "uid123",
             "createdAt" to timestamp.nativeValue,
             "updatedAt" to timestamp.nativeValue,
-            "deletedAt" to timestamp.nativeValue
+            "deletedAt" to timestamp.nativeValue,
         )
         val decoded: TestData = decode(TestData.serializer(), obj)
         assertEquals("uid123", decoded.uid)
@@ -93,7 +97,7 @@ class TimestampTests {
             "uid" to "uid123",
             "createdAt" to Timestamp.now().nativeValue,
             "updatedAt" to Timestamp.now().nativeValue,
-            "deletedAt" to null
+            "deletedAt" to null,
         )
         val decoded: TestData = decode(TestData.serializer(), obj)
         assertEquals("uid123", decoded.uid)
@@ -103,11 +107,10 @@ class TimestampTests {
 
     @Test
     fun serializers() = runTest {
-        //todo dont work in js due to use of reified type in firebaseSerializer - uncomment once switched to IR
-//        assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
-//        assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
-//        assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
-//        assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
+        assertEquals(BaseTimestampSerializer, (Timestamp(0, 0) as BaseTimestamp).firebaseSerializer())
+        assertEquals(BaseTimestampSerializer, (Timestamp.ServerTimestamp as BaseTimestamp).firebaseSerializer())
+        assertEquals(TimestampSerializer, Timestamp(0, 0).firebaseSerializer())
+        assertEquals(ServerTimestampSerializer, Timestamp.ServerTimestamp.firebaseSerializer())
     }
 
     @Test

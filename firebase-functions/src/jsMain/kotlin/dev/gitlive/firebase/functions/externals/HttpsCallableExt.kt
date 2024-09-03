@@ -6,5 +6,5 @@ package dev.gitlive.firebase.functions.externals
 
 import kotlin.js.Promise
 
-operator fun HttpsCallable.invoke() = asDynamic()() as Promise<HttpsCallableResult>
-operator fun HttpsCallable.invoke(data: Any?) = asDynamic()(data) as Promise<HttpsCallableResult>
+public operator fun HttpsCallable.invoke(): Promise<HttpsCallableResult> = asDynamic()() as Promise<HttpsCallableResult>
+public operator fun HttpsCallable.invoke(data: Any?): Promise<HttpsCallableResult> = asDynamic()(data) as Promise<HttpsCallableResult>

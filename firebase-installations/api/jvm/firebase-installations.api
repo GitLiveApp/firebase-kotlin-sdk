@@ -1,0 +1,12 @@
+public final class dev/gitlive/firebase/installations/FirebaseInstallations {
+	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getId (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getToken (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class dev/gitlive/firebase/installations/InstallationsKt {
+	public static final fun getAndroid (Ldev/gitlive/firebase/installations/FirebaseInstallations;)Lcom/google/firebase/installations/FirebaseInstallations;
+	public static final fun getInstallations (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
+	public static final fun installations (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
+}
+

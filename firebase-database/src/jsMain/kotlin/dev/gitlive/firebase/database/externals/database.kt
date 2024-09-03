@@ -3,145 +3,145 @@
 
 package dev.gitlive.firebase.database.externals
 
-import dev.gitlive.firebase.*
+import dev.gitlive.firebase.Unsubscribe
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 
-external fun child(parent: DatabaseReference, path: String): DatabaseReference
+public external fun child(parent: DatabaseReference, path: String): DatabaseReference
 
-external fun connectDatabaseEmulator(
+public external fun connectDatabaseEmulator(
     db: Database,
     host: String,
     port: Int,
-    options: Any? = definedExternally
+    options: Any? = definedExternally,
 )
 
-external fun enableLogging(enabled: Boolean?, persistent: Boolean? = definedExternally)
+public external fun enableLogging(enabled: Boolean?, persistent: Boolean? = definedExternally)
 
-external fun endAt(value: Any?, key: String? = definedExternally): QueryConstraint
+public external fun endAt(value: Any?, key: String? = definedExternally): QueryConstraint
 
-external fun endBefore(value: Any?, key: String? = definedExternally): QueryConstraint
+public external fun endBefore(value: Any?, key: String? = definedExternally): QueryConstraint
 
-external fun equalTo(value: Any?, key: String? = definedExternally): QueryConstraint
+public external fun equalTo(value: Any?, key: String? = definedExternally): QueryConstraint
 
-external fun get(query: Query): Promise<DataSnapshot>
+public external fun get(query: Query): Promise<DataSnapshot>
 
-external fun getDatabase(
+public external fun getDatabase(
     app: FirebaseApp? = definedExternally,
-    url: String? = definedExternally
+    url: String? = definedExternally,
 ): Database
 
-external fun increment(delta: Double): Any
+public external fun increment(delta: Double): Any
 
-external fun limitToFirst(limit: Int): QueryConstraint
+public external fun limitToFirst(limit: Int): QueryConstraint
 
-external fun limitToLast(limit: Int): QueryConstraint
+public external fun limitToLast(limit: Int): QueryConstraint
 
-external fun off(query: Query, eventType: String?, callback: Any?)
+public external fun off(query: Query, eventType: String?, callback: Any?)
 
-external fun goOffline(db: Database)
+public external fun goOffline(db: Database)
 
-external fun goOnline(db: Database)
+public external fun goOnline(db: Database)
 
-external fun onChildAdded(
+public external fun onChildAdded(
     query: Query,
     callback: ChangeSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
 ): Unsubscribe
 
-external fun onChildChanged(
+public external fun onChildChanged(
     query: Query,
     callback: ChangeSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
 ): Unsubscribe
 
-external fun onChildMoved(
+public external fun onChildMoved(
     query: Query,
     callback: ChangeSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
 ): Unsubscribe
 
-external fun onChildRemoved(
+public external fun onChildRemoved(
     query: Query,
     callback: ChangeSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
 ): Unsubscribe
 
-external fun onValue(
+public external fun onValue(
     query: Query,
     callback: ValueSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
 ): Unsubscribe
 
-external fun onDisconnect(ref: DatabaseReference): OnDisconnect
+public external fun onDisconnect(ref: DatabaseReference): OnDisconnect
 
-external fun orderByChild(path: String): QueryConstraint
+public external fun orderByChild(path: String): QueryConstraint
 
-external fun orderByKey(): QueryConstraint
+public external fun orderByKey(): QueryConstraint
 
-external fun orderByValue(): QueryConstraint
+public external fun orderByValue(): QueryConstraint
 
-external fun push(parent: DatabaseReference, value: Any? = definedExternally): ThenableReference
+public external fun push(parent: DatabaseReference, value: Any? = definedExternally): ThenableReference
 
-external fun query(query: Query, vararg queryConstraints: QueryConstraint): Query
+public external fun query(query: Query, vararg queryConstraints: QueryConstraint): Query
 
-external fun ref(db: Database, path: String? = definedExternally): DatabaseReference
+public external fun ref(db: Database, path: String? = definedExternally): DatabaseReference
 
-external fun remove(ref: DatabaseReference): Promise<Unit>
+public external fun remove(ref: DatabaseReference): Promise<Unit>
 
-external fun serverTimestamp(): Any
+public external fun serverTimestamp(): Any
 
-external fun set(ref: DatabaseReference, value: Any?): Promise<Unit>
+public external fun set(ref: DatabaseReference, value: Any?): Promise<Unit>
 
-external fun startAfter(value: Any?, key: String? = definedExternally): QueryConstraint
+public external fun startAfter(value: Any?, key: String? = definedExternally): QueryConstraint
 
-external fun startAt(value: Any?, key: String? = definedExternally): QueryConstraint
+public external fun startAt(value: Any?, key: String? = definedExternally): QueryConstraint
 
-external fun update(ref: DatabaseReference, values: Any): Promise<Unit>
+public external fun update(ref: DatabaseReference, values: Any): Promise<Unit>
 
-external fun <T> runTransaction(
+public external fun <T> runTransaction(
     ref: DatabaseReference,
     transactionUpdate: (currentData: T) -> T,
-    options: Any? = definedExternally
+    options: Any? = definedExternally,
 ): Promise<TransactionResult>
 
-external interface Database {
-    val app: FirebaseApp
+public external interface Database {
+    public val app: FirebaseApp
 }
 
-external interface Query {
-    val ref: DatabaseReference
+public external interface Query {
+    public val ref: DatabaseReference
 }
 
-external interface QueryConstraint
+public external interface QueryConstraint
 
-external interface DatabaseReference : Query {
-    val key: String?
-    val parent: DatabaseReference?
-    val root: DatabaseReference
+public external interface DatabaseReference : Query {
+    public val key: String?
+    public val parent: DatabaseReference?
+    public val root: DatabaseReference
 }
 
-external interface ThenableReference : DatabaseReference
+public external interface ThenableReference : DatabaseReference
 
-external interface DataSnapshot {
-    val key: String?
-    val size: Int
-    val ref: DatabaseReference
-    fun `val`(): Any
-    fun exists(): Boolean
-    fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
-    fun child(path: String): DataSnapshot
-    fun hasChildren(): Boolean;
+public external interface DataSnapshot {
+    public val key: String?
+    public val size: Int
+    public val ref: DatabaseReference
+    public fun `val`(): Any
+    public fun exists(): Boolean
+    public fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
+    public fun child(path: String): DataSnapshot
+    public fun hasChildren(): Boolean
 }
 
-external interface OnDisconnect {
-    fun cancel(): Promise<Unit>
-    fun remove(): Promise<Unit>
-    fun set(value: Any?): Promise<Unit>
-    fun update(value: Any): Promise<Unit>
+public external interface OnDisconnect {
+    public fun cancel(): Promise<Unit>
+    public fun remove(): Promise<Unit>
+    public fun set(value: Any?): Promise<Unit>
+    public fun update(value: Any): Promise<Unit>
 }
 
-external interface TransactionResult {
-    val committed: Boolean
-    val snapshot: DataSnapshot
+public external interface TransactionResult {
+    public val committed: Boolean
+    public val snapshot: DataSnapshot
 }

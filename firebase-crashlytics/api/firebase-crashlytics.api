@@ -1,0 +1,27 @@
+public final class dev/gitlive/firebase/crashlytics/CrashlyticsKt {
+	public static final fun crashlytics (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/crashlytics/FirebaseCrashlytics;
+	public static final fun getAndroid (Ldev/gitlive/firebase/crashlytics/FirebaseCrashlytics;)Lcom/google/firebase/crashlytics/FirebaseCrashlytics;
+	public static final fun getCrashlytics (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/crashlytics/FirebaseCrashlytics;
+}
+
+public final class dev/gitlive/firebase/crashlytics/FirebaseCrashlytics {
+	public final fun deleteUnsentReports ()V
+	public final fun didCrashOnPreviousExecution ()Z
+	public final fun log (Ljava/lang/String;)V
+	public final fun recordException (Ljava/lang/Throwable;)V
+	public final fun sendUnsentReports ()V
+	public final fun setCrashlyticsCollectionEnabled (Z)V
+	public final fun setCustomKey (Ljava/lang/String;D)V
+	public final fun setCustomKey (Ljava/lang/String;F)V
+	public final fun setCustomKey (Ljava/lang/String;I)V
+	public final fun setCustomKey (Ljava/lang/String;J)V
+	public final fun setCustomKey (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun setCustomKey (Ljava/lang/String;Z)V
+	public final fun setCustomKeys (Ljava/util/Map;)V
+	public final fun setUserId (Ljava/lang/String;)V
+}
+
+public class dev/gitlive/firebase/crashlytics/FirebaseCrashlyticsException : com/google/firebase/FirebaseException {
+	public fun <init> (Ljava/lang/String;)V
+}
+

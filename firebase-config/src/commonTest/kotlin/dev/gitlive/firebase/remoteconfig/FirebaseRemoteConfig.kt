@@ -8,16 +8,20 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
-import kotlinx.coroutines.test.TestResult
+import dev.gitlive.firebase.runTest
+import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 expect val context: Any
-expect fun runTest(test: suspend () -> Unit): TestResult
+expect annotation class IgnoreForAndroidUnitTest()
 
+@IgnoreForAndroidUnitTest
 class FirebaseRemoteConfigTest {
     private val defaults = arrayOf(
         "test_default_boolean" to true,
@@ -26,33 +30,35 @@ class FirebaseRemoteConfigTest {
         "test_default_string" to "Hello World",
     )
 
+    lateinit var remoteConfig: FirebaseRemoteConfig
+
     @BeforeTest
     fun initializeFirebase() {
-        Firebase
-            .takeIf { Firebase.apps(context).isEmpty() }
-            ?.apply {
-                initialize(
-                    context,
-                    FirebaseOptions(
-                        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                        storageBucket = "fir-kotlin-sdk.appspot.com",
-                        projectId = "fir-kotlin-sdk",
-                        gcmSenderId = "846484016111"
-                    )
-                )
-            }
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+            context,
+            FirebaseOptions(
+                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+                storageBucket = "fir-kotlin-sdk.appspot.com",
+                projectId = "fir-kotlin-sdk",
+                gcmSenderId = "846484016111",
+            ),
+        )
+
+        remoteConfig = Firebase.remoteConfig(app)
     }
 
     @AfterTest
     fun tearDown() = runTest {
-        Firebase.remoteConfig.reset()
+        remoteConfig.reset()
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test
     fun testGettingValues() = runTest {
-        val remoteConfig = Firebase.remoteConfig
         remoteConfig.setDefaults(*defaults)
 
         assertEquals(true, remoteConfig["test_default_boolean"])
@@ -69,8 +75,8 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testGetAll() = runTest {
-        Firebase.remoteConfig.setDefaults(*defaults)
-        val all = Firebase.remoteConfig.all
+        remoteConfig.setDefaults(*defaults)
+        val all = remoteConfig.all
         assertEquals(true, all["test_default_boolean"]?.asBoolean())
         assertEquals(42.0, all["test_default_double"]?.asDouble())
         assertEquals(42L, all["test_default_long"]?.asLong())
@@ -80,16 +86,16 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testGetKeysByPrefix() = runTest {
-        Firebase.remoteConfig.setDefaults(*defaults)
-        val keys = Firebase.remoteConfig.getKeysByPrefix("test_default")
+        remoteConfig.setDefaults(*defaults)
+        val keys = remoteConfig.getKeysByPrefix("test_default")
         assertEquals(
             setOf(
                 "test_default_boolean",
                 "test_default_double",
                 "test_default_long",
-                "test_default_string"
+                "test_default_string",
             ),
-            keys
+            keys,
         )
     }
 
@@ -98,22 +104,22 @@ class FirebaseRemoteConfigTest {
         assertEquals(
             FirebaseRemoteConfigInfo(
                 configSettings = FirebaseRemoteConfigSettings(),
-                fetchTimeMillis = -1,
-                lastFetchStatus = FetchStatus.NoFetchYet
+                fetchTime = Instant.fromEpochMilliseconds(-1),
+                lastFetchStatus = FetchStatus.NoFetchYet,
             ).toString(),
-            Firebase.remoteConfig.info.toString()
+            remoteConfig.info.toString(),
         )
     }
 
     @Test
     fun testSetConfigSettings() = runTest {
-        Firebase.remoteConfig.settings {
-            fetchTimeoutInSeconds = 42
-            minimumFetchIntervalInSeconds = 42
+        remoteConfig.settings {
+            fetchTimeout = 42.seconds
+            minimumFetchInterval = 42.seconds
         }
-        val info = Firebase.remoteConfig.info
-        assertEquals(42, info.configSettings.fetchTimeoutInSeconds)
-        assertEquals(42, info.configSettings.minimumFetchIntervalInSeconds)
+        val info = remoteConfig.info
+        assertEquals(42.seconds, info.configSettings.fetchTimeout)
+        assertEquals(42.seconds, info.configSettings.minimumFetchInterval)
     }
 
     // Unfortunately Firebase Remote Config is not implemented by Firebase emulator so it may be
@@ -122,9 +128,8 @@ class FirebaseRemoteConfigTest {
     @Test
     @Ignore
     fun testFetch() = runTest {
-        val remoteConfig = Firebase.remoteConfig
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetch()
@@ -138,9 +143,8 @@ class FirebaseRemoteConfigTest {
     @Test
     @Ignore
     fun testFetchAndActivate() = runTest {
-        val remoteConfig = Firebase.remoteConfig
         remoteConfig.settings {
-            minimumFetchIntervalInSeconds = 60
+            minimumFetchInterval = 1.minutes
         }
 
         remoteConfig.fetchAndActivate()

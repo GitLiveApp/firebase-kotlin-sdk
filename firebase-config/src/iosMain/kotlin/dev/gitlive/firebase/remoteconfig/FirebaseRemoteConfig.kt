@@ -12,19 +12,27 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
+import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toKotlinInstant
 import platform.Foundation.NSError
-import platform.Foundation.timeIntervalSince1970
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
-actual val Firebase.remoteConfig: FirebaseRemoteConfig
+public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = FIRRemoteConfig.remoteConfig()
+
+public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
-actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
-    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp)
+public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
+    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp),
 )
 
-actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig) {
-    actual val all: Map<String, FirebaseRemoteConfigValue>
+public actual class FirebaseRemoteConfig internal constructor(internal val ios: FIRRemoteConfig) {
+    @Suppress("UNCHECKED_CAST")
+    public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() {
             return listOf(
                 FIRRemoteConfigSource.FIRRemoteConfigSourceStatic,
@@ -36,84 +44,78 @@ actual class FirebaseRemoteConfig internal constructor(val ios: FIRRemoteConfig)
             }.flatten().toMap()
         }
 
-    actual val info: FirebaseRemoteConfigInfo
+    public actual val info: FirebaseRemoteConfigInfo
         get() {
             return FirebaseRemoteConfigInfo(
                 configSettings = ios.configSettings.asCommon(),
-                fetchTimeMillis = ios.lastFetchTime
-                    ?.timeIntervalSince1970
-                    ?.let { it.toLong() * 1000 }
-                    ?.takeIf { it > 0 }
-                    ?: -1L,
-                lastFetchStatus = ios.lastFetchStatus.asCommon()
+                fetchTime = ios.lastFetchTime?.toKotlinInstant()
+                    ?.takeIf { it.toEpochMilliseconds() > 0 }
+                    ?: Instant.fromEpochMilliseconds(-1),
+                lastFetchStatus = ios.lastFetchStatus.asCommon(),
             )
         }
 
-    actual suspend fun activate(): Boolean = ios.awaitResult { activateWithCompletion(it) }
+    public actual suspend fun activate(): Boolean = ios.awaitResult { activateWithCompletion(it) }
 
-    actual suspend fun ensureInitialized() =
+    public actual suspend fun ensureInitialized(): Unit =
         ios.await { ensureInitializedWithCompletionHandler(it) }
 
-    actual suspend fun fetch(minimumFetchIntervalInSeconds: Long?) {
-        val status: FIRRemoteConfigFetchStatus = if (minimumFetchIntervalInSeconds != null) {
-            ios.awaitResult {
-                fetchWithExpirationDuration(minimumFetchIntervalInSeconds.toDouble(), it)
+    public actual suspend fun fetch(minimumFetchInterval: Duration?) {
+        if (minimumFetchInterval != null) {
+            ios.awaitResult<FIRRemoteConfig, FIRRemoteConfigFetchStatus> {
+                fetchWithExpirationDuration(minimumFetchInterval.toDouble(DurationUnit.SECONDS), it)
             }
         } else {
             ios.awaitResult { fetchWithCompletionHandler(it) }
         }
     }
 
-    actual suspend fun fetchAndActivate(): Boolean {
+    public actual suspend fun fetchAndActivate(): Boolean {
         val status: FIRRemoteConfigFetchAndActivateStatus = ios.awaitResult {
             fetchAndActivateWithCompletionHandler(it)
         }
         return status == FIRRemoteConfigFetchAndActivateStatus.FIRRemoteConfigFetchAndActivateStatusSuccessFetchedFromRemote
     }
 
-    actual fun getKeysByPrefix(prefix: String): Set<String> =
+    public actual fun getKeysByPrefix(prefix: String): Set<String> =
         all.keys.filter { it.startsWith(prefix) }.toSet()
 
-    actual fun getValue(key: String): FirebaseRemoteConfigValue =
+    public actual fun getValue(key: String): FirebaseRemoteConfigValue =
         FirebaseRemoteConfigValue(ios.configValueForKey(key))
 
-    actual suspend fun reset() {
+    public actual suspend fun reset() {
         // not implemented for iOS target
     }
 
-    actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+    public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
         val iosSettings = FIRRemoteConfigSettings().apply {
-            minimumFetchInterval = settings.minimumFetchIntervalInSeconds.toDouble()
-            fetchTimeout = settings.fetchTimeoutInSeconds.toDouble()
+            minimumFetchInterval = settings.minimumFetchInterval.toDouble(DurationUnit.SECONDS)
+            fetchTimeout = settings.fetchTimeout.toDouble(DurationUnit.SECONDS)
         }
         ios.setConfigSettings(iosSettings)
     }
 
-    actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
+    public actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
         ios.setDefaults(defaults.toMap())
     }
 
-    private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings {
-        return FirebaseRemoteConfigSettings(
-            fetchTimeoutInSeconds = fetchTimeout.toLong(),
-            minimumFetchIntervalInSeconds = minimumFetchInterval.toLong(),
-        )
-    }
+    private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
+        fetchTimeout = fetchTimeout.seconds,
+        minimumFetchInterval = minimumFetchInterval.seconds,
+    )
 
-    private fun FIRRemoteConfigFetchStatus.asCommon(): FetchStatus {
-        return when (this) {
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusSuccess -> FetchStatus.Success
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
-            FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
-            else -> FetchStatus.Failure
-        }
+    private fun FIRRemoteConfigFetchStatus.asCommon(): FetchStatus = when (this) {
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusSuccess -> FetchStatus.Success
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusNoFetchYet -> FetchStatus.NoFetchYet
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusFailure -> FetchStatus.Failure
+        FIRRemoteConfigFetchStatus.FIRRemoteConfigFetchStatusThrottled -> FetchStatus.Throttled
+        else -> FetchStatus.Failure
     }
 }
 
 private suspend inline fun <T, reified R> T.awaitResult(
-    function: T.(callback: (R?, NSError?) -> Unit) -> Unit
+    function: T.(callback: (R?, NSError?) -> Unit) -> Unit,
 ): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
@@ -138,16 +140,15 @@ private suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit
     job.await()
 }
 
-
 private fun NSError.toException() = when (domain) {
     FIRRemoteConfigErrorDomain -> {
         when (code) {
             FIRRemoteConfigErrorThrottled -> FirebaseRemoteConfigFetchThrottledException(
-                localizedDescription
+                localizedDescription,
             )
 
             FIRRemoteConfigErrorInternalError -> FirebaseRemoteConfigServerException(
-                localizedDescription
+                localizedDescription,
             )
 
             else -> FirebaseRemoteConfigClientException(localizedDescription)
@@ -157,14 +158,10 @@ private fun NSError.toException() = when (domain) {
     else -> FirebaseException(localizedDescription)
 }
 
+public actual open class FirebaseRemoteConfigException(message: String) : FirebaseException(message)
 
-actual open class FirebaseRemoteConfigException(message: String) : FirebaseException(message)
+public actual class FirebaseRemoteConfigClientException(message: String) : FirebaseRemoteConfigException(message)
 
-actual class FirebaseRemoteConfigClientException(message: String) :
-    FirebaseRemoteConfigException(message)
+public actual class FirebaseRemoteConfigFetchThrottledException(message: String) : FirebaseRemoteConfigException(message)
 
-actual class FirebaseRemoteConfigFetchThrottledException(message: String) :
-    FirebaseRemoteConfigException(message)
-
-actual class FirebaseRemoteConfigServerException(message: String) :
-    FirebaseRemoteConfigException(message)
+public actual class FirebaseRemoteConfigServerException(message: String) : FirebaseRemoteConfigException(message)
