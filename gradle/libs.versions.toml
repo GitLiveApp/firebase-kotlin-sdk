@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.2"
+agp = "8.6.0"
 androidx-test-core = "1.6.1"
 androidx-test-junit = "1.2.1"
 androidx-test-runner = "1.6.2"
@@ -10,7 +10,7 @@ gson = "2.11.0"
 junit = "4.13.2"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.9.0-RC.2"
-kotlinx-serialization = "1.7.1"
+kotlinx-serialization = "1.7.2"
 kotlinx-binarycompatibilityvalidator = "0.16.3"
 kotlinx-datetime = "0.6.1"
 kotlinter = "4.4.1"
@@ -20,7 +20,6 @@ firebase-cocoapods = "11.1.0"
 ios-deploymentTarget = "13.0"
 test-logger-plugin = "4.0.0"
 dokka = "1.9.20"
-desugar-libs = "2.1.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -50,7 +49,6 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
-android-desugarjdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-libs" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
