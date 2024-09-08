@@ -51,7 +51,7 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public actual class OAuthProvider(val js: JsOAuthProvider) {
+public actual class OAuthProvider(public val js: JsOAuthProvider) {
 
     public actual constructor(
         provider: String,
@@ -80,7 +80,7 @@ public actual class OAuthProvider(val js: JsOAuthProvider) {
     }
 }
 
-public actual class PhoneAuthProvider(val js: JsPhoneAuthProvider) {
+public actual class PhoneAuthProvider(public val js: JsPhoneAuthProvider) {
 
     public actual constructor(auth: FirebaseAuth) : this(JsPhoneAuthProvider(auth.js))
 

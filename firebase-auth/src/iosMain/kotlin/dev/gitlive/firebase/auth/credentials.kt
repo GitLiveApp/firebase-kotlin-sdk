@@ -44,7 +44,7 @@ public actual object GoogleAuthProvider {
     }
 }
 
-public actual class OAuthProvider(val ios: FIROAuthProvider) {
+public actual class OAuthProvider(public val ios: FIROAuthProvider) {
 
     public actual constructor(
         provider: String,
@@ -70,7 +70,7 @@ public actual class OAuthProvider(val ios: FIROAuthProvider) {
     }
 }
 
-public actual class PhoneAuthProvider(val ios: FIRPhoneAuthProvider) {
+public actual class PhoneAuthProvider(public val ios: FIRPhoneAuthProvider) {
 
     public actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
 
