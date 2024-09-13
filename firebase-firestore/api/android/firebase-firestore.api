@@ -160,8 +160,8 @@ public final class dev/gitlive/firebase/firestore/FieldValue$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
-public abstract class dev/gitlive/firebase/firestore/FieldValueBuilder {
-	public abstract fun addEncoded (Ljava/lang/Object;)V
+public final class dev/gitlive/firebase/firestore/FieldValueBuilder {
+	public final fun addEncoded (Ljava/lang/Object;)V
 	public final fun addWithStrategy (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public final fun getBuildSettings ()Lkotlin/jvm/functions/Function1;
 	public final fun setBuildSettings (Lkotlin/jvm/functions/Function1;)V
@@ -176,14 +176,13 @@ public final class dev/gitlive/firebase/firestore/FieldValueSerializer : kotlinx
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
-public abstract class dev/gitlive/firebase/firestore/FieldsAndValuesBuilder {
-	public fun <init> ()V
+public final class dev/gitlive/firebase/firestore/FieldsAndValuesBuilder {
 	public final fun getBuildSettings ()Lkotlin/jvm/functions/Function1;
 	public final fun setBuildSettings (Lkotlin/jvm/functions/Function1;)V
 	public final fun to (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public final fun to (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-	public abstract fun toEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)V
-	public abstract fun toEncoded (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun toEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)V
+	public final fun toEncoded (Ljava/lang/String;Ljava/lang/Object;)V
 }
 
 public abstract class dev/gitlive/firebase/firestore/Filter {

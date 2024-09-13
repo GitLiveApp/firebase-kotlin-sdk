@@ -3,8 +3,9 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.EncodeSettings
 import kotlinx.serialization.SerializationStrategy
 
-public abstract class FieldValueBuilder internal constructor() {
+public class FieldValueBuilder internal constructor() {
 
+    internal val fieldValues: MutableList<Any> = mutableListOf()
     public var buildSettings: EncodeSettings.Builder.() -> Unit = {
         encodeDefaults = true
     }
@@ -18,5 +19,7 @@ public abstract class FieldValueBuilder internal constructor() {
     }
 
     @PublishedApi
-    internal abstract fun addEncoded(encodedValue: Any)
+    internal fun addEncoded(encodedValue: Any) {
+        fieldValues += encodedValue
+    }
 }
