@@ -224,7 +224,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public fun update(
         documentRef: DocumentReference,
         fieldsAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
-    ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues))
+    ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, dev.gitlive.firebase.firestore.internal.FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues))
 
     @PublishedApi
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, encodedData))
@@ -263,7 +263,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
             }
         }
 
-    public fun startAfter(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.startAfter(*FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
+    public fun startAfter(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.startAfter(*dev.gitlive.firebase.firestore.internal.FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
 
     public fun startAt(document: DocumentSnapshot): Query = Query(nativeQuery.startAt(document.native))
     public fun startAt(vararg fieldValues: Any?): Query = startAt({}, *fieldValues)
@@ -275,7 +275,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
             }
         }
 
-    public fun startAt(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.startAt(*FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
+    public fun startAt(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.startAt(*dev.gitlive.firebase.firestore.internal.FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
 
     public fun endBefore(document: DocumentSnapshot): Query = Query(nativeQuery.endBefore(document.native))
     public fun endBefore(vararg fieldValues: Any?): Query = endBefore({}, *fieldValues)
@@ -287,7 +287,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
             }
         }
 
-    public fun endBefore(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.endBefore(*FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
+    public fun endBefore(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.endBefore(*dev.gitlive.firebase.firestore.internal.FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
 
     public fun endAt(document: DocumentSnapshot): Query = Query(nativeQuery.endAt(document.native))
     public fun endAt(vararg fieldValues: Any?): Query = endAt({}, *fieldValues)
@@ -299,7 +299,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
             }
         }
 
-    public fun endAt(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.endAt(*FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
+    public fun endAt(builder: FieldValueBuilder.() -> Unit): Query = Query(nativeQuery.endAt(*dev.gitlive.firebase.firestore.internal.FieldValueBuilder().apply(builder).fieldValues.toTypedArray()))
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
@@ -461,7 +461,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
     ): WriteBatch = WriteBatch(
         nativeWrapper.updateEncoded(
             documentRef,
-            FieldsAndValuesBuilder().apply(fieldAndValuesBuilder).fieldAndValues,
+            dev.gitlive.firebase.firestore.internal.FieldsAndValuesBuilder().apply(fieldAndValuesBuilder).fieldAndValues,
         ),
     )
 
@@ -633,7 +633,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     public suspend fun update(
         fieldsAndValuesBuilder: FieldsAndValuesBuilder.() -> Unit,
     ) {
-        native.updateEncoded(FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues)
+        native.updateEncoded(dev.gitlive.firebase.firestore.internal.FieldsAndValuesBuilder().apply(fieldsAndValuesBuilder).fieldAndValues)
     }
 
     public suspend fun delete() {
