@@ -25,7 +25,7 @@ class TransactionTest : BaseFirebaseFirestoreTest() {
                 val count = get(document).data(FirestoreTest.serializer()).count
 
                 if (count < 1) {
-                    update(document) {
+                    updateFields(document) {
                         FirestoreTest::prop1.name to "newProperty"
                         FieldPath(FirestoreTest::count.name) to 5
                         FirestoreTest::duration.name.to(DurationAsIntSerializer(), 100.milliseconds)

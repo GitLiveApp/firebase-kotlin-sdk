@@ -42,7 +42,7 @@ Asynchronous operations that return a single or no value are represented by susp
 suspend fun signInWithCustomToken(token: String): AuthResult
 ```
 
-It is important to remember that unlike a callback based API, wating for suspending functions to complete is implicit and so if you don't want to wait for the result you can `launch` a new coroutine:
+It is important to remember that unlike a callback based API, waiting for suspending functions to complete is implicit and so if you don't want to wait for the result you can `launch` a new coroutine:
 
 ```kotlin
 //TODO don't use GlobalScope
@@ -209,8 +209,6 @@ user.updateProfile(profileUpdates)
 user.updateProfile(displayName = "Jane Q. User", photoURL = "https://example.com/jane-q-user/profile.jpg")
 ```
 
-
-
 <h3><a href="https://kotlinlang.org/docs/functions.html#infix-notation">Infix notation</a></h3>
 
 To improve readability and reduce boilerplate for functions such as the Cloud Firestore query operators are built with infix notation:
@@ -241,12 +239,17 @@ citiesRef.where {
 }
 ```
 
-Similar methods exist for `update` methods in the Firestore module:
+Similar methods exist for `update`/`startAt`/`startAfter`/`endAt`/`endBefore` methods in the Firestore module:
 
 ```kotlin
 documentRef.update {
     "field" to "value"
     "otherField".to(IntAsStringSerializer(), 1)
+}
+
+query.orderBy("field", "otherField").startAt { // similar syntax for startAfter/endAt/endBefore
+    add("Value")
+    add(1, IntAsStringSerializer())
 }
 ```
 

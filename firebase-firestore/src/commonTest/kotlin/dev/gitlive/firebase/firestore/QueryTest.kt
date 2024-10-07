@@ -446,7 +446,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         val encodedQuery = collection
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedSecondPage = encodedQuery.startAfter {
+        val encodedSecondPage = encodedQuery.startAfterFieldValues {
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
         encodedSecondPage.assertDocuments(FirestoreTest.serializer(), testThree)
@@ -462,7 +462,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
             .orderBy(FieldPath(FirestoreTest::time.name), Direction.ASCENDING)
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedMultipleSecondPage = encodedMultipleQuery.startAfter {
+        val encodedMultipleSecondPage = encodedMultipleQuery.startAfterFieldValues {
             add(0.0)
             addWithStrategy(NestedObject.serializer(), NestedObject("ddd"))
         }
@@ -495,7 +495,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         val encodedQuery = collection
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedSecondPage = encodedQuery.startAt {
+        val encodedSecondPage = encodedQuery.startAtFieldValues {
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
         encodedSecondPage.assertDocuments(FirestoreTest.serializer(), testTwo, testThree)
@@ -511,7 +511,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
             .orderBy(FieldPath(FirestoreTest::time.name), Direction.ASCENDING)
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedMultipleSecondPage = encodedMultipleQuery.startAt {
+        val encodedMultipleSecondPage = encodedMultipleQuery.startAtFieldValues {
             add(0.0)
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
@@ -544,7 +544,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         val encodedQuery = collection
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedSecondPage = encodedQuery.endBefore {
+        val encodedSecondPage = encodedQuery.endBeforeFieldValues {
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
         encodedSecondPage.assertDocuments(FirestoreTest.serializer(), testOne)
@@ -560,7 +560,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
             .orderBy(FieldPath(FirestoreTest::time.name), Direction.ASCENDING)
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedMultipleSecondPage = encodedMultipleQuery.endBefore {
+        val encodedMultipleSecondPage = encodedMultipleQuery.endBeforeFieldValues {
             add(0.0)
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
@@ -593,7 +593,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         val encodedQuery = collection
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedSecondPage = encodedQuery.endAt {
+        val encodedSecondPage = encodedQuery.endAtFieldValues {
             addWithStrategy(NestedObject.serializer(), NestedObject("eee"))
         }
         encodedSecondPage.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
@@ -609,7 +609,7 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
             .orderBy(FieldPath(FirestoreTest::time.name), Direction.ASCENDING)
             .orderBy(FirestoreTest::nested.name, Direction.ASCENDING)
 
-        val encodedMultipleSecondPage = encodedMultipleQuery.endAt {
+        val encodedMultipleSecondPage = encodedMultipleQuery.endAtFieldValues {
             add(0.0)
             addWithStrategy(NestedObject.serializer(), NestedObject("ddd"))
         }

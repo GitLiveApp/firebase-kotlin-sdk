@@ -205,7 +205,7 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
         assertEquals(NestedObject("nested"), dataBefore.nested)
         assertEquals(600.milliseconds, dataBefore.duration)
 
-        doc.update {
+        doc.updateFields {
             FirestoreTest::count.name to 5
             FieldPath(FirestoreTest::optional.name) to "notNull"
             FirestoreTest::nested.name.to(
@@ -367,7 +367,7 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
 
             // update data
             val updatedData = DataWithDocumentReference(documentRef2)
-            document.update {
+            document.updateFields {
                 FieldPath(DataWithDocumentReference::documentReference.name).to(
                     DocumentReferenceSerializer,
                     updatedData.documentReference,
