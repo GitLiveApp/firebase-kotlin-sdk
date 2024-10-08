@@ -8,6 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.milliseconds
 
+@IgnoreForAndroidUnitTest
 open class QueryTest : BaseFirebaseFirestoreTest() {
 
     companion object {
