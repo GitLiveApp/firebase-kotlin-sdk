@@ -167,13 +167,13 @@ class WriteBatchTest : BaseFirebaseFirestoreTest() {
         )
 
         val batch = firestore.batch()
-        batch.update(doc1) {
+        batch.updateFields(doc1) {
             FirestoreTest::prop1.name to "prop1-updated"
             FieldPath(FirestoreTest::optional.name) to "notNull"
             FirestoreTest::duration.name.to(DurationAsIntSerializer(), 300.milliseconds)
             FieldPath(FirestoreTest::nested.name).to(NestedObject.serializer(), NestedObject("nested"))
         }
-        batch.update(doc2) {
+        batch.updateFields(doc2) {
             FirestoreTest::prop1.name to "prop2-updated"
             FieldPath(FirestoreTest::optional.name) to "alsoNotNull"
             FirestoreTest::duration.name.to(DurationAsIntSerializer(), 200.milliseconds)
