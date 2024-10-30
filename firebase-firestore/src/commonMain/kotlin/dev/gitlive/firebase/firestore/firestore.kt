@@ -200,7 +200,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
         updateFields(
             documentRef,
         ) {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -215,7 +215,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
         updateFields(
             documentRef,
         ) {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -262,7 +262,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAfter(vararg fieldValues: Any?): Query = startAfter(*fieldValues) {}
     public fun startAfter(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         startAfterFieldValues {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -280,7 +280,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAt(vararg fieldValues: Any?): Query = startAt(*fieldValues) {}
     public fun startAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         startAtFieldValues {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -298,7 +298,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun endBefore(vararg fieldValues: Any?): Query = endBefore(*fieldValues) {}
     public fun endBefore(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         endBeforeFieldValues {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -316,7 +316,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun endAt(vararg fieldValues: Any?): Query = endAt(*fieldValues) {}
     public fun endAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         endAtFieldValues {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -463,7 +463,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateFields(
             documentRef,
         ) {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -478,7 +478,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateFields(
             documentRef,
         ) {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (path, value) ->
                 path to value
             }
@@ -645,7 +645,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     @JvmName("updateFields")
     public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
         updateFields {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -658,7 +658,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     @JvmName("updateFieldPaths")
     public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
         updateFields {
-            this.buildSettings = buildSettings
+            encodeNextWith(buildSettings)
             fieldsAndValues.forEach { (fieldPath, value) ->
                 fieldPath to value
             }

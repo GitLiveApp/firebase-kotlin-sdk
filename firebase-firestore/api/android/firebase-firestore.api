@@ -172,13 +172,15 @@ public final class dev/gitlive/firebase/firestore/FieldValueSerializer : kotlinx
 public final class dev/gitlive/firebase/firestore/FieldValuesDSL {
 	public final fun addEncoded (Ljava/lang/Object;)V
 	public final fun addWithStrategy (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-	public final fun getBuildSettings ()Lkotlin/jvm/functions/Function1;
-	public final fun setBuildSettings (Lkotlin/jvm/functions/Function1;)V
+	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
+	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
+	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class dev/gitlive/firebase/firestore/FieldsAndValuesUpdateDSL {
-	public final fun getBuildSettings ()Lkotlin/jvm/functions/Function1;
-	public final fun setBuildSettings (Lkotlin/jvm/functions/Function1;)V
+	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
+	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
+	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
 	public final fun to (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public final fun to (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public final fun toEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)V
@@ -238,9 +240,10 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder {
 	public final fun contains (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun containsAny (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun containsAny (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
+	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
 	public final fun equalTo (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun equalTo (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
-	public final fun getBuildSettings ()Lkotlin/jvm/functions/Function1;
+	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
 	public final fun greaterThan (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun greaterThan (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun greaterThanOrEqualTo (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
@@ -260,7 +263,7 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder {
 	public final fun notInArray (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun notInArray (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun or (Ldev/gitlive/firebase/firestore/Filter;Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter$Or;
-	public final fun setBuildSettings (Lkotlin/jvm/functions/Function1;)V
+	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore {

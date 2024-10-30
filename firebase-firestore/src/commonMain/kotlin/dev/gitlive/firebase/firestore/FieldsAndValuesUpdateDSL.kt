@@ -23,20 +23,25 @@ public class FieldsAndValuesUpdateDSL internal constructor() {
 
     internal val fieldAndValues: MutableList<FieldAndValue> = mutableListOf()
 
+    @PublishedApi
+    internal var encodeNextWith: EncodeSettings.Builder.() -> Unit = {
+        encodeDefaults = true
+    }
+
     /**
-     * The [EncodeSettings.Builder] to apply to the next values added to this update.
+     * Sets the [EncodeSettings.Builder] to apply to the next values added to this update.
      * Updating this value will only influence the encoding of values not yet added to the update.
      * This allows for custom encoding per update, e.g.
      *
      * ```
-     * buildSettings = { encodeDefaults = true }
+     * encodeNextWith { encodeDefaults = true }
      * "path" to ClassWithDefaults()
-     * buildSettings = { encodeDefaults = false }
+     * encodeNextWith { encodeDefaults = false }
      * "otherPath" to ClassWithDefaults()
      * ```
      */
-    public var buildSettings: EncodeSettings.Builder.() -> Unit = {
-        encodeDefaults = true
+    public fun encodeNextWith(builder: EncodeSettings.Builder.() -> Unit) {
+        encodeNextWith = builder
     }
 
     /**
@@ -45,7 +50,7 @@ public class FieldsAndValuesUpdateDSL internal constructor() {
      * @param value the value [T] to update to
      */
     public inline infix fun <reified T> String.to(value: T) {
-        toEncoded(encode(value, buildSettings))
+        toEncoded(encode(value, encodeNextWith))
     }
 
     /**
@@ -54,7 +59,7 @@ public class FieldsAndValuesUpdateDSL internal constructor() {
      * @param value the value [T] to update to
      */
     public inline infix fun <reified T> FieldPath.to(value: T) {
-        toEncoded(encode(value, buildSettings))
+        toEncoded(encode(value, encodeNextWith))
     }
 
     /**
@@ -64,7 +69,7 @@ public class FieldsAndValuesUpdateDSL internal constructor() {
      * @param value the value [T] to update to
      */
     public fun <T : Any> String.to(strategy: SerializationStrategy<T>, value: T) {
-        toEncoded(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings))
+        toEncoded(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith))
     }
 
     /**
@@ -74,7 +79,7 @@ public class FieldsAndValuesUpdateDSL internal constructor() {
      * @param value the value [T] to update to
      */
     public fun <T : Any> FieldPath.to(strategy: SerializationStrategy<T>, value: T) {
-        toEncoded(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings))
+        toEncoded(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith))
     }
 
     @PublishedApi

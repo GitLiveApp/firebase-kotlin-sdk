@@ -11,20 +11,25 @@ public class FieldValuesDSL internal constructor() {
 
     internal val fieldValues: MutableList<Any> = mutableListOf()
 
+    @PublishedApi
+    internal var encodeNextWith: EncodeSettings.Builder.() -> Unit = {
+        encodeDefaults = true
+    }
+
     /**
-     * The [EncodeSettings.Builder] to apply to the next field values added.
+     * Sets the [EncodeSettings.Builder] to apply to the next field values added.
      * Updating this value will only influence the encoding of field values not yet added to the update.
      * This allows for custom encoding per value, e.g.
      *
      * ```
-     * buildSettings = { encodeDefaults = true }
+     * encodeNextWith { encodeDefaults = true }
      * add(ClassWithDefaults())
-     * buildSettings = { encodeDefaults = false }
+     * encodeNextWith { encodeDefaults = false }
      * add(ClassWithDefaults())
      * ```
      */
-    public var buildSettings: EncodeSettings.Builder.() -> Unit = {
-        encodeDefaults = true
+    public fun encodeNextWith(builder: EncodeSettings.Builder.() -> Unit) {
+        encodeNextWith = builder
     }
 
     /**
@@ -33,7 +38,7 @@ public class FieldValuesDSL internal constructor() {
      * @param value the value [T] to add
      */
     public inline fun <reified T> add(value: T) {
-        addEncoded(encode(value, buildSettings)!!)
+        addEncoded(encode(value, encodeNextWith)!!)
     }
 
     /**
@@ -43,7 +48,7 @@ public class FieldValuesDSL internal constructor() {
      * @param value the value [T] to add
      */
     public fun <T : Any> addWithStrategy(strategy: SerializationStrategy<T>, value: T) {
-        addEncoded(dev.gitlive.firebase.internal.encode(strategy, value, buildSettings)!!)
+        addEncoded(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!)
     }
 
     @PublishedApi

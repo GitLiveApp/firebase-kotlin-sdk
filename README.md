@@ -197,7 +197,7 @@ documentRef.updateFields {
     "otherField".to(IntAsStringSerializer(), 1)
     
     // Overwrite build settings. All fields added after this will have these build settings applied
-    buildSettings = {
+    encodeNextWith {
         encodeDefaults = true
         serializersModule = module
     }
@@ -215,7 +215,7 @@ query.orderBy("field", "otherField", "city").startAtFieldValues { // similar syn
     add(1, IntAsStringSerializer())
 
     // Overwrite build settings. All field values added after this will have these build settings applied
-    buildSettings = {
+    encodeNextWith {
         encodeDefaults = true
         serializersModule = module
     }
