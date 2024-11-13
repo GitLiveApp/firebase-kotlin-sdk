@@ -76,7 +76,7 @@ plugins {
 }
 ```
 
-Then mark you custom classes `@Serializable`:
+Then mark your custom classes `@Serializable`:
 
 ```kotlin
 @Serializable
