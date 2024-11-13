@@ -169,22 +169,27 @@ public final class dev/gitlive/firebase/firestore/FieldValueSerializer : kotlinx
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
-public final class dev/gitlive/firebase/firestore/FieldValuesDSL {
-	public final fun addEncoded (Ljava/lang/Object;)V
+public final class dev/gitlive/firebase/firestore/FieldValuesDSL : dev/gitlive/firebase/EncodeSettings$Builder {
 	public final fun addWithStrategy (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
-	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
-	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
+	public fun getEncodeDefaults ()Z
+	public final fun getFieldValuesToAdd ()Ljava/util/List;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun setEncodeDefaults (Z)V
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+	public final fun withEncodeSettings (Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class dev/gitlive/firebase/firestore/FieldsAndValuesUpdateDSL {
-	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
-	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
-	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
+public final class dev/gitlive/firebase/firestore/FieldsAndValuesUpdateDSL : dev/gitlive/firebase/EncodeSettings$Builder {
+	public fun getEncodeDefaults ()Z
+	public final fun getFieldAndValueToAdd ()Ljava/util/List;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public fun setEncodeDefaults (Z)V
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
 	public final fun to (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
 	public final fun to (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
-	public final fun toEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)V
-	public final fun toEncoded (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun toEncoded (Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/internal/FieldAndValue$WithFieldPath;
+	public final fun toEncoded (Ljava/lang/String;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/internal/FieldAndValue$WithStringField;
+	public final fun withEncodeSettings (Lkotlin/jvm/functions/Function1;)V
 }
 
 public abstract class dev/gitlive/firebase/firestore/Filter {
@@ -232,7 +237,7 @@ public abstract class dev/gitlive/firebase/firestore/Filter$WithConstraint : dev
 	public abstract fun getConstraint ()Ldev/gitlive/firebase/firestore/WhereConstraint;
 }
 
-public final class dev/gitlive/firebase/firestore/FilterBuilder {
+public final class dev/gitlive/firebase/firestore/FilterBuilder : dev/gitlive/firebase/EncodeSettings$Builder {
 	public final fun all ([Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter;
 	public final fun and (Ldev/gitlive/firebase/firestore/Filter;Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter$And;
 	public final fun any ([Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter;
@@ -240,10 +245,11 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder {
 	public final fun contains (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun containsAny (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun containsAny (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
-	public final fun encodeNextWith (Lkotlin/jvm/functions/Function1;)V
 	public final fun equalTo (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun equalTo (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
-	public final fun getEncodeNextWith ()Lkotlin/jvm/functions/Function1;
+	public fun getEncodeDefaults ()Z
+	public final fun getEncodeSettingsBuilder ()Lkotlin/jvm/functions/Function1;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
 	public final fun greaterThan (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun greaterThan (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun greaterThanOrEqualTo (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
@@ -263,7 +269,9 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder {
 	public final fun notInArray (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun notInArray (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun or (Ldev/gitlive/firebase/firestore/Filter;Ldev/gitlive/firebase/firestore/Filter;)Ldev/gitlive/firebase/firestore/Filter$Or;
-	public final fun setEncodeNextWith (Lkotlin/jvm/functions/Function1;)V
+	public fun setEncodeDefaults (Z)V
+	public fun setSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
+	public final fun withEncoder (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Filter;
 }
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore {

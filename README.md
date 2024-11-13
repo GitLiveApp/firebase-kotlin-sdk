@@ -196,12 +196,12 @@ documentRef.updateFields {
     // Set the value of otherField to "1" using a custom Serializer
     "otherField".to(IntAsStringSerializer(), 1)
     
-    // Overwrite build settings. All fields added after this will have these build settings applied
-    encodeNextWith {
+    // Overwrite build settings. All fields added within this block will have these build settings applied
+    withEncodeSettings {
         encodeDefaults = true
         serializersModule = module
+        "city" to abstractCity
     }
-    "city" to abstractCity
 }
 ```
 
@@ -214,12 +214,12 @@ query.orderBy("field", "otherField", "city").startAtFieldValues { // similar syn
     // Starts at "1" for the otherField value
     add(1, IntAsStringSerializer())
 
-    // Overwrite build settings. All field values added after this will have these build settings applied
-    encodeNextWith {
+    // Overwrite build settings. All field values added within this block will have these build settings applied
+    withEncodeSettings {
         encodeDefaults = true
         serializersModule = module
+        add(abstractCity)
     }
-    add(abstractCity)
 }
 ```
 

@@ -1,7 +1,10 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.copyFrom
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 
 public sealed interface WhereConstraint {
 
@@ -39,211 +42,224 @@ public sealed class Filter {
     public data class Path @PublishedApi internal constructor(val path: FieldPath, override val constraint: WhereConstraint) : WithConstraint()
 }
 
-public class FilterBuilder internal constructor() {
+public class FilterBuilder internal constructor() : EncodeSettings.Builder {
+
+    private var _encodeDefaults: Boolean = true
+    override var encodeDefaults: Boolean
+        get() = _encodeDefaults
+        set(value) {
+            if (_encodeSettingsBuilder.isInitialized()) {
+                throw IllegalStateException("You should not change encode settings after they've been used. Call withEncoder again")
+            } else {
+                _encodeDefaults = value
+            }
+        }
+    private var _serializersModule: SerializersModule = EmptySerializersModule()
+    override var serializersModule: SerializersModule
+        get() = _serializersModule
+        set(value) {
+            if (_encodeSettingsBuilder.isInitialized()) {
+                throw IllegalStateException("You should not change encode settings after they've been used. Call withEncoder again")
+            } else {
+                _serializersModule = value
+            }
+        }
+
+    private val _encodeSettingsBuilder: Lazy<EncodeSettings.Builder.() -> Unit> = lazy {
+        {
+            copyFrom(this@FilterBuilder)
+        }
+    }
 
     @PublishedApi
-    internal var encodeNextWith: EncodeSettings.Builder.() -> Unit = {
-        encodeDefaults = true
-    }
+    internal val encodeSettingsBuilder: EncodeSettings.Builder.() -> Unit = _encodeSettingsBuilder.value
 
-    /**
-     * Sets the [EncodeSettings.Builder] to apply to the next [WhereConstraint] added.
-     * Updating this value will only influence the encoding of [WhereConstraint] not yet added to the update.
-     * This allows for custom encoding per value, e.g.
-     *
-     * ```
-     * encodeNextWith { encodeDefaults = true }
-     * "path" equalTo value
-     * encodeNextWith { encodeDefaults = false }
-     * "otherPath" equalTo otherValue
-     * ```
-     */
-    public fun encodeNextWith(builder: EncodeSettings.Builder.() -> Unit) {
-        encodeNextWith = builder
-    }
+    public fun withEncoder(dsl: FilterBuilder.() -> Filter): Filter = FilterBuilder()
+        .apply { copyFrom(this@FilterBuilder) }
+        .run(dsl)
 
     public val String.isNull: Filter.WithConstraint get() = Filter.Field(this, WhereConstraint.EqualTo(null))
     public inline infix fun <reified T> String.equalTo(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.EqualTo(encode(value, encodeNextWith)),
+        WhereConstraint.EqualTo(encode(value, encodeSettingsBuilder)),
     )
     public fun <T : Any> String.equalTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.EqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)),
+        WhereConstraint.EqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)),
     )
 
     public val FieldPath.isNull: Filter.WithConstraint get() = Filter.Path(this, WhereConstraint.EqualTo(null))
     public inline infix fun <reified T> FieldPath.equalTo(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.EqualTo(encode(value, encodeNextWith)),
+        WhereConstraint.EqualTo(encode(value, encodeSettingsBuilder)),
     )
     public fun <T : Any> FieldPath.equalTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.EqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)),
+        WhereConstraint.EqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)),
     )
 
     public val String.isNotNull: Filter.WithConstraint get() = Filter.Field(this, WhereConstraint.NotEqualTo(null))
     public inline infix fun <reified T> String.notEqualTo(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.NotEqualTo(encode(value, encodeNextWith)),
+        WhereConstraint.NotEqualTo(encode(value, encodeSettingsBuilder)),
     )
     public fun <T : Any> String.notEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.NotEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)),
+        WhereConstraint.NotEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)),
     )
 
     public val FieldPath.isNotNull: Filter.WithConstraint get() = Filter.Path(this, WhereConstraint.NotEqualTo(null))
     public inline infix fun <reified T> FieldPath.notEqualTo(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.NotEqualTo(encode(value, encodeNextWith)),
+        WhereConstraint.NotEqualTo(encode(value, encodeSettingsBuilder)),
     )
     public fun <T : Any> FieldPath.notEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.NotEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)),
+        WhereConstraint.NotEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)),
     )
 
     public inline infix fun <reified T : Any> String.lessThan(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.LessThan(encode(value, encodeNextWith)!!),
+        WhereConstraint.LessThan(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> String.lessThan(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.LessThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.LessThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> FieldPath.lessThan(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.LessThan(encode(value, encodeNextWith)!!),
+        WhereConstraint.LessThan(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> FieldPath.lessThan(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.LessThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.LessThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> String.greaterThan(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.GreaterThan(encode(value, encodeNextWith)!!),
+        WhereConstraint.GreaterThan(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> String.greaterThan(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.GreaterThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.GreaterThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> FieldPath.greaterThan(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.GreaterThan(encode(value, encodeNextWith)!!),
+        WhereConstraint.GreaterThan(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> FieldPath.greaterThan(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.GreaterThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.GreaterThan(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> String.lessThanOrEqualTo(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.LessThanOrEqualTo(encode(value, encodeNextWith)!!),
+        WhereConstraint.LessThanOrEqualTo(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> String.lessThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> FieldPath.lessThanOrEqualTo(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.LessThanOrEqualTo(encode(value, encodeNextWith)!!),
+        WhereConstraint.LessThanOrEqualTo(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> FieldPath.lessThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.LessThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> String.greaterThanOrEqualTo(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.GreaterThanOrEqualTo(encode(value, encodeNextWith)!!),
+        WhereConstraint.GreaterThanOrEqualTo(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> String.greaterThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> FieldPath.greaterThanOrEqualTo(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.GreaterThanOrEqualTo(encode(value, encodeNextWith)!!),
+        WhereConstraint.GreaterThanOrEqualTo(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> FieldPath.greaterThanOrEqualTo(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.GreaterThanOrEqualTo(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> String.contains(value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.ArrayContains(encode(value, encodeNextWith)!!),
+        WhereConstraint.ArrayContains(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> String.contains(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.ArrayContains(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.ArrayContains(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> FieldPath.contains(value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.ArrayContains(encode(value, encodeNextWith)!!),
+        WhereConstraint.ArrayContains(encode(value, encodeSettingsBuilder)!!),
     )
     public fun <T : Any> FieldPath.contains(strategy: SerializationStrategy<T>, value: T): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.ArrayContains(dev.gitlive.firebase.internal.encode(strategy, value, encodeNextWith)!!),
+        WhereConstraint.ArrayContains(dev.gitlive.firebase.internal.encode(strategy, value, encodeSettingsBuilder)!!),
     )
 
     public inline infix fun <reified T : Any> String.containsAny(values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.ArrayContainsAny(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.ArrayContainsAny(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> String.containsAny(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.ArrayContainsAny(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.ArrayContainsAny(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public inline infix fun <reified T : Any> FieldPath.containsAny(values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.ArrayContainsAny(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.ArrayContainsAny(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> FieldPath.containsAny(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.ArrayContainsAny(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.ArrayContainsAny(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public inline infix fun <reified T : Any> String.inArray(values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.InArray(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.InArray(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> String.inArray(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.InArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.InArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public inline infix fun <reified T : Any> FieldPath.inArray(values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.InArray(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.InArray(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> FieldPath.inArray(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.InArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.InArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public inline infix fun <reified T : Any> String.notInArray(values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.NotInArray(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.NotInArray(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> String.notInArray(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Field(
         this,
-        WhereConstraint.NotInArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.NotInArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public inline infix fun <reified T : Any> FieldPath.notInArray(values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.NotInArray(values.map { encode(it, encodeNextWith)!! }),
+        WhereConstraint.NotInArray(values.map { encode(it, encodeSettingsBuilder)!! }),
     )
     public fun <T : Any> FieldPath.notInArray(strategy: SerializationStrategy<T>, values: List<T>): Filter.WithConstraint = Filter.Path(
         this,
-        WhereConstraint.NotInArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeNextWith)!! }),
+        WhereConstraint.NotInArray(values.map { dev.gitlive.firebase.internal.encode(strategy, it, encodeSettingsBuilder)!! }),
     )
 
     public infix fun Filter.and(right: Filter): Filter.And {

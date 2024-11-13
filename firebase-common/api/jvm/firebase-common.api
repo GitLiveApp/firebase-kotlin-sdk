@@ -13,6 +13,11 @@ public abstract interface class dev/gitlive/firebase/EncodeDecodeSettings {
 public abstract interface class dev/gitlive/firebase/EncodeDecodeSettingsBuilder : dev/gitlive/firebase/DecodeSettings$Builder, dev/gitlive/firebase/EncodeSettings$Builder {
 }
 
+public final class dev/gitlive/firebase/EncodeDecodeSettingsKt {
+	public static final fun copyFrom (Ldev/gitlive/firebase/DecodeSettings$Builder;Ldev/gitlive/firebase/DecodeSettings$Builder;)V
+	public static final fun copyFrom (Ldev/gitlive/firebase/EncodeSettings$Builder;Ldev/gitlive/firebase/EncodeSettings$Builder;)V
+}
+
 public abstract interface class dev/gitlive/firebase/EncodeSettings : dev/gitlive/firebase/EncodeDecodeSettings {
 	public abstract fun getEncodeDefaults ()Z
 }

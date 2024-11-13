@@ -200,7 +200,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
         updateFields(
             documentRef,
         ) {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -215,7 +215,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
         updateFields(
             documentRef,
         ) {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -229,7 +229,7 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public fun updateFields(
         documentRef: DocumentReference,
         fieldsAndValuesUpdateDSL: FieldsAndValuesUpdateDSL.() -> Unit,
-    ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldAndValues))
+    ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues))
 
     @PublishedApi
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, encodedData))
@@ -262,7 +262,8 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAfter(vararg fieldValues: Any?): Query = startAfter(*fieldValues) {}
     public fun startAfter(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         startAfterFieldValues {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
+
             fieldValues.forEach {
                 add(it)
             }
@@ -280,7 +281,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAt(vararg fieldValues: Any?): Query = startAt(*fieldValues) {}
     public fun startAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         startAtFieldValues {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -298,9 +299,11 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun endBefore(vararg fieldValues: Any?): Query = endBefore(*fieldValues) {}
     public fun endBefore(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         endBeforeFieldValues {
-            encodeNextWith(buildSettings)
-            fieldValues.forEach {
-                add(it)
+            withEncodeSettings {
+                apply(buildSettings)
+                fieldValues.forEach {
+                    add(it)
+                }
             }
         }
 
@@ -316,7 +319,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun endAt(vararg fieldValues: Any?): Query = endAt(*fieldValues) {}
     public fun endAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
         endAtFieldValues {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldValues.forEach {
                 add(it)
             }
@@ -463,7 +466,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateFields(
             documentRef,
         ) {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -478,7 +481,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
         updateFields(
             documentRef,
         ) {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (path, value) ->
                 path to value
             }
@@ -495,7 +498,7 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
     ): WriteBatch = WriteBatch(
         nativeWrapper.updateEncoded(
             documentRef,
-            FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldAndValues,
+            FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues,
         ),
     )
 
@@ -645,7 +648,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     @JvmName("updateFields")
     public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
         updateFields {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (field, value) ->
                 field to value
             }
@@ -658,7 +661,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     @JvmName("updateFieldPaths")
     public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
         updateFields {
-            encodeNextWith(buildSettings)
+            apply(buildSettings)
             fieldsAndValues.forEach { (fieldPath, value) ->
                 fieldPath to value
             }
@@ -671,7 +674,7 @@ public data class DocumentReference internal constructor(internal val native: Na
     public suspend fun updateFields(
         fieldsAndValuesUpdateDSL: FieldsAndValuesUpdateDSL.() -> Unit,
     ) {
-        native.updateEncoded(FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldAndValues)
+        native.updateEncoded(FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues)
     }
 
     public suspend fun delete() {
