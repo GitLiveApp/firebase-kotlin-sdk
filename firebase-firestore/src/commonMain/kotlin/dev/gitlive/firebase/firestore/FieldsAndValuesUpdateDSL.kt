@@ -27,7 +27,7 @@ public class FieldsAndValuesUpdateDSL internal constructor() : EncodeSettings.Bu
 
     @PublishedApi
     internal val fieldAndValueToAdd: MutableList<() -> FieldAndValue> = mutableListOf()
-    internal val fieldsAndValues = fieldAndValueToAdd.map { fieldAndValueToEncode ->
+    internal val fieldsAndValues: List<FieldAndValue> get() = fieldAndValueToAdd.map { fieldAndValueToEncode ->
         fieldAndValueToEncode.invoke()
     }
 

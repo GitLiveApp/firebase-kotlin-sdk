@@ -17,7 +17,7 @@ public class FieldValuesDSL internal constructor() : EncodeSettings.Builder {
 
     @PublishedApi
     internal val fieldValuesToAdd: MutableList<() -> Any> = mutableListOf()
-    internal val fieldValues = fieldValuesToAdd.map { valueToEncode ->
+    internal val fieldValues get() = fieldValuesToAdd.map { valueToEncode ->
         valueToEncode.invoke()
     }
 
