@@ -48,7 +48,7 @@ public class FilterBuilder internal constructor() : EncodeSettings.Builder {
     override var encodeDefaults: Boolean
         get() = _encodeDefaults
         set(value) {
-            if (_encodeSettingsBuilder.isInitialized()) {
+            if (lazyEncodeSettingsBuilder.isInitialized()) {
                 throw IllegalStateException("You should not change encode settings after they've been used. Call withEncoder again")
             } else {
                 _encodeDefaults = value
@@ -58,21 +58,21 @@ public class FilterBuilder internal constructor() : EncodeSettings.Builder {
     override var serializersModule: SerializersModule
         get() = _serializersModule
         set(value) {
-            if (_encodeSettingsBuilder.isInitialized()) {
+            if (lazyEncodeSettingsBuilder.isInitialized()) {
                 throw IllegalStateException("You should not change encode settings after they've been used. Call withEncoder again")
             } else {
                 _serializersModule = value
             }
         }
 
-    private val _encodeSettingsBuilder: Lazy<EncodeSettings.Builder.() -> Unit> = lazy {
+    private val lazyEncodeSettingsBuilder: Lazy<EncodeSettings.Builder.() -> Unit> = lazy {
         {
             copyFrom(this@FilterBuilder)
         }
     }
 
     @PublishedApi
-    internal val encodeSettingsBuilder: EncodeSettings.Builder.() -> Unit = _encodeSettingsBuilder.value
+    internal val encodeSettingsBuilder: EncodeSettings.Builder.() -> Unit = lazyEncodeSettingsBuilder.value
 
     public fun withEncoder(dsl: FilterBuilder.() -> Filter): Filter = FilterBuilder()
         .apply { copyFrom(this@FilterBuilder) }
