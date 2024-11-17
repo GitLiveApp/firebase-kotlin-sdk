@@ -248,7 +248,6 @@ public final class dev/gitlive/firebase/firestore/FilterBuilder : dev/gitlive/fi
 	public final fun equalTo (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun equalTo (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public fun getEncodeDefaults ()Z
-	public final fun getEncodeSettingsBuilder ()Lkotlin/jvm/functions/Function1;
 	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
 	public final fun greaterThan (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
 	public final fun greaterThan (Ljava/lang/String;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Filter$WithConstraint;
@@ -611,8 +610,7 @@ public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint {
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContains : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -621,7 +619,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContains 
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsAny : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public fun <init> (Ljava/util/List;)V
-	public final fun component1 ()Ljava/util/List;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValues ()Ljava/util/List;
 	public fun hashCode ()I
@@ -629,8 +626,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ArrayContainsA
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$EqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -650,8 +646,7 @@ public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$F
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -659,8 +654,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThan : 
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -669,7 +663,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$GreaterThanOrE
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$InArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public fun <init> (Ljava/util/List;)V
-	public final fun component1 ()Ljava/util/List;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValues ()Ljava/util/List;
 	public fun hashCode ()I
@@ -677,8 +670,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$InArray : dev/
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThan : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -686,8 +678,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThan : dev
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -695,8 +686,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$LessThanOrEqua
 }
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo : dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -705,7 +695,6 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$NotEqualTo : d
 
 public final class dev/gitlive/firebase/firestore/WhereConstraint$NotInArray : dev/gitlive/firebase/firestore/WhereConstraint$ForArray {
 	public fun <init> (Ljava/util/List;)V
-	public final fun component1 ()Ljava/util/List;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValues ()Ljava/util/List;
 	public fun hashCode ()I
