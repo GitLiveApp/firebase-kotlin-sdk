@@ -15,41 +15,49 @@ public sealed interface WhereConstraint {
     public sealed interface ForObject : WhereConstraint {
         public val value: Any
     }
+
     public sealed interface ForArray : WhereConstraint {
         public val values: List<Any>
     }
 
     public data class EqualTo @PublishedApi internal constructor(private val valueBuilder: () -> Any?) : ForNullableObject {
-        override val value: Any? = valueBuilder()
+        override val value: Any? get() = valueBuilder()
     }
 
     public data class NotEqualTo @PublishedApi internal constructor(private val valueBuilder: () -> Any?) : ForNullableObject {
-        override val value: Any? = valueBuilder()
+        override val value: Any? get() = valueBuilder()
     }
 
     public data class LessThan @PublishedApi internal constructor(private val valueBuilder: () -> Any) : ForObject {
-        override val value: Any = valueBuilder()
+        override val value: Any get() = valueBuilder()
     }
+
     public data class GreaterThan @PublishedApi internal constructor(private val valueBuilder: () -> Any) : ForObject {
-        override val value: Any = valueBuilder()
+        override val value: Any get() = valueBuilder()
     }
+
     public data class LessThanOrEqualTo @PublishedApi internal constructor(private val valueBuilder: () -> Any) : ForObject {
-        override val value: Any = valueBuilder()
+        override val value: Any get() = valueBuilder()
     }
+
     public data class GreaterThanOrEqualTo @PublishedApi internal constructor(private val valueBuilder: () -> Any) : ForObject {
-        override val value: Any = valueBuilder()
+        override val value: Any get() = valueBuilder()
     }
+
     public data class ArrayContains @PublishedApi internal constructor(private val valueBuilder: () -> Any) : ForObject {
-        override val value: Any = valueBuilder()
+        override val value: Any get() = valueBuilder()
     }
+
     public data class ArrayContainsAny @PublishedApi internal constructor(private val valueBuilders: List<() -> Any>) : ForArray {
-        override val values: List<Any> = valueBuilders.map { it.invoke() }
+        override val values: List<Any> get() = valueBuilders.map { it.invoke() }
     }
+
     public data class InArray @PublishedApi internal constructor(private val valueBuilders: List<() -> Any>) : ForArray {
-        override val values: List<Any> = valueBuilders.map { it.invoke() }
+        override val values: List<Any> get() = valueBuilders.map { it.invoke() }
     }
+
     public data class NotInArray @PublishedApi internal constructor(private val valueBuilders: List<() -> Any>) : ForArray {
-        override val values: List<Any> = valueBuilders.map { it.invoke() }
+        override val values: List<Any> get() = valueBuilders.map { it.invoke() }
     }
 }
 
