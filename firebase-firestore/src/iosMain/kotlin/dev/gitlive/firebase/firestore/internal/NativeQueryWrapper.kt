@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
+import cocoapods.FirebaseFirestoreInternal.FIRAggregateSource
 import cocoapods.FirebaseFirestoreInternal.FIRFilter
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
@@ -13,7 +14,9 @@ import dev.gitlive.firebase.firestore.awaitResult
 import dev.gitlive.firebase.firestore.toException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSNull
+import kotlin.coroutines.resume
 
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
@@ -21,6 +24,18 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual suspend fun get(source: Source) =
         QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
+
+    actual suspend fun count(): Long = suspendCancellableCoroutine { continuation ->
+        val aggregateQuery = native.count()
+
+        aggregateQuery.aggregationWithSource(FIRAggregateSource.FIRAggregateSourceServer) { snapshot, error ->
+            if (error != null) {
+                continuation.resume(0L)
+            } else {
+                continuation.resume(snapshot?.count?.longValue ?: 0L)
+            }
+        }
+    }
 
     actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, error ->

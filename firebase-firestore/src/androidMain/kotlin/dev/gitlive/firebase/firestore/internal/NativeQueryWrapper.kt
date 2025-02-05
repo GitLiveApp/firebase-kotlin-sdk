@@ -1,6 +1,8 @@
 package dev.gitlive.firebase.firestore.internal
 
 import com.google.android.gms.tasks.TaskExecutors
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
@@ -40,6 +42,12 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual suspend fun get(source: Source): QuerySnapshot =
         QuerySnapshot(native.get(source.toAndroidSource()).await())
+
+    actual suspend fun count(): Long {
+        val aggregateQuery = native.count()
+        val task = aggregateQuery.get(AggregateSource.SERVER)
+        return Tasks.await(task).count
+    }
 
     actual fun where(filter: Filter) = native.where(filter.toAndroidFilter())
 

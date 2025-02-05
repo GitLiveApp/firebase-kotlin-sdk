@@ -33,6 +33,11 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual suspend fun get(source: Source) = rethrow { QuerySnapshot(js.get(source).await()) }
 
+    actual suspend fun count(): Long = rethrow {
+        val snapshot = js.get(Source.DEFAULT).await()
+        snapshot.docs.size.toLong()
+    }
+
     actual fun limit(limit: Number) = query(
         js,
         dev.gitlive.firebase.firestore.externals.limit(limit),

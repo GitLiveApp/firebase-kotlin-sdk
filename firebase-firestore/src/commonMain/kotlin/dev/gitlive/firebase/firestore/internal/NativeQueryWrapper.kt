@@ -17,6 +17,7 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot
+    suspend fun count(): Long
 
     fun where(filter: Filter): NativeQuery
 
