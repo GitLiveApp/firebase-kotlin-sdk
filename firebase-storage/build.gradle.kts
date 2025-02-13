@@ -126,7 +126,6 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 api(project(":firebase-common"))
-                implementation(project(":firebase-common"))
             }
         }
 
