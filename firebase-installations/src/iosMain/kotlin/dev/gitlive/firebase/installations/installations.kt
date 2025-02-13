@@ -4,35 +4,38 @@ import cocoapods.FirebaseInstallations.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.ios as publicIos
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.*
 
-actual val Firebase.installations
+public val FirebaseInstallations.ios: FIRInstallations get() = FIRInstallations.installations()
+
+public actual val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(FIRInstallations.installations())
 
-actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(
-    FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp)
+public actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(
+    FIRInstallations.installationsWithApp(app.publicIos as objcnames.classes.FIRApp),
 )
 
-actual class FirebaseInstallations internal constructor(val ios: FIRInstallations) {
+public actual class FirebaseInstallations internal constructor(internal val ios: FIRInstallations) {
 
-    actual suspend fun delete() = ios.await { deleteWithCompletion(completion = it) }
+    public actual suspend fun delete(): Unit = ios.await { deleteWithCompletion(completion = it) }
 
-    actual suspend fun getId(): String = ios.awaitResult { installationIDWithCompletion(completion = it) }
+    public actual suspend fun getId(): String = ios.awaitResult { installationIDWithCompletion(completion = it) }
 
-    actual suspend fun getToken(forceRefresh: Boolean): String {
+    public actual suspend fun getToken(forceRefresh: Boolean): String {
         val result: FIRInstallationsAuthTokenResult = ios.awaitResult { authTokenForcingRefresh(forceRefresh = forceRefresh, completion = it) }
 
         return result.authToken
     }
 }
 
-actual class FirebaseInstallationsException(message: String): FirebaseException(message)
+public actual class FirebaseInstallationsException(message: String) : FirebaseException(message)
 
 internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(FirebaseInstallationsException(error.toString()))
@@ -44,7 +47,7 @@ internal suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Uni
 internal suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(FirebaseInstallationsException(error.toString()))

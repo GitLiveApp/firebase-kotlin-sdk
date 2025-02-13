@@ -6,37 +6,47 @@ package dev.gitlive.firebase.auth
 
 import cocoapods.FirebaseAuth.*
 
-actual class MultiFactor(val ios: FIRMultiFactor) {
-    actual val enrolledFactors: List<MultiFactorInfo>
-        get() = ios.enrolledFactors.mapNotNull { info -> (info as? FIRMultiFactorInfo)?.let{  MultiFactorInfo(it) } }
-    actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) = ios.await { enrollWithAssertion(multiFactorAssertion.ios, displayName, it) }.run { Unit }
-    actual suspend fun getSession(): MultiFactorSession = MultiFactorSession(ios.awaitResult { getSessionWithCompletion(completion = it) })
-    actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo) = ios.await { unenrollWithInfo(multiFactorInfo.ios, it) }.run { Unit }
-    actual suspend fun unenroll(factorUid: String) = ios.await { unenrollWithFactorUID(factorUid, it) }.run { Unit }
+public val MultiFactor.ios: FIRMultiFactor get() = ios
+
+public actual class MultiFactor(internal val ios: FIRMultiFactor) {
+    public actual val enrolledFactors: List<MultiFactorInfo>
+        get() = ios.enrolledFactors().mapNotNull { info -> (info as? FIRMultiFactorInfo)?.let { MultiFactorInfo(it) } }
+    public actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?): Unit = ios.await { enrollWithAssertion(multiFactorAssertion.ios, displayName, it) }
+    public actual suspend fun getSession(): MultiFactorSession = MultiFactorSession(ios.awaitResult { getSessionWithCompletion(completion = it) })
+    public actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo): Unit = ios.await { unenrollWithInfo(multiFactorInfo.ios, it) }
+    public actual suspend fun unenroll(factorUid: String): Unit = ios.await { unenrollWithFactorUID(factorUid, it) }
 }
 
-actual class MultiFactorInfo(val ios: FIRMultiFactorInfo) {
-    actual val displayName: String?
-        get() = ios.displayName
-    actual val enrollmentTime: Double
-        get() = ios.enrollmentDate.timeIntervalSinceReferenceDate.toDouble()
-    actual val factorId: String
-        get() = ios.factorID
-    actual val uid: String
-        get() = ios.UID
+public val MultiFactorInfo.ios: FIRMultiFactorInfo get() = ios
+
+public actual class MultiFactorInfo(internal val ios: FIRMultiFactorInfo) {
+    public actual val displayName: String?
+        get() = ios.displayName()
+    public actual val enrollmentTime: Double
+        get() = ios.enrollmentDate().timeIntervalSinceReferenceDate
+    public actual val factorId: String
+        get() = ios.factorID()
+    public actual val uid: String
+        get() = ios.UID()
 }
 
-actual class MultiFactorAssertion(val ios: FIRMultiFactorAssertion) {
-    actual val factorId: String
-        get() = ios.factorID
+public val MultiFactorAssertion.ios: FIRMultiFactorAssertion get() = ios
+
+public actual class MultiFactorAssertion(internal val ios: FIRMultiFactorAssertion) {
+    public actual val factorId: String
+        get() = ios.factorID()
 }
 
-actual class MultiFactorSession(val ios: FIRMultiFactorSession)
+public val MultiFactorSession.ios: FIRMultiFactorSession get() = ios
 
-actual class MultiFactorResolver(val ios: FIRMultiFactorResolver) {
-    actual val auth: FirebaseAuth = FirebaseAuth(ios.auth)
-    actual val hints: List<MultiFactorInfo> = ios.hints.mapNotNull { hint -> (hint as? FIRMultiFactorInfo)?.let { MultiFactorInfo(it) } }
-    actual val session: MultiFactorSession = MultiFactorSession(ios.session)
+public actual class MultiFactorSession(internal val ios: FIRMultiFactorSession)
 
-    actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(ios.awaitResult { resolveSignInWithAssertion(assertion.ios, it) })
+public val MultiFactorResolver.ios: FIRMultiFactorResolver get() = ios
+
+public actual class MultiFactorResolver(internal val ios: FIRMultiFactorResolver) {
+    public actual val auth: FirebaseAuth = FirebaseAuth(ios.auth())
+    public actual val hints: List<MultiFactorInfo> = ios.hints().mapNotNull { hint -> (hint as? FIRMultiFactorInfo)?.let { MultiFactorInfo(it) } }
+    public actual val session: MultiFactorSession = MultiFactorSession(ios.session())
+
+    public actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(ios.awaitResult { resolveSignInWithAssertion(assertion.ios, it) })
 }

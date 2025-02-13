@@ -10,19 +10,13 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.externals.getApp
 import dev.gitlive.firebase.firestore.externals.MemoryCacheSettings
 import dev.gitlive.firebase.firestore.externals.PersistentCacheSettings
-import dev.gitlive.firebase.firestore.externals.getDoc
-import dev.gitlive.firebase.firestore.externals.getDocFromCache
-import dev.gitlive.firebase.firestore.externals.getDocFromServer
-import dev.gitlive.firebase.firestore.externals.getDocs
-import dev.gitlive.firebase.firestore.externals.getDocsFromCache
-import dev.gitlive.firebase.firestore.externals.getDocsFromServer
 import dev.gitlive.firebase.firestore.externals.memoryEagerGarbageCollector
 import dev.gitlive.firebase.firestore.externals.memoryLocalCache
 import dev.gitlive.firebase.firestore.externals.memoryLruGarbageCollector
 import dev.gitlive.firebase.firestore.externals.persistentLocalCache
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
-import dev.gitlive.firebase.firestore.internal.SetOptions
+import dev.gitlive.firebase.js
 import kotlin.js.Json
 import kotlin.js.json
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
@@ -38,71 +32,77 @@ import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
 import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 
-actual val Firebase.firestore get() =
+public actual val Firebase.firestore: FirebaseFirestore get() =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(getApp())) }
 
-actual fun Firebase.firestore(app: FirebaseApp) =
+public actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js)) }
 
-actual data class NativeFirebaseFirestore(val js: JsFirestore)
+internal actual data class NativeFirebaseFirestore(val js: JsFirestore)
 
-val FirebaseFirestore.js: JsFirestore get() = native.js
+public operator fun FirebaseFirestore.Companion.invoke(js: JsFirestore): FirebaseFirestore = FirebaseFirestore(
+    NativeFirebaseFirestore(js),
+)
+public val FirebaseFirestore.js: JsFirestore get() = native.js
 
-actual data class FirebaseFirestoreSettings(
+public actual data class FirebaseFirestoreSettings(
     actual val sslEnabled: Boolean,
     actual val host: String,
     actual val cacheSettings: LocalCacheSettings,
 ) {
 
-    actual companion object {
-        actual val CACHE_SIZE_UNLIMITED: Long = -1L
+    public actual companion object {
+        public actual val CACHE_SIZE_UNLIMITED: Long = -1L
         internal actual val DEFAULT_HOST: String = "firestore.googleapis.com"
         internal actual val MINIMUM_CACHE_BYTES: Long = 1 * 1024 * 1024
+
         // According to documentation, default JS Firestore cache size is 40MB, not 100MB
         internal actual val DEFAULT_CACHE_SIZE_BYTES: Long = 40 * 1024 * 1024
     }
 
-    actual class Builder internal constructor(
-        actual var sslEnabled: Boolean,
-        actual var host: String,
-        actual var cacheSettings: LocalCacheSettings,
+    public actual class Builder internal constructor(
+        public actual var sslEnabled: Boolean,
+        public actual var host: String,
+        public actual var cacheSettings: LocalCacheSettings,
     ) {
 
-        actual constructor() : this(
+        public actual constructor() : this(
             true,
             DEFAULT_HOST,
-            persistentCacheSettings {  },
+            persistentCacheSettings { },
         )
-        actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings)
+        public actual constructor(settings: FirebaseFirestoreSettings) : this(settings.sslEnabled, settings.host, settings.cacheSettings)
 
-        actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings)
+        public actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(sslEnabled, host, cacheSettings)
     }
 
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    val js: Json get() = json().apply {
+    internal val js: Json get() = json().apply {
         set("ssl", sslEnabled)
         set("host", host)
-        set("localCache",
-        when (cacheSettings) {
-            is LocalCacheSettings.Persistent -> persistentLocalCache(
-                json(
-                    "cacheSizeBytes" to cacheSettings.sizeBytes
-                ).asDynamic() as PersistentCacheSettings
-            )
-            is LocalCacheSettings.Memory -> {
-                val garbageCollecorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
-                    is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
-                    is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
+        set(
+            "localCache",
+            when (cacheSettings) {
+                is LocalCacheSettings.Persistent -> persistentLocalCache(
+                    json(
+                        "cacheSizeBytes" to cacheSettings.sizeBytes,
+                    ).asDynamic() as PersistentCacheSettings,
+                )
+                is LocalCacheSettings.Memory -> {
+                    val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
+                        is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
+                        is MemoryGarbageCollectorSettings.LRUGC -> memoryLruGarbageCollector(json("cacheSizeBytes" to garbageCollectorSettings.sizeBytes))
+                    }
+                    memoryLocalCache(json("garbageCollector" to garbageCollectorSettings).asDynamic() as MemoryCacheSettings)
                 }
-                memoryLocalCache(json("garbageCollector" to garbageCollecorSettings).asDynamic() as MemoryCacheSettings)
-            }
-        })
+            },
+        )
     }
 }
 
-actual fun firestoreSettings(
+public actual fun firestoreSettings(
     settings: FirebaseFirestoreSettings?,
-    builder: FirebaseFirestoreSettings.Builder.() -> Unit
+    builder: FirebaseFirestoreSettings.Builder.() -> Unit,
 ): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder().apply {
     settings?.let {
         sslEnabled = it.sslEnabled
@@ -111,79 +111,95 @@ actual fun firestoreSettings(
     }
 }.apply(builder).build()
 
-actual data class NativeWriteBatch(val js: JsWriteBatch)
+internal actual data class NativeWriteBatch(val js: JsWriteBatch)
 
-val WriteBatch.js get() = native.js
+public operator fun WriteBatch.Companion.invoke(js: JsWriteBatch): WriteBatch = WriteBatch(NativeWriteBatch(js))
+public val WriteBatch.js: JsWriteBatch get() = native.js
 
-actual data class NativeTransaction(val js: JsTransaction)
+internal actual data class NativeTransaction(val js: JsTransaction)
 
-val Transaction.js get() = native.js
+public operator fun Transaction.Companion.invoke(js: JsTransaction): Transaction = Transaction(NativeTransaction(js))
+public val Transaction.js: JsTransaction get() = native.js
 
 /** A class representing a platform specific Firebase DocumentReference. */
-actual typealias NativeDocumentReferenceType = JsDocumentReference
+internal actual typealias NativeDocumentReferenceType = JsDocumentReference
 
-val DocumentReference.js get() = native.js
+public operator fun DocumentReference.Companion.invoke(js: JsDocumentReference): DocumentReference = DocumentReference(js)
+public val DocumentReference.js: NativeDocumentReferenceType get() = native.js
 
-actual open class NativeQuery(open val js: JsQuery)
+internal actual open class NativeQuery(open val js: JsQuery)
 internal val JsQuery.wrapped get() = NativeQuery(this)
 
-val Query.js get() = native.js
+public operator fun Query.Companion.invoke(js: JsQuery): Query = Query(js.wrapped)
+public val Query.js: dev.gitlive.firebase.firestore.externals.Query get() = native.js
 
-actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
+internal actual data class NativeCollectionReference(override val js: JsCollectionReference) : NativeQuery(js)
 
-val CollectionReference.js get() = native.js
+public operator fun CollectionReference.Companion.invoke(js: JsCollectionReference): CollectionReference = CollectionReference(NativeCollectionReference(js))
+public val CollectionReference.js: dev.gitlive.firebase.firestore.externals.CollectionReference get() = native.js
 
-actual class FirebaseFirestoreException(cause: Throwable, val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
+public actual class FirebaseFirestoreException(cause: Throwable, public val code: FirestoreExceptionCode) : FirebaseException(code.toString(), cause)
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
+public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() = code
 
-actual class QuerySnapshot(val js: JsQuerySnapshot) {
-    actual val documents
+public val QuerySnapshot.js: JsQuerySnapshot get() = js
+
+public actual class QuerySnapshot(internal val js: JsQuerySnapshot) {
+    public actual val documents: List<DocumentSnapshot>
         get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
-    actual val documentChanges
+    public actual val documentChanges: List<DocumentChange>
         get() = js.docChanges().map { DocumentChange(it) }
-    actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
+    public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
 }
 
-actual class DocumentChange(val js: JsDocumentChange) {
-    actual val document: DocumentSnapshot
+public val DocumentChange.js: JsDocumentChange get() = js
+
+public actual class DocumentChange(internal val js: JsDocumentChange) {
+    public actual val document: DocumentSnapshot
         get() = DocumentSnapshot(NativeDocumentSnapshotWrapper(js.doc))
-    actual val newIndex: Int
+    public actual val newIndex: Int
         get() = js.newIndex
-    actual val oldIndex: Int
+    public actual val oldIndex: Int
         get() = js.oldIndex
-    actual val type: ChangeType
-        get() = ChangeType.values().first { it.jsString == js.type }
+    public actual val type: ChangeType
+        get() = ChangeType.entries.first { it.jsString == js.type }
 }
 
-actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
+internal actual data class NativeDocumentSnapshot(val js: JsDocumentSnapshot)
 
-val DocumentSnapshot.js get() = native.js
+public operator fun DocumentSnapshot.Companion.invoke(js: JsDocumentSnapshot): DocumentSnapshot = DocumentSnapshot(NativeDocumentSnapshot(js))
+public val DocumentSnapshot.js: dev.gitlive.firebase.firestore.externals.DocumentSnapshot get() = native.js
 
-actual class SnapshotMetadata(val js: JsSnapshotMetadata) {
-    actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
-    actual val isFromCache: Boolean get() = js.fromCache
+public val SnapshotMetadata.js: dev.gitlive.firebase.firestore.externals.SnapshotMetadata get() = js
+
+public actual class SnapshotMetadata(internal val js: JsSnapshotMetadata) {
+    public actual val hasPendingWrites: Boolean get() = js.hasPendingWrites
+    public actual val isFromCache: Boolean get() = js.fromCache
 }
 
-actual class FieldPath private constructor(val js: JsFieldPath) {
+public val FieldPath.js: dev.gitlive.firebase.firestore.externals.FieldPath get() = js
 
-    actual companion object {
-        actual val documentId = FieldPath(jsDocumentId())
+public actual class FieldPath private constructor(internal val js: JsFieldPath) {
+
+    public actual companion object {
+        public actual val documentId: FieldPath = FieldPath(jsDocumentId())
     }
-    actual constructor(vararg fieldNames: String) : this(dev.gitlive.firebase.firestore.rethrow {
-        JsFieldPath(*fieldNames)
-    })
-    actual val documentId: FieldPath get() = FieldPath.documentId
-    actual val encoded: EncodedFieldPath = js
+    public actual constructor(vararg fieldNames: String) : this(
+        dev.gitlive.firebase.firestore.rethrow {
+            JsFieldPath(*fieldNames)
+        },
+    )
+    public actual val documentId: FieldPath get() = FieldPath.documentId
+    public actual val encoded: EncodedFieldPath = js
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
 }
 
-actual typealias EncodedFieldPath = JsFieldPath
+public actual typealias EncodedFieldPath = JsFieldPath
 
-actual enum class FirestoreExceptionCode {
+public actual enum class FirestoreExceptionCode {
     OK,
     CANCELLED,
     UNKNOWN,
@@ -200,18 +216,18 @@ actual enum class FirestoreExceptionCode {
     INTERNAL,
     UNAVAILABLE,
     DATA_LOSS,
-    UNAUTHENTICATED
+    UNAUTHENTICATED,
 }
 
-actual enum class Direction(internal val jsString : String) {
+public actual enum class Direction(internal val jsString: String) {
     ASCENDING("asc"),
-    DESCENDING("desc");
+    DESCENDING("desc"),
 }
 
-actual enum class ChangeType(internal val jsString : String) {
+public actual enum class ChangeType(internal val jsString: String) {
     ADDED("added"),
     MODIFIED("modified"),
-    REMOVED("removed");
+    REMOVED("removed"),
 }
 
 internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }
@@ -221,7 +237,7 @@ internal inline fun <R> rethrow(function: () -> R): R {
         return function()
     } catch (e: Exception) {
         throw e
-    } catch(e: dynamic) {
+    } catch (e: dynamic) {
         throw errorToException(e)
     }
 }
@@ -231,25 +247,25 @@ internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .lowercase()
     .let {
         when {
-            "cancelled" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.CANCELLED)
-            "invalid-argument" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INVALID_ARGUMENT)
-            "deadline-exceeded" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DEADLINE_EXCEEDED)
-            "not-found" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.NOT_FOUND)
-            "already-exists" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ALREADY_EXISTS)
-            "permission-denied" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.PERMISSION_DENIED)
-            "resource-exhausted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.RESOURCE_EXHAUSTED)
-            "failed-precondition" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.FAILED_PRECONDITION)
-            "aborted" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.ABORTED)
-            "out-of-range" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.OUT_OF_RANGE)
-            "unimplemented" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNIMPLEMENTED)
-            "internal" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.INTERNAL)
-            "unavailable" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAVAILABLE)
-            "data-loss" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.DATA_LOSS)
-            "unauthenticated" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNAUTHENTICATED)
-            "unknown" in it -> FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+            "cancelled" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.CANCELLED)
+            "invalid-argument" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INVALID_ARGUMENT)
+            "deadline-exceeded" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DEADLINE_EXCEEDED)
+            "not-found" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.NOT_FOUND)
+            "already-exists" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ALREADY_EXISTS)
+            "permission-denied" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.PERMISSION_DENIED)
+            "resource-exhausted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.RESOURCE_EXHAUSTED)
+            "failed-precondition" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.FAILED_PRECONDITION)
+            "aborted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ABORTED)
+            "out-of-range" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.OUT_OF_RANGE)
+            "unimplemented" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNIMPLEMENTED)
+            "internal" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INTERNAL)
+            "unavailable" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAVAILABLE)
+            "data-loss" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DATA_LOSS)
+            "unauthenticated" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAUTHENTICATED)
+            "unknown" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)
             else -> {
                 println("Unknown error code in ${JSON.stringify(e)}")
-                FirebaseFirestoreException(e, FirestoreExceptionCode.UNKNOWN)
+                FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)
             }
         }
     }

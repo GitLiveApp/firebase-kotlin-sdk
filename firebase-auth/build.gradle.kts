@@ -1,4 +1,9 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
@@ -14,23 +19,22 @@ plugins {
 }
 
 android {
-    val minSdkVersion: Int by project
     val compileSdkVersion: Int by project
 
     compileSdk = compileSdkVersion
     namespace = "dev.gitlive.firebase.auth"
 
     defaultConfig {
-        minSdk = minSdkVersion
+        minSdk = 23 // Auth has a MinSDK of 23. See https://github.com/firebase/firebase-android-sdk/issues/5927#issuecomment-2093466572
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    testOptions.configureTestOptions()
+    testOptions.configureTestOptions(project)
     packaging {
         resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
         resources.pickFirsts.add("META-INF/AL2.0")
@@ -44,10 +48,22 @@ android {
 val supportIosTarget = project.property("skipIosTarget") != "true"
 
 kotlin {
+    explicitApi()
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     targets.configureEach {
         compilations.configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    if (this is KotlinJvmCompilerOptions) {
+                        jvmTarget = JvmTarget.JVM_17
+                    }
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
         }
     }
 
@@ -56,25 +72,23 @@ kotlin {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishAllLibraryVariants()
-        compilations.configureEach {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
     }
+
+    jvm()
 
     if (supportIosTarget) {
         iosArm64()
-        iosX64()
-        iosSimulatorArm64()
+        iosX64().enableKeychainForTests()
+        iosSimulatorArm64().enableKeychainForTests()
         cocoapods {
-            ios.deploymentTarget = "12.0"
+            ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             framework {
                 baseName = "FirebaseAuth"
             }
             noPodspec()
             pod("FirebaseAuth") {
-                version = "10.25.0"
+                version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
     }
@@ -82,29 +96,17 @@ kotlin {
     js(IR) {
         useCommonJs()
         nodejs {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
+            }
         }
         browser {
-            testTask(
-                Action {
-                    useKarma {
-                        useChromeHeadless()
-                    }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
                 }
-            )
-        }
-    }
-
-    jvm {
-        compilations.getByName("main") {
-            kotlinOptions {
-                jvmTarget = "17"
             }
         }
     }
@@ -150,9 +152,38 @@ if (project.property("firebase-auth.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-auth.skipJvmTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-auth.skipJsTests") == "true") {
     tasks.forEach {
         if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (supportIosTarget) {
+    tasks.create<Exec>("launchIosSimulator") {
+        commandLine("open", "-a", "Simulator")
+    }
+
+    tasks.withType<KotlinNativeSimulatorTest>().configureEach {
+        dependsOn("launchIosSimulator")
+        standalone.set(false)
+        device.set("booted")
+    }
+}
+
+fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath
+        )
     }
 }
 

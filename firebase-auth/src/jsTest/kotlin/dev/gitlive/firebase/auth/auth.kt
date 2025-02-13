@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.auth
 
-
 actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit

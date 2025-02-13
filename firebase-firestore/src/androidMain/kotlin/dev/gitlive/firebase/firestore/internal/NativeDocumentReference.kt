@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-@PublishedApi
 internal actual class NativeDocumentReference actual constructor(actual val nativeValue: NativeDocumentReferenceType) {
     val android: NativeDocumentReferenceType by ::nativeValue
     actual val id: String
@@ -33,9 +32,11 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         android.get(source.toAndroidSource()).await()
 
     actual suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) {
-        val task = (setOptions.android?.let {
-            android.set(encodedData.android, it)
-        } ?: android.set(encodedData.android))
+        val task = (
+            setOptions.android?.let {
+                android.set(encodedData.android, it)
+            } ?: android.set(encodedData.android)
+            )
         task.await()
     }
 
@@ -74,7 +75,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     private fun addSnapshotListener(
         includeMetadataChanges: Boolean = false,
-        listener: ProducerScope<NativeDocumentSnapshot>.(com.google.firebase.firestore.DocumentSnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit
+        listener: ProducerScope<NativeDocumentSnapshot>.(com.google.firebase.firestore.DocumentSnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit,
     ) = callbackFlow {
         val executor = callbackExecutorMap[android.firestore] ?: TaskExecutors.MAIN_THREAD
         val metadataChanges =

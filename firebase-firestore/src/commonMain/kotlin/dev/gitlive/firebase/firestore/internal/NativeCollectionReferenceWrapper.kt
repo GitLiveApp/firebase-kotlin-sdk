@@ -3,9 +3,7 @@ package dev.gitlive.firebase.firestore.internal
 import dev.gitlive.firebase.firestore.NativeCollectionReference
 import dev.gitlive.firebase.internal.EncodedObject
 
-@PublishedApi
-internal expect class NativeCollectionReferenceWrapper internal constructor(native: NativeCollectionReference) :
-    NativeQueryWrapper {
+internal expect class NativeCollectionReferenceWrapper internal constructor(native: NativeCollectionReference) : NativeQueryWrapper {
 
     override val native: NativeCollectionReference
 

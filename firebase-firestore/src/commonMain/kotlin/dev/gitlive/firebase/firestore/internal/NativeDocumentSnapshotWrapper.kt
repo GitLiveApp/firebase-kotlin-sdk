@@ -5,7 +5,6 @@ import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.ServerTimestampBehavior
 import dev.gitlive.firebase.firestore.SnapshotMetadata
 
-@PublishedApi
 internal expect class NativeDocumentSnapshotWrapper internal constructor(native: NativeDocumentSnapshot) {
 
     val native: NativeDocumentSnapshot

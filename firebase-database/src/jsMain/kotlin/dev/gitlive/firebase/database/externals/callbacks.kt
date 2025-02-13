@@ -4,6 +4,6 @@
 
 package dev.gitlive.firebase.database.externals
 
-typealias ChangeSnapshotCallback = (data: DataSnapshot, previousChildName: String?) -> Unit
-typealias ValueSnapshotCallback = (data: DataSnapshot) -> Unit
-typealias CancelCallback = (error: Throwable) -> Unit
+public typealias ChangeSnapshotCallback = (data: DataSnapshot, previousChildName: String?) -> Unit
+public typealias ValueSnapshotCallback = (data: DataSnapshot) -> Unit
+public typealias CancelCallback = (error: Throwable) -> Unit

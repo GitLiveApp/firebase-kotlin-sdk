@@ -7,13 +7,12 @@ import dev.gitlive.firebase.firestore.ios
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 
-@PublishedApi
 internal actual class NativeTransactionWrapper actual constructor(actual val native: FIRTransaction) {
 
     actual fun setEncoded(
         documentRef: DocumentReference,
         encodedData: EncodedObject,
-        setOptions: SetOptions
+        setOptions: SetOptions,
     ): NativeTransactionWrapper = when (setOptions) {
         is SetOptions.Merge -> native.setData(encodedData.ios, documentRef.ios, true)
         is SetOptions.Overwrite -> native.setData(encodedData.ios, documentRef.ios, false)
@@ -25,18 +24,18 @@ internal actual class NativeTransactionWrapper actual constructor(actual val nat
 
     actual fun updateEncodedFieldsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<String, Any?>>
+        encodedFieldsAndValues: List<Pair<String, Any?>>,
     ): NativeTransactionWrapper = native.updateData(
         encodedFieldsAndValues.toMap(),
-        documentRef.ios
+        documentRef.ios,
     ).let { this }
 
     actual fun updateEncodedFieldPathsAndValues(
         documentRef: DocumentReference,
-        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>
+        encodedFieldsAndValues: List<Pair<EncodedFieldPath, Any?>>,
     ): NativeTransactionWrapper = native.updateData(
         encodedFieldsAndValues.toMap(),
-        documentRef.ios
+        documentRef.ios,
     ).let { this }
 
     actual fun delete(documentRef: DocumentReference) =
@@ -44,5 +43,4 @@ internal actual class NativeTransactionWrapper actual constructor(actual val nat
 
     actual suspend fun get(documentRef: DocumentReference) =
         throwError { NativeDocumentSnapshotWrapper(native.getDocument(documentRef.ios, it)!!) }
-
 }

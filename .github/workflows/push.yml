@@ -1,0 +1,23 @@
+name: Push
+
+on: [ push ]
+
+jobs:
+  formatKotlin:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: formatKotlin
+        run: ./gradlew formatKotlin
+      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: lintKotlin
+        run: ./gradlew lintKotlin

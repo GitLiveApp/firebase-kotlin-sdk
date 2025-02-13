@@ -16,9 +16,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 
 @Suppress("UNCHECKED_CAST")
-inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>() }
+public inline fun <reified T : Any> T.firebaseSerializer(): SerializationStrategy<T> = runCatching { serializer<T>() }
     .getOrElse {
-        when(this) {
+        when (this) {
             is Map<*, *> -> FirebaseMapSerializer()
             is List<*> -> FirebaseListSerializer()
             is Set<*> -> FirebaseListSerializer()
@@ -26,12 +26,12 @@ inline fun <reified T: Any> T.firebaseSerializer() = runCatching { serializer<T>
         } as SerializationStrategy<T>
     }
 
-class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
+public class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
 
-    lateinit var keys: List<String>
-    lateinit var map: Map<String, Any?>
+    public lateinit var keys: List<String>
+    public lateinit var map: Map<String, Any?>
 
-    override val descriptor = object : SerialDescriptor {
+    override val descriptor: SerialDescriptor = object : SerialDescriptor {
         override val kind = StructureKind.MAP
         override val serialName = "kotlin.Map<String, Any>"
         override val elementsCount get() = map.size
@@ -54,7 +54,10 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
                 collectionEncoder.encodeSerializableElement(it.descriptor, index * 2, it, key)
             }
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index * 2 + 1, serializer, listValue
+                serializer.descriptor,
+                index * 2 + 1,
+                serializer,
+                listValue,
             )
         }
         collectionEncoder.endStructure(descriptor)
@@ -63,7 +66,7 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     override fun deserialize(decoder: Decoder): Map<String, Any?> {
         val collectionDecoder = decoder.beginStructure(descriptor) as FirebaseCompositeDecoder
         val map = mutableMapOf<String, Any?>()
-        for(index in 0 until collectionDecoder.decodeCollectionSize(descriptor) * 2 step 2) {
+        for (index in 0 until collectionDecoder.decodeCollectionSize(descriptor) * 2 step 2) {
 //            map[collectionDecoder.decodeNullableSerializableElement(index) as String] =
 //                collectionDecoder.decodeNullableSerializableElement(index + 1)
         }
@@ -71,11 +74,11 @@ class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     }
 }
 
-class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
+public class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
-    lateinit var list: List<Any?>
+    public lateinit var list: List<Any?>
 
-    override val descriptor = object : SerialDescriptor {
+    override val descriptor: SerialDescriptor = object : SerialDescriptor {
         override val kind = StructureKind.LIST
         override val serialName = "kotlin.List<Any>"
         override val elementsCount get() = list.size
@@ -93,7 +96,10 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
         list.forEachIndexed { index, listValue ->
             val serializer = (listValue?.firebaseSerializer() ?: Unit.serializer()) as KSerializer<Any>
             collectionEncoder.encodeNullableSerializableElement(
-                serializer.descriptor, index, serializer, listValue
+                serializer.descriptor,
+                index,
+                serializer,
+                listValue,
             )
         }
         collectionEncoder.endStructure(descriptor)
@@ -114,12 +120,12 @@ class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
  * A special case of serializer for values natively supported by Firebase and
  * don't require an additional encoding/decoding.
  */
-class SpecialValueSerializer<T>(
+public class SpecialValueSerializer<T>(
     serialName: String,
     private val toNativeValue: (T) -> Any?,
-    private val fromNativeValue: (Any?) -> T
+    private val fromNativeValue: (Any?) -> T,
 ) : KSerializer<T> {
-    override val descriptor = buildClassSerialDescriptor(serialName) { }
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor(serialName) { }
 
     override fun serialize(encoder: Encoder, value: T) {
         if (encoder is FirebaseEncoder) {
@@ -129,11 +135,9 @@ class SpecialValueSerializer<T>(
         }
     }
 
-    override fun deserialize(decoder: Decoder): T {
-        return if (decoder is FirebaseDecoder) {
-            fromNativeValue(decoder.value)
-        } else {
-            throw SerializationException("This serializer must be used with FirebaseDecoder")
-        }
+    override fun deserialize(decoder: Decoder): T = if (decoder is FirebaseDecoder) {
+        fromNativeValue(decoder.value)
+    } else {
+        throw SerializationException("This serializer must be used with FirebaseDecoder")
     }
 }

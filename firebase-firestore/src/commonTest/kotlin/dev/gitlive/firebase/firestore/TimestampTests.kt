@@ -19,7 +19,7 @@ data class TestData(
     val uid: String,
     val createdAt: Timestamp,
     var updatedAt: BaseTimestamp,
-    val deletedAt: BaseTimestamp?
+    val deletedAt: BaseTimestamp?,
 )
 
 class TimestampTests {
@@ -42,9 +42,9 @@ class TimestampTests {
                 "uid" to "uid123",
                 "createdAt" to timestamp.nativeValue,
                 "updatedAt" to timestamp.nativeValue,
-                "deletedAt" to null
+                "deletedAt" to null,
             ),
-            encode<TestData>(item) { encodeDefaults = false }
+            encode<TestData>(item) { encodeDefaults = false },
         )
     }
 
@@ -57,9 +57,9 @@ class TimestampTests {
                 "uid" to "uid123",
                 "createdAt" to timestamp.nativeValue,
                 "updatedAt" to FieldValue.serverTimestamp.nativeValue,
-                "deletedAt" to FieldValue.serverTimestamp.nativeValue
+                "deletedAt" to FieldValue.serverTimestamp.nativeValue,
             ),
-            encode<TestData>(item) { encodeDefaults = false }
+            encode<TestData>(item) { encodeDefaults = false },
         )
     }
 
@@ -70,7 +70,7 @@ class TimestampTests {
             "uid" to "uid123",
             "createdAt" to timestamp.nativeValue,
             "updatedAt" to timestamp.nativeValue,
-            "deletedAt" to timestamp.nativeValue
+            "deletedAt" to timestamp.nativeValue,
         )
         val decoded: TestData = decode(TestData.serializer(), obj)
         assertEquals("uid123", decoded.uid)
@@ -97,7 +97,7 @@ class TimestampTests {
             "uid" to "uid123",
             "createdAt" to Timestamp.now().nativeValue,
             "updatedAt" to Timestamp.now().nativeValue,
-            "deletedAt" to null
+            "deletedAt" to null,
         )
         val decoded: TestData = decode(TestData.serializer(), obj)
         assertEquals("uid123", decoded.uid)

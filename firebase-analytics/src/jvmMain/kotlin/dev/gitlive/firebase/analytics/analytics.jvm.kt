@@ -3,33 +3,38 @@ package dev.gitlive.firebase.analytics
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlin.time.Duration
 
-actual val Firebase.analytics: FirebaseAnalytics
+public actual val Firebase.analytics: FirebaseAnalytics
     get() = TODO("Not yet implemented")
 
-actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics {
-    TODO("Not yetimplemented")
+public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics {
+    TODO("Not yet implemented")
 }
 
-actual class FirebaseAnalytics {
-    actual fun setUserProperty(name: String, value: String) {}
-    actual fun setUserId(id: String) {}
-    actual fun resetAnalyticsData() {}
-    actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {}
-    actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Long) {}
-    actual suspend fun getSessionId(): Long? = TODO("Not yet implemented")
-    actual fun setDefaultEventParameters(parameters: Map<String, String>) {}
-    actual fun logEvent(name: String, parameters: Map<String, Any>?) {}
+public actual class FirebaseAnalytics {
+    public actual fun setUserProperty(name: String, value: String) {}
+    public actual fun setUserId(id: String?) {}
+    public actual fun resetAnalyticsData() {}
+    public actual fun setAnalyticsCollectionEnabled(enabled: Boolean) {}
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {}
+    public actual suspend fun getSessionId(): Long? = TODO("Not yet implemented")
+    public actual fun setDefaultEventParameters(parameters: Map<String, String>) {}
+    public actual fun logEvent(name: String, parameters: Map<String, Any>?) {}
 
-    actual fun setConsent(consentSettings: Map<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus>) {}
+    public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {}
 
-    actual enum class ConsentType {
-        AD_PERSONALIZATION, AD_STORAGE, AD_USER_DATA, ANALYTICS_STORAGE
+    public actual enum class ConsentType {
+        AD_PERSONALIZATION,
+        AD_STORAGE,
+        AD_USER_DATA,
+        ANALYTICS_STORAGE,
     }
 
-    actual enum class ConsentStatus {
-        GRANTED, DENIED
+    public actual enum class ConsentStatus {
+        GRANTED,
+        DENIED,
     }
 }
 
-actual class FirebaseAnalyticsException internal constructor(message: String) : FirebaseException(message)
+public actual class FirebaseAnalyticsException internal constructor(message: String) : FirebaseException(message)

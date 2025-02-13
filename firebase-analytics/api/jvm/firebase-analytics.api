@@ -1,0 +1,209 @@
+public final class dev/gitlive/firebase/analytics/AnalyticEventConstantsKt {
+	public static final fun getEvent (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsEvents;
+	public static final fun getParam (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsParam;
+	public static final fun getUserProperty (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsUserProperty;
+}
+
+public final class dev/gitlive/firebase/analytics/AnalyticsKt {
+	public static final fun logEvent (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static final fun setConsent (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Lkotlin/jvm/functions/Function1;)V
+	public static final fun setSessionTimeoutInterval (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;J)V
+}
+
+public final class dev/gitlive/firebase/analytics/Analytics_jvmKt {
+	public static final fun analytics (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics;
+	public static final fun getAnalytics (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
+	public fun <init> ()V
+	public final fun getSessionId (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun logEvent (Ljava/lang/String;Ljava/util/Map;)V
+	public static synthetic fun logEvent$default (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)V
+	public final fun resetAnalyticsData ()V
+	public final fun setAnalyticsCollectionEnabled (Z)V
+	public final fun setConsent (Ljava/util/Map;)V
+	public final fun setDefaultEventParameters (Ljava/util/Map;)V
+	public final fun setSessionTimeoutInterval-LRDsOJo (J)V
+	public final fun setUserId (Ljava/lang/String;)V
+	public final fun setUserProperty (Ljava/lang/String;Ljava/lang/String;)V
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus : java/lang/Enum {
+	public static final field DENIED Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public static final field GRANTED Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public static fun values ()[Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType : java/lang/Enum {
+	public static final field AD_PERSONALIZATION Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+	public static final field AD_STORAGE Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+	public static final field AD_USER_DATA Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+	public static final field ANALYTICS_STORAGE Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+	public static fun values ()[Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentType;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsConsentBuilder {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/Map;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsConsentBuilder;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/analytics/FirebaseAnalyticsConsentBuilder;Ljava/util/Map;ILjava/lang/Object;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsConsentBuilder;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAdPersonalization ()Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public final fun getAdStorage ()Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public final fun getAdUserData ()Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public final fun getAnalyticsStorage ()Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;
+	public final fun getConsentSettings ()Ljava/util/Map;
+	public fun hashCode ()I
+	public final fun setAdPersonalization (Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;)V
+	public final fun setAdStorage (Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;)V
+	public final fun setAdUserData (Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;)V
+	public final fun setAnalyticsStorage (Ldev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsEvents {
+	public static final field ADD_PAYMENT_INFO Ljava/lang/String;
+	public static final field ADD_SHIPPING_INFO Ljava/lang/String;
+	public static final field ADD_TO_CART Ljava/lang/String;
+	public static final field ADD_TO_WISHLIST Ljava/lang/String;
+	public static final field AD_IMPRESSION Ljava/lang/String;
+	public static final field APP_OPEN Ljava/lang/String;
+	public static final field BEGIN_CHECKOUT Ljava/lang/String;
+	public static final field CAMPAIGN_DETAILS Ljava/lang/String;
+	public static final field EARN_VIRTUAL_CURRENCY Ljava/lang/String;
+	public static final field GENERATE_LEAD Ljava/lang/String;
+	public static final field INSTANCE Ldev/gitlive/firebase/analytics/FirebaseAnalyticsEvents;
+	public static final field JOIN_GROUP Ljava/lang/String;
+	public static final field LEVEL_END Ljava/lang/String;
+	public static final field LEVEL_START Ljava/lang/String;
+	public static final field LEVEL_UP Ljava/lang/String;
+	public static final field LOGIN Ljava/lang/String;
+	public static final field POST_SCORE Ljava/lang/String;
+	public static final field PURCHASE Ljava/lang/String;
+	public static final field REFUND Ljava/lang/String;
+	public static final field REMOVE_FROM_CART Ljava/lang/String;
+	public static final field SCREEN_VIEW Ljava/lang/String;
+	public static final field SEARCH Ljava/lang/String;
+	public static final field SELECT_CONTENT Ljava/lang/String;
+	public static final field SELECT_ITEM Ljava/lang/String;
+	public static final field SELECT_PROMOTION Ljava/lang/String;
+	public static final field SHARE Ljava/lang/String;
+	public static final field SIGN_UP Ljava/lang/String;
+	public static final field SPEND_VIRTUAL_CURRENCY Ljava/lang/String;
+	public static final field TUTORIAL_BEGIN Ljava/lang/String;
+	public static final field TUTORIAL_COMPLETE Ljava/lang/String;
+	public static final field UNLOCK_ACHIEVEMENT Ljava/lang/String;
+	public static final field VIEW_CART Ljava/lang/String;
+	public static final field VIEW_ITEM Ljava/lang/String;
+	public static final field VIEW_ITEM_LIST Ljava/lang/String;
+	public static final field VIEW_PROMOTION Ljava/lang/String;
+	public static final field VIEW_SEARCH_RESULTS Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsException : com/google/firebase/FirebaseException {
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsParam {
+	public static final field ACHIEVEMENT_ID Ljava/lang/String;
+	public static final field ACLID Ljava/lang/String;
+	public static final field AD_FORMAT Ljava/lang/String;
+	public static final field AD_PLATFORM Ljava/lang/String;
+	public static final field AD_SOURCE Ljava/lang/String;
+	public static final field AD_UNIT_NAME Ljava/lang/String;
+	public static final field AFFILIATION Ljava/lang/String;
+	public static final field CAMPAIGN Ljava/lang/String;
+	public static final field CAMPAIGN_ID Ljava/lang/String;
+	public static final field CHARACTER Ljava/lang/String;
+	public static final field CONTENT Ljava/lang/String;
+	public static final field CONTENT_TYPE Ljava/lang/String;
+	public static final field COUPON Ljava/lang/String;
+	public static final field CP1 Ljava/lang/String;
+	public static final field CREATIVE_FORMAT Ljava/lang/String;
+	public static final field CREATIVE_NAME Ljava/lang/String;
+	public static final field CREATIVE_SLOT Ljava/lang/String;
+	public static final field CURRENCY Ljava/lang/String;
+	public static final field DESTINATION Ljava/lang/String;
+	public static final field DISCOUNT Ljava/lang/String;
+	public static final field END_DATE Ljava/lang/String;
+	public static final field EXTEND_SESSION Ljava/lang/String;
+	public static final field FLIGHT_NUMBER Ljava/lang/String;
+	public static final field GROUP_ID Ljava/lang/String;
+	public static final field INDEX Ljava/lang/String;
+	public static final field INSTANCE Ldev/gitlive/firebase/analytics/FirebaseAnalyticsParam;
+	public static final field ITEMS Ljava/lang/String;
+	public static final field ITEM_BRAND Ljava/lang/String;
+	public static final field ITEM_CATEGORY Ljava/lang/String;
+	public static final field ITEM_CATEGORY2 Ljava/lang/String;
+	public static final field ITEM_CATEGORY3 Ljava/lang/String;
+	public static final field ITEM_CATEGORY4 Ljava/lang/String;
+	public static final field ITEM_CATEGORY5 Ljava/lang/String;
+	public static final field ITEM_ID Ljava/lang/String;
+	public static final field ITEM_LIST_ID Ljava/lang/String;
+	public static final field ITEM_LIST_NAME Ljava/lang/String;
+	public static final field ITEM_NAME Ljava/lang/String;
+	public static final field ITEM_VARIANT Ljava/lang/String;
+	public static final field LEVEL Ljava/lang/String;
+	public static final field LEVEL_NAME Ljava/lang/String;
+	public static final field LOCATION Ljava/lang/String;
+	public static final field LOCATION_ID Ljava/lang/String;
+	public static final field MARKETING_TACTIC Ljava/lang/String;
+	public static final field MEDIUM Ljava/lang/String;
+	public static final field METHOD Ljava/lang/String;
+	public static final field NUMBER_OF_NIGHTS Ljava/lang/String;
+	public static final field NUMBER_OF_PASSENGERS Ljava/lang/String;
+	public static final field NUMBER_OF_ROOMS Ljava/lang/String;
+	public static final field ORIGIN Ljava/lang/String;
+	public static final field PAYMENT_TYPE Ljava/lang/String;
+	public static final field PRICE Ljava/lang/String;
+	public static final field PROMOTION_ID Ljava/lang/String;
+	public static final field PROMOTION_NAME Ljava/lang/String;
+	public static final field QUANTITY Ljava/lang/String;
+	public static final field SCORE Ljava/lang/String;
+	public static final field SCREEN_CLASS Ljava/lang/String;
+	public static final field SCREEN_NAME Ljava/lang/String;
+	public static final field SEARCH_TERM Ljava/lang/String;
+	public static final field SHIPPING Ljava/lang/String;
+	public static final field SHIPPING_TIER Ljava/lang/String;
+	public static final field SOURCE Ljava/lang/String;
+	public static final field SOURCE_PLATFORM Ljava/lang/String;
+	public static final field START_DATE Ljava/lang/String;
+	public static final field SUCCESS Ljava/lang/String;
+	public static final field TAX Ljava/lang/String;
+	public static final field TERM Ljava/lang/String;
+	public static final field TRANSACTION_ID Ljava/lang/String;
+	public static final field TRAVEL_CLASS Ljava/lang/String;
+	public static final field VALUE Ljava/lang/String;
+	public static final field VIRTUAL_CURRENCY_NAME Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsParameters {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/Map;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsParameters;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/analytics/FirebaseAnalyticsParameters;Ljava/util/Map;ILjava/lang/Object;)Ldev/gitlive/firebase/analytics/FirebaseAnalyticsParameters;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getParameters ()Ljava/util/Map;
+	public fun hashCode ()I
+	public final fun param (Ljava/lang/String;D)V
+	public final fun param (Ljava/lang/String;I)V
+	public final fun param (Ljava/lang/String;J)V
+	public final fun param (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun param (Ljava/lang/String;Z)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsUserProperty {
+	public static final field ALLOW_AD_PERSONALIZATION_SIGNALS Ljava/lang/String;
+	public static final field INSTANCE Ldev/gitlive/firebase/analytics/FirebaseAnalyticsUserProperty;
+	public static final field SIGN_UP_METHOD Ljava/lang/String;
+}
+

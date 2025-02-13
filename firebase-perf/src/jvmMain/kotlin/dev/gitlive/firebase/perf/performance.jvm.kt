@@ -6,26 +6,25 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
 
 /** Returns the [FirebasePerformance] instance of the default [FirebaseApp]. */
-actual val Firebase.performance: FirebasePerformance
+public actual val Firebase.performance: FirebasePerformance
     get() = TODO("Not yet implemented")
 
 /** Returns the [FirebasePerformance] instance of a given [FirebaseApp]. */
-actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance {
+public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance {
     TODO("Not yet implemented")
 }
 
-actual class FirebasePerformance {
-    actual fun newTrace(traceName: String): Trace {
+public actual class FirebasePerformance {
+    public actual fun newTrace(traceName: String): Trace {
         TODO("Not yet implemented")
     }
 
-    actual fun isPerformanceCollectionEnabled(): Boolean {
+    public actual fun isPerformanceCollectionEnabled(): Boolean {
         TODO("Not yet implemented")
     }
 
-    actual fun setPerformanceCollectionEnabled(enable: Boolean) {
+    public actual fun setPerformanceCollectionEnabled(enable: Boolean) {
     }
-
 }
 
-actual open class FirebasePerformanceException internal constructor(message: String) : FirebaseException(message)
+public actual open class FirebasePerformanceException internal constructor(message: String) : FirebaseException(message)

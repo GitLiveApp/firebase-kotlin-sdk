@@ -1,12 +1,12 @@
 package dev.gitlive.firebase.perf.metrics
 
 /** Trace allows you to set beginning and end of a certain action in your app. */
-expect class Trace {
+public expect class Trace {
     /** Starts this trace. */
-    fun start()
+    public fun start()
 
     /** Stops this trace. */
-    fun stop()
+    public fun stop()
 
     /**
      * Gets the value of the metric with the given name in the current trace. If a metric with the
@@ -16,7 +16,7 @@ expect class Trace {
      *     leading underscore '_' character, max length is 100 characters.
      * @return Value of the metric or 0 if it hasn't yet been set.
      */
-    fun getLongMetric(metricName: String): Long
+    public fun getLongMetric(metricName: String): Long
 
     /**
      * Atomically increments the metric with the given name in this trace by the incrementBy value. If
@@ -27,7 +27,7 @@ expect class Trace {
      *     whitespace, no leading underscore [_] character, max length of 100 characters.
      * @param incrementBy Amount by which the metric has to be incremented.
      */
-    fun incrementMetric(metricName: String, incrementBy: Long)
+    public fun incrementMetric(metricName: String, incrementBy: Long)
 
     /**
      * Sets the value of the metric with the given name in this trace to the value provided. If a
@@ -39,5 +39,5 @@ expect class Trace {
      *     leading underscore '_' character, max length is 100 characters.
      * @param value The value to which the metric should be set to.
      */
-    fun putMetric(metricName: String, value: Long)
+    public fun putMetric(metricName: String, value: Long)
 }

@@ -6,37 +6,53 @@ package dev.gitlive.firebase.auth
 
 import kotlinx.coroutines.tasks.await
 
-actual class MultiFactor(val android: com.google.firebase.auth.MultiFactor) {
-    actual val enrolledFactors: List<MultiFactorInfo>
+public val MultiFactor.android: com.google.firebase.auth.MultiFactor get() = android
+
+public actual class MultiFactor(internal val android: com.google.firebase.auth.MultiFactor) {
+    public actual val enrolledFactors: List<MultiFactorInfo>
         get() = android.enrolledFactors.map { MultiFactorInfo(it) }
-    actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) = android.enroll(multiFactorAssertion.android, displayName).await().run { Unit }
-    actual suspend fun getSession(): MultiFactorSession = MultiFactorSession(android.session.await())
-    actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo) = android.unenroll(multiFactorInfo.android).await().run { Unit }
-    actual suspend fun unenroll(factorUid: String) = android.unenroll(factorUid).await().run { Unit }
+    public actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) {
+        android.enroll(multiFactorAssertion.android, displayName).await()
+    }
+    public actual suspend fun getSession(): MultiFactorSession = MultiFactorSession(android.session.await())
+    public actual suspend fun unenroll(multiFactorInfo: MultiFactorInfo) {
+        android.unenroll(multiFactorInfo.android).await()
+    }
+    public actual suspend fun unenroll(factorUid: String) {
+        android.unenroll(factorUid).await()
+    }
 }
 
-actual class MultiFactorInfo(val android: com.google.firebase.auth.MultiFactorInfo) {
-    actual val displayName: String?
+public val MultiFactorInfo.android: com.google.firebase.auth.MultiFactorInfo get() = android
+
+public actual class MultiFactorInfo(internal val android: com.google.firebase.auth.MultiFactorInfo) {
+    public actual val displayName: String?
         get() = android.displayName
-    actual val enrollmentTime: Double
+    public actual val enrollmentTime: Double
         get() = android.enrollmentTimestamp.toDouble()
-    actual val factorId: String
+    public actual val factorId: String
         get() = android.factorId
-    actual val uid: String
+    public actual val uid: String
         get() = android.uid
 }
 
-actual class MultiFactorAssertion(val android: com.google.firebase.auth.MultiFactorAssertion) {
-    actual val factorId: String
+public val MultiFactorAssertion.android: com.google.firebase.auth.MultiFactorAssertion get() = android
+
+public actual class MultiFactorAssertion(internal val android: com.google.firebase.auth.MultiFactorAssertion) {
+    public actual val factorId: String
         get() = android.factorId
 }
 
-actual class MultiFactorSession(val android: com.google.firebase.auth.MultiFactorSession)
+public val MultiFactorSession.android: com.google.firebase.auth.MultiFactorSession get() = android
 
-actual class MultiFactorResolver(val android: com.google.firebase.auth.MultiFactorResolver) {
-    actual val auth: FirebaseAuth = FirebaseAuth(android.firebaseAuth)
-    actual val hints: List<MultiFactorInfo> = android.hints.map { MultiFactorInfo(it) }
-    actual val session: MultiFactorSession = MultiFactorSession(android.session)
+public actual class MultiFactorSession(internal val android: com.google.firebase.auth.MultiFactorSession)
 
-    actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(android.resolveSignIn(assertion.android).await())
+public val MultiFactorResolver.android: com.google.firebase.auth.MultiFactorResolver get() = android
+
+public actual class MultiFactorResolver(internal val android: com.google.firebase.auth.MultiFactorResolver) {
+    public actual val auth: FirebaseAuth = FirebaseAuth(android.firebaseAuth)
+    public actual val hints: List<MultiFactorInfo> = android.hints.map { MultiFactorInfo(it) }
+    public actual val session: MultiFactorSession = MultiFactorSession(android.session)
+
+    public actual suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(android.resolveSignIn(assertion.android).await())
 }

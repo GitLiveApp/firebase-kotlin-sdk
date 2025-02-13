@@ -5,25 +5,31 @@ import dev.gitlive.firebase.Firebase
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError
 
-actual val Firebase.messaging: FirebaseMessaging
+public val FirebaseMessaging.ios: FIRMessaging get() = FIRMessaging.messaging()
+
+public actual val Firebase.messaging: FirebaseMessaging
     get() = FirebaseMessaging(FIRMessaging.messaging())
 
-actual class FirebaseMessaging(val ios: FIRMessaging) {
-    actual fun subscribeToTopic(topic: String) {
+public actual class FirebaseMessaging(internal val ios: FIRMessaging) {
+    public actual fun subscribeToTopic(topic: String) {
         ios.subscribeToTopic(topic)
     }
 
-    actual fun unsubscribeFromTopic(topic: String) {
+    public actual fun unsubscribeFromTopic(topic: String) {
         ios.unsubscribeFromTopic(topic)
     }
 
-    actual suspend fun getToken(): String = awaitResult { ios.tokenWithCompletion(it) }
+    public actual suspend fun getToken(): String = awaitResult { ios.tokenWithCompletion(it) }
+
+    public actual suspend fun deleteToken() {
+        await { ios.deleteTokenWithCompletion(it) }
+    }
 }
 
-suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
+public suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(Unit)
         } else {
             job.completeExceptionally(Exception(error.toString()))
@@ -32,10 +38,10 @@ suspend inline fun <T> T.await(function: T.(callback: (NSError?) -> Unit) -> Uni
     job.await()
 }
 
-suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
+public suspend inline fun <T, reified R> T.awaitResult(function: T.(callback: (R?, NSError?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { result, error ->
-        if(error == null) {
+        if (error == null) {
             job.complete(result)
         } else {
             job.completeExceptionally(Exception(error.toString()))

@@ -11,8 +11,6 @@ import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
 import kotlin.test.*
 
-actual val emulatorHost: String = "localhost"
-
 actual val context: Any = Unit
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
@@ -32,8 +30,8 @@ class JsPerformanceTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         performance = Firebase.performance(app)

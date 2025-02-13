@@ -10,10 +10,8 @@ actual val emulatorHost: String = "localhost"
 
 actual val context: Any = Unit
 
-actual fun encodedAsMap(encoded: Any?): Map<String, Any?> {
-    return (js("Object").entries(encoded) as Array<Array<Any>>).associate {
-        it[0] as String to it[1]
-    }
+actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = (js("Object").entries(encoded) as Array<Array<Any>>).associate {
+    it[0] as String to it[1]
 }
 actual fun Map<String, Any?>.asEncoded(): Any =
     json(*entries.map { (key, value) -> key to value }.toTypedArray())

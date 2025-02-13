@@ -6,48 +6,48 @@ package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.Firebase
 
-expect open class AuthCredential {
-    val providerId: String
+public expect open class AuthCredential {
+    public val providerId: String
 }
-expect class PhoneAuthCredential : AuthCredential
+public expect class PhoneAuthCredential : AuthCredential
 
-expect class OAuthCredential : AuthCredential
+public expect class OAuthCredential : AuthCredential
 
-expect object EmailAuthProvider {
-    fun credential(email: String, password: String): AuthCredential
-    fun credentialWithLink(email: String, emailLink: String): AuthCredential
-}
-
-expect object FacebookAuthProvider {
-    fun credential(accessToken: String): AuthCredential
+public expect object EmailAuthProvider {
+    public fun credential(email: String, password: String): AuthCredential
+    public fun credentialWithLink(email: String, emailLink: String): AuthCredential
 }
 
-expect object GithubAuthProvider {
-    fun credential(token: String): AuthCredential
+public expect object FacebookAuthProvider {
+    public fun credential(accessToken: String): AuthCredential
 }
 
-expect object GoogleAuthProvider {
-    fun credential(idToken: String?, accessToken: String?): AuthCredential
+public expect object GithubAuthProvider {
+    public fun credential(token: String): AuthCredential
 }
 
-expect class OAuthProvider constructor(
+public expect object GoogleAuthProvider {
+    public fun credential(idToken: String?, accessToken: String?): AuthCredential
+}
+
+public expect class OAuthProvider(
     provider: String,
     scopes: List<String> = emptyList(),
     customParameters: Map<String, String> = emptyMap(),
-    auth: FirebaseAuth = Firebase.auth
+    auth: FirebaseAuth = Firebase.auth,
 ) {
-    companion object {
-        fun credential(providerId: String, accessToken: String? = null, idToken: String? = null, rawNonce: String? = null): OAuthCredential
+    public companion object {
+        public fun credential(providerId: String, accessToken: String? = null, idToken: String? = null, rawNonce: String? = null): OAuthCredential
     }
 }
 
-expect class PhoneAuthProvider constructor(auth: FirebaseAuth = Firebase.auth) {
-    fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
-    suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
+public expect class PhoneAuthProvider(auth: FirebaseAuth = Firebase.auth) {
+    public fun credential(verificationId: String, smsCode: String): PhoneAuthCredential
+    public suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential
 }
 
-expect interface PhoneVerificationProvider
+public expect interface PhoneVerificationProvider
 
-expect object TwitterAuthProvider {
-    fun credential(token: String, secret: String): AuthCredential
+public expect object TwitterAuthProvider {
+    public fun credential(token: String, secret: String): AuthCredential
 }

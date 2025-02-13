@@ -5,7 +5,6 @@ import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 
-@PublishedApi
 internal actual class NativeCollectionReferenceWrapper internal actual constructor(actual override val native: NativeCollectionReference) : NativeQueryWrapper(native) {
 
     actual val path: String
@@ -13,7 +12,7 @@ internal actual class NativeCollectionReferenceWrapper internal actual construct
 
     actual val document get() = NativeDocumentReference(native.documentWithAutoID())
 
-    actual val parent get() = native.parent?.let{ NativeDocumentReference(it) }
+    actual val parent get() = native.parent?.let { NativeDocumentReference(it) }
 
     actual fun document(documentPath: String) =
         NativeDocumentReference(native.documentWithPath(documentPath))

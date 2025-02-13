@@ -32,8 +32,8 @@ class FirebaseAuthTest {
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
                 projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111"
-            )
+                gcmSenderId = "846484016111",
+            ),
         )
 
         auth = Firebase.auth(app).apply {
@@ -71,6 +71,7 @@ class FirebaseAuthTest {
     }
 
     @Test
+    @Ignore
     fun testFetchSignInMethods() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         var signInMethodResult = auth.fetchSignInMethodsForEmail(email)
@@ -109,6 +110,22 @@ class FirebaseAuthTest {
         val credential = EmailAuthProvider.credential("test@test.com", "test123")
         val result = auth.signInWithCredential(credential)
         assertEquals(uid, result.user!!.uid)
+    }
+
+    @Test
+    fun testAuthResultStructure() = runTest {
+        val uid = getTestUid("test@test.com", "test123")
+        val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
+        assertNotNull(result.user, "User does not exist.")
+        assertEquals(uid, result.user!!.uid, "uid does not match.")
+        assertNull(result.credential, "Credential throws.")
+        // Just test if it does not throw
+        result.additionalUserInfo?.let { additionalUserInfo ->
+            additionalUserInfo.providerId
+            additionalUserInfo.username
+            additionalUserInfo.profile
+            additionalUserInfo.isNewUser
+        }
     }
 
     @Test

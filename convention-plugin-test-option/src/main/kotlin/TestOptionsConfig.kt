@@ -1,8 +1,12 @@
 import com.android.build.api.dsl.ManagedVirtualDevice
 import com.android.build.api.dsl.TestOptions
+import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.provideDelegate
 
-fun TestOptions.configureTestOptions() {
+fun TestOptions.configureTestOptions(project: Project) {
+    val targetSdkVersion: Int by project
+    targetSdk = targetSdkVersion
     unitTests {
         isIncludeAndroidResources = true
         all { test: org.gradle.api.tasks.testing.Test ->

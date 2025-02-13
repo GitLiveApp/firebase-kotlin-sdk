@@ -39,5 +39,6 @@ internal class EncodeDecodeSettingsBuilderImpl : EncodeDecodeSettingsBuilder {
 
 @PublishedApi
 internal fun EncodeSettings.Builder.buildEncodeSettings(): EncodeSettings = EncodeSettingsImpl(encodeDefaults, serializersModule)
+
 @PublishedApi
 internal fun DecodeSettings.Builder.buildDecodeSettings(): DecodeSettings = DecodeSettingsImpl(serializersModule)

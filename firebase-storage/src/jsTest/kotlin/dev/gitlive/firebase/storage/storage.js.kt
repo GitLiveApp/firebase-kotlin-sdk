@@ -1,5 +1,5 @@
 package dev.gitlive.firebase.storage
 
-actual fun createTestData(): Data {
-    TODO("Not yet implemented")
-}
+import org.khronos.webgl.Uint8Array
+
+actual fun createTestData(): Data = Data(Uint8Array("test".encodeToByteArray().toTypedArray()))
