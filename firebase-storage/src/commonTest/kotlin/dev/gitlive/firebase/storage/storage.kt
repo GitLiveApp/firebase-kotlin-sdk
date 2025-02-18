@@ -55,11 +55,6 @@ class FirebaseStorageTest {
     }
 
     @Test
-    fun test_loading_storage() {
-        Firebase.storage
-    }
-
-    @Test
     fun testStorageNotNull() = runTest {
         assertNotNull(storage)
     }
