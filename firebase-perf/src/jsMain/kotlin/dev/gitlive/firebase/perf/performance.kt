@@ -6,6 +6,7 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.js
 import dev.gitlive.firebase.perf.externals.getPerformance
 import dev.gitlive.firebase.perf.externals.trace
+import dev.gitlive.firebase.perf.metrics.HttpMetric
 import dev.gitlive.firebase.perf.metrics.Trace
 import dev.gitlive.firebase.perf.externals.FirebasePerformance as JsFirebasePerformance
 
@@ -36,6 +37,10 @@ public actual class FirebasePerformance internal constructor(internal val js: Js
 
     public fun setInstrumentationEnabled(enable: Boolean) {
         js.instrumentationEnabled = enable
+    }
+
+    public actual fun newHttpMetric(url: String, httpMethod: String): HttpMetric {
+        return HttpMetric()
     }
 }
 

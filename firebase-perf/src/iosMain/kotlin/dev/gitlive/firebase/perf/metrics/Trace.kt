@@ -23,4 +23,20 @@ public actual class Trace internal constructor(internal val ios: FIRTrace?) {
     public actual fun putMetric(metricName: String, value: Long) {
         ios?.setIntValue(value, metricName)
     }
+
+    public actual fun getAttribute(attribute: String): String? {
+        TODO("Not yet implemented")
+    }
+
+    public actual fun getAttributes(): Map<String, String> {
+        TODO("Not yet implemented")
+    }
+
+    public actual fun putAttribute(attribute: String, value: String) {
+        TODO("Not yet implemented")
+    }
+
+    public actual fun removeAttribute(attribute: String) {
+        TODO("Not yet implemented")
+    }
 }

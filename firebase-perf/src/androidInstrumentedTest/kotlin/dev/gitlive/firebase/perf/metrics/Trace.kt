@@ -60,8 +60,8 @@ class AndroidTraceTest {
 
         assertEquals(3, attributes.size)
 
+        // TODO: refactor? this should check if keys are same as you have placed and if values are same as you have placed
         attributes.onEachIndexed { _, entry ->
-
             assertEquals(entry.key.last(), entry.value.last())
         }
 
@@ -87,4 +87,6 @@ class AndroidTraceTest {
         assertEquals("Test Put Attribute Value", trace.getAttribute("Test_Put_Attribute"))
         trace.stop()
     }
+
+    // TODO: new tests for functions
 }
