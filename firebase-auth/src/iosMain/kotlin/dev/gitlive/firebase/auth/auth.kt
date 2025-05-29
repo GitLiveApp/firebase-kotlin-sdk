@@ -9,6 +9,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.FirebaseNetworkException
+import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import dev.gitlive.firebase.ios
 import kotlinx.cinterop.*
@@ -171,7 +172,7 @@ public actual open class FirebaseAuthEmailException(message: String) : FirebaseA
 public actual open class FirebaseAuthInvalidCredentialsException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthWeakPasswordException(message: String) : FirebaseAuthInvalidCredentialsException(message)
 public actual open class FirebaseAuthInvalidUserException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthMultiFactorException(message: String) : FirebaseAuthException(message)
+public actual open class FirebaseAuthMultiFactorException(message: String, public val resolver: FIRMultiFactorResolver?) : FirebaseAuthException(message)
 public actual open class FirebaseAuthRecentLoginRequiredException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthUserCollisionException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthWebException(message: String) : FirebaseAuthException(message)
@@ -248,7 +249,13 @@ private fun NSError.toException() = when (domain) {
         17078L, // AuthErrorCode.secondFactorRequired
         17088L, // AuthErrorCode.maximumSecondFactorCountExceeded
         17084L, // AuthErrorCode.multiFactorInfoNotFound
-        -> FirebaseAuthMultiFactorException(toString())
+        -> {
+            val resolver = userInfo["FIRAuthErrorUserInfoMultiFactorResolverKey"] as? FIRMultiFactorResolver
+            FirebaseAuthMultiFactorException(toString(), resolver)
+        }
+
+        17052L, // AuthErrorCode.quotaExceeded
+        -> FirebaseTooManyRequestsException(toString())
 
         17007L, // AuthErrorCode.emailAlreadyInUse
         17012L, // AuthErrorCode.accountExistsWithDifferentCredential
