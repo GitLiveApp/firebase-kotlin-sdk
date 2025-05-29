@@ -25,18 +25,23 @@ public actual class Trace internal constructor(internal val ios: FIRTrace?) {
     }
 
     public actual fun getAttribute(attribute: String): String? {
-        TODO("Not yet implemented")
+        return ios?.valueForAttribute(attribute)
     }
 
     public actual fun getAttributes(): Map<String, String> {
-        TODO("Not yet implemented")
+        val attributesDict = ios?.attributes
+        return attributesDict?.let { dict ->
+            dict.keys.map { key ->
+                key.toString() to dict[key]?.toString().orEmpty()
+            }.toMap()
+        } ?: emptyMap()
     }
 
     public actual fun putAttribute(attribute: String, value: String) {
-        TODO("Not yet implemented")
+        ios?.setValue(value, attribute)
     }
 
     public actual fun removeAttribute(attribute: String) {
-        TODO("Not yet implemented")
+        ios?.removeAttribute(attribute)
     }
 }
