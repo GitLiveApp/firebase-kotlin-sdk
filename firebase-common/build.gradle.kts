@@ -81,6 +81,9 @@ kotlin {
     if (supportIosTarget) {
         iosArm64()
         iosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
     }
 
     js(IR) {

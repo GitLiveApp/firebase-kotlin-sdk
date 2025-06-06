@@ -83,8 +83,12 @@ kotlin {
     if (supportIosTarget) {
         iosArm64()
         iosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+            tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
             framework {
                 baseName = "FirebaseDatabase"
             }
@@ -123,7 +127,10 @@ kotlin {
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.FlowPreview")
                 optIn("kotlinx.serialization.InternalSerializationApi")
-                if (name.lowercase().contains("ios")) {
+                if (name.lowercase().contains("ios")
+                    || name.lowercase().contains("apple")
+                    || name.lowercase().contains("tvos")
+                    ) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 }
             }
