@@ -14,6 +14,7 @@ import platform.Foundation.NSDefaultRunLoopMode
 import platform.Foundation.NSRunLoop
 import platform.Foundation.create
 import platform.Foundation.runMode
+import kotlin.test.assertEquals
 
 actual fun runTest(test: suspend CoroutineScope.() -> Unit) = runBlocking {
     val testRun = MainScope().async { test() }
@@ -30,5 +31,5 @@ actual fun runBlockingTest(action: suspend CoroutineScope.() -> Unit) = runBlock
 actual fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any = mapOf(*pairs)
 actual fun nativeListOf(vararg elements: Any?): Any = listOf(*elements)
 actual fun nativeAssertEquals(expected: Any?, actual: Any?) {
-    kotlin.test.assertEquals(expected, actual)
+    assertEquals(expected, actual)
 }
