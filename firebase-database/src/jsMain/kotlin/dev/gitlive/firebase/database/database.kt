@@ -4,34 +4,12 @@
 
 package dev.gitlive.firebase.database
 
-import dev.gitlive.firebase.DecodeSettings
-import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.database.externals.CancelCallback
-import dev.gitlive.firebase.database.externals.ChangeSnapshotCallback
-import dev.gitlive.firebase.database.externals.Database
-import dev.gitlive.firebase.database.externals.child
-import dev.gitlive.firebase.database.externals.connectDatabaseEmulator
-import dev.gitlive.firebase.database.externals.enableLogging
-import dev.gitlive.firebase.database.externals.getDatabase
-import dev.gitlive.firebase.database.externals.onChildAdded
-import dev.gitlive.firebase.database.externals.onChildChanged
-import dev.gitlive.firebase.database.externals.onChildMoved
-import dev.gitlive.firebase.database.externals.onChildRemoved
-import dev.gitlive.firebase.database.externals.onDisconnect
-import dev.gitlive.firebase.database.externals.onValue
-import dev.gitlive.firebase.database.externals.push
-import dev.gitlive.firebase.database.externals.query
-import dev.gitlive.firebase.database.externals.ref
-import dev.gitlive.firebase.database.externals.remove
-import dev.gitlive.firebase.database.externals.set
-import dev.gitlive.firebase.database.externals.update
+import dev.gitlive.firebase.*
+import dev.gitlive.firebase.database.externals.*
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
 import dev.gitlive.firebase.internal.reencodeTransformation
-import dev.gitlive.firebase.js
 import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -73,12 +51,16 @@ public actual fun Firebase.database(url: String): FirebaseDatabase =
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase =
     rethrow { FirebaseDatabase(getDatabase(app = app.js, url = url)) }
 
-public val FirebaseDatabase.js get() = js
+public val FirebaseDatabase.js: Database get() = js
 
 public actual class FirebaseDatabase internal constructor(internal val js: Database) {
 
-    public actual fun reference(path: String): DatabaseReference = rethrow { DatabaseReference(NativeDatabaseReference(ref(js, path), js)) }
-    public actual fun reference(): DatabaseReference = rethrow { DatabaseReference(NativeDatabaseReference(ref(js), js)) }
+    public actual fun reference(path: String): DatabaseReference =
+        rethrow { DatabaseReference(NativeDatabaseReference(ref(js, path), js)) }
+
+    public actual fun reference(): DatabaseReference =
+        rethrow { DatabaseReference(NativeDatabaseReference(ref(js), js)) }
+
     public actual fun setPersistenceEnabled(enabled: Boolean) {}
     public actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {}
     public actual fun setLoggingEnabled(enabled: Boolean): Unit = rethrow { enableLogging(enabled) }
@@ -148,27 +130,36 @@ public actual open class Query internal actual constructor(
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }
     }
 
-    public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: String, key: String?): Query =
+        Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: Double, key: String?): Query =
+        Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
+    public actual fun startAt(value: Boolean, key: String?): Query =
+        Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: String, key: String?): Query =
+        Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: Double, key: String?): Query =
+        Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
+    public actual fun endAt(value: Boolean, key: String?): Query =
+        Query(query(publicJs, jsEndAt(value, key ?: undefined)), database)
 
     public actual fun limitToFirst(limit: Int): Query = Query(query(publicJs, jsLimitToFirst(limit)), database)
 
     public actual fun limitToLast(limit: Int): Query = Query(query(publicJs, jsLimitToLast(limit)), database)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: String, key: String?): Query =
+        Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: Double, key: String?): Query =
+        Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
+    public actual fun equalTo(value: Boolean, key: String?): Query =
+        Query(query(publicJs, jsEqualTo(value, key ?: undefined)), database)
 
     override fun toString(): String = publicJs.toString()
 }
@@ -193,7 +184,11 @@ internal actual class NativeDatabaseReference internal constructor(
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) =
         rethrow { update(js, encodedUpdate.js).awaitWhileOnline(database) }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = DataSnapshot(
+    actual suspend fun <T> runTransaction(
+        strategy: KSerializer<T>,
+        buildSettings: EncodeDecodeSettingsBuilder.() -> Unit,
+        transactionUpdate: (currentData: T) -> T
+    ): DataSnapshot = DataSnapshot(
         jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
             reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
         }).awaitWhileOnline(database).snapshot,
@@ -207,15 +202,19 @@ public actual class DataSnapshot internal constructor(
     internal val js: JsDataSnapshot,
     public val database: Database,
 ) {
-    public actual val value: Any? get() {
-        check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }
-        return js.`val`()
-    }
+    public actual val value: Any?
+        get() {
+            check(!hasChildren) { "DataSnapshot.value can only be used for primitive values (snapshots without children)" }
+            return js.`val`()
+        }
 
     public actual inline fun <reified T> value(): T =
         rethrow { decode<T>(value = publicJs.`val`()) }
 
-    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T =
+    public actual inline fun <T> value(
+        strategy: DeserializationStrategy<T>,
+        buildSettings: DecodeSettings.Builder.() -> Unit
+    ): T =
         rethrow { decode(strategy, publicJs.`val`(), buildSettings) }
 
     public actual val exists: Boolean get() = rethrow { js.exists() }
@@ -252,8 +251,12 @@ internal actual class NativeOnDisconnect internal constructor(
 public val OnDisconnect.js: dev.gitlive.firebase.database.externals.OnDisconnect get() = native.js
 public val OnDisconnect.database: Database get() = native.database
 
-public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause) {
-    public constructor(error: dynamic) : this("${error.code ?: "UNKNOWN"}: ${error.message}", error.unsafeCast<Throwable>())
+public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) :
+    RuntimeException(message, cause) {
+    public constructor(error: dynamic) : this(
+        "${error.code ?: "UNKNOWN"}: ${error.message}",
+        error.unsafeCast<Throwable>()
+    )
 }
 
 @PublishedApi
