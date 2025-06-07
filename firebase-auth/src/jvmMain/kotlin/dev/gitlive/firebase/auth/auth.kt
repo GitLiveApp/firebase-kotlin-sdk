@@ -61,8 +61,7 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
         android.confirmPasswordReset(code, newPassword).await()
     }
 
-    public actual suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult =
-        AuthResult(android.createUserWithEmailAndPassword(email, password).await())
+    public actual suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult = AuthResult(android.createUserWithEmailAndPassword(email, password).await())
 
     public actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = android.fetchSignInMethodsForEmail(email).await().signInMethods.orEmpty()
 
@@ -76,19 +75,15 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
 
     public actual fun isSignInWithEmailLink(link: String): Boolean = android.isSignInWithEmailLink(link)
 
-    public actual suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult =
-        AuthResult(android.signInWithEmailAndPassword(email, password).await())
+    public actual suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult = AuthResult(android.signInWithEmailAndPassword(email, password).await())
 
-    public actual suspend fun signInWithCustomToken(token: String): AuthResult =
-        AuthResult(android.signInWithCustomToken(token).await())
+    public actual suspend fun signInWithCustomToken(token: String): AuthResult = AuthResult(android.signInWithCustomToken(token).await())
 
     public actual suspend fun signInAnonymously(): AuthResult = AuthResult(android.signInAnonymously().await())
 
-    public actual suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult =
-        AuthResult(android.signInWithCredential(authCredential.android).await())
+    public actual suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult = AuthResult(android.signInWithCredential(authCredential.android).await())
 
-    public actual suspend fun signInWithEmailLink(email: String, link: String): AuthResult =
-        AuthResult(android.signInWithEmailLink(email, link).await())
+    public actual suspend fun signInWithEmailLink(email: String, link: String): AuthResult = AuthResult(android.signInWithEmailLink(email, link).await())
 
     public actual suspend fun signOut() {
         android.signOut()

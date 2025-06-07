@@ -20,14 +20,11 @@ import dev.gitlive.firebase.functions.js as publicJs
 public actual val Firebase.functions: FirebaseFunctions
     get() = rethrow { FirebaseFunctions(getFunctions()) }
 
-public actual fun Firebase.functions(region: String): FirebaseFunctions =
-    rethrow { FirebaseFunctions(getFunctions(regionOrCustomDomain = region)) }
+public actual fun Firebase.functions(region: String): FirebaseFunctions = rethrow { FirebaseFunctions(getFunctions(regionOrCustomDomain = region)) }
 
-public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions =
-    rethrow { FirebaseFunctions(getFunctions(app.js)) }
+public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = rethrow { FirebaseFunctions(getFunctions(app.js)) }
 
-public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions =
-    rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
+public actual fun Firebase.functions(app: FirebaseApp, region: String): FirebaseFunctions = rethrow { FirebaseFunctions(getFunctions(app.js, region)) }
 
 public val FirebaseFunctions.js: Functions get() = js
 
@@ -65,8 +62,7 @@ public val HttpsCallableResult.js: JsHttpsCallableResult get() = js
 
 public actual class HttpsCallableResult(internal val js: JsHttpsCallableResult) {
 
-    public actual inline fun <reified T> data(): T =
-        rethrow { decode<T>(value = publicJs.data) }
+    public actual inline fun <reified T> data(): T = rethrow { decode<T>(value = publicJs.data) }
 
     public actual inline fun <T> data(
         strategy: DeserializationStrategy<T>,
