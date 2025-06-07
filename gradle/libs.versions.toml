@@ -19,6 +19,7 @@ settings-language = "2.2"
 firebase-cocoapods = "11.14.0"
 ios-deploymentTarget = "13.0"
 tvos-deploymentTarget = "13.0"
+macos-deploymentTarget = "10.15"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"
 

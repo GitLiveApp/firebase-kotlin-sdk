@@ -13,7 +13,7 @@ public actual val Firebase.installations: FirebaseInstallations
 public actual fun Firebase.installations(app: FirebaseApp): FirebaseInstallations =
     rethrow { FirebaseInstallations(getInstallations(app.js)) }
 
-public val FirebaseInstallations.js get() = js
+public val FirebaseInstallations.js: Installations get() = js
 
 public actual class FirebaseInstallations internal constructor(internal val js: Installations) {
 

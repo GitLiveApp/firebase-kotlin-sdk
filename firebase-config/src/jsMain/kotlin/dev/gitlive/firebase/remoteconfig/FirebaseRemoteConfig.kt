@@ -18,7 +18,7 @@ public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig 
     FirebaseRemoteConfig(getRemoteConfig(app.js))
 }
 
-public val FirebaseRemoteConfig.js get() = js
+public val FirebaseRemoteConfig.js: RemoteConfig get() = js
 
 public actual class FirebaseRemoteConfig internal constructor(internal val js: RemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
