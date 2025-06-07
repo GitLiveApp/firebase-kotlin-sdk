@@ -85,10 +85,13 @@ kotlin {
         tvosArm64()
         tvosX64()
         tvosSimulatorArm64()
+        macosArm64()
+        macosX64()
 
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+            osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
             framework {
                 baseName = "FirebaseApp"
             }
@@ -127,6 +130,7 @@ kotlin {
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
+                    || name.lowercase().contains("macos")
                 ) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 }

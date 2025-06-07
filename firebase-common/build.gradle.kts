@@ -84,6 +84,8 @@ kotlin {
         tvosArm64()
         tvosX64()
         tvosSimulatorArm64()
+        macosArm64()
+        macosX64()
     }
 
     js(IR) {
