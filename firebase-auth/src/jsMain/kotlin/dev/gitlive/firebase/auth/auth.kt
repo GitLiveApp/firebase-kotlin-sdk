@@ -188,6 +188,7 @@ public actual class AuthTokenResult(internal val js: IdTokenResult) {
 internal fun ActionCodeSettings.toJson() = json(
     "url" to url,
     "android" to (androidPackageName?.run { json("installApp" to installIfNotAvailable, "minimumVersion" to minimumVersion, "packageName" to packageName) } ?: undefined),
+    "linkDomain" to (linkDomain ?: undefined),
     "dynamicLinkDomain" to (dynamicLinkDomain ?: undefined),
     "handleCodeInApp" to canHandleCodeInApp,
     "ios" to (iOSBundleId?.run { json("bundleId" to iOSBundleId) } ?: undefined),
