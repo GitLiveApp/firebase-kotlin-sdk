@@ -80,6 +80,11 @@ kotlin {
         iosArm64()
         iosX64()
         iosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+        macosArm64()
+        macosX64()
     }
 
     js(IR) {

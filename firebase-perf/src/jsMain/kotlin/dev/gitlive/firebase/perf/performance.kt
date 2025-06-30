@@ -18,7 +18,7 @@ public actual fun Firebase.performance(app: FirebaseApp): FirebasePerformance = 
     FirebasePerformance(getPerformance(app.js))
 }
 
-public val FirebasePerformance.js get() = js
+public val FirebasePerformance.js: JsFirebasePerformance get() = js
 
 public actual class FirebasePerformance internal constructor(internal val js: JsFirebasePerformance) {
 
