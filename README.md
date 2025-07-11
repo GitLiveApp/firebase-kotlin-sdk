@@ -192,6 +192,10 @@ Where an `update` method exists, an `updateFields` method will also be available
 
 ```kotlin
 documentRef.updateFields {
+    // Root level encode settings
+    encodeDefaults = false
+    serializersModule = module
+    
     "field" to "value"
     // Set the value of otherField to "1" using a custom Serializer
     "otherField".to(IntAsStringSerializer(), 1)
@@ -199,7 +203,7 @@ documentRef.updateFields {
     // Overwrite build settings. All fields added within this block will have these build settings applied
     withEncodeSettings {
         encodeDefaults = true
-        serializersModule = module
+        serializersModule = otherModule
         "city" to abstractCity
     }
 }
@@ -209,6 +213,10 @@ Similarly, the `Query` methods `startAt`/`startAfter`/`endAt`/`endBefore` have a
 
 ```kotlin
 query.orderBy("field", "otherField", "city").startAtFieldValues { // similar syntax for startAfter/endAt/endBefore
+    // Root level encode settings
+    encodeDefaults = false
+    serializersModule = module
+    
     add("Value")
 
     // Starts at "1" for the otherField value
@@ -217,7 +225,7 @@ query.orderBy("field", "otherField", "city").startAtFieldValues { // similar syn
     // Overwrite build settings. All field values added within this block will have these build settings applied
     withEncodeSettings {
         encodeDefaults = true
-        serializersModule = module
+        serializersModule = otherModule
         add(abstractCity)
     }
 }
