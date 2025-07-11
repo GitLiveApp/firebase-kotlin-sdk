@@ -31,6 +31,8 @@ public final class dev/gitlive/firebase/internal/EncodeDecodeSettingsBuilderImpl
 public final class dev/gitlive/firebase/internal/EncodeDecodeSettingsKt {
 	public static final fun buildDecodeSettings (Ldev/gitlive/firebase/DecodeSettings$Builder;)Ldev/gitlive/firebase/DecodeSettings;
 	public static final fun buildEncodeSettings (Ldev/gitlive/firebase/EncodeSettings$Builder;)Ldev/gitlive/firebase/EncodeSettings;
+	public static final fun copyFrom (Ldev/gitlive/firebase/DecodeSettings$Builder;Ldev/gitlive/firebase/DecodeSettings$Builder;)V
+	public static final fun copyFrom (Ldev/gitlive/firebase/EncodeSettings$Builder;Ldev/gitlive/firebase/EncodeSettings$Builder;)V
 }
 
 public final class dev/gitlive/firebase/internal/EncodeSettingsImpl : dev/gitlive/firebase/EncodeSettings {

@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.copyFrom
+import dev.gitlive.firebase.internal.copyFrom
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
