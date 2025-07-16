@@ -132,7 +132,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api(libs.google.firebase.perf.ktx)
+                api(libs.google.firebase.perf)
             }
         }
 
