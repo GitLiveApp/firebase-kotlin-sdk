@@ -28,6 +28,21 @@ public expect class FirebaseCrashlytics {
     public fun recordException(exception: Throwable)
 
     /**
+     * Records a non-fatal report to send to Crashlytics.
+     *
+     * Combined with app level custom keys, the event is restricted to a maximum of 64 key/value
+     * pairs. New keys beyond that limit are ignored. Keys or values that exceed 1024 characters are
+     * truncated.
+     *
+     * The values of event keys override the values of app level custom keys if they're identical.
+     *
+     * @param exception a [Throwable] to be recorded as a non-fatal event.
+     * @param customKeys A dictionary of keys and the values to associate with the non fatal
+     *                      exception, in addition to the app level custom keys.
+     */
+    public fun recordException(exception: Throwable, customKeys: Map<String, Any>)
+
+    /**
      * Logs a message that's included in the next fatal, non-fatal, or ANR report.
      *
      * Logs are visible in the session view on the Firebase Crashlytics console.
