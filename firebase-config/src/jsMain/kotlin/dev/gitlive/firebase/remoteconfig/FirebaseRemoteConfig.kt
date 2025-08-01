@@ -10,6 +10,7 @@ import kotlinx.datetime.Instant
 import kotlin.js.json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = rethrow { FirebaseRemoteConfig(getRemoteConfig()) }
@@ -24,6 +25,7 @@ public actual class FirebaseRemoteConfig internal constructor(internal val js: R
     public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() = rethrow { getAllKeys().associateWith { getValue(it) } }
 
+    @OptIn(ExperimentalTime::class)
     public actual val info: FirebaseRemoteConfigInfo
         get() = rethrow {
             FirebaseRemoteConfigInfo(

@@ -20,6 +20,7 @@ import platform.Foundation.NSError
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 
 public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = FIRRemoteConfig.remoteConfig()
 
@@ -44,6 +45,7 @@ public actual class FirebaseRemoteConfig internal constructor(internal val ios: 
             }.flatten().toMap()
         }
 
+    @OptIn(ExperimentalTime::class)
     public actual val info: FirebaseRemoteConfigInfo
         get() {
             return FirebaseRemoteConfigInfo(
