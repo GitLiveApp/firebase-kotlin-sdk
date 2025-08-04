@@ -22,7 +22,7 @@ jobs:
       - name: run apiCheck
         run: ./gradlew apiCheck
   jobMatrixSetup:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
