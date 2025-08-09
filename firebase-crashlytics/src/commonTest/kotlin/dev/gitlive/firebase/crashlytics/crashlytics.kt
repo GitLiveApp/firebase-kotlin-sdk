@@ -42,13 +42,6 @@ class FirebaseCrashlyticsTest {
         crashlytics = Firebase.crashlytics(app)
     }
 
-    @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
-    }
-
     @Test
     fun testRecordException() = runTest {
         crashlytics.recordException(Exception("Test Exception"))
