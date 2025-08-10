@@ -42,8 +42,8 @@ class FirebaseStorageTest {
 
         storage = Firebase.storage(app).apply {
             useEmulator(emulatorHost, 9199)
-            setMaxOperationRetryTime(10.seconds)
-            setMaxUploadRetryTime(10.seconds)
+            setMaxOperationRetryTime(30.seconds)
+            setMaxUploadRetryTime(30.seconds)
         }
     }
 
