@@ -6,7 +6,7 @@ import kotlin.js.Date
 import dev.gitlive.firebase.auth.externals.UserInfo as JsUserInfo
 import kotlin.js.json
 
-public val FirebaseUser.js get() = js
+public val FirebaseUser.js: User get() = js
 
 public actual class FirebaseUser internal constructor(internal val js: User) {
     public actual val uid: String
@@ -57,7 +57,7 @@ public actual class FirebaseUser internal constructor(internal val js: User) {
     public actual suspend fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?): Unit = rethrow { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJson()).await() }
 }
 
-public val UserInfo.js get() = js
+public val UserInfo.js: JsUserInfo get() = js
 
 public actual class UserInfo(internal val js: JsUserInfo) {
     public actual val displayName: String?
@@ -74,7 +74,7 @@ public actual class UserInfo(internal val js: JsUserInfo) {
         get() = rethrow { js.uid }
 }
 
-public val UserMetaData.js get() = js
+public val UserMetaData.js: UserMetadata get() = js
 
 public actual class UserMetaData(internal val js: UserMetadata) {
     public actual val creationTime: Double?
