@@ -603,7 +603,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$EqualTo : dev/
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForArray : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValues ()Ljava/util/List;
+	public fun getSafeValues ()Ljava/util/List;
 	public abstract fun getValues ()Ljava/util/List;
 }
 
@@ -612,7 +612,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ForArray$Defau
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public fun getSafeValue ()Ljava/lang/Object;
 	public abstract fun getValue ()Ljava/lang/Object;
 }
 
@@ -621,7 +621,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObj
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForObject : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public fun getSafeValue ()Ljava/lang/Object;
 	public abstract fun getValue ()Ljava/lang/Object;
 }
 
