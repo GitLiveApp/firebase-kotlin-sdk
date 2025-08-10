@@ -12,6 +12,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
@@ -21,8 +22,7 @@ public val FirebaseRemoteConfig.android: AndroidFirebaseRemoteConfig get() = And
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance())
 
-public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig =
-    FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
+public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
 
 public actual class FirebaseRemoteConfig internal constructor(internal val android: AndroidFirebaseRemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
@@ -66,6 +66,7 @@ public actual class FirebaseRemoteConfig internal constructor(internal val andro
         minimumFetchInterval = minimumFetchIntervalInSeconds.seconds,
     )
 
+    @OptIn(ExperimentalTime::class)
     private fun AndroidFirebaseRemoteConfigInfo.asCommon(): FirebaseRemoteConfigInfo {
         val lastFetchStatus = when (lastFetchStatus) {
             AndroidFirebaseRemoteConfig.LAST_FETCH_STATUS_SUCCESS -> FetchStatus.Success
