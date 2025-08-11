@@ -120,7 +120,7 @@ kotlin {
 
         getByName("androidMain") {
             dependencies {
-                api(libs.google.firebase.crashlytics.ktx)
+                api(libs.google.firebase.crashlytics)
             }
         }
 
