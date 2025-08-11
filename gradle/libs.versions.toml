@@ -29,16 +29,16 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 gitlive-firebase-java-sdk = { module = "dev.gitlive:firebase-java-sdk", version.ref = "gitlive-firebase-java-sdk" }
 google-firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
-google-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx"}
-google-firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx"}
-google-firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx"}
-google-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx"}
-google-firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx"}
+google-firebase-auth = { module = "com.google.firebase:firebase-auth"}
+google-firebase-common = { module = "com.google.firebase:firebase-common"}
+google-firebase-config = { module = "com.google.firebase:firebase-config"}
+google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics"}
+google-firebase-database = { module = "com.google.firebase:firebase-database"}
 google-firebase-firestore = { module = "com.google.firebase:firebase-firestore"}
 google-firebase-functions = { module = "com.google.firebase:firebase-functions"}
-google-firebase-installations-ktx = { module = "com.google.firebase:firebase-installations-ktx"}
+google-firebase-installations = { module = "com.google.firebase:firebase-installations"}
 google-firebase-messaging = { module = "com.google.firebase:firebase-messaging"}
-google-firebase-perf-ktx = { module = "com.google.firebase:firebase-perf-ktx"}
+google-firebase-perf = { module = "com.google.firebase:firebase-perf"}
 google-firebase-storage = { module = "com.google.firebase:firebase-storage"}
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { module = "junit:junit", version.ref = "junit" }
