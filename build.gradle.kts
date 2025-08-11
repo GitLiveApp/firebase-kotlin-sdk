@@ -196,8 +196,7 @@ subprojects {
 
         repositories {
             maven {
-                url = uri("https://central.sonatype.com/api/v1/publisher/deployments/download/")
-
+                url = uri("https://central.sonatype.com/repository/maven-snapshots")
                 credentials {
                     username = project.findProperty("sonatypeUsername") as String? ?: System.getenv("sonatypeUsername")
                     password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
