@@ -25,46 +25,92 @@
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            Firebase Kotlin SDK
-                    </a>            </div>
-            <div class="library-version">2.1.0
-            </div>
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.2.0
         </div>
-        <div class="filter-section" id="filter-section">
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-functions:dokkaHtmlPartial/commonMain">common</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-functions:dokkaHtmlPartial/iosMain">ios</button>
                 <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-functions:dokkaHtmlPartial/jsMain">js</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-functions:dokkaHtmlPartial/commonMain" data-filter=":firebase-functions:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-functions:dokkaHtmlPartial/iosMain" data-filter=":firebase-functions:dokkaHtmlPartial/iosMain">
+                                <span class="checkbox--icon"></span>
+                                ios
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-functions:dokkaHtmlPartial/jsMain" data-filter=":firebase-functions:dokkaHtmlPartial/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-            <a class="navigation-controls--btn navigation-controls--homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="firebase-functions::dev.gitlive.firebase.functions/FunctionsExceptionCode.ALREADY_EXISTS///PointingToDeclaration/{&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;:{&quot;key&quot;:&quot;org.jetbrains.dokka.links.EnumEntryDRIExtra&quot;}}/-256314152">
   <div class="breadcrumbs"><a href="../../../index.html">firebase-functions</a><span class="delimiter">/</span><a href="../../index.html">dev.gitlive.firebase.functions</a><span class="delimiter">/</span><a href="../index.html">FunctionsExceptionCode</a><span class="delimiter">/</span><span class="current">ALREADY_EXISTS</span></div>
   <div class="cover ">
-    <h1 class="cover"><span><span>ALREADY_EXISTS</span></span></h1>
+    <h1 class="cover"><span>ALREADY_</span><wbr><span>EXISTS</span></h1>
     <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
       <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":firebase-functions:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/iosMain" data-toggle=":firebase-functions:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/jsMain" data-toggle=":firebase-functions:dokkaHtmlPartial/jsMain">js</button></div>
 <div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-functions:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><a href="index.html">ALREADY_EXISTS</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><div class="block"><a href="index.html">ALREADY_EXISTS</a></div></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><div class="block"><a href="index.html">ALREADY_EXISTS</a></div></div></div>    </div>
@@ -86,7 +132,7 @@
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":firebase-functions:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/iosMain" data-toggle=":firebase-functions:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/jsMain" data-toggle=":firebase-functions:dokkaHtmlPartial/jsMain">js</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-functions:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F744548958">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F-434477242">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F674746112">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-functions:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F744548958">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F-434477242">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-372974862%2FProperties%2F674746112">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -103,7 +149,7 @@
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/commonMain" data-active="" data-toggle=":firebase-functions:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/iosMain" data-toggle=":firebase-functions:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-functions:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-functions:dokkaHtmlPartial/jsMain" data-toggle=":firebase-functions:dokkaHtmlPartial/jsMain">js</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-functions:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F744548958">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F-434477242">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F674746112">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-functions:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F744548958">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/iosMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F-434477242">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-functions:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-u-n-a-u-t-h-e-n-t-i-c-a-t-e-d/index.html#-739389684%2FProperties%2F674746112">ordinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -113,12 +159,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 GitLive Ltd.</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-
