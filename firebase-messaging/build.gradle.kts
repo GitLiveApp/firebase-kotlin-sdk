@@ -14,6 +14,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("testOptionsConvention")
+    alias(libs.plugins.publish)
 }
 
 android {
@@ -162,9 +163,13 @@ if (project.property("firebase-messaging.skipJsTests") == "true") {
     }
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    coordinates(
+        groupId = "dev.gitlive",
+        artifactId = "firebase-messaging",
+        version = project.property("firebase-messaging.version") as String
+    )
 }

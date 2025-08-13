@@ -20,6 +20,7 @@ firebase-cocoapods = "11.4.0"
 ios-deploymentTarget = "13.0"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"
+publish = "0.34.0"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -60,3 +61,4 @@ native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref =
 test-logger-plugin = { id = "com.adarshr.test-logger", version.ref = "test-logger-plugin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }

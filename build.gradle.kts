@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.kotlinter) apply false
     alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.publish) apply false
     id("base")
     id("testOptionsConvention")
 }
@@ -193,16 +194,6 @@ subprojects {
     }
 
     configure<PublishingExtension> {
-
-        repositories {
-            maven {
-                url = uri("https://central.sonatype.com/repository/maven-snapshots")
-                credentials {
-                    username = project.findProperty("sonatypeUsername") as String? ?: System.getenv("sonatypeUsername")
-                    password = project.findProperty("sonatypePassword") as String? ?: System.getenv("sonatypePassword")
-                }
-            }
-        }
 
         publications.all {
             this as MavenPublication

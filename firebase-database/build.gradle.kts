@@ -15,6 +15,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
+    alias(libs.plugins.publish)
 }
 
 android {
@@ -173,9 +174,13 @@ if (project.property("firebase-database.skipJsTests") == "true") {
     }
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    coordinates(
+        groupId = "dev.gitlive",
+        artifactId = "firebase-database",
+        version = project.property("firebase-database.version") as String
+    )
 }

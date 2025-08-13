@@ -14,6 +14,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
+    alias(libs.plugins.publish)
 }
 
 android {
@@ -160,9 +161,13 @@ if (project.property("firebase-storage.skipJsTests") == "true") {
     }
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    coordinates(
+        groupId = "dev.gitlive",
+        artifactId = "firebase-storage",
+        version = project.property("firebase-storage.version") as String
+    )
 }

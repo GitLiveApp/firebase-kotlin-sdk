@@ -8,10 +8,10 @@ on:
     types: [ prereleased, released ]
 
 env:
-  sonatypeUsername: ${{ secrets.SONATYPEUSERNAME }}
-  sonatypePassword: ${{ secrets.SONATYPEPASSWORD }}
-  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_PRIVATE_KEY }}
-  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PASSPHRASE }}
+  ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPEUSERNAME }}
+  ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPEPASSWORD }}
+  ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
+  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.PASSPHRASE }}
 
 jobs:
   build:

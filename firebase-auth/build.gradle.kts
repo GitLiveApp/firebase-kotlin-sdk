@@ -16,6 +16,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("testOptionsConvention")
+    alias(libs.plugins.publish)
 }
 
 android {
@@ -186,9 +187,13 @@ fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
     }
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications)
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    coordinates(
+        groupId = "dev.gitlive",
+        artifactId = "firebase-auth",
+        version = project.property("firebase-auth.version") as String
+    )
 }
