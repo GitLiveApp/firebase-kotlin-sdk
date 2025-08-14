@@ -1,7 +1,9 @@
+import org.gradle.kotlin.dsl.distribution
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import kotlin.text.set
 
 /*
  * Copyright (c) 2023 GitLive Ltd. Use of this source code is governed by the Apache 2.0 license.
@@ -170,4 +172,39 @@ mavenPublishing {
         artifactId = "firebase-storage",
         version = project.property("firebase-storage.version") as String
     )
+
+    pom {
+        name.set("firebase-kotlin-sdk")
+        description.set("The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the Firebase Android SDK Kotlin Extensions but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting iOS, Android or JS.")
+        url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+        inceptionYear.set("2019")
+
+        scm {
+            url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk")
+            connection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+            developerConnection.set("scm:git:https://github.com/GitLiveApp/firebase-kotlin-sdk.git")
+            tag.set("HEAD")
+        }
+
+        issueManagement {
+            system.set("GitHub Issues")
+            url.set("https://github.com/GitLiveApp/firebase-kotlin-sdk/issues")
+        }
+
+        developers {
+            developer {
+                name.set("Nicholas Bransby-Williams")
+                email.set("nbransby@gmail.com")
+            }
+        }
+
+        licenses {
+            license {
+                name.set("The Apache Software License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("repo")
+                comments.set("A business-friendly OSS license")
+            }
+        }
+    }
 }
