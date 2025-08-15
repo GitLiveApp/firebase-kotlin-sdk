@@ -77,6 +77,7 @@ public data class ActionCodeSettings(
     val dynamicLinkDomain: String? = null,
     val canHandleCodeInApp: Boolean = false,
     val iOSBundleId: String? = null,
+    val linkDomain: String? = null,
 )
 
 public data class AndroidPackageName(
