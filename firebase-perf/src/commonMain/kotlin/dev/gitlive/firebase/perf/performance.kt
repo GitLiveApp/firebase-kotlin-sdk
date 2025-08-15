@@ -3,6 +3,7 @@ package dev.gitlive.firebase.perf
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.perf.metrics.HttpMetric
 import dev.gitlive.firebase.perf.metrics.Trace
 
 /** Returns the [FirebasePerformance] instance of the default [FirebaseApp]. */
@@ -20,14 +21,6 @@ public expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
  * to the Firebase backend. To stop sending performance events, call [setPerformanceCollectionEnabled] with value [false].
  */
 public expect class FirebasePerformance {
-    /**
-     * Creates a Trace object with given name.
-     *
-     * @param traceName name of the trace, requires no leading or trailing whitespace, no leading
-     *     underscore '_' character.
-     * @return the new Trace object.
-     */
-    public fun newTrace(traceName: String): Trace
 
     /**
      * Determines whether performance monitoring is enabled or disabled. This respects the Firebase
@@ -39,6 +32,17 @@ public expect class FirebasePerformance {
      *     instrumentation is enabled/disabled in Gradle properties.
      */
     public fun isPerformanceCollectionEnabled(): Boolean
+
+    public fun newHttpMetric(url: String, httpMethod: String): HttpMetric
+
+    /**
+     * Creates a Trace object with given name.
+     *
+     * @param traceName name of the trace, requires no leading or trailing whitespace, no leading
+     *     underscore '_' character.
+     * @return the new Trace object.
+     */
+    public fun newTrace(traceName: String): Trace
 
     /**
      * Enables or disables performance monitoring. This setting is persisted and applied on future
