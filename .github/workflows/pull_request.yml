@@ -19,8 +19,17 @@ jobs:
           java-version: '17'
       - name: ktLint
         run: ./gradlew lintKotlin
-      - name: run apiCheck
-        run: ./gradlew apiCheck
+  apiCheck:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+     - name: Set up JDK
+       uses: actions/setup-java@v4
+       with:
+         distribution: 'zulu'
+         java-version: '17'
+     - name: Run Api Check
+       run: ./gradlew apiCheck
   jobMatrixSetup:
     runs-on: macos-latest
     outputs:
