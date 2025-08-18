@@ -8,28 +8,24 @@ on:
     branches: [ master ]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
+  formatKotlin:
+    runs-on: macos-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: ktLint
-        run: ./gradlew lintKotlin
-  apiCheck:
-    runs-on: ubuntu-latest
-    steps:
-     - uses: actions/checkout@v4
-     - name: Set up JDK
-       uses: actions/setup-java@v4
-       with:
-         distribution: 'zulu'
-         java-version: '17'
-     - name: Run Api Check
-       run: ./gradlew apiCheck
+      - name: Format Kotlin
+        run: ./gradlew formatKotlin
+      - name: Api File Update
+        run: ./gradlew apiDump
+      - uses: stefanzweifel/git-auto-commit-action@v6
   jobMatrixSetup:
     runs-on: macos-latest
     outputs:
