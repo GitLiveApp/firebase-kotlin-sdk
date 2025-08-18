@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  formatKotlinAndApiDump:
+  lintAndApiChecks:
     runs-on: macos-latest
     permissions:
       contents: write
@@ -30,11 +30,16 @@ jobs:
           xcode-version: latest-stable
       - name: Format Kotlin
         run: ./gradlew formatKotlin
+      - name: Api Check
+        id: apiCheck
+        continue-on-error: true
+        run: ./gradlew apiCheck
       - name: Api File Update
+        if: ${{ steps.apiCheck.conclusion == 'failure' }}
         run: ./gradlew apiDump
       - uses: stefanzweifel/git-auto-commit-action@v6
   jobMatrixSetup:
-    needs: formatKotlinAndApiDump
+    needs: lintAndApiChecks
     runs-on: macos-latest
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
