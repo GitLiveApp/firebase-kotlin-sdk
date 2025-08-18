@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 public expect val Firebase.auth: FirebaseAuth
 
-
-
-
 public expect fun Firebase.auth(app: FirebaseApp): FirebaseAuth
 
 public expect class FirebaseAuth {
