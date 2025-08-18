@@ -1,8 +1,10 @@
 package dev.gitlive.firebase.remoteconfig
 
 import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
 
 /** Wraps the current state of the [FirebaseRemoteConfig] singleton object. */
+@OptIn(ExperimentalTime::class)
 public data class FirebaseRemoteConfigInfo(
     /**
      * Gets the current settings of the [FirebaseRemoteConfig] singleton object.

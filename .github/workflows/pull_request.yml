@@ -7,22 +7,32 @@ on:
   pull_request:
     branches: [ master ]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
-    runs-on: ubuntu-latest
+  lintAndApiChecks:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: ktLint
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Lint Kotlin
         run: ./gradlew lintKotlin
-      - name: run apiCheck
+      - name: Api File Update
         run: ./gradlew apiCheck
   jobMatrixSetup:
-    runs-on: ubuntu-latest
+    needs: lintAndApiChecks
+    runs-on: macos-latest
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
@@ -128,6 +138,9 @@ jobs:
             */build/cocoapods
             */build/classes
           key: cocoapods-cache-v2
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: Setup test environment
         uses: ./.github/actions/setup_test_action
       - name: Set Artifact Name

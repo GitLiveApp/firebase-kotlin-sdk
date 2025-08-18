@@ -17,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
@@ -99,6 +100,7 @@ class FirebaseRemoteConfigTest {
         )
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun testGetInfo() = runTest {
         assertEquals(
