@@ -159,6 +159,7 @@ internal fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCod
     .setUrl(url)
     .also { androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) } }
     .also { dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) } }
+    .also { linkDomain?.run { it.setLinkDomain(this) } }
     .setHandleCodeInApp(canHandleCodeInApp)
     .also { iOSBundleId?.run { it.setIOSBundleId(this) } }
     .build()
