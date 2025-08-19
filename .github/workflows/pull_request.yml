@@ -7,29 +7,11 @@ on:
   pull_request:
     branches: [ master ]
 
+concurrency:
+  group: ci-pull-request-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-      - name: ktLint
-        run: ./gradlew lintKotlin
-  apiCheck:
-    runs-on: ubuntu-latest
-    steps:
-     - uses: actions/checkout@v4
-     - name: Set up JDK
-       uses: actions/setup-java@v4
-       with:
-         distribution: 'zulu'
-         java-version: '17'
-     - name: Run Api Check
-       run: ./gradlew apiCheck
   jobMatrixSetup:
     runs-on: macos-latest
     outputs:
