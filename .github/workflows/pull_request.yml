@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 concurrency:
-  group: ci-pull-request-${{ github.ref }}
+  group: ci-pull-request-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:

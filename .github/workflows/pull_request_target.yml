@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 concurrency:
-  group: ci-lint-api-check-${{ github.ref }}
+  group: ci-lint-api-check-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
