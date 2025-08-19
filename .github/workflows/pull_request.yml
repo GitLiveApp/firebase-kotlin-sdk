@@ -13,7 +13,6 @@ concurrency:
 
 jobs:
   jobMatrixSetup:
-    needs: lintAndApiChecks
     runs-on: macos-latest
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
