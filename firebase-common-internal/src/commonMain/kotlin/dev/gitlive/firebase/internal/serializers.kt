@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.internal
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SealedSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.serializer
@@ -31,6 +32,7 @@ public class FirebaseMapSerializer : KSerializer<Map<String, Any?>> {
     public lateinit var keys: List<String>
     public lateinit var map: Map<String, Any?>
 
+    @OptIn(SealedSerializationApi::class)
     override val descriptor: SerialDescriptor = object : SerialDescriptor {
         override val kind = StructureKind.MAP
         override val serialName = "kotlin.Map<String, Any>"
@@ -78,6 +80,7 @@ public class FirebaseListSerializer : KSerializer<Iterable<Any?>> {
 
     public lateinit var list: List<Any?>
 
+    @OptIn(SealedSerializationApi::class)
     override val descriptor: SerialDescriptor = object : SerialDescriptor {
         override val kind = StructureKind.LIST
         override val serialName = "kotlin.List<Any>"

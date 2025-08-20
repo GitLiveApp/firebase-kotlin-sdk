@@ -34,9 +34,7 @@ internal actual class NativeTransactionWrapper internal actual constructor(actua
         },
     ).let { this }
 
-    actual fun delete(documentRef: DocumentReference) =
-        native.delete(documentRef.android).let { this }
+    actual fun delete(documentRef: DocumentReference) = native.delete(documentRef.android).let { this }
 
-    actual suspend fun get(documentRef: DocumentReference) =
-        NativeDocumentSnapshotWrapper(native.get(documentRef.android))
+    actual suspend fun get(documentRef: DocumentReference) = NativeDocumentSnapshotWrapper(native.get(documentRef.android))
 }

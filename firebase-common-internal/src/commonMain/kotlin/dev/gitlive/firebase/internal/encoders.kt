@@ -18,8 +18,7 @@ public fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncode
     this.encodeDefaults = shouldEncodeElementDefault
 }
 
-public inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? =
-    encode(strategy, value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
+public inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? = encode(strategy, value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 @PublishedApi
 internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
@@ -30,8 +29,7 @@ public inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boole
     this.encodeDefaults = shouldEncodeElementDefault
 }
 
-public inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Any? =
-    encode(value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
+public inline fun <reified T> encode(value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Any? = encode(value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 /**
  * Encodes data as an [EncodedObject].

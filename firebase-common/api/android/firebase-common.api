@@ -28,7 +28,7 @@ public abstract interface annotation class dev/gitlive/firebase/FirebaseClassDis
 	public abstract fun discriminator ()Ljava/lang/String;
 }
 
-public synthetic class dev/gitlive/firebase/FirebaseClassDiscriminator$Impl : dev/gitlive/firebase/FirebaseClassDiscriminator {
+public final synthetic class dev/gitlive/firebase/FirebaseClassDiscriminator$Impl : dev/gitlive/firebase/FirebaseClassDiscriminator {
 	public fun <init> (Ljava/lang/String;)V
 	public final synthetic fun discriminator ()Ljava/lang/String;
 }
