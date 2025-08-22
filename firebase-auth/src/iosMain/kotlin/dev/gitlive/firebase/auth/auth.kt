@@ -9,6 +9,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.FirebaseNetworkException
+import dev.gitlive.firebase.FirebaseTooManyRequestsException
 import dev.gitlive.firebase.auth.ActionCodeResult.*
 import dev.gitlive.firebase.ios
 import kotlinx.cinterop.*
@@ -53,12 +54,10 @@ public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth)
     public actual suspend fun applyActionCode(code: String): Unit = ios.await { applyActionCode(code, it) }
     public actual suspend fun confirmPasswordReset(code: String, newPassword: String): Unit = ios.await { confirmPasswordResetWithCode(code, newPassword, it) }
 
-    public actual suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult =
-        AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
+    public actual suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult = AuthResult(ios.awaitResult { createUserWithEmail(email = email, password = password, completion = it) })
 
     @Suppress("UNCHECKED_CAST")
-    public actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> =
-        ios.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
+    public actual suspend fun fetchSignInMethodsForEmail(email: String): List<String> = ios.awaitResult<FIRAuth, List<*>?> { fetchSignInMethodsForEmail(email, it) }.orEmpty() as List<String>
 
     public actual suspend fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?) {
         ios.await { actionCodeSettings?.let { actionSettings -> sendPasswordResetWithEmail(email, actionSettings.toIos(), it) } ?: sendPasswordResetWithEmail(email = email, completion = it) }
@@ -68,20 +67,15 @@ public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth)
 
     public actual fun isSignInWithEmailLink(link: String): Boolean = ios.isSignInWithEmailLink(link)
 
-    public actual suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
+    public actual suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult = AuthResult(ios.awaitResult { signInWithEmail(email = email, password = password, completion = it) })
 
-    public actual suspend fun signInWithCustomToken(token: String): AuthResult =
-        AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
+    public actual suspend fun signInWithCustomToken(token: String): AuthResult = AuthResult(ios.awaitResult { signInWithCustomToken(token, it) })
 
-    public actual suspend fun signInAnonymously(): AuthResult =
-        AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
+    public actual suspend fun signInAnonymously(): AuthResult = AuthResult(ios.awaitResult { signInAnonymouslyWithCompletion(it) })
 
-    public actual suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult =
-        AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
+    public actual suspend fun signInWithCredential(authCredential: AuthCredential): AuthResult = AuthResult(ios.awaitResult { signInWithCredential(authCredential.ios, it) })
 
-    public actual suspend fun signInWithEmailLink(email: String, link: String): AuthResult =
-        AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
+    public actual suspend fun signInWithEmailLink(email: String, link: String): AuthResult = AuthResult(ios.awaitResult { signInWithEmail(email = email, link = link, completion = it) })
 
     public actual suspend fun signOut(): Unit = ios.throwError { signOut(it) }
 
@@ -161,6 +155,7 @@ internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     it.setURL(NSURL.URLWithString(url))
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
     it.setDynamicLinkDomain(dynamicLinkDomain)
+    it.setLinkDomain(linkDomain)
     it.setHandleCodeInApp(canHandleCodeInApp)
     iOSBundleId?.run { it.setIOSBundleID(this) }
 }
@@ -171,7 +166,7 @@ public actual open class FirebaseAuthEmailException(message: String) : FirebaseA
 public actual open class FirebaseAuthInvalidCredentialsException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthWeakPasswordException(message: String) : FirebaseAuthInvalidCredentialsException(message)
 public actual open class FirebaseAuthInvalidUserException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthMultiFactorException(message: String) : FirebaseAuthException(message)
+public actual open class FirebaseAuthMultiFactorException(message: String, public val resolver: FIRMultiFactorResolver?) : FirebaseAuthException(message)
 public actual open class FirebaseAuthRecentLoginRequiredException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthUserCollisionException(message: String) : FirebaseAuthException(message)
 public actual open class FirebaseAuthWebException(message: String) : FirebaseAuthException(message)
@@ -248,7 +243,13 @@ private fun NSError.toException() = when (domain) {
         17078L, // AuthErrorCode.secondFactorRequired
         17088L, // AuthErrorCode.maximumSecondFactorCountExceeded
         17084L, // AuthErrorCode.multiFactorInfoNotFound
-        -> FirebaseAuthMultiFactorException(toString())
+        -> {
+            val resolver = userInfo["FIRAuthErrorUserInfoMultiFactorResolverKey"] as? FIRMultiFactorResolver
+            FirebaseAuthMultiFactorException(toString(), resolver)
+        }
+
+        17052L, // AuthErrorCode.quotaExceeded
+        -> FirebaseTooManyRequestsException(toString())
 
         17007L, // AuthErrorCode.emailAlreadyInUse
         17012L, // AuthErrorCode.accountExistsWithDifferentCredential

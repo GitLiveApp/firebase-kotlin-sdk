@@ -36,11 +36,7 @@ class EmulatorJobsMatrix {
                     (rootProject.property("${subProject.name}.skipIosTests") == "true").not()
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
-                "x86", "i386", "ia-32", "i686" -> "${subProject.path}:iosX86Test"
-                "x86_64", "amd64", "x64", "x86-64" -> "${subProject.path}:iosX64Test"
-                "arm", "arm-v7", "armv7", "arm32",
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:iosSimulatorArm64Test"
-
                 else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
             }
         }.map { listOf("cleanTest", it) }

@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-common-internal",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-common-internal.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/GitLiveApp/firebase-kotlin-multiplatform-sdk",
   "dependencies": {
-    "@gitlive/firebase-common": "2.1.0",
+    "@gitlive/firebase-common": "2.2.0",
     "firebase": "9.19.1",
     "kotlin": "1.8.20",
     "kotlinx-coroutines-core": "1.6.4",

@@ -12,8 +12,7 @@ public val FirebaseCrashlytics.ios: FIRCrashlytics get() = FIRCrashlytics.crashl
 public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
     FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 
-public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics =
-    FirebaseCrashlytics(FIRCrashlytics.crashlytics())
+public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = FirebaseCrashlytics(FIRCrashlytics.crashlytics())
 
 public actual class FirebaseCrashlytics internal constructor(internal val ios: FIRCrashlytics) {
 
@@ -37,22 +36,22 @@ public actual class FirebaseCrashlytics internal constructor(internal val ios: F
     }
     public actual fun didCrashOnPreviousExecution(): Boolean = ios.didCrashDuringPreviousExecution()
     public actual fun setCustomKey(key: String, value: String) {
-        ios.setCustomValue(key, value)
+        ios.setCustomValue(value, key)
     }
     public actual fun setCustomKey(key: String, value: Boolean) {
-        ios.setCustomValue(key, value.toString())
+        ios.setCustomValue(value.toString(), key)
     }
     public actual fun setCustomKey(key: String, value: Double) {
-        ios.setCustomValue(key, value.toString())
+        ios.setCustomValue(value.toString(), key)
     }
     public actual fun setCustomKey(key: String, value: Float) {
-        ios.setCustomValue(key, value.toString())
+        ios.setCustomValue(value.toString(), key)
     }
     public actual fun setCustomKey(key: String, value: Int) {
-        ios.setCustomValue(key, value.toString())
+        ios.setCustomValue(value.toString(), key)
     }
     public actual fun setCustomKey(key: String, value: Long) {
-        ios.setCustomValue(key, value.toString())
+        ios.setCustomValue(value.toString(), key)
     }
 
     @Suppress("UNCHECKED_CAST")

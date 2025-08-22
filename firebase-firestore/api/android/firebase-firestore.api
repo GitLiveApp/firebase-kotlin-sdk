@@ -603,7 +603,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$EqualTo : dev/
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForArray : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValues ()Ljava/util/List;
+	public fun getSafeValues ()Ljava/util/List;
 	public abstract fun getValues ()Ljava/util/List;
 }
 
@@ -612,7 +612,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ForArray$Defau
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObject : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public fun getSafeValue ()Ljava/lang/Object;
 	public abstract fun getValue ()Ljava/lang/Object;
 }
 
@@ -621,7 +621,7 @@ public final class dev/gitlive/firebase/firestore/WhereConstraint$ForNullableObj
 }
 
 public abstract interface class dev/gitlive/firebase/firestore/WhereConstraint$ForObject : dev/gitlive/firebase/firestore/WhereConstraint {
-	public abstract fun getSafeValue ()Ljava/lang/Object;
+	public fun getSafeValue ()Ljava/lang/Object;
 	public abstract fun getValue ()Ljava/lang/Object;
 }
 
@@ -730,7 +730,8 @@ public final class dev/gitlive/firebase/firestore/_encodersKt {
 }
 
 public final class dev/gitlive/firebase/firestore/android {
-	public static final fun firestore (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static final fun firestore (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static synthetic fun firestore$default (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
 	public static final fun firestoreSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public static synthetic fun firestoreSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/CollectionReference;)Lcom/google/firebase/firestore/CollectionReference;
