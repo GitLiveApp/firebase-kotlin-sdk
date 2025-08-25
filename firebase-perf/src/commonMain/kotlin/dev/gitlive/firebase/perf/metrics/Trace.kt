@@ -2,11 +2,9 @@ package dev.gitlive.firebase.perf.metrics
 
 /** Trace allows you to set beginning and end of a certain action in your app. */
 public expect class Trace {
-    /** Starts this trace. */
-    public fun start()
+    public fun getAttribute(attribute: String): String?
 
-    /** Stops this trace. */
-    public fun stop()
+    public fun getAttributes(): Map<String, String>
 
     /**
      * Gets the value of the metric with the given name in the current trace. If a metric with the
@@ -29,6 +27,8 @@ public expect class Trace {
      */
     public fun incrementMetric(metricName: String, incrementBy: Long)
 
+    public fun putAttribute(attribute: String, value: String)
+
     /**
      * Sets the value of the metric with the given name in this trace to the value provided. If a
      * metric with the given name doesn't exist, a new one will be created. If the trace has not been
@@ -40,4 +40,12 @@ public expect class Trace {
      * @param value The value to which the metric should be set to.
      */
     public fun putMetric(metricName: String, value: Long)
+
+    public fun removeAttribute(attribute: String)
+
+    /** Starts this trace. */
+    public fun start()
+
+    /** Stops this trace. */
+    public fun stop()
 }

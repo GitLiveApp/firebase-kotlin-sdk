@@ -24,4 +24,5 @@ public external interface PerformanceTrace {
     public fun removeAttribute(attr: String)
     public fun start()
     public fun stop()
+    // no record(startTime, duration, options) defined since it's specific for js
 }
