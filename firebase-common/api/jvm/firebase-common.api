@@ -33,3 +33,21 @@ public final synthetic class dev/gitlive/firebase/FirebaseClassDiscriminator$Imp
 	public final synthetic fun discriminator ()Ljava/lang/String;
 }
 
+public abstract interface class dev/gitlive/firebase/FirebaseDecoder : kotlinx/serialization/encoding/Decoder {
+}
+
+public final class dev/gitlive/firebase/FirebaseDecoder$DefaultImpls {
+	public static fun decodeNullableSerializableValue (Ldev/gitlive/firebase/FirebaseDecoder;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+	public static fun decodeSerializableValue (Ldev/gitlive/firebase/FirebaseDecoder;Lkotlinx/serialization/DeserializationStrategy;)Ljava/lang/Object;
+}
+
+public abstract interface class dev/gitlive/firebase/FirebaseEncoder : kotlinx/serialization/encoding/Encoder {
+}
+
+public final class dev/gitlive/firebase/FirebaseEncoder$DefaultImpls {
+	public static fun beginCollection (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;I)Lkotlinx/serialization/encoding/CompositeEncoder;
+	public static fun encodeNotNullMark (Ldev/gitlive/firebase/FirebaseEncoder;)V
+	public static fun encodeNullableSerializableValue (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+	public static fun encodeSerializableValue (Ldev/gitlive/firebase/FirebaseEncoder;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)V
+}
+
