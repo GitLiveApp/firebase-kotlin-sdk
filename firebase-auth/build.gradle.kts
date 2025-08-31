@@ -81,6 +81,7 @@ kotlin {
 
     if (supportIosTarget) {
         iosArm64()
+        iosX64().enableKeychainForTests()
         iosSimulatorArm64().enableKeychainForTests()
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
