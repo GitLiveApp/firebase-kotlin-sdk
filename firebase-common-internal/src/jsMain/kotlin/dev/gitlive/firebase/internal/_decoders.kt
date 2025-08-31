@@ -39,8 +39,7 @@ internal actual fun FirebaseDecoderImpl.structureDecoder(descriptor: SerialDescr
 }
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-internal actual fun getPolymorphicType(value: Any?, discriminator: String): String =
-    (value as Json)[discriminator] as String
+internal actual fun getPolymorphicType(value: Any?, discriminator: String): String = (value as Json)[discriminator] as String
 
 private fun FirebaseDecoderImpl.decodeAsList(): CompositeDecoder = (value as Array<*>).let {
     FirebaseCompositeDecoder(it.size, settings) { _, index -> it[index] }

@@ -178,48 +178,46 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): Transaction = Transaction(nativeWrapper.setEncoded(documentRef, encodedData, setOptions))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, data) { this.encodeDefaults = encodeDefaults }"))
-    public fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean): Transaction =
-        update(documentRef, data) {
-            this.encodeDefaults = encodeDefaults
-        }
+    public fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean): Transaction = update(documentRef, data) {
+        this.encodeDefaults = encodeDefaults
+    }
     public inline fun update(documentRef: DocumentReference, data: Any, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncoded(documentRef, encodeAsObject(data, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, strategy, data) { this.encodeDefaults = encodeDefaults }"))
-    public fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): Transaction =
-        update(documentRef, strategy, data) {
-            this.encodeDefaults = encodeDefaults
-        }
+    public fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): Transaction = update(documentRef, strategy, data) {
+        this.encodeDefaults = encodeDefaults
+    }
     public inline fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateFields")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): Transaction =
-        update(documentRef, *fieldsAndValues) {}
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) { fieldsAndValues.forEach { (field, value) -> field to value } }"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): Transaction = update(documentRef, *fieldsAndValues) {}
 
     @JvmName("updateFields")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Transaction =
-        updateFields(
-            documentRef,
-        ) {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) {\napply(buildSettings)\nfieldsAndValues.forEach { (field, value) -> field to value }\n}"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Transaction = updateFields(
+        documentRef,
+    ) {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
         }
+    }
 
     @JvmName("updateFieldPaths")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): Transaction =
-        update(documentRef, *fieldsAndValues) {}
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) { fieldsAndValues.forEach { (field, value) -> field to value } }"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): Transaction = update(documentRef, *fieldsAndValues) {}
 
     @JvmName("updateFieldPaths")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Transaction =
-        updateFields(
-            documentRef,
-        ) {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) {\napply(buildSettings)\nfieldsAndValues.forEach { (field, value) -> field to value }\n}"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Transaction = updateFields(
+        documentRef,
+    ) {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
         }
+    }
 
     /**
      * Updates Fields/[FieldPath] of a [DocumentReference] using a [FieldsAndValuesUpdateDSL].
@@ -259,15 +257,18 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING): Query = Query(nativeQuery.orderBy(field.encoded, direction))
 
     public fun startAfter(document: DocumentSnapshot): Query = Query(nativeQuery.startAfter(document.native))
-    public fun startAfter(vararg fieldValues: Any?): Query = startAfter(*fieldValues) {}
-    public fun startAfter(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
-        startAfterFieldValues {
-            apply(buildSettings)
 
-            fieldValues.forEach {
-                add(it)
-            }
+    @Deprecated("Deprecated. Use `startAfterFieldValues` instead", replaceWith = ReplaceWith("startAfterFieldValues { fieldValues.forEach { add(it) } }"))
+    public fun startAfter(vararg fieldValues: Any?): Query = startAfter(*fieldValues) {}
+
+    @Deprecated("Deprecated. Use `startAfterFieldValues` instead", replaceWith = ReplaceWith("startAfterFieldValues {\napply(buildSettings)\nfieldValues.forEach { add(it) }\n}"))
+    public fun startAfter(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query = startAfterFieldValues {
+        apply(buildSettings)
+
+        fieldValues.forEach {
+            add(it)
         }
+    }
 
     /**
      * Creates and returns a new [Query] that starts after the provided fields relative to the order of the query.
@@ -278,14 +279,17 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAfterFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.startAfter(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
     public fun startAt(document: DocumentSnapshot): Query = Query(nativeQuery.startAt(document.native))
+
+    @Deprecated("Deprecated. Use `startAtFieldValues` instead", replaceWith = ReplaceWith("startAtFieldValues { fieldValues.forEach { add(it) } }"))
     public fun startAt(vararg fieldValues: Any?): Query = startAt(*fieldValues) {}
-    public fun startAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
-        startAtFieldValues {
-            apply(buildSettings)
-            fieldValues.forEach {
-                add(it)
-            }
+
+    @Deprecated("Deprecated. Use `startAtFieldValues` instead", replaceWith = ReplaceWith("startAtFieldValues {\napply(buildSettings)\nfieldValues.forEach { add(it) }\n}"))
+    public fun startAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query = startAtFieldValues {
+        apply(buildSettings)
+        fieldValues.forEach {
+            add(it)
         }
+    }
 
     /**
      * Creates and returns a new [Query] that starts at the provided fields relative to the order of the query.
@@ -296,16 +300,17 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun startAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.startAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
     public fun endBefore(document: DocumentSnapshot): Query = Query(nativeQuery.endBefore(document.native))
+
+    @Deprecated("Deprecated. Use `endBefore` instead", replaceWith = ReplaceWith("endBeforeFieldValues { fieldValues.forEach { add(it) } }"))
     public fun endBefore(vararg fieldValues: Any?): Query = endBefore(*fieldValues) {}
-    public fun endBefore(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
-        endBeforeFieldValues {
-            withEncodeSettings {
-                apply(buildSettings)
-                fieldValues.forEach {
-                    add(it)
-                }
-            }
+
+    @Deprecated("Deprecated. Use `endBefore` instead", replaceWith = ReplaceWith("endBefore {\napply(buildSettings)\nfieldValues.forEach { add(it) }\n}"))
+    public fun endBefore(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query = endBeforeFieldValues {
+        apply(buildSettings)
+        fieldValues.forEach {
+            add(it)
         }
+    }
 
     /**
      * Creates and returns a new [Query] that ends before the provided fields relative to the order of the query.
@@ -316,14 +321,17 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun endBeforeFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.endBefore(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
     public fun endAt(document: DocumentSnapshot): Query = Query(nativeQuery.endAt(document.native))
+
+    @Deprecated("Deprecated. Use `endAtFieldValues` instead", replaceWith = ReplaceWith("endAtFieldValues { fieldValues.forEach { add(it) } }"))
     public fun endAt(vararg fieldValues: Any?): Query = endAt(*fieldValues) {}
-    public fun endAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query =
-        endAtFieldValues {
-            apply(buildSettings)
-            fieldValues.forEach {
-                add(it)
-            }
+
+    @Deprecated("Deprecated. Use `endAt` instead", replaceWith = ReplaceWith("endAt {\napply(buildSettings)\nfieldValues.forEach { add(it) }\n}"))
+    public fun endAt(vararg fieldValues: Any?, buildSettings: EncodeSettings.Builder.() -> Unit): Query = endAtFieldValues {
+        apply(buildSettings)
+        fieldValues.forEach {
+            add(it)
         }
+    }
 
     /**
      * Creates and returns a new [Query] that ends at the provided fields relative to the order of the query.
@@ -436,50 +444,46 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
     internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): WriteBatch = WriteBatch(nativeWrapper.setEncoded(documentRef, encodedData, setOptions))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, data) { this.encodeDefaults = encodeDefaults }"))
-    public inline fun <reified T : Any> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean): WriteBatch =
-        update(documentRef, data) {
-            this.encodeDefaults = encodeDefaults
-        }
-    public inline fun <reified T : Any> update(documentRef: DocumentReference, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch =
-        updateEncoded(documentRef, encodeAsObject(data, buildSettings))
+    public inline fun <reified T : Any> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean): WriteBatch = update(documentRef, data) {
+        this.encodeDefaults = encodeDefaults
+    }
+    public inline fun <reified T : Any> update(documentRef: DocumentReference, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncoded(documentRef, encodeAsObject(data, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, strategy, data) { this.encodeDefaults = encodeDefaults }"))
-    public fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): WriteBatch =
-        update(documentRef, strategy, data) {
-            this.encodeDefaults = encodeDefaults
-        }
-    public inline fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch =
-        updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
+    public fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, encodeDefaults: Boolean): WriteBatch = update(documentRef, strategy, data) {
+        this.encodeDefaults = encodeDefaults
+    }
+    public inline fun <T : Any> update(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = updateEncoded(documentRef, encodeAsObject(strategy, data, buildSettings))
 
     @JvmName("updateField")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch =
-        update(documentRef, *fieldsAndValues) {}
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) { fieldsAndValues.forEach { (field, value) -> field to value } }"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>): WriteBatch = update(documentRef, *fieldsAndValues) {}
 
     @JvmName("updateField")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): WriteBatch =
-        updateFields(
-            documentRef,
-        ) {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) {\napply(buildSettings)\nfieldsAndValues.forEach { (field, value) -> field to value }\n}"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): WriteBatch = updateFields(
+        documentRef,
+    ) {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
         }
+    }
 
     @JvmName("updateFieldPath")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): WriteBatch =
-        update(documentRef, *fieldsAndValues) {}
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) { fieldsAndValues.forEach { (field, value) -> field to value } }"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>): WriteBatch = update(documentRef, *fieldsAndValues) {}
 
     @JvmName("updateFieldPath")
-    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): WriteBatch =
-        updateFields(
-            documentRef,
-        ) {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (path, value) ->
-                path to value
-            }
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields(documentRef) {\napply(buildSettings)\nfieldsAndValues.forEach { (field, value) -> field to value }\n}"))
+    public fun update(documentRef: DocumentReference, vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): WriteBatch = updateFields(
+        documentRef,
+    ) {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (path, value) ->
+            path to value
         }
+    }
 
     /**
      * Updates Fields/[FieldPath] of a [DocumentReference] using a [FieldsAndValuesUpdateDSL].
@@ -636,30 +640,28 @@ public data class DocumentReference internal constructor(internal val native: Na
     }
 
     @JvmName("updateFields")
-    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>): Unit =
-        update(*fieldsAndValues) {}
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields { fieldsAndValues.forEach { (field, value) -> field to value } }"))
+    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>): Unit = update(*fieldsAndValues) {}
 
     @JvmName("updateFields")
-    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
-        updateFields {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (field, value) ->
-                field to value
-            }
+    @Deprecated("Deprecated. Use `updateFields` instead", replaceWith = ReplaceWith("updateFields {\napply(buildSettings)\nfieldsAndValues.forEach { (field, value) -> field to value }\n}"))
+    public suspend fun update(vararg fieldsAndValues: Pair<String, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit = updateFields {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (field, value) ->
+            field to value
         }
+    }
 
     @JvmName("updateFieldPaths")
-    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>): Unit =
-        update(*fieldsAndValues) {}
+    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>): Unit = update(*fieldsAndValues) {}
 
     @JvmName("updateFieldPaths")
-    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit =
-        updateFields {
-            apply(buildSettings)
-            fieldsAndValues.forEach { (fieldPath, value) ->
-                fieldPath to value
-            }
+    public suspend fun update(vararg fieldsAndValues: Pair<FieldPath, Any?>, buildSettings: EncodeSettings.Builder.() -> Unit): Unit = updateFields {
+        apply(buildSettings)
+        fieldsAndValues.forEach { (fieldPath, value) ->
+            fieldPath to value
         }
+    }
 
     /**
      * Updates Fields/[FieldPath] using a [FieldsAndValuesUpdateDSL].

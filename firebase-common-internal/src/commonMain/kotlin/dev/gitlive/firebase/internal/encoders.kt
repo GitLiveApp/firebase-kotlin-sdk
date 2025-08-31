@@ -21,8 +21,7 @@ public fun <T> encode(strategy: SerializationStrategy<T>, value: T, shouldEncode
 public inline fun <T> encode(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit): Any? = encode(strategy, value, EncodeSettingsImpl.Builder().apply(buildSettings).buildEncodeSettings())
 
 @PublishedApi
-internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? =
-    FirebaseEncoderImpl(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
+internal fun <T> encode(strategy: SerializationStrategy<T>, value: T, encodeSettings: EncodeSettings): Any? = FirebaseEncoderImpl(encodeSettings).apply { encodeSerializableValue(strategy, value) }.value
 
 @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("encode(value) { this.encodeDefaults = shouldEncodeElementDefault }"))
 public inline fun <reified T> encode(value: T, shouldEncodeElementDefault: Boolean): Any? = encode(value) {
@@ -209,8 +208,7 @@ internal open class FirebaseCompositeEncoder(
     override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String): Unit = set(descriptor, index, value)
 
     @ExperimentalSerializationApi
-    override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder =
-        FirebaseEncoderImpl(settings)
+    override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder = FirebaseEncoderImpl(settings)
 
     public fun encodePolymorphicClassDiscriminator(discriminator: String, type: String) {
         setPolymorphicType(discriminator, type)

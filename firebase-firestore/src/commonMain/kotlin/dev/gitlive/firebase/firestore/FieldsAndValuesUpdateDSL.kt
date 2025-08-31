@@ -95,10 +95,8 @@ public class FieldsAndValuesUpdateDSL internal constructor() : EncodeSettings.Bu
     }
 
     @PublishedApi
-    internal fun String.toEncoded(encodedValue: Any?): FieldAndValue.WithStringField =
-        FieldAndValue.WithStringField(this, encodedValue)
+    internal fun String.toEncoded(encodedValue: Any?): FieldAndValue.WithStringField = FieldAndValue.WithStringField(this, encodedValue)
 
     @PublishedApi
-    internal fun FieldPath.toEncoded(encodedValue: Any?): FieldAndValue.WithFieldPath =
-        FieldAndValue.WithFieldPath(this, encodedValue)
+    internal fun FieldPath.toEncoded(encodedValue: Any?): FieldAndValue.WithFieldPath = FieldAndValue.WithFieldPath(this, encodedValue)
 }

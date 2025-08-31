@@ -54,10 +54,9 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         ios.updateData(encodedData.ios, it)
     }
 
-    actual suspend fun updateEncoded(encodedFieldsAndValues: List<FieldAndValue>) =
-        await {
-            ios.updateData(encodedFieldsAndValues.toEncodedMap(), it)
-        }
+    actual suspend fun updateEncoded(encodedFieldsAndValues: List<FieldAndValue>) = await {
+        ios.updateData(encodedFieldsAndValues.toEncodedMap(), it)
+    }
 
     actual suspend fun delete() = await { ios.deleteDocumentWithCompletion(it) }
 

@@ -149,10 +149,9 @@ internal open class FirebaseCompositeDecoder(
     override fun endStructure(descriptor: SerialDescriptor) {}
 
     @ExperimentalSerializationApi
-    override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder =
-        decodeElement(descriptor, index) {
-            FirebaseDecoderImpl(it, settings)
-        }
+    override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder = decodeElement(descriptor, index) {
+        FirebaseDecoderImpl(it, settings)
+    }
 
     private fun <T> decodeElement(descriptor: SerialDescriptor, index: Int, decoder: (Any?) -> T): T = try {
         decoder(get(descriptor, index))
