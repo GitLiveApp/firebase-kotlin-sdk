@@ -76,9 +76,9 @@ kotlin {
 
     jvm()
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
+    val supportAppleTarget = project.property("skipAppleTargets") != "true"
 
-    if (supportIosTarget) {
+    if (supportAppleTarget) {
         iosArm64()
         iosX64()
         iosSimulatorArm64()
