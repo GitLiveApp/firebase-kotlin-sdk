@@ -48,7 +48,7 @@ android {
     }
 }
 
-val supportIosTarget = project.property("skipIosTarget") != "true"
+val supportAppleTarget = project.property("skipAppleTargets") != "true"
 
 kotlin {
     explicitApi()
@@ -79,7 +79,7 @@ kotlin {
 
     // jvm()
 
-    if (supportIosTarget) {
+    if (supportAppleTarget) {
         iosArm64()
         iosX64()
         iosSimulatorArm64()
