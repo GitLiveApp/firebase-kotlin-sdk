@@ -37,4 +37,4 @@ jobs:
         run: ./gradlew formatKotlin
       - name: Api File Update
         run: ./gradlew apiDump
-      - uses: stefanzweifel/git-auto-commit-action@v6
+      - uses: stefanzweifel/git-auto-commit-action@v6.0.1
