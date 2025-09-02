@@ -24,7 +24,7 @@ android {
     val compileSdkVersion: Int by project
 
     compileSdk = compileSdkVersion
-    namespace="dev.gitlive.firebase"
+    namespace = "dev.gitlive.firebase"
 
     defaultConfig {
         minSdk = minSdkVersion
@@ -47,7 +47,7 @@ android {
     }
 }
 
-val supportIosTarget = project.property("skipIosTarget") != "true"
+val supportAppleTarget = project.property("skipAppleTargets") != "true"
 
 kotlin {
     explicitApi()
@@ -79,12 +79,20 @@ kotlin {
 
     jvm()
 
-    if (supportIosTarget) {
+    if (supportAppleTarget) {
         iosArm64()
+        iosX64()
         iosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+        macosArm64()
+        macosX64()
 
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+            tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+            osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
             framework {
                 baseName = "FirebaseApp"
             }
@@ -120,7 +128,11 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
-                if (name.lowercase().contains("ios")) {
+                if (name.lowercase().contains("ios")
+                    || name.lowercase().contains("apple")
+                    || name.lowercase().contains("tvos")
+                    || name.lowercase().contains("macos")
+                ) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 }
             }
@@ -152,19 +164,25 @@ kotlin {
 
 if (project.property("firebase-app.skipIosTests") == "true") {
     tasks.forEach {
-        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+        if (it.name.contains("ios", true) && it.name.contains("test", true)) {
+            it.enabled = false
+        }
     }
 }
 
 if (project.property("firebase-app.skipJvmTests") == "true") {
     tasks.forEach {
-        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
+        if (it.name.contains("jvm", true) && it.name.contains("test", true)) {
+            it.enabled = false
+        }
     }
 }
 
 if (project.property("firebase-app.skipJsTests") == "true") {
     tasks.forEach {
-        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
+        if (it.name.contains("js", true) && it.name.contains("test", true)) {
+            it.enabled = false
+        }
     }
 }
 

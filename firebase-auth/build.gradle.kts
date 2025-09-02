@@ -48,7 +48,7 @@ android {
     }
 }
 
-val supportIosTarget = project.property("skipIosTarget") != "true"
+val supportAppleTarget = project.property("skipAppleTargets") != "true"
 
 kotlin {
     explicitApi()
@@ -79,8 +79,9 @@ kotlin {
 
     jvm()
 
-    if (supportIosTarget) {
+    if (supportAppleTarget) {
         iosArm64()
+        iosX64().enableKeychainForTests()
         iosSimulatorArm64().enableKeychainForTests()
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
@@ -166,7 +167,7 @@ if (project.property("firebase-auth.skipJsTests") == "true") {
     }
 }
 
-if (supportIosTarget) {
+if (supportAppleTarget) {
     tasks.create<Exec>("launchIosSimulator") {
         commandLine("open", "-a", "Simulator")
     }

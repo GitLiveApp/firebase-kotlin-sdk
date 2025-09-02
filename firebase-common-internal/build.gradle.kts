@@ -77,11 +77,17 @@ kotlin {
 
     jvm()
 
-    val supportIosTarget = project.property("skipIosTarget") != "true"
+    val supportAppleTarget = project.property("skipAppleTargets") != "true"
 
-    if (supportIosTarget) {
+    if (supportAppleTarget) {
         iosArm64()
+        iosX64()
         iosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+        macosArm64()
+        macosX64()
     }
 
     js(IR) {
