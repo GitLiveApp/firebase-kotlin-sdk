@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.perf.metrics
 
+import com.google.firebase.perf.v1.NetworkRequestMetric
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -16,9 +17,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.seconds
 
-class AndroidTraceTest {
+class AndroidHttpMetricTest {
 
     private lateinit var performance: FirebasePerformance
+
+    companion object {
+        const val URL = "https://example.com"
+        val httpMethod = NetworkRequestMetric.HttpMethod.POST.name
+    }
 
     @BeforeTest
     fun initializeFirebase() {
@@ -48,7 +54,7 @@ class AndroidTraceTest {
 
     @Test
     fun testGetAttributes() = runTest {
-        val trace = performance.newTrace("testGetAttributes")
+        val trace = performance.newHttpMetric(URL, httpMethod)
         trace.start()
         val values = listOf(1, 2, 3)
 
@@ -70,7 +76,7 @@ class AndroidTraceTest {
 
     @Test
     fun testGetAttribute() = runTest {
-        val trace = performance.newTrace("testGetAttribute")
+        val trace = performance.newHttpMetric(URL, httpMethod)
         trace.start()
         trace.putAttribute("Test_Get_Attribute", "Test Get Attribute Value")
 
@@ -80,7 +86,7 @@ class AndroidTraceTest {
 
     @Test
     fun testPutAttribute() = runTest {
-        val trace = performance.newTrace("testPutAttribute")
+        val trace = performance.newHttpMetric(URL, httpMethod)
         trace.start()
         trace.putAttribute("Test_Put_Attribute", "Test Put Attribute Value")
 
@@ -89,20 +95,8 @@ class AndroidTraceTest {
     }
 
     @Test
-    fun testLongMetric() = runTest {
-        val trace = performance.newTrace("testLongMetric")
-        trace.start()
-
-        trace.putMetric("Test_Put_Attribute", 3L)
-        trace.incrementMetric("Test_Put_Attribute", 1L)
-
-        assertEquals(4L, trace.getLongMetric("Test_Put_Attribute"))
-        trace.stop()
-    }
-
-    @Test
     fun testRemoveAttribute() = runTest {
-        val trace = performance.newTrace("testRemoveAttribute")
+        val trace = performance.newHttpMetric(URL, httpMethod)
         trace.start()
 
         trace.putAttribute("Test_Put_Attribute", "Test Put Attribute Value")
@@ -110,6 +104,19 @@ class AndroidTraceTest {
 
         trace.removeAttribute("Test_Put_Attribute")
         assertEquals(null, trace.getAttribute("Test_Put_Attribute"))
+
+        trace.stop()
+    }
+
+    @Test
+    fun testSettingHttpMetrics() = runTest {
+        val trace = performance.newHttpMetric(URL, httpMethod)
+        trace.start()
+
+        trace.setHttpResponseCode(1)
+        trace.setRequestPayloadSize(10L)
+        trace.setResponseContentType("application/json")
+        trace.setResponsePayloadSize(44L)
 
         trace.stop()
     }
