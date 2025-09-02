@@ -35,8 +35,7 @@ import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 public actual val Firebase.firestore: FirebaseFirestore get() =
     rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(getApp(), null)) }
 
-public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore =
-    rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js, databaseId)) }
+public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore = rethrow { FirebaseFirestore(NativeFirebaseFirestoreWrapper(app.js, databaseId)) }
 
 internal actual data class NativeFirebaseFirestore(val js: JsFirestore)
 

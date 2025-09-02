@@ -104,7 +104,7 @@ jobs:
           path: "**/firebase-debug.log"
   build-ios:
     needs: jobMatrixSetup
-    runs-on: macos-latest
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
