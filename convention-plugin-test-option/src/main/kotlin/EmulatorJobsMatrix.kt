@@ -16,6 +16,8 @@ class EmulatorJobsMatrix {
         mapOf(
             "emulator_jobs_matrix.json" to getEmulatorTaskList(rootProject = rootProject),
             "ios_test_jobs_matrix.json" to getIosTestTaskList(rootProject = rootProject),
+            "macos_test_jobs_matrix.json" to getMacosTestTaskList(rootProject = rootProject),
+            "tvos_test_jobs_matrix.json" to getTvosTestTaskList(rootProject = rootProject),
             "js_test_jobs_matrix.json" to getJsTestTaskList(rootProject = rootProject),
             "jvm_test_jobs_matrix.json" to getJvmTestTaskList(rootProject = rootProject)
         )
@@ -37,6 +39,28 @@ class EmulatorJobsMatrix {
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:iosSimulatorArm64Test"
+                else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
+            }
+        }.map { listOf("cleanTest", it) }
+
+    fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
+        rootProject.subprojects.filter { subProject ->
+            subProject.name == "test-utils" ||
+                    (rootProject.property("${subProject.name}.skipMacosTests") == "true").not()
+        }.map { subProject ->
+            when (val osArch = System.getProperty("os.arch")) {
+                "arm64", "arm-v8", "aarch64" -> "${subProject.path}:macosArm64Test"
+                else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
+            }
+        }.map { listOf("cleanTest", it) }
+
+    fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
+        rootProject.subprojects.filter { subProject ->
+            subProject.name == "test-utils" ||
+                    (rootProject.property("${subProject.name}.skipTvosTests") == "true").not()
+        }.map { subProject ->
+            when (val osArch = System.getProperty("os.arch")) {
+                "arm64", "arm-v8", "aarch64" -> "${subProject.path}:tvosSimulatorArm64Test"
                 else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
             }
         }.map { listOf("cleanTest", it) }

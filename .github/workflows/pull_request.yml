@@ -147,7 +147,7 @@ jobs:
           path: "**/firebase-debug.log"
   build-macos:
     needs: jobMatrixSetup
-    runs-on: macos-latest
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
@@ -182,11 +182,11 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: iOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          name: macOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-tvos:
     needs: jobMatrixSetup
-    runs-on: macos-latest
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
@@ -215,13 +215,13 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: iOS ${{ env.ARCHIVE_KEY }} Test Report HTML
+          name: tvOS ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/tests/tvosArm64Test/"
       - name: Upload Firebase Debug Log
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: iOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+          name: tvOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
           path: "**/firebase-debug.log"
   build-jvm:
     needs: jobMatrixSetup
