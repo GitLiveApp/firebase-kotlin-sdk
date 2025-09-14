@@ -46,6 +46,8 @@ class EmulatorJobsMatrix {
     fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
             subProject.name == "test-utils" ||
+            subProject.name == "firebase-perf" ||
+            subProject.name == "firebase-auth" ||
                     (rootProject.property("${subProject.name}.skipMacosTests") == "true").not()
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
@@ -57,6 +59,7 @@ class EmulatorJobsMatrix {
     fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
             subProject.name == "test-utils" ||
+            subProject.name == "firebase-auth" ||
                     (rootProject.property("${subProject.name}.skipTvosTests") == "true").not()
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
