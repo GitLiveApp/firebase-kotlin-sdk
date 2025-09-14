@@ -91,6 +91,7 @@ kotlin {
 
         cocoapods {
             ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+            osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
             tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
             framework {
                 baseName = "FirebasePerformance"
@@ -158,6 +159,18 @@ kotlin {
 if (project.property("firebase-perf.skipIosTests") == "true") {
     tasks.forEach {
         if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-perf.skipMacosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("macos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-perf.skipTvosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("tvos", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 

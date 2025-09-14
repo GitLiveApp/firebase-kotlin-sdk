@@ -165,6 +165,18 @@ if (project.property("firebase-messaging.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-messaging.skipMacosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("macos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-messaging.skipTvosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("tvos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-messaging.skipJvmTests") == "true") {
     tasks.forEach {
         if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }

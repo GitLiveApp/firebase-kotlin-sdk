@@ -163,6 +163,18 @@ if (project.property("firebase-config.skipIosTests") == "true") {
     }
 }
 
+if (project.property("firebase-config.skipMacosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("macos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
+if (project.property("firebase-config.skipTvosTests") == "true") {
+    tasks.forEach {
+        if (it.name.contains("tvos", true) && it.name.contains("test", true)) { it.enabled = false }
+    }
+}
+
 if (project.property("firebase-config.skipJvmTests") == "true") {
     tasks.forEach {
         if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
