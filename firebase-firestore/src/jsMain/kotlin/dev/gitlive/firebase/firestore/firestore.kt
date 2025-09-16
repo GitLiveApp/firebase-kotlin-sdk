@@ -44,8 +44,9 @@ import dev.gitlive.firebase.firestore.externals.where as jsWhere
 actual val Firebase.firestore get() =
     rethrow { FirebaseFirestore(getFirestore()) }
 
-actual fun Firebase.firestore(app: FirebaseApp) =
-    rethrow { FirebaseFirestore(getFirestore(app.js)) }
+public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore =
+    rethrow { FirebaseFirestore(getFirestore(app.js, databaseId)) }
+
 
 /** Helper method to perform an update operation. */
 private fun <R> performUpdate(

@@ -23,8 +23,9 @@ import com.google.firebase.firestore.Filter as AndroidFilter
 actual val Firebase.firestore get() =
     FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance())
 
-actual fun Firebase.firestore(app: FirebaseApp) =
-    FirebaseFirestore(com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
+public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore =
+    FirebaseFirestore(databaseId?.let { com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android, databaseId) }
+        ?: com.google.firebase.firestore.FirebaseFirestore.getInstance(app.android))
 
 /** Helper method to perform an update operation. */
 @JvmName("performUpdateFields")

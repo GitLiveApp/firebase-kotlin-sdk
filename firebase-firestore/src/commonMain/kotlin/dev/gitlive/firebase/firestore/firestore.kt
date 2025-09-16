@@ -16,7 +16,7 @@ import kotlinx.serialization.SerializationStrategy
 expect val Firebase.firestore: FirebaseFirestore
 
 /** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
-expect fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore
+public expect fun Firebase.firestore(app: FirebaseApp, databaseId: String? = null): FirebaseFirestore
 
 expect class FirebaseFirestore {
     fun collection(collectionPath: String): CollectionReference

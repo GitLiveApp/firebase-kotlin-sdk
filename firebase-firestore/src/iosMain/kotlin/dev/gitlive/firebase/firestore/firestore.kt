@@ -21,8 +21,8 @@ import platform.Foundation.NSNull
 actual val Firebase.firestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
-actual fun Firebase.firestore(app: FirebaseApp): FirebaseFirestore = FirebaseFirestore(
-    FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp)
+public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore = FirebaseFirestore(
+    databaseId?.let { FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp, it) } ?: FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
 )
 
 @Suppress("UNCHECKED_CAST")
