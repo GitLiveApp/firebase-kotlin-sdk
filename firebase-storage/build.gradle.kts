@@ -14,8 +14,12 @@ version = project.property("firebase-storage.version") as String
 val supportedPlatforms = (project.property("firebase-perf.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    id("com.android.library")
-    kotlin("native.cocoapods")
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        id("com.android.library")
+    }
+    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
+        kotlin("native.cocoapods")
+    }
     kotlin("multiplatform")
     id("testOptionsConvention")
     alias(libs.plugins.publish)

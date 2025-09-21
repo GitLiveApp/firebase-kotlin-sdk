@@ -12,7 +12,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 version = "0.0.1"
 
 plugins {
-    id("com.android.library")
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        id("com.android.library")
+    }
     kotlin("multiplatform")
     kotlin("plugin.serialization")
 }

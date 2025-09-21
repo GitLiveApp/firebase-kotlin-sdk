@@ -14,8 +14,12 @@ version = project.property("firebase-firestore.version") as String
 val supportedPlatforms = (project.property("firebase-firestore.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    id("com.android.library")
-    kotlin("native.cocoapods")
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        id("com.android.library")
+    }
+    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
+        kotlin("native.cocoapods")
+    }
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")

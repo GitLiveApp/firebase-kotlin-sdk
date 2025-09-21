@@ -14,9 +14,13 @@ version = project.property("firebase-messaging.version") as String
 val supportedPlatforms = (project.property("firebase-messaging.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    id("com.android.library")
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        id("com.android.library")
+    }
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
+    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
+        kotlin("native.cocoapods")
+    }
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }

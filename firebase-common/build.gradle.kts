@@ -13,7 +13,9 @@ version = project.property("firebase-common.version") as String
 val supportedPlatforms = (project.property("firebase-common.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    id("com.android.library")
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        id("com.android.library")
+    }
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
