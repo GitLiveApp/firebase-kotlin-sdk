@@ -1,15 +1,16 @@
-import org.gradle.kotlin.dsl.distribution
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
-import kotlin.text.set
+import utils.TargetPlatform
+import utils.toTargetPlatforms
 
 /*
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
 version = project.property("firebase-common-internal.version") as String
+val supportedPlatforms = (project.property("firebase-common-internal.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
     id("com.android.library")
@@ -19,31 +20,33 @@ plugins {
     alias(libs.plugins.publish)
 }
 
-android {
-    val minSdkVersion: Int by project
-    val compileSdkVersion: Int by project
+if (supportedPlatforms.contains(TargetPlatform.Android)) {
+    android {
+        val minSdkVersion: Int by project
+        val compileSdkVersion: Int by project
 
-    compileSdk = compileSdkVersion
-    namespace = "dev.gitlive.firebase.common.internal"
-    defaultConfig {
-        minSdk = minSdkVersion
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+        compileSdk = compileSdkVersion
+        namespace = "dev.gitlive.firebase.common.internal"
+        defaultConfig {
+            minSdk = minSdkVersion
+            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+        }
 
-    testOptions.configureTestOptions(project)
+        testOptions.configureTestOptions(project)
 
-    packaging {
-        resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
-        resources.pickFirsts.add("META-INF/AL2.0")
-        resources.pickFirsts.add("META-INF/LGPL2.1")
-    }
-    lint {
-        abortOnError = false
+        packaging {
+            resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
+            resources.pickFirsts.add("META-INF/AL2.0")
+            resources.pickFirsts.add("META-INF/LGPL2.1")
+        }
+        lint {
+            abortOnError = false
+        }
     }
 }
 
@@ -68,41 +71,49 @@ kotlin {
         }
     }
 
-    @Suppress("OPT_IN_USAGE")
-    androidTarget {
-        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-        publishAllLibraryVariants()
+    if (supportedPlatforms.contains(TargetPlatform.Android)) {
+        @Suppress("OPT_IN_USAGE")
+        androidTarget {
+            instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+            unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+            publishAllLibraryVariants()
+        }
     }
 
-    jvm()
+    if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
+        jvm()
+    }
 
-    val supportAppleTarget = project.property("skipAppleTargets") != "true"
-
-    if (supportAppleTarget) {
+    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
         iosArm64()
         iosX64()
         iosSimulatorArm64()
+    }
+    if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
         tvosX64()
         tvosSimulatorArm64()
+    }
+    if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
         macosX64()
     }
 
-    js(IR) {
-        useCommonJs()
-        nodejs {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+    if (supportedPlatforms.contains(TargetPlatform.Js)) {
+        js(IR) {
+            useCommonJs()
+            nodejs {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
             }
-        }
-        browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
                 }
             }
         }
@@ -133,58 +144,34 @@ kotlin {
             }
         }
 
-        getByName("androidMain") {
-            dependencies {
-                api(libs.google.firebase.common)
+        if (supportedPlatforms.contains(TargetPlatform.Android)) {
+            getByName("androidMain") {
+                dependencies {
+                    api(libs.google.firebase.common)
+                }
             }
         }
 
-        getByName("jsMain") {
-            dependencies {
-                api(npm("firebase", "10.12.2"))
+        if (supportedPlatforms.contains(TargetPlatform.Js)) {
+            getByName("jsMain") {
+                dependencies {
+                    api(npm("firebase", "10.12.2"))
+                }
             }
         }
 
-        getByName("jvmMain") {
-            kotlin.srcDir("src/androidMain/kotlin")
-        }
-
-        getByName("jvmTest") {
-            dependencies {
-                implementation(kotlin("test-junit"))
+        if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
+            getByName("jvmMain") {
+                kotlin.srcDir("src/androidMain/kotlin")
             }
-            kotlin.srcDir("src/androidAndroidTest/kotlin")
+
+            getByName("jvmTest") {
+                dependencies {
+                    implementation(kotlin("test-junit"))
+                }
+                kotlin.srcDir("src/androidAndroidTest/kotlin")
+            }
         }
-    }
-}
-
-if (project.property("firebase-common.skipIosTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("ios", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-common.skipMacosTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("macos", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-common.skipTvosTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("tvos", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-common.skipJvmTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("jvm", true) && it.name.contains("test", true)) { it.enabled = false }
-    }
-}
-
-if (project.property("firebase-common.skipJsTests") == "true") {
-    tasks.forEach {
-        if (it.name.contains("js", true) && it.name.contains("test", true)) { it.enabled = false }
     }
 }
 
