@@ -146,6 +146,7 @@ kotlin {
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
+                    || name.lowercase().contains("macos")
                     ) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 }
