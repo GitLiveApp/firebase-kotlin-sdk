@@ -16,13 +16,9 @@ version = project.property("firebase-auth.version") as String
 val supportedPlatforms = (project.property("firebase-auth.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    if (supportedPlatforms.contains(TargetPlatform.Android)) {
-        id("com.android.library")
-    }
+    id("com.android.library")
     kotlin("multiplatform")
-    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-        kotlin("native.cocoapods")
-    }
+    kotlin("native.cocoapods")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }

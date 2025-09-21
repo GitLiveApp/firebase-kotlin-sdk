@@ -14,12 +14,8 @@ version = project.property("firebase-analytics.version") as String
 val supportedPlatforms = (project.property("firebase-analytics.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
-    if (supportedPlatforms.contains(TargetPlatform.Android)) {
-        id("com.android.library")
-    }
-    if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-        kotlin("native.cocoapods")
-    }
+    id("com.android.library")
+    kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
