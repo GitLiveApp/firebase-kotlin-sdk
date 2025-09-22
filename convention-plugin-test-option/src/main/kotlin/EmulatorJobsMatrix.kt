@@ -34,8 +34,7 @@ class EmulatorJobsMatrix {
 
     fun getIosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipIosTests") == "true").not()
+            subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:iosSimulatorArm64Test"
@@ -45,8 +44,7 @@ class EmulatorJobsMatrix {
 
     fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipMacosTests") == "true").not()
+            subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:macosArm64Test"
@@ -56,8 +54,7 @@ class EmulatorJobsMatrix {
 
     fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipTvosTests") == "true").not()
+            subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:tvosSimulatorArm64Test"
@@ -67,16 +64,14 @@ class EmulatorJobsMatrix {
 
     fun getJsTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipJsTests") == "true").not()
+            subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jsTest"
         }.map { listOf("cleanTest", it) }
 
     fun getJvmTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipJvmTests") == "true").not()
+            subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jvmTest"
         }.map { listOf("cleanTest", it) }
