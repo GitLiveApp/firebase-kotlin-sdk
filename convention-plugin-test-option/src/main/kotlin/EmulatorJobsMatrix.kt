@@ -1,7 +1,5 @@
 import com.google.gson.GsonBuilder
 import org.gradle.api.Project
-import utils.TargetPlatform
-import utils.toTargetPlatforms
 import java.io.File
 import java.util.Properties
 
@@ -126,4 +124,21 @@ fun getSdkmanagerFile(rootDir: File): File? =
         val sdkmanagerFile = files.firstOrNull()
         println("sdkmanagerFile: $sdkmanagerFile")
         sdkmanagerFile
+    }
+
+enum class TargetPlatform {
+    Android, Ios, Macos, Tvos, Jvm, Js
+}
+
+fun String.toTargetPlatforms(): List<TargetPlatform> =
+    split(",").map {
+        when (it.lowercase().trim()) {
+            "android" -> TargetPlatform.Android
+            "ios" -> TargetPlatform.Ios
+            "macos" -> TargetPlatform.Macos
+            "tvos" -> TargetPlatform.Tvos
+            "jvm" -> TargetPlatform.Jvm
+            "js" -> TargetPlatform.Js
+            else -> throw IllegalArgumentException("Unknown target platform: $it")
+        }
     }
