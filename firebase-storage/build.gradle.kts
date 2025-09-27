@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
@@ -11,7 +12,7 @@ import utils.toTargetPlatforms
  */
 
 version = project.property("firebase-storage.version") as String
-val supportedPlatforms = (project.property("firebase-perf.supportedTargets") as String).toTargetPlatforms()
+val supportedPlatforms = (project.property("firebase-storage.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
     id("com.android.library")
