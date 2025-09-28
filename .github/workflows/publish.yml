@@ -31,7 +31,7 @@ jobs:
         run: chmod +x gradlew
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.2'
+          xcode-version: '16.4'
       - name: Publish Firebase Analytics
         run: ./gradlew :firebase-analytics:publish
       - name: Publish Firebase App
