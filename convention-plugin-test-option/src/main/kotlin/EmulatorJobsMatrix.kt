@@ -34,7 +34,7 @@ class EmulatorJobsMatrix {
 
     fun getIosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            (subProject.property("${subProject.name}.supportedTargets") as String).toTargetPlatforms().contains(
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Ios) || subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
@@ -45,7 +45,7 @@ class EmulatorJobsMatrix {
 
     fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            (subProject.property("${subProject.name}.supportedTargets") as String).toTargetPlatforms().contains(
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Macos) || subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
@@ -56,7 +56,7 @@ class EmulatorJobsMatrix {
 
     fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            (subProject.property("${subProject.name}.supportedTargets") as String).toTargetPlatforms().contains(
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Tvos) || subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
@@ -67,7 +67,7 @@ class EmulatorJobsMatrix {
 
     fun getJsTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            (subProject.property("${subProject.name}.supportedTargets") as String).toTargetPlatforms().contains(
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Js) || subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jsTest"
@@ -75,7 +75,7 @@ class EmulatorJobsMatrix {
 
     fun getJvmTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            (subProject.property("${subProject.name}.supportedTargets") as String).toTargetPlatforms().contains(
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Jvm) || subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jvmTest"
