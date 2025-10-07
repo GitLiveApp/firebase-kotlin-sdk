@@ -91,6 +91,15 @@ kotlin {
         iosX64().enableKeychainForTests()
         iosSimulatorArm64().enableKeychainForTests()
     }
+    if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
+        tvosArm64().enableKeychainForTests()
+        tvosX64().enableKeychainForTests()
+        tvosSimulatorArm64().enableKeychainForTests()
+    }
+    if (supportedPlatforms.contains(TargetPlatform.Macos)) {
+        macosArm64().enableKeychainForTests()
+        macosX64().enableKeychainForTests()
+    }
 
     if (supportedPlatforms.supportsApple()) {
         cocoapods {
