@@ -106,6 +106,12 @@ kotlin {
             if (supportedPlatforms.contains(TargetPlatform.Ios)) {
                 ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
             }
+            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
+                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+            }
+            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
+                macos.deploymentTarget = libs.versions.macos.deploymentTarget.get()
+            }
             framework {
                 baseName = "FirebaseAuth"
             }
