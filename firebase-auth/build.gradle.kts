@@ -87,7 +87,7 @@ kotlin {
     }
 
     if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-        iosArm64().enableKeychainForTests()
+        iosArm64()
         iosX64().enableKeychainForTests()
         iosSimulatorArm64().enableKeychainForTests()
     }
