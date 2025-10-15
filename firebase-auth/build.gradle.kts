@@ -150,7 +150,7 @@ kotlin {
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                if (name.lowercase().contains("ios")) {
+                if (name.lowercase().contains("ios") || name.lowercase().contains("tvos") || name.lowercase().contains("macos")) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                     optIn("kotlinx.cinterop.BetaInteropApi")
                 }
