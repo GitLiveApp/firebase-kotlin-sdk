@@ -92,9 +92,9 @@ kotlin {
         iosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-        tvosArm64().enableKeychainForTests()
-        tvosX64().enableKeychainForTests()
-        tvosSimulatorArm64().enableKeychainForTests()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
