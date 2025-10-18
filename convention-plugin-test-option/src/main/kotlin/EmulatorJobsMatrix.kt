@@ -16,6 +16,8 @@ class EmulatorJobsMatrix {
         mapOf(
             "emulator_jobs_matrix.json" to getEmulatorTaskList(rootProject = rootProject),
             "ios_test_jobs_matrix.json" to getIosTestTaskList(rootProject = rootProject),
+            "macos_test_jobs_matrix.json" to getMacosTestTaskList(rootProject = rootProject),
+            "tvos_test_jobs_matrix.json" to getTvosTestTaskList(rootProject = rootProject),
             "js_test_jobs_matrix.json" to getJsTestTaskList(rootProject = rootProject),
             "jvm_test_jobs_matrix.json" to getJvmTestTaskList(rootProject = rootProject)
         )
@@ -32,8 +34,8 @@ class EmulatorJobsMatrix {
 
     fun getIosTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipIosTests") == "true").not()
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.Ios) || subProject.name == "test-utils"
         }.map { subProject ->
             when (val osArch = System.getProperty("os.arch")) {
                 "arm64", "arm-v8", "aarch64" -> "${subProject.path}:iosSimulatorArm64Test"
@@ -41,18 +43,40 @@ class EmulatorJobsMatrix {
             }
         }.map { listOf("cleanTest", it) }
 
+    fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
+        rootProject.subprojects.filter { subProject ->
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.Macos) || subProject.name == "test-utils"
+        }.map { subProject ->
+            when (val osArch = System.getProperty("os.arch")) {
+                "arm64", "arm-v8", "aarch64" -> "${subProject.path}:macosArm64Test"
+                else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
+            }
+        }.map { listOf("cleanTest", it) }
+
+    fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
+        rootProject.subprojects.filter { subProject ->
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.Tvos) || subProject.name == "test-utils"
+        }.map { subProject ->
+            when (val osArch = System.getProperty("os.arch")) {
+                "arm64", "arm-v8", "aarch64" -> "${subProject.path}:tvosSimulatorArm64Test"
+                else -> throw Error("Unexpected System.getProperty(\"os.arch\") = $osArch")
+            }
+        }.map { listOf("cleanTest", it) }
+
     fun getJsTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipJsTests") == "true").not()
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.Js) || subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jsTest"
         }.map { listOf("cleanTest", it) }
 
     fun getJvmTestTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
-            subProject.name == "test-utils" ||
-                    (rootProject.property("${subProject.name}.skipJvmTests") == "true").not()
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.Jvm) || subProject.name == "test-utils"
         }.map { subProject ->
             "${subProject.path}:jvmTest"
         }.map { listOf("cleanTest", it) }
@@ -100,4 +124,21 @@ fun getSdkmanagerFile(rootDir: File): File? =
         val sdkmanagerFile = files.firstOrNull()
         println("sdkmanagerFile: $sdkmanagerFile")
         sdkmanagerFile
+    }
+
+enum class TargetPlatform {
+    Android, Ios, Macos, Tvos, Jvm, Js
+}
+
+fun String.toTargetPlatforms(): List<TargetPlatform> =
+    split(",").map {
+        when (it.lowercase().trim()) {
+            "android" -> TargetPlatform.Android
+            "ios" -> TargetPlatform.Ios
+            "macos" -> TargetPlatform.Macos
+            "tvos" -> TargetPlatform.Tvos
+            "jvm" -> TargetPlatform.Jvm
+            "js" -> TargetPlatform.Js
+            else -> throw IllegalArgumentException("Unknown target platform: $it")
+        }
     }
