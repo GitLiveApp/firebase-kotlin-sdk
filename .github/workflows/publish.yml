@@ -24,7 +24,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
       - name: Setup versions
         run: ./gradlew :updateVersions
       - name: Grant execute permission for gradlew
