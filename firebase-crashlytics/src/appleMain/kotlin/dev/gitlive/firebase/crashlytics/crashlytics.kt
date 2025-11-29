@@ -6,6 +6,8 @@ import platform.Foundation.NSLocalizedDescriptionKey
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlin.Any
+import kotlin.collections.Map
 
 public val FirebaseCrashlytics.ios: FIRCrashlytics get() = FIRCrashlytics.crashlytics()
 
@@ -18,6 +20,10 @@ public actual class FirebaseCrashlytics internal constructor(internal val ios: F
 
     public actual fun recordException(exception: Throwable) {
         ios.recordError(exception.asNSError())
+    }
+    @Suppress("UNCHECKED_CAST")
+    public actual fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+        ios.recordError(exception.asNSError(), customKeys as Map<Any?, *>)
     }
     public actual fun log(message: String) {
         ios.log(message)
