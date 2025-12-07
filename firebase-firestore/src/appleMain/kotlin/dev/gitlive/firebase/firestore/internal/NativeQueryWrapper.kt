@@ -18,6 +18,7 @@ import platform.Foundation.NSNull
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())
+    actual fun limitToLast(limit: Number) = native.queryLimitedToLast(limit.toLong())
 
     actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
 

@@ -38,6 +38,11 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         dev.gitlive.firebase.firestore.externals.limit(limit),
     ).wrapped
 
+    actual fun limitToLast(limit: Number) = query(
+        js,
+        dev.gitlive.firebase.firestore.externals.limitToLast(limit)
+    ).wrapped
+
     actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
 
     private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {

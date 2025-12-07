@@ -4,9 +4,11 @@ import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.Source
@@ -19,6 +21,7 @@ import kotlinx.coroutines.tasks.await
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: Query) {
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
+    actual fun limitToLast(limit: Number) = native.limitToLast(limit.toLong())
 
     actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, exception ->
@@ -137,4 +140,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             }
         awaitClose { registration.remove() }
     }
+
+    actual fun count(): NativeAggregateQuery = native.count()
+    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField) = native.aggregate(aggregateField.android, *aggregateFields.map { it.android }.toTypedArray())
 }

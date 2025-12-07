@@ -88,6 +88,7 @@ public external fun increment(n: Int): FieldValue
 public external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore
 
 public external fun limit(limit: Number): QueryConstraint
+public external fun limitToLast(limit: Number): QueryConstraint
 
 public external fun onSnapshot(
     reference: DocumentReference,
