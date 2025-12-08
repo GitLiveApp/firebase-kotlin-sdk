@@ -69,7 +69,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         awaitClose { registration.remove() }
     }
 
-    override fun equals(other: Any?): Boolean = this === other || other is NativeDocumentReference && nativeValue == other.nativeValue
+    override fun equals(other: Any?): Boolean = this === other || (other is NativeDocumentReference && nativeValue == other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
 
