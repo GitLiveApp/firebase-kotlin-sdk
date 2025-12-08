@@ -344,8 +344,10 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      */
     public fun endAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.endAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
-    public fun aggregate(aggregateField: AggregateField, vararg  aggregateFields: AggregateField): AggregateQuery = AggregateQuery(
-        nativeQuery.aggregate(aggregateField, *aggregateFields)
+    public fun count(): AggregateQuery = AggregateQuery(nativeQuery.count())
+
+    public fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): AggregateQuery = AggregateQuery(
+        nativeQuery.aggregate(aggregateField, *aggregateFields),
     )
 }
 
@@ -414,7 +416,6 @@ public class AggregateQuery internal constructor(internal val nativeQuery: Nativ
     internal constructor(native: NativeAggregateQuery) : this(NativeAggregateQueryWrapper(native))
 
     public suspend fun get(source: AggregateSource = AggregateSource.SERVER): AggregateQuerySnapshot = AggregateQuerySnapshot(nativeQuery.get(source))
-
 }
 
 public class AggregateQuerySnapshot internal constructor(internal val nativeSnapshot: NativeAggregateQuerySnapshotWrapper) {
@@ -869,7 +870,7 @@ public enum class Source {
 }
 
 public enum class AggregateSource {
-    SERVER
+    SERVER,
 }
 
 public expect sealed class AggregateField {
@@ -885,5 +886,4 @@ public expect sealed class AggregateField {
     public object Count : AggregateField
     public class Average : AggregateField
     public class Sum : AggregateField
-
 }

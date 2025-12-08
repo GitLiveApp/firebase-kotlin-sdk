@@ -226,6 +226,27 @@ public external interface QuerySnapshot {
     public fun docChanges(): Array<DocumentChange>
 }
 
+public external interface AggregateField<T>
+
+public external fun count(): AggregateField<Int>
+public external fun sum(field: String): AggregateField<Double?>
+public external fun average(field: String): AggregateField<Double?>
+
+public external fun getAggregateFromServer(
+    query: Query,
+    aggregateSpec: Json,
+): Promise<AggregateQuerySnapshot>
+
+public external fun getCount(
+    query: Query,
+): Promise<AggregateQuerySnapshot>
+
+public external interface AggregateQuerySnapshot {
+    public val query: Query
+
+    public fun data(): Json
+}
+
 public external interface SnapshotMetadata {
     public val hasPendingWrites: Boolean
     public val fromCache: Boolean

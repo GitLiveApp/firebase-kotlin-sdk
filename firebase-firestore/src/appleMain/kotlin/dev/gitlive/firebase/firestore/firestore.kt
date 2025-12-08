@@ -122,6 +122,15 @@ internal actual typealias NativeQuery = FIRQuery
 public operator fun Query.Companion.invoke(ios: FIRQuery): Query = Query(ios)
 public val Query.ios: NativeQuery get() = native
 
+internal actual typealias NativeAggregateQuery = FIRAggregateQuery
+internal actual typealias NativeAggregateQuerySnapshot = FIRAggregateQuerySnapshot
+
+public operator fun AggregateQuery.Companion.invoke(android: FIRQuery): AggregateQuery = AggregateQuery(android)
+public val AggregateQuery.ios: FIRAggregateQuery get() = native
+
+public operator fun AggregateQuerySnapshot.Companion.invoke(android: FIRAggregateQuerySnapshot): AggregateQuerySnapshot = AggregateQuerySnapshot(android)
+public val AggregateQuerySnapshot.ios: FIRAggregateQuerySnapshot get() = native
+
 internal actual typealias NativeCollectionReference = FIRCollectionReference
 
 public operator fun CollectionReference.Companion.invoke(ios: FIRCollectionReference): CollectionReference = CollectionReference(ios)
@@ -262,4 +271,27 @@ internal suspend inline fun <T> await(function: (callback: (NSError?) -> Unit) -
     }
     job.await()
     return result
+}
+
+public actual sealed class AggregateField {
+
+    public abstract val ios: FIRAggregateField
+
+    public actual companion object {
+        public actual fun average(field: String): Average = Average(FIRAggregateField.aggregateFieldForAverageOfField(field))
+        public actual fun average(fieldPath: FieldPath): Average = Average(FIRAggregateField.aggregateFieldForAverageOfFieldPath(fieldPath.ios))
+        public actual fun count(): Count = Count
+        public actual fun sum(field: String): Sum = Sum(FIRAggregateField.aggregateFieldForSumOfField(field))
+        public actual fun sum(fieldPath: FieldPath): Sum = Sum(FIRAggregateField.aggregateFieldForSumOfFieldPath(fieldPath.ios))
+    }
+
+    public actual data object Count : AggregateField() {
+        override val ios: FIRAggregateField get() = FIRAggregateField.aggregateFieldForCount()
+    }
+    public actual data class Average(
+        override val ios: FIRAggregateField,
+    ) : AggregateField()
+    public actual data class Sum(
+        override val ios: FIRAggregateField,
+    ) : AggregateField()
 }

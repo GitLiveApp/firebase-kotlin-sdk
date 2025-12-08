@@ -37,5 +37,5 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
     fun endAt(vararg fieldValues: Any): NativeQuery
 
     fun count(): NativeAggregateQuery
-    fun aggregate(aggregateField: AggregateField, vararg  aggregateFields: AggregateField): NativeAggregateQuery
+    fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): NativeAggregateQuery
 }

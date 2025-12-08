@@ -12,7 +12,6 @@ internal expect class NativeAggregateQueryWrapper(native: NativeAggregateQuery) 
     val query: NativeQuery
 
     suspend fun get(source: AggregateSource = AggregateSource.SERVER): NativeAggregateQuerySnapshot
-
 }
 
 internal expect class NativeAggregateQuerySnapshotWrapper(native: NativeAggregateQuerySnapshot) {

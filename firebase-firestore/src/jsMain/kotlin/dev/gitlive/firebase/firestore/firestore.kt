@@ -19,6 +19,8 @@ import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
 import dev.gitlive.firebase.js
 import kotlin.js.Json
 import kotlin.js.json
+import dev.gitlive.firebase.firestore.externals.AggregateField as JsAggregateField
+import dev.gitlive.firebase.firestore.externals.AggregateQuerySnapshot as JsAggregateQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.Firestore as JsFirestore
 import dev.gitlive.firebase.firestore.externals.CollectionReference as JsCollectionReference
 import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChange
@@ -30,6 +32,9 @@ import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
 import dev.gitlive.firebase.firestore.externals.Transaction as JsTransaction
 import dev.gitlive.firebase.firestore.externals.WriteBatch as JsWriteBatch
+import dev.gitlive.firebase.firestore.externals.average as jsAverage
+import dev.gitlive.firebase.firestore.externals.count as jsCount
+import dev.gitlive.firebase.firestore.externals.sum as jsSum
 import dev.gitlive.firebase.firestore.externals.documentId as jsDocumentId
 
 public actual val Firebase.firestore: FirebaseFirestore get() =
@@ -144,6 +149,12 @@ public actual val FirebaseFirestoreException.code: FirestoreExceptionCode get() 
 
 public val QuerySnapshot.js: JsQuerySnapshot get() = js
 
+internal actual data class NativeAggregateQuery(val query: JsQuery, val aggregateFields: List<AggregateField>)
+internal actual data class NativeAggregateQuerySnapshot(val js: JsAggregateQuerySnapshot)
+
+public operator fun AggregateQuerySnapshot.Companion.invoke(android: JsAggregateQuerySnapshot): AggregateQuerySnapshot = AggregateQuerySnapshot(android)
+public val AggregateQuerySnapshot.js: JsAggregateQuerySnapshot get() = native.js
+
 public actual class QuerySnapshot(internal val js: JsQuerySnapshot) {
     public actual val documents: List<DocumentSnapshot>
         get() = js.docs.map { DocumentSnapshot(NativeDocumentSnapshotWrapper(it)) }
@@ -194,6 +205,8 @@ public actual class FieldPath private constructor(internal val js: JsFieldPath) 
     override fun equals(other: Any?): Boolean = other is FieldPath && js.isEqual(other.js)
     override fun hashCode(): Int = js.hashCode()
     override fun toString(): String = js.toString()
+
+    internal val pathString: String get() = js.asDynamic()["_internalPath"].toString()
 }
 
 public actual typealias EncodedFieldPath = JsFieldPath
@@ -227,6 +240,39 @@ public actual enum class ChangeType(internal val jsString: String) {
     ADDED("added"),
     MODIFIED("modified"),
     REMOVED("removed"),
+}
+
+public actual sealed class AggregateField {
+
+    public abstract val js: JsAggregateField<*>
+    internal abstract val alias: String
+
+    public actual companion object {
+        public actual fun average(field: String): Average = Average(jsAverage(field), "averageOf$field")
+        public actual fun average(fieldPath: FieldPath): Average = fieldPath.pathString.let {
+            println("Path is $it")
+            Average(jsAverage(it), "averageOf$it")
+        }
+        public actual fun count(): Count = Count
+        public actual fun sum(field: String): Sum = Sum(jsSum(field), "sumOf$field")
+        public actual fun sum(fieldPath: FieldPath): Sum = fieldPath.pathString.let {
+            println("Path is $it")
+            Sum(jsSum(it), "sumOf$it")
+        }
+    }
+
+    public actual data object Count : AggregateField() {
+        override val js: JsAggregateField<Int> get() = jsCount()
+        override val alias: String = "countOfDocs"
+    }
+    public actual data class Average internal constructor(
+        override val js: JsAggregateField<Double?>,
+        override val alias: String,
+    ) : AggregateField()
+    public actual data class Sum internal constructor(
+        override val js: JsAggregateField<Double?>,
+        override val alias: String,
+    ) : AggregateField()
 }
 
 internal inline fun <T, R> T.rethrow(function: T.() -> R): R = dev.gitlive.firebase.firestore.rethrow { function() }

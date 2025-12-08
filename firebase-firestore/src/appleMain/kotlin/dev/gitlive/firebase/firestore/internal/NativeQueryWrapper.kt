@@ -1,9 +1,11 @@
 package dev.gitlive.firebase.firestore.internal
 
 import cocoapods.FirebaseFirestoreInternal.FIRFilter
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
@@ -82,4 +84,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
     actual fun endBefore(vararg fieldValues: Any) = native.queryEndingBeforeValues(fieldValues.asList())
     actual fun endAt(document: NativeDocumentSnapshot) = native.queryEndingAtDocument(document)
     actual fun endAt(vararg fieldValues: Any) = native.queryEndingAtValues(fieldValues.asList())
+
+    actual fun count(): NativeAggregateQuery = native.count()
+    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField) = native.aggregate(listOf(aggregateField.ios, *aggregateFields.map { it.ios }.toTypedArray()))
 }

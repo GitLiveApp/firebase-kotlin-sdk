@@ -11,9 +11,11 @@ internal actual class NativeAggregateQueryWrapper actual constructor(actual val 
 
     actual val query: NativeQuery get() = native.query
 
-    actual suspend fun get(source: AggregateSource): NativeAggregateQuerySnapshot = native.get(when (source) {
-        AggregateSource.SERVER -> com.google.firebase.firestore.AggregateSource.SERVER
-    }).await()
+    actual suspend fun get(source: AggregateSource): NativeAggregateQuerySnapshot = native.get(
+        when (source) {
+            AggregateSource.SERVER -> com.google.firebase.firestore.AggregateSource.SERVER
+        },
+    ).await()
 }
 
 internal actual class NativeAggregateQuerySnapshotWrapper actual constructor(actual val native: NativeAggregateQuerySnapshot) {

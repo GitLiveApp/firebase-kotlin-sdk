@@ -1,3 +1,80 @@
+public abstract class dev/gitlive/firebase/firestore/AggregateField {
+	public static final field Companion Ldev/gitlive/firebase/firestore/AggregateField$Companion;
+	public abstract fun getAndroid ()Lcom/google/firebase/firestore/AggregateField;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateField$Average : dev/gitlive/firebase/firestore/AggregateField {
+	public fun <init> (Lcom/google/firebase/firestore/AggregateField$AverageAggregateField;)V
+	public final fun component1 ()Lcom/google/firebase/firestore/AggregateField$AverageAggregateField;
+	public final fun copy (Lcom/google/firebase/firestore/AggregateField$AverageAggregateField;)Ldev/gitlive/firebase/firestore/AggregateField$Average;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/AggregateField$Average;Lcom/google/firebase/firestore/AggregateField$AverageAggregateField;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/AggregateField$Average;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAndroid ()Lcom/google/firebase/firestore/AggregateField$AverageAggregateField;
+	public synthetic fun getAndroid ()Lcom/google/firebase/firestore/AggregateField;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateField$Companion {
+	public final fun average (Ldev/gitlive/firebase/firestore/FieldPath;)Ldev/gitlive/firebase/firestore/AggregateField$Average;
+	public final fun average (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/AggregateField$Average;
+	public final fun count ()Ldev/gitlive/firebase/firestore/AggregateField$Count;
+	public final fun sum (Ldev/gitlive/firebase/firestore/FieldPath;)Ldev/gitlive/firebase/firestore/AggregateField$Sum;
+	public final fun sum (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/AggregateField$Sum;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateField$Count : dev/gitlive/firebase/firestore/AggregateField {
+	public static final field INSTANCE Ldev/gitlive/firebase/firestore/AggregateField$Count;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAndroid ()Lcom/google/firebase/firestore/AggregateField$CountAggregateField;
+	public synthetic fun getAndroid ()Lcom/google/firebase/firestore/AggregateField;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateField$Sum : dev/gitlive/firebase/firestore/AggregateField {
+	public fun <init> (Lcom/google/firebase/firestore/AggregateField$SumAggregateField;)V
+	public final fun component1 ()Lcom/google/firebase/firestore/AggregateField$SumAggregateField;
+	public final fun copy (Lcom/google/firebase/firestore/AggregateField$SumAggregateField;)Ldev/gitlive/firebase/firestore/AggregateField$Sum;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/firestore/AggregateField$Sum;Lcom/google/firebase/firestore/AggregateField$SumAggregateField;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/AggregateField$Sum;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAndroid ()Lcom/google/firebase/firestore/AggregateField$SumAggregateField;
+	public synthetic fun getAndroid ()Lcom/google/firebase/firestore/AggregateField;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateQuery {
+	public static final field Companion Ldev/gitlive/firebase/firestore/AggregateQuery$Companion;
+	public final fun get (Ldev/gitlive/firebase/firestore/AggregateSource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/AggregateQuery;Ldev/gitlive/firebase/firestore/AggregateSource;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getQuery ()Ldev/gitlive/firebase/firestore/Query;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateQuery$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateQuerySnapshot {
+	public static final field Companion Ldev/gitlive/firebase/firestore/AggregateQuerySnapshot$Companion;
+	public final fun get (Ldev/gitlive/firebase/firestore/AggregateField$Average;)Ljava/lang/Double;
+	public final fun get (Ldev/gitlive/firebase/firestore/AggregateField$Count;)J
+	public final fun get (Ldev/gitlive/firebase/firestore/AggregateField;)Ljava/lang/Number;
+	public final fun getCount ()J
+	public final fun getDouble (Ldev/gitlive/firebase/firestore/AggregateField;)Ljava/lang/Double;
+	public final fun getLong (Ldev/gitlive/firebase/firestore/AggregateField;)Ljava/lang/Long;
+	public final fun getQuery ()Ldev/gitlive/firebase/firestore/AggregateQuery;
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateQuerySnapshot$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/AggregateSource : java/lang/Enum {
+	public static final field SERVER Ldev/gitlive/firebase/firestore/AggregateSource;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/AggregateSource;
+	public static fun values ()[Ldev/gitlive/firebase/firestore/AggregateSource;
+}
+
 public abstract class dev/gitlive/firebase/firestore/BaseTimestamp {
 	public static final field Companion Ldev/gitlive/firebase/firestore/BaseTimestamp$Companion;
 }
@@ -450,6 +527,8 @@ public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings
 
 public class dev/gitlive/firebase/firestore/Query {
 	public static final field Companion Ldev/gitlive/firebase/firestore/Query$Companion;
+	public final fun aggregate (Ldev/gitlive/firebase/firestore/AggregateField;[Ldev/gitlive/firebase/firestore/AggregateField;)Ldev/gitlive/firebase/firestore/AggregateQuery;
+	public final fun count ()Ldev/gitlive/firebase/firestore/AggregateQuery;
 	public final fun endAt (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
@@ -462,6 +541,7 @@ public class dev/gitlive/firebase/firestore/Query {
 	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getSnapshots ()Lkotlinx/coroutines/flow/Flow;
 	public final fun limit (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun limitToLast (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ljava/lang/String;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public static synthetic fun orderBy$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
@@ -742,6 +822,8 @@ public final class dev/gitlive/firebase/firestore/android {
 	public static synthetic fun firestore$default (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
 	public static final fun firestoreSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
 	public static synthetic fun firestoreSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/AggregateQuery;)Lcom/google/firebase/firestore/AggregateQuery;
+	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/AggregateQuerySnapshot;)Lcom/google/firebase/firestore/AggregateQuerySnapshot;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/CollectionReference;)Lcom/google/firebase/firestore/CollectionReference;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentChange;)Lcom/google/firebase/firestore/DocumentChange;
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/DocumentReference;)Lcom/google/firebase/firestore/DocumentReference;
@@ -756,6 +838,8 @@ public final class dev/gitlive/firebase/firestore/android {
 	public static final fun getAndroid (Ldev/gitlive/firebase/firestore/WriteBatch;)Lcom/google/firebase/firestore/WriteBatch;
 	public static final fun getCode (Lcom/google/firebase/firestore/FirebaseFirestoreException;)Lcom/google/firebase/firestore/FirebaseFirestoreException$Code;
 	public static final fun getFirestore (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/firestore/FirebaseFirestore;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/AggregateQuery$Companion;Lcom/google/firebase/firestore/Query;)Ldev/gitlive/firebase/firestore/AggregateQuery;
+	public static final fun invoke (Ldev/gitlive/firebase/firestore/AggregateQuerySnapshot$Companion;Lcom/google/firebase/firestore/AggregateQuerySnapshot;)Ldev/gitlive/firebase/firestore/AggregateQuerySnapshot;
 	public static final fun invoke (Ldev/gitlive/firebase/firestore/CollectionReference$Companion;Lcom/google/firebase/firestore/CollectionReference;)Ldev/gitlive/firebase/firestore/CollectionReference;
 	public static final fun invoke (Ldev/gitlive/firebase/firestore/DocumentReference$Companion;Lcom/google/firebase/firestore/DocumentReference;)Ldev/gitlive/firebase/firestore/DocumentReference;
 	public static final fun invoke (Ldev/gitlive/firebase/firestore/DocumentSnapshot$Companion;Lcom/google/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/DocumentSnapshot;

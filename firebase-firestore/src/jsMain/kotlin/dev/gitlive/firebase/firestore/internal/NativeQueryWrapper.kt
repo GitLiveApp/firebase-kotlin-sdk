@@ -1,8 +1,10 @@
 package dev.gitlive.firebase.firestore.internal
 
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
@@ -23,6 +25,7 @@ import dev.gitlive.firebase.firestore.wrapped
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.collections.listOf
 import kotlin.js.json
 
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
@@ -40,7 +43,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual fun limitToLast(limit: Number) = query(
         js,
-        dev.gitlive.firebase.firestore.externals.limitToLast(limit)
+        dev.gitlive.firebase.firestore.externals.limitToLast(limit),
     ).wrapped
 
     actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
@@ -142,6 +145,12 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             dev.gitlive.firebase.firestore.externals.endAt(*fieldValues),
         ).wrapped
     }
+
+    actual fun count(): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(AggregateField.Count))
+    actual fun aggregate(
+        aggregateField: AggregateField,
+        vararg aggregateFields: AggregateField,
+    ): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(aggregateField, *aggregateFields))
 
     actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {

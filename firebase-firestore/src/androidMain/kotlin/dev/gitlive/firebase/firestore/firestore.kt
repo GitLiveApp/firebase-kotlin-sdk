@@ -230,9 +230,9 @@ public actual sealed class AggregateField {
         override val android: AndroidCountAggregateField get() = AndroidAggregateField.count()
     }
     public actual data class Average(
-        override val android: AndroidAverageAggregateField
+        override val android: AndroidAverageAggregateField,
     ) : AggregateField()
     public actual data class Sum(
-        override val android: AndroidSumAggregateField
+        override val android: AndroidSumAggregateField,
     ) : AggregateField()
 }
