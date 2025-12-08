@@ -11,6 +11,7 @@ import dev.gitlive.firebase.firestore.Filter
 import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import kotlinx.coroutines.channels.ProducerScope
@@ -40,6 +41,13 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         }
         awaitClose { listener.remove() }
     }
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val listener = native.addSnapshotListener(listenOptions.android) { snapshot, exception ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            exception?.let { close(exception) }
+        }
+        awaitClose { listener.remove() }
+    }
 
     actual suspend fun get(source: Source): QuerySnapshot = QuerySnapshot(native.get(source.toAndroidSource()).await())
 
@@ -50,10 +58,12 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
+
         is Filter.Or -> com.google.firebase.firestore.Filter.or(
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
+
         is Filter.Field -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
@@ -63,6 +73,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(field, constraint.value)
                 }
+
                 is WhereConstraint.ForObject -> {
                     val modifier: (String, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
@@ -73,6 +84,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(field, constraint.value)
                 }
+
                 is WhereConstraint.ForArray -> {
                     val modifier: (String, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray
@@ -83,6 +95,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                 }
             }
         }
+
         is Filter.Path -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
@@ -92,6 +105,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
+
                 is WhereConstraint.ForObject -> {
                     val modifier: (FieldPath, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
@@ -102,6 +116,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
+
                 is WhereConstraint.ForArray -> {
                     val modifier: (FieldPath, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray

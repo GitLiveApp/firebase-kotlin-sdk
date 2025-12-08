@@ -31,6 +31,7 @@ public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): Fir
 
 public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {
     is LocalCacheSettings.Persistent -> FIRPersistentCacheSettings(NSNumber.numberWithLong(sizeBytes))
+
     is LocalCacheSettings.Memory -> FIRMemoryCacheSettings(
         when (garbaseCollectorSettings) {
             is MemoryGarbageCollectorSettings.Eager -> FIRMemoryEagerGCSettings()
@@ -194,6 +195,7 @@ public fun NSError.toException(): FirebaseFirestoreException = when (domain) {
         FIRFirestoreErrorCodeUnauthenticated -> FirestoreExceptionCode.UNAUTHENTICATED
         else -> FirestoreExceptionCode.UNKNOWN
     }
+
     else -> FirestoreExceptionCode.UNKNOWN
 }.let { FirebaseFirestoreException(description!!, it) }
 

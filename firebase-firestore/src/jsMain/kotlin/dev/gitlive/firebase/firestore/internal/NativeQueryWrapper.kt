@@ -8,6 +8,7 @@ import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import dev.gitlive.firebase.firestore.errorToException
@@ -50,7 +51,9 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {
         is Filter.And -> and(*filters.map { it.toQueryConstraint() }.toTypedArray())
+
         is Filter.Or -> or(*filters.map { it.toQueryConstraint() }.toTypedArray())
+
         is Filter.Field -> {
             val value = when (constraint) {
                 is WhereConstraint.ForNullableObject -> constraint.value
@@ -59,6 +62,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             }
             dev.gitlive.firebase.firestore.externals.where(field, constraint.filterOp, value)
         }
+
         is Filter.Path -> {
             val value = when (constraint) {
                 is WhereConstraint.ForNullableObject -> constraint.value
@@ -168,6 +172,18 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             onSnapshot(
                 js,
                 json("includeMetadataChanges" to includeMetadataChanges),
+                { trySend(QuerySnapshot(it)) },
+                { close(errorToException(it)) },
+            )
+        }
+        awaitClose { rethrow { unsubscribe() } }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val unsubscribe = rethrow {
+            onSnapshot(
+                js,
+                listenOptions.js,
                 { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) },
             )

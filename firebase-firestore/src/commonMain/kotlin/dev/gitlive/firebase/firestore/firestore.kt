@@ -251,7 +251,9 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
     public fun limitToLast(limit: Number): Query = Query(nativeQuery.limitToLast(limit))
     public val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = nativeQuery.snapshots(listenOptions)
+
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
 
     public fun where(builder: FilterBuilder.() -> Filter?): Query = builder(FilterBuilder())?.let { Query(nativeQuery.where(it)) } ?: this
@@ -565,7 +567,8 @@ public data class DocumentReference internal constructor(internal val native: Na
     val path: String get() = native.path
     val snapshots: Flow<DocumentSnapshot> get() = native.snapshots.map(::DocumentSnapshot)
     val parent: CollectionReference get() = CollectionReference(native.parent)
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = native.snapshots(listenOptions).map(::DocumentSnapshot)
 
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(native.collection(collectionPath))
     public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(native.get(source))

@@ -3,6 +3,7 @@ package dev.gitlive.firebase.firestore.internal
 import dev.gitlive.firebase.firestore.NativeCollectionReference
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.errorToException
 import dev.gitlive.firebase.firestore.externals.deleteDoc
@@ -56,6 +57,16 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         val unsubscribe = onSnapshot(
             js,
             json("includeMetadataChanges" to includeMetadataChanges),
+            { trySend(NativeDocumentSnapshot(it)) },
+            { close(errorToException(it)) },
+        )
+        awaitClose { unsubscribe() }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val unsubscribe = onSnapshot(
+            js,
+            listenOptions.js,
             { trySend(NativeDocumentSnapshot(it)) },
             { close(errorToException(it)) },
         )

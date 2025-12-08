@@ -266,5 +266,6 @@ private fun NSError.toException() = when (domain) {
 
         else -> FirebaseAuthException(toString())
     }
+
     else -> FirebaseAuthException(toString())
 }

@@ -49,16 +49,19 @@ internal actual class NativeAggregateQuerySnapshotWrapper actual constructor(act
             val alias = element.drop(1).takeWhile { it != '"' }
             when {
                 alias == AggregateField.Count.alias -> AggregateField.Count
+
                 alias.startsWith("sumOf") -> AggregateField.sum(
                     FieldPath(
                         *alias.removePrefix("sumOf").split(".").toTypedArray(),
                     ),
                 )
+
                 alias.startsWith("averageOf") -> AggregateField.average(
                     FieldPath(
                         *alias.removePrefix("averageOf").split(".").toTypedArray(),
                     ),
                 )
+
                 else -> null
             }
         }

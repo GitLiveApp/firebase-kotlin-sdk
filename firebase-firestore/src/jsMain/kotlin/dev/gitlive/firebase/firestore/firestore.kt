@@ -92,6 +92,7 @@ public actual data class FirebaseFirestoreSettings(
                         "cacheSizeBytes" to cacheSettings.sizeBytes,
                     ).asDynamic() as PersistentCacheSettings,
                 )
+
                 is LocalCacheSettings.Memory -> {
                     val garbageCollectorSettings = when (val garbageCollectorSettings = cacheSettings.garbaseCollectorSettings) {
                         is MemoryGarbageCollectorSettings.Eager -> memoryEagerGarbageCollector()
@@ -293,21 +294,37 @@ internal fun errorToException(e: dynamic) = (e?.code ?: e?.message ?: "")
     .let {
         when {
             "cancelled" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.CANCELLED)
+
             "invalid-argument" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INVALID_ARGUMENT)
+
             "deadline-exceeded" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DEADLINE_EXCEEDED)
+
             "not-found" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.NOT_FOUND)
+
             "already-exists" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ALREADY_EXISTS)
+
             "permission-denied" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.PERMISSION_DENIED)
+
             "resource-exhausted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.RESOURCE_EXHAUSTED)
+
             "failed-precondition" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.FAILED_PRECONDITION)
+
             "aborted" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.ABORTED)
+
             "out-of-range" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.OUT_OF_RANGE)
+
             "unimplemented" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNIMPLEMENTED)
+
             "internal" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.INTERNAL)
+
             "unavailable" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAVAILABLE)
+
             "data-loss" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.DATA_LOSS)
+
             "unauthenticated" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNAUTHENTICATED)
+
             "unknown" in it -> FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)
+
             else -> {
                 println("Unknown error code in ${JSON.stringify(e)}")
                 FirebaseFirestoreException(e.unsafeCast<Throwable>(), FirestoreExceptionCode.UNKNOWN)

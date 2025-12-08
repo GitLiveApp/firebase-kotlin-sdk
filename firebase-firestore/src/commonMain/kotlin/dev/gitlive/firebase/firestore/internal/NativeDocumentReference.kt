@@ -3,7 +3,9 @@ package dev.gitlive.firebase.firestore.internal
 import dev.gitlive.firebase.firestore.NativeCollectionReference
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
+import dev.gitlive.firebase.firestore.snapshotListenOptions
 import dev.gitlive.firebase.internal.EncodedObject
 import kotlinx.coroutines.flow.Flow
 
@@ -13,7 +15,8 @@ internal expect class NativeDocumentReference(nativeValue: NativeDocumentReferen
     val path: String
     val snapshots: Flow<NativeDocumentSnapshot>
     val parent: NativeCollectionReferenceWrapper
-    fun snapshots(includeMetadataChanges: Boolean = false): Flow<NativeDocumentSnapshot>
+    fun snapshots(includeMetadataChanges: Boolean): Flow<NativeDocumentSnapshot>
+    fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<NativeDocumentSnapshot>
 
     fun collection(collectionPath: String): NativeCollectionReference
     suspend fun get(source: Source = Source.DEFAULT): NativeDocumentSnapshot

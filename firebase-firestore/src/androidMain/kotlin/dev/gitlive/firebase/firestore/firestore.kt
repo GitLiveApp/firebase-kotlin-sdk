@@ -48,10 +48,12 @@ public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (t
     is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {
         setSizeBytes(sizeBytes)
     }
+
     is LocalCacheSettings.Memory -> androidMemoryCacheSettings {
         setGcSettings(
             when (garbaseCollectorSettings) {
                 is MemoryGarbageCollectorSettings.Eager -> androidMemoryEagerGcSettings { }
+
                 is MemoryGarbageCollectorSettings.LRUGC -> androidMemoryLruGcSettings {
                     setSizeBytes(garbaseCollectorSettings.sizeBytes)
                 }

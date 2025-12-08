@@ -8,7 +8,9 @@ import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
+import dev.gitlive.firebase.firestore.snapshotListenOptions
 import kotlinx.coroutines.flow.Flow
 
 internal expect open class NativeQueryWrapper internal constructor(native: NativeQuery) {
@@ -18,7 +20,8 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
     fun limit(limit: Number): NativeQuery
     fun limitToLast(limit: Number): NativeQuery
     val snapshots: Flow<QuerySnapshot>
-    fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
+    fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot>
+    fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot>
     suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot
 
     fun where(filter: Filter): NativeQuery
