@@ -129,12 +129,4 @@ open class AggregateQueryTest : BaseFirebaseFirestoreTest() {
         firestore.collection(COLLECTION).document("two").delete()
         firestore.collection(COLLECTION).document("three").delete()
     }
-
-    private suspend fun <T> Query.assertDocuments(serializer: KSerializer<T>, vararg expected: T) {
-        val documents = get().documents
-        assertEquals(expected.size, documents.size)
-        documents.forEachIndexed { index, documentSnapshot ->
-            assertEquals(expected[index], documentSnapshot.data(serializer))
-        }
-    }
 }

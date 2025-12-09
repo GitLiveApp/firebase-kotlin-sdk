@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlin.random.Random
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,7 +43,7 @@ class FirebaseDatabaseTest {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
-                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                applicationId = "1:${Random.nextInt()}:ios:dd1f6688bad7af768c841a",
                 apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                 databaseUrl = "https://fir-kotlin-sdk-default-rtdb.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
