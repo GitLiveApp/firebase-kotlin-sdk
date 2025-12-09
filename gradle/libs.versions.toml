@@ -9,7 +9,7 @@ settings-api = "2.2"
 settings-language = "2.2"
 
 #Android
-agp = "8.12.3"
+agp = "8.13.1"
 androidx-test-core = "1.7.0"
 androidx-test-junit = "1.3.0"
 androidx-test-runner = "1.7.0"
