@@ -78,7 +78,7 @@ jobs:
       - name: Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
       - name: Uploading build folder
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: artefact
           path: build/dokka/htmlMultiModule

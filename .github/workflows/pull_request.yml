@@ -64,13 +64,13 @@ jobs:
       - name: Run Android Instrumented Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload Android test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: Android ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/androidTests/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: Android ${{ env.ARCHIVE_KEY }} Firebase Debug Log
@@ -92,7 +92,7 @@ jobs:
       - name: Run JS Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload JS test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: JS ${{ env.ARCHIVE_KEY }} Test Report HTML
@@ -101,7 +101,7 @@ jobs:
             **/build/reports/tests/jsBrowserTest/
             **/build/reports/tests/jsNodeTest/
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: JS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
@@ -134,13 +134,13 @@ jobs:
       - name: Run iOS Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: iOS ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/tests/iosSimulatorArm64Test/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: iOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
@@ -173,13 +173,13 @@ jobs:
       - name: Run macOS Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload macOS test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: macOS ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/tests/macosArm64Test/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: macOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
@@ -212,13 +212,13 @@ jobs:
       - name: Run tvOS Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload tvOS test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: tvOS ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: "**/build/reports/tests/tvosArm64Test/"
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: tvOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
@@ -240,14 +240,14 @@ jobs:
       - name: Run JVM Tests
         run: ./gradlew ${{ matrix.gradle_tasks }}
       - name: Upload JVM test artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: JVM ${{ env.ARCHIVE_KEY }} Test Report HTML
           path: |
             **/build/reports/tests/jvmTest/
       - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: JVM ${{ env.ARCHIVE_KEY }} Firebase Debug Log
