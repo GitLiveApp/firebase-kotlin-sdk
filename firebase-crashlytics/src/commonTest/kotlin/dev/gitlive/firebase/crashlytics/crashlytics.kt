@@ -51,6 +51,22 @@ class FirebaseCrashlyticsTest {
     }
 
     @Test
+    fun testRecordExceptionWithMap() = runTest {
+        val keys = mapOf<String, Any>(
+            "message" to "Test Exception",   // String
+            "enabled" to true,               // Boolean
+            "countInt" to 3,                 // Int
+            "countLong" to 3L,               // Long
+            "ratioFloat" to 0.75f,           // Float
+            "ratioDouble" to 3.141592,       // Double
+        )
+
+        crashlytics.recordException(Exception("Test Exception"), keys)
+        delay(1.seconds)
+    }
+
+
+    @Test
     fun testLog() = runTest {
         crashlytics.log("Test Log")
 
