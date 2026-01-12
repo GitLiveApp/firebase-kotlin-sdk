@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -31,7 +31,7 @@ jobs:
         run: chmod +x gradlew
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '16.4'
       - name: Publish Firebase Analytics
         run: ./gradlew :firebase-analytics:publish
       - name: Publish Firebase App
@@ -63,7 +63,7 @@ jobs:
   documentation:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -74,7 +74,7 @@ jobs:
         run: chmod +x gradlew
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '16.4'
       - name: Generate documentation
         run: ./gradlew dokkaHtmlMultiModule
       - name: Uploading build folder
