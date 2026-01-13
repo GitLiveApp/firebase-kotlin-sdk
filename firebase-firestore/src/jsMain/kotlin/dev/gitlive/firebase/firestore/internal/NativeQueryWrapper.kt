@@ -1,11 +1,14 @@
 package dev.gitlive.firebase.firestore.internal
 
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import dev.gitlive.firebase.firestore.errorToException
@@ -23,6 +26,7 @@ import dev.gitlive.firebase.firestore.wrapped
 import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.collections.listOf
 import kotlin.js.json
 
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
@@ -38,11 +42,18 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         dev.gitlive.firebase.firestore.externals.limit(limit),
     ).wrapped
 
+    actual fun limitToLast(limit: Number) = query(
+        js,
+        dev.gitlive.firebase.firestore.externals.limitToLast(limit),
+    ).wrapped
+
     actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
 
     private fun Filter.toQueryConstraint(): QueryConstraint = when (this) {
         is Filter.And -> and(*filters.map { it.toQueryConstraint() }.toTypedArray())
+
         is Filter.Or -> or(*filters.map { it.toQueryConstraint() }.toTypedArray())
+
         is Filter.Field -> {
             val value = when (constraint) {
                 is WhereConstraint.ForNullableObject -> constraint.value
@@ -51,6 +62,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             }
             dev.gitlive.firebase.firestore.externals.where(field, constraint.filterOp, value)
         }
+
         is Filter.Path -> {
             val value = when (constraint) {
                 is WhereConstraint.ForNullableObject -> constraint.value
@@ -138,6 +150,12 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         ).wrapped
     }
 
+    actual fun count(): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(AggregateField.Count))
+    actual fun aggregate(
+        aggregateField: AggregateField,
+        vararg aggregateFields: AggregateField,
+    ): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(aggregateField, *aggregateFields))
+
     actual val snapshots get() = callbackFlow {
         val unsubscribe = rethrow {
             onSnapshot(
@@ -154,6 +172,18 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             onSnapshot(
                 js,
                 json("includeMetadataChanges" to includeMetadataChanges),
+                { trySend(QuerySnapshot(it)) },
+                { close(errorToException(it)) },
+            )
+        }
+        awaitClose { rethrow { unsubscribe() } }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val unsubscribe = rethrow {
+            onSnapshot(
+                js,
+                listenOptions.js,
                 { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) },
             )

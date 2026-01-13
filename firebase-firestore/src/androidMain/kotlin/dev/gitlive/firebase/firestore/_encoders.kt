@@ -7,5 +7,6 @@ internal actual fun isSpecialValue(value: Any): Boolean = when (value) {
     is NativeTimestamp,
     is NativeDocumentReferenceType,
     -> true
+
     else -> false
 }

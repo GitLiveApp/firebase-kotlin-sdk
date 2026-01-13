@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.MetadataChanges
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.performUpdate
 import dev.gitlive.firebase.internal.EncodedObject
@@ -59,7 +60,16 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         exception?.let { close(exception) }
     }
 
-    override fun equals(other: Any?): Boolean = this === other || other is NativeDocumentReference && nativeValue == other.nativeValue
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val registration =
+            android.addSnapshotListener(listenOptions.android) { snapshots, exception ->
+                snapshots?.let { trySend(snapshots) }
+                exception?.let { close(exception) }
+            }
+        awaitClose { registration.remove() }
+    }
+
+    override fun equals(other: Any?): Boolean = this === other || (other is NativeDocumentReference && nativeValue == other.nativeValue)
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()
 

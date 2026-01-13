@@ -9,8 +9,11 @@ public val EncodedObject.js: Json get() = json(*getRaw().entries.map { (key, val
 internal actual fun Any.asNativeMap(): Map<*, *>? {
     val json = when (this) {
         is Number -> null
+
         is Boolean -> null
+
         is String -> null
+
         is Map<*, *> -> {
             if (keys.all { it is String }) {
                 json(*mapKeys { (key, _) -> key as String }.toList().toTypedArray())
@@ -18,8 +21,11 @@ internal actual fun Any.asNativeMap(): Map<*, *>? {
                 null
             }
         }
+
         is Collection<*> -> null
+
         is Array<*> -> null
+
         else -> {
             @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
             this as Json

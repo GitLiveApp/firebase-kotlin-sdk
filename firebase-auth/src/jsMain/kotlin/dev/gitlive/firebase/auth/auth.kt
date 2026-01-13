@@ -104,17 +104,23 @@ public actual class FirebaseAuth internal constructor(internal val js: Auth) {
         @Suppress("UNCHECKED_CAST")
         return when (result.operation) {
             "EMAIL_SIGNIN" -> ActionCodeResult.SignInWithEmailLink
+
             "VERIFY_EMAIL" -> ActionCodeResult.VerifyEmail(result.data.email!!)
+
             "PASSWORD_RESET" -> ActionCodeResult.PasswordReset(result.data.email!!)
+
             "RECOVER_EMAIL" -> ActionCodeResult.RecoverEmail(result.data.email!!, result.data.previousEmail!!)
+
             "VERIFY_AND_CHANGE_EMAIL" -> ActionCodeResult.VerifyBeforeChangeEmail(
                 result.data.email!!,
                 result.data.previousEmail!!,
             )
+
             "REVERT_SECOND_FACTOR_ADDITION" -> ActionCodeResult.RevertSecondFactorAddition(
                 result.data.email!!,
                 result.data.multiFactorInfo?.let { MultiFactorInfo(it) },
             )
+
             else -> throw UnsupportedOperationException(result.operation)
         } as T
     }
@@ -208,26 +214,39 @@ private inline fun <R> rethrow(function: () -> R): R {
 
 private fun errorToException(cause: dynamic) = when (val code = cause.code?.toString()?.lowercase()) {
     "auth/invalid-user-token" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+
     "auth/requires-recent-login" -> FirebaseAuthRecentLoginRequiredException(code, cause.unsafeCast<Throwable>())
+
     "auth/user-disabled" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+
     "auth/user-token-expired" -> FirebaseAuthInvalidUserException(code, cause.unsafeCast<Throwable>())
+
     "auth/web-storage-unsupported" -> FirebaseAuthWebException(code, cause.unsafeCast<Throwable>())
+
     "auth/network-request-failed" -> FirebaseNetworkException(code, cause.unsafeCast<Throwable>())
+
     "auth/timeout" -> FirebaseNetworkException(code, cause.unsafeCast<Throwable>())
+
     "auth/weak-password" -> FirebaseAuthWeakPasswordException(code, cause.unsafeCast<Throwable>())
+
     "auth/invalid-credential",
     "auth/invalid-verification-code",
     "auth/missing-verification-code",
     "auth/invalid-verification-id",
     "auth/missing-verification-id",
     -> FirebaseAuthInvalidCredentialsException(code, cause.unsafeCast<Throwable>())
+
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use",
     -> FirebaseAuthMultiFactorException(code, cause.unsafeCast<Throwable>())
+
     "auth/credential-already-in-use" -> FirebaseAuthUserCollisionException(code, cause.unsafeCast<Throwable>())
+
     "auth/email-already-in-use" -> FirebaseAuthUserCollisionException(code, cause.unsafeCast<Throwable>())
+
     "auth/invalid-email" -> FirebaseAuthEmailException(code, cause.unsafeCast<Throwable>())
-//                "auth/app-deleted" ->
+
+    //                "auth/app-deleted" ->
 //                "auth/app-not-authorized" ->
 //                "auth/argument-error" ->
 //                "auth/invalid-api-key" ->

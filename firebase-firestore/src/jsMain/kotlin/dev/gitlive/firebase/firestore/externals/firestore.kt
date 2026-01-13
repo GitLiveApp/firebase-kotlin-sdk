@@ -88,6 +88,7 @@ public external fun increment(n: Int): FieldValue
 public external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore
 
 public external fun limit(limit: Number): QueryConstraint
+public external fun limitToLast(limit: Number): QueryConstraint
 
 public external fun onSnapshot(
     reference: DocumentReference,
@@ -223,6 +224,27 @@ public external interface QuerySnapshot {
     public val empty: Boolean
     public val metadata: SnapshotMetadata
     public fun docChanges(): Array<DocumentChange>
+}
+
+public external interface AggregateField<T>
+
+public external fun count(): AggregateField<Int>
+public external fun sum(field: String): AggregateField<Double?>
+public external fun average(field: String): AggregateField<Double?>
+
+public external fun getAggregateFromServer(
+    query: Query,
+    aggregateSpec: Json,
+): Promise<AggregateQuerySnapshot>
+
+public external fun getCount(
+    query: Query,
+): Promise<AggregateQuerySnapshot>
+
+public external interface AggregateQuerySnapshot {
+    public val query: Query
+
+    public fun data(): Json
 }
 
 public external interface SnapshotMetadata {
