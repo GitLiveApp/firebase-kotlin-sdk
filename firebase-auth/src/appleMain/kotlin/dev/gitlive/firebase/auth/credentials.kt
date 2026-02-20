@@ -70,21 +70,6 @@ public actual class OAuthProvider(internal val ios: FIROAuthProvider) {
     }
 }
 
-public val PhoneAuthProvider.ios: FIRPhoneAuthProvider get() = ios
-
-public actual class PhoneAuthProvider(internal val ios: FIRPhoneAuthProvider) {
-
-    public actual constructor(auth: FirebaseAuth) : this(FIRPhoneAuthProvider.providerWithAuth(auth.ios))
-
-    public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(ios.credentialWithVerificationID(verificationId, smsCode))
-
-    public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential {
-        val verificationId: String = ios.awaitResult { ios.verifyPhoneNumber(phoneNumber, verificationProvider.delegate, it) }
-        val verificationCode = verificationProvider.getVerificationCode()
-        return credential(verificationId, verificationCode)
-    }
-}
-
 public actual interface PhoneVerificationProvider {
     public val delegate: FIRAuthUIDelegateProtocol?
     public suspend fun getVerificationCode(): String
