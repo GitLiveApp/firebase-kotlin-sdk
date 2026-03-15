@@ -17,13 +17,13 @@ Each Firebase product is a separate Gradle module (e.g. `firebase-auth`, `fireba
 ```
 src/
   commonMain/   ← shared public API (Kotlin)
-  androidMain/  ← wraps Firebase Android SDK
-  iosMain/      ← wraps Firebase iOS SDK via Kotlin/Native
+  androidMain/  ← wraps Firebase Android SDK (and is also used as the physical dir for `jvmMain` in some modules, e.g. firebase-firestore)
+  appleMain/    ← shared Apple targets (iOS/tvOS/macOS) wrapping Firebase iOS SDK via Kotlin/Native
   jsMain/       ← wraps Firebase JS SDK
-  jvmMain/      ← wraps firebase-java-sdk (mirrors Android API)
+  jvmMain/      ← JVM desktop/server target (may map to src/androidMain/kotlin in some modules)
   commonTest/   ← shared tests
   androidTest/
-  iosTest/
+  appleTest/
   jsTest/
   jvmTest/
 ```
