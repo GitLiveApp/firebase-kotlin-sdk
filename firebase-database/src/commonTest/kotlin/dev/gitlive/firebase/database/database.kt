@@ -80,6 +80,19 @@ class FirebaseDatabaseTest {
     }
 
     @Test
+    fun testGet() = runTest {
+        ensureDatabaseConnected()
+        val testValue = "testGetValue"
+        val testReference = database.reference("testGet")
+
+        testReference.setValue(testValue)
+
+        val snapshot = testReference.get()
+
+        assertEquals(testValue, snapshot.value<String>())
+    }
+
+    @Test
     fun testChildCount() = runTest {
         setupRealtimeData()
         val dataSnapshot = database

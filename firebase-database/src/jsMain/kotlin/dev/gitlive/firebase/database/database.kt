@@ -20,6 +20,7 @@ import dev.gitlive.firebase.database.externals.onChildChanged
 import dev.gitlive.firebase.database.externals.onChildMoved
 import dev.gitlive.firebase.database.externals.onChildRemoved
 import dev.gitlive.firebase.database.externals.onDisconnect
+import dev.gitlive.firebase.database.externals.get
 import dev.gitlive.firebase.database.externals.onValue
 import dev.gitlive.firebase.database.externals.push
 import dev.gitlive.firebase.database.externals.query
@@ -32,6 +33,7 @@ import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
 import dev.gitlive.firebase.internal.reencodeTransformation
 import dev.gitlive.firebase.js
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.asDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
@@ -143,6 +145,10 @@ public actual open class Query internal actual constructor(
             }
         }
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }
+    }
+
+    public actual suspend fun get(): DataSnapshot = rethrow {
+        DataSnapshot(get(publicJs).awaitWhileOnline(database), database)
     }
 
     public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
