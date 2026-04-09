@@ -14,6 +14,7 @@ import cocoapods.FirebaseDatabase.FIRDataSnapshot
 import cocoapods.FirebaseDatabase.FIRDatabase
 import cocoapods.FirebaseDatabase.FIRDatabaseQuery
 import cocoapods.FirebaseDatabase.FIRDatabaseReference
+import cocoapods.FirebaseDatabase.FIRMutableData
 import cocoapods.FirebaseDatabase.FIRTransactionResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
@@ -42,6 +43,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 import platform.Foundation.allObjects
 
 public val FirebaseDatabase.ios: FIRDatabase get() = FIRDatabase.database()
@@ -210,10 +212,38 @@ internal actual class NativeDatabaseReference internal constructor(
         )
         return deferred.await()
     }
+
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? {
+        val deferred = CompletableDeferred<DataSnapshot?>()
+        ios.runTransactionBlock(
+            block = { fIRMutableData ->
+                val mutableData = MutableData(fIRMutableData!!)
+                when(val result = Transaction().update(mutableData)) {
+                    is Transaction.Result.Success ->
+                        FIRTransactionResult.successWithValue(result.data.ios)
+
+                    Transaction.Result.Abort ->
+                        FIRTransactionResult.abort()
+                }
+            },
+            andCompletionBlock = { error, committed, snapshot ->
+                if (error != null) {
+                    deferred.completeExceptionally(DatabaseException(error.toString(), null))
+                } else if (committed) {
+                    deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                } else {
+                    deferred.complete(null)
+                }
+            },
+            withLocalEvents = false
+        )
+        return deferred.await()
+    }
 }
 
 public val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
 public val DataSnapshot.ios: FIRDataSnapshot get() = ios
+public val MutableData.ios: FIRMutableData get() = ios
 
 public actual class DataSnapshot internal constructor(
     internal val ios: FIRDataSnapshot,
@@ -235,6 +265,22 @@ public actual class DataSnapshot internal constructor(
     public actual fun child(path: String): DataSnapshot = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
     public actual val hasChildren: Boolean get() = ios.hasChildren()
     public actual val children: Iterable<DataSnapshot> get() = ios.children.allObjects.map { DataSnapshot(it as FIRDataSnapshot, persistenceEnabled) }
+}
+
+public actual class MutableData internal constructor(
+    internal val ios: FIRMutableData
+) {
+    public actual val key: String? get() = ios.key
+
+    public actual var value: Any?
+        get() = ios.value?.takeIf { it !is NSNull }
+        set(value) { ios.value = value }
+
+    public actual fun child(path: String): MutableData = MutableData(ios.childDataByAppendingPath(path))
+
+    public actual val hasChildren: Boolean get() = ios.hasChildren()
+    public actual val children: Iterable<MutableData>
+        get() = ios.children.allObjects.map { MutableData(it as FIRMutableData) }
 }
 
 internal actual class NativeOnDisconnect internal constructor(

@@ -195,6 +195,17 @@ internal actual class NativeDatabaseReference internal constructor(
         }).awaitWhileOnline(database).snapshot,
         database,
     )
+
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? {
+        val result = jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+            val mutableData = MutableData(js.key, currentData)
+            when (val txResult = Transaction().update(mutableData)) {
+                is Transaction.Result.Success -> txResult.data.jsValue
+                Transaction.Result.Abort -> undefined
+            }
+        }).awaitWhileOnline(database)
+        return if (result.committed) DataSnapshot(result.snapshot, database) else null
+    }
 }
 
 public val DataSnapshot.js: JsDataSnapshot get() = js
@@ -226,6 +237,35 @@ public actual class DataSnapshot internal constructor(
     }
     public actual val ref: DatabaseReference
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
+}
+
+public actual class MutableData internal constructor(
+    public actual val key: String?,
+    @PublishedApi internal var jsValue: dynamic,
+) {
+    public actual var value: Any?
+        get() = jsValue.unsafeCast<Any?>()
+        set(v) { jsValue = v }
+
+    public actual fun child(path: String): MutableData {
+        val parts = path.split("/")
+        val childValue = parts.fold(jsValue) { current: dynamic, part -> current?.get(part) }
+        return MutableData(parts.last(), childValue)
+    }
+
+    public actual val hasChildren: Boolean
+        get() {
+            val v = jsValue
+            if (v == null || js("typeof v") != "object") return false
+            return (js("Object.keys(v)") as Array<*>).isNotEmpty()
+        }
+
+    public actual val children: Iterable<MutableData>
+        get() {
+            val v = jsValue
+            if (v == null || js("typeof v") != "object") return emptyList()
+            return (js("Object.keys(v)") as Array<String>).map { k -> MutableData(k, jsValue[k]) }
+        }
 }
 
 internal actual class NativeOnDisconnect internal constructor(
