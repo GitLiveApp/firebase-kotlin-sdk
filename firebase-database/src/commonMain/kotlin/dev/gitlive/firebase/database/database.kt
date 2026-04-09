@@ -545,7 +545,10 @@ public expect class MutableData {
     public val key: String?
 
     /**
+     * The data at this location as a native type. Set this to the desired new data
+     * at the location. Setting this to null will remove the data at this location.
      *
+     * @return The current data at this location as a native type, or null if no data exists.
      */
     public var value: Any?
 
