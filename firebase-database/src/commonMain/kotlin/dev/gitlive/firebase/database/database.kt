@@ -170,6 +170,12 @@ public expect open class Query internal constructor(nativeQuery: NativeQuery) {
     public fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
 
     /**
+     * Gets the server values for this query. Updates the cache and raises events if successful. If not
+     * connected, falls back to a locally-cached value or null.
+     */
+    public suspend fun get(): DataSnapshot
+
+    /**
      * Creates a query in which child nodes are ordered by their keys.
      *
      * @return A query with the new constraint

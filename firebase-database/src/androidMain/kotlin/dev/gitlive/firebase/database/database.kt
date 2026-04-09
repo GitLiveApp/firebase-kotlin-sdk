@@ -199,6 +199,16 @@ public actual open class Query internal actual constructor(
         awaitClose { android.removeEventListener(listener) }
     }
 
+    public actual suspend fun get(): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        android.get().addOnSuccessListener { snapshot ->
+            deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
+        }.addOnFailureListener { exception ->
+            deferred.completeExceptionally(exception)
+        }
+        return deferred.await()
+    }
+
     override fun toString(): String = android.toString()
 }
 
