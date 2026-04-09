@@ -18,6 +18,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
@@ -131,6 +133,35 @@ class FirebaseDatabaseTest {
         // Check the database after transaction
         assertEquals(data.title, userDocAfter.title)
         assertEquals(data.likes - 1, userDocAfter.likes)
+    }
+
+    @Test
+    fun testMutableDataTransactionSuccess() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/counter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value<Double?>() ?: 0.0
+            currentData.value = current + 1.0
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(6.0, snapshot!!.value<Double>())
+    }
+
+    @Test
+    fun testMutableDataTransactionAbort() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/abortCounter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { abort() }
+
+        assertNull(snapshot)
+        val unchanged = userRef.valueEvents.first().value<Double>()
+        assertEquals(5.0, unchanged)
     }
 
     @Test

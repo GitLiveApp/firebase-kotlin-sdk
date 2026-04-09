@@ -297,6 +297,8 @@ internal expect class NativeDatabaseReference : NativeQuery {
     suspend fun removeValue()
 
     suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
+
+    suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot?
 }
 
 /**
@@ -403,6 +405,53 @@ public class DatabaseReference internal constructor(internal val nativeReference
      * @param handler An object to handle running the transaction
      */
     public suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
+
+    /**
+     * Run a transaction on the data at this location using [MutableData].
+     *
+     * ```
+     * private fun onStarClicked(postRef: DatabaseReference) {
+     *     // ...
+     *     val snapshot: DataSnapshot? = try {
+     *         postRef.runTransaction { currentData ->
+     *             val p: Post = currentData.value()
+     *                 ?: return@runTransaction abort()
+     *
+     *             if (p.stars.containsKey(uid)) {
+     *                 // Unstar the post and remove self from stars
+     *                 p.starCount = p.starCount - 1
+     *                 p.stars.remove(uid)
+     *             } else {
+     *                 // Star the post and add self to stars
+     *                 p.starCount = p.starCount + 1
+     *                 p.stars[uid] = true
+     *             }
+     *
+     *             // Set value and report transaction success
+     *             currentData.value = p
+     *             success(currentData)
+     *         }
+     *     } catch(e: Throwable) {
+     *         println("post transaction failed: $e")
+     *         null
+     *     }
+     *     if (snapshot != null) {
+     *         // Snapshot was committed.
+     *     } else {
+     *         // Snapshot was not committed.
+     *     }
+     * }
+     * ```
+     *
+     * @param update A function which will be called, *possibly multiple times*, with the current
+     *     data at this location. It is responsible for inspecting that data and returning a
+     *     [Transaction.Result] specifying either the desired new data at the location or that the
+     *     transaction should be aborted. Since this function may be called repeatedly for the same
+     *     transaction, be extremely careful of any side effects it may trigger. Best practices are
+     *     to rely only on the data passed in via [MutableData].
+     * @return The committed [DataSnapshot], or null if the transaction was aborted.
+     */
+    public suspend fun runTransaction(update: Transaction.(currentData: MutableData) -> Transaction.Result): DataSnapshot? = nativeReference.runTransaction(update)
 }
 
 /**
@@ -486,6 +535,66 @@ public expect class DataSnapshot {
  * Exception that gets thrown when an operation on Firebase Database fails.
  */
 public expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
+
+public expect class MutableData {
+    /**
+     * @return The key name of this location, or null if it is the top-most location.
+     */
+    public val key: String?
+
+    /**
+     *
+     */
+    public var value: Any?
+
+
+    public inline fun <reified T> value(): T
+
+    /**
+     * Used to obtain a MutableData instance that represents the data at the given relative path.
+     * Note that changes made to the child MutableData instance will be visible to the parent.
+     *
+     * @param path A relative path from this location to the child location
+     * @return A MutableData instance representing the data at the given path
+     */
+    public fun child(path: String): MutableData
+
+    /**
+     * Indicates whether this MutableData has any children.
+     *
+     * @return True if this MutableData has any children, otherwise false
+     */
+    public val hasChildren: Boolean
+
+    /**
+     * Gives access to all the immediate children of this MutableData. Can be used in native for
+     * loops:
+     *
+     * ```
+     * for (MutableData child : parent.getChildren()) {
+     *     ...
+     * }
+     * ```
+     *
+     * @return The immediate children of this MutableData
+     */
+    public val children: Iterable<MutableData>
+}
+
+public class Transaction internal constructor() {
+    public fun success(resultData: MutableData): Result {
+        return Result.Success(data = resultData)
+    }
+
+    public fun abort(): Result {
+        return Result.Abort
+    }
+
+    public sealed class Result {
+        public data class Success internal constructor(val data: MutableData): Result()
+        public object Abort: Result()
+    }
+}
 
 internal expect class NativeOnDisconnect {
     suspend fun removeValue()
