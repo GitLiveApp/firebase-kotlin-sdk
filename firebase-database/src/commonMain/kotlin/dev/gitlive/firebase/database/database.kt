@@ -582,17 +582,13 @@ public expect class MutableData {
 }
 
 public class Transaction internal constructor() {
-    public fun success(resultData: MutableData): Result {
-        return Result.Success(data = resultData)
-    }
+    public fun success(resultData: MutableData): Result = Result.Success(data = resultData)
 
-    public fun abort(): Result {
-        return Result.Abort
-    }
+    public fun abort(): Result = Result.Abort
 
     public sealed class Result {
-        public data class Success internal constructor(val data: MutableData): Result()
-        public object Abort: Result()
+        public data class Success internal constructor(val data: MutableData) : Result()
+        public object Abort : Result()
     }
 }
 

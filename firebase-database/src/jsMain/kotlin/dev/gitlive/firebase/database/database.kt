@@ -245,7 +245,9 @@ public actual class MutableData internal constructor(
 ) {
     public actual var value: Any?
         get() = jsValue.unsafeCast<Any?>()
-        set(v) { jsValue = v }
+        set(v) {
+            jsValue = v
+        }
 
     public actual inline fun <reified T> value(): T = rethrow { decode<T>(value = jsValue) }
 

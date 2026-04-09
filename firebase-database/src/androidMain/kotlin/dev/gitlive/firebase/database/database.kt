@@ -231,34 +231,39 @@ internal actual class NativeDatabaseReference internal constructor(
     @OptIn(ExperimentalSerializationApi::class)
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
-        android.runTransaction(/* handler = */ object : com.google.firebase.database.Transaction.Handler {
+        android.runTransaction(
+            /* handler = */
+            object : com.google.firebase.database.Transaction.Handler {
 
-            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
-                val valueToReencode = currentData.value
-                // Value may be null initially, so only reencode if this is allowed
-                if (strategy.descriptor.isNullable || valueToReencode != null) {
-                    currentData.value = reencodeTransformation(
-                        strategy,
-                        valueToReencode,
-                        buildSettings,
-                        transactionUpdate,
-                    )
+                override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
+                    val valueToReencode = currentData.value
+                    // Value may be null initially, so only reencode if this is allowed
+                    if (strategy.descriptor.isNullable || valueToReencode != null) {
+                        currentData.value = reencodeTransformation(
+                            strategy,
+                            valueToReencode,
+                            buildSettings,
+                            transactionUpdate,
+                        )
+                    }
+                    return com.google.firebase.database.Transaction.success(currentData)
                 }
-                return com.google.firebase.database.Transaction.success(currentData)
-            }
 
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                snapshot: com.google.firebase.database.DataSnapshot?,
-            ) {
-                if (error != null) {
-                    deferred.completeExceptionally(error.toException())
-                } else {
-                    deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    snapshot: com.google.firebase.database.DataSnapshot?,
+                ) {
+                    if (error != null) {
+                        deferred.completeExceptionally(error.toException())
+                    } else {
+                        deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                    }
                 }
-            }
-        }, /* fireLocalEvents = */ false)
+            },
+            /* fireLocalEvents = */
+            false,
+        )
         return deferred.await()
     }
 
@@ -267,7 +272,7 @@ internal actual class NativeDatabaseReference internal constructor(
         android.runTransaction(object : com.google.firebase.database.Transaction.Handler {
             override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
                 val mutableData = MutableData(currentData)
-                return when(val result = Transaction().update(mutableData)) {
+                return when (val result = Transaction().update(mutableData)) {
                     is Transaction.Result.Success ->
                         com.google.firebase.database.Transaction.success(result.data.android)
 
@@ -321,13 +326,15 @@ public actual class DataSnapshot internal constructor(
 }
 
 public actual class MutableData internal constructor(
-    internal val android: com.google.firebase.database.MutableData
+    internal val android: com.google.firebase.database.MutableData,
 ) {
     public actual val key: String? get() = android.key
 
     public actual var value: Any?
         get() = android.value
-        set(value) { android.value = value }
+        set(value) {
+            android.value = value
+        }
 
     public actual inline fun <reified T> value(): T = decode<T>(value = publicAndroid.value)
 

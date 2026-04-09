@@ -218,7 +218,7 @@ internal actual class NativeDatabaseReference internal constructor(
         ios.runTransactionBlock(
             block = { fIRMutableData ->
                 val mutableData = MutableData(fIRMutableData!!)
-                when(val result = Transaction().update(mutableData)) {
+                when (val result = Transaction().update(mutableData)) {
                     is Transaction.Result.Success ->
                         FIRTransactionResult.successWithValue(result.data.ios)
 
@@ -235,7 +235,7 @@ internal actual class NativeDatabaseReference internal constructor(
                     deferred.complete(null)
                 }
             },
-            withLocalEvents = false
+            withLocalEvents = false,
         )
         return deferred.await()
     }
@@ -268,22 +268,22 @@ public actual class DataSnapshot internal constructor(
 }
 
 public actual class MutableData internal constructor(
-    internal val ios: FIRMutableData
+    internal val ios: FIRMutableData,
 ) {
     public actual val key: String? get() = ios.key
 
     public actual var value: Any?
         get() = ios.value?.takeIf { it !is NSNull }
-        set(value) { ios.value = value }
+        set(value) {
+            ios.value = value
+        }
 
     public actual inline fun <reified T> value(): T = decode<T>(value = value)
 
-    public actual fun child(path: String): MutableData =
-        MutableData(ios.childDataByAppendingPath(path))
+    public actual fun child(path: String): MutableData = MutableData(ios.childDataByAppendingPath(path))
 
     public actual val hasChildren: Boolean get() = ios.hasChildren()
-    public actual val children: Iterable<MutableData>
-        get() = ios.children.allObjects.map { MutableData(it as FIRMutableData) }
+    public actual val children: Iterable<MutableData> get() = ios.children.allObjects.map { MutableData(it as FIRMutableData) }
 }
 
 internal actual class NativeOnDisconnect internal constructor(
