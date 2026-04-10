@@ -12,12 +12,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.nullable
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
@@ -144,6 +147,64 @@ class FirebaseDatabaseTest {
         // Check the database after transaction
         assertEquals(data.title, userDocAfter.title)
         assertEquals(data.likes - 1, userDocAfter.likes)
+    }
+
+    @Test
+    fun testMutableDataTransactionSuccess() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/counter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value<Double?>() ?: 0.0
+            currentData.value = current + 1.0
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(6.0, snapshot.value<Double>())
+    }
+
+    @Test
+    fun testMutableDataTransactionAbort() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/abortCounter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { abort() }
+
+        assertNull(snapshot)
+        val unchanged = userRef.valueEvents.first().value<Double>()
+        assertEquals(5.0, unchanged)
+    }
+
+    @Test
+    fun testMutableDataTransactionWithSerializableType() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostFive", 5)
+        val userRef = database.reference("users/user_1/post_id_5")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        val newTitle = "title"
+        val increment = 1
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value(DatabaseTest.serializer().nullable)
+                ?: return@runTransaction success(currentData)
+
+            currentData.setValue(
+                current.copy(
+                    title = newTitle,
+                    likes = current.likes + increment,
+                ),
+            )
+            success(currentData)
+        }
+
+        assertNotNull(snapshot, "Transaction result is null")
+        val result = snapshot.value(DatabaseTest.serializer())
+        assertEquals(newTitle, result.title)
+        assertEquals(data.likes + increment, result.likes)
     }
 
     @Test
