@@ -7,19 +7,21 @@ package dev.gitlive.firebase.database
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
 import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.encode
 import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
 public expect val Firebase.database: FirebaseDatabase
@@ -415,7 +417,7 @@ public class DatabaseReference internal constructor(internal val nativeReference
      *     val snapshot: DataSnapshot? = try {
      *         postRef.runTransaction { currentData ->
      *             val p: Post = currentData.value()
-     *                 ?: return@runTransaction abort()
+     *                 ?: return@runTransaction success(currentData)
      *
      *             if (p.stars.containsKey(uid)) {
      *                 // Unstar the post and remove self from stars
@@ -551,13 +553,6 @@ public expect class MutableData {
     public var value: Any?
 
     /**
-     * Deserializes the data at this location into the type [T].
-     *
-     * @return The current data at this location deserialized as [T].
-     */
-    public inline fun <reified T> value(): T
-
-    /**
      * Used to obtain a MutableData instance that represents the data at the given relative path.
      * Note that changes made to the child MutableData instance will be visible to the parent.
      *
@@ -586,6 +581,31 @@ public expect class MutableData {
      * @return The immediate children of this MutableData
      */
     public val children: Iterable<MutableData>
+}
+
+/**
+ * Deserializes the data at this location into the type [T].
+ *
+ * @return The current data at this location deserialized as [T].
+ */
+public inline fun <reified T> MutableData.value(
+    strategy: DeserializationStrategy<T> = serializer<T>(),
+    buildSettings: DecodeSettings.Builder.() -> Unit = {},
+): T = decode(strategy, value, buildSettings)
+
+/**
+ * Serializes [newValue] into the type [T] and sets the value at this location.
+ */
+public inline fun <reified T> MutableData.setValue(
+    newValue: T,
+    strategy: SerializationStrategy<T> = serializer<T>(),
+    buildSettings: EncodeSettings.Builder.() -> Unit = {},
+) {
+    value = encode(
+        strategy = strategy,
+        value = newValue,
+        buildSettings = buildSettings,
+    )
 }
 
 public class Transaction internal constructor() {

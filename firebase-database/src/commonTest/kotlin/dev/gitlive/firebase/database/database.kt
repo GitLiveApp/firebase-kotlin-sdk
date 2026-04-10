@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.nullable
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -148,7 +149,7 @@ class FirebaseDatabaseTest {
         }
 
         assertNotNull(snapshot)
-        assertEquals(6.0, snapshot!!.value<Double>())
+        assertEquals(6.0, snapshot.value<Double>())
     }
 
     @Test
@@ -162,6 +163,35 @@ class FirebaseDatabaseTest {
         assertNull(snapshot)
         val unchanged = userRef.valueEvents.first().value<Double>()
         assertEquals(5.0, unchanged)
+    }
+
+    @Test
+    fun testMutableDataTransactionWithSerializableType() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostFive", 5)
+        val userRef = database.reference("users/user_1/post_id_5")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        val newTitle = "title"
+        val increment = 1
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value(DatabaseTest.serializer().nullable)
+                ?: return@runTransaction success(currentData)
+
+            currentData.setValue(
+                current.copy(
+                    title = newTitle,
+                    likes = current.likes + increment,
+                ),
+            )
+            success(currentData)
+        }
+
+        assertNotNull(snapshot, "Transaction result is null")
+        val result = snapshot.value(DatabaseTest.serializer())
+        assertEquals(newTitle, result.title)
+        assertEquals(data.likes + increment, result.likes)
     }
 
     @Test

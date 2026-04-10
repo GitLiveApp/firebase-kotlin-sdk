@@ -249,8 +249,6 @@ public actual class MutableData internal constructor(
             jsValue = v
         }
 
-    public actual inline fun <reified T> value(): T = rethrow { decode<T>(value = jsValue) }
-
     public actual fun child(path: String): MutableData {
         val parts = path.split("/")
         val childValue = parts.fold(jsValue) { current: dynamic, part -> current?.get(part) }

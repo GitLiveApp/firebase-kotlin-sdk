@@ -13,12 +13,11 @@ import com.google.firebase.database.Logger
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
-import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
 import dev.gitlive.firebase.database.ChildEvent.Type
-import dev.gitlive.firebase.database.android as publicAndroid
+import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.android
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.reencodeTransformation
@@ -39,6 +38,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
+import dev.gitlive.firebase.database.android as publicAndroid
 
 public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
 
@@ -269,32 +269,37 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? {
         val deferred = CompletableDeferred<DataSnapshot?>()
-        android.runTransaction(object : com.google.firebase.database.Transaction.Handler {
-            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
-                val mutableData = MutableData(currentData)
-                return when (val result = Transaction().update(mutableData)) {
-                    is Transaction.Result.Success ->
-                        com.google.firebase.database.Transaction.success(result.data.android)
+        android.runTransaction(
+            /* handler = */
+            object : com.google.firebase.database.Transaction.Handler {
+                override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
+                    val mutableData = MutableData(currentData)
+                    return when (val result = Transaction().update(mutableData)) {
+                        is Transaction.Result.Success ->
+                            com.google.firebase.database.Transaction.success(result.data.android)
 
-                    Transaction.Result.Abort ->
-                        com.google.firebase.database.Transaction.abort()
+                        Transaction.Result.Abort ->
+                            com.google.firebase.database.Transaction.abort()
+                    }
                 }
-            }
 
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                snapshot: com.google.firebase.database.DataSnapshot?,
-            ) {
-                if (error != null) {
-                    deferred.completeExceptionally(error.toException())
-                } else if (committed) {
-                    deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
-                } else {
-                    deferred.complete(null)
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    snapshot: com.google.firebase.database.DataSnapshot?,
+                ) {
+                    if (error != null) {
+                        deferred.completeExceptionally(error.toException())
+                    } else if (committed) {
+                        deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                    } else {
+                        deferred.complete(null)
+                    }
                 }
-            }
-        })
+            },
+            /* fireLocalEvents = */
+            false,
+        )
         return deferred.await()
     }
 }
@@ -335,8 +340,6 @@ public actual class MutableData internal constructor(
         set(value) {
             android.value = value
         }
-
-    public actual inline fun <reified T> value(): T = decode<T>(value = publicAndroid.value)
 
     public actual fun child(path: String): MutableData = MutableData(android.child(path))
     public actual val hasChildren: Boolean get() = android.hasChildren()

@@ -278,8 +278,6 @@ public actual class MutableData internal constructor(
             ios.value = value
         }
 
-    public actual inline fun <reified T> value(): T = decode<T>(value = value)
-
     public actual fun child(path: String): MutableData = MutableData(ios.childDataByAppendingPath(path))
 
     public actual val hasChildren: Boolean get() = ios.hasChildren()
