@@ -32,6 +32,10 @@ public final class dev/gitlive/firebase/database/DataSnapshot {
 	public static synthetic fun value$default (Ldev/gitlive/firebase/database/DataSnapshot;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class dev/gitlive/firebase/database/DatabaseException : java/lang/RuntimeException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+}
+
 public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive/firebase/database/Query {
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/DatabaseReference;
 	public final fun getKey ()Ljava/lang/String;

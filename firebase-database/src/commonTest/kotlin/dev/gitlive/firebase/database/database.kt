@@ -261,6 +261,29 @@ class FirebaseDatabaseTest {
     }
 
     @Test
+    fun testTransactionThrowsDatabaseException() = runTest {
+        ensureDatabaseConnected()
+        val ref = database.reference("FirebaseRealtimeDatabaseTest/lastActivity")
+        ref.setValue(1)
+        assertFailsWith<DatabaseException> {
+            ref.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1) }
+        }
+    }
+
+    @Test
+    fun testMutableDataTransactionThrowsDatabaseException() = runTest {
+        ensureDatabaseConnected()
+        val ref = database.reference("FirebaseRealtimeDatabaseTest/lastActivity")
+        ref.setValue(1)
+        assertFailsWith<DatabaseException> {
+            ref.runTransaction { currentData ->
+                currentData.value = "stringNotAllowed"
+                success(currentData)
+            }
+        }
+    }
+
+    @Test
     fun testUpdateChildren() = runTest {
         setupRealtimeData()
         val reference = database
