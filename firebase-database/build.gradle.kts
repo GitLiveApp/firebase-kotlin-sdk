@@ -175,12 +175,6 @@ kotlin {
             }
         }
 
-        if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
-            getByName("jvmMain") {
-                kotlin.srcDir("src/androidMain/kotlin")
-            }
-        }
-
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
