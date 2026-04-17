@@ -9,7 +9,6 @@ package dev.gitlive.firebase.database
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseException as NativeDatabaseException
 import com.google.firebase.database.Logger
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
@@ -39,17 +38,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
-import dev.gitlive.firebase.database.android as publicAndroid
 
-public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
-
-private fun NativeDatabaseException.wrap() = DatabaseException(message, this)
+private fun com.google.firebase.database.DatabaseException.wrap() = DatabaseException(message, this)
 
 private fun DatabaseError.toKotlinException() = toException().wrap()
 
 private suspend fun <T> Task<T>.awaitWrapped(): T = try {
     await()
-} catch (e: NativeDatabaseException) {
+} catch (e: com.google.firebase.database.DatabaseException) {
     throw e.wrap()
 }
 
@@ -120,8 +116,6 @@ internal actual open class NativeQuery(
     val persistenceEnabled: Boolean,
 )
 
-public val Query.android: com.google.firebase.database.Query get() = nativeQuery.android
-
 public actual open class Query internal actual constructor(
     internal val nativeQuery: NativeQuery,
 ) {
@@ -131,8 +125,8 @@ public actual open class Query internal actual constructor(
         persistenceEnabled: Boolean,
     ) : this(NativeQuery(android, persistenceEnabled))
 
-    internal open val android: com.google.firebase.database.Query = nativeQuery.android
-    public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+    public open val android: com.google.firebase.database.Query get() = nativeQuery.android
+    public val persistenceEnabled: Boolean get() = nativeQuery.persistenceEnabled
 
     public actual fun orderByKey(): Query = Query(android.orderByKey(), persistenceEnabled)
 
@@ -214,7 +208,7 @@ public actual open class Query internal actual constructor(
             deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
         }.addOnFailureListener { exception ->
             deferred.completeExceptionally(
-                if (exception is NativeDatabaseException) {
+                if (exception is com.google.firebase.database.DatabaseException) {
                     exception.wrap()
                 } else {
                     exception
@@ -331,12 +325,8 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 }
 
-public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
-public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = android
-public val MutableData.android: com.google.firebase.database.MutableData get() = android
-
 public actual class DataSnapshot internal constructor(
-    internal val android: com.google.firebase.database.DataSnapshot,
+    public val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
@@ -348,9 +338,9 @@ public actual class DataSnapshot internal constructor(
 
     public actual val value: Any? get() = android.value
 
-    public actual inline fun <reified T> value(): T = decode<T>(value = publicAndroid.value)
+    public actual inline fun <reified T> value(): T = decode<T>(value = value)
 
-    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, publicAndroid.value, buildSettings)
+    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, value, buildSettings)
 
     public actual fun child(path: String): DataSnapshot = DataSnapshot(android.child(path), persistenceEnabled)
     public actual val hasChildren: Boolean get() = android.hasChildren()
@@ -358,7 +348,7 @@ public actual class DataSnapshot internal constructor(
 }
 
 public actual class MutableData internal constructor(
-    internal val android: com.google.firebase.database.MutableData,
+    public val android: com.google.firebase.database.MutableData,
 ) {
     public actual val key: String? get() = android.key
 

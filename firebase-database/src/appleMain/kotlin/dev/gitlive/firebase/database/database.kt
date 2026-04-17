@@ -44,9 +44,6 @@ import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
 import platform.Foundation.allObjects
-import dev.gitlive.firebase.database.ios as publicIos
-
-public val FirebaseDatabase.ios: FIRDatabase get() = FIRDatabase.database()
 
 public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase(FIRDatabase.database()) }
@@ -61,7 +58,7 @@ public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseData
     FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url),
 )
 
-public actual class FirebaseDatabase internal constructor(internal val ios: FIRDatabase) {
+public actual class FirebaseDatabase internal constructor(public val ios: FIRDatabase) {
 
     public actual fun reference(path: String): DatabaseReference = DatabaseReference(NativeDatabaseReference(ios.referenceWithPath(path), ios.persistenceEnabled))
 
@@ -104,16 +101,14 @@ internal actual open class NativeQuery(
     val persistenceEnabled: Boolean,
 )
 
-public val Query.ios: FIRDatabaseQuery get() = nativeQuery.ios
-
 public actual open class Query internal actual constructor(
     internal val nativeQuery: NativeQuery,
 ) {
 
     internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
 
-    internal open val ios: FIRDatabaseQuery = nativeQuery.ios
-    public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+    public open val ios: FIRDatabaseQuery get() = nativeQuery.ios
+    public val persistenceEnabled: Boolean get() = nativeQuery.persistenceEnabled
 
     public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey(), persistenceEnabled)
 
@@ -143,7 +138,7 @@ public actual open class Query internal actual constructor(
 
     public actual fun equalTo(value: Boolean, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
+    public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
@@ -153,7 +148,7 @@ public actual open class Query internal actual constructor(
         awaitClose { ios.removeObserverWithHandle(handle) }
     }
 
-    public actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow<ChildEvent> {
+    public actual fun childEvents(vararg types: Type): Flow<ChildEvent> = callbackFlow {
         val handles = types.map { type ->
             ios.observeEventType(
                 type.toEventType(),
@@ -210,7 +205,7 @@ internal actual class NativeDatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-                firMutableData?.value = reencodeTransformation(strategy, firMutableData?.value, buildSettings, transactionUpdate)
+                firMutableData?.value = reencodeTransformation(strategy, firMutableData.value, buildSettings, transactionUpdate)
                 FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->
@@ -253,12 +248,8 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 }
 
-public val DatabaseReference.ios: FIRDatabaseReference get() = nativeReference.ios
-public val DataSnapshot.ios: FIRDataSnapshot get() = ios
-public val MutableData.ios: FIRMutableData get() = ios
-
 public actual class DataSnapshot internal constructor(
-    internal val ios: FIRDataSnapshot,
+    public val ios: FIRDataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
@@ -272,7 +263,7 @@ public actual class DataSnapshot internal constructor(
 
     public actual inline fun <reified T> value(): T = decode<T>(value = value)
 
-    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, publicIos.value, buildSettings)
+    public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, ios.value, buildSettings)
 
     public actual fun child(path: String): DataSnapshot = DataSnapshot(ios.childSnapshotForPath(path), persistenceEnabled)
     public actual val hasChildren: Boolean get() = ios.hasChildren()
@@ -280,7 +271,7 @@ public actual class DataSnapshot internal constructor(
 }
 
 public actual class MutableData internal constructor(
-    internal val ios: FIRMutableData,
+    public val ios: FIRMutableData,
 ) {
     public actual val key: String? get() = ios.key
 
@@ -322,6 +313,7 @@ public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEn
 
 public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
+@Suppress("unused")
 internal suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
     val job = CompletableDeferred<R?>()
     function { error, result ->

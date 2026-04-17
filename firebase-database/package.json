@@ -1,6 +1,6 @@
 {
   "name": "@gitlive/firebase-database",
-  "version": "2.4.0",
+  "version": "2.4.0-local-version",
   "description": "Wrapper around firebase for usage in Kotlin Multiplatform projects",
   "main": "firebase-database.js",
   "scripts": {

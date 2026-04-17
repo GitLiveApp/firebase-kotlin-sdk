@@ -39,8 +39,18 @@ import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 import kotlin.time.Duration.Companion.seconds
 
+private fun com.google.firebase.database.DatabaseException.wrap() = DatabaseException(message, this)
+
+private fun DatabaseError.toKotlinException() = toException().wrap()
+
+private suspend fun <T> Task<T>.awaitWrapped(): T = try {
+    await()
+} catch (e: com.google.firebase.database.DatabaseException) {
+    throw e.wrap()
+}
+
 internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T = merge(
-    flow { emit(await()) },
+    flow { emit(awaitWrapped()) },
     database
         .reference(".info/connected")
         .valueEvents
@@ -59,7 +69,7 @@ public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = Fireba
 
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
 
-public actual class FirebaseDatabase internal constructor(internal val android: com.google.firebase.database.FirebaseDatabase) {
+public actual class FirebaseDatabase internal constructor(public val android: com.google.firebase.database.FirebaseDatabase) {
 
     public companion object {
         private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
@@ -115,8 +125,8 @@ public actual open class Query internal actual constructor(
         persistenceEnabled: Boolean,
     ) : this(NativeQuery(android, persistenceEnabled))
 
-    internal open val android: com.google.firebase.database.Query = nativeQuery.android
-    public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
+    public open val android: com.google.firebase.database.Query get() = nativeQuery.android
+    public val persistenceEnabled: Boolean get() = nativeQuery.persistenceEnabled
 
     public actual fun orderByKey(): Query = Query(android.orderByKey(), persistenceEnabled)
 
@@ -154,7 +164,7 @@ public actual open class Query internal actual constructor(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
+                    close(error.toKotlinException())
                 }
             }
             android.addValueEventListener(listener)
@@ -185,7 +195,7 @@ public actual open class Query internal actual constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                close(error.toKotlinException())
             }
         }
         android.addChildEventListener(listener)
@@ -197,7 +207,13 @@ public actual open class Query internal actual constructor(
         android.get().addOnSuccessListener { snapshot ->
             deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
         }.addOnFailureListener { exception ->
-            deferred.completeExceptionally(exception)
+            deferred.completeExceptionally(
+                if (exception is com.google.firebase.database.DatabaseException) {
+                    exception.wrap()
+                } else {
+                    exception
+                },
+            )
         }
         return deferred.await()
     }
@@ -220,17 +236,17 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual suspend fun setValueEncoded(encodedValue: Any?) {
         android.setValue(encodedValue)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         android.updateChildren(encodedUpdate.android)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     actual suspend fun removeValue() {
         android.removeValue()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -260,7 +276,7 @@ internal actual class NativeDatabaseReference internal constructor(
                     snapshot: com.google.firebase.database.DataSnapshot?,
                 ) {
                     if (error != null) {
-                        deferred.completeExceptionally(error.toException())
+                        deferred.completeExceptionally(error.toKotlinException())
                     } else {
                         deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                     }
@@ -294,7 +310,7 @@ internal actual class NativeDatabaseReference internal constructor(
                     snapshot: com.google.firebase.database.DataSnapshot?,
                 ) {
                     if (error != null) {
-                        deferred.completeExceptionally(error.toException())
+                        deferred.completeExceptionally(error.toKotlinException())
                     } else if (committed) {
                         deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                     } else {
@@ -310,7 +326,7 @@ internal actual class NativeDatabaseReference internal constructor(
 }
 
 public actual class DataSnapshot internal constructor(
-    internal val android: com.google.firebase.database.DataSnapshot,
+    public val android: com.google.firebase.database.DataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
@@ -332,7 +348,7 @@ public actual class DataSnapshot internal constructor(
 }
 
 public actual class MutableData internal constructor(
-    internal val android: com.google.firebase.database.MutableData,
+    public val android: com.google.firebase.database.MutableData,
 ) {
     public actual val key: String? get() = android.key
 
@@ -356,23 +372,27 @@ internal actual class NativeOnDisconnect internal constructor(
 
     actual suspend fun removeValue() {
         android.removeValue()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     actual suspend fun cancel() {
         android.cancel()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     actual suspend fun setEncodedValue(encodedValue: Any?) {
         android.setValue(encodedValue)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         android.updateChildren(encodedUpdate.android)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+            .run { if (persistenceEnabled) awaitWrapped() else awaitWhileOnline(database) }
     }
 }
 
-public actual typealias DatabaseException = com.google.firebase.database.DatabaseException
+public val OnDisconnect.android: com.google.firebase.database.OnDisconnect get() = native.android
+public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEnabled
+public val OnDisconnect.database: FirebaseDatabase get() = native.database
+
+public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
