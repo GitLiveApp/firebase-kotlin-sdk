@@ -201,11 +201,16 @@ public actual open class Query internal actual constructor(
 
     public actual suspend fun get(): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
-        android.get().addOnSuccessListener { snapshot ->
-            deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
-        }.addOnFailureListener { exception ->
-            deferred.completeExceptionally(exception)
-        }
+        android.get()
+            .addOnSuccessListener { snapshot ->
+                deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
+            }
+            .addOnFailureListener { exception ->
+                deferred.completeExceptionally(exception)
+            }
+            .addOnCanceledListener {
+                deferred.cancel()
+            }
         return deferred.await()
     }
 
