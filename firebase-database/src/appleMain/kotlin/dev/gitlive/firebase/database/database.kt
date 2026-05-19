@@ -42,6 +42,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 import platform.Foundation.allObjects
 
 public val FirebaseDatabase.ios: FIRDatabase get() = FIRDatabase.database()
@@ -226,9 +227,9 @@ public actual class DataSnapshot internal constructor(
 
     public actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(ios.ref, persistenceEnabled))
 
-    public actual val value: Any? get() = ios.value
+    public actual val value: Any? get() = ios.value?.takeIf { it !is NSNull }
 
-    public actual inline fun <reified T> value(): T = decode<T>(value = publicIos.value)
+    public actual inline fun <reified T> value(): T = decode<T>(value = value)
 
     public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, publicIos.value, buildSettings)
 
