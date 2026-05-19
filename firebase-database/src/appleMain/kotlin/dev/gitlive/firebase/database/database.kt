@@ -42,6 +42,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 import platform.Foundation.allObjects
 
 public val FirebaseDatabase.ios: FIRDatabase get() = FIRDatabase.database()
@@ -119,27 +120,27 @@ public actual open class Query internal actual constructor(
 
     public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), persistenceEnabled)
 
-    public actual fun startAt(value: String, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
     public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
@@ -238,9 +239,9 @@ public actual class DataSnapshot internal constructor(
 
     public actual val ref: DatabaseReference get() = DatabaseReference(NativeDatabaseReference(ios.ref, persistenceEnabled))
 
-    public actual val value: Any? get() = ios.value
+    public actual val value: Any? get() = ios.value?.takeIf { it !is NSNull }
 
-    public actual inline fun <reified T> value(): T = decode<T>(value = publicIos.value)
+    public actual inline fun <reified T> value(): T = decode<T>(value = value)
 
     public actual inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = decode(strategy, publicIos.value, buildSettings)
 
