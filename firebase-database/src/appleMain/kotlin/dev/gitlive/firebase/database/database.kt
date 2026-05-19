@@ -119,27 +119,27 @@ public actual open class Query internal actual constructor(
 
     public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), persistenceEnabled)
 
-    public actual fun startAt(value: String, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
     public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(

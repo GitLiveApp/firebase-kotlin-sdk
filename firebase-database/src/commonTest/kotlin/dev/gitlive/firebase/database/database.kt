@@ -237,6 +237,67 @@ class FirebaseDatabaseTest {
         assertFalse(valueEvents.first().exists)
     }
 
+    @Test
+    fun testOrderByKeyWithStartAtAndEndAt() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("testOrderByKey")
+        reference.child("prefix_a").setValue("valueA")
+        reference.child("prefix_b").setValue("valueB")
+        reference.child("prefix_c").setValue("valueC")
+        reference.child("other_d").setValue("valueD")
+
+        val snapshot = reference
+            .orderByKey()
+            .startAt("prefix_")
+            .endAt("prefix_\uf8ff") // \uf8ff is a high Unicode char used as a wildcard to match all keys starting with "prefix_"
+            .valueEvents
+            .first()
+
+        val childKeys = snapshot.children.map { it.key }
+        assertEquals(3, childKeys.count())
+        assertTrue(childKeys.all { it!!.startsWith("prefix_") })
+    }
+
+    @Test
+    fun testOrderByKeyWithStartAt() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("testOrderByKeyStartAt")
+        reference.child("a_first").setValue(1)
+        reference.child("b_second").setValue(2)
+        reference.child("c_third").setValue(3)
+
+        val snapshot = reference
+            .orderByKey()
+            .startAt("b")
+            .valueEvents
+            .first()
+
+        val childKeys = snapshot.children.map { it.key }
+        assertEquals(2, childKeys.count())
+        assertTrue(childKeys.contains("b_second"))
+        assertTrue(childKeys.contains("c_third"))
+    }
+
+    @Test
+    fun testOrderByKeyWithEndAt() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("testOrderByKeyEndAt")
+        reference.child("a_first").setValue(1)
+        reference.child("b_second").setValue(2)
+        reference.child("c_third").setValue(3)
+
+        val snapshot = reference
+            .orderByKey()
+            .endAt("b\uf8ff") // \uf8ff is a high Unicode char used as a wildcard to match all keys starting with "b"
+            .valueEvents
+            .first()
+
+        val childKeys = snapshot.children.map { it.key }
+        assertEquals(2, childKeys.count())
+        assertTrue(childKeys.contains("a_first"))
+        assertTrue(childKeys.contains("b_second"))
+    }
+
     private suspend fun setupRealtimeData() {
         ensureDatabaseConnected()
         val firebaseDatabaseTestReference = database
