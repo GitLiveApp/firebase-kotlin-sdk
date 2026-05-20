@@ -165,6 +165,7 @@ internal fun ActionCodeSettings.toAndroid() = com.google.firebase.auth.ActionCod
     .build()
 
 public actual typealias FirebaseAuthException = com.google.firebase.auth.FirebaseAuthException
+public actual val FirebaseAuthException.code: String? get() = errorCode
 public actual typealias FirebaseAuthActionCodeException = com.google.firebase.auth.FirebaseAuthActionCodeException
 public actual typealias FirebaseAuthEmailException = com.google.firebase.auth.FirebaseAuthEmailException
 public actual typealias FirebaseAuthInvalidCredentialsException = com.google.firebase.auth.FirebaseAuthInvalidCredentialsException

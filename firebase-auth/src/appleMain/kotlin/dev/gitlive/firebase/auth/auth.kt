@@ -160,16 +160,17 @@ internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     iOSBundleId?.run { it.setIOSBundleID(this) }
 }
 
-public actual open class FirebaseAuthException(message: String) : FirebaseException(message)
-public actual open class FirebaseAuthActionCodeException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthEmailException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthInvalidCredentialsException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthWeakPasswordException(message: String) : FirebaseAuthInvalidCredentialsException(message)
-public actual open class FirebaseAuthInvalidUserException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthMultiFactorException(message: String, public val resolver: FIRMultiFactorResolver?) : FirebaseAuthException(message)
-public actual open class FirebaseAuthRecentLoginRequiredException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthUserCollisionException(message: String) : FirebaseAuthException(message)
-public actual open class FirebaseAuthWebException(message: String) : FirebaseAuthException(message)
+public actual open class FirebaseAuthException(message: String, internal val authCode: String? = null) : FirebaseException(message)
+public actual val FirebaseAuthException.code: String? get() = authCode
+public actual open class FirebaseAuthActionCodeException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthEmailException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthInvalidCredentialsException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthWeakPasswordException(message: String, code: String? = null) : FirebaseAuthInvalidCredentialsException(message, code)
+public actual open class FirebaseAuthInvalidUserException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthMultiFactorException(message: String, public val resolver: FIRMultiFactorResolver?, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthRecentLoginRequiredException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthUserCollisionException(message: String, code: String? = null) : FirebaseAuthException(message, code)
+public actual open class FirebaseAuthWebException(message: String, code: String? = null) : FirebaseAuthException(message, code)
 
 internal fun <T, R> T.throwError(block: T.(errorPointer: CPointer<ObjCObjectVar<NSError?>>) -> R): R {
     memScoped {
@@ -214,10 +215,10 @@ private fun NSError.toException() = when (domain) {
     FIRAuthErrorDomain -> when (code) {
         17030L, // AuthErrorCode.invalidActionCode
         17029L, // AuthErrorCode.expiredActionCode
-        -> FirebaseAuthActionCodeException(toString())
+        -> FirebaseAuthActionCodeException(toString(), code.toString())
 
         17008L, // AuthErrorCode.invalidEmail
-        -> FirebaseAuthEmailException(toString())
+        -> FirebaseAuthEmailException(toString(), code.toString())
 
         17056L, // AuthErrorCode.captchaCheckFailed
         17042L, // AuthErrorCode.invalidPhoneNumber
@@ -228,16 +229,16 @@ private fun NSError.toException() = when (domain) {
         17043L, // AuthErrorCode.missingVerificationCode
         17021L, // AuthErrorCode.userTokenExpired
         17004L, // AuthErrorCode.invalidCredential
-        -> FirebaseAuthInvalidCredentialsException(toString())
+        -> FirebaseAuthInvalidCredentialsException(toString(), code.toString())
 
         17026L, // AuthErrorCode.weakPassword
-        -> FirebaseAuthWeakPasswordException(toString())
+        -> FirebaseAuthWeakPasswordException(toString(), code.toString())
 
         17017L, // AuthErrorCode.invalidUserToken
-        -> FirebaseAuthInvalidUserException(toString())
+        -> FirebaseAuthInvalidUserException(toString(), code.toString())
 
         17014L, // AuthErrorCode.requiresRecentLogin
-        -> FirebaseAuthRecentLoginRequiredException(toString())
+        -> FirebaseAuthRecentLoginRequiredException(toString(), code.toString())
 
         17087L, // AuthErrorCode.secondFactorAlreadyEnrolled
         17078L, // AuthErrorCode.secondFactorRequired
@@ -245,7 +246,7 @@ private fun NSError.toException() = when (domain) {
         17084L, // AuthErrorCode.multiFactorInfoNotFound
         -> {
             val resolver = userInfo["FIRAuthErrorUserInfoMultiFactorResolverKey"] as? FIRMultiFactorResolver
-            FirebaseAuthMultiFactorException(toString(), resolver)
+            FirebaseAuthMultiFactorException(toString(), resolver, code.toString())
         }
 
         17052L, // AuthErrorCode.quotaExceeded
@@ -254,17 +255,17 @@ private fun NSError.toException() = when (domain) {
         17007L, // AuthErrorCode.emailAlreadyInUse
         17012L, // AuthErrorCode.accountExistsWithDifferentCredential
         17025L, // AuthErrorCode.credentialAlreadyInUse
-        -> FirebaseAuthUserCollisionException(toString())
+        -> FirebaseAuthUserCollisionException(toString(), code.toString())
 
         17057L, // AuthErrorCode.webContextAlreadyPresented
         17058L, // AuthErrorCode.webContextCancelled
         17062L, // AuthErrorCode.webInternalError
-        -> FirebaseAuthWebException(toString())
+        -> FirebaseAuthWebException(toString(), code.toString())
 
         17020L, // AuthErrorCode.networkError
         -> FirebaseNetworkException(toString())
 
-        else -> FirebaseAuthException(toString())
+        else -> FirebaseAuthException(toString(), code.toString())
     }
     else -> FirebaseAuthException(toString())
 }
