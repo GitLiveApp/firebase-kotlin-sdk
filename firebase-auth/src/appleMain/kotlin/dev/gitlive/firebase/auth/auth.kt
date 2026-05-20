@@ -229,6 +229,7 @@ private fun NSError.toException() = when (domain) {
         17043L, // AuthErrorCode.missingVerificationCode
         17021L, // AuthErrorCode.userTokenExpired
         17004L, // AuthErrorCode.invalidCredential
+        17009L, // AuthErrorCode.wrongPassword
         -> FirebaseAuthInvalidCredentialsException(toString(), code.toString())
 
         17026L, // AuthErrorCode.weakPassword
