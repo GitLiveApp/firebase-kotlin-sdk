@@ -294,5 +294,6 @@ public final class dev/gitlive/firebase/auth/android {
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthResult;)Lcom/google/firebase/auth/AuthResult;
 	public static final fun getAndroid (Ldev/gitlive/firebase/auth/AuthTokenResult;)Lcom/google/firebase/auth/GetTokenResult;
 	public static final fun getAuth (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/auth/FirebaseAuth;
+	public static final fun getCode (Lcom/google/firebase/auth/FirebaseAuthException;)Ljava/lang/String;
 }
 
