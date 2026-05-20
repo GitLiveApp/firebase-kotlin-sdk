@@ -221,6 +221,7 @@ private fun errorToException(cause: dynamic) = when (val code = cause.code?.toSt
     "auth/missing-verification-code",
     "auth/invalid-verification-id",
     "auth/missing-verification-id",
+    "auth/wrong-password",
     -> FirebaseAuthInvalidCredentialsException(code, cause.unsafeCast<Throwable>())
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use",
