@@ -166,6 +166,18 @@ public actual open class Query internal actual constructor(
         }
     }
 
+    public actual suspend fun get(): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        ios.getDataWithCompletionBlock { error, snapshot ->
+            if (error != null) {
+                deferred.completeExceptionally(DatabaseException(error.toString(), null))
+            } else {
+                deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+            }
+        }
+        return deferred.await()
+    }
+
     override fun toString(): String = ios.toString()
 }
 
