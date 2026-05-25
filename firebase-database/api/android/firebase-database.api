@@ -93,6 +93,7 @@ public class dev/gitlive/firebase/database/Query {
 	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;DLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
 	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
 	public static synthetic fun equalTo$default (Ldev/gitlive/firebase/database/Query;ZLjava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/database/Query;
+	public final fun get (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getPersistenceEnabled ()Z
 	public final fun getValueEvents ()Lkotlinx/coroutines/flow/Flow;
 	public final fun limitToFirst (I)Ldev/gitlive/firebase/database/Query;
