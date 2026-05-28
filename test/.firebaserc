@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "fir-kotlin-sdk"
+  },
+  "targets": {
+    "fir-kotlin-sdk": {
+      "database": {
+        "default": [
+          "fir-kotlin-sdk-default-rtdb"
+        ]
+      }
+    }
   }
 }
