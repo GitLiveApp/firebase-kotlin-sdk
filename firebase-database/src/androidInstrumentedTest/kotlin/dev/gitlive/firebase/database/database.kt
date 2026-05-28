@@ -7,6 +7,7 @@
 package dev.gitlive.firebase.database
 
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.flow.first
 import org.junit.Ignore
 
 actual val emulatorHost: String = "10.0.2.2"
@@ -22,4 +23,7 @@ actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
     goOffline()
     purgeOutstandingWrites()
     goOnline()
+    // Android SDK only re-establishes the connection once there is an active server listen
+    // Attach one to force reconnection, otherwise the subsequent ensureDatabaseConnected() hangs
+    reference("testPurgeOutstandingWrites").valueEvents.first()
 }
