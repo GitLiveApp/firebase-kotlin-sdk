@@ -15,7 +15,5 @@ actual typealias IgnoreForAndroidUnitTest = Ignore
 actual typealias IgnoreForAndroidTest = Ignore
 
 actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
-    goOffline()
     purgeOutstandingWrites()
-    goOnline()
 }
