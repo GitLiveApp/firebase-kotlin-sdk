@@ -17,3 +17,9 @@ actual annotation class IgnoreForAndroidUnitTest
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidTest
+
+actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
+    goOffline()
+    purgeOutstandingWrites()
+    goOnline()
+}

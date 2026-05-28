@@ -1,5 +1,7 @@
 package dev.gitlive.firebase.database
 
+import kotlin.test.assertFailsWith
+
 actual val emulatorHost: String = "127.0.0.1" // in JS tests connection is refused if we use localhost
 
 actual val context: Any = Unit
@@ -9,3 +11,9 @@ actual annotation class IgnoreForAndroidUnitTest
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidTest
+
+actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
+    assertFailsWith<UnsupportedOperationException> {
+        purgeOutstandingWrites()
+    }
+}

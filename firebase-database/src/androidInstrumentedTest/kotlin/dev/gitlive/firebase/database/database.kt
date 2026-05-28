@@ -17,3 +17,9 @@ actual val context: Any = InstrumentationRegistry.getInstrumentation().targetCon
 actual annotation class IgnoreForAndroidUnitTest
 
 actual typealias IgnoreForAndroidTest = Ignore
+
+actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
+    goOffline()
+    purgeOutstandingWrites()
+    goOnline()
+}
