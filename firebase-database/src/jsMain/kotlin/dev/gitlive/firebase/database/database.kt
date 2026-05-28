@@ -86,7 +86,7 @@ public actual class FirebaseDatabase internal constructor(internal val js: Datab
 
     public actual fun goOnline(): Unit = rethrow { jsGoOnline(js) }
 
-    public actual fun purgeOutstandingWrites(): Unit = throw UnsupportedOperationException("purgeOutstandingWrites is not supported by the Firebase Realtime Database JS SDK.")
+    public actual fun purgeOutstandingWrites() {}
 }
 
 internal actual open class NativeQuery(
