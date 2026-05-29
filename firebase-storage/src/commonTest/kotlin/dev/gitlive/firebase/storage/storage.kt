@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
@@ -132,6 +133,26 @@ class FirebaseStorageTest {
         assertEquals(metadata.contentLanguage, fetchedMetadata.contentLanguage)
         assertEquals(metadata.contentType, fetchedMetadata.contentType)
         assertEquals(metadata.customMetadata["updated"], fetchedMetadata.customMetadata["updated"])
+    }
+
+    @Test
+    fun testPaginatedList() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test/testPaginatedList")
+        ref.child("one.txt").putData(data)
+        ref.child("two.txt").putData(data)
+        ref.child("three.txt").putData(data)
+
+        val firstPage = ref.list(maxResults = 2)
+        val pageToken = assertNotNull(firstPage.pageToken)
+        val secondPage = ref.list(maxResults = 2, pageToken = pageToken)
+        val itemNames = (firstPage.items + secondPage.items).map { it.name }
+
+        assertEquals(2, firstPage.items.size)
+        assertEquals(1, secondPage.items.size)
+        assertTrue("one.txt" in itemNames)
+        assertTrue("two.txt" in itemNames)
+        assertTrue("three.txt" in itemNames)
     }
 }
 
