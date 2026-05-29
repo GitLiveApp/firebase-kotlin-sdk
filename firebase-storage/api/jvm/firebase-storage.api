@@ -91,6 +91,7 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getBucket ()Ljava/lang/String;
+	public final fun getData (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getDownloadUrl (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getMetadata (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getName ()Ljava/lang/String;

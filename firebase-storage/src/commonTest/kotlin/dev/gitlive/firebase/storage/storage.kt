@@ -69,6 +69,17 @@ class FirebaseStorageTest {
     }
 
     @Test
+    fun testDownloadData() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testDownloadData.txt")
+        ref.putData(data)
+
+        val downloadedData = ref.getData(maxDownloadSizeBytes = 1024)
+
+        assertTestDataEquals(downloadedData)
+    }
+
+    @Test
     fun testUploadMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadMetadata.txt")
@@ -157,3 +168,4 @@ class FirebaseStorageTest {
 }
 
 expect fun createTestData(): Data
+expect fun assertTestDataEquals(data: Data)
