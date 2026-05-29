@@ -105,6 +105,7 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public static synthetic fun putFile$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun putFileResumable (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;)Ldev/gitlive/firebase/storage/ProgressFlow;
 	public static synthetic fun putFileResumable$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public final fun updateMetadata (Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/storage/android {

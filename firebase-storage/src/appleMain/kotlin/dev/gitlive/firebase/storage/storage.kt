@@ -93,6 +93,16 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
         }
     }
 
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = ios.awaitResult {
+        updateMetadata(metadata.toFIRMetadata()) { updatedMetadata, error ->
+            if (error == null) {
+                it.invoke(updatedMetadata?.toFirebaseStorageMetadata(), null)
+            } else {
+                it.invoke(null, error)
+            }
+        }
+    }
+
     public actual suspend fun delete(): Unit = await { ios.deleteWithCompletion(it) }
 
     public actual suspend fun getDownloadUrl(): String = ios.awaitResult {

@@ -67,6 +67,9 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).await().toFirebaseStorageMetadata() }
 
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
+        rethrow { updateMetadata(js, metadata.toStorageMetadata().unsafeCast<SettableMetadata>()).await().toFirebaseStorageMetadata() }
+
     public actual fun child(path: String): StorageReference = StorageReference(ref(js, path))
 
     public actual suspend fun delete(): Unit = rethrow { deleteObject(js).await() }

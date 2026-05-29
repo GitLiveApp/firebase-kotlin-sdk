@@ -71,6 +71,9 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
 
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
+        android.updateMetadata(metadata.toStorageMetadata()).await().toFirebaseStorageMetadata()
+
     public actual fun child(path: String): StorageReference = StorageReference(android.child(path))
 
     public actual suspend fun delete() {

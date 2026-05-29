@@ -176,6 +176,14 @@ public expect class StorageReference {
     public suspend fun getMetadata(): FirebaseStorageMetadata?
 
     /**
+     * Updates metadata associated with an object at this [StorageReference].
+     *
+     * @param metadata The new metadata for this object.
+     * @return the updated metadata.
+     */
+    public suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata?
+
+    /**
      * Returns a new instance of [StorageReference] pointing to a child location of the current
      * reference. All leading and trailing slashes will be removed, and consecutive slashes will be
      * compressed to single slashes. For example:
