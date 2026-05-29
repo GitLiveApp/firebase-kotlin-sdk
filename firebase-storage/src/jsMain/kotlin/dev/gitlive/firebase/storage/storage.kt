@@ -76,6 +76,15 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
 
     public actual suspend fun getDownloadUrl(): String = rethrow { getDownloadURL(js).await().toString() }
 
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = rethrow {
+        ListResult(
+            list(
+                js,
+                json("maxResults" to maxResults, "pageToken" to pageToken).unsafeCast<ListOptions>(),
+            ).await(),
+        )
+    }
+
     public actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).await()) }
 
     public actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata?.toStorageMetadata()).await() }

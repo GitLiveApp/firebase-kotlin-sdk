@@ -109,6 +109,18 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
         downloadURLWithCompletion(completion = it)
     }.absoluteString()!!
 
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = awaitResult {
+        if (pageToken == null) {
+            ios.listWithMaxResults(maxResults.toLong()) { firStorageListResult, nsError ->
+                it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
+            }
+        } else {
+            ios.listWithMaxResults(maxResults.toLong(), pageToken) { firStorageListResult, nsError ->
+                it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
+            }
+        }
+    }
+
     public actual suspend fun listAll(): ListResult = awaitResult {
         ios.listAllWithCompletion { firStorageListResult, nsError ->
             it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)

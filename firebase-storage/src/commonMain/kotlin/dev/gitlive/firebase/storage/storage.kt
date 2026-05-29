@@ -216,6 +216,17 @@ public expect class StorageReference {
     public suspend fun getDownloadUrl(): String
 
     /**
+     * List items (files) and prefixes (folders) under this StorageReference.
+     *
+     * [list] is only available for projects using Firebase Rules Version 2.
+     *
+     * @param maxResults The maximum number of results to return in a single page.
+     * @param pageToken A page token from a previous [ListResult], or null to fetch the first page.
+     * @return A [ListResult] containing one page of items and prefixes under the current StorageReference.
+     */
+    public suspend fun list(maxResults: Int, pageToken: String? = null): ListResult
+
+    /**
      * List all items (files) and prefixes (folders) under this StorageReference.
      *
      * This is a helper method for calling list() repeatedly until there are no more

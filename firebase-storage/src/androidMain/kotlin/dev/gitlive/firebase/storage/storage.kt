@@ -82,6 +82,13 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
 
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult =
+        if (pageToken == null) {
+            ListResult(android.list(maxResults).await())
+        } else {
+            ListResult(android.list(maxResults, pageToken).await())
+        }
+
     public actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
     public actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?) {

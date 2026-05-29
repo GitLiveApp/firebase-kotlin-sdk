@@ -98,6 +98,8 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRoot ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getStorage ()Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public final fun list (ILjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun list$default (Ldev/gitlive/firebase/storage/StorageReference;ILjava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun listAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun putData (Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun putData$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
