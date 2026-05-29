@@ -98,6 +98,41 @@ class FirebaseStorageTest {
         assertNotNull(metadataResult)
         assertEquals(metadata.customMetadata["key"], metadataResult.customMetadata["key"])
     }
+
+    @Test
+    fun testUpdateMetadata() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testUpdateMetadata.txt")
+        ref.putData(data, storageMetadata { contentType = "text/plain" })
+
+        val metadata = storageMetadata {
+            cacheControl = "public,max-age=300"
+            contentDisposition = "attachment; filename=testUpdateMetadata.txt"
+            contentEncoding = "identity"
+            contentLanguage = "en"
+            contentType = "text/markdown"
+            setCustomMetadata("updated", "true")
+        }
+
+        val updatedMetadata = ref.updateMetadata(metadata)
+        val fetchedMetadata = ref.getMetadata()
+
+        assertNotNull(updatedMetadata)
+        assertEquals(metadata.cacheControl, updatedMetadata.cacheControl)
+        assertEquals(metadata.contentDisposition, updatedMetadata.contentDisposition)
+        assertEquals(metadata.contentEncoding, updatedMetadata.contentEncoding)
+        assertEquals(metadata.contentLanguage, updatedMetadata.contentLanguage)
+        assertEquals(metadata.contentType, updatedMetadata.contentType)
+        assertEquals(metadata.customMetadata["updated"], updatedMetadata.customMetadata["updated"])
+
+        assertNotNull(fetchedMetadata)
+        assertEquals(metadata.cacheControl, fetchedMetadata.cacheControl)
+        assertEquals(metadata.contentDisposition, fetchedMetadata.contentDisposition)
+        assertEquals(metadata.contentEncoding, fetchedMetadata.contentEncoding)
+        assertEquals(metadata.contentLanguage, fetchedMetadata.contentLanguage)
+        assertEquals(metadata.contentType, fetchedMetadata.contentType)
+        assertEquals(metadata.customMetadata["updated"], fetchedMetadata.customMetadata["updated"])
+    }
 }
 
 expect fun createTestData(): Data
