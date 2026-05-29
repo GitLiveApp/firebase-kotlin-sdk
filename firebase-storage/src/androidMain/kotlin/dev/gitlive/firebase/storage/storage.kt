@@ -71,6 +71,8 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = Data(android.getBytes(maxDownloadSizeBytes).await())
+
     public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
         android.updateMetadata(metadata.toStorageMetadata()).await().toFirebaseStorageMetadata()
 

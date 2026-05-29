@@ -67,6 +67,9 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).await().toFirebaseStorageMetadata() }
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data =
+        rethrow { Data(getBytes(js, maxDownloadSizeBytes.toDouble()).await()) }
+
     public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
         rethrow { updateMetadata(js, metadata.toStorageMetadata().unsafeCast<SettableMetadata>()).await().toFirebaseStorageMetadata() }
 

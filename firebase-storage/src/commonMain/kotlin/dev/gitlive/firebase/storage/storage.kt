@@ -176,6 +176,14 @@ public expect class StorageReference {
     public suspend fun getMetadata(): FirebaseStorageMetadata?
 
     /**
+     * Downloads the object at this [StorageReference] into memory.
+     *
+     * @param maxDownloadSizeBytes The maximum number of bytes to download.
+     * @return The downloaded data.
+     */
+    public suspend fun getData(maxDownloadSizeBytes: Long): Data
+
+    /**
      * Updates metadata associated with an object at this [StorageReference].
      *
      * @param metadata The new metadata for this object.

@@ -93,6 +93,12 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
         }
     }
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = Data(
+        ios.awaitResult {
+            dataWithMaxSize(maxDownloadSizeBytes, it)
+        },
+    )
+
     public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = ios.awaitResult {
         updateMetadata(metadata.toFIRMetadata()) { updatedMetadata, error ->
             if (error == null) {
