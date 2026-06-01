@@ -91,18 +91,25 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
         @Suppress("UNCHECKED_CAST")
         return when (result.operation) {
             SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
+
             VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
+
             PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
+
             RECOVER_EMAIL -> (result.info as ActionCodeEmailInfo).run {
                 ActionCodeResult.RecoverEmail(email, previousEmail)
             }
+
             VERIFY_BEFORE_CHANGE_EMAIL -> (result.info as ActionCodeEmailInfo).run {
                 ActionCodeResult.VerifyBeforeChangeEmail(email, previousEmail)
             }
+
             REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
                 ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
             }
+
             ERROR -> throw UnsupportedOperationException(result.operation.toString())
+
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T
     }

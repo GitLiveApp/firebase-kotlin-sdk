@@ -32,7 +32,7 @@ buildscript {
 
 val compileSdkVersion by extra(34)
 val targetSdkVersion by extra(34)
-val minSdkVersion by extra(21)
+val minSdkVersion by extra(23)
 
 tasks {
     register("updateVersions") {

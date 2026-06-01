@@ -134,6 +134,7 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
                 when (it!!.error()!!.code) {
                     /*FIRStorageErrorCodeCancelled = */
                     -13040L -> cancel(it.error()!!.localizedDescription)
+
                     else -> close(FirebaseStorageException(it.error().toString()))
                 }
             }

@@ -12,6 +12,12 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import java.util.concurrent.Executor
+import com.google.firebase.firestore.AggregateField as AndroidAggregateField
+import com.google.firebase.firestore.AggregateField.AverageAggregateField as AndroidAverageAggregateField
+import com.google.firebase.firestore.AggregateField.CountAggregateField as AndroidCountAggregateField
+import com.google.firebase.firestore.AggregateField.SumAggregateField as AndroidSumAggregateField
+import com.google.firebase.firestore.AggregateQuery as AndroidAggregateQuery
+import com.google.firebase.firestore.AggregateQuerySnapshot as AndroidAggregateQuerySnapshot
 import com.google.firebase.firestore.CollectionReference as AndroidCollectionReference
 import com.google.firebase.firestore.DocumentChange as AndroidDocumentChange
 import com.google.firebase.firestore.DocumentReference as AndroidDocumentReference
@@ -42,10 +48,12 @@ public val LocalCacheSettings.android: AndroidLocalCacheSettings get() = when (t
     is LocalCacheSettings.Persistent -> androidPersistentCacheSettings {
         setSizeBytes(sizeBytes)
     }
+
     is LocalCacheSettings.Memory -> androidMemoryCacheSettings {
         setGcSettings(
             when (garbaseCollectorSettings) {
                 is MemoryGarbageCollectorSettings.Eager -> androidMemoryEagerGcSettings { }
+
                 is MemoryGarbageCollectorSettings.LRUGC -> androidMemoryLruGcSettings {
                     setSizeBytes(garbaseCollectorSettings.sizeBytes)
                 }
@@ -124,6 +132,15 @@ internal actual typealias NativeQuery = AndroidQuery
 public operator fun Query.Companion.invoke(android: AndroidQuery): Query = Query(android)
 public val Query.android: AndroidQuery get() = native
 
+internal actual typealias NativeAggregateQuery = AndroidAggregateQuery
+internal actual typealias NativeAggregateQuerySnapshot = AndroidAggregateQuerySnapshot
+
+public operator fun AggregateQuery.Companion.invoke(android: AndroidQuery): AggregateQuery = AggregateQuery(android)
+public val AggregateQuery.android: AndroidAggregateQuery get() = native
+
+public operator fun AggregateQuerySnapshot.Companion.invoke(android: AndroidAggregateQuerySnapshot): AggregateQuerySnapshot = AggregateQuerySnapshot(android)
+public val AggregateQuerySnapshot.android: AndroidAggregateQuerySnapshot get() = native
+
 public actual typealias Direction = AndroidQuery.Direction
 public actual typealias ChangeType = AndroidDocumentChange.Type
 
@@ -198,3 +215,26 @@ public actual class FieldPath private constructor(internal val android: AndroidF
 public actual typealias EncodedFieldPath = AndroidFieldPath
 
 internal typealias NativeSource = AndroidSource
+
+public actual sealed class AggregateField {
+
+    public abstract val android: AndroidAggregateField
+
+    public actual companion object {
+        public actual fun average(field: String): Average = Average(AndroidAggregateField.average(field))
+        public actual fun average(fieldPath: FieldPath): Average = Average(AndroidAggregateField.average(fieldPath.android))
+        public actual fun count(): Count = Count
+        public actual fun sum(field: String): Sum = Sum(AndroidAggregateField.sum(field))
+        public actual fun sum(fieldPath: FieldPath): Sum = Sum(AndroidAggregateField.sum(fieldPath.android))
+    }
+
+    public actual data object Count : AggregateField() {
+        override val android: AndroidCountAggregateField get() = AndroidAggregateField.count()
+    }
+    public actual data class Average(
+        override val android: AndroidAverageAggregateField,
+    ) : AggregateField()
+    public actual data class Sum(
+        override val android: AndroidSumAggregateField,
+    ) : AggregateField()
+}
