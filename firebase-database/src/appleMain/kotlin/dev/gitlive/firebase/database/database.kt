@@ -89,6 +89,10 @@ public actual class FirebaseDatabase internal constructor(internal val ios: FIRD
     public actual fun goOnline() {
         ios.goOnline()
     }
+
+    public actual fun purgeOutstandingWrites() {
+        ios.purgeOutstandingWrites()
+    }
 }
 
 public fun Type.toEventType(): FIRDataEventType = when (this) {
