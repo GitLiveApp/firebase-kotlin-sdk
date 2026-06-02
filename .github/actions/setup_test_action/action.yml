@@ -11,9 +11,9 @@ runs:
         java-version: '21'
         cache: gradle
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
-        node-version: '21.x'
+        node-version: '24'
     - name: Upgrade packages
       shell: bash
       run: npm update
@@ -25,8 +25,11 @@ runs:
     - name: Install Firebase tools
       shell: bash
       run: npm install -g firebase-tools wait-on
+    - name: Install test functions dependencies
+      shell: bash
+      run: npm install --prefix test/functions
     - name: Start Firebase emulator
       shell: bash
       run: |
         firebase emulators:start --config=./test/firebase.json &
-        wait-on http://127.0.0.1:9099
+        wait-on tcp:127.0.0.1:9099 tcp:127.0.0.1:5001

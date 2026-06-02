@@ -89,6 +89,10 @@ public actual class FirebaseDatabase internal constructor(internal val ios: FIRD
     public actual fun goOnline() {
         ios.goOnline()
     }
+
+    public actual fun purgeOutstandingWrites() {
+        ios.purgeOutstandingWrites()
+    }
 }
 
 public fun Type.toEventType(): FIRDataEventType = when (this) {
@@ -164,6 +168,18 @@ public actual open class Query internal actual constructor(
         awaitClose {
             handles.forEach { ios.removeObserverWithHandle(it) }
         }
+    }
+
+    public actual suspend fun get(): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        ios.getDataWithCompletionBlock { error, snapshot ->
+            if (error != null) {
+                deferred.completeExceptionally(DatabaseException(error.toString(), null))
+            } else {
+                deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+            }
+        }
+        return deferred.await()
     }
 
     override fun toString(): String = ios.toString()

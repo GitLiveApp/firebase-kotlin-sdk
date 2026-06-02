@@ -25,6 +25,7 @@ expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 expect annotation class IgnoreForAndroidTest()
+expect suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites()
 
 @IgnoreForAndroidUnitTest
 class FirebaseDatabaseTest {
@@ -77,6 +78,19 @@ class FirebaseDatabaseTest {
             .value<String>()
 
         assertEquals(testValue, testReferenceValue)
+    }
+
+    @Test
+    fun testGet() = runTest {
+        ensureDatabaseConnected()
+        val testValue = "testGetValue"
+        val testReference = database.reference("testGet")
+
+        testReference.setValue(testValue)
+
+        val snapshot = testReference.get()
+
+        assertEquals(testValue, snapshot.value<String>())
     }
 
     @Test
@@ -235,6 +249,15 @@ class FirebaseDatabaseTest {
         database.goOnline()
         ensureDatabaseConnected()
         assertFalse(valueEvents.first().exists)
+    }
+
+    @Test
+    fun testPurgeOutstandingWrites() = runTest {
+        ensureDatabaseConnected()
+
+        database.verifyPurgeOutstandingWrites()
+
+        ensureDatabaseConnected()
     }
 
     @Test
