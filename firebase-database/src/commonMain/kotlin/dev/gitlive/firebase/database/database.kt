@@ -103,6 +103,14 @@ public expect class FirebaseDatabase {
      * call.
      */
     public fun goOnline()
+
+    /**
+     * Purges all outstanding writes to the Firebase Database server.
+     *
+     * The writes will be rolled back locally and the affected events will be raised again with the
+     * reverted data.
+     */
+    public fun purgeOutstandingWrites()
 }
 
 /**

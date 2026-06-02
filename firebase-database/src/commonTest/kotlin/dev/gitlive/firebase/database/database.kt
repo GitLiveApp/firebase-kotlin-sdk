@@ -25,6 +25,7 @@ expect val emulatorHost: String
 expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 expect annotation class IgnoreForAndroidTest()
+expect suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites()
 
 @IgnoreForAndroidUnitTest
 class FirebaseDatabaseTest {
@@ -248,6 +249,15 @@ class FirebaseDatabaseTest {
         database.goOnline()
         ensureDatabaseConnected()
         assertFalse(valueEvents.first().exists)
+    }
+
+    @Test
+    fun testPurgeOutstandingWrites() = runTest {
+        ensureDatabaseConnected()
+
+        database.verifyPurgeOutstandingWrites()
+
+        ensureDatabaseConnected()
     }
 
     @Test

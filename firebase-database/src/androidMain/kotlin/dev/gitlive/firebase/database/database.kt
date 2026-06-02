@@ -104,6 +104,10 @@ public actual class FirebaseDatabase internal constructor(internal val android: 
     public actual fun goOnline() {
         android.goOnline()
     }
+
+    public actual fun purgeOutstandingWrites() {
+        android.purgeOutstandingWrites()
+    }
 }
 
 internal actual open class NativeQuery(
