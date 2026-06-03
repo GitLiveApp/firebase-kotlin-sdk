@@ -73,8 +73,7 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = Data(android.getBytes(maxDownloadSizeBytes).await())
 
-    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
-        android.updateMetadata(metadata.toStorageMetadata()).await().toFirebaseStorageMetadata()
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = android.updateMetadata(metadata.toStorageMetadata()).await().toFirebaseStorageMetadata()
 
     public actual fun child(path: String): StorageReference = StorageReference(android.child(path))
 
@@ -84,12 +83,11 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
 
-    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult =
-        if (pageToken == null) {
-            ListResult(android.list(maxResults).await())
-        } else {
-            ListResult(android.list(maxResults, pageToken).await())
-        }
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = if (pageToken == null) {
+        ListResult(android.list(maxResults).await())
+    } else {
+        ListResult(android.list(maxResults, pageToken).await())
+    }
 
     public actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
