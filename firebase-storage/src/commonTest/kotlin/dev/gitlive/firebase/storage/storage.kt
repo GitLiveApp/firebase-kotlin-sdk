@@ -10,6 +10,9 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -77,6 +80,27 @@ class FirebaseStorageTest {
         val downloadedData = ref.getData(maxDownloadSizeBytes = 1024)
 
         assertTestDataEquals(downloadedData)
+    }
+
+    @Test
+    fun testPutDataResumable() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testPutDataResumable.txt")
+        val metadata = storageMetadata {
+            contentType = "text/plain"
+        }
+
+        // putDataResumable emits via real async callbacks, so the timeout must run on a
+        // real dispatcher rather than runTest's virtual clock (which would fast-forward to 30s).
+        withContext(Dispatchers.Default.limitedParallelism(1)) {
+            withTimeout(30.seconds) {
+                ref.putDataResumable(data, metadata).collect {}
+            }
+        }
+
+        val metadataResult = ref.getMetadata()
+        assertNotNull(metadataResult)
+        assertEquals(metadata.contentType, metadataResult.contentType)
     }
 
     @Test
