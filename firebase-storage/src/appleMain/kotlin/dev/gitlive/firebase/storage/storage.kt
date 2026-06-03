@@ -141,6 +141,41 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
         putData(data.data, metadata?.toFIRMetadata(), callback)
     }.run {}
 
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val ios = ios.putData(data.data, metadata?.toFIRMetadata())
+
+        val flow = callbackFlow {
+            ios.observeStatus(FIRStorageTaskStatusProgress) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusPause) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Paused(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusResume) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusSuccess) { close() }
+            ios.observeStatus(FIRStorageTaskStatusFailure) {
+                when (it!!.error()!!.code) {
+                    /*FIRStorageErrorCodeCancelled = */
+                    -13040L -> cancel(it.error()!!.localizedDescription)
+                    else -> close(FirebaseStorageException(it.error().toString()))
+                }
+            }
+            awaitClose { ios.removeAllObservers() }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = ios.pause()
+            override fun resume() = ios.resume()
+            override fun cancel() = ios.cancel()
+        }
+    }
+
     public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val ios = ios.putFile(file.url, metadata?.toFIRMetadata())
 
