@@ -109,6 +109,38 @@ public actual class StorageReference(internal val android: com.google.firebase.s
         }
     }
 
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val android = if (metadata != null) {
+            android.putBytes(data.data, metadata.toStorageMetadata())
+        } else {
+            android.putBytes(data.data, FirebaseStorageMetadata().toStorageMetadata())
+        }
+
+        val flow = callbackFlow {
+            val onCanceledListener = OnCanceledListener { cancel() }
+            val onCompleteListener = OnCompleteListener<UploadTask.TaskSnapshot> { close(it.exception) }
+            val onPausedListener = OnPausedListener<UploadTask.TaskSnapshot> { trySendBlocking(Progress.Paused(it.bytesTransferred, it.totalByteCount)) }
+            val onProgressListener = OnProgressListener<UploadTask.TaskSnapshot> { trySendBlocking(Progress.Running(it.bytesTransferred, it.totalByteCount)) }
+            android.addOnCanceledListener(onCanceledListener)
+            android.addOnCompleteListener(onCompleteListener)
+            android.addOnPausedListener(onPausedListener)
+            android.addOnProgressListener(onProgressListener)
+            awaitClose {
+                android.removeOnCanceledListener(onCanceledListener)
+                android.removeOnCompleteListener(onCompleteListener)
+                android.removeOnPausedListener(onPausedListener)
+                android.removeOnProgressListener(onProgressListener)
+            }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = android.pause().run {}
+            override fun resume() = android.resume().run {}
+            override fun cancel() = android.cancel().run {}
+        }
+    }
+
     public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val android = if (metadata != null) {
             android.putFile(file.uri, metadata.toStorageMetadata())

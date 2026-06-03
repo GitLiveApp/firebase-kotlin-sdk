@@ -268,6 +268,16 @@ public expect class StorageReference {
     public suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
 
     /**
+     * Asynchronously uploads byte data to this [StorageReference].
+     *
+     * @param data The [Data] to upload.
+     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
+     *     about the object being uploaded.
+     * @return A [ProgressFlow] that can be used to monitor and manage the upload.
+     */
+    public fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata? = null): ProgressFlow
+
+    /**
      * Asynchronously uploads from a content URI to this [StorageReference].
      *
      * @param file The source of the upload. This is a [File]. A content

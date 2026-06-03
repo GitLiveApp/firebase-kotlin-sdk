@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlin.js.Json
 import kotlin.js.json
+import org.khronos.webgl.Uint8Array
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
@@ -68,7 +69,7 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).await().toFirebaseStorageMetadata() }
 
     public actual suspend fun getData(maxDownloadSizeBytes: Long): Data =
-        rethrow { Data(getBytes(js, maxDownloadSizeBytes.toDouble()).await()) }
+        rethrow { Data(Uint8Array(getBytes(js, maxDownloadSizeBytes.toDouble()).await())) }
 
     public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? =
         rethrow { updateMetadata(js, metadata.toStorageMetadata().unsafeCast<SettableMetadata>()).await().toFirebaseStorageMetadata() }
@@ -93,6 +94,35 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
     public actual suspend fun putFile(file: File, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, file, metadata?.toStorageMetadata()).await() }
 
     public actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, data.data, metadata?.toStorageMetadata()).await() }
+
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
+        val uploadTask = uploadBytesResumable(js, data.data, metadata?.toStorageMetadata())
+
+        val flow = callbackFlow {
+            val unsubscribe = uploadTask.on(
+                "state_changed",
+                {
+                    when (it.state) {
+                        "paused" -> trySend(Progress.Paused(it.bytesTransferred, it.totalBytes))
+                        "running" -> trySend(Progress.Running(it.bytesTransferred, it.totalBytes))
+                        "canceled" -> cancel()
+                        "success", "error" -> Unit
+                        else -> TODO("Unknown state ${it.state}")
+                    }
+                },
+                { close(errorToException(it)) },
+                { close() },
+            )
+            awaitClose { unsubscribe() }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = uploadTask.pause().run {}
+            override fun resume() = uploadTask.resume().run {}
+            override fun cancel() = uploadTask.cancel().run {}
+        }
+    }
 
     public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
         val uploadTask = uploadBytesResumable(js, file, metadata?.toStorageMetadata())
