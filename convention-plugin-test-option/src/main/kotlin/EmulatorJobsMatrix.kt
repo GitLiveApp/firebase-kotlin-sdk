@@ -33,12 +33,6 @@ class EmulatorJobsMatrix {
             }
     }
 
-    /**
-     * Returns the names of the subprojects affected by the changed files listed in the file passed
-     * via -PchangedFilesPath, including all modules that (transitively) depend on a changed module.
-     * Returns null (= everything is affected) when no change list is provided or when files outside
-     * of any module (build scripts, CI config, test setup etc.) have changed.
-     */
     private fun getAffectedProjectNames(rootProject: Project): Set<String>? {
         val changedFilesPath = rootProject.findProperty("changedFilesPath") as? String ?: return null
         val changedFiles = File(rootProject.rootDir, changedFilesPath)
