@@ -14,11 +14,27 @@ runs:
       uses: actions/setup-node@v6
       with:
         node-version: '24'
+        cache: 'npm'
+        cache-dependency-path: test/functions/package-lock.json
     - name: Upgrade packages
       shell: bash
       run: npm update
     - name: Gradle cache
       uses: gradle/actions/setup-gradle@v4
+    - name: Kotlin/Native cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.konan
+        key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+        restore-keys: |
+          konan-${{ runner.os }}-
+    - name: Firebase emulator cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/firebase/emulators
+        key: firebase-emulators-${{ runner.os }}-${{ hashFiles('test/firebase.json') }}
+        restore-keys: |
+          firebase-emulators-${{ runner.os }}-
     - name: Grant execute permission for gradlew
       shell: bash
       run: chmod +x gradlew
