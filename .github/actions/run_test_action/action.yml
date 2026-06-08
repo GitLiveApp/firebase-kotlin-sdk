@@ -1,0 +1,75 @@
+name: 'Run Tests'
+description: 'Runs a Gradle test matrix entry and uploads failure artifacts'
+
+inputs:
+  gradle-tasks:
+    description: 'Gradle tasks and arguments to run'
+    required: true
+  platform-name:
+    description: 'Display name used for step and artifact names'
+    required: true
+  report-paths:
+    description: 'Newline-separated report paths to upload on failure'
+    required: true
+  android:
+    description: 'Whether to enable Android emulator setup'
+    required: false
+    default: 'false'
+  apple:
+    description: 'Whether to enable Apple/Xcode setup'
+    required: false
+    default: 'false'
+  xcode-version:
+    description: 'Xcode version to select when apple is true'
+    required: false
+    default: '16.4'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Enable KVM group perms
+      if: inputs.android == 'true'
+      shell: bash
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - name: Cocoapods cache
+      if: inputs.apple == 'true'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cocoapods
+          ~/Library/Caches/CocoaPods
+          */build/cocoapods
+          */build/classes
+        key: cocoapods-cache-v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      if: inputs.apple == 'true'
+      with:
+        xcode-version: ${{ inputs.xcode-version }}
+    - name: Setup test environment
+      uses: ./.github/actions/setup_test_action
+    - name: Set artifact name
+      shell: bash
+      run: |
+        echo "ARCHIVE_KEY=$(echo ${{ inputs.gradle-tasks }} | cut -d: -f2)" >> $GITHUB_ENV
+    - name: Apply Android licenses
+      if: inputs.android == 'true'
+      shell: bash
+      run: ./gradlew ciSdkManagerLicenses
+    - name: Run ${{ inputs.platform-name }} Tests
+      shell: bash
+      run: ./gradlew ${{ inputs.gradle-tasks }}
+    - name: Upload ${{ inputs.platform-name }} test artifact
+      uses: actions/upload-artifact@v5
+      if: failure()
+      with:
+        name: ${{ inputs.platform-name }} ${{ env.ARCHIVE_KEY }} Test Report HTML
+        path: ${{ inputs.report-paths }}
+    - name: Upload Firebase Debug Log
+      uses: actions/upload-artifact@v5
+      if: failure()
+      with:
+        name: ${{ inputs.platform-name }} ${{ env.ARCHIVE_KEY }} Firebase Debug Log
+        path: "**/firebase-debug.log"
