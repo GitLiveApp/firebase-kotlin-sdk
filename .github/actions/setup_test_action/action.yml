@@ -22,14 +22,14 @@ runs:
     - name: Gradle cache
       uses: gradle/actions/setup-gradle@v4
     - name: Kotlin/Native cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.konan
         key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
         restore-keys: |
           konan-${{ runner.os }}-
     - name: Firebase emulator cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.cache/firebase/emulators
         key: firebase-emulators-${{ runner.os }}-${{ hashFiles('test/firebase.json') }}
