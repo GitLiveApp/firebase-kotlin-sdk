@@ -85,6 +85,8 @@ public actual class FirebaseDatabase internal constructor(internal val js: Datab
     public actual fun goOffline(): Unit = rethrow { jsGoOffline(js) }
 
     public actual fun goOnline(): Unit = rethrow { jsGoOnline(js) }
+
+    public actual fun purgeOutstandingWrites() {}
 }
 
 internal actual open class NativeQuery(
