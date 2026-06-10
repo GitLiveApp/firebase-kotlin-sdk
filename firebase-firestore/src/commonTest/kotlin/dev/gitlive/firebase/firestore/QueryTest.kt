@@ -632,6 +632,38 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         assertEquals(0L, emptyCount)
     }
 
+    @Test
+    fun testSum() = runTestWithFirestoreData {
+        assertEquals(6.0, collection.sum(FirestoreTest::count.name))
+        assertEquals(6.0, collection.sum(FieldPath(FirestoreTest::count.name)))
+
+        val filteredSum = collection
+            .where { FirestoreTest::count.name greaterThan 1 }
+            .sum(FirestoreTest::count.name)
+        assertEquals(5.0, filteredSum)
+
+        val emptySum = collection
+            .where { FirestoreTest::prop1.name equalTo "doesNotExist" }
+            .sum(FirestoreTest::count.name)
+        assertEquals(0.0, emptySum)
+    }
+
+    @Test
+    fun testAverage() = runTestWithFirestoreData {
+        assertEquals(2.0, collection.average(FirestoreTest::count.name))
+        assertEquals(2.0, collection.average(FieldPath(FirestoreTest::count.name)))
+
+        val filteredAverage = collection
+            .where { FirestoreTest::count.name greaterThan 1 }
+            .average(FirestoreTest::count.name)
+        assertEquals(2.5, filteredAverage)
+
+        val emptyAverage = collection
+            .where { FirestoreTest::prop1.name equalTo "doesNotExist" }
+            .average(FirestoreTest::count.name)
+        assertEquals(null, emptyAverage)
+    }
+
     private fun runTestWithFirestoreData(
         documentOne: FirestoreTest = testOne,
         documentTwo: FirestoreTest = testTwo,
