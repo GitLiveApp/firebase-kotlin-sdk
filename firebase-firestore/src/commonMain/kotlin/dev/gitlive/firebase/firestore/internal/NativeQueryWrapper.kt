@@ -15,6 +15,10 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
 
     fun limit(limit: Number): NativeQuery
     suspend fun count(): Long
+    suspend fun sum(field: String): Double
+    suspend fun sum(field: EncodedFieldPath): Double
+    suspend fun average(field: String): Double?
+    suspend fun average(field: EncodedFieldPath): Double?
     val snapshots: Flow<QuerySnapshot>
     fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot>
     suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot

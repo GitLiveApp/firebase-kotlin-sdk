@@ -226,6 +226,18 @@ public external interface AggregateQuerySnapshot {
     public fun data(): dynamic
 }
 
+public external interface AggregateField
+
+public external fun sum(field: String): AggregateField
+
+public external fun sum(field: FieldPath): AggregateField
+
+public external fun average(field: String): AggregateField
+
+public external fun average(field: FieldPath): AggregateField
+
+public external fun getAggregateFromServer(query: Query, aggregateSpec: Json): Promise<AggregateQuerySnapshot>
+
 public external interface QuerySnapshot {
     public val docs: Array<DocumentSnapshot>
     public val empty: Boolean

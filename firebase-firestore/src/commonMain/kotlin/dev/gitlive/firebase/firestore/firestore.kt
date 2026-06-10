@@ -249,6 +249,10 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
 
     public suspend fun count(): Long = nativeQuery.count()
+    public suspend fun sum(field: String): Double = nativeQuery.sum(field)
+    public suspend fun sum(field: FieldPath): Double = nativeQuery.sum(field.encoded)
+    public suspend fun average(field: String): Double? = nativeQuery.average(field)
+    public suspend fun average(field: FieldPath): Double? = nativeQuery.average(field.encoded)
     public val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
     public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
