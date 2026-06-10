@@ -30,8 +30,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
     actual suspend fun average(field: String): Double? = aggregateDouble(AggregateField.average(field))
     actual suspend fun average(field: EncodedFieldPath): Double? = aggregateDouble(AggregateField.average(field))
 
-    private suspend fun aggregateDouble(aggregateField: AggregateField): Double? =
-        native.aggregate(aggregateField).get(AggregateSource.SERVER).await().getDouble(aggregateField)
+    private suspend fun aggregateDouble(aggregateField: AggregateField): Double? = native.aggregate(aggregateField).get(AggregateSource.SERVER).await().getDouble(aggregateField)
 
     actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, exception ->
