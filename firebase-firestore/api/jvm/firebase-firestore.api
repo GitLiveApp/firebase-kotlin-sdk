@@ -466,6 +466,7 @@ public class dev/gitlive/firebase/firestore/Query {
 	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getSnapshots ()Lkotlinx/coroutines/flow/Flow;
 	public final fun limit (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun limitToLast (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ljava/lang/String;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public static synthetic fun orderBy$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;

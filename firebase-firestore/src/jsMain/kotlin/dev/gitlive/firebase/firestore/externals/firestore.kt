@@ -93,6 +93,8 @@ public external fun initializeFirestore(app: FirebaseApp, settings: dynamic = de
 
 public external fun limit(limit: Number): QueryConstraint
 
+public external fun limitToLast(limit: Number): QueryConstraint
+
 public external fun onSnapshot(
     reference: DocumentReference,
     next: (snapshot: DocumentSnapshot) -> Unit,

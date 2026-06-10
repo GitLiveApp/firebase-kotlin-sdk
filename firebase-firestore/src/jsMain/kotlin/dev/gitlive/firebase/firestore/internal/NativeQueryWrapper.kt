@@ -41,6 +41,11 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         dev.gitlive.firebase.firestore.externals.limit(limit),
     ).wrapped
 
+    actual fun limitToLast(limit: Number) = query(
+        js,
+        dev.gitlive.firebase.firestore.externals.limitToLast(limit),
+    ).wrapped
+
     actual suspend fun count(): Long = rethrow {
         getCountFromServer(js).await().data().count.unsafeCast<Double>().toLong()
     }

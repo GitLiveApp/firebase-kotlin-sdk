@@ -21,6 +21,7 @@ import kotlinx.coroutines.tasks.await
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: Query) {
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
+    actual fun limitToLast(limit: Number) = native.limitToLast(limit.toLong())
 
     actual suspend fun count(): Long = native.count().get(AggregateSource.SERVER).await().count
 

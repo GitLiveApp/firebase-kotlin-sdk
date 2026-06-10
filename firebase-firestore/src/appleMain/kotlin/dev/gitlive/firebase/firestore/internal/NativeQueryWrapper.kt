@@ -22,6 +22,7 @@ import platform.Foundation.NSNumber
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())
+    actual fun limitToLast(limit: Number) = native.queryLimitedToLast(limit.toLong())
 
     actual suspend fun count(): Long = awaitResult<FIRAggregateQuerySnapshot> {
         native.count.aggregationWithSource(FIRAggregateSource.FIRAggregateSourceServer, it)

@@ -247,6 +247,7 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     internal open val native: NativeQuery = nativeQuery.native
 
     public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
+    public fun limitToLast(limit: Number): Query = Query(nativeQuery.limitToLast(limit))
 
     public suspend fun count(): Long = nativeQuery.count()
     public suspend fun sum(field: String): Double = nativeQuery.sum(field)

@@ -14,6 +14,7 @@ internal expect open class NativeQueryWrapper internal constructor(native: Nativ
     open val native: NativeQuery
 
     fun limit(limit: Number): NativeQuery
+    fun limitToLast(limit: Number): NativeQuery
     suspend fun count(): Long
     suspend fun sum(field: String): Double
     suspend fun sum(field: EncodedFieldPath): Double
