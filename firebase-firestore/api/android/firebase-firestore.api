@@ -289,7 +289,9 @@ public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
 	public final fun setSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
 	public final fun setSettings (Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;)V
 	public static synthetic fun setSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestore;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;ILjava/lang/Object;)V
+	public final fun terminate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun useEmulator (Ljava/lang/String;I)V
+	public final fun waitForPendingWrites (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore$Companion {
