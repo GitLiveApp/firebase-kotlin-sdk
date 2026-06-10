@@ -75,6 +75,8 @@ public external fun getDocFromServer(
     reference: DocumentReference,
 ): Promise<DocumentSnapshot>
 
+public external fun getCountFromServer(query: Query): Promise<AggregateQuerySnapshot>
+
 public external fun getDocs(query: Query): Promise<QuerySnapshot>
 
 public external fun getDocsFromCache(query: Query): Promise<QuerySnapshot>
@@ -219,6 +221,10 @@ public external class FieldValue {
 public external interface Query
 
 public external interface QueryConstraint
+
+public external interface AggregateQuerySnapshot {
+    public fun data(): dynamic
+}
 
 public external interface QuerySnapshot {
     public val docs: Array<DocumentSnapshot>

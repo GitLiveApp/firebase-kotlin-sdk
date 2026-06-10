@@ -1,5 +1,7 @@
 package dev.gitlive.firebase.firestore.internal
 
+import cocoapods.FirebaseFirestoreInternal.FIRAggregateQuerySnapshot
+import cocoapods.FirebaseFirestoreInternal.FIRAggregateSource
 import cocoapods.FirebaseFirestoreInternal.FIRFilter
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
@@ -18,6 +20,10 @@ import platform.Foundation.NSNull
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())
+
+    actual suspend fun count(): Long = awaitResult<FIRAggregateQuerySnapshot> {
+        native.count.aggregationWithSource(FIRAggregateSource.FIRAggregateSourceServer, it)
+    }.count.longLongValue
 
     actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
 

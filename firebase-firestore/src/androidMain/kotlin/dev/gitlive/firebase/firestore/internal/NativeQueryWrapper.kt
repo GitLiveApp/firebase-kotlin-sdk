@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore.internal
 
 import com.google.android.gms.tasks.TaskExecutors
+import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
@@ -19,6 +20,8 @@ import kotlinx.coroutines.tasks.await
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: Query) {
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
+
+    actual suspend fun count(): Long = native.count().get(AggregateSource.SERVER).await().count
 
     actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, exception ->

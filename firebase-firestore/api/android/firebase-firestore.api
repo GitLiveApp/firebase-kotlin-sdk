@@ -451,6 +451,7 @@ public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings
 
 public class dev/gitlive/firebase/firestore/Query {
 	public static final field Companion Ldev/gitlive/firebase/firestore/Query$Companion;
+	public final fun count (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun endAt (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;

@@ -12,6 +12,7 @@ import dev.gitlive.firebase.firestore.errorToException
 import dev.gitlive.firebase.firestore.externals.Query
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
 import dev.gitlive.firebase.firestore.externals.and
+import dev.gitlive.firebase.firestore.externals.getCountFromServer
 import dev.gitlive.firebase.firestore.externals.getDocs
 import dev.gitlive.firebase.firestore.externals.getDocsFromCache
 import dev.gitlive.firebase.firestore.externals.getDocsFromServer
@@ -37,6 +38,10 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         js,
         dev.gitlive.firebase.firestore.externals.limit(limit),
     ).wrapped
+
+    actual suspend fun count(): Long = rethrow {
+        getCountFromServer(js).await().data().count.unsafeCast<Double>().toLong()
+    }
 
     actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
 
