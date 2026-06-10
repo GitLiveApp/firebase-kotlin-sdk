@@ -22,4 +22,6 @@ internal expect class NativeFirebaseFirestoreWrapper internal constructor(native
     fun useEmulator(host: String, port: Int)
     suspend fun disableNetwork()
     suspend fun enableNetwork()
+    suspend fun terminate()
+    suspend fun waitForPendingWrites()
 }

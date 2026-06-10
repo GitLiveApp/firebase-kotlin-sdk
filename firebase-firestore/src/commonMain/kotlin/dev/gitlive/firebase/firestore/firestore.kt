@@ -99,6 +99,14 @@ public class FirebaseFirestore internal constructor(private val wrapper: NativeF
     public suspend fun enableNetwork() {
         wrapper.enableNetwork()
     }
+
+    public suspend fun terminate() {
+        wrapper.terminate()
+    }
+
+    public suspend fun waitForPendingWrites() {
+        wrapper.waitForPendingWrites()
+    }
 }
 
 public expect class FirebaseFirestoreSettings {

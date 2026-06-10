@@ -54,6 +54,10 @@ public external fun enableIndexedDbPersistence(
 
 public external fun enableNetwork(firestore: Firestore): Promise<Unit>
 
+public external fun terminate(firestore: Firestore): Promise<Unit>
+
+public external fun waitForPendingWrites(firestore: Firestore): Promise<Unit>
+
 public external fun endAt(document: DocumentSnapshot): QueryConstraint
 
 public external fun endAt(vararg fieldValues: Any): QueryConstraint
