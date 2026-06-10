@@ -618,6 +618,22 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
+    fun testLimit() = runTestWithFirestoreData {
+        val limited = collection
+            .orderBy(FirestoreTest::prop1.name, Direction.ASCENDING)
+            .limit(2)
+        limited.assertDocuments(FirestoreTest.serializer(), testOne, testTwo)
+    }
+
+    @Test
+    fun testLimitToLast() = runTestWithFirestoreData {
+        val limited = collection
+            .orderBy(FirestoreTest::prop1.name, Direction.ASCENDING)
+            .limitToLast(2)
+        limited.assertDocuments(FirestoreTest.serializer(), testTwo, testThree)
+    }
+
+    @Test
     fun testCount() = runTestWithFirestoreData {
         assertEquals(3L, collection.count())
 
