@@ -617,6 +617,21 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
         encodedMultipleSecondPage.assertDocuments(FirestoreTest.serializer(), testOne)
     }
 
+    @Test
+    fun testCount() = runTestWithFirestoreData {
+        assertEquals(3L, collection.count())
+
+        val filteredCount = collection
+            .where { FirestoreTest::count.name greaterThan 1 }
+            .count()
+        assertEquals(2L, filteredCount)
+
+        val emptyCount = collection
+            .where { FirestoreTest::prop1.name equalTo "doesNotExist" }
+            .count()
+        assertEquals(0L, emptyCount)
+    }
+
     private fun runTestWithFirestoreData(
         documentOne: FirestoreTest = testOne,
         documentTwo: FirestoreTest = testTwo,
