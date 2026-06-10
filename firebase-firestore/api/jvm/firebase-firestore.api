@@ -156,6 +156,7 @@ public final class dev/gitlive/firebase/firestore/FieldValue$Companion {
 	public final fun arrayUnion ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getDelete ()Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getServerTimestamp ()Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun increment (D)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun increment (I)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }

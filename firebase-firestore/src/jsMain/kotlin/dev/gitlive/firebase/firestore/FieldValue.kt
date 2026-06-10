@@ -26,6 +26,7 @@ public actual class FieldValue internal actual constructor(internal actual val n
         public actual val serverTimestamp: FieldValue get() = rethrow { FieldValue(jsServerTimestamp()) }
         public actual val delete: FieldValue get() = rethrow { FieldValue(deleteField()) }
         public actual fun increment(value: Int): FieldValue = rethrow { FieldValue(jsIncrement(value)) }
+        public actual fun increment(value: Double): FieldValue = rethrow { FieldValue(jsIncrement(value)) }
         public actual fun arrayUnion(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayUnion(*elements)) }
         public actual fun arrayRemove(vararg elements: Any): FieldValue = rethrow { FieldValue(jsArrayRemove(*elements)) }
     }

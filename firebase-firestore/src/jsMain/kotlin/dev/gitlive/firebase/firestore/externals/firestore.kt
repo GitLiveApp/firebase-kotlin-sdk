@@ -85,6 +85,8 @@ public external fun getFirestore(app: FirebaseApp? = definedExternally, database
 
 public external fun increment(n: Int): FieldValue
 
+public external fun increment(n: Double): FieldValue
+
 public external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore
 
 public external fun limit(limit: Number): QueryConstraint
