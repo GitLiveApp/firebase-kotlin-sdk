@@ -19,6 +19,7 @@ class EmulatorJobsMatrix {
             "macos_test_jobs_matrix.json" to getMacosTestTaskList(rootProject = rootProject),
             "tvos_test_jobs_matrix.json" to getTvosTestTaskList(rootProject = rootProject),
             "js_test_jobs_matrix.json" to getJsTestTaskList(rootProject = rootProject),
+            "wasm_js_test_jobs_matrix.json" to getWasmJsTestTaskList(rootProject = rootProject),
             "jvm_test_jobs_matrix.json" to getJvmTestTaskList(rootProject = rootProject)
         )
             .mapValues { entry -> entry.value.map { it.joinToString(separator = " ") } }
@@ -81,6 +82,14 @@ class EmulatorJobsMatrix {
             "${subProject.path}:jvmTest"
         }.map { listOf("cleanTest", it) }
 
+    fun getWasmJsTestTaskList(rootProject: Project): List<List<String>> =
+        rootProject.subprojects.filter { subProject ->
+            (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
+                TargetPlatform.WasmJs) || subProject.name == "test-utils"
+        }.map { subProject ->
+            "${subProject.path}:wasmJsTest"
+        }.map { listOf("cleanTest", it) }
+
     fun getEmulatorTaskList(rootProject: Project): List<List<String>> =
         rootProject.subprojects.filter { subProject ->
             File(subProject.projectDir, "src${File.separator}commonTest").exists() ||
@@ -127,7 +136,7 @@ fun getSdkmanagerFile(rootDir: File): File? =
     }
 
 enum class TargetPlatform {
-    Android, Ios, Macos, Tvos, Jvm, Js
+    Android, Ios, Macos, Tvos, Jvm, Js, WasmJs
 }
 
 fun String.toTargetPlatforms(): List<TargetPlatform> =
@@ -139,6 +148,7 @@ fun String.toTargetPlatforms(): List<TargetPlatform> =
             "tvos" -> TargetPlatform.Tvos
             "jvm" -> TargetPlatform.Jvm
             "js" -> TargetPlatform.Js
+            "wasmjs" -> TargetPlatform.WasmJs
             else -> throw IllegalArgumentException("Unknown target platform: $it")
         }
     }
