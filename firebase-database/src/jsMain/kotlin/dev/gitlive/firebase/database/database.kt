@@ -14,6 +14,7 @@ import dev.gitlive.firebase.database.externals.Database
 import dev.gitlive.firebase.database.externals.child
 import dev.gitlive.firebase.database.externals.connectDatabaseEmulator
 import dev.gitlive.firebase.database.externals.enableLogging
+import dev.gitlive.firebase.database.externals.get
 import dev.gitlive.firebase.database.externals.getDatabase
 import dev.gitlive.firebase.database.externals.onChildAdded
 import dev.gitlive.firebase.database.externals.onChildChanged
@@ -84,6 +85,8 @@ public actual class FirebaseDatabase internal constructor(internal val js: Datab
     public actual fun goOffline(): Unit = rethrow { jsGoOffline(js) }
 
     public actual fun goOnline(): Unit = rethrow { jsGoOnline(js) }
+
+    public actual fun purgeOutstandingWrites() {}
 }
 
 internal actual open class NativeQuery(
@@ -143,6 +146,10 @@ public actual open class Query internal actual constructor(
             }
         }
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }
+    }
+
+    public actual suspend fun get(): DataSnapshot = rethrow {
+        DataSnapshot(get(publicJs).awaitWhileOnline(database), database)
     }
 
     public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)

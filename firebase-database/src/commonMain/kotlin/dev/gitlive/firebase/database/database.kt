@@ -105,6 +105,14 @@ public expect class FirebaseDatabase {
      * call.
      */
     public fun goOnline()
+
+    /**
+     * Purges all outstanding writes to the Firebase Database server.
+     *
+     * The writes will be rolled back locally and the affected events will be raised again with the
+     * reverted data.
+     */
+    public fun purgeOutstandingWrites()
 }
 
 /**
@@ -170,6 +178,12 @@ internal expect open class NativeQuery
 public expect open class Query internal constructor(nativeQuery: NativeQuery) {
     public val valueEvents: Flow<DataSnapshot>
     public fun childEvents(vararg types: ChildEvent.Type = arrayOf(ADDED, CHANGED, MOVED, REMOVED)): Flow<ChildEvent>
+
+    /**
+     * Gets the server values for this query. Updates the cache and raises events if successful. If not
+     * connected, falls back to a locally-cached value or null.
+     */
+    public suspend fun get(): DataSnapshot
 
     /**
      * Creates a query in which child nodes are ordered by their keys.

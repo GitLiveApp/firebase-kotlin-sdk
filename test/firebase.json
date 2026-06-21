@@ -5,12 +5,21 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "database": {
-    "rules": "database.rules.json"
+  "database": [
+    {
+      "target": "default",
+      "rules": "database.rules.json"
+    }
+  ],
+  "functions": {
+    "source": "functions"
   },
   "emulators": {
     "auth": {
       "port": 9099
+    },
+    "functions": {
+      "port": 5001
     },
     "firestore": {
       "port": 8080

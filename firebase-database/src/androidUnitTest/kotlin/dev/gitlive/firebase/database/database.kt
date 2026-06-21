@@ -13,3 +13,7 @@ actual val emulatorHost: String = "10.0.2.2"
 actual val context: Any = ""
 actual typealias IgnoreForAndroidUnitTest = Ignore
 actual typealias IgnoreForAndroidTest = Ignore
+
+actual suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites() {
+    purgeOutstandingWrites()
+}

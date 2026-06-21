@@ -92,34 +92,36 @@ public actual enum class FunctionsExceptionCode {
     UNAUTHENTICATED,
 }
 
-// todo uncomment once https://github.com/firebase/firebase-ios-sdk/issues/11862 fixed
+private const val FUNCTIONS_ERROR_DOMAIN = "com.firebase.functions"
+private const val FUNCTIONS_ERROR_DETAILS_KEY = "details"
+
 internal fun NSError.toException() = when (domain) {
-//    FIRFunctionsErrorDomain -> when(code) {
-//        FIRFunctionsErrorCodeOK -> FunctionsExceptionCode.OK
-//        FIRFunctionsErrorCodeCancelled -> FunctionsExceptionCode.CANCELLED
-//        FIRFunctionsErrorCodeUnknown -> FunctionsExceptionCode.UNKNOWN
-//        FIRFunctionsErrorCodeInvalidArgument -> FunctionsExceptionCode.INVALID_ARGUMENT
-//        FIRFunctionsErrorCodeDeadlineExceeded -> FunctionsExceptionCode.DEADLINE_EXCEEDED
-//        FIRFunctionsErrorCodeNotFound -> FunctionsExceptionCode.NOT_FOUND
-//        FIRFunctionsErrorCodeAlreadyExists -> FunctionsExceptionCode.ALREADY_EXISTS
-//        FIRFunctionsErrorCodePermissionDenied -> FunctionsExceptionCode.PERMISSION_DENIED
-//        FIRFunctionsErrorCodeResourceExhausted -> FunctionsExceptionCode.RESOURCE_EXHAUSTED
-//        FIRFunctionsErrorCodeFailedPrecondition -> FunctionsExceptionCode.FAILED_PRECONDITION
-//        FIRFunctionsErrorCodeAborted -> FunctionsExceptionCode.ABORTED
-//        FIRFunctionsErrorCodeOutOfRange -> FunctionsExceptionCode.OUT_OF_RANGE
-//        FIRFunctionsErrorCodeUnimplemented -> FunctionsExceptionCode.UNIMPLEMENTED
-//        FIRFunctionsErrorCodeInternal -> FunctionsExceptionCode.INTERNAL
-//        FIRFunctionsErrorCodeUnavailable -> FunctionsExceptionCode.UNAVAILABLE
-//        FIRFunctionsErrorCodeDataLoss -> FunctionsExceptionCode.DATA_LOSS
-//        FIRFunctionsErrorCodeUnauthenticated -> FunctionsExceptionCode.UNAUTHENTICATED
-//        else -> FunctionsExceptionCode.UNKNOWN
-//    }
+    FUNCTIONS_ERROR_DOMAIN -> when (code) {
+        0L -> FunctionsExceptionCode.OK
+        1L -> FunctionsExceptionCode.CANCELLED
+        2L -> FunctionsExceptionCode.UNKNOWN
+        3L -> FunctionsExceptionCode.INVALID_ARGUMENT
+        4L -> FunctionsExceptionCode.DEADLINE_EXCEEDED
+        5L -> FunctionsExceptionCode.NOT_FOUND
+        6L -> FunctionsExceptionCode.ALREADY_EXISTS
+        7L -> FunctionsExceptionCode.PERMISSION_DENIED
+        8L -> FunctionsExceptionCode.RESOURCE_EXHAUSTED
+        9L -> FunctionsExceptionCode.FAILED_PRECONDITION
+        10L -> FunctionsExceptionCode.ABORTED
+        11L -> FunctionsExceptionCode.OUT_OF_RANGE
+        12L -> FunctionsExceptionCode.UNIMPLEMENTED
+        13L -> FunctionsExceptionCode.INTERNAL
+        14L -> FunctionsExceptionCode.UNAVAILABLE
+        15L -> FunctionsExceptionCode.DATA_LOSS
+        16L -> FunctionsExceptionCode.UNAUTHENTICATED
+        else -> FunctionsExceptionCode.UNKNOWN
+    }
     else -> FunctionsExceptionCode.UNKNOWN
 }.let {
     FirebaseFunctionsException(
-        description!!,
+        localizedDescription,
         it,
-        null, // userInfo[FIRFunctionsErrorDetails
+        userInfo[FUNCTIONS_ERROR_DETAILS_KEY],
     )
 }
 
