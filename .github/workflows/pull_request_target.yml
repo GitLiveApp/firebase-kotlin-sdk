@@ -21,18 +21,16 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
           cache: gradle
-      - name: Cocoapods cache
+      - name: SwiftPM cache
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
+            ~/Library/Caches/org.swift.swiftpm
             */build/classes
-          key: cocoapods-cache-v2
+          key: swiftpm-cache-v1
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.2.0'
       - name: Format Kotlin
         run: ./gradlew formatKotlin
       - name: Api File Update

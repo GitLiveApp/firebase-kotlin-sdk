@@ -17,3 +17,6 @@ Firebase*.zip
 # Kotlin SwiftPM import lock/checkout dirs
 .swiftpm-locks/
 
+
+# IDEA-generated Gradle daemon JVM criteria (local; do not pin CI to JBR)
+gradle/gradle-daemon-jvm.properties
