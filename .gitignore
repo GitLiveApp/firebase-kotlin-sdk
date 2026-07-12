@@ -13,3 +13,7 @@ Firebase*.zip
 /kotlin-js-store/yarn.lock
 
 .kotlin/
+
+# Kotlin SwiftPM import lock/checkout dirs
+.swiftpm-locks/
+

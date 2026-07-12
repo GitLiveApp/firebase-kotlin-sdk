@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.perf.metrics
 
-import cocoapods.FirebasePerformance.FIRTrace
+import swiftPMImport.dev.gitlive.firebase.perf.FIRTrace
 
 public val Trace.ios: FIRTrace? get() = ios
 

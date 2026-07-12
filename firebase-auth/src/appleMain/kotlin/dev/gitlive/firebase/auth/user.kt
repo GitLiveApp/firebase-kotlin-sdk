@@ -4,10 +4,10 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRAuthDataResult
-import cocoapods.FirebaseAuth.FIRUser
-import cocoapods.FirebaseAuth.FIRUserInfoProtocol
-import cocoapods.FirebaseAuth.FIRUserMetadata
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthDataResult
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUserInfoProtocol
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUserMetadata
 import platform.Foundation.NSURL
 
 public val FirebaseUser.ios: FIRUser get() = ios

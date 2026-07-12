@@ -16,7 +16,6 @@ val supportedPlatforms = (project.property("firebase-crashlytics.supportedTarget
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }
@@ -98,24 +97,17 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseCrashlytics"
-            }
-            noPodspec()
-            pod("FirebaseCrashlytics") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.ios.sdk.get()),
+                products = listOf(product("FirebaseCrashlytics")),
+                importedClangModules = listOf("FirebaseCrashlytics"),
+            )
         }
     }
 

@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRTransaction
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRTransaction
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.ios
 import dev.gitlive.firebase.firestore.toEncodedMap

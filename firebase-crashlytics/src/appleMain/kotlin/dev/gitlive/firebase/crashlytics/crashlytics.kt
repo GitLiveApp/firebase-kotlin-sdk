@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.crashlytics
 
-import cocoapods.FirebaseCrashlytics.FIRCrashlytics
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRCrashlytics
 import platform.Foundation.NSError
 import platform.Foundation.NSLocalizedDescriptionKey
 import dev.gitlive.firebase.Firebase

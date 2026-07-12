@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import swiftPMImport.dev.gitlive.firebase.auth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
