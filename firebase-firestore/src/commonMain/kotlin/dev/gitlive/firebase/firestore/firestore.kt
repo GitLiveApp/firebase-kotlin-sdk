@@ -99,6 +99,14 @@ public class FirebaseFirestore internal constructor(private val wrapper: NativeF
     public suspend fun enableNetwork() {
         wrapper.enableNetwork()
     }
+
+    public suspend fun terminate() {
+        wrapper.terminate()
+    }
+
+    public suspend fun waitForPendingWrites() {
+        wrapper.waitForPendingWrites()
+    }
 }
 
 public expect class FirebaseFirestoreSettings {
@@ -247,6 +255,13 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     internal open val native: NativeQuery = nativeQuery.native
 
     public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
+    public fun limitToLast(limit: Number): Query = Query(nativeQuery.limitToLast(limit))
+
+    public suspend fun count(): Long = nativeQuery.count()
+    public suspend fun sum(field: String): Double = nativeQuery.sum(field)
+    public suspend fun sum(field: FieldPath): Double = nativeQuery.sum(field.encoded)
+    public suspend fun average(field: String): Double? = nativeQuery.average(field)
+    public suspend fun average(field: FieldPath): Double? = nativeQuery.average(field.encoded)
     public val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
     public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
