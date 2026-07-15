@@ -1,51 +1,76 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Pull Request
+name: Nightly
 
 on:
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
 
 concurrency:
-  group: ci-pull-request-${{ github.head_ref }}
+  group: ci-nightly
   cancel-in-progress: true
 
 jobs:
+  checkForChanges:
+    runs-on: ubuntu-latest
+    outputs:
+      has_new_commits: ${{ steps.check.outputs.has_new_commits }}
+      last_successful_sha: ${{ steps.check.outputs.last_successful_sha }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last_successful_sha="$(
+            gh api \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/actions/workflows/nightly.yml/runs?branch=${{ github.ref_name }}&status=success&per_page=1" \
+              --jq '.workflow_runs[0].head_sha // ""'
+          )"
+          echo "last_successful_sha=$last_successful_sha" >> $GITHUB_OUTPUT
+
+          if [ "${{ github.sha }}" != "$last_successful_sha" ]; then
+            echo "has_new_commits=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_new_commits=false" >> $GITHUB_OUTPUT
+          fi
   jobMatrixSetup:
+    needs: checkForChanges
+    if: needs.checkForChanges.outputs.has_new_commits == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: macos-latest
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
+      macos_test_jobs_matrix: ${{ steps.dataStep.outputs.macos_test_jobs_matrix }}
+      tvos_test_jobs_matrix: ${{ steps.dataStep.outputs.tvos_test_jobs_matrix }}
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: gradle
-      - name: Determine changed files
-        run: |
-          mkdir -p build
-          git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | tee build/changed_files.txt
       - name: Prepare the matrix JSON
-        run: ./gradlew ciJobsMatrixSetup -PchangedFilesPath=build/changed_files.txt
+        run: ./gradlew ciJobsMatrixSetup
       - id: dataStep
         run: |
           echo "
           emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)
           ios_test_jobs_matrix=$(jq -c . < ./build/ios_test_jobs_matrix.json)
+          macos_test_jobs_matrix=$(jq -c . < ./build/macos_test_jobs_matrix.json)
+          tvos_test_jobs_matrix=$(jq -c . < ./build/tvos_test_jobs_matrix.json)
           js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
           jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
           " >> $GITHUB_OUTPUT
   build-android:
     needs: jobMatrixSetup
-    if: fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -60,7 +85,6 @@ jobs:
           android: 'true'
   build-js:
     needs: jobMatrixSetup
-    if: fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -77,7 +101,6 @@ jobs:
             **/build/reports/tests/jsNodeTest/
   build-ios:
     needs: jobMatrixSetup
-    if: fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: macos-15
     strategy:
       fail-fast: false
@@ -90,9 +113,36 @@ jobs:
           platform-name: iOS
           report-paths: "**/build/reports/tests/iosSimulatorArm64Test/"
           apple: 'true'
+  build-macos:
+    needs: jobMatrixSetup
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run_test_action
+        with:
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: macOS
+          report-paths: "**/build/reports/tests/macosArm64Test/"
+          apple: 'true'
+  build-tvos:
+    needs: jobMatrixSetup
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run_test_action
+        with:
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: tvOS
+          report-paths: "**/build/reports/tests/tvosArm64Test/"
+          apple: 'true'
   build-jvm:
     needs: jobMatrixSetup
-    if: fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
