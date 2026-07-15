@@ -319,34 +319,15 @@ On android, some modules (`config`) require you to enable [Core library desugari
 
 ### Running on iOS
 
-On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is **not** linked as a transitive dependency, so any project using this SDK must link the Firebase frameworks itself. Add the Firebase products that correspond to the `firebase-kotlin-sdk` modules you use — for example `FirebaseFirestore` for `firebase-firestore`, `FirebaseAuth` for `firebase-auth` (`FirebaseCore` is always required).
+On iOS the SDK binds to the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk). It is **not bundled** into the published klibs — instead, each module records the `firebase-ios-sdk` Swift Package Manager dependency it needs as metadata in its Maven publication, so **your KMP app inherits it transitively**. You do not declare or link Firebase yourself.
 
-You can link them using **any** of the [installation methods supported by Firebase](https://firebase.google.com/docs/ios/installation-methods#integrate-manually) — all are supported since this SDK is agnostic to how Firebase is provided:
+**Recommended (Swift Package Manager, automatic).** Consume the SDK via Maven as usual (e.g. `implementation("dev.gitlive:firebase-auth:<version>")`) and integrate your shared framework into Xcode using Kotlin's [Swift Package Manager integration](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html#run-the-swiftpm-integration-task). The Kotlin Gradle plugin resolves the inherited `firebase-ios-sdk` dependency, generates the Swift package, and links it for you (including for iOS/macOS/tvOS tests). Requires **Kotlin 2.4+** and **Xcode 26.2+**.
 
-- **Swift Package Manager** (recommended) — add `https://github.com/firebase/firebase-ios-sdk.git` to your Xcode app (File ▸ Add Packages) or `Package.swift`.
-- **CocoaPods** — add the pods (e.g. `pod 'FirebaseFirestore'`) to your app's `Podfile`.
-- **Manual integration / Carthage** — download the Firebase framework zip and add the frameworks plus the `-ObjC` linker flag, per the [Firebase guide](https://firebase.google.com/docs/ios/installation-methods#integrate-manually).
+You can optionally add your own `swiftPMDependencies { swiftPackage("firebase-ios-sdk", …) }` in your shared module to pin a specific Firebase version or pull in extra products.
 
-This satisfies the link for your final iOS app. Separately, when **building your Kotlin/Native shared framework and running iOS tests**, Firebase must also be on the Kotlin/Native link path. Declare it in your shared module's `build.gradle.kts` using either Swift Package Manager (requires Kotlin 2.4+) or CocoaPods:
+**Alternative (link Firebase yourself).** If instead you integrate your framework into Xcode via CocoaPods or link Firebase manually, add the Firebase products matching the modules you use (`FirebaseCore` plus e.g. `FirebaseFirestore` for `firebase-firestore`) using any [Firebase installation method](https://firebase.google.com/docs/ios/installation-methods#integrate-manually) — SPM, CocoaPods, or manual/Carthage.
 
-```kotlin
-kotlin {
-    // Swift Package Manager
-    swiftPMDependencies {
-        swiftPackage(
-            url = url("https://github.com/firebase/firebase-ios-sdk.git"),
-            version = from("11.8.0"),
-            products = listOf(product("FirebaseFirestore")), // one per module you use
-        )
-    }
-    // …or CocoaPods (requires the kotlin("native.cocoapods") plugin)
-    // cocoapods {
-    //     pod("FirebaseFirestore") { version = "11.8.0" }
-    // }
-}
-```
-
-For the full recipe — the product → Clang-module mapping, `discoverClangModulesImplicitly`, and how to hand off your shared framework to Xcode so Firebase resolves transitively — see [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md).
+See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
 
 ## Contributing
 If you'd like to contribute to this project then you can fork this repository. 
