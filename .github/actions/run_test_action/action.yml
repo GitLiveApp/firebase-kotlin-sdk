@@ -22,7 +22,7 @@ inputs:
   xcode-version:
     description: 'Xcode version to select when apple is true'
     required: false
-    default: '16.4'
+    default: '26.2.0'
 
 runs:
   using: "composite"
