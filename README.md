@@ -319,20 +319,21 @@ On android, some modules (`config`) require you to enable [Core library desugari
 
 ### Running on iOS
 
-On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) in not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+On iOS the SDK binds to the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk). It is **not bundled** into the published klibs — instead, each module records the `firebase-ios-sdk` Swift Package Manager dependency it needs as metadata in its Maven publication, so **your KMP app inherits it transitively**. You do not declare or link Firebase yourself.
 
-Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
-```kotlin
-cocoapods {
-   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
-}
-```
+**Recommended (Swift Package Manager, automatic).** Consume the SDK via Maven as usual (e.g. `implementation("dev.gitlive:firebase-auth:<version>")`) and integrate your shared framework into Xcode using Kotlin's [Swift Package Manager integration](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html#run-the-swiftpm-integration-task). The Kotlin Gradle plugin resolves the inherited `firebase-ios-sdk` dependency, generates the Swift package, and links it for you (including for iOS/macOS/tvOS tests). Requires **Kotlin 2.4+** and **Xcode 26.2+**.
+
+You can optionally add your own `swiftPMDependencies { swiftPackage("firebase-ios-sdk", …) }` in your shared module to pin a specific Firebase version or pull in extra products.
+
+**Alternative (link Firebase yourself).** If instead you integrate your framework into Xcode via CocoaPods or link Firebase manually, add the Firebase products matching the modules you use (`FirebaseCore` plus e.g. `FirebaseFirestore` for `firebase-firestore`) using any [Firebase installation method](https://firebase.google.com/docs/ios/installation-methods#integrate-manually) — SPM, CocoaPods, or manual/Carthage.
+
+See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
 
 ## Contributing
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
+2. Make sure Xcode 26.2+ is installed with the iOS/tvOS platforms (the Apple targets use Kotlin's Swift Package Manager integration, which requires Kotlin 2.4+; no CocoaPods installation is needed).
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 

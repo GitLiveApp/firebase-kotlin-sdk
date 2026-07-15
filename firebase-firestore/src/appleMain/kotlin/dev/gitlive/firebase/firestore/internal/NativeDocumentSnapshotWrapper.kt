@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRServerTimestampBehavior
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRServerTimestampBehavior
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.ServerTimestampBehavior

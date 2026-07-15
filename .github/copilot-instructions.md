@@ -143,8 +143,8 @@ These are only accessible from the respective platform source sets. Do **not** u
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- The Firebase iOS SDK is **not** a transitive dependency — consuming projects must link it via CocoaPods or SPM.
-- Tests need the relevant Firebase pods in the `cocoapods` block of `build.gradle.kts`.
+- The Firebase iOS SDK is **not** a transitive dependency — consuming projects must link it themselves (Swift Package Manager, CocoaPods, or manual integration).
+- The Apple targets consume Firebase via the `swiftPMDependencies` block in each module's `build.gradle.kts` (Kotlin 2.4+); this also links Firebase for iOS/macOS/tvOS tests.
 
 ### JVM / Desktop
 - Uses [`firebase-java-sdk`](https://github.com/GitLiveApp/firebase-java-sdk), which mirrors the Android SDK API.

@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.perf
 
-import cocoapods.FirebasePerformance.FIRPerformance
+import swiftPMImport.dev.gitlive.firebase.perf.FIRPerformance
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

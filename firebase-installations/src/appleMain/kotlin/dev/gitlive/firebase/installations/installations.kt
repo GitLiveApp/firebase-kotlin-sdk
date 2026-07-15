@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.installations
 
-import cocoapods.FirebaseInstallations.*
+import swiftPMImport.dev.gitlive.firebase.installations.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

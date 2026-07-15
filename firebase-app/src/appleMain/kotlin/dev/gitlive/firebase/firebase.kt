@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase
 
-import cocoapods.FirebaseCore.*
+import swiftPMImport.dev.gitlive.firebase.app.*
 import kotlinx.coroutines.CompletableDeferred
 
 public actual open class FirebaseException(message: String) : Exception(message)

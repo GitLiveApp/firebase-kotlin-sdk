@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRFilter
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRFilter
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
