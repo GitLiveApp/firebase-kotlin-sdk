@@ -17,238 +17,91 @@ jobs:
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
-      macos_test_jobs_matrix: ${{ steps.dataStep.outputs.macos_test_jobs_matrix }}
-      tvos_test_jobs_matrix: ${{ steps.dataStep.outputs.tvos_test_jobs_matrix }}
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: gradle
+      - name: Determine changed files
+        run: |
+          mkdir -p build
+          git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | tee build/changed_files.txt
       - name: Prepare the matrix JSON
-        run: ./gradlew ciJobsMatrixSetup
+        run: ./gradlew ciJobsMatrixSetup -PchangedFilesPath=build/changed_files.txt
       - id: dataStep
         run: |
           echo "
           emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)
           ios_test_jobs_matrix=$(jq -c . < ./build/ios_test_jobs_matrix.json)
-          macos_test_jobs_matrix=$(jq -c . < ./build/macos_test_jobs_matrix.json)
-          tvos_test_jobs_matrix=$(jq -c . < ./build/tvos_test_jobs_matrix.json)
           js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
           jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
           " >> $GITHUB_OUTPUT
   build-android:
     needs: jobMatrixSetup
+    if: fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Apply Android licenses
-        run: ./gradlew ciSdkManagerLicenses
-      - name: Run Android Instrumented Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload Android test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
+      - uses: ./.github/actions/run_test_action
         with:
-          name: Android ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: "**/build/reports/androidTests/"
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: Android ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: Android
+          report-paths: "**/build/reports/androidTests/"
+          android: 'true'
   build-js:
     needs: jobMatrixSetup
+    if: fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-        timeout-minutes: 10
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Run JS Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload JS test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
+      - uses: ./.github/actions/run_test_action
         with:
-          name: JS ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: |
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: JS
+          report-paths: |
             **/build/reports/tests/jsTest/
             **/build/reports/tests/jsBrowserTest/
             **/build/reports/tests/jsNodeTest/
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: JS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"
   build-ios:
     needs: jobMatrixSetup
+    if: fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: macos-15
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - name: Cocoapods cache
-        uses: actions/cache@v4
+      - uses: ./.github/actions/run_test_action
         with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache-v2
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.4'
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Run iOS Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload iOS test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: iOS ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: "**/build/reports/tests/iosSimulatorArm64Test/"
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: iOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"
-  build-macos:
-    needs: jobMatrixSetup
-    runs-on: macos-15
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
-    steps:
-      - uses: actions/checkout@v6
-      - name: Cocoapods cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache-v2
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.4'
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Run macOS Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload macOS test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: macOS ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: "**/build/reports/tests/macosArm64Test/"
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: macOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"
-  build-tvos:
-    needs: jobMatrixSetup
-    runs-on: macos-15
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
-    steps:
-      - uses: actions/checkout@v6
-      - name: Cocoapods cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache-v2
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.4'
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Run tvOS Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload tvOS test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: tvOS ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: "**/build/reports/tests/tvosArm64Test/"
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: tvOS ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: iOS
+          report-paths: "**/build/reports/tests/iosSimulatorArm64Test/"
+          apple: 'true'
   build-jvm:
     needs: jobMatrixSetup
+    if: fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - name: Setup test environment
-        uses: ./.github/actions/setup_test_action
-        timeout-minutes: 10
-      - name: Set Artifact Name
-        run: |
-          echo "ARCHIVE_KEY=$(echo ${{ matrix.gradle_tasks }} | cut -d: -f2)" >> $GITHUB_ENV
-      - name: Run JVM Tests
-        run: ./gradlew ${{ matrix.gradle_tasks }}
-      - name: Upload JVM test artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
+      - uses: ./.github/actions/run_test_action
         with:
-          name: JVM ${{ env.ARCHIVE_KEY }} Test Report HTML
-          path: |
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: JVM
+          report-paths: |
             **/build/reports/tests/jvmTest/
-      - name: Upload Firebase Debug Log
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: JVM ${{ env.ARCHIVE_KEY }} Firebase Debug Log
-          path: "**/firebase-debug.log"

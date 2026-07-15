@@ -104,6 +104,10 @@ public actual class FirebaseDatabase internal constructor(internal val android: 
     public actual fun goOnline() {
         android.goOnline()
     }
+
+    public actual fun purgeOutstandingWrites() {
+        android.purgeOutstandingWrites()
+    }
 }
 
 internal actual open class NativeQuery(
@@ -197,6 +201,21 @@ public actual open class Query internal actual constructor(
         }
         android.addChildEventListener(listener)
         awaitClose { android.removeEventListener(listener) }
+    }
+
+    public actual suspend fun get(): DataSnapshot {
+        val deferred = CompletableDeferred<DataSnapshot>()
+        android.get()
+            .addOnSuccessListener { snapshot ->
+                deferred.complete(DataSnapshot(snapshot, persistenceEnabled))
+            }
+            .addOnFailureListener { exception ->
+                deferred.completeExceptionally(exception)
+            }
+            .addOnCanceledListener {
+                deferred.cancel()
+            }
+        return deferred.await()
     }
 
     override fun toString(): String = android.toString()

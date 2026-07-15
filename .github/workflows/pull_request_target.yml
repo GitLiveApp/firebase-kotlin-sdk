@@ -15,14 +15,16 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
           cache: gradle
+
       - name: Cocoapods cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cocoapods
@@ -30,12 +32,17 @@ jobs:
             */build/cocoapods
             */build/classes
           key: cocoapods-cache-v2
+
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '26.2.0'
+
       - name: Format Kotlin
         run: ./gradlew formatKotlin
+
       - name: Api File Update
         run: ./gradlew apiDump
+
       - run: git status
+
       - uses: stefanzweifel/git-auto-commit-action@v7
