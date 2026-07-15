@@ -35,12 +35,23 @@ app does not re-declare `firebase-ios-sdk`.
 1. **Depend on the SDK via Maven** as usual — e.g. `implementation("dev.gitlive:firebase-auth:<v>")`.
    Nothing extra is required to obtain the Firebase iOS SDK; it is inherited from the SDK's published
    SwiftPM metadata.
-2. **Use SwiftPM direct integration for the Xcode project.** Because the linkage is delivered as a
-   Gradle-generated Swift package, the Xcode project must be wired for Kotlin's direct SwiftPM
-   integration (the `integrateEmbedAndSign` / `integrateLinkagePackage` tasks), rather than the older
-   CocoaPods-based KMP integration. Follow the Xcode-integration steps in the Kotlin guide:
-   <https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html> and
-   <https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration.html>.
+2. **Integrate your shared framework into Xcode with _direct integration_.** Kotlin offers two ways
+   to get a KMP framework into Xcode; for an app that consumes this SDK, only one currently works:
+
+   - ✅ **[Direct integration](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html)**
+     — add the `embedAndSignAppleFrameworkForXcode` run-script build phase (KGP exposes the
+     SwiftPM-aware `integrateEmbedAndSign` / `integrateLinkagePackage` tasks). On each build Gradle
+     compiles, resolves the inherited `firebase-ios-sdk`, generates the synthetic Swift package, and
+     embeds/signs the framework. Setup steps and the exact script are in that guide (and the
+     [CocoaPods→SwiftPM migration guide](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration.html));
+     background on SwiftPM import is [here](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html).
+   - ❌ **[Remote / SwiftPM export](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html)**
+     (packaging your shared module as its own Swift package via an exported XCFramework +
+     `Package.swift`) is **not currently supported** for apps consuming this SDK: your shared module
+     inherits `firebase-ios-sdk` as a SwiftPM dependency, and Kotlin does not yet support exporting a
+     module that *uses* SwiftPM import as a Swift package
+     ([KT-84420](https://youtrack.jetbrains.com/issue/KT-84420)). Use direct integration until that
+     lands.
 3. **Build your shared framework as static** — set `isStatic = true` on your `binaries.framework`.
    Firebase's SwiftPM products are static libraries; a **dynamic** shared framework produces
    `@rpath/…framework` load commands that aren't satisfied at runtime, so the app crashes with a
