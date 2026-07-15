@@ -38,8 +38,7 @@ private val dokkaCopyrightMessage = "© 2024 GitLive Ltd."
 private val dokkaHomepageUrl = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
 
 tasks.withType<AbstractDokkaTask>().configureEach {
-    val version = project.property("firebase-app.version") as String
-    moduleVersion.set(version)
+    moduleVersion.set(project.version.toString())
     moduleName.set("Firebase Kotlin SDK")
 
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
