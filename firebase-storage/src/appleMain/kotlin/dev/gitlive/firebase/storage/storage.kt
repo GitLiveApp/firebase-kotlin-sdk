@@ -93,11 +93,39 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
         }
     }
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = Data(
+        ios.awaitResult {
+            dataWithMaxSize(maxDownloadSizeBytes, it)
+        },
+    )
+
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = ios.awaitResult {
+        updateMetadata(metadata.toFIRMetadata()) { updatedMetadata, error ->
+            if (error == null) {
+                it.invoke(updatedMetadata?.toFirebaseStorageMetadata(), null)
+            } else {
+                it.invoke(null, error)
+            }
+        }
+    }
+
     public actual suspend fun delete(): Unit = await { ios.deleteWithCompletion(it) }
 
     public actual suspend fun getDownloadUrl(): String = ios.awaitResult {
         downloadURLWithCompletion(completion = it)
     }.absoluteString()!!
+
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = awaitResult {
+        if (pageToken == null) {
+            ios.listWithMaxResults(maxResults.toLong()) { firStorageListResult, nsError ->
+                it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
+            }
+        } else {
+            ios.listWithMaxResults(maxResults.toLong(), pageToken) { firStorageListResult, nsError ->
+                it.invoke(firStorageListResult?.let { ListResult(it) }, nsError)
+            }
+        }
+    }
 
     public actual suspend fun listAll(): ListResult = awaitResult {
         ios.listAllWithCompletion { firStorageListResult, nsError ->
@@ -112,6 +140,41 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
     public actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = ios.awaitResult { callback ->
         putData(data.data, metadata?.toFIRMetadata(), callback)
     }.run {}
+
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val ios = ios.putData(data.data, metadata?.toFIRMetadata())
+
+        val flow = callbackFlow {
+            ios.observeStatus(FIRStorageTaskStatusProgress) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusPause) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Paused(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusResume) {
+                val progress = it!!.progress()!!
+                trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
+            }
+            ios.observeStatus(FIRStorageTaskStatusSuccess) { close() }
+            ios.observeStatus(FIRStorageTaskStatusFailure) {
+                when (it!!.error()!!.code) {
+                    /*FIRStorageErrorCodeCancelled = */
+                    -13040L -> cancel(it.error()!!.localizedDescription)
+                    else -> close(FirebaseStorageException(it.error().toString()))
+                }
+            }
+            awaitClose { ios.removeAllObservers() }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = ios.pause()
+            override fun resume() = ios.resume()
+            override fun cancel() = ios.cancel()
+        }
+    }
 
     public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow {
         val ios = ios.putFile(file.url, metadata?.toFIRMetadata())

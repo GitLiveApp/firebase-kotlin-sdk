@@ -176,6 +176,22 @@ public expect class StorageReference {
     public suspend fun getMetadata(): FirebaseStorageMetadata?
 
     /**
+     * Downloads the object at this [StorageReference] into memory.
+     *
+     * @param maxDownloadSizeBytes The maximum number of bytes to download.
+     * @return The downloaded data.
+     */
+    public suspend fun getData(maxDownloadSizeBytes: Long): Data
+
+    /**
+     * Updates metadata associated with an object at this [StorageReference].
+     *
+     * @param metadata The new metadata for this object.
+     * @return the updated metadata.
+     */
+    public suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata?
+
+    /**
      * Returns a new instance of [StorageReference] pointing to a child location of the current
      * reference. All leading and trailing slashes will be removed, and consecutive slashes will be
      * compressed to single slashes. For example:
@@ -206,6 +222,17 @@ public expect class StorageReference {
      * @return The String representing the download URL.
      */
     public suspend fun getDownloadUrl(): String
+
+    /**
+     * List items (files) and prefixes (folders) under this StorageReference.
+     *
+     * [list] is only available for projects using Firebase Rules Version 2.
+     *
+     * @param maxResults The maximum number of results to return in a single page.
+     * @param pageToken A page token from a previous [ListResult], or null to fetch the first page.
+     * @return A [ListResult] containing one page of items and prefixes under the current StorageReference.
+     */
+    public suspend fun list(maxResults: Int, pageToken: String? = null): ListResult
 
     /**
      * List all items (files) and prefixes (folders) under this StorageReference.
@@ -239,6 +266,16 @@ public expect class StorageReference {
      *     about the object being uploaded.
      */
     public suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
+
+    /**
+     * Asynchronously uploads byte data to this [StorageReference].
+     *
+     * @param data The [Data] to upload.
+     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
+     *     about the object being uploaded.
+     * @return A [ProgressFlow] that can be used to monitor and manage the upload.
+     */
+    public fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata? = null): ProgressFlow
 
     /**
      * Asynchronously uploads from a content URI to this [StorageReference].
