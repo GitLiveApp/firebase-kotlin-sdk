@@ -78,7 +78,7 @@ jobs:
   build-ios:
     needs: jobMatrixSetup
     if: fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix).gradle_tasks[0] != null
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}

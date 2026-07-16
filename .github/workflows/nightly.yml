@@ -101,7 +101,7 @@ jobs:
             **/build/reports/tests/jsNodeTest/
   build-ios:
     needs: jobMatrixSetup
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
@@ -115,7 +115,7 @@ jobs:
           apple: 'true'
   build-macos:
     needs: jobMatrixSetup
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
@@ -129,7 +129,7 @@ jobs:
           apple: 'true'
   build-tvos:
     needs: jobMatrixSetup
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
