@@ -15,6 +15,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -23,25 +25,48 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Cocoapods cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache-v2
-
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.2.0'
-
       - name: Format Kotlin
         run: ./gradlew formatKotlin
 
-      - name: Api File Update
-        run: ./gradlew apiDump
+      - name: Update API files for changed modules
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed_modules=""
+          dump_all=false
+
+          while IFS= read -r changed_file; do
+            module="${changed_file%%/*}"
+            if [ -d "$module/api" ]; then
+              case " $changed_modules " in
+                *" $module "*) ;;
+                *) changed_modules="$changed_modules $module" ;;
+              esac
+            else
+              dump_all=true
+            fi
+          done < <(git diff --name-only "$BASE_SHA...$HEAD_SHA")
+
+          if [ "$dump_all" = true ] || [ -z "$changed_modules" ]; then
+            changed_modules=""
+            for api_directory in */api; do
+              changed_modules="$changed_modules ${api_directory%/api}"
+            done
+          fi
+
+          api_dump_tasks=""
+          for module in $changed_modules; do
+            if [ -d "$module/api/android" ] || find "$module/api" -maxdepth 1 -name '*.api' -print -quit | grep -q .; then
+              api_dump_tasks="$api_dump_tasks :${module}:androidApiDump"
+            fi
+            if [ -d "$module/api/jvm" ]; then
+              api_dump_tasks="$api_dump_tasks :${module}:jvmApiDump"
+            fi
+          done
+
+          echo "Running API dump tasks:$api_dump_tasks"
+          ./gradlew $api_dump_tasks
 
       - run: git status
 
