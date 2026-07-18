@@ -28,6 +28,29 @@ public expect class FirebaseCrashlytics {
     public fun recordException(exception: Throwable)
 
     /**
+     * Records a non-fatal event with additional custom keys.
+     *
+     * This is a convenience overload to attach diagnostic metadata together with a non-fatal report.
+     * Implementations typically convert/apply [customKeys] and then record [exception].
+     *
+     * Supported value types
+     * Values should be one of: [String], [Boolean], [Int], [Long], [Float], [Double].
+     * Other types may be converted to string via `toString()` (or ignored), depending on platform.
+     *
+     * Notes
+     * Custom keys may affect subsequent reports depending on platform implementation.
+     * For persistent metadata, prefer [setCustomKeys] / [setCustomKey].
+     *
+     * @param exception A [Throwable] to be recorded as a non-fatal event.
+     * @param customKeys Key-value pairs to associate with this event context.
+     *
+     * @see setCustomKeys
+     * @see setCustomKey
+     */
+    public fun recordException(exception: Throwable, customKeys: Map<String, Any>)
+
+
+    /**
      * Logs a message that's included in the next fatal, non-fatal, or ANR report.
      *
      * Logs are visible in the session view on the Firebase Crashlytics console.

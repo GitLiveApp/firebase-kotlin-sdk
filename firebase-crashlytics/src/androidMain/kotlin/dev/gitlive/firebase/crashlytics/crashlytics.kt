@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.crashlytics
 
 import com.google.firebase.FirebaseException
+import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.CustomKeysAndValues.Builder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -17,6 +18,9 @@ public actual class FirebaseCrashlytics internal constructor(internal val androi
 
     public actual fun recordException(exception: Throwable) {
         android.recordException(exception)
+    }
+    public actual fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+        android.recordException(exception, customKeys.toCustomKeysAndValues())
     }
     public actual fun log(message: String) {
         android.log(message)
@@ -68,6 +72,23 @@ public actual class FirebaseCrashlytics internal constructor(internal val androi
             }.build(),
         )
     }
+}
+
+
+private fun Map<String, Any>.toCustomKeysAndValues(): CustomKeysAndValues {
+    val b = Builder()
+    for ((k, v) in this) {
+        when (v) {
+            is String -> b.putString(k, v)
+            is Boolean -> b.putBoolean(k, v)
+            is Int -> b.putInt(k, v)
+            is Long -> b.putLong(k, v)
+            is Float -> b.putFloat(k, v)
+            is Double -> b.putDouble(k, v)
+            else -> b.putString(k, v.toString()) // 지원 안 하면 문자열로
+        }
+    }
+    return b.build()
 }
 
 public actual open class FirebaseCrashlyticsException(message: String) : FirebaseException(message)

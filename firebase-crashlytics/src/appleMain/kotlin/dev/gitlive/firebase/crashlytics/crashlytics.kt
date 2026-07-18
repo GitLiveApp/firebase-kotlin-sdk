@@ -19,6 +19,10 @@ public actual class FirebaseCrashlytics internal constructor(internal val ios: F
     public actual fun recordException(exception: Throwable) {
         ios.recordError(exception.asNSError())
     }
+    @Suppress("UNCHECKED_CAST")
+    public actual fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+        ios.recordError(exception.asNSError(), customKeys as Map<Any?,*>)
+    }
     public actual fun log(message: String) {
         ios.log(message)
     }
@@ -58,6 +62,7 @@ public actual class FirebaseCrashlytics internal constructor(internal val ios: F
     public actual fun setCustomKeys(customKeys: Map<String, Any>) {
         ios.setCustomKeysAndValues(customKeys as Map<Any?, *>)
     }
+
 }
 
 public actual open class FirebaseCrashlyticsException internal constructor(message: String) : FirebaseException(message)
