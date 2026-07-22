@@ -10,8 +10,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.Logger
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
@@ -252,9 +250,9 @@ internal actual class NativeDatabaseReference internal constructor(
     @OptIn(ExperimentalSerializationApi::class)
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
-        android.runTransaction(object : Transaction.Handler {
+        android.runTransaction(object : com.google.firebase.database.Transaction.Handler {
 
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
+            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
                 val valueToReencode = currentData.value
                 // Value may be null initially, so only reencode if this is allowed
                 if (strategy.descriptor.isNullable || valueToReencode != null) {
@@ -265,7 +263,7 @@ internal actual class NativeDatabaseReference internal constructor(
                         transactionUpdate,
                     )
                 }
-                return Transaction.success(currentData)
+                return com.google.firebase.database.Transaction.success(currentData)
             }
 
             override fun onComplete(
@@ -279,13 +277,50 @@ internal actual class NativeDatabaseReference internal constructor(
                     deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
                 }
             }
-        })
+        }, false)
+        return deferred.await()
+    }
+
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? {
+        val deferred = CompletableDeferred<DataSnapshot?>()
+        android.runTransaction(
+            /* handler = */
+            object : com.google.firebase.database.Transaction.Handler {
+                override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
+                    val mutableData = MutableData(currentData)
+                    return when (val result = Transaction().update(mutableData)) {
+                        is Transaction.Result.Success ->
+                            com.google.firebase.database.Transaction.success(result.data.android)
+
+                        Transaction.Result.Abort ->
+                            com.google.firebase.database.Transaction.abort()
+                    }
+                }
+
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    snapshot: com.google.firebase.database.DataSnapshot?,
+                ) {
+                    if (error != null) {
+                        deferred.completeExceptionally(error.toException())
+                    } else if (committed) {
+                        deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                    } else {
+                        deferred.complete(null)
+                    }
+                }
+            },
+            /* fireLocalEvents = */
+            false,
+        )
         return deferred.await()
     }
 }
 
 public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
 public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = android
+public val MutableData.android: com.google.firebase.database.MutableData get() = android
 
 public actual class DataSnapshot internal constructor(
     internal val android: com.google.firebase.database.DataSnapshot,
@@ -307,6 +342,21 @@ public actual class DataSnapshot internal constructor(
     public actual fun child(path: String): DataSnapshot = DataSnapshot(android.child(path), persistenceEnabled)
     public actual val hasChildren: Boolean get() = android.hasChildren()
     public actual val children: Iterable<DataSnapshot> get() = android.children.map { DataSnapshot(it, persistenceEnabled) }
+}
+
+public actual class MutableData internal constructor(
+    internal val android: com.google.firebase.database.MutableData
+) {
+    public actual val key: String? get() = android.key
+
+    public actual var value: Any?
+        get() = android.value
+        set(value) { android.value = value }
+
+    public actual fun child(path: String): MutableData = MutableData(android.child(path))
+    public actual val hasChildren: Boolean get() = android.hasChildren()
+    public actual val children: Iterable<MutableData>
+        get() = android.children.map { MutableData(it) }
 }
 
 internal actual class NativeOnDisconnect internal constructor(
