@@ -9,6 +9,7 @@ public final class dev/gitlive/firebase/crashlytics/FirebaseCrashlytics {
 	public final fun didCrashOnPreviousExecution ()Z
 	public final fun log (Ljava/lang/String;)V
 	public final fun recordException (Ljava/lang/Throwable;)V
+	public final fun recordException (Ljava/lang/Throwable;Ljava/util/Map;)V
 	public final fun sendUnsentReports ()V
 	public final fun setCrashlyticsCollectionEnabled (Z)V
 	public final fun setCustomKey (Ljava/lang/String;D)V

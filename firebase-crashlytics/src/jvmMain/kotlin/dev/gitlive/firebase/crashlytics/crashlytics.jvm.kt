@@ -17,6 +17,9 @@ actual class FirebaseCrashlytics {
     actual fun recordException(exception: Throwable) {
     }
 
+    actual fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+    }
+
     actual fun log(message: String) {
     }
 
