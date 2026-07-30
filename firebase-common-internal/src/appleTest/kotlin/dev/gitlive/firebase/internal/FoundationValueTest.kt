@@ -56,6 +56,13 @@ class FoundationValueTest {
     }
 
     @Test
+    fun floatsKeepTheirBridgedDoubleWidening() {
+        val transformed = mapOf("f" to 1.2f, "b" to true).withFoundationBooleans()!!
+        val json = foundationJson(transformed)
+        assertTrue("\"f\":1.2000000476837158" in json, json)
+    }
+
+    @Test
     fun booleanFreeContainersAreReturnedUnchanged() {
         val original = mapOf("n" to 1, "s" to "x", "nested" to listOf(1, 2))
         assertSame(original, original.withFoundationBooleans())

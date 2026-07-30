@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import utils.TargetPlatform
 import utils.supportsApple
 import utils.toTargetPlatforms
@@ -100,6 +101,11 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
+        targets.withType<KotlinNativeTarget>().matching { it.konanTarget.family.isAppleFamily }.configureEach {
+            compilations.getByName("main").cinterops.create("booleanQuery") {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/booleanQuery.def"))
+            }
+        }
         cocoapods {
             if (supportedPlatforms.contains(TargetPlatform.Ios)) {
                 ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()

@@ -20,6 +20,9 @@ import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingAtBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEqualToBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAtBoolean
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
@@ -129,13 +132,13 @@ public actual open class Query internal actual constructor(
 
     public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
     public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
@@ -145,7 +148,7 @@ public actual open class Query internal actual constructor(
 
     public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(GitLiveQueryEqualToBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
