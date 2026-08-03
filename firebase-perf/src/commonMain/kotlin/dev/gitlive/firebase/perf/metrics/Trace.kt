@@ -8,6 +8,12 @@ public expect class Trace {
     /** Stops this trace. */
     public fun stop()
 
+    /** Returns the value of the custom attribute with the given [attribute] name. */
+    public fun getAttribute(attribute: String): String?
+
+    /** Returns all custom attributes associated with this trace. */
+    public fun getAttributes(): Map<String, String>
+
     /**
      * Gets the value of the metric with the given name in the current trace. If a metric with the
      * given name doesn't exist, it is NOT created and a 0 is returned. This method is atomic.
@@ -29,6 +35,9 @@ public expect class Trace {
      */
     public fun incrementMetric(metricName: String, incrementBy: Long)
 
+    /** Sets a custom [attribute] to the given [value] on this trace. */
+    public fun putAttribute(attribute: String, value: String)
+
     /**
      * Sets the value of the metric with the given name in this trace to the value provided. If a
      * metric with the given name doesn't exist, a new one will be created. If the trace has not been
@@ -40,4 +49,7 @@ public expect class Trace {
      * @param value The value to which the metric should be set to.
      */
     public fun putMetric(metricName: String, value: Long)
+
+    /** Removes the custom attribute with the given [attribute] name from this trace. */
+    public fun removeAttribute(attribute: String)
 }
