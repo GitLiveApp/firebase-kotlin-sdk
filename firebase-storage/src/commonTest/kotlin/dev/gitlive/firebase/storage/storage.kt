@@ -10,11 +10,15 @@ import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 expect val emulatorHost: String
@@ -68,6 +72,38 @@ class FirebaseStorageTest {
     }
 
     @Test
+    fun testDownloadData() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testDownloadData.txt")
+        ref.putData(data)
+
+        val downloadedData = ref.getData(maxDownloadSizeBytes = 1024)
+
+        assertTestDataEquals(downloadedData)
+    }
+
+    @Test
+    fun testPutDataResumable() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testPutDataResumable.txt")
+        val metadata = storageMetadata {
+            contentType = "text/plain"
+        }
+
+        // putDataResumable emits via real async callbacks, so the timeout must run on a
+        // real dispatcher rather than runTest's virtual clock (which would fast-forward to 30s).
+        withContext(Dispatchers.Default.limitedParallelism(1)) {
+            withTimeout(30.seconds) {
+                ref.putDataResumable(data, metadata).collect {}
+            }
+        }
+
+        val metadataResult = ref.getMetadata()
+        assertNotNull(metadataResult)
+        assertEquals(metadata.contentType, metadataResult.contentType)
+    }
+
+    @Test
     fun testUploadMetadata() = runTest {
         val data = createTestData()
         val ref = storage.reference("test").child("testUploadMetadata.txt")
@@ -98,6 +134,62 @@ class FirebaseStorageTest {
         assertNotNull(metadataResult)
         assertEquals(metadata.customMetadata["key"], metadataResult.customMetadata["key"])
     }
+
+    @Test
+    fun testUpdateMetadata() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test").child("testUpdateMetadata.txt")
+        ref.putData(data, storageMetadata { contentType = "text/plain" })
+
+        val metadata = storageMetadata {
+            cacheControl = "public,max-age=300"
+            contentDisposition = "attachment; filename=testUpdateMetadata.txt"
+            contentEncoding = "identity"
+            contentLanguage = "en"
+            contentType = "text/markdown"
+            setCustomMetadata("updated", "true")
+        }
+
+        val updatedMetadata = ref.updateMetadata(metadata)
+        val fetchedMetadata = ref.getMetadata()
+
+        assertNotNull(updatedMetadata)
+        assertEquals(metadata.cacheControl, updatedMetadata.cacheControl)
+        assertEquals(metadata.contentDisposition, updatedMetadata.contentDisposition)
+        assertEquals(metadata.contentEncoding, updatedMetadata.contentEncoding)
+        assertEquals(metadata.contentLanguage, updatedMetadata.contentLanguage)
+        assertEquals(metadata.contentType, updatedMetadata.contentType)
+        assertEquals(metadata.customMetadata["updated"], updatedMetadata.customMetadata["updated"])
+
+        assertNotNull(fetchedMetadata)
+        assertEquals(metadata.cacheControl, fetchedMetadata.cacheControl)
+        assertEquals(metadata.contentDisposition, fetchedMetadata.contentDisposition)
+        assertEquals(metadata.contentEncoding, fetchedMetadata.contentEncoding)
+        assertEquals(metadata.contentLanguage, fetchedMetadata.contentLanguage)
+        assertEquals(metadata.contentType, fetchedMetadata.contentType)
+        assertEquals(metadata.customMetadata["updated"], fetchedMetadata.customMetadata["updated"])
+    }
+
+    @Test
+    fun testPaginatedList() = runTest {
+        val data = createTestData()
+        val ref = storage.reference("test/testPaginatedList")
+        ref.child("one.txt").putData(data)
+        ref.child("two.txt").putData(data)
+        ref.child("three.txt").putData(data)
+
+        val firstPage = ref.list(maxResults = 2)
+        val pageToken = assertNotNull(firstPage.pageToken)
+        val secondPage = ref.list(maxResults = 2, pageToken = pageToken)
+        val itemNames = (firstPage.items + secondPage.items).map { it.name }
+
+        assertEquals(2, firstPage.items.size)
+        assertEquals(1, secondPage.items.size)
+        assertTrue("one.txt" in itemNames)
+        assertTrue("two.txt" in itemNames)
+        assertTrue("three.txt" in itemNames)
+    }
 }
 
 expect fun createTestData(): Data
+expect fun assertTestDataEquals(data: Data)

@@ -56,6 +56,22 @@ class FirebaseAuthTest {
     }
 
     @Test
+    fun testSignInWithWrongPasswordThrowsInvalidCredentialsWithCode() = runTest {
+        val email = "test+${Random.nextInt(100000)}@test.com"
+        auth.createUserWithEmailAndPassword(email, "test123")
+        try {
+            auth.signOut()
+
+            val exception = assertFailsWith<FirebaseAuthInvalidCredentialsException> {
+                auth.signInWithEmailAndPassword(email, "wrong-password")
+            }
+            assertNotNull(exception.code)
+        } finally {
+            auth.signInWithEmailAndPassword(email, "test123").user!!.delete()
+        }
+    }
+
+    @Test
     fun testCreateUserWithEmailAndPassword() = runTest {
         val email = "test+${Random.nextInt(100000)}@test.com"
         val createResult = auth.createUserWithEmailAndPassword(email, "test123")

@@ -40,4 +40,8 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
     actual suspend fun disableNetwork() = native.disableNetwork().await().run { }
 
     actual suspend fun enableNetwork() = native.enableNetwork().await().run { }
+
+    actual suspend fun terminate() = native.terminate().await().run { }
+
+    actual suspend fun waitForPendingWrites() = native.waitForPendingWrites().await().run { }
 }

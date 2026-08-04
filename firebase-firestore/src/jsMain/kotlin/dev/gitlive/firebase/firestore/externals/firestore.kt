@@ -54,6 +54,10 @@ public external fun enableIndexedDbPersistence(
 
 public external fun enableNetwork(firestore: Firestore): Promise<Unit>
 
+public external fun terminate(firestore: Firestore): Promise<Unit>
+
+public external fun waitForPendingWrites(firestore: Firestore): Promise<Unit>
+
 public external fun endAt(document: DocumentSnapshot): QueryConstraint
 
 public external fun endAt(vararg fieldValues: Any): QueryConstraint
@@ -75,6 +79,8 @@ public external fun getDocFromServer(
     reference: DocumentReference,
 ): Promise<DocumentSnapshot>
 
+public external fun getCountFromServer(query: Query): Promise<AggregateQuerySnapshot>
+
 public external fun getDocs(query: Query): Promise<QuerySnapshot>
 
 public external fun getDocsFromCache(query: Query): Promise<QuerySnapshot>
@@ -85,9 +91,13 @@ public external fun getFirestore(app: FirebaseApp? = definedExternally, database
 
 public external fun increment(n: Int): FieldValue
 
+public external fun increment(n: Double): FieldValue
+
 public external fun initializeFirestore(app: FirebaseApp, settings: dynamic = definedExternally, databaseId: String? = definedExternally): Firestore
 
 public external fun limit(limit: Number): QueryConstraint
+
+public external fun limitToLast(limit: Number): QueryConstraint
 
 public external fun onSnapshot(
     reference: DocumentReference,
@@ -217,6 +227,22 @@ public external class FieldValue {
 public external interface Query
 
 public external interface QueryConstraint
+
+public external interface AggregateQuerySnapshot {
+    public fun data(): dynamic
+}
+
+public external interface AggregateField
+
+public external fun sum(field: String): AggregateField
+
+public external fun sum(field: FieldPath): AggregateField
+
+public external fun average(field: String): AggregateField
+
+public external fun average(field: FieldPath): AggregateField
+
+public external fun getAggregateFromServer(query: Query, aggregateSpec: Json): Promise<AggregateQuerySnapshot>
 
 public external interface QuerySnapshot {
     public val docs: Array<DocumentSnapshot>

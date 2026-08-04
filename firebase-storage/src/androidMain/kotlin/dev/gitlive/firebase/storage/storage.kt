@@ -71,6 +71,10 @@ public actual class StorageReference(internal val android: com.google.firebase.s
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = android.metadata.await().toFirebaseStorageMetadata()
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = Data(android.getBytes(maxDownloadSizeBytes).await())
+
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = android.updateMetadata(metadata.toStorageMetadata()).await().toFirebaseStorageMetadata()
+
     public actual fun child(path: String): StorageReference = StorageReference(android.child(path))
 
     public actual suspend fun delete() {
@@ -78,6 +82,12 @@ public actual class StorageReference(internal val android: com.google.firebase.s
     }
 
     public actual suspend fun getDownloadUrl(): String = android.downloadUrl.await().toString()
+
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = if (pageToken == null) {
+        ListResult(android.list(maxResults).await())
+    } else {
+        ListResult(android.list(maxResults, pageToken).await())
+    }
 
     public actual suspend fun listAll(): ListResult = ListResult(android.listAll().await())
 
@@ -94,6 +104,38 @@ public actual class StorageReference(internal val android: com.google.firebase.s
             android.putBytes(data.data, metadata.toStorageMetadata()).await().run {}
         } else {
             android.putBytes(data.data, FirebaseStorageMetadata().toStorageMetadata()).await().run {}
+        }
+    }
+
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow {
+        val android = if (metadata != null) {
+            android.putBytes(data.data, metadata.toStorageMetadata())
+        } else {
+            android.putBytes(data.data, FirebaseStorageMetadata().toStorageMetadata())
+        }
+
+        val flow = callbackFlow {
+            val onCanceledListener = OnCanceledListener { cancel() }
+            val onCompleteListener = OnCompleteListener<UploadTask.TaskSnapshot> { close(it.exception) }
+            val onPausedListener = OnPausedListener<UploadTask.TaskSnapshot> { trySendBlocking(Progress.Paused(it.bytesTransferred, it.totalByteCount)) }
+            val onProgressListener = OnProgressListener<UploadTask.TaskSnapshot> { trySendBlocking(Progress.Running(it.bytesTransferred, it.totalByteCount)) }
+            android.addOnCanceledListener(onCanceledListener)
+            android.addOnCompleteListener(onCompleteListener)
+            android.addOnPausedListener(onPausedListener)
+            android.addOnProgressListener(onProgressListener)
+            awaitClose {
+                android.removeOnCanceledListener(onCanceledListener)
+                android.removeOnCompleteListener(onCompleteListener)
+                android.removeOnPausedListener(onPausedListener)
+                android.removeOnProgressListener(onProgressListener)
+            }
+        }
+
+        return object : ProgressFlow {
+            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+            override fun pause() = android.pause().run {}
+            override fun resume() = android.resume().run {}
+            override fun cancel() = android.cancel().run {}
         }
     }
 
