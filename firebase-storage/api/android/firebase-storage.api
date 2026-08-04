@@ -91,6 +91,7 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getBucket ()Ljava/lang/String;
+	public final fun getData (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getDownloadUrl (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getMetadata (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getName ()Ljava/lang/String;
@@ -98,13 +99,18 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRoot ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getStorage ()Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public final fun list (ILjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun list$default (Ldev/gitlive/firebase/storage/StorageReference;ILjava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun listAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun putData (Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun putData$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun putDataResumable (Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public static synthetic fun putDataResumable$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/Data;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/ProgressFlow;
 	public final fun putFile (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun putFile$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun putFileResumable (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;)Ldev/gitlive/firebase/storage/ProgressFlow;
 	public static synthetic fun putFileResumable$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public final fun updateMetadata (Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/storage/android {

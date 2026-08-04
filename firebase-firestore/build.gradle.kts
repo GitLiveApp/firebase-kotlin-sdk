@@ -10,7 +10,6 @@ import utils.toTargetPlatforms
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-firestore.version") as String
 val supportedPlatforms = (project.property("firebase-firestore.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
@@ -217,7 +216,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.gitlive",
         artifactId = "firebase-firestore",
-        version = project.property("firebase-firestore.version") as String
+        version = project.version.toString()
     )
 
     pom {

@@ -7,6 +7,7 @@ import dev.gitlive.firebase.analytics.externals.getAnalytics
 import dev.gitlive.firebase.js
 import kotlinx.coroutines.await
 import kotlin.time.Duration
+import kotlin.js.json
 
 public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(getAnalytics())
@@ -20,11 +21,12 @@ public actual class FirebaseAnalytics(internal val js: dev.gitlive.firebase.anal
         name: String,
         parameters: Map<String, Any>?,
     ) {
-        dev.gitlive.firebase.analytics.externals.logEvent(js, name, parameters)
+        val json = json(*parameters?.map { it.key to it.value }.orEmpty().toTypedArray())
+        dev.gitlive.firebase.analytics.externals.logEvent(js, name, json)
     }
 
     public actual fun setUserProperty(name: String, value: String) {
-        dev.gitlive.firebase.analytics.externals.setUserProperty(js, name, value)
+        dev.gitlive.firebase.analytics.externals.setUserProperties(js, json(name to value))
     }
 
     public actual fun setUserId(id: String?) {

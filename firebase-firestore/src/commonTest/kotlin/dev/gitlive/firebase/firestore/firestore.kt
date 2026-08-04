@@ -110,4 +110,19 @@ class FirebaseFirestoreTest : BaseFirebaseFirestoreTest() {
         Firebase.firestore(firebaseApp).disableNetwork()
         Firebase.firestore(firebaseApp).enableNetwork()
     }
+
+    @Test
+    fun testWaitForPendingWrites() = runTest {
+        val doc = firestore.collection("testFirestoreWaitForPendingWrites").document("test1")
+        doc.set(FirestoreTest.serializer(), FirestoreTest("waitForPendingWrites"))
+        // Completes once the pending write above is acknowledged by the backend.
+        firestore.waitForPendingWrites()
+        doc.delete()
+    }
+
+    @Test
+    fun testTerminate() = runTest {
+        // terminate must be the last operation on this instance; further use is expected to fail.
+        firestore.terminate()
+    }
 }

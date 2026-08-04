@@ -10,7 +10,6 @@ import utils.toTargetPlatforms
  * Copyright (c) 2023 GitLive Ltd. Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-analytics.version") as String
 val supportedPlatforms = (project.property("firebase-analytics.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
@@ -186,7 +185,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.gitlive",
         artifactId = "firebase-analytics",
-        version = project.property("firebase-analytics.version") as String
+        version = project.version.toString()
     )
 
     pom {

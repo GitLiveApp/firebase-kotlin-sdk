@@ -48,4 +48,12 @@ internal actual class NativeFirebaseFirestoreWrapper internal actual constructor
     actual suspend fun enableNetwork() {
         await { native.enableNetworkWithCompletion(it) }
     }
+
+    actual suspend fun terminate() {
+        await { native.terminateWithCompletion(it) }
+    }
+
+    actual suspend fun waitForPendingWrites() {
+        await { native.waitForPendingWritesWithCompletion(it) }
+    }
 }
