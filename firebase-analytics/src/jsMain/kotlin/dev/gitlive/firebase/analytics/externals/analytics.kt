@@ -6,11 +6,12 @@ package dev.gitlive.firebase.analytics.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
+import kotlin.js.Json
 
 public external fun getAnalytics(app: FirebaseApp? = definedExternally): FirebaseAnalytics
 
-public external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Map<String, Any>?)
-public external fun setUserProperty(app: FirebaseAnalytics, name: String, value: String)
+public external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Json?)
+public external fun setUserProperties(app: FirebaseAnalytics, properties: Json)
 public external fun setUserId(app: FirebaseAnalytics, id: String?)
 public external fun resetAnalyticsData(app: FirebaseAnalytics)
 public external fun setDefaultEventParameters(app: FirebaseAnalytics, parameters: Map<String, String>)

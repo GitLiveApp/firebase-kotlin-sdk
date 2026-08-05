@@ -79,4 +79,28 @@ class TraceTest {
         assertEquals(1L, trace.getLongMetric("Get Put Metric Test"))
         trace.stop()
     }
+
+    @Test
+    fun testAttributes() = runTest {
+        val trace = performance.newTrace("testAttributes")
+        trace.start()
+
+        trace.putAttribute("first_attribute", "first_value")
+        trace.putAttribute("second_attribute", "second_value")
+
+        assertEquals("first_value", trace.getAttribute("first_attribute"))
+        assertEquals(
+            mapOf(
+                "first_attribute" to "first_value",
+                "second_attribute" to "second_value",
+            ),
+            trace.getAttributes(),
+        )
+
+        trace.removeAttribute("first_attribute")
+
+        assertEquals(null, trace.getAttribute("first_attribute"))
+        assertEquals(mapOf("second_attribute" to "second_value"), trace.getAttributes())
+        trace.stop()
+    }
 }

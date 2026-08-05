@@ -10,7 +10,6 @@ import utils.toTargetPlatforms
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-messaging.version") as String
 val supportedPlatforms = (project.property("firebase-messaging.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
@@ -188,7 +187,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.gitlive",
         artifactId = "firebase-messaging",
-        version = project.property("firebase-messaging.version") as String
+        version = project.version.toString()
     )
 
     pom {

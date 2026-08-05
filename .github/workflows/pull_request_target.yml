@@ -15,27 +15,84 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
           cache: gradle
-      - name: Cocoapods cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cocoapods
-            ~/Library/Caches/CocoaPods
-            */build/cocoapods
-            */build/classes
-          key: cocoapods-cache-v2
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.4'
+
       - name: Format Kotlin
         run: ./gradlew formatKotlin
-      - name: Api File Update
-        run: ./gradlew apiDump
+
+      - name: Update API files for changed modules
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed_modules=""
+          dump_all=false
+
+          while IFS= read -r changed_file; do
+            module="${changed_file%%/*}"
+            if [ -d "$module/api" ]; then
+              case " $changed_modules " in
+                *" $module "*) ;;
+                *) changed_modules="$changed_modules $module" ;;
+              esac
+            else
+              dump_all=true
+            fi
+          done < <(git diff --name-only "$BASE_SHA...$HEAD_SHA")
+
+          if [ "$dump_all" = true ] || [ -z "$changed_modules" ]; then
+            changed_modules=""
+            for api_directory in */api; do
+              changed_modules="$changed_modules ${api_directory%/api}"
+            done
+          fi
+
+          api_dump_tasks=""
+          for module in $changed_modules; do
+            if [ -d "$module/api/android" ] || find "$module/api" -maxdepth 1 -name '*.api' -print -quit | grep -q .; then
+              api_dump_tasks="$api_dump_tasks :${module}:androidApiDump"
+            fi
+            if [ -d "$module/api/jvm" ]; then
+              api_dump_tasks="$api_dump_tasks :${module}:jvmApiDump"
+            fi
+          done
+
+          echo "Running API dump tasks:$api_dump_tasks"
+          echo "API_DUMP_TASKS=$api_dump_tasks" >> "$GITHUB_ENV"
+          ./gradlew $api_dump_tasks
+
       - run: git status
+
+      # Fork PRs run with a read-only GITHUB_TOKEN, and their head branch does not
+      # exist in this repo, so the auto-commit below cannot work. Verify instead and
+      # tell the contributor what to run locally.
+      - name: Verify formatting and API files are up to date
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          # Match what git-auto-commit-action would have staged (file_pattern
+          # defaults to "."), so tracked edits and new API files both count.
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Formatting or API dump files are out of date."
+            echo "This PR comes from a fork, so CI cannot update them for you."
+            echo "Run the following locally and commit the result:"
+            echo "  ./gradlew formatKotlin"
+            echo "  ./gradlew$API_DUMP_TASKS"
+            echo ""
+            echo "Files that differ:"
+            git status --porcelain
+            exit 1
+          fi
+          echo "Formatting and API files are up to date."
+
       - uses: stefanzweifel/git-auto-commit-action@v7
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          branch: ${{ github.head_ref }}
