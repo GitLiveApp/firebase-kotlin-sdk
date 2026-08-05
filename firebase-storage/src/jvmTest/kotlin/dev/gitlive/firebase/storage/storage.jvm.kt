@@ -1,5 +1,9 @@
 package dev.gitlive.firebase.storage
 
-actual fun createTestData(): Data {
-    TODO("Not yet implemented")
+import kotlin.test.assertContentEquals
+
+actual fun createTestData(): Data = Data("test".toByteArray())
+
+actual fun assertTestDataEquals(data: Data) {
+    assertContentEquals("test".toByteArray(), data.data)
 }

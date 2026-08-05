@@ -12,7 +12,6 @@ import utils.toTargetPlatforms
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-auth.version") as String
 val supportedPlatforms = (project.property("firebase-auth.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
@@ -197,6 +196,16 @@ kotlin {
                     api(libs.google.firebase.auth)
                 }
             }
+
+            getByName("androidInstrumentedTest") {
+                dependencies {
+                    // phone auth registers an sms retriever via ContextCompat.registerReceiver(
+                    // Context, BroadcastReceiver, IntentFilter, Int), which firebase-auth calls but
+                    // does not pull in - without this the test apk resolves androidx.core 1.2.0 and
+                    // PhoneAuthTest fails with a NoSuchMethodError
+                    implementation(libs.androidx.core)
+                }
+            }
         }
     }
 }
@@ -231,7 +240,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.gitlive",
         artifactId = "firebase-auth",
-        version = project.property("firebase-auth.version") as String
+        version = project.version.toString()
     )
 
     pom {

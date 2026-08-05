@@ -156,6 +156,7 @@ public final class dev/gitlive/firebase/firestore/FieldValue$Companion {
 	public final fun arrayUnion ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getDelete ()Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getServerTimestamp ()Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun increment (D)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun increment (I)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
@@ -288,7 +289,9 @@ public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
 	public final fun setSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
 	public final fun setSettings (Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;)V
 	public static synthetic fun setSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestore;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;ILjava/lang/Object;)V
+	public final fun terminate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun useEmulator (Ljava/lang/String;I)V
+	public final fun waitForPendingWrites (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore$Companion {
@@ -450,6 +453,9 @@ public final class dev/gitlive/firebase/firestore/MemoryGarbageCollectorSettings
 
 public class dev/gitlive/firebase/firestore/Query {
 	public static final field Companion Ldev/gitlive/firebase/firestore/Query$Companion;
+	public final fun average (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun average (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun count (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun endAt (Ldev/gitlive/firebase/firestore/DocumentSnapshot;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun endAt ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
@@ -462,6 +468,7 @@ public class dev/gitlive/firebase/firestore/Query {
 	public static synthetic fun get$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/Source;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getSnapshots ()Lkotlinx/coroutines/flow/Flow;
 	public final fun limit (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun limitToLast (Ljava/lang/Number;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun orderBy (Ljava/lang/String;Lcom/google/firebase/firestore/Query$Direction;)Ldev/gitlive/firebase/firestore/Query;
 	public static synthetic fun orderBy$default (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lcom/google/firebase/firestore/Query$Direction;ILjava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
@@ -476,6 +483,8 @@ public class dev/gitlive/firebase/firestore/Query {
 	public final fun startAt ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun startAt ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
 	public final fun startAtFieldValues (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
+	public final fun sum (Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun sum (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun where (Lkotlin/jvm/functions/Function1;)Ldev/gitlive/firebase/firestore/Query;
 }
 

@@ -11,6 +11,7 @@ public expect class FieldValue internal constructor(nativeValue: Any) {
         public val serverTimestamp: FieldValue
         public val delete: FieldValue
         public fun increment(value: Int): FieldValue
+        public fun increment(value: Double): FieldValue
         public fun arrayUnion(vararg elements: Any): FieldValue
         public fun arrayRemove(vararg elements: Any): FieldValue
     }

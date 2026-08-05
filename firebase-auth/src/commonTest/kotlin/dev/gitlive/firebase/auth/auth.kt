@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.auth
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -22,6 +23,12 @@ class FirebaseAuthTest {
 
     lateinit var auth: FirebaseAuth
 
+    // One app is created for the whole class and never deleted. firebase-auth 24.x keeps
+    // internal references to an app after it is deleted and dereferences them on the next
+    // call, so deleting between tests fails the following test with "FirebaseApp was
+    // deleted" from inside the sdk (FirebaseApp.get <- zzad.zza), whoever owned the app.
+    // useEmulator is only valid before the auth instance has been used, so it is applied
+    // here, on creation, rather than on every reuse.
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
@@ -34,18 +41,17 @@ class FirebaseAuthTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
-        )
-
-        auth = Firebase.auth(app).apply {
-            useEmulator(emulatorHost, 9099)
+        ).also {
+            Firebase.auth(it).useEmulator(emulatorHost, 9099)
         }
+
+        auth = Firebase.auth(app)
     }
 
+    // Reset the signed-in user rather than deleting the app.
     @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+    fun signOut() = runBlockingTest {
+        auth.signOut()
     }
 
     @Test
@@ -53,6 +59,22 @@ class FirebaseAuthTest {
         val uid = getTestUid("test@test.com", "test123")
         val result = auth.signInWithEmailAndPassword("test@test.com", "test123")
         assertEquals(uid, result.user!!.uid)
+    }
+
+    @Test
+    fun testSignInWithWrongPasswordThrowsInvalidCredentialsWithCode() = runTest {
+        val email = "test+${Random.nextInt(100000)}@test.com"
+        auth.createUserWithEmailAndPassword(email, "test123")
+        try {
+            auth.signOut()
+
+            val exception = assertFailsWith<FirebaseAuthInvalidCredentialsException> {
+                auth.signInWithEmailAndPassword(email, "wrong-password")
+            }
+            assertNotNull(exception.code)
+        } finally {
+            auth.signInWithEmailAndPassword(email, "test123").user!!.delete()
+        }
     }
 
     @Test
