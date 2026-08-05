@@ -171,6 +171,16 @@ kotlin {
                     api(libs.google.firebase.auth)
                 }
             }
+
+            getByName("androidInstrumentedTest") {
+                dependencies {
+                    // phone auth registers an sms retriever via ContextCompat.registerReceiver(
+                    // Context, BroadcastReceiver, IntentFilter, Int), which firebase-auth calls but
+                    // does not pull in - without this the test apk resolves androidx.core 1.2.0 and
+                    // PhoneAuthTest fails with a NoSuchMethodError
+                    implementation(libs.androidx.core)
+                }
+            }
         }
     }
 }

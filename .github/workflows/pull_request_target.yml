@@ -66,8 +66,33 @@ jobs:
           done
 
           echo "Running API dump tasks:$api_dump_tasks"
+          echo "API_DUMP_TASKS=$api_dump_tasks" >> "$GITHUB_ENV"
           ./gradlew $api_dump_tasks
 
       - run: git status
 
+      # Fork PRs run with a read-only GITHUB_TOKEN, and their head branch does not
+      # exist in this repo, so the auto-commit below cannot work. Verify instead and
+      # tell the contributor what to run locally.
+      - name: Verify formatting and API files are up to date
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          # Match what git-auto-commit-action would have staged (file_pattern
+          # defaults to "."), so tracked edits and new API files both count.
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Formatting or API dump files are out of date."
+            echo "This PR comes from a fork, so CI cannot update them for you."
+            echo "Run the following locally and commit the result:"
+            echo "  ./gradlew formatKotlin"
+            echo "  ./gradlew$API_DUMP_TASKS"
+            echo ""
+            echo "Files that differ:"
+            git status --porcelain
+            exit 1
+          fi
+          echo "Formatting and API files are up to date."
+
       - uses: stefanzweifel/git-auto-commit-action@v7
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          branch: ${{ github.head_ref }}
