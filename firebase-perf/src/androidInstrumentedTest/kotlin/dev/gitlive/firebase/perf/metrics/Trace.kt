@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.perf.metrics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -22,7 +23,7 @@ class AndroidTraceTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -32,6 +33,7 @@ class AndroidTraceTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "traceAndroidTest${nextAppId++}",
         )
 
         performance = Firebase.performance(app)
@@ -39,11 +41,7 @@ class AndroidTraceTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        // Performance runs installation in the background, which crashes if the app is deleted before completion
-        delay(5.seconds)
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     @Test

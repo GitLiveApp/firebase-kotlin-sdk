@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.database
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -31,6 +32,13 @@ expect suspend fun FirebaseDatabase.verifyPurgeOutstandingWrites()
 class FirebaseDatabaseTest {
 
     lateinit var database: FirebaseDatabase
+    private lateinit var app: FirebaseApp
+
+    companion object {
+        // A fresh instance of the test class is created per test, so the counter has to
+        // live here for the generated app names to stay unique across the whole run.
+        private var nextAppId = 0
+    }
 
     @Serializable
     data class FirebaseDatabaseChildTest(val prop1: String? = null, val time: Double = 0.0, val boolean: Boolean = true)
@@ -38,9 +46,12 @@ class FirebaseDatabaseTest {
     @Serializable
     data class DatabaseTest(val title: String, val likes: Int = 0)
 
+    // Each test gets its own uniquely named app, deleted again in teardown. Reusing
+    // whatever Firebase.apps() returned would hand back the app deleted by the previous
+    // test and fail with "FirebaseApp was deleted".
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -50,6 +61,7 @@ class FirebaseDatabaseTest {
                 projectId = "fir-kotlin-sdk-default-rtdb",
                 gcmSenderId = "846484016111",
             ),
+            "databaseTest${nextAppId++}",
         )
 
         database = Firebase.database(app).apply {
@@ -59,9 +71,7 @@ class FirebaseDatabaseTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     @Test

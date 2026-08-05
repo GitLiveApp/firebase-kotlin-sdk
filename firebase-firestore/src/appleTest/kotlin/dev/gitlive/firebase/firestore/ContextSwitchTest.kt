@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -57,10 +58,17 @@ fun <T> runTestWithContextSwitch(create: suspend CoroutineScope.() -> T, test: s
 class ContextSwitchTest {
 
     lateinit var firestore: FirebaseFirestore
+    private lateinit var app: FirebaseApp
+
+    companion object {
+        // A fresh instance of the test class is created per test, so the counter has
+        // to live here for the generated app names to stay unique across the run.
+        private var nextAppId = 0
+    }
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -70,6 +78,7 @@ class ContextSwitchTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "contextSwitchTest${nextAppId++}",
         )
 
         firestore = Firebase.firestore(app).apply {
@@ -79,9 +88,7 @@ class ContextSwitchTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     private data class TestFieldValuesOps(
