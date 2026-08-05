@@ -49,23 +49,20 @@ class PhoneAuthTest {
          * has timed out is clearly distinguishable from one which asks as soon as it is sent.
          */
         const val AUTO_RETRIEVAL_TIMEOUT_SECONDS = 120L
-
-        // A fresh instance of the test class is created per test, so the counter has to
-        // live here for the generated app names to stay unique across the whole run.
-        var nextAppId = 0
     }
 
-    private lateinit var app: FirebaseApp
     private lateinit var auth: FirebaseAuth
     private lateinit var scenario: ActivityScenario<Activity>
     private lateinit var activity: Activity
 
-    // Each test gets its own uniquely named app, deleted again in teardown. Reusing
-    // whatever Firebase.apps() returned would hand back the app deleted by the previous
-    // test and fail with "FirebaseApp was deleted".
+    // Shares the app with FirebaseAuthTest, which runs in the same instrumented process,
+    // and never deletes it: firebase-auth 24.x keeps internal references to a deleted app
+    // and dereferences them on the next call, failing the following test with
+    // "FirebaseApp was deleted". The emulator and the verification override are only
+    // valid before the auth instance has been used, so they are applied on creation.
     @BeforeTest
     fun initializeFirebase() {
-        app = Firebase.initialize(
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -75,23 +72,30 @@ class PhoneAuthTest {
                 projectId = PROJECT_ID,
                 gcmSenderId = "846484016111",
             ),
-            "phoneAuthTest${nextAppId++}",
-        )
-
-        auth = Firebase.auth(app).apply {
-            useEmulator(emulatorHost, AUTH_EMULATOR_PORT)
-            // there is no play services attestation on a test device, so skip app verification
-            android.firebaseAuthSettings.setAppVerificationDisabledForTesting(true)
+        ).also {
+            Firebase.auth(it).apply {
+                useEmulator(emulatorHost, AUTH_EMULATOR_PORT)
+                // there is no play services attestation on a test device, so skip app verification
+                android.firebaseAuthSettings.setAppVerificationDisabledForTesting(true)
+            }
         }
+
+        auth = Firebase.auth(app)
 
         scenario = ActivityScenario.launch(Activity::class.java)
         scenario.onActivity { activity = it }
     }
 
+    // Guarded because a failure in initializeFirebase leaves these unset, and an
+    // exception here would mask the one that actually failed the test.
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        scenario.close()
-        app.delete()
+        if (::scenario.isInitialized) {
+            scenario.close()
+        }
+        if (::auth.isInitialized) {
+            auth.signOut()
+        }
     }
 
     @Test
