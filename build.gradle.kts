@@ -31,7 +31,7 @@ buildscript {
 
 val compileSdkVersion by extra(34)
 val targetSdkVersion by extra(34)
-val minSdkVersion by extra(21)
+val minSdkVersion by extra(23)
 
 private val dokkaCopyrightMessage = "© 2024 GitLive Ltd."
 private val dokkaHomepageUrl = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
