@@ -35,15 +35,9 @@ class FirebaseFunctionsTest {
     private lateinit var firebaseApp: FirebaseApp
     private lateinit var functions: FirebaseFunctions
 
-    companion object {
-        // A fresh instance of the test class is created per test, so the counter has
-        // to live here for the generated app names to stay unique across the run.
-        private var nextAppId = 0
-    }
-
     @BeforeTest
     fun initializeFirebase() {
-        firebaseApp = Firebase.initialize(
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -53,17 +47,19 @@ class FirebaseFunctionsTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
-            "functionsTest${nextAppId++}",
         )
+        firebaseApp = app
 
-        functions = Firebase.functions(firebaseApp).apply {
+        functions = Firebase.functions(app).apply {
             useEmulator(emulatorHost, 5001)
         }
     }
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        firebaseApp.delete()
+        Firebase.apps(context).forEach {
+            it.delete()
+        }
     }
 
     @Test
