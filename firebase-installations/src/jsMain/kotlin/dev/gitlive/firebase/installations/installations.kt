@@ -16,7 +16,7 @@ public val FirebaseInstallations.js: Installations get() = js
 
 public actual class FirebaseInstallations internal constructor(internal val js: Installations) {
 
-    public actual suspend fun delete(): Unit = rethrow { delete(js).await() }
+    public actual suspend fun delete(): Unit = rethrow { deleteInstallations(js).await() }
 
     public actual suspend fun getId(): String = rethrow { getId(js).await() }
 

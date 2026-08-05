@@ -5,7 +5,7 @@ package dev.gitlive.firebase.installations.externals
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
 
-public external fun delete(installations: Installations): Promise<JsAny?>
+public external fun deleteInstallations(installations: Installations): Promise<JsAny?>
 
 public external fun getId(installations: Installations): Promise<JsString>
 

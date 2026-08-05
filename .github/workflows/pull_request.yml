@@ -18,6 +18,7 @@ jobs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
+      wasm_js_test_jobs_matrix: ${{ steps.dataStep.outputs.wasm_js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
       - uses: actions/checkout@v6
@@ -41,6 +42,7 @@ jobs:
           emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)
           ios_test_jobs_matrix=$(jq -c . < ./build/ios_test_jobs_matrix.json)
           js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
+          wasm_js_test_jobs_matrix=$(jq -c . < ./build/wasm_js_test_jobs_matrix.json)
           jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
           " >> $GITHUB_OUTPUT
   build-android:
@@ -75,6 +77,22 @@ jobs:
             **/build/reports/tests/jsTest/
             **/build/reports/tests/jsBrowserTest/
             **/build/reports/tests/jsNodeTest/
+  build-wasm-js:
+    needs: jobMatrixSetup
+    if: fromJson(needs.jobMatrixSetup.outputs.wasm_js_test_jobs_matrix).gradle_tasks[0] != null
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.wasm_js_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run_test_action
+        with:
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: Wasm JS
+          report-paths: |
+            **/build/reports/tests/wasmJsBrowserTest/
+            **/build/reports/tests/wasmJsNodeTest/
   build-ios:
     needs: jobMatrixSetup
     if: fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix).gradle_tasks[0] != null

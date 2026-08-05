@@ -11,6 +11,7 @@ import dev.gitlive.firebase.externals.awaitUnit
 import dev.gitlive.firebase.externals.awaitValue
 import dev.gitlive.firebase.externals.jsGet
 import dev.gitlive.firebase.externals.jsObjectKeys
+import dev.gitlive.firebase.externals.jsSet
 import dev.gitlive.firebase.externals.json
 import dev.gitlive.firebase.externals.jsonStringify
 import dev.gitlive.firebase.externals.toKotlin
@@ -27,11 +28,12 @@ import kotlin.js.JsException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
+import org.khronos.webgl.Uint8Array
 
 public actual val Firebase.storage: FirebaseStorage
     get() = FirebaseStorage(getStorage())
 
-public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(null, url))
+public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(bucketUrl = url))
 
 public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(getStorage(app.js))
 
@@ -74,11 +76,25 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
 
     public actual suspend fun getMetadata(): FirebaseStorageMetadata? = rethrow { getMetadata(js).awaitValue().toFirebaseStorageMetadata() }
 
+    public actual suspend fun getData(maxDownloadSizeBytes: Long): Data = rethrow {
+        Data(Uint8Array(getBytes(js, maxDownloadSizeBytes.toDouble()).awaitValue()))
+    }
+
+    public actual suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = rethrow {
+        updateMetadata(js, metadata.toStorageMetadata()).awaitValue().toFirebaseStorageMetadata()
+    }
+
     public actual fun child(path: String): StorageReference = StorageReference(ref(js, path))
 
     public actual suspend fun delete(): Unit = rethrow { deleteObject(js).awaitUnit() }
 
     public actual suspend fun getDownloadUrl(): String = rethrow { getDownloadURL(js).awaitValue().toKotlinString() }
+
+    public actual suspend fun list(maxResults: Int, pageToken: String?): ListResult = rethrow {
+        val options = json("maxResults" to maxResults)
+        pageToken?.let { jsSet(options, "pageToken", it.toJsString()) }
+        ListResult(list(js, options).awaitValue())
+    }
 
     public actual suspend fun listAll(): ListResult = rethrow { ListResult(listAll(js).awaitValue()) }
 
@@ -86,33 +102,40 @@ public actual class StorageReference(internal val js: dev.gitlive.firebase.stora
 
     public actual suspend fun putData(data: Data, metadata: FirebaseStorageMetadata?): Unit = rethrow { uploadBytes(js, data.data, metadata?.toStorageMetadata()).awaitUnit() }
 
+    public actual fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
+        uploadBytesResumable(js, data.data, metadata?.toStorageMetadata()).asProgressFlow()
+    }
+
     public actual fun putFileResumable(file: File, metadata: FirebaseStorageMetadata?): ProgressFlow = rethrow {
-        val uploadTask = uploadBytesResumable(js, file, metadata?.toStorageMetadata())
+        uploadBytesResumable(js, file, metadata?.toStorageMetadata()).asProgressFlow()
+    }
+}
 
-        val flow = callbackFlow {
-            val unsubscribe = uploadTask.on(
-                "state_changed",
-                {
-                    when (it.state) {
-                        "paused" -> trySend(Progress.Paused(it.bytesTransferred, it.totalBytes))
-                        "running" -> trySend(Progress.Running(it.bytesTransferred, it.totalBytes))
-                        "canceled" -> cancel()
-                        "success", "error" -> Unit
-                        else -> TODO("Unknown state ${it.state}")
-                    }
-                },
-                { close(it.toFirebaseStorageException()) },
-                { close() },
-            )
-            awaitClose { unsubscribe() }
-        }
+private fun UploadTask.asProgressFlow(): ProgressFlow {
+    val uploadTask = this
+    val flow = callbackFlow {
+        val unsubscribe = uploadTask.on(
+            "state_changed",
+            {
+                when (it.state) {
+                    "paused" -> trySend(Progress.Paused(it.bytesTransferred, it.totalBytes))
+                    "running" -> trySend(Progress.Running(it.bytesTransferred, it.totalBytes))
+                    "canceled" -> cancel()
+                    "success", "error" -> Unit
+                    else -> TODO("Unknown state ${it.state}")
+                }
+            },
+            { close(it.toFirebaseStorageException()) },
+            { close() },
+        )
+        awaitClose { unsubscribe() }
+    }
 
-        return object : ProgressFlow {
-            override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
-            override fun pause() = uploadTask.pause().run {}
-            override fun resume() = uploadTask.resume().run {}
-            override fun cancel() = uploadTask.cancel().run {}
-        }
+    return object : ProgressFlow {
+        override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+        override fun pause() = uploadTask.pause().run {}
+        override fun resume() = uploadTask.resume().run {}
+        override fun cancel() = uploadTask.cancel().run {}
     }
 }
 

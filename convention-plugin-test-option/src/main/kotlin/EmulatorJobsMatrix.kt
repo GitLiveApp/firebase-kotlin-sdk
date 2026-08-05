@@ -120,12 +120,18 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getWasmJsTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.WasmJs) || subProject.name == "test-utils"
         }.map { subProject ->
-            "${subProject.path}:wasmJsTest"
-        }.map { listOf("cleanTest", it) }
+            buildList {
+                add("cleanTest")
+                add("${subProject.path}:wasmJsBrowserTest")
+                if (subProject.name == "firebase-common" || subProject.name == "firebase-common-internal") {
+                    add("${subProject.path}:wasmJsNodeTest")
+                }
+            }
+        }
 
     fun getEmulatorTaskList(rootProject: Project): List<List<String>> =
         affectedSubprojects(rootProject).filter { subProject ->

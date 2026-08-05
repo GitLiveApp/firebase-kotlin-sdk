@@ -48,6 +48,7 @@ jobs:
       macos_test_jobs_matrix: ${{ steps.dataStep.outputs.macos_test_jobs_matrix }}
       tvos_test_jobs_matrix: ${{ steps.dataStep.outputs.tvos_test_jobs_matrix }}
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
+      wasm_js_test_jobs_matrix: ${{ steps.dataStep.outputs.wasm_js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
       - uses: actions/checkout@v6
@@ -67,6 +68,7 @@ jobs:
           macos_test_jobs_matrix=$(jq -c . < ./build/macos_test_jobs_matrix.json)
           tvos_test_jobs_matrix=$(jq -c . < ./build/tvos_test_jobs_matrix.json)
           js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
+          wasm_js_test_jobs_matrix=$(jq -c . < ./build/wasm_js_test_jobs_matrix.json)
           jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
           " >> $GITHUB_OUTPUT
   build-android:
@@ -99,6 +101,21 @@ jobs:
             **/build/reports/tests/jsTest/
             **/build/reports/tests/jsBrowserTest/
             **/build/reports/tests/jsNodeTest/
+  build-wasm-js:
+    needs: jobMatrixSetup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.wasm_js_test_jobs_matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run_test_action
+        with:
+          gradle-tasks: ${{ matrix.gradle_tasks }}
+          platform-name: Wasm JS
+          report-paths: |
+            **/build/reports/tests/wasmJsBrowserTest/
+            **/build/reports/tests/wasmJsNodeTest/
   build-ios:
     needs: jobMatrixSetup
     runs-on: macos-latest

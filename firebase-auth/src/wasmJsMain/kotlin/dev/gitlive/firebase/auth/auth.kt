@@ -212,7 +212,8 @@ internal fun ActionCodeSettings.toJson(): JsAny {
     return json
 }
 
-public actual open class FirebaseAuthException(code: String?, cause: Throwable) : FirebaseException(code, cause)
+public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode, cause)
+public actual val FirebaseAuthException.code: String? get() = authCode
 public actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthEmailException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthInvalidCredentialsException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
@@ -247,6 +248,7 @@ private fun errorToException(cause: JsException) = when (val code = cause.errorC
     "auth/missing-verification-code",
     "auth/invalid-verification-id",
     "auth/missing-verification-id",
+    "auth/wrong-password",
     -> FirebaseAuthInvalidCredentialsException(code, cause)
     "auth/maximum-second-factor-count-exceeded",
     "auth/second-factor-already-in-use",

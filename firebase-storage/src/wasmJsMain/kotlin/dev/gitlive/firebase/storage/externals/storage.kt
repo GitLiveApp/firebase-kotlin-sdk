@@ -4,6 +4,7 @@ package dev.gitlive.firebase.storage.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp
 import kotlin.js.Promise
+import org.khronos.webgl.ArrayBuffer
 
 public external fun getStorage(app: FirebaseApp? = definedExternally, bucketUrl: String): FirebaseStorage
 
@@ -15,14 +16,15 @@ public external fun ref(ref: StorageReference, path: String? = definedExternally
 public external fun getDownloadURL(ref: StorageReference): Promise<JsString>
 
 public external fun getMetadata(ref: StorageReference): Promise<FullMetadata>
-public external fun updateMetadata(ref: StorageReference, metadata: SettableMetadata): Promise<FullMetadata>
+public external fun updateMetadata(ref: StorageReference, metadata: JsAny): Promise<FullMetadata>
+public external fun getBytes(ref: StorageReference, maxDownloadSizeBytes: Double): Promise<ArrayBuffer>
 
 public external fun uploadBytes(ref: StorageReference, file: JsAny?, metadata: JsAny?): Promise<UploadResult>
 public external fun uploadBytesResumable(ref: StorageReference, data: JsAny?, metadata: JsAny?): UploadTask
 
 public external fun deleteObject(ref: StorageReference): Promise<JsAny?>
 
-public external fun list(ref: StorageReference, options: ListOptions?): Promise<ListResult>
+public external fun list(ref: StorageReference, options: JsAny?): Promise<ListResult>
 public external fun listAll(ref: StorageReference): Promise<ListResult>
 
 public external fun connectStorageEmulator(
@@ -53,7 +55,7 @@ public external interface ListOptions : JsAny {
 
 public external interface ListResult : JsAny {
     public val items: JsArray<StorageReference>
-    public val nextPageToken: String
+    public val nextPageToken: String?
     public val prefixes: JsArray<StorageReference>
 }
 

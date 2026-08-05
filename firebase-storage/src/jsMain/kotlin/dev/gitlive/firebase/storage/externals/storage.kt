@@ -58,7 +58,7 @@ public external interface ListOptions {
 
 public external interface ListResult {
     public val items: Array<StorageReference>
-    public val nextPageToken: String
+    public val nextPageToken: String?
     public val prefixes: Array<StorageReference>
 }
 

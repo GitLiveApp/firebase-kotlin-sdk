@@ -134,4 +134,12 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     actual suspend fun enableNetwork() {
         rethrow { dev.gitlive.firebase.firestore.externals.enableNetwork(js).awaitUnit() }
     }
+
+    actual suspend fun terminate() {
+        rethrow { dev.gitlive.firebase.firestore.externals.terminate(js).awaitUnit() }
+    }
+
+    actual suspend fun waitForPendingWrites() {
+        rethrow { dev.gitlive.firebase.firestore.externals.waitForPendingWrites(js).awaitUnit() }
+    }
 }

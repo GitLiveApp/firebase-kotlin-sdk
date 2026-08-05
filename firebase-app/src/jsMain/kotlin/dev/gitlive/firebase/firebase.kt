@@ -8,6 +8,7 @@ import dev.gitlive.firebase.externals.deleteApp
 import dev.gitlive.firebase.externals.getApp
 import dev.gitlive.firebase.externals.getApps
 import dev.gitlive.firebase.externals.initializeApp
+import kotlinx.coroutines.await
 import kotlin.js.json
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 
@@ -33,7 +34,7 @@ public actual class FirebaseApp internal constructor(internal val js: JsFirebase
         }
 
     public actual suspend fun delete() {
-        deleteApp(js)
+        deleteApp(js).await()
     }
 }
 

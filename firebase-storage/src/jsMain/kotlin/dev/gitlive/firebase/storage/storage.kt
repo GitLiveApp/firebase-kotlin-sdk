@@ -25,7 +25,7 @@ import kotlin.time.DurationUnit
 public actual val Firebase.storage: FirebaseStorage
     get() = FirebaseStorage(getStorage())
 
-public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(null, url))
+public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStorage(getStorage(bucketUrl = url))
 
 public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(getStorage(app.js))
 
