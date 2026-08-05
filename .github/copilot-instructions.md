@@ -143,7 +143,7 @@ These are only accessible from the respective platform source sets. Do **not** u
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- The Firebase iOS SDK is **not** a transitive dependency — consuming projects must link it themselves (Swift Package Manager, CocoaPods, or manual integration).
+- The Firebase iOS SDK is **not** bundled into the published klibs. Each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, so a consuming KMP app inherits it transitively and does not re-declare it. Only projects that integrate their framework another way (CocoaPods, manual) link Firebase themselves.
 - The Apple targets consume Firebase via the `swiftPMDependencies` block in each module's `build.gradle.kts` (Kotlin 2.4+); this also links Firebase for iOS/macOS/tvOS tests.
 
 ### JVM / Desktop
