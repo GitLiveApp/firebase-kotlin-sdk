@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.analytics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -22,10 +23,17 @@ expect annotation class IgnoreForAndroidUnitTest()
 class FirebaseAnalyticsTest {
 
     lateinit var analytics: FirebaseAnalytics
+    private lateinit var app: FirebaseApp
+
+    companion object {
+        // A fresh instance of the test class is created per test, so the counter has
+        // to live here for the generated app names to stay unique across the run.
+        private var nextAppId = 0
+    }
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -35,6 +43,7 @@ class FirebaseAnalyticsTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "analyticsTest${nextAppId++}",
         )
 
         analytics = Firebase.analytics(app)
@@ -42,9 +51,7 @@ class FirebaseAnalyticsTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     @Test

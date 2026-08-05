@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.perf.metrics
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -17,10 +18,17 @@ import kotlin.test.assertEquals
 class JsTraceTest {
 
     private lateinit var performance: FirebasePerformance
+    private lateinit var app: FirebaseApp
+
+    companion object {
+        // A fresh instance of the test class is created per test, so the counter has
+        // to live here for the generated app names to stay unique across the run.
+        private var nextAppId = 0
+    }
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -30,6 +38,7 @@ class JsTraceTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "traceJsTest${nextAppId++}",
         )
 
         performance = Firebase.performance(app)
@@ -37,9 +46,7 @@ class JsTraceTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     @Test
