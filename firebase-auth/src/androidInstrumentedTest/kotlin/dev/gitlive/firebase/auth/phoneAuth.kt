@@ -7,6 +7,7 @@ package dev.gitlive.firebase.auth
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -48,15 +49,23 @@ class PhoneAuthTest {
          * has timed out is clearly distinguishable from one which asks as soon as it is sent.
          */
         const val AUTO_RETRIEVAL_TIMEOUT_SECONDS = 120L
+
+        // A fresh instance of the test class is created per test, so the counter has to
+        // live here for the generated app names to stay unique across the whole run.
+        var nextAppId = 0
     }
 
+    private lateinit var app: FirebaseApp
     private lateinit var auth: FirebaseAuth
     private lateinit var scenario: ActivityScenario<Activity>
     private lateinit var activity: Activity
 
+    // Each test gets its own uniquely named app, deleted again in teardown. Reusing
+    // whatever Firebase.apps() returned would hand back the app deleted by the previous
+    // test and fail with "FirebaseApp was deleted".
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
@@ -66,6 +75,7 @@ class PhoneAuthTest {
                 projectId = PROJECT_ID,
                 gcmSenderId = "846484016111",
             ),
+            "phoneAuthTest${nextAppId++}",
         )
 
         auth = Firebase.auth(app).apply {
@@ -81,9 +91,7 @@ class PhoneAuthTest {
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
         scenario.close()
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        app.delete()
     }
 
     @Test
