@@ -6,8 +6,8 @@
 
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestoreInternal.*
-import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
+import swiftPMImport.dev.gitlive.firebase.firestore.*
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

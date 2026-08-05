@@ -36,7 +36,14 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
     }
 
     public actual val idTokenChanged: Flow<FirebaseUser?> get() = callbackFlow {
-        val listener = com.google.firebase.auth.FirebaseAuth.IdTokenListener { auth -> trySend(auth.currentUser?.let { FirebaseUser(it) }) }
+        // Explicit object (not a SAM lambda) so the compiler doesn't infer IdTokenListener's
+        // functional type, which carries a checker-framework annotation (@UnknownInitialization)
+        // not on the Kotlin compile classpath — otherwise Kotlin 2.4 errors "annotation inaccessible".
+        val listener = object : com.google.firebase.auth.FirebaseAuth.IdTokenListener {
+            override fun onIdTokenChanged(auth: com.google.firebase.auth.FirebaseAuth) {
+                trySend(auth.currentUser?.let { FirebaseUser(it) })
+            }
+        }
         android.addIdTokenListener(listener)
         awaitClose { android.removeIdTokenListener(listener) }
     }

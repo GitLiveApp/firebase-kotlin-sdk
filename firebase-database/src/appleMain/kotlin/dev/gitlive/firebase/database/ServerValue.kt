@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.database
 
-import cocoapods.FirebaseDatabase.FIRServerValue
+import swiftPMImport.dev.gitlive.firebase.database.FIRServerValue
 import kotlinx.serialization.Serializable
 import platform.Foundation.NSNumber
 

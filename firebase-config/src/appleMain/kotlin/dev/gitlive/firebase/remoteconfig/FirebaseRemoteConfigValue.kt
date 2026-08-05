@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.remoteconfig
 
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigSource
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigValue
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigSource
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigValue
 
 public actual class FirebaseRemoteConfigValue internal constructor(private val ios: FIRRemoteConfigValue) {
     @ExperimentalUnsignedTypes

@@ -13,7 +13,6 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
     alias(libs.plugins.multiplatform) apply false
-    alias(libs.plugins.native.cocoapods) apply false
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
     alias(libs.plugins.kotlinter) apply false

@@ -9,7 +9,7 @@ firebase-bom = "34.17.0"
 gitlive-firebase-java-sdk = "0.6.3"
 gson = "2.14.0"
 junit = "4.13.2"
-kotlin = "2.2.21"
+kotlin = "2.4.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
 kotlinx-binarycompatibilityvalidator = "0.18.1"
@@ -17,9 +17,10 @@ kotlinx-datetime = "0.7.1"
 kotlinter = "5.2.0"
 settings-api = "2.2"
 settings-language = "2.2"
-firebase-cocoapods = "11.8.0"
-ios-deploymentTarget = "13.0"
-tvos-deploymentTarget = "13.0"
+firebase-ios-sdk = "12.17.0"
+# firebase-ios-sdk 12 declares platforms: [.iOS(.v15), .macCatalyst(.v15), .macOS(.v10_15), .tvOS(.v15), .watchOS(.v7)]
+ios-deploymentTarget = "15.0"
+tvos-deploymentTarget = "15.0"
 macos-deploymentTarget = "10.15"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"
@@ -61,7 +62,6 @@ ben-manes-versions = { id = "com.github.ben-manes.versions", version.ref = "ben-
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinx-binarycompatibilityvalidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx-binarycompatibilityvalidator" }
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 test-logger-plugin = { id = "com.adarshr.test-logger", version.ref = "test-logger-plugin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }

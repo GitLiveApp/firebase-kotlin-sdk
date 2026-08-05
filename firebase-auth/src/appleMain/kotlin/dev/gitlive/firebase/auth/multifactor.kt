@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import swiftPMImport.dev.gitlive.firebase.auth.*
 
 public val MultiFactor.ios: FIRMultiFactor get() = ios
 

@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRFirestoreSource
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestoreSource
 import dev.gitlive.firebase.firestore.Source
 
 internal fun Source.toIosSource() = when (this) {
