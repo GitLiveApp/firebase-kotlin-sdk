@@ -192,7 +192,7 @@ public actual class StorageReference(internal val ios: FIRStorageReference) {
                 val progress = it!!.progress()!!
                 trySendBlocking(Progress.Running(progress.completedUnitCount, progress.totalUnitCount))
             }
-            ios.observeStatus(FIRStorageTaskStatusSuccess) { close(FirebaseStorageException(it!!.error().toString())) }
+            ios.observeStatus(FIRStorageTaskStatusSuccess) { close() }
             ios.observeStatus(FIRStorageTaskStatusFailure) {
                 when (it!!.error()!!.code) {
                     /*FIRStorageErrorCodeCancelled = */
