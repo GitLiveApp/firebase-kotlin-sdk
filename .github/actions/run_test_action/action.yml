@@ -41,8 +41,9 @@ runs:
       with:
         path: |
           ~/Library/Caches/org.swift.swiftpm
-          */build/classes
-        key: swiftpm-cache-v1
+        key: swiftpm-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+        restore-keys: |
+          swiftpm-${{ runner.os }}-
 
     - uses: maxim-lobanov/setup-xcode@v1
       if: inputs.apple == 'true'
