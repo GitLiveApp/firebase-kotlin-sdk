@@ -14,14 +14,15 @@ publication:
 
 - The root Gradle module metadata exposes a **`swiftPMDependenciesMetadataElements`** variant
   (usage `swiftPMDependenciesMetadata`) referencing a **`<module>-<version>-swiftpm-metadata.json`**
-  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `11.8.0`, product
-  `FirebaseCore`, deployment targets, and `isModulesDiscoveryEnabled = false`.
+  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `12.17.0`, product
+  `FirebaseCore`, deployment targets, and `isModulesDiscoveryEnabled = false`. The declared version
+  is a `from(...)` lower bound, so SwiftPM may resolve a newer patch within the same major.
 - A downstream KMP module that depends on `dev.gitlive:firebase-*` from Maven resolves this via its
   `swiftPMDependenciesMetadataClasspath`, aggregating the SwiftPM dependencies across the whole
   dependency graph — **without declaring any `swiftPMDependencies` of its own**. (Verified: a
   consumer depending only on `dev.gitlive:firebase-app` produced an aggregated
   `build/kotlin/swiftPMDependenciesMetadataForLockFiles` listing `firebase-ios-sdk` / `FirebaseCore`
-  / `11.8.0`.)
+  / `12.17.0`.)
 - The Kotlin Gradle plugin then generates a synthetic Swift package containing all transitive
   SwiftPM dependencies and provides the machine code when linking the app's framework / running
   Kotlin/Native tests (`generateSyntheticLinkageSwiftPMImportProject…`, `integrateEmbedAndSign`,
@@ -67,10 +68,11 @@ Xcode 27 betas are currently incompatible with KGP 2.4).
   integration context, so `…Test` tasks that touch Firebase symbols may fail to resolve them when run
   standalone. If you hit this, run the affected tests through the Xcode-integrated build, or disable
   the pure-Gradle iOS test tasks that require Firebase.
-- **Deployment target.** This SDK targets **iOS 13 / tvOS 13 / macOS 10.15**, at or above
-  firebase-ios-sdk 11.8's own declared minimums (iOS 12 / tvOS 13 / macOS 10.15). Your app's
-  deployment target must be **≥** these. (Newer Firebase/Xcode combinations may require a higher
-  floor — e.g. iOS 15/16 — so check the Firebase release notes if you upgrade `firebase-ios-sdk`.)
+- **Deployment target.** This SDK targets **iOS 15 / tvOS 15 / macOS 10.15**, matching
+  firebase-ios-sdk 12's own declared minimums (iOS 15 / macCatalyst 15 / macOS 10.15 / tvOS 15 /
+  watchOS 7). Your app's deployment target must be **≥** these. The iOS and tvOS floors rose from
+  13 in firebase-ios-sdk 12.0.0 — if your app still targets iOS 13 or 14, stay on a release of this
+  SDK that pins `firebase-ios-sdk` 11.x.
 - **Don't mix package managers for Firebase.** All Firebase products share transitive C/C++
   dependencies (gRPC/abseil/leveldb/BoringSSL/nanopb). Linking some via SwiftPM and others via
   CocoaPods duplicates those symbols and causes `dyld` crashes — use one mechanism for the whole
@@ -90,9 +92,9 @@ expose Obj-C via an `*Internal` module):
 | FirebaseCore          | `FirebaseCore`                         |
 | FirebaseAnalytics     | `FirebaseAnalytics`                    |
 | FirebaseAuth          | `FirebaseAuth`, `FirebaseAuthInternal` |
-| FirebaseRemoteConfig  | `FirebaseRemoteConfigInternal`         |
+| FirebaseRemoteConfig  | `FirebaseRemoteConfig`, `FirebaseRemoteConfigInternal` |
 | FirebaseCrashlytics   | `FirebaseCrashlytics`                  |
-| FirebaseDatabase      | `FirebaseDatabaseInternal`             |
+| FirebaseDatabase      | `FirebaseDatabase`, `FirebaseDatabaseInternal` |
 | FirebaseFirestore     | `FirebaseFirestoreInternal`            |
 | FirebaseFunctions     | `FirebaseFunctions`                    |
 | FirebaseInstallations | `FirebaseInstallations`                |
