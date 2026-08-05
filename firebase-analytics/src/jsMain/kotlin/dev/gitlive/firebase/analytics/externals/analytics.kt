@@ -11,7 +11,7 @@ import kotlin.js.Json
 public external fun getAnalytics(app: FirebaseApp? = definedExternally): FirebaseAnalytics
 
 public external fun logEvent(app: FirebaseAnalytics, name: String, parameters: Json?)
-public external fun setUserProperty(app: FirebaseAnalytics, name: String, value: String)
+public external fun setUserProperties(app: FirebaseAnalytics, properties: Json)
 public external fun setUserId(app: FirebaseAnalytics, id: String?)
 public external fun resetAnalyticsData(app: FirebaseAnalytics)
 public external fun setDefaultEventParameters(app: FirebaseAnalytics, parameters: Map<String, String>)
