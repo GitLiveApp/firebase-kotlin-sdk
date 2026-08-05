@@ -56,9 +56,6 @@ $dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/detail
 $dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/entries/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]entries.html
 $dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]value-of.html
 $dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/values/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]values.html
-$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/getAttribute/#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]get-attribute.html
-$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/putAttribute/#kotlin.String#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]put-attribute.html
-$dokka.location:dev.gitlive.firebase.perf.metrics/Trace/removeAttribute/#kotlin.String/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf.metrics/-trace/[js]remove-attribute.html
 $dokka.location:dev.gitlive.firebase.storage/Data/data/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-data/[jvm]data.html
 $dokka.location:dev.gitlive.firebase.storage/File/uri/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-file/[jvm]uri.html
 module:firebase-analytics
