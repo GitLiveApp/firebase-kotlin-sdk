@@ -27,10 +27,8 @@ $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.fire
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Query.Companion#com.google.firebase.firestore.Query/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Transaction.Companion#com.google.firebase.firestore.Transaction/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.WriteBatch.Companion#com.google.firebase.firestore.WriteBatch/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
-$dokka.location:dev.gitlive.firebase.firestore/ChangeType/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]entries.html
 $dokka.location:dev.gitlive.firebase.firestore/ChangeType/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]value-of.html
 $dokka.location:dev.gitlive.firebase.firestore/ChangeType/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]values.html
-$dokka.location:dev.gitlive.firebase.firestore/Direction/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]entries.html
 $dokka.location:dev.gitlive.firebase.firestore/Direction/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]value-of.html
 $dokka.location:dev.gitlive.firebase.firestore/Direction/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]values.html
 $dokka.location:dev.gitlive.firebase.firestore/FieldPath/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]equals.html
@@ -42,7 +40,6 @@ $dokka.location:dev.gitlive.firebase.firestore/FieldValue/toString/#/PointingToD
 $dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreException/code/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-exception/[js]code.html
 $dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings.Builder/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/-builder/[jvm]callback-executor.html
 $dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/[jvm]callback-executor.html
-$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]entries.html
 $dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]value-of.html
 $dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]values.html
 $dokka.location:dev.gitlive.firebase.firestore/GeoPoint/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]equals.html
@@ -53,7 +50,6 @@ $dokka.location:dev.gitlive.firebase.firestore/Timestamp/hashCode/#/PointingToDe
 $dokka.location:dev.gitlive.firebase.firestore/Timestamp/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]to-string.html
 $dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/code/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]code.html
 $dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/details/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]details.html
-$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/entries/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]entries.html
 $dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]value-of.html
 $dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/values/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]values.html
 $dokka.location:dev.gitlive.firebase.storage/Data/data/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-data/[jvm]data.html
