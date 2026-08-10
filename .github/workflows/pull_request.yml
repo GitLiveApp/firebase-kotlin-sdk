@@ -20,7 +20,7 @@ jobs:
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up JDK
@@ -51,7 +51,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -66,7 +66,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -98,7 +98,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
