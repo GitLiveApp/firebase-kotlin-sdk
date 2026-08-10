@@ -126,7 +126,10 @@ subprojects {
         dependencies {
             "commonMainImplementation"(libs.kotlinx.coroutines.core)
             "androidMainImplementation"(libs.kotlinx.coroutines.play.services)
-            "androidMainImplementation"(platform(libs.firebase.bom))
+            // api, not implementation: the Firebase artifacts are declared with `api` and without a
+            // version, so the BoM has to reach the api variant as well or a consumer resolving the
+            // compile classpath has nothing to supply the version from.
+            "androidMainApi"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {
