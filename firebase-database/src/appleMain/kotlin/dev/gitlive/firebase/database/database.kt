@@ -20,6 +20,9 @@ import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingAtBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEqualToBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAtBoolean
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
@@ -29,6 +32,7 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.ios
 import dev.gitlive.firebase.internal.reencodeTransformation
+import dev.gitlive.firebase.internal.withFoundationBooleans
 import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.FlowPreview
@@ -128,13 +132,13 @@ public actual open class Query internal actual constructor(
 
     public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
     public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
 
@@ -144,7 +148,7 @@ public actual open class Query internal actual constructor(
 
     public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(GitLiveQueryEqualToBoolean(ios, value, key) as FIRDatabaseQuery, persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
@@ -198,11 +202,11 @@ internal actual class NativeDatabaseReference internal constructor(
     actual fun onDisconnect() = NativeOnDisconnect(ios, persistenceEnabled)
 
     actual suspend fun setValueEncoded(encodedValue: Any?) {
-        ios.await(persistenceEnabled) { setValue(encodedValue, it) }
+        ios.await(persistenceEnabled) { setValue(encodedValue.asIosValue(), it) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
+        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.iosValue, it) }
     }
 
     actual suspend fun removeValue() {
@@ -213,7 +217,7 @@ internal actual class NativeDatabaseReference internal constructor(
         val deferred = CompletableDeferred<DataSnapshot>()
         ios.runTransactionBlock(
             block = { firMutableData ->
-                firMutableData?.value = reencodeTransformation(strategy, firMutableData?.value, buildSettings, transactionUpdate)
+                firMutableData?.value = reencodeTransformation(strategy, firMutableData?.value, buildSettings, transactionUpdate).asIosValue()
                 FIRTransactionResult.successWithValue(firMutableData!!)
             },
             andCompletionBlock = { error, _, snapshot ->
@@ -267,13 +271,31 @@ internal actual class NativeOnDisconnect internal constructor(
     }
 
     actual suspend fun setEncodedValue(encodedValue: Any?) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
+        ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue.asIosValue(), it) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
+        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.iosValue, it) }
     }
 }
+
+/**
+ * Converts an encoded value into the form passed to the FirebaseDatabase SDK, rebuilding
+ * boolean-carrying containers as Foundation objects so booleans are stored as JSON booleans
+ * instead of 1/0 (see [withFoundationBooleans]). A boolean at the root cannot survive the
+ * interop boundary on its own, so it is wrapped in the SDK's {".value": x} leaf form, which
+ * FSnapshotUtilities resolves to a plain scalar write.
+ */
+private fun Any?.asIosValue(): Any? = when (this) {
+    is Boolean -> mapOf(".value" to this).withFoundationBooleans()
+    else -> withFoundationBooleans()
+}
+
+// Deliberately not hoisted into EncodedObject.ios: that is public API also used by firestore,
+// and changing its returned representation there is a separate decision.
+private val EncodedObject.iosValue: Map<Any?, *>
+    @Suppress("UNCHECKED_CAST")
+    get() = ios.withFoundationBooleans() as Map<Any?, *>
 
 public val OnDisconnect.ios: FIRDatabaseReference get() = native.ios
 public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEnabled

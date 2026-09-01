@@ -234,6 +234,72 @@ class FirebaseDatabaseTest {
         assertEquals(FirebaseDatabaseChildTest(), value)
     }
 
+    // The raw snapshot value distinguishes a stored boolean from a stored 0/1, while the
+    // typed decoder deliberately accepts both. Booleans written from Apple targets used to
+    // arrive as 1/0 because Kotlin/Native boxes Boolean as a non-CFBoolean NSNumber.
+    @Test
+    fun testBooleansAreStoredAsBooleans() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseRawBooleanTest")
+
+        reference.child("direct").setValue(true)
+        assertEquals(true, reference.child("direct").valueEvents.first().value)
+
+        reference.child("nested").setValue(FirebaseDatabaseChildTest(boolean = false))
+        assertEquals(false, reference.child("nested").child("boolean").valueEvents.first().value)
+
+        reference.updateChildren(mapOf("updated" to true, "updatedNested" to mapOf("flag" to false)))
+        assertEquals(true, reference.child("updated").valueEvents.first().value)
+        assertEquals(false, reference.child("updatedNested").child("flag").valueEvents.first().value)
+
+        val transactionRef = reference.child("transaction")
+        transactionRef.setValue(FirebaseDatabaseChildTest(boolean = false))
+        transactionRef.runTransaction(FirebaseDatabaseChildTest.serializer()) { it.copy(boolean = true) }
+        assertEquals(true, transactionRef.child("boolean").valueEvents.first().value)
+    }
+
+    // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870
+    @IgnoreForAndroidTest
+    @Test
+    fun testOnDisconnectBooleansAreStoredAsBooleans() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseRawBooleanOnDisconnectTest")
+        reference.child("set").onDisconnect().setValue(true)
+        reference.onDisconnect().updateChildren(mapOf("updated" to true))
+        database.goOffline()
+
+        database.goOnline()
+        ensureDatabaseConnected()
+        assertEquals(true, reference.child("set").valueEvents.first().value)
+        assertEquals(true, reference.child("updated").valueEvents.first().value)
+    }
+
+    @Test
+    fun testBooleanQueriesMatchStoredBooleans() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseBooleanQueryTest")
+        reference.child("boolTrue").setValue(true)
+        reference.child("boolFalse").setValue(false)
+        reference.child("numberOne").setValue(1)
+        reference.child("numberZero").setValue(0)
+
+        val equalToTrue = reference.orderByValue().equalTo(true).valueEvents.first().children.map { it.key }
+        assertEquals(listOf("boolTrue"), equalToTrue)
+
+        val equalToFalse = reference.orderByValue().equalTo(false).valueEvents.first().children.map { it.key }
+        assertEquals(listOf("boolFalse"), equalToFalse)
+
+        val equalToTrueWithKey = reference.orderByValue().equalTo(true, "boolTrue").valueEvents.first().children.map { it.key }
+        assertEquals(listOf("boolTrue"), equalToTrueWithKey)
+
+        // Value order is null < false < true < numbers, so starting at true excludes only false.
+        val startAtTrue = reference.orderByValue().startAt(true).valueEvents.first().children.map { it.key }
+        assertEquals(listOf("boolTrue", "numberZero", "numberOne"), startAtTrue)
+
+        val endAtFalse = reference.orderByValue().endAt(false).valueEvents.first().children.map { it.key }
+        assertEquals(listOf("boolFalse"), endAtFalse)
+    }
+
     // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870
     @IgnoreForAndroidTest
     @Test
