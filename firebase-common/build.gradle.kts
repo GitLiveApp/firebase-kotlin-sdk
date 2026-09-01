@@ -191,7 +191,6 @@ kotlin {
                 dependencies {
                     implementation(kotlin("test-junit"))
                 }
-                kotlin.srcDir("src/androidAndroidTest/kotlin")
             }
         }
     }
