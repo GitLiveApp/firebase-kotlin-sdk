@@ -5,7 +5,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, v3.0.0 ]
 
 concurrency:
   group: ci-pull-request-${{ github.head_ref }}
