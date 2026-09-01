@@ -6,9 +6,12 @@ name: Pull Request
 on:
   pull_request:
     branches: [ master, v3.0.0 ]
+  # Manual full run against any branch. Branch pushes have no CI trigger, so this is
+  # the only way to validate a commit that did not arrive through a pull request.
+  workflow_dispatch:
 
 concurrency:
-  group: ci-pull-request-${{ github.head_ref }}
+  group: ci-pull-request-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,7 +35,13 @@ jobs:
       - name: Determine changed files
         run: |
           mkdir -p build
-          git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | tee build/changed_files.txt
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # No diff base on a manual run: treat every tracked file as changed so the
+            # full matrix is built rather than an empty one.
+            git ls-files | tee build/changed_files.txt
+          else
+            git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | tee build/changed_files.txt
+          fi
       - name: Prepare the matrix JSON
         run: ./gradlew ciJobsMatrixSetup -PchangedFilesPath=build/changed_files.txt
       - id: dataStep
