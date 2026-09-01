@@ -110,7 +110,7 @@ internal actual class NativeFirebaseFirestoreWrapper internal constructor(
     actual suspend fun <T> runTransaction(func: suspend NativeTransaction.() -> T): T = rethrow {
         val result = dev.gitlive.firebase.firestore.externals.runTransaction(
             js,
-            { transaction -> GlobalScope.promise { NativeTransaction(transaction).func() } },
+            { transaction -> GlobalScope.promise { NativeTransaction(transaction).func()?.toJsReference() } },
         ).awaitValue()
         @Suppress("UNCHECKED_CAST")
         (result as? JsReference<*>)?.get() as T

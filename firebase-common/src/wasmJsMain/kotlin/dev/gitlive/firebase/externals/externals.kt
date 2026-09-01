@@ -76,12 +76,10 @@ public fun parseDateStringToMillis(date: String): Double = js("new Date(date).ge
 /**
  * Awaits a [Promise] and returns its resolved value, typed by the promise's own parameter.
  *
- * `kotlinx.coroutines.await` on wasm has signature `Promise<JsAny?>.await(): T`, inferring its
- * result solely from call context — which fails whenever the awaited value is chained or assigned
- * without an explicit expected type. Keying the type parameter to the promise instead avoids that.
+ * Retained as a named alias for `await` so call sites read consistently; kotlinx-coroutines 1.11.0
+ * keys `Promise.await` to the promise's own type parameter, so no cast is needed.
  */
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-public suspend fun <T : JsAny?> Promise<T>.awaitValue(): T = (this as Promise<JsAny?>).await()
+public suspend fun <T : JsAny?> Promise<T>.awaitValue(): T = await()
 
 /** Awaits a [Promise] whose resolved value is discarded (mirrors `Promise<void>` in JS). */
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
