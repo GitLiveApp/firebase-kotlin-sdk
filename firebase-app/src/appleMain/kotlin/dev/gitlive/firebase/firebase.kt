@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase
 
-import cocoapods.FirebaseCore.*
+import swiftPMImport.dev.gitlive.firebase.app.*
 import kotlinx.coroutines.CompletableDeferred
 
 public actual open class FirebaseException(message: String) : Exception(message)
@@ -29,7 +29,19 @@ public actual data class FirebaseApp internal constructor(internal val ios: FIRA
     actual val name: String
         get() = ios.name
     actual val options: FirebaseOptions
-        get() = ios.options.run { FirebaseOptions(bundleID, APIKey!!, databaseURL!!, trackingID, storageBucket, projectID, GCMSenderID) }
+        // FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0, where it had long been
+        // deprecated as unused, so gaTrackingId cannot be round tripped on apple targets
+        get() = ios.options.run {
+            FirebaseOptions(
+                applicationId = bundleID,
+                apiKey = APIKey!!,
+                databaseUrl = databaseURL!!,
+                gaTrackingId = null,
+                storageBucket = storageBucket,
+                projectId = projectID,
+                gcmSenderId = GCMSenderID,
+            )
+        }
 
     public actual suspend fun delete() {
         val deleted = CompletableDeferred<Unit>()
@@ -46,7 +58,7 @@ public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = FIRApp.allAp
 private fun FirebaseOptions.toIos() = FIROptions(this@toIos.applicationId, this@toIos.gcmSenderId ?: "").apply {
     APIKey = this@toIos.apiKey
     databaseURL = this@toIos.databaseUrl
-    trackingID = this@toIos.gaTrackingId
+    // gaTrackingId is dropped here - FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0
     storageBucket = this@toIos.storageBucket
     projectID = this@toIos.projectId
 }

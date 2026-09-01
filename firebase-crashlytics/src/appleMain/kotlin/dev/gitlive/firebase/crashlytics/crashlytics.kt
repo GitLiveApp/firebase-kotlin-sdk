@@ -1,11 +1,13 @@
 package dev.gitlive.firebase.crashlytics
 
-import cocoapods.FirebaseCrashlytics.FIRCrashlytics
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRCrashlytics
 import platform.Foundation.NSError
 import platform.Foundation.NSLocalizedDescriptionKey
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlin.Any
+import kotlin.collections.Map
 
 public val FirebaseCrashlytics.ios: FIRCrashlytics get() = FIRCrashlytics.crashlytics()
 
@@ -19,37 +21,54 @@ public actual class FirebaseCrashlytics internal constructor(internal val ios: F
     public actual fun recordException(exception: Throwable) {
         ios.recordError(exception.asNSError())
     }
+
+    @Suppress("UNCHECKED_CAST")
+    public actual fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+        ios.recordError(exception.asNSError(), customKeys as Map<Any?, *>)
+    }
+
     public actual fun log(message: String) {
         ios.log(message)
     }
+
     public actual fun setUserId(userId: String) {
         ios.setUserID(userId)
     }
+
     public actual fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
         ios.setCrashlyticsCollectionEnabled(enabled)
     }
+
     public actual fun sendUnsentReports() {
         ios.sendUnsentReports()
     }
+
     public actual fun deleteUnsentReports() {
         ios.deleteUnsentReports()
     }
+
     public actual fun didCrashOnPreviousExecution(): Boolean = ios.didCrashDuringPreviousExecution()
+
     public actual fun setCustomKey(key: String, value: String) {
         ios.setCustomValue(value, key)
     }
+
     public actual fun setCustomKey(key: String, value: Boolean) {
         ios.setCustomValue(value.toString(), key)
     }
+
     public actual fun setCustomKey(key: String, value: Double) {
         ios.setCustomValue(value.toString(), key)
     }
+
     public actual fun setCustomKey(key: String, value: Float) {
         ios.setCustomValue(value.toString(), key)
     }
+
     public actual fun setCustomKey(key: String, value: Int) {
         ios.setCustomValue(value.toString(), key)
     }
+
     public actual fun setCustomKey(key: String, value: Long) {
         ios.setCustomValue(value.toString(), key)
     }

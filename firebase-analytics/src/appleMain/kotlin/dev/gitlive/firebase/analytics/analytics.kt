@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.analytics
 
-import cocoapods.FirebaseAnalytics.FIRAnalytics
-import cocoapods.FirebaseAnalytics.setConsent
+import swiftPMImport.dev.gitlive.firebase.analytics.FIRAnalytics
+import swiftPMImport.dev.gitlive.firebase.analytics.setConsent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException

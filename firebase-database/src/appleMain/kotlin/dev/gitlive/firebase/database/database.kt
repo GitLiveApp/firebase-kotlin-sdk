@@ -4,17 +4,17 @@
 
 package dev.gitlive.firebase.database
 
-import cocoapods.FirebaseDatabase.FIRDataEventType
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildAdded
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildChanged
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildMoved
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildRemoved
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeValue
-import cocoapods.FirebaseDatabase.FIRDataSnapshot
-import cocoapods.FirebaseDatabase.FIRDatabase
-import cocoapods.FirebaseDatabase.FIRDatabaseQuery
-import cocoapods.FirebaseDatabase.FIRDatabaseReference
-import cocoapods.FirebaseDatabase.FIRTransactionResult
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildAdded
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildChanged
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildMoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildRemoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeValue
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataSnapshot
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabase
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseQuery
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseReference
+import swiftPMImport.dev.gitlive.firebase.database.FIRTransactionResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.Firebase

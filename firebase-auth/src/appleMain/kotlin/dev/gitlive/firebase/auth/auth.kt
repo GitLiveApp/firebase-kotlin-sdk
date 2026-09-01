@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import swiftPMImport.dev.gitlive.firebase.auth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -154,7 +154,8 @@ public actual class AuthTokenResult(internal val ios: FIRAuthTokenResult) {
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     it.setURL(NSURL.URLWithString(url))
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
-    dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) }
+    // dynamicLinkDomain is ignored here - FIRActionCodeSettings.dynamicLinkDomain was removed in
+    // firebase-ios-sdk 12.0.0 with the dynamic links shutdown, linkDomain replaces it
     linkDomain?.run { it.setLinkDomain(this) }
     it.setHandleCodeInApp(canHandleCodeInApp)
     iOSBundleId?.run { it.setIOSBundleID(this) }

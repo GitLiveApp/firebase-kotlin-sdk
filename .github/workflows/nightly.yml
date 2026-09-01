@@ -20,7 +20,7 @@ jobs:
       has_new_commits: ${{ steps.check.outputs.has_new_commits }}
       last_successful_sha: ${{ steps.check.outputs.last_successful_sha }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - id: check
         env:
           GH_TOKEN: ${{ github.token }}
@@ -51,7 +51,7 @@ jobs:
       wasm_js_test_jobs_matrix: ${{ steps.dataStep.outputs.wasm_js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -78,7 +78,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.emulator_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -92,7 +92,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.js_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -123,7 +123,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -137,7 +137,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -151,7 +151,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -165,7 +165,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
