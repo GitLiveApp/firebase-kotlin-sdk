@@ -36,15 +36,11 @@ public actual class FirebaseAnalytics(internal val js: dev.gitlive.firebase.anal
         dev.gitlive.firebase.analytics.externals.setAnalyticsCollectionEnabled(js, enabled)
     }
 
-    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
-        throw UnsupportedOperationException("Setting the session timeout is not supported in the Firebase JS SDK")
-    }
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration): Unit = throw UnsupportedOperationException("Setting the session timeout is not supported in the Firebase JS SDK")
 
     public actual suspend fun getSessionId(): Long? = throw UnsupportedOperationException("Getting the session ID is not supported in the Firebase JS SDK")
 
-    public actual fun resetAnalyticsData() {
-        throw UnsupportedOperationException("Resetting analytics data is not supported in the Firebase JS SDK")
-    }
+    public actual fun resetAnalyticsData(): Unit = throw UnsupportedOperationException("Resetting analytics data is not supported in the Firebase JS SDK")
 
     public actual fun setDefaultEventParameters(parameters: Map<String, String>) {
         dev.gitlive.firebase.analytics.externals.setDefaultEventParameters(json(*parameters.map { it.key to it.value }.toTypedArray()))

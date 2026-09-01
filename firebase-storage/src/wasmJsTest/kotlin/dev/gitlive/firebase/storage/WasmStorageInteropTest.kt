@@ -37,5 +37,4 @@ class WasmStorageInteropTest {
     }
 }
 
-private fun listResultWithoutPageToken(): dev.gitlive.firebase.storage.externals.ListResult =
-    js("({ items: [], prefixes: [] })")
+private fun listResultWithoutPageToken(): dev.gitlive.firebase.storage.externals.ListResult = js("({ items: [], prefixes: [] })")
