@@ -156,8 +156,9 @@ jobs:
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
           platform-name: tvOS
-          report-paths: "**/build/reports/tests/tvosArm64Test/"
+          report-paths: "**/build/reports/tests/tvosSimulatorArm64Test/"
           apple: 'true'
+          boot-simulator: tvOS
   build-jvm:
     needs: jobMatrixSetup
     runs-on: ubuntu-latest
