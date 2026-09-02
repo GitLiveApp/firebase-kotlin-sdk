@@ -4,6 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # kotlinx-coroutines 1.11.0 regressed Promise rejection handling on Wasm/JS:
+      # a rejected Promise no longer surfaces as JsException, so the raw JS error
+      # object (and its structured `details`) is unrecoverable through public API.
+      # Tracked upstream in Kotlin/kotlinx.coroutines#4678. Remove this entry once
+      # that is fixed. See also #855, which introduced and then reverted the bump.
+      - dependency-name: "org.jetbrains.kotlinx:kotlinx-coroutines-*"
+        versions: [ "1.11.x" ]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
