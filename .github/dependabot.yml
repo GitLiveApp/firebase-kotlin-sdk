@@ -12,6 +12,16 @@ updates:
       # that is fixed. See also #855, which introduced and then reverted the bump.
       - dependency-name: "org.jetbrains.kotlinx:kotlinx-coroutines-*"
         versions: [ "1.11.x" ]
+      # dokka 2.2.0 added a pre-generation validity check that rejects two source sets
+      # sharing a source root. 10 of the 14 modules do exactly that: their jvmMain
+      # source set adds kotlin.srcDir("src/androidMain/kotlin"), so 'android' and 'jvm'
+      # share a root and dokkaGeneratePublicationHtml fails. That runs during publish,
+      # not in PR CI, so the bump passed every check and only broke at release time.
+      # Remove this once dokka can handle shared source roots (Kotlin/dokka#3701).
+      - dependency-name: "org.jetbrains.dokka:*"
+        versions: [ "2.2.x" ]
+      - dependency-name: "org.jetbrains.dokka"
+        versions: [ "2.2.x" ]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
