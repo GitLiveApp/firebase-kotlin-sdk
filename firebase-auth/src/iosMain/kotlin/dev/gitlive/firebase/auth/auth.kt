@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRMultiFactorResolver
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorResolver
 import dev.gitlive.firebase.FirebaseException
 import platform.Foundation.NSError
 
