@@ -55,6 +55,11 @@ class FirebaseAnalyticsTest {
         analytics.logEvent("test") {
             param("key", "value")
         }
+        analytics.setUserProperty("test_property", "value")
+        analytics.setDefaultEventParameters(mapOf("default_key" to "default_value"))
+        analytics.setConsent {
+            analyticsStorage = FirebaseAnalytics.ConsentStatus.GRANTED
+        }
     }
 }
 

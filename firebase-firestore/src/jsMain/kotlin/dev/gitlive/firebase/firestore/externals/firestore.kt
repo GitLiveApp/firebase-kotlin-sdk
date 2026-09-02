@@ -45,7 +45,9 @@ public external fun disableNetwork(firestore: Firestore): Promise<Unit>
 
 public external fun doc(firestore: Firestore, documentPath: String): DocumentReference
 
-public external fun doc(firestore: CollectionReference, documentPath: String? = definedExternally): DocumentReference
+public external fun doc(firestore: CollectionReference): DocumentReference
+
+public external fun doc(firestore: CollectionReference, documentPath: String): DocumentReference
 
 public external fun enableIndexedDbPersistence(
     firestore: Firestore,

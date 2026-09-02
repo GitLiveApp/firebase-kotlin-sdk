@@ -95,6 +95,20 @@ kotlin {
         macosX64()
     }
 
+    if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            }
+        }
+    }
+
     if (supportedPlatforms.contains(TargetPlatform.Js)) {
         js(IR) {
             useCommonJs()
@@ -109,6 +123,9 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
@@ -132,6 +149,14 @@ kotlin {
             getByName("jsMain") {
                 dependencies {
                     implementation(kotlin("test-js"))
+                }
+            }
+        }
+
+        if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+            getByName("wasmJsMain") {
+                dependencies {
+                    implementation(kotlin("test-wasm-js"))
                 }
             }
         }
