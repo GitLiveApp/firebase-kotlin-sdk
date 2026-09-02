@@ -23,6 +23,14 @@ inputs:
     description: 'Xcode version to select when apple is true'
     required: false
     default: '26.2.0'
+  boot-simulator:
+    description: >-
+      Runtime prefix of a simulator to boot before running the tests, e.g. "tvOS".
+      The Kotlin simulator test tasks attach to an already-booted device
+      (standalone = false, device = "booted"), and `open -a Simulator` only brings up
+      the default iOS device, so a non-iOS runtime has to be booted explicitly.
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -50,6 +58,24 @@ runs:
       if: inputs.apple == 'true'
       with:
         xcode-version: ${{ inputs.xcode-version }}
+
+    - name: Boot ${{ inputs.boot-simulator }} simulator
+      if: inputs.boot-simulator != ''
+      shell: bash
+      run: |
+        set -euo pipefail
+        udid=$(xcrun simctl list devices available -j | python3 -c "
+        import json, sys
+        devices = json.load(sys.stdin)['devices']
+        for runtime, entries in devices.items():
+            if '${{ inputs.boot-simulator }}' in runtime and entries:
+                print(entries[0]['udid']); break
+        else:
+            sys.exit('No available ${{ inputs.boot-simulator }} simulator')
+        ")
+        echo "Booting ${{ inputs.boot-simulator }} simulator $udid"
+        xcrun simctl boot "$udid"
+        xcrun simctl bootstatus "$udid" -b
 
     - name: Setup test environment
       uses: ./.github/actions/setup_test_action
