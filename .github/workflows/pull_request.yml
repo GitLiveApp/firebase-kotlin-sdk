@@ -20,7 +20,6 @@ jobs:
     outputs:
       emulator_jobs_matrix: ${{ steps.dataStep.outputs.emulator_jobs_matrix }}
       ios_test_jobs_matrix: ${{ steps.dataStep.outputs.ios_test_jobs_matrix }}
-      tvos_test_jobs_matrix: ${{ steps.dataStep.outputs.tvos_test_jobs_matrix }}
       js_test_jobs_matrix: ${{ steps.dataStep.outputs.js_test_jobs_matrix }}
       jvm_test_jobs_matrix: ${{ steps.dataStep.outputs.jvm_test_jobs_matrix }}
     steps:
@@ -50,7 +49,6 @@ jobs:
           echo "
           emulator_jobs_matrix=$(jq -c . < ./build/emulator_jobs_matrix.json)
           ios_test_jobs_matrix=$(jq -c . < ./build/ios_test_jobs_matrix.json)
-          tvos_test_jobs_matrix=$(jq -c . < ./build/tvos_test_jobs_matrix.json)
           js_test_jobs_matrix=$(jq -c . < ./build/js_test_jobs_matrix.json)
           jvm_test_jobs_matrix=$(jq -c . < ./build/jvm_test_jobs_matrix.json)
           " >> $GITHUB_OUTPUT
@@ -101,23 +99,6 @@ jobs:
           platform-name: iOS
           report-paths: "**/build/reports/tests/iosSimulatorArm64Test/"
           apple: 'true'
-  build-tvos:
-    needs: jobMatrixSetup
-    if: fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix).gradle_tasks[0] != null
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/run_test_action
-        with:
-          gradle-tasks: ${{ matrix.gradle_tasks }}
-          platform-name: tvOS
-          report-paths: "**/build/reports/tests/tvosSimulatorArm64Test/"
-          apple: 'true'
-          boot-simulator: tvOS
-
   build-jvm:
     needs: jobMatrixSetup
     if: fromJson(needs.jobMatrixSetup.outputs.jvm_test_jobs_matrix).gradle_tasks[0] != null
