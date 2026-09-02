@@ -38,6 +38,7 @@ public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive
 	public final fun onDisconnect ()Ldev/gitlive/firebase/database/OnDisconnect;
 	public final fun push ()Ldev/gitlive/firebase/database/DatabaseReference;
 	public final fun removeValue (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun runTransaction (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun runTransaction (Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun runTransaction$default (Ldev/gitlive/firebase/database/DatabaseReference;Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun setValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -64,6 +65,15 @@ public final class dev/gitlive/firebase/database/FirebaseDatabase {
 }
 
 public final class dev/gitlive/firebase/database/FirebaseDatabase$Companion {
+}
+
+public final class dev/gitlive/firebase/database/MutableData {
+	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/database/MutableData;
+	public final fun getChildren ()Ljava/lang/Iterable;
+	public final fun getHasChildren ()Z
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/Object;
+	public final fun setValue (Ljava/lang/Object;)V
 }
 
 public final class dev/gitlive/firebase/database/OnDisconnect {
@@ -133,6 +143,26 @@ public final class dev/gitlive/firebase/database/ServerValueSerializer : kotlinx
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
+public final class dev/gitlive/firebase/database/Transaction {
+	public final fun abort ()Ldev/gitlive/firebase/database/Transaction$Result;
+	public final fun success (Ldev/gitlive/firebase/database/MutableData;)Ldev/gitlive/firebase/database/Transaction$Result;
+}
+
+public abstract class dev/gitlive/firebase/database/Transaction$Result {
+}
+
+public final class dev/gitlive/firebase/database/Transaction$Result$Abort : dev/gitlive/firebase/database/Transaction$Result {
+	public static final field INSTANCE Ldev/gitlive/firebase/database/Transaction$Result$Abort;
+}
+
+public final class dev/gitlive/firebase/database/Transaction$Result$Success : dev/gitlive/firebase/database/Transaction$Result {
+	public final fun component1 ()Ldev/gitlive/firebase/database/MutableData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getData ()Ldev/gitlive/firebase/database/MutableData;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/gitlive/firebase/database/databaseAndroid {
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/database/FirebaseDatabase;
 	public static final fun database (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/database/FirebaseDatabase;
@@ -140,6 +170,7 @@ public final class dev/gitlive/firebase/database/databaseAndroid {
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/DataSnapshot;)Lcom/google/firebase/database/DataSnapshot;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/DatabaseReference;)Lcom/google/firebase/database/DatabaseReference;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/FirebaseDatabase;)Lcom/google/firebase/database/FirebaseDatabase;
+	public static final fun getAndroid (Ldev/gitlive/firebase/database/MutableData;)Lcom/google/firebase/database/MutableData;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/OnDisconnect;)Lcom/google/firebase/database/OnDisconnect;
 	public static final fun getAndroid (Ldev/gitlive/firebase/database/Query;)Lcom/google/firebase/database/Query;
 	public static final fun getDatabase (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/database/FirebaseDatabase;
