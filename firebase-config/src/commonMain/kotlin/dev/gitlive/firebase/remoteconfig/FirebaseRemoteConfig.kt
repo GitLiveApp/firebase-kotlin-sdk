@@ -3,6 +3,7 @@ package dev.gitlive.firebase.remoteconfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -128,6 +129,18 @@ public expect class FirebaseRemoteConfig {
      *     keys and values.
      */
     public suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
+
+    /**
+     * Returns a [Flow] that emits [ConfigUpdate] events whenever the remote config is updated
+     * on the server side.
+     *
+     * When a config update is detected, the SDK automatically fetches the new values, but does
+     * **not** activate them. Call [activate] in the collector to apply the new values.
+     *
+     * The returned [Flow] uses a [kotlinx.coroutines.channels.Channel] internally and
+     * unregisters the underlying listener when the flow collection is cancelled.
+     */
+    public val configUpdates: Flow<ConfigUpdate>
 }
 
 @Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("fetch(minimumFetchIntervalInSeconds.seconds)"))

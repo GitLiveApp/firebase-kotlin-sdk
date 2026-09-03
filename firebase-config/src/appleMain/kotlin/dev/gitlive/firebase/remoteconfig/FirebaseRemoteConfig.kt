@@ -14,6 +14,9 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.app
 import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinInstant
 import platform.Foundation.NSError
@@ -98,6 +101,21 @@ public actual class FirebaseRemoteConfig internal constructor(internal val ios: 
     public actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
         ios.setDefaults(defaults.toMap())
     }
+
+    @Suppress("UNCHECKED_CAST")
+    public actual val configUpdates: Flow<ConfigUpdate>
+        get() = callbackFlow {
+            val registration = ios.addOnConfigUpdateListener { update, error ->
+                if (error != null) {
+                    // do not close the flow on transient errors; just drop the event
+                    return@addOnConfigUpdateListener
+                }
+                update?.updatedKeys?.let { keys ->
+                    trySend(ConfigUpdate((keys as Set<String>)))
+                }
+            }
+            awaitClose { registration.remove() }
+        }
 
     private fun FIRRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
         fetchTimeout = fetchTimeout.seconds,
