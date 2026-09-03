@@ -1,0 +1,219 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>OAuthProvider</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-alpha02
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filter=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="firebase-auth::dev.gitlive.firebase.auth.externals/OAuthProvider///PointingToDeclaration//999135774">
+  <div class="breadcrumbs"><a href="../../index.html">firebase-auth</a><span class="delimiter">/</span><a href="../index.html">dev.gitlive.firebase.auth.externals</a><span class="delimiter">/</span><span class="current">OAuthProvider</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>OAuth</span><wbr><span><span>Provider</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">class </span><a href="index.html">OAuthProvider</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">providerId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span> : <a href="../-auth-provider/index.html">AuthProvider</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-auth/src/wasmJsMain/kotlin/dev/gitlive/firebase/auth/externals/auth.kt#L259">source</a>)</span></span></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="279738073%2FConstructors%2F999135774" anchor-label="OAuthProvider" id="279738073%2FConstructors%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-o-auth-provider.html"><span>OAuth</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="279738073%2FConstructors%2F999135774"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">providerId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1196546331%2FProperties%2F999135774" anchor-label="providerId" id="1196546331%2FProperties%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="provider-id.html"><span>provider</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1196546331%2FProperties%2F999135774"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="provider-id.html">providerId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1983647568%2FFunctions%2F999135774" anchor-label="addScope" id="1983647568%2FFunctions%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-scope.html"><span>add</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1983647568%2FFunctions%2F999135774"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="add-scope.html"><span class="token function">addScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scope<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1821153938%2FFunctions%2F999135774" anchor-label="credential" id="1821153938%2FFunctions%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="credential.html"><span><span>credential</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1821153938%2FFunctions%2F999135774"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="credential.html"><span class="token function">credential</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">optionsOrIdToken<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">accessToken<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-auth-credential/index.html">AuthCredential</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2112263055%2FFunctions%2F999135774" anchor-label="setCustomParameters" id="-2112263055%2FFunctions%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-custom-parameters.html"><span>set</span><wbr><span>Custom</span><wbr><span><span>Parameters</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2112263055%2FFunctions%2F999135774"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-custom-parameters.html"><span class="token function">setCustomParameters</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">customOAuthParameters<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,86 +1,106 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/entries/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]entries.html
-$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]value-of.html
-$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[jvm]values.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentStatus/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-status/[wasm-js]values.html
 $dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/entries/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]entries.html
-$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]value-of.html
-$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[jvm]values.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/valueOf/#kotlin.String/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.analytics/FirebaseAnalytics.ConsentType/values/#/PointingToDeclaration/firebase-analytics/dev.gitlive.firebase.analytics/-firebase-analytics/-consent-type/[wasm-js]values.html
 $dokka.location:dev.gitlive.firebase.auth/AuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-auth-credential/[jvm]android.html
 $dokka.location:dev.gitlive.firebase.auth/OAuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-o-auth-credential/[jvm]android.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneAuthCredential/android/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-auth-credential/[jvm]android.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/activity/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]activity.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/codeSent/#kotlin.Function1[kotlin.Unit,kotlin.Unit]/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]code-sent.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/getVerificationCode/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]get-verification-code.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/getVerificationCode/#kotlin.String/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[wasm-js]get-verification-code.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/timeout/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]timeout.html
 $dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/unit/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[jvm]unit.html
+$dokka.location:dev.gitlive.firebase.auth/PhoneVerificationProvider/verifier/#/PointingToDeclaration/firebase-auth/dev.gitlive.firebase.auth/-phone-verification-provider/[wasm-js]verifier.html
+$dokka.location:dev.gitlive.firebase.database/DataSnapshot/database/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-data-snapshot/[wasm-js]database.html
 $dokka.location:dev.gitlive.firebase.database/FirebaseDatabase.Companion///PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-firebase-database/[jvm]-companion/index.html
+$dokka.location:dev.gitlive.firebase.database/Query/database/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[wasm-js]database.html
 $dokka.location:dev.gitlive.firebase.database/Query/persistenceEnabled/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[jvm]persistence-enabled.html
-$dokka.location:dev.gitlive.firebase.database/Query/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[jvm]to-string.html
-$dokka.location:dev.gitlive.firebase.database/ServerValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]equals.html
-$dokka.location:dev.gitlive.firebase.database/ServerValue/hashCode/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]hash-code.html
-$dokka.location:dev.gitlive.firebase.database/ServerValue/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[jvm]to-string.html
+$dokka.location:dev.gitlive.firebase.database/Query/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-query/[wasm-js]to-string.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[wasm-js]equals.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/hashCode/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[wasm-js]hash-code.html
+$dokka.location:dev.gitlive.firebase.database/ServerValue/toString/#/PointingToDeclaration/firebase-database/dev.gitlive.firebase.database/-server-value/[wasm-js]to-string.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.CollectionReference.Companion#com.google.firebase.firestore.CollectionReference/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.CollectionReference.Companion#dev.gitlive.firebase.firestore.externals.CollectionReference/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.DocumentReference.Companion#com.google.firebase.firestore.DocumentReference/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.DocumentReference.Companion#dev.gitlive.firebase.firestore.externals.DocumentReference/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.DocumentSnapshot.Companion#com.google.firebase.firestore.DocumentSnapshot/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.DocumentSnapshot.Companion#dev.gitlive.firebase.firestore.externals.DocumentSnapshot/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.FirebaseFirestore.Companion#com.google.firebase.firestore.FirebaseFirestore/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.FirebaseFirestore.Companion#dev.gitlive.firebase.firestore.externals.Firestore/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Query.Companion#com.google.firebase.firestore.Query/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Query.Companion#dev.gitlive.firebase.firestore.externals.Query/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Transaction.Companion#com.google.firebase.firestore.Transaction/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.Transaction.Companion#dev.gitlive.firebase.firestore.externals.Transaction/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
 $dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.WriteBatch.Companion#com.google.firebase.firestore.WriteBatch/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[jvm]invoke.html
-$dokka.location:dev.gitlive.firebase.firestore/ChangeType/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]entries.html
-$dokka.location:dev.gitlive.firebase.firestore/ChangeType/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]value-of.html
-$dokka.location:dev.gitlive.firebase.firestore/ChangeType/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[js]values.html
-$dokka.location:dev.gitlive.firebase.firestore/Direction/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]entries.html
-$dokka.location:dev.gitlive.firebase.firestore/Direction/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]value-of.html
-$dokka.location:dev.gitlive.firebase.firestore/Direction/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[js]values.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldPath/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]equals.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldPath/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]hash-code.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldPath/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[jvm]to-string.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]equals.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldValue/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]hash-code.html
-$dokka.location:dev.gitlive.firebase.firestore/FieldValue/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[jvm]to-string.html
-$dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreException/code/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-exception/[js]code.html
+$dokka.location:dev.gitlive.firebase.firestore//invoke/dev.gitlive.firebase.firestore.WriteBatch.Companion#dev.gitlive.firebase.firestore.externals.WriteBatch/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/[wasm-js]invoke.html
+$dokka.location:dev.gitlive.firebase.firestore/ChangeType/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/ChangeType/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-change-type/[wasm-js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/Direction/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/Direction/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-direction/[wasm-js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[wasm-js]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[wasm-js]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldPath/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-path/[wasm-js]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[wasm-js]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[wasm-js]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/FieldValue/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-field-value/[wasm-js]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreException/code/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-exception/[wasm-js]code.html
 $dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings.Builder/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/-builder/[jvm]callback-executor.html
 $dokka.location:dev.gitlive.firebase.firestore/FirebaseFirestoreSettings/callbackExecutor/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firebase-firestore-settings/[jvm]callback-executor.html
-$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/entries/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]entries.html
-$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]value-of.html
-$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[js]values.html
-$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]equals.html
-$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]hash-code.html
-$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[jvm]to-string.html
-$dokka.location:dev.gitlive.firebase.firestore/Timestamp/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]equals.html
-$dokka.location:dev.gitlive.firebase.firestore/Timestamp/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]hash-code.html
-$dokka.location:dev.gitlive.firebase.firestore/Timestamp/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[jvm]to-string.html
-$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/code/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]code.html
-$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/details/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[js]details.html
-$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/entries/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]entries.html
-$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]value-of.html
-$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/values/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[js]values.html
-$dokka.location:dev.gitlive.firebase.storage/Data/data/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-data/[jvm]data.html
+$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.firestore/FirestoreExceptionCode/values/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-firestore-exception-code/[wasm-js]values.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[wasm-js]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[wasm-js]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/GeoPoint/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-geo-point/[wasm-js]to-string.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/equals/#kotlin.Any?/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[wasm-js]equals.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/hashCode/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[wasm-js]hash-code.html
+$dokka.location:dev.gitlive.firebase.firestore/Timestamp/toString/#/PointingToDeclaration/firebase-firestore/dev.gitlive.firebase.firestore/-timestamp/[wasm-js]to-string.html
+$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/code/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[wasm-js]code.html
+$dokka.location:dev.gitlive.firebase.functions/FirebaseFunctionsException/details/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-firebase-functions-exception/[wasm-js]details.html
+$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/valueOf/#kotlin.String/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[wasm-js]value-of.html
+$dokka.location:dev.gitlive.firebase.functions/FunctionsExceptionCode/values/#/PointingToDeclaration/firebase-functions/dev.gitlive.firebase.functions/-functions-exception-code/[wasm-js]values.html
+$dokka.location:dev.gitlive.firebase.perf/FirebasePerformance/isInstrumentationEnabled/#/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf/-firebase-performance/[wasm-js]is-instrumentation-enabled.html
+$dokka.location:dev.gitlive.firebase.perf/FirebasePerformance/setInstrumentationEnabled/#kotlin.Boolean/PointingToDeclaration/firebase-perf/dev.gitlive.firebase.perf/-firebase-performance/[wasm-js]set-instrumentation-enabled.html
+$dokka.location:dev.gitlive.firebase.storage/Data/data/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-data/[wasm-js]data.html
 $dokka.location:dev.gitlive.firebase.storage/File/uri/#/PointingToDeclaration/firebase-storage/dev.gitlive.firebase.storage/-file/[jvm]uri.html
 module:firebase-analytics
 dev.gitlive.firebase.analytics
+dev.gitlive.firebase.analytics.externals
 module:firebase-app
 dev.gitlive.firebase
+dev.gitlive.firebase.externals
 module:firebase-auth
 dev.gitlive.firebase.auth
+dev.gitlive.firebase.auth.externals
 module:firebase-config
 dev.gitlive.firebase.remoteconfig
+dev.gitlive.firebase.remoteconfig.externals
 module:firebase-crashlytics
 dev.gitlive.firebase.crashlytics
 module:firebase-database
 dev.gitlive.firebase.database
+dev.gitlive.firebase.database.externals
 module:firebase-firestore
 dev.gitlive.firebase.firestore
+dev.gitlive.firebase.firestore.externals
 module:firebase-functions
 dev.gitlive.firebase.functions
+dev.gitlive.firebase.functions.externals
 module:firebase-installations
 dev.gitlive.firebase.installations
+dev.gitlive.firebase.installations.externals
 module:firebase-messaging
 dev.gitlive.firebase.messaging
+dev.gitlive.firebase.messaging.externals
 module:firebase-perf
 dev.gitlive.firebase.perf
+dev.gitlive.firebase.perf.externals
 dev.gitlive.firebase.perf.metrics
 dev.gitlive.firebase.perf.session
 module:firebase-storage
 dev.gitlive.firebase.storage
+dev.gitlive.firebase.storage.externals

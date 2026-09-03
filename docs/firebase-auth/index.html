@@ -41,7 +41,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.7.0
+        <div class="library-version" id="library-version">3.0.0-alpha02
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
@@ -52,6 +52,7 @@
                 <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-auth:dokkaHtmlPartial/jsMain">js</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-auth:dokkaHtmlPartial/jvmMain">jvm</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-auth:dokkaHtmlPartial/tvosMain">tvos</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -109,6 +110,13 @@
                                 tvos
                             </label>
                         </li>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filter=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
@@ -139,22 +147,22 @@
                 </div>
             </div>
             <div id="main">
-<div class="main-content" id="content" pageids="firebase-auth::////PointingToDeclaration//-1058669669">
+<div class="main-content" id="content" pageids="firebase-auth::////PointingToDeclaration//-1854736083">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h1 class="cover"><span><span>firebase-auth</span></span></h1>
     <div class="platform-hinted UnderCoverText with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/appleMain" data-toggle=":firebase-auth:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/commonMain" data-toggle=":firebase-auth:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/iosMain" data-toggle=":firebase-auth:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/jsMain" data-toggle=":firebase-auth:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-auth:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/tvosMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/tvosMain" data-toggle=":firebase-auth:dokkaHtmlPartial/tvosMain">tvos</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/androidMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/appleMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/commonMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/iosMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/jsMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/jvmMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/tvosMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-auth:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/appleMain" data-toggle=":firebase-auth:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/commonMain" data-toggle=":firebase-auth:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/iosMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/iosMain" data-toggle=":firebase-auth:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/jsMain" data-toggle=":firebase-auth:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-auth:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/tvosMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/tvosMain" data-toggle=":firebase-auth:dokkaHtmlPartial/tvosMain">tvos</button><button class="platform-bookmark" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-auth:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-auth:dokkaHtmlPartial/androidMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/appleMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/commonMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/iosMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/jsMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/jvmMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/tvosMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-auth:dokkaHtmlPartial/wasmJsMain"><p class="paragraph">This module is a direct forward of the Firebase Authentication library. It provides the main functionality, like authenticating with Google or Apple.</p></div>    </div>
   </div>
   <h2 class="">Packages</h2>
-  <div class="table"><a data-name="1527853896%2FPackages%2F-1058669669" anchor-label="dev.gitlive.firebase.auth" id="1527853896%2FPackages%2F-1058669669" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain"></a>
-    <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain">
+  <div class="table"><a data-name="1527853896%2FPackages%2F-1854736083" anchor-label="dev.gitlive.firebase.auth" id="1527853896%2FPackages%2F-1854736083" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain,:firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+    <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain,:firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/androidMain,:firebase-auth:dokkaHtmlPartial/appleMain,:firebase-auth:dokkaHtmlPartial/commonMain,:firebase-auth:dokkaHtmlPartial/iosMain,:firebase-auth:dokkaHtmlPartial/jsMain,:firebase-auth:dokkaHtmlPartial/jvmMain,:firebase-auth:dokkaHtmlPartial/tvosMain,:firebase-auth:dokkaHtmlPartial/wasmJsMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="dev.gitlive.firebase.auth/index.html">dev.gitlive.firebase.auth</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1527853896%2FPackages%2F-1058669669"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1527853896%2FPackages%2F-1854736083"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -166,6 +174,25 @@
               <div class="platform-tag js-like">js</div>
               <div class="platform-tag jvm-like">jvm</div>
               <div class="platform-tag common-like">tvos</div>
+              <div class="platform-tag wasm-like">wasmJs</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-385865502%2FPackages%2F999135774" anchor-label="dev.gitlive.firebase.auth.externals" id="-385865502%2FPackages%2F999135774" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain"></a>
+    <div class="table-row" data-filterable-current=":firebase-auth:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-auth:dokkaHtmlPartial/wasmJsMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="dev.gitlive.firebase.auth.externals/index.html">dev.gitlive.firebase.auth.externals</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-385865502%2FPackages%2F999135774"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag wasm-like">wasmJs</div>
             </div>
           </div>
         </div>

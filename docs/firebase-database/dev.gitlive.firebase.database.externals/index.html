@@ -1,0 +1,875 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>dev.gitlive.firebase.database.externals</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-alpha02
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filter=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-database::dev.gitlive.firebase.database.externals////PointingToDeclaration//-65321749">
+  <div class="breadcrumbs"><a href="../index.html">firebase-database</a><span class="delimiter">/</span><span class="current">dev.gitlive.firebase.database.externals</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1669230870%2FClasslikes%2F-65321749" anchor-label="CancelCallback" id="1669230870%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cancel-callback/index.html"><span>Cancel</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1669230870%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator"> = </span><span class="token punctuation">(</span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2068862660%2FClasslikes%2F-65321749" anchor-label="ChangeSnapshotCallback" id="-2068862660%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-change-snapshot-callback/index.html"><span>Change</span><wbr><span>Snapshot</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2068862660%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-change-snapshot-callback/index.html">ChangeSnapshotCallback</a><span class="token operator"> = </span><span class="token punctuation">(</span>data<span class="token operator">: </span><a href="-data-snapshot/index.html">DataSnapshot</a><span class="token punctuation">, </span>previousChildName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="116759290%2FClasslikes%2F-65321749" anchor-label="Database" id="116759290%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-database/index.html"><span><span>Database</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="116759290%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-database/index.html">Database</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-559818051%2FClasslikes%2F-65321749" anchor-label="DatabaseReference" id="-559818051%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-database-reference/index.html"><span>Database</span><wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-559818051%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2129713593%2FClasslikes%2F-65321749" anchor-label="DataSnapshot" id="-2129713593%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-data-snapshot/index.html"><span>Data</span><wbr><span><span>Snapshot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2129713593%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-data-snapshot/index.html">DataSnapshot</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1806938470%2FClasslikes%2F-65321749" anchor-label="OnDisconnect" id="-1806938470%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on-disconnect/index.html"><span>On</span><wbr><span><span>Disconnect</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1806938470%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-on-disconnect/index.html">OnDisconnect</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="720327429%2FClasslikes%2F-65321749" anchor-label="Query" id="720327429%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-query/index.html"><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="720327429%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-query/index.html">Query</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2044178088%2FClasslikes%2F-65321749" anchor-label="QueryConstraint" id="2044178088%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-query-constraint/index.html"><span>Query</span><wbr><span><span>Constraint</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2044178088%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-868452551%2FClasslikes%2F-65321749" anchor-label="ThenableReference" id="-868452551%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-thenable-reference/index.html"><span>Thenable</span><wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-868452551%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-thenable-reference/index.html">ThenableReference</a> : <a href="-database-reference/index.html">DatabaseReference</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1374593902%2FClasslikes%2F-65321749" anchor-label="TransactionResult" id="-1374593902%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transaction-result/index.html"><span>Transaction</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1374593902%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">interface </span><a href="-transaction-result/index.html">TransactionResult</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1656823379%2FClasslikes%2F-65321749" anchor-label="ValueSnapshotCallback" id="1656823379%2FClasslikes%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-value-snapshot-callback/index.html"><span>Value</span><wbr><span>Snapshot</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1656823379%2FClasslikes%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-value-snapshot-callback/index.html">ValueSnapshotCallback</a><span class="token operator"> = </span><span class="token punctuation">(</span>data<span class="token operator">: </span><a href="-data-snapshot/index.html">DataSnapshot</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="69696030%2FFunctions%2F-65321749" anchor-label="child" id="69696030%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="child.html"><span><span>child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="69696030%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="child.html"><span class="token function">child</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">parent<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a><span class="token punctuation">, </span></span><span class="parameter ">path<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1297653949%2FFunctions%2F-65321749" anchor-label="connectDatabaseEmulator" id="-1297653949%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="connect-database-emulator.html"><span>connect</span><wbr><span>Database</span><wbr><span><span>Emulator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1297653949%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="connect-database-emulator.html"><span class="token function">connectDatabaseEmulator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">db<span class="token operator">: </span><a href="-database/index.html">Database</a><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">port<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">options<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1110708535%2FFunctions%2F-65321749" anchor-label="enableLogging" id="-1110708535%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enable-logging.html"><span>enable</span><wbr><span><span>Logging</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1110708535%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="enable-logging.html"><span class="token function">enableLogging</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">persistent<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2052876384%2FFunctions%2F-65321749" anchor-label="endAt" id="2052876384%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="end-at.html"><span>end</span><wbr><span><span>At</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2052876384%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="end-at.html"><span class="token function">endAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1114501036%2FFunctions%2F-65321749" anchor-label="endBefore" id="1114501036%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="end-before.html"><span>end</span><wbr><span><span>Before</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1114501036%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="end-before.html"><span class="token function">endBefore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="515995009%2FFunctions%2F-65321749" anchor-label="equalTo" id="515995009%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="equal-to.html"><span>equal</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="515995009%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="equal-to.html"><span class="token function">equalTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1626365125%2FFunctions%2F-65321749" anchor-label="get" id="-1626365125%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1626365125%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><a href="-data-snapshot/index.html">DataSnapshot</a><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1600958628%2FFunctions%2F-65321749" anchor-label="getDatabase" id="1600958628%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-database.html"><span>get</span><wbr><span><span>Database</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1600958628%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="get-database.html"><span class="token function">getDatabase</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase.externals/-firebase-app/index.html">FirebaseApp</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally<span class="token punctuation">, </span></span><span class="parameter ">url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-database/index.html">Database</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-987025185%2FFunctions%2F-65321749" anchor-label="goOffline" id="-987025185%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="go-offline.html"><span>go</span><wbr><span><span>Offline</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-987025185%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="go-offline.html"><span class="token function">goOffline</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">db<span class="token operator">: </span><a href="-database/index.html">Database</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2089018855%2FFunctions%2F-65321749" anchor-label="goOnline" id="-2089018855%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="go-online.html"><span>go</span><wbr><span><span>Online</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2089018855%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="go-online.html"><span class="token function">goOnline</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">db<span class="token operator">: </span><a href="-database/index.html">Database</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1963589187%2FFunctions%2F-65321749" anchor-label="increment" id="1963589187%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="increment.html"><span><span>increment</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1963589187%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="increment.html"><span class="token function">increment</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">delta<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="464689038%2FFunctions%2F-65321749" anchor-label="limitToFirst" id="464689038%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="limit-to-first.html"><span>limit</span><wbr><span>To</span><wbr><span><span>First</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="464689038%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="limit-to-first.html"><span class="token function">limitToFirst</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="405702466%2FFunctions%2F-65321749" anchor-label="limitToLast" id="405702466%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="limit-to-last.html"><span>limit</span><wbr><span>To</span><wbr><span><span>Last</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="405702466%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="limit-to-last.html"><span class="token function">limitToLast</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="722989489%2FFunctions%2F-65321749" anchor-label="off" id="722989489%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="off.html"><span><span>off</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="722989489%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="off.html"><span class="token function">off</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">eventType<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1482934333%2FFunctions%2F-65321749" anchor-label="onChildAdded" id="1482934333%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-child-added.html"><span>on</span><wbr><span>Child</span><wbr><span><span>Added</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1482934333%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-child-added.html"><span class="token function">onChildAdded</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><a href="-change-snapshot-callback/index.html">ChangeSnapshotCallback</a><span class="token punctuation">, </span></span><span class="parameter ">cancelCallback<span class="token operator">: </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-unsubscribe/index.html">Unsubscribe</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1584594313%2FFunctions%2F-65321749" anchor-label="onChildChanged" id="1584594313%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-child-changed.html"><span>on</span><wbr><span>Child</span><wbr><span><span>Changed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1584594313%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-child-changed.html"><span class="token function">onChildChanged</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><a href="-change-snapshot-callback/index.html">ChangeSnapshotCallback</a><span class="token punctuation">, </span></span><span class="parameter ">cancelCallback<span class="token operator">: </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-unsubscribe/index.html">Unsubscribe</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-975093206%2FFunctions%2F-65321749" anchor-label="onChildMoved" id="-975093206%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-child-moved.html"><span>on</span><wbr><span>Child</span><wbr><span><span>Moved</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-975093206%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-child-moved.html"><span class="token function">onChildMoved</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><a href="-change-snapshot-callback/index.html">ChangeSnapshotCallback</a><span class="token punctuation">, </span></span><span class="parameter ">cancelCallback<span class="token operator">: </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-unsubscribe/index.html">Unsubscribe</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-477066659%2FFunctions%2F-65321749" anchor-label="onChildRemoved" id="-477066659%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-child-removed.html"><span>on</span><wbr><span>Child</span><wbr><span><span>Removed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-477066659%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-child-removed.html"><span class="token function">onChildRemoved</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><a href="-change-snapshot-callback/index.html">ChangeSnapshotCallback</a><span class="token punctuation">, </span></span><span class="parameter ">cancelCallback<span class="token operator">: </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-unsubscribe/index.html">Unsubscribe</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="328377470%2FFunctions%2F-65321749" anchor-label="onDisconnect" id="328377470%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-disconnect.html"><span>on</span><wbr><span><span>Disconnect</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="328377470%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-disconnect.html"><span class="token function">onDisconnect</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ref<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-on-disconnect/index.html">OnDisconnect</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1885947772%2FFunctions%2F-65321749" anchor-label="onValue" id="-1885947772%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-value.html"><span>on</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1885947772%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="on-value.html"><span class="token function">onValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter ">callback<span class="token operator">: </span><a href="-value-snapshot-callback/index.html">ValueSnapshotCallback</a><span class="token punctuation">, </span></span><span class="parameter ">cancelCallback<span class="token operator">: </span><a href="-cancel-callback/index.html">CancelCallback</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../firebase-app/dev.gitlive.firebase/-unsubscribe/index.html">Unsubscribe</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1241106033%2FFunctions%2F-65321749" anchor-label="orderByChild" id="1241106033%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="order-by-child.html"><span>order</span><wbr><span>By</span><wbr><span><span>Child</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1241106033%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="order-by-child.html"><span class="token function">orderByChild</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">path<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1051991536%2FFunctions%2F-65321749" anchor-label="orderByKey" id="-1051991536%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="order-by-key.html"><span>order</span><wbr><span>By</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1051991536%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="order-by-key.html"><span class="token function">orderByKey</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-913409346%2FFunctions%2F-65321749" anchor-label="orderByValue" id="-913409346%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="order-by-value.html"><span>order</span><wbr><span>By</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-913409346%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="order-by-value.html"><span class="token function">orderByValue</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="64794526%2FFunctions%2F-65321749" anchor-label="push" id="64794526%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="push.html"><span><span>push</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="64794526%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="push.html"><span class="token function">push</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">parent<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-thenable-reference/index.html">ThenableReference</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-692843346%2FFunctions%2F-65321749" anchor-label="query" id="-692843346%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="query.html"><span><span>query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-692843346%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="query.html"><span class="token function">query</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">query<span class="token operator">: </span><a href="-query/index.html">Query</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>queryConstraints<span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query/index.html">Query</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="457071191%2FFunctions%2F-65321749" anchor-label="ref" id="457071191%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ref.html"><span><span>ref</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="457071191%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="ref.html"><span class="token function">ref</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">db<span class="token operator">: </span><a href="-database/index.html">Database</a><span class="token punctuation">, </span></span><span class="parameter ">path<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1025796313%2FFunctions%2F-65321749" anchor-label="remove" id="-1025796313%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove.html"><span><span>remove</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1025796313%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="remove.html"><span class="token function">remove</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ref<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1238287810%2FFunctions%2F-65321749" anchor-label="runTransaction" id="1238287810%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="run-transaction.html"><span>run</span><wbr><span><span>Transaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1238287810%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="run-transaction.html"><span class="token function">runTransaction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ref<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a><span class="token punctuation">, </span></span><span class="parameter ">transactionUpdate<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">options<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><a href="-transaction-result/index.html">TransactionResult</a><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="320028989%2FFunctions%2F-65321749" anchor-label="serverTimestamp" id="320028989%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="server-timestamp.html"><span>server</span><wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="320028989%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="server-timestamp.html"><span class="token function">serverTimestamp</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1689697060%2FFunctions%2F-65321749" anchor-label="set" id="-1689697060%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set.html"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1689697060%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ref<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1846244014%2FFunctions%2F-65321749" anchor-label="startAfter" id="-1846244014%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="start-after.html"><span>start</span><wbr><span><span>After</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1846244014%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="start-after.html"><span class="token function">startAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1953005337%2FFunctions%2F-65321749" anchor-label="startAt" id="-1953005337%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="start-at.html"><span>start</span><wbr><span><span>At</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1953005337%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="start-at.html"><span class="token function">startAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-query-constraint/index.html">QueryConstraint</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1079690220%2FFunctions%2F-65321749" anchor-label="update" id="-1079690220%2FFunctions%2F-65321749" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update.html"><span><span>update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1079690220%2FFunctions%2F-65321749"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">external </span><span class="token keyword">fun </span><a href="update.html"><span class="token function">update</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ref<span class="token operator">: </span><a href="-database-reference/index.html">DatabaseReference</a><span class="token punctuation">, </span></span><span class="parameter ">values<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
