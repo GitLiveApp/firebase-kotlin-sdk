@@ -31,21 +31,20 @@ class FirebaseRemoteConfigTest {
         "test_default_string" to "Hello World",
     )
 
+    private val options = FirebaseOptions(
+        applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+        apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
+        databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+        storageBucket = "fir-kotlin-sdk.appspot.com",
+        projectId = "fir-kotlin-sdk",
+        gcmSenderId = "846484016111",
+    )
+
     lateinit var remoteConfig: FirebaseRemoteConfig
 
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
-            context,
-            FirebaseOptions(
-                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
-                apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
-                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                storageBucket = "fir-kotlin-sdk.appspot.com",
-                projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111",
-            ),
-        )
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(context, options)
 
         remoteConfig = Firebase.remoteConfig(app)
     }
@@ -111,6 +110,29 @@ class FirebaseRemoteConfigTest {
             ).toString(),
             remoteConfig.info.toString(),
         )
+    }
+
+    // Regression test for #707. On Apple the `app` argument used to be ignored in favour of the
+    // default app, so this returned the default app's instance (and threw an NPE outright when no
+    // default app existed). Every other test here passes the default app, so none of them could
+    // have caught it.
+    @Test
+    fun testRemoteConfigUsesGivenApp() = runTest {
+        val secondaryApp = Firebase.initialize(context, options, "secondary")
+        val secondaryConfig = Firebase.remoteConfig(secondaryApp)
+        try {
+            secondaryConfig.setDefaults("test_secondary_only" to "secondary value")
+
+            val onSecondary = secondaryConfig.getValue("test_secondary_only")
+            assertEquals("secondary value", onSecondary.asString())
+            assertEquals(ValueSource.Default, onSecondary.getSource())
+
+            // A distinct instance, so the default just set must not exist on the default app at
+            // all. Static is the source reported for a key that was never set.
+            assertEquals(ValueSource.Static, remoteConfig.getValue("test_secondary_only").getSource())
+        } finally {
+            secondaryConfig.reset()
+        }
     }
 
     @Test
