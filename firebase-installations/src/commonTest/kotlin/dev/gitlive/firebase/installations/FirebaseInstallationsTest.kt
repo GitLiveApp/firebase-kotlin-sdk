@@ -55,6 +55,9 @@ class FirebaseInstallationsTest {
     @Test
     fun testDelete() = runTest {
         val id = Firebase.installations.getId()
+        // getId() returns before the installation is registered and the JS SDK refuses to delete a pending
+        // registration, so wait for a token (which completes the registration) before deleting.
+        Firebase.installations.getToken(false)
         Firebase.installations.delete()
         assertTrue(id.isNotBlank())
     }
