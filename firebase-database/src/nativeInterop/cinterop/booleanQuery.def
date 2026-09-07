@@ -1,0 +1,39 @@
+language = Objective-C
+package = dev.gitlive.firebase.database.cinterop
+---
+#import <Foundation/Foundation.h>
+
+// Builds a query bound for a boolean value without the value crossing the
+// Kotlin/Native interop boundary as an object. Kotlin/Native boxes a Kotlin
+// Boolean as an NSNumber subclass that is not a CFBoolean, so the FirebaseDatabase
+// SDK would treat the bound as the number 1/0 instead of a JSON boolean
+// (https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/275). The boolean
+// enters here as a primitive C BOOL, which is unaffected, and the CFBoolean it
+// selects never surfaces in Kotlin. The query is typed id so this file does not
+// need the FirebaseDatabase headers.
+static inline id _Nonnull GitLiveBooleanQueryBound(id _Nonnull query,
+                                                   SEL _Nonnull selector,
+                                                   SEL _Nonnull selectorWithKey,
+                                                   BOOL value,
+                                                   id _Nullable childKey) {
+    id boolValue = value ? (__bridge id)kCFBooleanTrue : (__bridge id)kCFBooleanFalse;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    if (childKey == nil) {
+        return [query performSelector:selector withObject:boolValue];
+    }
+    return [query performSelector:selectorWithKey withObject:boolValue withObject:childKey];
+#pragma clang diagnostic pop
+}
+
+static inline id _Nonnull GitLiveQueryStartingAtBoolean(id _Nonnull query, BOOL value, id _Nullable childKey) {
+    return GitLiveBooleanQueryBound(query, @selector(queryStartingAtValue:), @selector(queryStartingAtValue:childKey:), value, childKey);
+}
+
+static inline id _Nonnull GitLiveQueryEndingAtBoolean(id _Nonnull query, BOOL value, id _Nullable childKey) {
+    return GitLiveBooleanQueryBound(query, @selector(queryEndingAtValue:), @selector(queryEndingAtValue:childKey:), value, childKey);
+}
+
+static inline id _Nonnull GitLiveQueryEqualToBoolean(id _Nonnull query, BOOL value, id _Nullable childKey) {
+    return GitLiveBooleanQueryBound(query, @selector(queryEqualToValue:), @selector(queryEqualToValue:childKey:), value, childKey);
+}
