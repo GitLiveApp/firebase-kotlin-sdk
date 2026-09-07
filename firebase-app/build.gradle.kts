@@ -20,7 +20,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.publish)
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -41,6 +41,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
         testOptions.configureTestOptions(project)
         packaging {
             resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -175,7 +176,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(project(":android-sdk:relocated-firebase-common"))
+                    api(libs.google.firebase.common)
                 }
             }
         }
@@ -184,18 +185,26 @@ kotlin {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")
             }
+            project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/androidMain/java")
         }
     }
 }
 
-// com.google.android.gms.tasks is provided by Play Services (android) / firebase-java-sdk (jvm) at runtime.
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+// The com.google.* declarations are header stubs on Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real
+// Firebase Android SDK / firebase-java-sdk classes are used at runtime.
 stripHeaderStubs(
-    packageDir = "com/google/android/gms/tasks",
-    referenceJars = files({
-        configurations.findByName("debugCompileClasspath")?.incoming?.artifactView {
+    packageDirs = listOf("com/google/android/gms", "com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
-        }?.files?.filter { it.name.startsWith("play-services-tasks") } ?: files()
+        }?.files ?: files()
     }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
 )
 
 registerAndroidSourceCompat("firebase-common/api.txt")

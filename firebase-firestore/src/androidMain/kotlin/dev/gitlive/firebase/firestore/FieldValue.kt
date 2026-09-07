@@ -3,7 +3,7 @@ package dev.gitlive.firebase.firestore
 import kotlinx.serialization.Serializable
 
 /** Represents a platform specific Firebase FieldValue. */
-public typealias NativeFieldValue = dev.gitlive.firebase.android.firestore.FieldValue
+public typealias NativeFieldValue = com.google.firebase.firestore.FieldValue
 
 /** Represents a Firebase FieldValue. */
 @Serializable(with = FieldValueSerializer::class)

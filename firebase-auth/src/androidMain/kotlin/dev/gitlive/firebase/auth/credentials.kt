@@ -5,10 +5,10 @@
 package dev.gitlive.firebase.auth
 
 import android.app.Activity
-import dev.gitlive.firebase.android.FirebaseException
-import dev.gitlive.firebase.android.auth.OAuthProvider as AndroidOAuthProvider
-import dev.gitlive.firebase.android.auth.PhoneAuthOptions
-import dev.gitlive.firebase.android.auth.PhoneAuthProvider
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.OAuthProvider as AndroidOAuthProvider
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,33 +18,33 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.TimeUnit
 
-public actual open class AuthCredential(public open val android: dev.gitlive.firebase.android.auth.AuthCredential) {
+public actual open class AuthCredential(public open val android: com.google.firebase.auth.AuthCredential) {
     public actual val providerId: String
         get() = android.provider
 }
 
-public actual class PhoneAuthCredential(override val android: dev.gitlive.firebase.android.auth.PhoneAuthCredential) : AuthCredential(android)
+public actual class PhoneAuthCredential(override val android: com.google.firebase.auth.PhoneAuthCredential) : AuthCredential(android)
 
-public actual class OAuthCredential(override val android: dev.gitlive.firebase.android.auth.OAuthCredential) : AuthCredential(android)
+public actual class OAuthCredential(override val android: com.google.firebase.auth.OAuthCredential) : AuthCredential(android)
 
 public actual object EmailAuthProvider {
     public actual fun credential(
         email: String,
         password: String,
-    ): AuthCredential = AuthCredential(dev.gitlive.firebase.android.auth.EmailAuthProvider.getCredential(email, password))
+    ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredential(email, password))
 
     public actual fun credentialWithLink(
         email: String,
         emailLink: String,
-    ): AuthCredential = AuthCredential(dev.gitlive.firebase.android.auth.EmailAuthProvider.getCredentialWithLink(email, emailLink))
+    ): AuthCredential = AuthCredential(com.google.firebase.auth.EmailAuthProvider.getCredentialWithLink(email, emailLink))
 }
 
 public actual object FacebookAuthProvider {
-    public actual fun credential(accessToken: String): AuthCredential = AuthCredential(dev.gitlive.firebase.android.auth.FacebookAuthProvider.getCredential(accessToken))
+    public actual fun credential(accessToken: String): AuthCredential = AuthCredential(com.google.firebase.auth.FacebookAuthProvider.getCredential(accessToken))
 }
 
 public actual object GithubAuthProvider {
-    public actual fun credential(token: String): AuthCredential = AuthCredential(dev.gitlive.firebase.android.auth.GithubAuthProvider.getCredential(token))
+    public actual fun credential(token: String): AuthCredential = AuthCredential(com.google.firebase.auth.GithubAuthProvider.getCredential(token))
 }
 
 public actual object GoogleAuthProvider {
@@ -52,7 +52,7 @@ public actual object GoogleAuthProvider {
         require(idToken != null || accessToken != null) {
             "Both parameters are optional but at least one must be present."
         }
-        return AuthCredential(dev.gitlive.firebase.android.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
+        return AuthCredential(com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, accessToken))
     }
 }
 
@@ -79,7 +79,7 @@ public actual class OAuthProvider(internal val android: AndroidOAuthProvider) {
             accessToken?.let { builder.setAccessToken(it) }
             idToken?.let { builder.setIdToken(it) }
             rawNonce?.let { builder.setIdTokenWithRawNonce(idToken!!, it) }
-            return OAuthCredential(builder.build() as dev.gitlive.firebase.android.auth.OAuthCredential)
+            return OAuthCredential(builder.build() as com.google.firebase.auth.OAuthCredential)
         }
     }
 }
@@ -113,7 +113,7 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
                 }
             }
 
-            override fun onVerificationCompleted(credential: dev.gitlive.firebase.android.auth.PhoneAuthCredential) {
+            override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
                 autoRetrieved.complete(AuthCredential(credential))
             }
 
@@ -160,5 +160,5 @@ public actual interface PhoneVerificationProvider {
 }
 
 public actual object TwitterAuthProvider {
-    public actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(dev.gitlive.firebase.android.auth.TwitterAuthProvider.getCredential(token, secret))
+    public actual fun credential(token: String, secret: String): AuthCredential = AuthCredential(com.google.firebase.auth.TwitterAuthProvider.getCredential(token, secret))
 }

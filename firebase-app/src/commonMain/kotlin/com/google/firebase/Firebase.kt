@@ -9,7 +9,8 @@ package com.google.firebase
  *
  * The `com.google.firebase` packages in this library mirror the Firebase Android SDK API (including `Task` return
  * types) so that Android code compiles unchanged on every platform; the `dev.gitlive.firebase` packages offer the
- * Kotlin-first (suspending) API built on top of them.
+ * Kotlin-first (suspending) API built on top of them. On Android and the JVM these declarations are only compiled
+ * against and never shipped: the real Firebase Android SDK classes are used.
  */
 public object Firebase
 
@@ -23,12 +24,3 @@ public fun Firebase.app(name: String): FirebaseApp = FirebaseApp.getInstance(nam
 /** Returns the [FirebaseOptions] of the default [FirebaseApp]. */
 public val Firebase.options: FirebaseOptions
     get() = Firebase.app.options
-
-/** Initializes and returns the default [FirebaseApp] from the platform's configuration file, if any. */
-public fun Firebase.initialize(context: Any?): FirebaseApp? = FirebaseApp.initializeApp(context)
-
-/** Initializes and returns the default [FirebaseApp] with the given [options]. */
-public fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp.initializeApp(context, options)
-
-/** Initializes and returns a [FirebaseApp] with the given [options] and [name]. */
-public fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp.initializeApp(context, options, name)

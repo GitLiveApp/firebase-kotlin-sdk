@@ -42,22 +42,24 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(FIRApp.appNamed(name) ?: throw IllegalStateException("FirebaseApp with name $name does not exist."))
 
-        public actual fun initializeApp(context: Any?): FirebaseApp? {
+        /** Platform extra: initialises like the Android SDK's `initializeApp(Context)`; the context is ignored. */
+        public fun initializeApp(context: Any?): FirebaseApp? {
             FIRApp.configure()
             return FIRApp.defaultApp()?.let { FirebaseApp(it) }
         }
 
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp {
+        public fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp {
             FIRApp.configureWithOptions(options.ios)
             return getInstance()
         }
 
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp {
+        public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp {
             FIRApp.configureWithName(name, options.ios)
             return getInstance(name)
         }
 
-        public actual fun getApps(context: Any?): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
+        /** Platform extra: like the Android SDK's `getApps(Context)`; the context is ignored. */
+        public fun getApps(context: Any?): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
     }
 }
 

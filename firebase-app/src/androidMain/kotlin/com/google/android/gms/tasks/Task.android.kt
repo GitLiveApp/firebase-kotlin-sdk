@@ -4,6 +4,8 @@
 
 package com.google.android.gms.tasks
 
+import dev.gitlive.firebase.stub
+
 /*
  * Header stubs for the Play Services Tasks API.
  *
@@ -20,7 +22,7 @@ public actual abstract class Task<TResult> actual constructor() {
     public actual abstract val isCanceled: Boolean
     public actual abstract val result: TResult
     public actual abstract val exception: Exception?
-    public actual abstract fun addOnSuccessListener(listener: OnSuccessListener<in TResult>): Task<TResult>
+    public actual abstract fun addOnSuccessListener(listener: OnSuccessListener<TResult>): Task<TResult>
     public actual abstract fun addOnFailureListener(listener: OnFailureListener): Task<TResult>
     public actual abstract fun addOnCompleteListener(listener: OnCompleteListener<TResult>): Task<TResult>
     public actual abstract fun addOnCanceledListener(listener: OnCanceledListener): Task<TResult>
@@ -62,5 +64,3 @@ public actual class TaskCompletionSource<TResult> actual constructor() {
 }
 
 public actual class RuntimeExecutionException actual constructor(cause: Throwable) : RuntimeException(cause)
-
-private fun stub(): Nothing = throw UnsupportedOperationException("Header stub; the real Play Services class is used at runtime")

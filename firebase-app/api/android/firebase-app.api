@@ -1,70 +1,3 @@
-public final class com/google/firebase/Firebase {
-	public static final field INSTANCE Lcom/google/firebase/Firebase;
-}
-
-public final class com/google/firebase/FirebaseApp {
-	public static final field Companion Lcom/google/firebase/FirebaseApp$Companion;
-	public static final field DEFAULT_APP_NAME Ljava/lang/String;
-	public final fun delete ()V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAndroid ()Ldev/gitlive/firebase/android/FirebaseApp;
-	public static final fun getApps (Ljava/lang/Object;)Ljava/util/List;
-	public static final fun getInstance ()Lcom/google/firebase/FirebaseApp;
-	public static final fun getInstance (Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-	public final fun getName ()Ljava/lang/String;
-	public final fun getOptions ()Lcom/google/firebase/FirebaseOptions;
-	public fun hashCode ()I
-	public static final fun initializeApp (Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
-	public static final fun initializeApp (Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
-	public static final fun initializeApp (Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/google/firebase/FirebaseApp$Companion {
-	public final fun getApps (Ljava/lang/Object;)Ljava/util/List;
-	public final fun getInstance ()Lcom/google/firebase/FirebaseApp;
-	public final fun getInstance (Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-	public final fun initializeApp (Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
-	public final fun initializeApp (Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
-	public final fun initializeApp (Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-}
-
-public final class com/google/firebase/FirebaseKt {
-	public static final fun app (Lcom/google/firebase/Firebase;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-	public static final fun getApp (Lcom/google/firebase/Firebase;)Lcom/google/firebase/FirebaseApp;
-	public static final fun getOptions (Lcom/google/firebase/Firebase;)Lcom/google/firebase/FirebaseOptions;
-	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
-	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
-	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
-}
-
-public final class com/google/firebase/FirebaseOptions {
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAndroid ()Ldev/gitlive/firebase/android/FirebaseOptions;
-	public final fun getApiKey ()Ljava/lang/String;
-	public final fun getApplicationId ()Ljava/lang/String;
-	public final fun getDatabaseUrl ()Ljava/lang/String;
-	public final fun getGaTrackingId ()Ljava/lang/String;
-	public final fun getGcmSenderId ()Ljava/lang/String;
-	public final fun getProjectId ()Ljava/lang/String;
-	public final fun getStorageBucket ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/google/firebase/FirebaseOptions$Builder {
-	public fun <init> ()V
-	public fun <init> (Lcom/google/firebase/FirebaseOptions;)V
-	public final fun build ()Lcom/google/firebase/FirebaseOptions;
-	public final fun setApiKey (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setApplicationId (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setDatabaseUrl (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setGaTrackingId (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setGcmSenderId (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setProjectId (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-	public final fun setStorageBucket (Ljava/lang/String;)Lcom/google/firebase/FirebaseOptions$Builder;
-}
-
 public final class dev/gitlive/firebase/Firebase {
 	public static final field INSTANCE Ldev/gitlive/firebase/Firebase;
 }
@@ -81,16 +14,8 @@ public final class dev/gitlive/firebase/FirebaseApp {
 
 public final class dev/gitlive/firebase/FirebaseKt {
 	public static final fun app (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/FirebaseApp;
-	public static final fun apps (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;
-	public static synthetic fun apps$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ljava/util/List;
 	public static final fun getApp (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/FirebaseApp;
 	public static final fun getOptions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/FirebaseOptions;
-	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
-	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;)Ldev/gitlive/firebase/FirebaseApp;
-	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;Ljava/lang/String;)Ldev/gitlive/firebase/FirebaseApp;
-	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
-	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
-	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
 }
 
 public final class dev/gitlive/firebase/FirebaseOptions {
@@ -120,7 +45,15 @@ public final class dev/gitlive/firebase/FirebaseOptions {
 }
 
 public final class dev/gitlive/firebase/Firebase_androidKt {
-	public static final fun getAndroid (Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/android/FirebaseApp;
+	public static final fun apps (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;
+	public static synthetic fun apps$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ljava/util/List;
+	public static final fun getAndroid (Ldev/gitlive/firebase/FirebaseApp;)Lcom/google/firebase/FirebaseApp;
+	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
+	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;)Ldev/gitlive/firebase/FirebaseApp;
+	public static final fun initialize (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;Ljava/lang/String;)Ldev/gitlive/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Ldev/gitlive/firebase/Firebase;Ljava/lang/Object;Ldev/gitlive/firebase/FirebaseOptions;Ljava/lang/String;ILjava/lang/Object;)Ldev/gitlive/firebase/FirebaseApp;
 }
 
 public final class dev/gitlive/firebase/tasks/AwaitKt {

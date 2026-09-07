@@ -23,7 +23,6 @@ object SourceCompatReport {
         androidSdk: List<ApiClass>,
         ours: List<ApiClass>,
         exclusions: List<Regex>,
-        typealiases: List<Regex> = emptyList(),
     ): String {
         val oursByName = ours.associateBy { it.name }
         val out = StringBuilder()
@@ -37,20 +36,12 @@ object SourceCompatReport {
             val outerName = sdkClass.name.substringBefore('$')
             if (exclusions.any { it.matches(sdkClass.name) || it.matches(outerName) }) continue
             val ourClass = oursByName[sdkClass.name]
-            val isTypealias = ourClass == null && typealiases.any { it.matches(sdkClass.name) || it.matches(outerName) }
-            body.appendLine(
-                sdkClass.name.replace('$', '.') + when {
-                    isTypealias -> "  (typealias to the relocated Android SDK class)"
-                    ourClass == null -> "  (class missing)"
-                    else -> ""
-                },
-            )
+            body.appendLine(sdkClass.name.replace('$', '.') + if (ourClass == null) "  (class missing)" else "")
             for (member in sdkClass.members.sortedWith(compareBy({ it.kind }, { it.name }, { it.parameters.size }))) {
                 val rendered = member.render(sdkClass.name)
                 val excluded = exclusions.any { it.matches("${sdkClass.name}#${member.name}") }
                 when {
                     member.isDeprecated || excluded -> body.appendLine("  SKIP  $rendered")
-                    isTypealias -> { ok++; body.appendLine("  OK    $rendered") }
                     ourClass == null -> { missing++; body.appendLine("  MISS  $rendered") }
                     else -> {
                         val (status, note) = classify(member, ourClass)

@@ -5,7 +5,7 @@ package dev.gitlive.firebase.firestore
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase Timestamp. */
-public actual typealias NativeTimestamp = dev.gitlive.firebase.android.Timestamp
+public actual typealias NativeTimestamp = com.google.firebase.Timestamp
 
 /** A base class that could be used to combine [Timestamp] and [Timestamp.ServerTimestamp] in the same field. */
 @Serializable(with = BaseTimestampSerializer::class)

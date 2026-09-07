@@ -1,19 +1,19 @@
 package dev.gitlive.firebase.crashlytics
 
-import dev.gitlive.firebase.android.FirebaseException
-import dev.gitlive.firebase.android.crashlytics.CustomKeysAndValues.Builder
+import com.google.firebase.FirebaseException
+import com.google.firebase.crashlytics.CustomKeysAndValues.Builder
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
 
-public val FirebaseCrashlytics.android: dev.gitlive.firebase.android.crashlytics.FirebaseCrashlytics get() = dev.gitlive.firebase.android.crashlytics.FirebaseCrashlytics.getInstance()
+public val FirebaseCrashlytics.android: com.google.firebase.crashlytics.FirebaseCrashlytics get() = com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
 
 public actual val Firebase.crashlytics: FirebaseCrashlytics get() =
-    FirebaseCrashlytics(dev.gitlive.firebase.android.crashlytics.FirebaseCrashlytics.getInstance())
+    FirebaseCrashlytics(com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance())
 
-public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = FirebaseCrashlytics(app.android.get(dev.gitlive.firebase.android.crashlytics.FirebaseCrashlytics::class.java))
+public actual fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = FirebaseCrashlytics(app.android.get(com.google.firebase.crashlytics.FirebaseCrashlytics::class.java))
 
-public actual class FirebaseCrashlytics internal constructor(internal val android: dev.gitlive.firebase.android.crashlytics.FirebaseCrashlytics) {
+public actual class FirebaseCrashlytics internal constructor(internal val android: com.google.firebase.crashlytics.FirebaseCrashlytics) {
 
     public actual fun recordException(exception: Throwable) {
         android.recordException(exception)

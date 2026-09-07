@@ -18,7 +18,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.publish)
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -183,7 +183,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(project(":android-sdk:relocated-firebase-database"))
+                    api(libs.google.firebase.database)
                 }
             }
         }

@@ -6,7 +6,7 @@
 package dev.gitlive.firebase
 
 import android.app.Application
-import dev.gitlive.firebase.android.FirebasePlatform
+import com.google.firebase.FirebasePlatform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Duration.Companion.minutes

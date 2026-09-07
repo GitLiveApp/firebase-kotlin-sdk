@@ -5,83 +5,73 @@
 package com.google.firebase
 
 import android.content.Context
-import dev.gitlive.firebase.android.FirebaseApp as AndroidFirebaseApp
-import dev.gitlive.firebase.android.FirebaseOptions as AndroidFirebaseOptions
+import dev.gitlive.firebase.stub
 
-public actual typealias FirebaseException = dev.gitlive.firebase.android.FirebaseException
+/*
+ * Header stubs for the Firebase Android SDK core classes (see buildSrc utils/HeaderStubs.kt): they only satisfy the
+ * `expect` declarations at compile time and are deleted from the compilation output, so the real classes from
+ * com.google.firebase:firebase-common bind at runtime. Every member must exist on the real class with the same JVM
+ * signature (verified by the build); members that only exist here (Context overloads) are for this module's own use.
+ */
 
-public actual typealias FirebaseNetworkException = dev.gitlive.firebase.android.FirebaseNetworkException
+public actual open class FirebaseException : Exception {
+    public actual constructor(message: String) : super(message)
+    public actual constructor(message: String, cause: Throwable) : super(message, cause)
+}
 
-public actual typealias FirebaseTooManyRequestsException = dev.gitlive.firebase.android.FirebaseTooManyRequestsException
+public actual class FirebaseNetworkException actual constructor(message: String) : FirebaseException(message)
 
-public actual typealias FirebaseApiNotAvailableException = dev.gitlive.firebase.android.FirebaseApiNotAvailableException
+public actual open class FirebaseTooManyRequestsException actual constructor(message: String) : FirebaseException(message)
 
-/** @property android The underlying (relocated) Firebase Android SDK object. */
-public actual class FirebaseApp internal constructor(public val android: AndroidFirebaseApp) {
+public actual open class FirebaseApiNotAvailableException actual constructor(message: String) : FirebaseException(message)
 
-    public actual val name: String get() = android.name
-
-    public actual val options: FirebaseOptions get() = FirebaseOptions(android.options)
-
-    public actual fun delete(): Unit = android.delete()
-
-    override fun equals(other: Any?): Boolean = other is FirebaseApp && other.android == android
-
-    override fun hashCode(): Int = android.hashCode()
-
-    override fun toString(): String = android.toString()
+public actual class FirebaseApp private constructor() {
+    public actual val name: String get() = stub()
+    public actual val options: FirebaseOptions get() = stub()
+    public actual fun delete(): Unit = stub()
 
     public actual companion object {
         @JvmField
-        public actual val DEFAULT_APP_NAME: String = AndroidFirebaseApp.DEFAULT_APP_NAME
+        public actual val DEFAULT_APP_NAME: String = "[DEFAULT]"
 
         @JvmStatic
-        public actual fun getInstance(): FirebaseApp = FirebaseApp(AndroidFirebaseApp.getInstance())
+        public actual fun getInstance(): FirebaseApp = stub()
 
         @JvmStatic
-        public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(AndroidFirebaseApp.getInstance(name))
+        public actual fun getInstance(name: String): FirebaseApp = stub()
 
         @JvmStatic
-        public actual fun initializeApp(context: Any?): FirebaseApp? = AndroidFirebaseApp.initializeApp(context as Context)?.let { FirebaseApp(it) }
+        public fun initializeApp(context: Context): FirebaseApp? = stub()
 
         @JvmStatic
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(AndroidFirebaseApp.initializeApp(context as Context, options.android))
+        public fun initializeApp(context: Context, options: FirebaseOptions): FirebaseApp = stub()
 
         @JvmStatic
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(AndroidFirebaseApp.initializeApp(context as Context, options.android, name))
+        public fun initializeApp(context: Context, options: FirebaseOptions, name: String): FirebaseApp = stub()
 
         @JvmStatic
-        public actual fun getApps(context: Any?): List<FirebaseApp> = AndroidFirebaseApp.getApps(context as Context).map { FirebaseApp(it) }
+        public fun getApps(context: Context): List<FirebaseApp> = stub()
     }
 }
 
-/** @property android The underlying (relocated) Firebase Android SDK object. */
-public actual class FirebaseOptions internal constructor(public val android: AndroidFirebaseOptions) {
+public actual class FirebaseOptions private constructor() {
+    public actual val apiKey: String get() = stub()
+    public actual val applicationId: String get() = stub()
+    public actual val databaseUrl: String? get() = stub()
+    public actual val gcmSenderId: String? get() = stub()
+    public actual val projectId: String? get() = stub()
+    public actual val storageBucket: String? get() = stub()
+    public actual val gaTrackingId: String? get() = stub()
 
-    public actual val apiKey: String get() = android.apiKey
-    public actual val applicationId: String get() = android.applicationId
-    public actual val databaseUrl: String? get() = android.databaseUrl
-    public actual val gcmSenderId: String? get() = android.gcmSenderId
-    public actual val projectId: String? get() = android.projectId
-    public actual val storageBucket: String? get() = android.storageBucket
-    public actual val gaTrackingId: String? get() = android.gaTrackingId
-
-    override fun equals(other: Any?): Boolean = other is FirebaseOptions && other.android == android
-
-    override fun hashCode(): Int = android.hashCode()
-
-    override fun toString(): String = android.toString()
-
-    public actual class Builder private constructor(private val android: AndroidFirebaseOptions.Builder) {
-        public actual constructor() : this(AndroidFirebaseOptions.Builder())
-        public actual constructor(options: FirebaseOptions) : this(AndroidFirebaseOptions.Builder(options.android))
-        public actual fun setApiKey(apiKey: String): Builder = apply { android.setApiKey(apiKey) }
-        public actual fun setApplicationId(applicationId: String): Builder = apply { android.setApplicationId(applicationId) }
-        public actual fun setDatabaseUrl(databaseUrl: String?): Builder = apply { android.setDatabaseUrl(databaseUrl) }
-        public actual fun setGcmSenderId(gcmSenderId: String?): Builder = apply { android.setGcmSenderId(gcmSenderId) }
-        public actual fun setProjectId(projectId: String?): Builder = apply { android.setProjectId(projectId) }
-        public actual fun setStorageBucket(storageBucket: String?): Builder = apply { android.setStorageBucket(storageBucket) }
-        public actual fun setGaTrackingId(gaTrackingId: String?): Builder = apply { android.setGaTrackingId(gaTrackingId) }
-        public actual fun build(): FirebaseOptions = FirebaseOptions(android.build())
+    public actual class Builder actual constructor() {
+        public actual constructor(options: FirebaseOptions) : this()
+        public actual fun setApiKey(apiKey: String): Builder = stub()
+        public actual fun setApplicationId(applicationId: String): Builder = stub()
+        public actual fun setDatabaseUrl(databaseUrl: String?): Builder = stub()
+        public actual fun setGcmSenderId(gcmSenderId: String?): Builder = stub()
+        public actual fun setProjectId(projectId: String?): Builder = stub()
+        public actual fun setStorageBucket(storageBucket: String?): Builder = stub()
+        public actual fun setGaTrackingId(gaTrackingId: String?): Builder = stub()
+        public actual fun build(): FirebaseOptions = stub()
     }
 }

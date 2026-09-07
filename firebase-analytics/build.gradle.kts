@@ -17,7 +17,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.publish)
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -171,7 +171,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(project(":android-sdk:relocated-firebase-analytics"))
+                    api(libs.google.firebase.analytics)
                 }
             }
         }

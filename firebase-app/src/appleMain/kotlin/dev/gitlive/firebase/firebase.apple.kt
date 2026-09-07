@@ -12,6 +12,14 @@ import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 /** The underlying Firebase iOS SDK app. */
 public val FirebaseApp.ios: FIRApp get() = compat.ios
 
+public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFirebaseApp.initializeApp(context)?.let { FirebaseApp(it) }
+
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat()))
+
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat(), name))
+
+public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = CompatFirebaseApp.getApps(context).map { FirebaseApp(it) }
+
 internal actual suspend fun CompatFirebaseApp.deleteAwaiting() {
     val deleted = CompletableDeferred<Unit>()
     ios.deleteApp { deleted.complete(Unit) }

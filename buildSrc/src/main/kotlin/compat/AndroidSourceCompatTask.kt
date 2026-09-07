@@ -36,11 +36,10 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val exclusionsFile: RegularFileProperty
 
-    /** Classes that are `actual typealias`es to the relocated Android SDK classes on Android and so do not appear in the dump. */
-    @get:InputFile
-    @get:Optional
+    /** The dump of the Android header stubs written by `stripHeaderStubs` (they are removed before the BCV dump is taken). */
+    @get:InputFiles
     @get:PathSensitive(PathSensitivity.NONE)
-    abstract val typealiasesFile: RegularFileProperty
+    abstract val headerStubDumps: ConfigurableFileCollection
 
     /** When set, the generated report is compared with this file instead of written to it. */
     @get:Input
@@ -63,10 +62,10 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
             file.useLines { lines -> lines.firstOrNull { it.startsWith("// Source: ") } }?.substringAfter("firebase-android-sdk/")?.substringBefore('/')
         } ?: "unknown"
         val androidSdk = sdkFiles.flatMap { AndroidSdkApiTxtParser.parse(it.readText()) }
-        val ours = BcvApiParser.parse(bcvDump.get().asFile.readText())
+        val ours = BcvApiParser.parse(bcvDump.get().asFile.readText()) +
+            headerStubDumps.files.filter { it.isFile }.flatMap { BcvApiParser.parse(it.readText()) }
         val exclusions = exclusionsFile.patterns()
-        val typealiases = typealiasesFile.patterns()
-        val report = SourceCompatReport.generate(moduleName.get(), ref, androidSdk, ours, exclusions, typealiases)
+        val report = SourceCompatReport.generate(moduleName.get(), ref, androidSdk, ours, exclusions)
         val target = reportFile.get().asFile
         if (check.get()) {
             val existing = target.takeIf { it.exists() }?.readText()

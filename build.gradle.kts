@@ -19,7 +19,7 @@ plugins {
     alias(libs.plugins.kotlinter) apply false
     alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
     alias(libs.plugins.dokka)
-    id("com.vanniktech.maven.publish") apply false // provided by buildSrc
+    alias(libs.plugins.publish) apply false
     id("base")
     id("testOptionsConvention")
 }
@@ -28,11 +28,6 @@ buildscript {
     dependencies {
         classpath(libs.dokka.base)
     }
-}
-
-apiValidation {
-    // The relocated Firebase Android SDK artifacts (android-sdk/*) are not this SDK's API.
-    ignoredProjects += file("android-sdk").listFiles().orEmpty().filter { File(it, "build.gradle.kts").exists() }.map { "relocated-${it.name}" }
 }
 
 val compileSdkVersion by extra(34)
@@ -55,9 +50,6 @@ tasks.withType<AbstractDokkaTask>().configureEach {
 }
 
 subprojects {
-
-    // The android-sdk projects are plain Android/Java libraries configured by their own plugins.
-    if (project.path.startsWith(":android-sdk")) return@subprojects
 
     group = "dev.gitlive"
 
@@ -134,11 +126,14 @@ subprojects {
         dependencies {
             "commonMainImplementation"(libs.kotlinx.coroutines.core)
             "androidMainImplementation"(libs.kotlinx.coroutines.play.services)
+            // api, not implementation: the Firebase artifacts are declared with `api` and without a
+            // version, so the BoM has to reach the api variant as well or a consumer resolving the
+            // compile classpath has nothing to supply the version from.
+            "androidMainApi"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                // The JVM port of the Firebase Android SDK, relocated like the Android artifacts (see android-sdk/).
-                "jvmMainApi"(project(":android-sdk:relocated-firebase-java-sdk"))
+                "jvmMainApi"(libs.gitlive.firebase.java.sdk)
                 "jvmMainApi"(libs.kotlinx.coroutines.play.services) {
                     exclude("com.google.android.gms")
                 }

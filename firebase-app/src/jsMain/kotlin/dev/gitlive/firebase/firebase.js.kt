@@ -13,6 +13,14 @@ import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 /** The underlying Firebase JS SDK app. */
 public val FirebaseApp.js: JsFirebaseApp get() = compat.js
 
+public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFirebaseApp.initializeApp(context)?.let { FirebaseApp(it) }
+
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat()))
+
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat(), name))
+
+public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = CompatFirebaseApp.getApps(context).map { FirebaseApp(it) }
+
 internal actual suspend fun CompatFirebaseApp.deleteAwaiting() {
     deleteApp(js).await()
 }

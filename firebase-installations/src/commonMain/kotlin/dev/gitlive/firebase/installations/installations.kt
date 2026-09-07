@@ -4,13 +4,17 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.tasks.await
 import com.google.firebase.installations.FirebaseInstallations as CompatFirebaseInstallations
+import com.google.firebase.installations.installations as compatInstallations
+
+// The Android-SDK-shaped entry points are reached through the `Firebase.installations` extensions (InstallationsKt),
+// which are real static methods on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseInstallations] instance of the default [FirebaseApp]. */
 public val Firebase.installations: FirebaseInstallations
-    get() = FirebaseInstallations(CompatFirebaseInstallations.getInstance())
+    get() = FirebaseInstallations(com.google.firebase.Firebase.compatInstallations)
 
 /** Returns the [FirebaseInstallations] instance of a given [FirebaseApp]. */
-public fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(CompatFirebaseInstallations.getInstance(app.compat))
+public fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(com.google.firebase.Firebase.compatInstallations(app.compat))
 
 /**
  * Entry point for Firebase installations.

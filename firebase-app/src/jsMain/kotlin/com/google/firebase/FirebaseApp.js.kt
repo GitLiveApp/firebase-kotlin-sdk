@@ -56,13 +56,15 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(jsGetApp(name))
 
-        public actual fun initializeApp(context: Any?): FirebaseApp? = throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
+        /** Platform extra: initialises like the Android SDK's `initializeApp(Context)`; the context is ignored. */
+        public fun initializeApp(context: Any?): FirebaseApp? = throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
 
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson()))
+        public fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson()))
 
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson(), name))
+        public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson(), name))
 
-        public actual fun getApps(context: Any?): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
+        /** Platform extra: like the Android SDK's `getApps(Context)`; the context is ignored. */
+        public fun getApps(context: Any?): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
     }
 }
 

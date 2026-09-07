@@ -5,39 +5,32 @@
 package com.google.firebase.installations
 
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
-import dev.gitlive.firebase.android.installations.FirebaseInstallations as AndroidFirebaseInstallations
-import dev.gitlive.firebase.android.installations.FirebaseInstallationsException as AndroidFirebaseInstallationsException
-import dev.gitlive.firebase.android.installations.InstallationTokenResult as AndroidInstallationTokenResult
+import dev.gitlive.firebase.installations.stub
 
-/** @property android The underlying (relocated) Firebase Android SDK object. */
-public actual class FirebaseInstallations internal constructor(public val android: AndroidFirebaseInstallations) {
+/*
+ * Header stubs for com.google.firebase:firebase-installations (see buildSrc utils/HeaderStubs.kt): compiled against,
+ * verified to match the real classes, and deleted from the output so the real SDK binds at runtime.
+ */
 
-    public actual fun getId(): Task<String> = android.id.mapResult { it }
-
-    public actual fun getToken(forceRefresh: Boolean): Task<InstallationTokenResult> = android.getToken(forceRefresh).mapResult { InstallationTokenResultWrapper(it) }
-
-    public actual fun delete(): Task<Nothing?> = android.delete().mapResult { null }
+public actual class FirebaseInstallations private constructor() {
+    public actual fun getId(): Task<String> = stub()
+    public actual fun getToken(forceRefresh: Boolean): Task<InstallationTokenResult> = stub()
+    public actual fun delete(): Task<Nothing?> = stub()
 
     public actual companion object {
         @JvmStatic
-        public actual fun getInstance(): FirebaseInstallations = FirebaseInstallations(AndroidFirebaseInstallations.getInstance())
+        public actual fun getInstance(): FirebaseInstallations = stub()
 
         @JvmStatic
-        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(AndroidFirebaseInstallations.getInstance(app.android))
+        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = stub()
     }
 }
 
 public actual abstract class InstallationTokenResult actual constructor() {
     public actual abstract val token: String
     public actual abstract val tokenExpirationTimestamp: Long
-}
-
-private class InstallationTokenResultWrapper(val android: AndroidInstallationTokenResult) : InstallationTokenResult() {
-    override val token: String get() = android.token
-    override val tokenExpirationTimestamp: Long get() = android.tokenExpirationTimestamp
 }
 
 public actual class FirebaseInstallationsException : FirebaseException {
@@ -55,33 +48,10 @@ public actual class FirebaseInstallationsException : FirebaseException {
         this.status = status
     }
 
+    // Same order as the Android SDK: `when` over the enum compiles to ordinals.
     public actual enum class Status {
         BAD_CONFIG,
         UNAVAILABLE,
         TOO_MANY_REQUESTS,
     }
-}
-
-/** Maps the result of a relocated SDK task and converts its exception to the `com.google.firebase` type. */
-private fun <T, R> Task<T>.mapResult(transform: (T) -> R): Task<R> = continueWithTask { task ->
-    val exception = task.exception
-    when {
-        exception != null -> Tasks.forException(exception.toCompat())
-        task.isCanceled -> Tasks.forCanceled()
-        else -> Tasks.forResult(transform(task.result))
-    }
-}
-
-private fun Exception.toCompat(): Exception = when (this) {
-    is AndroidFirebaseInstallationsException -> FirebaseInstallationsException(
-        message ?: status.name,
-        when (status) {
-            AndroidFirebaseInstallationsException.Status.BAD_CONFIG -> FirebaseInstallationsException.Status.BAD_CONFIG
-            AndroidFirebaseInstallationsException.Status.UNAVAILABLE -> FirebaseInstallationsException.Status.UNAVAILABLE
-            AndroidFirebaseInstallationsException.Status.TOO_MANY_REQUESTS -> FirebaseInstallationsException.Status.TOO_MANY_REQUESTS
-            else -> FirebaseInstallationsException.Status.UNAVAILABLE
-        },
-        this,
-    )
-    else -> this
 }

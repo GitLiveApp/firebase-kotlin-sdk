@@ -11,9 +11,9 @@ import org.gradle.api.Project
  * - `androidSourceCompatCheck` (part of `check`) fails if that report is out of date.
  *
  * `api/android-sdk/exclusions.txt` may list members (`com.google.firebase.FirebaseApp#getApplicationContext`) or
- * classes (`com.google.firebase.provider.*`) that are intentionally not mirrored, and `api/android-sdk/typealiases.txt`
- * the classes that are `actual typealias`es to the relocated Android SDK classes (invisible in the dump but available).
- * `//` starts a comment in both files.
+ * classes (`com.google.firebase.provider.*`) that are intentionally not mirrored; `//` starts a comment.
+ * The Android header stubs (removed from the compiled output, see `utils.stripHeaderStubs`) are read from the dump that
+ * the Android compilation writes to `build/header-stubs/`.
  */
 fun Project.registerAndroidSourceCompat(vararg androidSdkApiFiles: String) {
     val sdkDir = layout.projectDirectory.dir("api/android-sdk")
@@ -31,7 +31,8 @@ fun Project.registerAndroidSourceCompat(vararg androidSdkApiFiles: String) {
         bcvDump.set(layout.projectDirectory.file("api/android/${project.name}.api"))
         this.androidSdkApiFiles.from(fileTree(sdkDir) { include("*.api.txt") })
         sdkDir.file("exclusions.txt").takeIf { it.asFile.exists() }?.let { exclusionsFile.set(it) }
-        sdkDir.file("typealiases.txt").takeIf { it.asFile.exists() }?.let { typealiasesFile.set(it) }
+        headerStubDumps.from(layout.buildDirectory.file("header-stubs/compileReleaseKotlinAndroid.api"))
+        dependsOn(provider { tasks.findByName("compileReleaseKotlinAndroid") })
         check.set(checkMode)
         reportFile.set(layout.projectDirectory.file("api/android-sdk-compat.txt"))
         mustRunAfter("androidApiDump")

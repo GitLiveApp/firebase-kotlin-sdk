@@ -1,6 +1,0 @@
-// On Android these com.google.firebase classes are `actual typealias`es to the relocated Android SDK classes
-// (dev.gitlive.firebase.android.*), so they are fully source compatible but do not appear in api/android/firebase-app.api.
-com.google.firebase.FirebaseException
-com.google.firebase.FirebaseNetworkException
-com.google.firebase.FirebaseTooManyRequestsException
-com.google.firebase.FirebaseApiNotAvailableException

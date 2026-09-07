@@ -322,8 +322,13 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 Rules of thumb for this layer:
 - It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
   API is built on top of it and remains the recommended way to write new multiplatform code.
+- On Android and the JVM nothing is added to your app: the library depends on the official Firebase Android SDK
+  (`firebase-java-sdk` on the JVM) and these declarations are only compiled against, so your Android code binds to the
+  real classes exactly as before. Other libraries depending on Firebase, the Firebase Gradle plugins and Play Services
+  all keep working.
 - An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
-  can be adapted rather than failing at runtime. APIs that exist on Android, JVM and Apple but not on JS live in a
+  can be adapted rather than failing at runtime. This includes everything taking an `android.content.Context`
+  (`FirebaseApp.initializeApp`, `getApps`): use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code. APIs that exist on Android, JVM and Apple but not on JS live in a
   `nonJsMain` source set, so Android + iOS projects keep full source compatibility by declaring the same intermediate source set.
 - Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
   Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`).
@@ -336,13 +341,6 @@ So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, excep
 ### Accessing the underlying Firebase SDK
 
 In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property.
-
-On Android (and JVM) the underlying SDK is a *relocated* copy of the Firebase Android SDK: because this SDK declares the
-`com.google.firebase` classes itself, the official artifacts are republished by this project with all their classes moved to
-the `dev.gitlive.firebase.android` package (as `dev.gitlive.firebase.android:<artifact>`), which is what the `android`
-properties return. Consequences: other libraries in your app must not depend on `com.google.firebase:*` directly, the Firebase
-Performance Gradle plugin is not supported, and an app upgrading to this version gets a new Installations id (persisted state
-is keyed by the package name). `play-services-tasks` and the rest of Play Services are shared with your app as usual.
 
 These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
 

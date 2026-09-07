@@ -5,12 +5,12 @@
 package dev.gitlive.firebase.auth
 
 import android.net.Uri
-import dev.gitlive.firebase.android.auth.UserProfileChangeRequest
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 
-public val FirebaseUser.android: dev.gitlive.firebase.android.auth.FirebaseUser get() = android
+public val FirebaseUser.android: com.google.firebase.auth.FirebaseUser get() = android
 
-public actual class FirebaseUser internal constructor(internal val android: dev.gitlive.firebase.android.auth.FirebaseUser) {
+public actual class FirebaseUser internal constructor(internal val android: com.google.firebase.auth.FirebaseUser) {
     public actual val uid: String
         get() = android.uid
     public actual val displayName: String?
@@ -72,9 +72,9 @@ public actual class FirebaseUser internal constructor(internal val android: dev.
     }
 }
 
-public val UserInfo.android: dev.gitlive.firebase.android.auth.UserInfo get() = android
+public val UserInfo.android: com.google.firebase.auth.UserInfo get() = android
 
-public actual class UserInfo(internal val android: dev.gitlive.firebase.android.auth.UserInfo) {
+public actual class UserInfo(internal val android: com.google.firebase.auth.UserInfo) {
     public actual val displayName: String?
         get() = android.displayName
     public actual val email: String?
@@ -89,9 +89,9 @@ public actual class UserInfo(internal val android: dev.gitlive.firebase.android.
         get() = android.uid
 }
 
-public val UserMetaData.android: dev.gitlive.firebase.android.auth.FirebaseUserMetadata get() = android
+public val UserMetaData.android: com.google.firebase.auth.FirebaseUserMetadata get() = android
 
-public actual class UserMetaData(internal val android: dev.gitlive.firebase.android.auth.FirebaseUserMetadata) {
+public actual class UserMetaData(internal val android: com.google.firebase.auth.FirebaseUserMetadata) {
     public actual val creationTime: Double?
         get() = android.creationTimestamp.toDouble()
     public actual val lastSignInTime: Double?

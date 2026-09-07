@@ -72,9 +72,6 @@ jobs:
           echo "API_DUMP_TASKS=$api_dump_tasks" >> "$GITHUB_ENV"
           ./gradlew $api_dump_tasks
 
-      - name: Verify the relocated Firebase Android SDK artifacts
-        run: ./gradlew :android-sdk:verifyNoUnrelocatedReferences
-
       - run: git status
 
       # Fork PRs run with a read-only GITHUB_TOKEN, and their head branch does not

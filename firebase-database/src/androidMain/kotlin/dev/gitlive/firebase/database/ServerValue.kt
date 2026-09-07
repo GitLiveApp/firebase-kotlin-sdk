@@ -2,7 +2,7 @@ package dev.gitlive.firebase.database
 
 import kotlinx.serialization.Serializable
 
-private typealias NativeServerValue = dev.gitlive.firebase.android.database.ServerValue
+private typealias NativeServerValue = com.google.firebase.database.ServerValue
 
 /** Represents a Firebase ServerValue. */
 @Serializable(with = ServerValueSerializer::class)

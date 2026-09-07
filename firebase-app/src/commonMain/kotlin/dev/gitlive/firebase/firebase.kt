@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase
 
+import com.google.firebase.app
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
@@ -55,22 +56,22 @@ public class FirebaseApp internal constructor(public val compat: CompatFirebaseA
 
 /** Returns the default firebase app instance. */
 public val Firebase.app: FirebaseApp
-    get() = FirebaseApp(CompatFirebaseApp.getInstance())
+    get() = FirebaseApp(com.google.firebase.Firebase.app)
 
 /** Returns a named firebase app instance. */
-public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.getInstance(name))
+public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.app(name))
 
 /** Returns all firebase app instances. */
-public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = CompatFirebaseApp.getApps(context).map { FirebaseApp(it) }
+public expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
 
 /** Initializes and returns a FirebaseApp. */
-public fun Firebase.initialize(context: Any? = null): FirebaseApp? = CompatFirebaseApp.initializeApp(context)?.let { FirebaseApp(it) }
+public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
 
 /** Initializes and returns a FirebaseApp. */
-public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat()))
+public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
 
 /** Initializes and returns a FirebaseApp. */
-public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat(), name))
+public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
 
 /** Returns options of default FirebaseApp */
 @Suppress("UnusedReceiverParameter")

@@ -1,29 +1,29 @@
 # Android SDK source compatibility of firebase-app
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 33 public members available (26 identical, 7 mapped, 0 missing)
+# 100% of 26 public members available (26 identical, 0 mapped, 0 missing)
 #
 com.google.firebase.Firebase
   OK    static Firebase INSTANCE
 com.google.firebase.FirebaseApp
   SKIP  Context getApplicationContext()
-  MAP   static List getApps(Context)  [Context -> Object]
+  SKIP  static List getApps(Context)
   OK    static FirebaseApp getInstance()
   OK    static FirebaseApp getInstance(String)
   OK    String getName()
   OK    FirebaseOptions getOptions()
-  MAP   static FirebaseApp initializeApp(Context)  [Context -> Object]
-  MAP   static FirebaseApp initializeApp(Context, FirebaseOptions)  [Context -> Object]
-  MAP   static FirebaseApp initializeApp(Context, FirebaseOptions, String)  [Context -> Object]
+  SKIP  static FirebaseApp initializeApp(Context)
+  SKIP  static FirebaseApp initializeApp(Context, FirebaseOptions)
+  SKIP  static FirebaseApp initializeApp(Context, FirebaseOptions, String)
   SKIP  void setAutomaticResourceManagementEnabled(boolean)
   OK    static String DEFAULT_APP_NAME
 com.google.firebase.FirebaseKt
   OK    static FirebaseApp app(Firebase, String)
   OK    static FirebaseApp getApp(Firebase)
   OK    static FirebaseOptions getOptions(Firebase)
-  MAP   static FirebaseApp initialize(Firebase, Context)  [Context -> Object]
-  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions)  [Context -> Object]
-  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)  [Context -> Object]
-com.google.firebase.FirebaseNetworkException  (typealias to the relocated Android SDK class)
+  SKIP  static FirebaseApp initialize(Firebase, Context)
+  SKIP  static FirebaseApp initialize(Firebase, Context, FirebaseOptions)
+  SKIP  static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)
+com.google.firebase.FirebaseNetworkException
   OK    FirebaseNetworkException(String)
 com.google.firebase.FirebaseOptions
   SKIP  static FirebaseOptions fromResource(Context)
@@ -44,5 +44,5 @@ com.google.firebase.FirebaseOptions.Builder
   OK    Builder setProjectId(String)
   SKIP  Builder setRecaptchaSiteKey(String)
   OK    Builder setStorageBucket(String)
-com.google.firebase.FirebaseTooManyRequestsException  (typealias to the relocated Android SDK class)
+com.google.firebase.FirebaseTooManyRequestsException
   OK    FirebaseTooManyRequestsException(String)

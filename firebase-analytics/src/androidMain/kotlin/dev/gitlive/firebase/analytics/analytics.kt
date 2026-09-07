@@ -3,22 +3,21 @@
 package dev.gitlive.firebase.analytics
 
 import android.os.Bundle
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.setConsent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.android
 import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration
 
 public actual val Firebase.analytics: FirebaseAnalytics
-    get() = FirebaseAnalytics(
-        dev.gitlive.firebase.android.analytics.FirebaseAnalytics.getInstance(dev.gitlive.firebase.android.FirebaseApp.getInstance().applicationContext),
-    )
+    get() = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
-public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(dev.gitlive.firebase.android.analytics.FirebaseAnalytics.getInstance(app.android.applicationContext))
+public actual fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics = FirebaseAnalytics(com.google.firebase.Firebase.analytics)
 
-public val FirebaseAnalytics.android: dev.gitlive.firebase.android.analytics.FirebaseAnalytics get() = android
+public val FirebaseAnalytics.android: com.google.firebase.analytics.FirebaseAnalytics get() = android
 
-public actual class FirebaseAnalytics(internal val android: dev.gitlive.firebase.android.analytics.FirebaseAnalytics) {
+public actual class FirebaseAnalytics(internal val android: com.google.firebase.analytics.FirebaseAnalytics) {
     public actual fun logEvent(name: String, parameters: Map<String, Any>?) {
         android.logEvent(name, parameters?.toBundle())
     }
@@ -46,21 +45,30 @@ public actual class FirebaseAnalytics(internal val android: dev.gitlive.firebase
     public actual suspend fun getSessionId(): Long? = android.sessionId.await()
 
     public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
-        android.setConsent(
-            consentSettings.entries.associate {
-                val type = when (it.key) {
-                    ConsentType.AD_PERSONALIZATION -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentType.AD_PERSONALIZATION
-                    ConsentType.AD_STORAGE -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentType.AD_STORAGE
-                    ConsentType.AD_USER_DATA -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentType.AD_USER_DATA
-                    ConsentType.ANALYTICS_STORAGE -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE
+        consentSettings.entries.associate {
+            it.key to when (it.value) {
+                ConsentStatus.GRANTED -> com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus.GRANTED
+                ConsentStatus.DENIED -> com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus.DENIED
+            }
+        }.let { androidConsentSettings ->
+            android.setConsent {
+                androidConsentSettings.entries.forEach {
+                    when (it.key) {
+                        ConsentType.AD_PERSONALIZATION ->
+                            this.adPersonalization = it.value
+
+                        ConsentType.AD_STORAGE ->
+                            this.adStorage = it.value
+
+                        ConsentType.AD_USER_DATA ->
+                            this.adUserData = it.value
+
+                        ConsentType.ANALYTICS_STORAGE ->
+                            this.analyticsStorage = it.value
+                    }
                 }
-                val status = when (it.value) {
-                    ConsentStatus.GRANTED -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentStatus.GRANTED
-                    ConsentStatus.DENIED -> dev.gitlive.firebase.android.analytics.FirebaseAnalytics.ConsentStatus.DENIED
-                }
-                type to status
-            },
-        )
+            }
+        }
     }
 
     public actual enum class ConsentType {

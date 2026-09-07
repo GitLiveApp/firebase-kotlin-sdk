@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
+import com.google.firebase.firestore.firestoreSettings
 import dev.gitlive.firebase.firestore.FirebaseFirestoreSettings
 import dev.gitlive.firebase.firestore.NativeFirebaseFirestore
 import dev.gitlive.firebase.firestore.NativeTransaction
@@ -17,14 +18,14 @@ internal actual class NativeFirebaseFirestoreWrapper actual constructor(actual v
 
     actual fun batch() = native.batch()
 
-    actual fun setLoggingEnabled(loggingEnabled: Boolean) = dev.gitlive.firebase.android.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
+    actual fun setLoggingEnabled(loggingEnabled: Boolean) = com.google.firebase.firestore.FirebaseFirestore.setLoggingEnabled(loggingEnabled)
 
     actual fun applySettings(settings: FirebaseFirestoreSettings) {
-        native.firestoreSettings = dev.gitlive.firebase.android.firestore.FirebaseFirestoreSettings.Builder()
-            .setSslEnabled(settings.sslEnabled)
-            .setHost(settings.host)
-            .setLocalCacheSettings(settings.cacheSettings.android)
-            .build()
+        native.firestoreSettings = firestoreSettings {
+            isSslEnabled = settings.sslEnabled
+            host = settings.host
+            setLocalCacheSettings(settings.cacheSettings.android)
+        }
         callbackExecutorMap[native] = settings.callbackExecutor
     }
 

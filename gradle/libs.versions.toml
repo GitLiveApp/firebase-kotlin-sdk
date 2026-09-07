@@ -29,8 +29,6 @@ asm = "9.8"
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
-vanniktech-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "publish" }
 asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }

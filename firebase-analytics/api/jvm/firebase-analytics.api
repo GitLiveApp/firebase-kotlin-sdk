@@ -107,7 +107,7 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsEvents {
 	public static final field VIEW_SEARCH_RESULTS Ljava/lang/String;
 }
 
-public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsException : dev/gitlive/firebase/android/FirebaseException {
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsException : com/google/firebase/FirebaseException {
 }
 
 public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsParam {

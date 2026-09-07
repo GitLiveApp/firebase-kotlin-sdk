@@ -118,18 +118,16 @@ class SourceCompatReportTest {
     }
 
     @Test
-    fun reportsMissingClassesAndTypealiases() {
+    fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",
             ref = "main",
             androidSdk = AndroidSdkApiTxtParser.parse(apiTxt),
             ours = emptyList(),
             exclusions = emptyList(),
-            typealiases = listOf(Regex("com\\.google\\.firebase\\.installations\\.InstallationsKt")),
         )
         assertTrue(report.contains("FirebaseInstallations  (class missing)"), report)
         assertTrue(report.contains("MISS  Task delete()"), report)
-        assertTrue(report.contains("InstallationsKt  (typealias to the relocated Android SDK class)"), report)
-        assertTrue(report.contains("OK    static FirebaseInstallations getInstallations(Firebase)"), report)
+        assertTrue(report.contains("# 0% of 12 public members available"), report)
     }
 }

@@ -20,7 +20,7 @@ public expect abstract class Task<TResult>() {
     public abstract val isCanceled: Boolean
     public abstract val result: TResult
     public abstract val exception: Exception?
-    public abstract fun addOnSuccessListener(listener: OnSuccessListener<in TResult>): Task<TResult>
+    public abstract fun addOnSuccessListener(listener: OnSuccessListener<TResult>): Task<TResult>
     public abstract fun addOnFailureListener(listener: OnFailureListener): Task<TResult>
     public abstract fun addOnCompleteListener(listener: OnCompleteListener<TResult>): Task<TResult>
     public abstract fun addOnCanceledListener(listener: OnCanceledListener): Task<TResult>

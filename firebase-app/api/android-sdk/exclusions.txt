@@ -1,4 +1,7 @@
-// Firebase Android SDK APIs intentionally not mirrored by firebase-app (see README, "Compatibility with the Firebase Android SDK").
+// Firebase Android SDK APIs intentionally not mirrored by firebase-app (see README, "Using the Firebase Android SDK API from common code").
+com.google.firebase.FirebaseApp#initializeApp  // takes an android.content.Context: use dev.gitlive.firebase.Firebase.initialize from common code
+com.google.firebase.FirebaseApp#getApps  // takes an android.content.Context: use dev.gitlive.firebase.Firebase.apps from common code
+com.google.firebase.FirebaseKt#initialize  // takes an android.content.Context
 com.google.firebase.FirebaseApp#getApplicationContext  // android.content.Context has no multiplatform equivalent
 com.google.firebase.FirebaseApp#setAutomaticResourceManagementEnabled
 com.google.firebase.FirebaseOptions#fromResource  // reads Android resources

@@ -12,24 +12,24 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
 import java.util.concurrent.Executor
-import dev.gitlive.firebase.android.firestore.CollectionReference as AndroidCollectionReference
-import dev.gitlive.firebase.android.firestore.DocumentChange as AndroidDocumentChange
-import dev.gitlive.firebase.android.firestore.DocumentReference as AndroidDocumentReference
-import dev.gitlive.firebase.android.firestore.DocumentSnapshot as AndroidDocumentSnapshot
-import dev.gitlive.firebase.android.firestore.FieldPath as AndroidFieldPath
-import dev.gitlive.firebase.android.firestore.FirebaseFirestore as AndroidFirebaseFirestore
-import dev.gitlive.firebase.android.firestore.FirebaseFirestoreException as AndroidFirebaseFirestoreException
-import dev.gitlive.firebase.android.firestore.LocalCacheSettings as AndroidLocalCacheSettings
-import dev.gitlive.firebase.android.firestore.Query as AndroidQuery
-import dev.gitlive.firebase.android.firestore.QuerySnapshot as AndroidQuerySnapshot
-import dev.gitlive.firebase.android.firestore.SnapshotMetadata as AndroidSnapshotMetadata
-import dev.gitlive.firebase.android.firestore.Source as AndroidSource
-import dev.gitlive.firebase.android.firestore.Transaction as AndroidTransaction
-import dev.gitlive.firebase.android.firestore.WriteBatch as AndroidWriteBatch
-import dev.gitlive.firebase.android.firestore.memoryCacheSettings as androidMemoryCacheSettings
-import dev.gitlive.firebase.android.firestore.memoryEagerGcSettings as androidMemoryEagerGcSettings
-import dev.gitlive.firebase.android.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
-import dev.gitlive.firebase.android.firestore.persistentCacheSettings as androidPersistentCacheSettings
+import com.google.firebase.firestore.CollectionReference as AndroidCollectionReference
+import com.google.firebase.firestore.DocumentChange as AndroidDocumentChange
+import com.google.firebase.firestore.DocumentReference as AndroidDocumentReference
+import com.google.firebase.firestore.DocumentSnapshot as AndroidDocumentSnapshot
+import com.google.firebase.firestore.FieldPath as AndroidFieldPath
+import com.google.firebase.firestore.FirebaseFirestore as AndroidFirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException as AndroidFirebaseFirestoreException
+import com.google.firebase.firestore.LocalCacheSettings as AndroidLocalCacheSettings
+import com.google.firebase.firestore.Query as AndroidQuery
+import com.google.firebase.firestore.QuerySnapshot as AndroidQuerySnapshot
+import com.google.firebase.firestore.SnapshotMetadata as AndroidSnapshotMetadata
+import com.google.firebase.firestore.Source as AndroidSource
+import com.google.firebase.firestore.Transaction as AndroidTransaction
+import com.google.firebase.firestore.WriteBatch as AndroidWriteBatch
+import com.google.firebase.firestore.memoryCacheSettings as androidMemoryCacheSettings
+import com.google.firebase.firestore.memoryEagerGcSettings as androidMemoryEagerGcSettings
+import com.google.firebase.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
+import com.google.firebase.firestore.persistentCacheSettings as androidPersistentCacheSettings
 
 public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = AndroidFirebaseFirestore.getInstance()
 

@@ -14,7 +14,7 @@ public actual abstract class Task<TResult> actual constructor() {
     public actual abstract val isCanceled: Boolean
     public actual abstract val result: TResult
     public actual abstract val exception: Exception?
-    public actual abstract fun addOnSuccessListener(listener: OnSuccessListener<in TResult>): Task<TResult>
+    public actual abstract fun addOnSuccessListener(listener: OnSuccessListener<TResult>): Task<TResult>
     public actual abstract fun addOnFailureListener(listener: OnFailureListener): Task<TResult>
     public actual abstract fun addOnCompleteListener(listener: OnCompleteListener<TResult>): Task<TResult>
     public actual abstract fun addOnCanceledListener(listener: OnCanceledListener): Task<TResult>
@@ -114,7 +114,7 @@ internal class TaskImpl<TResult> : Task<TResult>() {
         }
     }
 
-    override fun addOnSuccessListener(listener: OnSuccessListener<in TResult>): Task<TResult> = addListener { task -> if (task.isSuccessful) listener.onSuccess(task.result) }
+    override fun addOnSuccessListener(listener: OnSuccessListener<TResult>): Task<TResult> = addListener { task -> if (task.isSuccessful) listener.onSuccess(task.result) }
 
     override fun addOnFailureListener(listener: OnFailureListener): Task<TResult> = addListener { task -> task.exception?.let(listener::onFailure) }
 

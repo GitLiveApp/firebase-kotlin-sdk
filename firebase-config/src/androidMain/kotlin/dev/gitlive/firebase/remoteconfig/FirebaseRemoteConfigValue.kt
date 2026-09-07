@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.remoteconfig
 
-import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfig
-import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigValue as AndroidFirebaseRemoteConfigValue
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue as AndroidFirebaseRemoteConfigValue
 
 public actual class FirebaseRemoteConfigValue internal constructor(
     private val android: AndroidFirebaseRemoteConfigValue,

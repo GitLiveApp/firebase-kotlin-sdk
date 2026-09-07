@@ -19,7 +19,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("testOptionsConvention")
-    id("com.vanniktech.maven.publish")
+    alias(libs.plugins.publish)
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -176,7 +176,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(project(":android-sdk:relocated-firebase-auth"))
+                    api(libs.google.firebase.auth)
                 }
             }
 

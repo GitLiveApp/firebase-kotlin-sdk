@@ -120,9 +120,14 @@ The SDK has two public API layers per module:
 1. **`com.google.firebase.*` (source-compatibility layer)** — `expect` declarations in `commonMain` that mirror the
    [Firebase Android SDK API](https://firebase.google.com/docs/reference/kotlin/packages) exactly: same package, class, member and
    parameter names *and shapes*, including `com.google.android.gms.tasks.Task` return types and listener interfaces. Code written
-   against the Android SDK must compile unchanged (no import changes) on every platform. Each platform `actual` wraps the
-   native SDK: on Android/JVM the *relocated* Android SDK (`dev.gitlive.firebase.android.*`, see `android-sdk/README.md`),
-   on Apple the iOS SDK, on JS the modular JS SDK. Non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`).
+   against the Android SDK must compile unchanged (no import changes) on every platform. On Apple the `actual`s wrap the iOS SDK,
+   on JS the modular JS SDK, and non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
+   Android/JVM the `actual`s are **header stubs**: signature-identical declarations that are compiled against, verified against
+   the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
+   Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
+   widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
+   members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a
+   package-private Java helper (`firebase-app/src/androidMain/java`).
    - An Android API that cannot be mapped onto a platform is **omitted** on purpose so callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
@@ -140,8 +145,7 @@ When adding to the `dev.gitlive` layer, keep matching class, function and parame
 
 Each wrapper class exposes the underlying native SDK object via extension properties:
 
-- `.android` — the *relocated* Firebase Android SDK object (`dev.gitlive.firebase.android.*`; also used for JVM via the
-  relocated `firebase-java-sdk`)
+- `.android` — Firebase Android SDK object (also used for JVM via `firebase-java-sdk`)
 - `.ios` — Firebase iOS SDK object (Kotlin/Native)
 - `.js` — Firebase JS SDK object
 
