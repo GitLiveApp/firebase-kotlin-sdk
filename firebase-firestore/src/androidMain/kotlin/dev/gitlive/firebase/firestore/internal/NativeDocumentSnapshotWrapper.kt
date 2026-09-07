@@ -4,7 +4,7 @@ import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.ServerTimestampBehavior
 import dev.gitlive.firebase.firestore.SnapshotMetadata
 
-internal actual class NativeDocumentSnapshotWrapper internal actual constructor(actual val native: com.google.firebase.firestore.DocumentSnapshot) {
+internal actual class NativeDocumentSnapshotWrapper internal actual constructor(actual val native: dev.gitlive.firebase.android.firestore.DocumentSnapshot) {
 
     actual val id get() = native.id
     actual val reference get() = NativeDocumentReference(native.reference)
@@ -20,9 +20,9 @@ internal actual class NativeDocumentSnapshotWrapper internal actual constructor(
 
     actual val metadata: SnapshotMetadata get() = SnapshotMetadata(native.metadata)
 
-    fun ServerTimestampBehavior.toAndroid(): com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior = when (this) {
-        ServerTimestampBehavior.ESTIMATE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
-        ServerTimestampBehavior.NONE -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.NONE
-        ServerTimestampBehavior.PREVIOUS -> com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior.PREVIOUS
+    fun ServerTimestampBehavior.toAndroid(): dev.gitlive.firebase.android.firestore.DocumentSnapshot.ServerTimestampBehavior = when (this) {
+        ServerTimestampBehavior.ESTIMATE -> dev.gitlive.firebase.android.firestore.DocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+        ServerTimestampBehavior.NONE -> dev.gitlive.firebase.android.firestore.DocumentSnapshot.ServerTimestampBehavior.NONE
+        ServerTimestampBehavior.PREVIOUS -> dev.gitlive.firebase.android.firestore.DocumentSnapshot.ServerTimestampBehavior.PREVIOUS
     }
 }

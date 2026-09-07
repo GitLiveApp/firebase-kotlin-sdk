@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.perf.metrics
 
-import com.google.firebase.perf.metrics.Trace as AndroidTrace
+import dev.gitlive.firebase.android.perf.metrics.Trace as AndroidTrace
 import dev.gitlive.firebase.perf.session.PerfSession
 
 public val Trace.android: AndroidTrace get() = android

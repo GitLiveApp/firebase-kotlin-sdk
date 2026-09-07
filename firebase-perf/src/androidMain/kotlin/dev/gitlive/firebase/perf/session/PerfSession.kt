@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.perf.session
 
-import com.google.firebase.perf.session.PerfSession as AndroidPerfSession
+import dev.gitlive.firebase.android.perf.session.PerfSession as AndroidPerfSession
 
 public val PerfSession.android: AndroidPerfSession get() = android
 

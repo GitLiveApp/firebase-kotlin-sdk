@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -17,7 +20,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
-    alias(libs.plugins.publish)
+    id("com.vanniktech.maven.publish")
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -52,6 +55,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -171,7 +175,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(libs.google.firebase.common)
+                    api(project(":android-sdk:relocated-firebase-common"))
                 }
             }
         }
@@ -183,6 +187,18 @@ kotlin {
         }
     }
 }
+
+// com.google.android.gms.tasks is provided by Play Services (android) / firebase-java-sdk (jvm) at runtime.
+stripHeaderStubs(
+    packageDir = "com/google/android/gms/tasks",
+    referenceJars = files({
+        configurations.findByName("debugCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files?.filter { it.name.startsWith("play-services-tasks") } ?: files()
+    }),
+)
+
+registerAndroidSourceCompat("firebase-common/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

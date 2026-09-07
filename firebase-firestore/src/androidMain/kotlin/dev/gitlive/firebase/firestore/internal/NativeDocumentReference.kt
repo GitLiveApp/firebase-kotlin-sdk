@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.firestore.internal
 
 import com.google.android.gms.tasks.TaskExecutors
-import com.google.firebase.firestore.MetadataChanges
+import dev.gitlive.firebase.android.firestore.MetadataChanges
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.Source
@@ -65,7 +65,7 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
 
     private fun addSnapshotListener(
         includeMetadataChanges: Boolean = false,
-        listener: ProducerScope<NativeDocumentSnapshot>.(com.google.firebase.firestore.DocumentSnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit,
+        listener: ProducerScope<NativeDocumentSnapshot>.(dev.gitlive.firebase.android.firestore.DocumentSnapshot?, dev.gitlive.firebase.android.firestore.FirebaseFirestoreException?) -> Unit,
     ) = callbackFlow {
         val executor = callbackExecutorMap[android.firestore] ?: TaskExecutors.MAIN_THREAD
         val metadataChanges =

@@ -17,7 +17,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("testOptionsConvention")
-    alias(libs.plugins.publish)
+    id("com.vanniktech.maven.publish")
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -167,7 +167,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(libs.google.firebase.config)
+                    api(project(":android-sdk:relocated-firebase-config"))
                 }
             }
         }

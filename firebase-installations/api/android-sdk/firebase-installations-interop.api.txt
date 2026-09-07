@@ -1,0 +1,12 @@
+// Source: https://raw.githubusercontent.com/firebase/firebase-android-sdk/fc5a2bee3a2f81f2f35652867628a3f4913e915d/firebase-installations-interop/api.txt
+// Signature format: 3.0
+package com.google.firebase.installations {
+
+  @com.google.auto.value.AutoValue public abstract class InstallationTokenResult {
+    ctor public InstallationTokenResult();
+    method public abstract String getToken();
+    method public abstract long getTokenExpirationTimestamp();
+  }
+
+}
+

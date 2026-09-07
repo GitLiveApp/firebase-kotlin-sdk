@@ -63,11 +63,17 @@ jobs:
             if [ -d "$module/api/jvm" ]; then
               api_dump_tasks="$api_dump_tasks :${module}:jvmApiDump"
             fi
+            if [ -d "$module/api/android-sdk" ]; then
+              api_dump_tasks="$api_dump_tasks :${module}:androidSourceCompatDump"
+            fi
           done
 
           echo "Running API dump tasks:$api_dump_tasks"
           echo "API_DUMP_TASKS=$api_dump_tasks" >> "$GITHUB_ENV"
           ./gradlew $api_dump_tasks
+
+      - name: Verify the relocated Firebase Android SDK artifacts
+        run: ./gradlew :android-sdk:verifyNoUnrelocatedReferences
 
       - run: git status
 

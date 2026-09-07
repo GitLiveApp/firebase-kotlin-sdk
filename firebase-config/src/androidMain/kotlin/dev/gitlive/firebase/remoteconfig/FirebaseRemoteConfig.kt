@@ -2,9 +2,9 @@
 
 package dev.gitlive.firebase.remoteconfig
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigClientException
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigFetchThrottledException
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigServerException
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
@@ -13,16 +13,16 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfig as AndroidFirebaseRemoteConfig
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigInfo as AndroidFirebaseRemoteConfigInfo
+import dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigSettings as AndroidFirebaseRemoteConfigSettings
 
 public val FirebaseRemoteConfig.android: AndroidFirebaseRemoteConfig get() = AndroidFirebaseRemoteConfig.getInstance()
 
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
-    get() = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance())
+    get() = FirebaseRemoteConfig(dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfig.getInstance())
 
-public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
+public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfig.getInstance(app.android))
 
 public actual class FirebaseRemoteConfig internal constructor(internal val android: AndroidFirebaseRemoteConfig) {
     public actual val all: Map<String, FirebaseRemoteConfigValue>
@@ -33,7 +33,7 @@ public actual class FirebaseRemoteConfig internal constructor(internal val andro
 
     public actual suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
         val settings = FirebaseRemoteConfigSettings().apply(init)
-        val androidSettings = com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder()
+        val androidSettings = dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(settings.minimumFetchInterval.inWholeSeconds)
             .setFetchTimeoutInSeconds(settings.fetchTimeout.inWholeSeconds)
             .build()
@@ -84,7 +84,7 @@ public actual class FirebaseRemoteConfig internal constructor(internal val andro
     }
 }
 
-public actual typealias FirebaseRemoteConfigException = com.google.firebase.remoteconfig.FirebaseRemoteConfigException
+public actual typealias FirebaseRemoteConfigException = dev.gitlive.firebase.android.remoteconfig.FirebaseRemoteConfigException
 public actual typealias FirebaseRemoteConfigClientException = FirebaseRemoteConfigClientException
 public actual typealias FirebaseRemoteConfigFetchThrottledException = FirebaseRemoteConfigFetchThrottledException
 public actual typealias FirebaseRemoteConfigServerException = FirebaseRemoteConfigServerException

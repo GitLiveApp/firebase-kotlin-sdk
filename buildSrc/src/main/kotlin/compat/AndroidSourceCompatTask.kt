@@ -1,0 +1,88 @@
+package compat
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+
+/**
+ * Compares the module's `api/android/<module>.api` (binary-compatibility-validator dump) against the vendored Firebase
+ * Android SDK `api.txt` files and writes/checks `api/android-sdk-compat.txt`.
+ */
+abstract class AndroidSourceCompatTask : DefaultTask() {
+
+    @get:Input
+    abstract val moduleName: Property<String>
+
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val bcvDump: RegularFileProperty
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
+    abstract val androidSdkApiFiles: ConfigurableFileCollection
+
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val exclusionsFile: RegularFileProperty
+
+    /** Classes that are `actual typealias`es to the relocated Android SDK classes on Android and so do not appear in the dump. */
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val typealiasesFile: RegularFileProperty
+
+    /** When set, the generated report is compared with this file instead of written to it. */
+    @get:Input
+    abstract val check: Property<Boolean>
+
+    @get:OutputFile
+    abstract val reportFile: RegularFileProperty
+
+    /** One pattern per line (`*` wildcards, `#member` suffix for members); `//` starts a comment. */
+    private fun RegularFileProperty.patterns(): List<Regex> = orNull?.asFile?.takeIf { it.exists() }?.readLines().orEmpty()
+        .map { it.substringBefore("//").trim() }
+        .filter { it.isNotEmpty() }
+        .map { Regex(it.replace(".", "\\.").replace("$", "\\$").replace("*", ".*")) }
+
+    @TaskAction
+    fun run() {
+        val sdkFiles = androidSdkApiFiles.files.filter { it.isFile }.sortedBy { it.name }
+        if (sdkFiles.isEmpty()) throw GradleException("No Android SDK api.txt files found; run updateAndroidSdkApi first")
+        val ref = sdkFiles.firstNotNullOfOrNull { file ->
+            file.useLines { lines -> lines.firstOrNull { it.startsWith("// Source: ") } }?.substringAfter("firebase-android-sdk/")?.substringBefore('/')
+        } ?: "unknown"
+        val androidSdk = sdkFiles.flatMap { AndroidSdkApiTxtParser.parse(it.readText()) }
+        val ours = BcvApiParser.parse(bcvDump.get().asFile.readText())
+        val exclusions = exclusionsFile.patterns()
+        val typealiases = typealiasesFile.patterns()
+        val report = SourceCompatReport.generate(moduleName.get(), ref, androidSdk, ours, exclusions, typealiases)
+        val target = reportFile.get().asFile
+        if (check.get()) {
+            val existing = target.takeIf { it.exists() }?.readText()
+            if (existing != report) {
+                val generated = project.layout.buildDirectory.file("android-sdk-compat.txt").get().asFile
+                generated.parentFile.mkdirs()
+                generated.writeText(report)
+                throw GradleException(
+                    "Android SDK source compatibility report ${target.relativeTo(project.rootDir)} is out of date. " +
+                        "Run ./gradlew :${moduleName.get()}:androidSourceCompatDump and commit the result (generated report: $generated)",
+                )
+            }
+        } else {
+            target.parentFile.mkdirs()
+            target.writeText(report)
+            logger.lifecycle(report.lines().drop(2).first())
+        }
+    }
+}

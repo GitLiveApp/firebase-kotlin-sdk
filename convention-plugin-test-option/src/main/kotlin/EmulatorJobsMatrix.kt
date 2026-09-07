@@ -40,7 +40,7 @@ class EmulatorJobsMatrix {
             ?.readLines()?.map { it.trim() }?.filter { it.isNotEmpty() }
             ?.takeIf { it.isNotEmpty() }
             ?: return null
-        val moduleNames = rootProject.subprojects.map { it.name }.toSet()
+        val moduleNames = rootProject.kmpSubprojects.map { it.name }.toSet()
         val changedModules = mutableSetOf<String>()
         changedFiles.forEach { changedFile ->
             val moduleName = changedFile.substringBefore("/")
@@ -50,7 +50,7 @@ class EmulatorJobsMatrix {
                 return null
             }
         }
-        val dependencies = rootProject.subprojects.associate { subProject ->
+        val dependencies = rootProject.kmpSubprojects.associate { subProject ->
             subProject.name to subProject.configurations.flatMap { configuration ->
                 configuration.dependencies.filterIsInstance<ProjectDependency>().map { it.name }
             }.toSet()
@@ -66,7 +66,7 @@ class EmulatorJobsMatrix {
 
     private fun affectedSubprojects(rootProject: Project): List<Project> {
         val affected = getAffectedProjectNames(rootProject)
-        return rootProject.subprojects.filter { affected == null || affected.contains(it.name) }
+        return rootProject.kmpSubprojects.filter { affected == null || affected.contains(it.name) }
     }
 
     fun getIosTestTaskList(rootProject: Project): List<List<String>> =
@@ -179,3 +179,7 @@ fun String.toTargetPlatforms(): List<TargetPlatform> =
             else -> throw IllegalArgumentException("Unknown target platform: $it")
         }
     }
+
+/** The Kotlin Multiplatform modules; the relocated android-sdk projects have no tests of their own. */
+private val Project.kmpSubprojects: Set<Project>
+    get() = subprojects.filter { it.hasProperty("${it.name}.supportedTestTargets") }.toSet()

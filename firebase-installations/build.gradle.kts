@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
 import utils.supportsApple
 import utils.toTargetPlatforms
@@ -17,7 +18,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
-    alias(libs.plugins.publish)
+    id("com.vanniktech.maven.publish")
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -171,7 +172,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(libs.google.firebase.installations)
+                    api(project(":android-sdk:relocated-firebase-installations"))
                 }
             }
         }
@@ -183,6 +184,8 @@ kotlin {
         }
     }
 }
+
+registerAndroidSourceCompat("firebase-installations/api.txt", "firebase-installations-interop/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

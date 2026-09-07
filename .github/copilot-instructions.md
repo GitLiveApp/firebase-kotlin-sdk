@@ -115,12 +115,24 @@ The SDK uses **`kotlinx.serialization`** throughout. Never use platform-specific
 
 ## API Compatibility Goal
 
-The target is **near binary compatibility** with the [Firebase Android SDK Kotlin API](https://firebase.google.com/docs/reference/kotlin/packages):
+The SDK has two public API layers per module:
 
-- Match class names, function names, and parameter names from the Android SDK.
-- Package imports should be the **only change** needed when porting Android code: `com.google.firebase` → `dev.gitlive.firebase`.
-- When an Android SDK API is Java-first (uses builders, callbacks, etc.), provide **both** the Android-compatible form *and* a Kotlin-idiomatic overload.
-- When the Android SDK API is already Kotlin-first, simply match it.
+1. **`com.google.firebase.*` (source-compatibility layer)** — `expect` declarations in `commonMain` that mirror the
+   [Firebase Android SDK API](https://firebase.google.com/docs/reference/kotlin/packages) exactly: same package, class, member and
+   parameter names *and shapes*, including `com.google.android.gms.tasks.Task` return types and listener interfaces. Code written
+   against the Android SDK must compile unchanged (no import changes) on every platform. Each platform `actual` wraps the
+   native SDK: on Android/JVM the *relocated* Android SDK (`dev.gitlive.firebase.android.*`, see `android-sdk/README.md`),
+   on Apple the iOS SDK, on JS the modular JS SDK. Non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`).
+   - An Android API that cannot be mapped onto a platform is **omitted** on purpose so callers get a compile error and adapt.
+   - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
+   - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
+     vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`).
+2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
+   `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
+   builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+
+When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
+`com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.
 
 ---
 
@@ -128,11 +140,13 @@ The target is **near binary compatibility** with the [Firebase Android SDK Kotli
 
 Each wrapper class exposes the underlying native SDK object via extension properties:
 
-- `.android` — Firebase Android SDK object (also used for JVM via `firebase-java-sdk`)
+- `.android` — the *relocated* Firebase Android SDK object (`dev.gitlive.firebase.android.*`; also used for JVM via the
+  relocated `firebase-java-sdk`)
 - `.ios` — Firebase iOS SDK object (Kotlin/Native)
 - `.js` — Firebase JS SDK object
 
 These are only accessible from the respective platform source sets. Do **not** use them in `commonMain`.
+Migrated modules additionally expose `.compat`, the `com.google.firebase` object a `dev.gitlive` wrapper is built on, from `commonMain`.
 
 ---
 

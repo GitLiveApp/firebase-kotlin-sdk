@@ -301,9 +301,48 @@ The Firebase Kotlin SDK provides a common API to access Firebase for projects ta
 
 It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target. The library requires [additional initialization](https://github.com/GitLiveApp/firebase-java-sdk?tab=readme-ov-file#initializing-the-sdk) compared to the official Firebase SDKs.
 
+### Using the Firebase Android SDK API from common code
+
+Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
+`com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
+(including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
+in common code targeting Android, iOS, JVM and JS:
+
+```kotlin
+import com.google.firebase.installations.FirebaseInstallations
+import dev.gitlive.firebase.tasks.await // multiplatform equivalent of kotlinx.coroutines.tasks.await
+
+FirebaseInstallations.getInstance().getId()
+    .addOnSuccessListener { id -> println("Installation id: $id") }
+    .addOnFailureListener { e -> println("Failed: ${e.message}") }
+
+val token = FirebaseInstallations.getInstance().getToken(false).await().token
+```
+
+Rules of thumb for this layer:
+- It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
+  API is built on top of it and remains the recommended way to write new multiplatform code.
+- An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
+  can be adapted rather than failing at runtime. APIs that exist on Android, JVM and Apple but not on JS live in a
+  `nonJsMain` source set, so Android + iOS projects keep full source compatibility by declaring the same intermediate source set.
+- Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
+  Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`).
+- `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper is not mirrored (use `await()` or
+  `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
+
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, exceptions, `Task`) and
+`firebase-installations`; the other modules are migrated one by one.
+
 ### Accessing the underlying Firebase SDK
 
 In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property.
+
+On Android (and JVM) the underlying SDK is a *relocated* copy of the Firebase Android SDK: because this SDK declares the
+`com.google.firebase` classes itself, the official artifacts are republished by this project with all their classes moved to
+the `dev.gitlive.firebase.android` package (as `dev.gitlive.firebase.android:<artifact>`), which is what the `android`
+properties return. Consequences: other libraries in your app must not depend on `com.google.firebase:*` directly, the Firebase
+Performance Gradle plugin is not supported, and an app upgrading to this version gets a new Installations id (persisted state
+is keyed by the package name). `play-services-tasks` and the rest of Play Services are shared with your app as usual.
 
 These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
 
@@ -375,7 +414,7 @@ But with the majority of the Android SDK being designed for Java, the Kotlin SDK
 More recently, with the official SDK for Android providing better support for Kotlin and the inclusion of the new Kotlin-friendly features direct in the main modules, the API differences between the official SDK and this project are likely to start to blur. Therefore, in particular for developers porting android code to multiplatform, one of our goals going forward will be API compatibility with the Android SDK where possible.
 
 For contributors this means following these points when adding new code to the public API of this project:
-- **Match the [Android SDKs API](https://firebase.google.com/docs/reference/kotlin/packages).** When adding new API coverage use the Android SDK as the guide on what the public API should be in regard to naming, parameters etc. The goal here is *near binary compatibility*, meaning code consuming the Android SDK compiles *as is* with the Kotlin SDK after just changing the package imports from `com.google` to `dev.gitlive`.
+- **Match the [Android SDKs API](https://firebase.google.com/docs/reference/kotlin/packages).** When adding new API coverage use the Android SDK as the guide on what the public API should be in regard to naming, parameters etc. The goal here is *source compatibility*: the `com.google.firebase` layer (see [Using the Firebase Android SDK API from common code](#using-the-firebase-android-sdk-api-from-common-code)) takes the exact Android shape so code consuming the Android SDK compiles *as is*, and the `dev.gitlive` layer keeps the same names with Kotlin-first shapes. Run `./gradlew :<module>:androidSourceCompatDump` to see which Android SDK members a module still lacks.
 - **Follow our [Kotlin-first design](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#kotlin-first-design) principles when needed.** If the API you are adding coverage for is new, and it's Kotlin-first in the Android SDK, then you can simply just match the Android SDKs API as described in the first point, but if it's an older Java-first API then ideally we would include an identical API for API compatibility *plus* a Kotlin-first overload. A good example for this is where the Builder pattern is employed in the Android SDK, here we can follow [this Kotlin-first design principle](https://github.com/GitLiveApp/firebase-kotlin-sdk/?tab=readme-ov-file#default-arguments) and provide both methods, one taking the options created with the builder and an overload with default arguments to avoid the builder boilerplate for developers not porting an existing android code base.
 
 And finally, please remember that this is an open source project, all the project maintainers are **volunteers**, they are **not paid to maintain** this project, and they have **their own jobs**, so please be **patient** when waiting for a response to your issue or PR. Any form of abuse or harassment will not be tolerated and will result in being reported to GitHub.

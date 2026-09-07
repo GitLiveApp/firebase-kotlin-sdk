@@ -1,11 +1,11 @@
 package dev.gitlive.firebase.firestore.internal
 
 import com.google.android.gms.tasks.TaskExecutors
-import com.google.firebase.firestore.AggregateField
-import com.google.firebase.firestore.AggregateSource
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.Query
+import dev.gitlive.firebase.android.firestore.AggregateField
+import dev.gitlive.firebase.android.firestore.AggregateSource
+import dev.gitlive.firebase.android.firestore.FieldPath
+import dev.gitlive.firebase.android.firestore.MetadataChanges
+import dev.gitlive.firebase.android.firestore.Query
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
@@ -54,39 +54,39 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual fun where(filter: Filter) = native.where(filter.toAndroidFilter())
 
-    private fun Filter.toAndroidFilter(): com.google.firebase.firestore.Filter = when (this) {
-        is Filter.And -> com.google.firebase.firestore.Filter.and(
+    private fun Filter.toAndroidFilter(): dev.gitlive.firebase.android.firestore.Filter = when (this) {
+        is Filter.And -> dev.gitlive.firebase.android.firestore.Filter.and(
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
-        is Filter.Or -> com.google.firebase.firestore.Filter.or(
+        is Filter.Or -> dev.gitlive.firebase.android.firestore.Filter.or(
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
         is Filter.Field -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
-                    val modifier: (String, Any?) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.EqualTo -> com.google.firebase.firestore.Filter::equalTo
-                        is WhereConstraint.NotEqualTo -> com.google.firebase.firestore.Filter::notEqualTo
+                    val modifier: (String, Any?) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.EqualTo -> dev.gitlive.firebase.android.firestore.Filter::equalTo
+                        is WhereConstraint.NotEqualTo -> dev.gitlive.firebase.android.firestore.Filter::notEqualTo
                     }
                     modifier.invoke(field, constraint.value)
                 }
                 is WhereConstraint.ForObject -> {
-                    val modifier: (String, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
-                        is WhereConstraint.GreaterThan -> com.google.firebase.firestore.Filter::greaterThan
-                        is WhereConstraint.LessThanOrEqualTo -> com.google.firebase.firestore.Filter::lessThanOrEqualTo
-                        is WhereConstraint.GreaterThanOrEqualTo -> com.google.firebase.firestore.Filter::greaterThanOrEqualTo
-                        is WhereConstraint.ArrayContains -> com.google.firebase.firestore.Filter::arrayContains
+                    val modifier: (String, Any) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.LessThan -> dev.gitlive.firebase.android.firestore.Filter::lessThan
+                        is WhereConstraint.GreaterThan -> dev.gitlive.firebase.android.firestore.Filter::greaterThan
+                        is WhereConstraint.LessThanOrEqualTo -> dev.gitlive.firebase.android.firestore.Filter::lessThanOrEqualTo
+                        is WhereConstraint.GreaterThanOrEqualTo -> dev.gitlive.firebase.android.firestore.Filter::greaterThanOrEqualTo
+                        is WhereConstraint.ArrayContains -> dev.gitlive.firebase.android.firestore.Filter::arrayContains
                     }
                     modifier.invoke(field, constraint.value)
                 }
                 is WhereConstraint.ForArray -> {
-                    val modifier: (String, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray
-                        is WhereConstraint.ArrayContainsAny -> com.google.firebase.firestore.Filter::arrayContainsAny
-                        is WhereConstraint.NotInArray -> com.google.firebase.firestore.Filter::notInArray
+                    val modifier: (String, List<Any>) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.InArray -> dev.gitlive.firebase.android.firestore.Filter::inArray
+                        is WhereConstraint.ArrayContainsAny -> dev.gitlive.firebase.android.firestore.Filter::arrayContainsAny
+                        is WhereConstraint.NotInArray -> dev.gitlive.firebase.android.firestore.Filter::notInArray
                     }
                     modifier.invoke(field, constraint.values)
                 }
@@ -95,27 +95,27 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         is Filter.Path -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
-                    val modifier: (FieldPath, Any?) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.EqualTo -> com.google.firebase.firestore.Filter::equalTo
-                        is WhereConstraint.NotEqualTo -> com.google.firebase.firestore.Filter::notEqualTo
+                    val modifier: (FieldPath, Any?) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.EqualTo -> dev.gitlive.firebase.android.firestore.Filter::equalTo
+                        is WhereConstraint.NotEqualTo -> dev.gitlive.firebase.android.firestore.Filter::notEqualTo
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
                 is WhereConstraint.ForObject -> {
-                    val modifier: (FieldPath, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
-                        is WhereConstraint.GreaterThan -> com.google.firebase.firestore.Filter::greaterThan
-                        is WhereConstraint.LessThanOrEqualTo -> com.google.firebase.firestore.Filter::lessThanOrEqualTo
-                        is WhereConstraint.GreaterThanOrEqualTo -> com.google.firebase.firestore.Filter::greaterThanOrEqualTo
-                        is WhereConstraint.ArrayContains -> com.google.firebase.firestore.Filter::arrayContains
+                    val modifier: (FieldPath, Any) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.LessThan -> dev.gitlive.firebase.android.firestore.Filter::lessThan
+                        is WhereConstraint.GreaterThan -> dev.gitlive.firebase.android.firestore.Filter::greaterThan
+                        is WhereConstraint.LessThanOrEqualTo -> dev.gitlive.firebase.android.firestore.Filter::lessThanOrEqualTo
+                        is WhereConstraint.GreaterThanOrEqualTo -> dev.gitlive.firebase.android.firestore.Filter::greaterThanOrEqualTo
+                        is WhereConstraint.ArrayContains -> dev.gitlive.firebase.android.firestore.Filter::arrayContains
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
                 is WhereConstraint.ForArray -> {
-                    val modifier: (FieldPath, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
-                        is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray
-                        is WhereConstraint.ArrayContainsAny -> com.google.firebase.firestore.Filter::arrayContainsAny
-                        is WhereConstraint.NotInArray -> com.google.firebase.firestore.Filter::notInArray
+                    val modifier: (FieldPath, List<Any>) -> dev.gitlive.firebase.android.firestore.Filter = when (constraint) {
+                        is WhereConstraint.InArray -> dev.gitlive.firebase.android.firestore.Filter::inArray
+                        is WhereConstraint.ArrayContainsAny -> dev.gitlive.firebase.android.firestore.Filter::arrayContainsAny
+                        is WhereConstraint.NotInArray -> dev.gitlive.firebase.android.firestore.Filter::notInArray
                     }
                     modifier.invoke(path.android, constraint.values)
                 }
@@ -138,7 +138,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     private fun addSnapshotListener(
         includeMetadataChanges: Boolean = false,
-        listener: ProducerScope<QuerySnapshot>.(com.google.firebase.firestore.QuerySnapshot?, com.google.firebase.firestore.FirebaseFirestoreException?) -> Unit,
+        listener: ProducerScope<QuerySnapshot>.(dev.gitlive.firebase.android.firestore.QuerySnapshot?, dev.gitlive.firebase.android.firestore.FirebaseFirestoreException?) -> Unit,
     ) = callbackFlow {
         val executor = callbackExecutorMap[native.firestore] ?: TaskExecutors.MAIN_THREAD
         val metadataChanges =

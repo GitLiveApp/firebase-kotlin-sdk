@@ -2,13 +2,10 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:JvmMultifileClass
-@file:JvmName("CommonKt")
-
 package dev.gitlive.firebase
 
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
+import com.google.firebase.FirebaseApp as CompatFirebaseApp
+import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
 /**
  * Single access point to all firebase sdks from Kotlin.
@@ -31,13 +28,15 @@ public object Firebase
  * Any `FirebaseApp` initialization must occur only in the main process of the app.
  * Use of Firebase in processes other than the main process is not supported and will likely cause
  * problems related to resource contention.
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.FirebaseApp] this app wraps.
  */
-public expect class FirebaseApp {
+public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
-    public val name: String
+    public val name: String get() = compat.name
 
     /** Returns the specified [FirebaseOptions]. */
-    public val options: FirebaseOptions
+    public val options: FirebaseOptions get() = compat.options.toPublic()
 
     /**
      * Deletes the [FirebaseApp] and all its data. All calls to this [FirebaseApp]
@@ -45,26 +44,33 @@ public expect class FirebaseApp {
      *
      * A no-op if delete was called before.
      */
-    public suspend fun delete()
+    public suspend fun delete(): Unit = compat.deleteAwaiting()
+
+    override fun equals(other: Any?): Boolean = other is FirebaseApp && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebaseApp(name=$name)"
 }
 
 /** Returns the default firebase app instance. */
-public expect val Firebase.app: FirebaseApp
+public val Firebase.app: FirebaseApp
+    get() = FirebaseApp(CompatFirebaseApp.getInstance())
 
 /** Returns a named firebase app instance. */
-public expect fun Firebase.app(name: String): FirebaseApp
+public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.getInstance(name))
 
 /** Returns all firebase app instances. */
-public expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
+public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = CompatFirebaseApp.getApps(context).map { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
+public fun Firebase.initialize(context: Any? = null): FirebaseApp? = CompatFirebaseApp.initializeApp(context)?.let { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat()))
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebaseApp.initializeApp(context, options.toCompat(), name))
 
 /** Returns options of default FirebaseApp */
 @Suppress("UnusedReceiverParameter")
@@ -109,19 +115,47 @@ public data class FirebaseOptions(
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-public expect open class FirebaseException : Exception
+public typealias FirebaseException = com.google.firebase.FirebaseException
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-public expect class FirebaseNetworkException : FirebaseException
+public typealias FirebaseNetworkException = com.google.firebase.FirebaseNetworkException
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-public expect open class FirebaseTooManyRequestsException : FirebaseException
+public typealias FirebaseTooManyRequestsException = com.google.firebase.FirebaseTooManyRequestsException
 
 /**
  * Exception that gets thrown when an operation on Firebase fails.
  */
-public expect open class FirebaseApiNotAvailableException : FirebaseException
+public typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
+
+/** Deletes the app, waiting for the platform SDK to finish where it reports completion asynchronously. */
+internal expect suspend fun CompatFirebaseApp.deleteAwaiting()
+
+/** Converts to the Android-SDK-shaped options (platform specific because JS also carries [FirebaseOptions.authDomain]). */
+internal expect fun FirebaseOptions.toCompat(): CompatFirebaseOptions
+
+internal expect fun CompatFirebaseOptions.toPublic(): FirebaseOptions
+
+internal fun FirebaseOptions.toCompatBuilder(): CompatFirebaseOptions.Builder = CompatFirebaseOptions.Builder()
+    .setApplicationId(applicationId)
+    .setApiKey(apiKey)
+    .setDatabaseUrl(databaseUrl)
+    .setGaTrackingId(gaTrackingId)
+    .setStorageBucket(storageBucket)
+    .setProjectId(projectId)
+    .setGcmSenderId(gcmSenderId)
+
+internal fun CompatFirebaseOptions.toPublic(authDomain: String?): FirebaseOptions = FirebaseOptions(
+    applicationId = applicationId,
+    apiKey = apiKey,
+    databaseUrl = databaseUrl,
+    gaTrackingId = gaTrackingId,
+    storageBucket = storageBucket,
+    projectId = projectId,
+    gcmSenderId = gcmSenderId,
+    authDomain = authDomain,
+)

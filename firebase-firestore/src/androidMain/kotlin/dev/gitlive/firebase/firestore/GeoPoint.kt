@@ -3,7 +3,7 @@ package dev.gitlive.firebase.firestore
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase GeoPoint. */
-public actual typealias NativeGeoPoint = com.google.firebase.firestore.GeoPoint
+public actual typealias NativeGeoPoint = dev.gitlive.firebase.android.firestore.GeoPoint
 
 /** A class representing a Firebase GeoPoint. */
 @Serializable(with = GeoPointSerializer::class)

@@ -1,0 +1,12 @@
+// Firebase Android SDK APIs intentionally not mirrored by firebase-app (see README, "Compatibility with the Firebase Android SDK").
+com.google.firebase.FirebaseApp#getApplicationContext  // android.content.Context has no multiplatform equivalent
+com.google.firebase.FirebaseApp#setAutomaticResourceManagementEnabled
+com.google.firebase.FirebaseOptions#fromResource  // reads Android resources
+com.google.firebase.FirebaseOptions.Builder#setRecaptchaSiteKey  // deprecated
+com.google.firebase.provider.*  // FirebaseInitProvider is an Android ContentProvider
+com.google.firebase.Timestamp  // provided by firebase-firestore
+com.google.firebase.TimestampKt
+com.google.firebase.datastorage.*
+com.google.firebase.emulators.*
+com.google.firebase.events.*
+com.google.firebase.util.*

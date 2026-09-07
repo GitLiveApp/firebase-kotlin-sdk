@@ -6,9 +6,9 @@ package dev.gitlive.firebase.auth
 
 import kotlinx.coroutines.tasks.await
 
-public val MultiFactor.android: com.google.firebase.auth.MultiFactor get() = android
+public val MultiFactor.android: dev.gitlive.firebase.android.auth.MultiFactor get() = android
 
-public actual class MultiFactor(internal val android: com.google.firebase.auth.MultiFactor) {
+public actual class MultiFactor(internal val android: dev.gitlive.firebase.android.auth.MultiFactor) {
     public actual val enrolledFactors: List<MultiFactorInfo>
         get() = android.enrolledFactors.map { MultiFactorInfo(it) }
     public actual suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) {
@@ -23,9 +23,9 @@ public actual class MultiFactor(internal val android: com.google.firebase.auth.M
     }
 }
 
-public val MultiFactorInfo.android: com.google.firebase.auth.MultiFactorInfo get() = android
+public val MultiFactorInfo.android: dev.gitlive.firebase.android.auth.MultiFactorInfo get() = android
 
-public actual class MultiFactorInfo(internal val android: com.google.firebase.auth.MultiFactorInfo) {
+public actual class MultiFactorInfo(internal val android: dev.gitlive.firebase.android.auth.MultiFactorInfo) {
     public actual val displayName: String?
         get() = android.displayName
     public actual val enrollmentTime: Double
@@ -36,20 +36,20 @@ public actual class MultiFactorInfo(internal val android: com.google.firebase.au
         get() = android.uid
 }
 
-public val MultiFactorAssertion.android: com.google.firebase.auth.MultiFactorAssertion get() = android
+public val MultiFactorAssertion.android: dev.gitlive.firebase.android.auth.MultiFactorAssertion get() = android
 
-public actual class MultiFactorAssertion(internal val android: com.google.firebase.auth.MultiFactorAssertion) {
+public actual class MultiFactorAssertion(internal val android: dev.gitlive.firebase.android.auth.MultiFactorAssertion) {
     public actual val factorId: String
         get() = android.factorId
 }
 
-public val MultiFactorSession.android: com.google.firebase.auth.MultiFactorSession get() = android
+public val MultiFactorSession.android: dev.gitlive.firebase.android.auth.MultiFactorSession get() = android
 
-public actual class MultiFactorSession(internal val android: com.google.firebase.auth.MultiFactorSession)
+public actual class MultiFactorSession(internal val android: dev.gitlive.firebase.android.auth.MultiFactorSession)
 
-public val MultiFactorResolver.android: com.google.firebase.auth.MultiFactorResolver get() = android
+public val MultiFactorResolver.android: dev.gitlive.firebase.android.auth.MultiFactorResolver get() = android
 
-public actual class MultiFactorResolver(internal val android: com.google.firebase.auth.MultiFactorResolver) {
+public actual class MultiFactorResolver(internal val android: dev.gitlive.firebase.android.auth.MultiFactorResolver) {
     public actual val auth: FirebaseAuth = FirebaseAuth(android.firebaseAuth)
     public actual val hints: List<MultiFactorInfo> = android.hints.map { MultiFactorInfo(it) }
     public actual val session: MultiFactorSession = MultiFactorSession(android.session)

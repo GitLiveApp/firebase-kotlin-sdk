@@ -5,7 +5,7 @@ public final class dev/gitlive/firebase/perf/FirebasePerformance {
 	public final fun setPerformanceCollectionEnabled (Z)V
 }
 
-public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google/firebase/FirebaseException {
+public class dev/gitlive/firebase/perf/FirebasePerformanceException : dev/gitlive/firebase/android/FirebaseException {
 }
 
 public final class dev/gitlive/firebase/perf/Performance_jvmKt {

@@ -1,12 +1,58 @@
+public final class com/google/firebase/installations/FirebaseInstallations {
+	public static final field Companion Lcom/google/firebase/installations/FirebaseInstallations$Companion;
+	public final fun delete ()Lcom/google/android/gms/tasks/Task;
+	public final fun getAndroid ()Ldev/gitlive/firebase/android/installations/FirebaseInstallations;
+	public final fun getId ()Lcom/google/android/gms/tasks/Task;
+	public static final fun getInstance ()Lcom/google/firebase/installations/FirebaseInstallations;
+	public static final fun getInstance (Lcom/google/firebase/FirebaseApp;)Lcom/google/firebase/installations/FirebaseInstallations;
+	public final fun getToken (Z)Lcom/google/android/gms/tasks/Task;
+}
+
+public final class com/google/firebase/installations/FirebaseInstallations$Companion {
+	public final fun getInstance ()Lcom/google/firebase/installations/FirebaseInstallations;
+	public final fun getInstance (Lcom/google/firebase/FirebaseApp;)Lcom/google/firebase/installations/FirebaseInstallations;
+}
+
+public final class com/google/firebase/installations/FirebaseInstallationsException : com/google/firebase/FirebaseException {
+	public fun <init> (Lcom/google/firebase/installations/FirebaseInstallationsException$Status;)V
+	public fun <init> (Ljava/lang/String;Lcom/google/firebase/installations/FirebaseInstallationsException$Status;)V
+	public fun <init> (Ljava/lang/String;Lcom/google/firebase/installations/FirebaseInstallationsException$Status;Ljava/lang/Throwable;)V
+	public final fun getStatus ()Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+}
+
+public final class com/google/firebase/installations/FirebaseInstallationsException$Status : java/lang/Enum {
+	public static final field BAD_CONFIG Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+	public static final field TOO_MANY_REQUESTS Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+	public static final field UNAVAILABLE Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+	public static fun values ()[Lcom/google/firebase/installations/FirebaseInstallationsException$Status;
+}
+
+public abstract class com/google/firebase/installations/InstallationTokenResult {
+	public fun <init> ()V
+	public abstract fun getToken ()Ljava/lang/String;
+	public abstract fun getTokenExpirationTimestamp ()J
+}
+
+public final class com/google/firebase/installations/InstallationsKt {
+	public static final fun getInstallations (Lcom/google/firebase/Firebase;)Lcom/google/firebase/installations/FirebaseInstallations;
+	public static final fun installations (Lcom/google/firebase/Firebase;Lcom/google/firebase/FirebaseApp;)Lcom/google/firebase/installations/FirebaseInstallations;
+}
+
 public final class dev/gitlive/firebase/installations/FirebaseInstallations {
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getCompat ()Lcom/google/firebase/installations/FirebaseInstallations;
 	public final fun getId (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getToken (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/installations/InstallationsKt {
-	public static final fun getAndroid (Ldev/gitlive/firebase/installations/FirebaseInstallations;)Lcom/google/firebase/installations/FirebaseInstallations;
 	public static final fun getInstallations (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
 	public static final fun installations (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/installations/FirebaseInstallations;
+}
+
+public final class dev/gitlive/firebase/installations/Installations_androidKt {
+	public static final fun getAndroid (Ldev/gitlive/firebase/installations/FirebaseInstallations;)Ldev/gitlive/firebase/android/installations/FirebaseInstallations;
 }
 

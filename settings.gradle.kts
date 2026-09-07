@@ -16,6 +16,17 @@ include(
     "test-utils"
 )
 
+// Relocated republications of the Firebase Android SDK artifacts (see android-sdk/README.md).
+// Project names carry a "relocated-" prefix so they never collide with the modules of the same artifact id.
+file("android-sdk").listFiles()
+    ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
+    ?.sortedBy { it.name }
+    ?.forEach { dir ->
+        val path = ":android-sdk:relocated-${dir.name}"
+        include(path)
+        project(path).projectDir = dir
+    }
+
 pluginManagement {
     includeBuild("convention-plugin-test-option")
     repositories {

@@ -7,12 +7,12 @@
 package dev.gitlive.firebase.database
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.Logger
-import com.google.firebase.database.MutableData
-import com.google.firebase.database.Transaction
-import com.google.firebase.database.ValueEventListener
+import dev.gitlive.firebase.android.database.ChildEventListener
+import dev.gitlive.firebase.android.database.DatabaseError
+import dev.gitlive.firebase.android.database.Logger
+import dev.gitlive.firebase.android.database.MutableData
+import dev.gitlive.firebase.android.database.Transaction
+import dev.gitlive.firebase.android.database.ValueEventListener
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.internal.EncodedObject
@@ -36,24 +36,24 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 
-public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
+public val FirebaseDatabase.android: dev.gitlive.firebase.android.database.FirebaseDatabase get() = dev.gitlive.firebase.android.database.FirebaseDatabase.getInstance()
 
 public actual val Firebase.database: FirebaseDatabase
-    by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }
+    by lazy { FirebaseDatabase.getInstance(dev.gitlive.firebase.android.database.FirebaseDatabase.getInstance()) }
 
-public actual fun Firebase.database(url: String): FirebaseDatabase = FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(url))
+public actual fun Firebase.database(url: String): FirebaseDatabase = FirebaseDatabase.getInstance(dev.gitlive.firebase.android.database.FirebaseDatabase.getInstance(url))
 
-public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android))
+public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase.getInstance(dev.gitlive.firebase.android.database.FirebaseDatabase.getInstance(app.android))
 
-public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance(app.android, url))
+public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase.getInstance(dev.gitlive.firebase.android.database.FirebaseDatabase.getInstance(app.android, url))
 
-public actual class FirebaseDatabase internal constructor(internal val android: com.google.firebase.database.FirebaseDatabase) {
+public actual class FirebaseDatabase internal constructor(internal val android: dev.gitlive.firebase.android.database.FirebaseDatabase) {
 
     public companion object {
-        private val instances = WeakHashMap<com.google.firebase.database.FirebaseDatabase, FirebaseDatabase>()
+        private val instances = WeakHashMap<dev.gitlive.firebase.android.database.FirebaseDatabase, FirebaseDatabase>()
 
         internal fun getInstance(
-            android: com.google.firebase.database.FirebaseDatabase,
+            android: dev.gitlive.firebase.android.database.FirebaseDatabase,
         ) = instances.getOrPut(android) { FirebaseDatabase(android) }
     }
 
@@ -94,18 +94,18 @@ public actual class FirebaseDatabase internal constructor(internal val android: 
 }
 
 internal actual open class NativeQuery(
-    open val android: com.google.firebase.database.Query,
+    open val android: dev.gitlive.firebase.android.database.Query,
     val persistenceEnabled: Boolean,
 )
 
-public val Query.android: com.google.firebase.database.Query get() = nativeQuery.android
+public val Query.android: dev.gitlive.firebase.android.database.Query get() = nativeQuery.android
 
 public actual open class Query internal actual constructor(
     internal val nativeQuery: NativeQuery,
 ) {
 
     internal constructor(
-        android: com.google.firebase.database.Query,
+        android: dev.gitlive.firebase.android.database.Query,
         persistenceEnabled: Boolean,
     ) : this(NativeQuery(android, persistenceEnabled))
 
@@ -207,7 +207,7 @@ public actual open class Query internal actual constructor(
 }
 
 internal actual class NativeDatabaseReference internal constructor(
-    override val android: com.google.firebase.database.DatabaseReference,
+    override val android: dev.gitlive.firebase.android.database.DatabaseReference,
     persistenceEnabled: Boolean,
 ) : NativeQuery(android, persistenceEnabled) {
 
@@ -253,7 +253,7 @@ internal actual class NativeDatabaseReference internal constructor(
             override fun onComplete(
                 error: DatabaseError?,
                 committed: Boolean,
-                snapshot: com.google.firebase.database.DataSnapshot?,
+                snapshot: dev.gitlive.firebase.android.database.DataSnapshot?,
             ) {
                 if (error != null) {
                     deferred.completeExceptionally(error.toException())
@@ -266,11 +266,11 @@ internal actual class NativeDatabaseReference internal constructor(
     }
 }
 
-public val DatabaseReference.android: com.google.firebase.database.DatabaseReference get() = nativeReference.android
-public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = android
+public val DatabaseReference.android: dev.gitlive.firebase.android.database.DatabaseReference get() = nativeReference.android
+public val DataSnapshot.android: dev.gitlive.firebase.android.database.DataSnapshot get() = android
 
 public actual class DataSnapshot internal constructor(
-    internal val android: com.google.firebase.database.DataSnapshot,
+    internal val android: dev.gitlive.firebase.android.database.DataSnapshot,
     private val persistenceEnabled: Boolean,
 ) {
 
@@ -292,7 +292,7 @@ public actual class DataSnapshot internal constructor(
 }
 
 internal actual class NativeOnDisconnect internal constructor(
-    val android: com.google.firebase.database.OnDisconnect,
+    val android: dev.gitlive.firebase.android.database.OnDisconnect,
     val persistenceEnabled: Boolean,
     val database: FirebaseDatabase,
 ) {
@@ -322,4 +322,4 @@ public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEn
 @Deprecated("Unused; it will be removed in the next major version.")
 public val OnDisconnect.database: FirebaseDatabase get() = native.database
 
-public actual typealias DatabaseException = com.google.firebase.database.DatabaseException
+public actual typealias DatabaseException = dev.gitlive.firebase.android.database.DatabaseException

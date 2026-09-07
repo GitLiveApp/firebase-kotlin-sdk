@@ -18,7 +18,7 @@ plugins {
     kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
-    alias(libs.plugins.publish)
+    id("com.vanniktech.maven.publish")
 }
 
 if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -173,7 +173,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 dependencies {
-                    api(libs.google.firebase.storage)
+                    api(project(":android-sdk:relocated-firebase-storage"))
                 }
             }
         }

@@ -2,10 +2,10 @@ public final class dev/gitlive/firebase/functions/AndroidFunctions {
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 	public static final fun functions (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
-	public static final fun getAndroid (Ldev/gitlive/firebase/functions/FirebaseFunctions;)Lcom/google/firebase/functions/FirebaseFunctions;
-	public static final fun getAndroid (Ldev/gitlive/firebase/functions/HttpsCallableResult;)Lcom/google/firebase/functions/HttpsCallableResult;
-	public static final fun getCode (Lcom/google/firebase/functions/FirebaseFunctionsException;)Lcom/google/firebase/functions/FirebaseFunctionsException$Code;
-	public static final fun getDetails (Lcom/google/firebase/functions/FirebaseFunctionsException;)Ljava/lang/Object;
+	public static final fun getAndroid (Ldev/gitlive/firebase/functions/FirebaseFunctions;)Ldev/gitlive/firebase/android/functions/FirebaseFunctions;
+	public static final fun getAndroid (Ldev/gitlive/firebase/functions/HttpsCallableResult;)Ldev/gitlive/firebase/android/functions/HttpsCallableResult;
+	public static final fun getCode (Ldev/gitlive/firebase/android/functions/FirebaseFunctionsException;)Ldev/gitlive/firebase/android/functions/FirebaseFunctionsException$Code;
+	public static final fun getDetails (Ldev/gitlive/firebase/android/functions/FirebaseFunctionsException;)Ljava/lang/Object;
 	public static final fun getFunctions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/functions/FirebaseFunctions;
 }
 
@@ -31,18 +31,18 @@ public final class dev/gitlive/firebase/functions/HttpsCallableReference {
 }
 
 public final class dev/gitlive/firebase/functions/HttpsCallableResult {
-	public fun <init> (Lcom/google/firebase/functions/HttpsCallableResult;)V
+	public fun <init> (Ldev/gitlive/firebase/android/functions/HttpsCallableResult;)V
 	public final fun data (Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static synthetic fun data$default (Ldev/gitlive/firebase/functions/HttpsCallableResult;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/functions/NativeHttpsCallableReference {
-	public fun <init> (Lcom/google/firebase/functions/HttpsCallableReference;)V
-	public final fun component1 ()Lcom/google/firebase/functions/HttpsCallableReference;
-	public final fun copy (Lcom/google/firebase/functions/HttpsCallableReference;)Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;
-	public static synthetic fun copy$default (Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;Lcom/google/firebase/functions/HttpsCallableReference;ILjava/lang/Object;)Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;
+	public fun <init> (Ldev/gitlive/firebase/android/functions/HttpsCallableReference;)V
+	public final fun component1 ()Ldev/gitlive/firebase/android/functions/HttpsCallableReference;
+	public final fun copy (Ldev/gitlive/firebase/android/functions/HttpsCallableReference;)Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;Ldev/gitlive/firebase/android/functions/HttpsCallableReference;ILjava/lang/Object;)Ldev/gitlive/firebase/functions/NativeHttpsCallableReference;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAndroid ()Lcom/google/firebase/functions/HttpsCallableReference;
+	public final fun getAndroid ()Ldev/gitlive/firebase/android/functions/HttpsCallableReference;
 	public fun hashCode ()I
 	public final fun invoke (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun invoke (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
