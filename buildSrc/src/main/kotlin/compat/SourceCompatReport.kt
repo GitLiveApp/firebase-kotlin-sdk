@@ -29,7 +29,9 @@ data class Exclusion(val pattern: Regex, val uncountedStatus: String?) {
  * - `PLAT` involves an Android/JVM-only type (listed in the exclusions with `@platform`), not counted.
  *
  * Classes in an `internal` package, deprecated classes and classes excluded with `@hide` or `@platform` are not listed
- * at all. A Kotlin `Companion` field is not a member of the API surface and is ignored.
+ * at all. A Kotlin `Companion` field is not a member of the API surface and is ignored, and the members of a Kotlin
+ * file facade (`FirebaseKt`) are looked up across every facade of the package, since this SDK may declare a top-level
+ * function in a differently named file.
  * The percentage in the header is the share of counted members that are available; it is also the module's API
  * coverage badge in the README.
  */
@@ -49,6 +51,14 @@ object SourceCompatReport {
         exclusions: List<Exclusion>,
     ): String {
         val oursByName = ours.associateBy { it.name }
+
+        // Top-level functions may live in any file facade (`*Kt`) of the package: the facade name is a compilation detail.
+        fun ourClassFor(name: String): ApiClass? {
+            if (!name.endsWith("Kt")) return oursByName[name]
+            val pkg = name.substringBeforeLast('.')
+            val facades = ours.filter { it.name.substringBeforeLast('.') == pkg && it.name.substringAfterLast('.').endsWith("Kt") }
+            return if (facades.isEmpty()) null else ApiClass(name, facades.flatMap { it.members })
+        }
         val out = StringBuilder()
         var ok = 0
         var mapped = 0
@@ -61,7 +71,7 @@ object SourceCompatReport {
             val outerName = sdkClass.name.substringBefore('$')
             val classExclusion = exclusions.firstOrNull { it.matchesClass(sdkClass.name) || it.matchesClass(outerName) }
             if (classExclusion?.uncountedStatus != null) continue
-            val ourClass = oursByName[sdkClass.name]
+            val ourClass = ourClassFor(sdkClass.name)
             val note = when {
                 classExclusion != null -> "  (class omitted)"
                 ourClass == null -> "  (class missing)"

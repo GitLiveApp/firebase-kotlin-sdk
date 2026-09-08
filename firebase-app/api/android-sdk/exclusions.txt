@@ -2,7 +2,6 @@
 // @platform: the signature involves an Android/JVM-only type, so the member cannot exist in common code (not counted).
 com.google.firebase.FirebaseApp#initializeApp  // @platform android.content.Context: use dev.gitlive.firebase.Firebase.initialize from common code
 com.google.firebase.FirebaseApp#getApps  // @platform android.content.Context: use dev.gitlive.firebase.Firebase.apps from common code
-com.google.firebase.FirebaseKt#initialize  // @platform android.content.Context
 com.google.firebase.FirebaseApp#getApplicationContext  // @platform android.content.Context
 com.google.firebase.FirebaseOptions#fromResource  // @platform reads Android resources through a Context
 com.google.firebase.FirebaseOptions.Builder#setRecaptchaSiteKey  // deprecated

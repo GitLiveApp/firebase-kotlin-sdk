@@ -31,6 +31,8 @@ fun Project.stripHeaderStubs(
     packageDirs: List<String>,
     androidReferenceJars: FileCollection,
     jvmReferenceJars: FileCollection,
+    /** Class files under [packageDirs] (e.g. `com/google/firebase/FirebaseInitializeKt.class`) that are real code and are shipped. */
+    keepClasses: List<String> = emptyList(),
 ) {
     tasks.withType(KotlinCompile::class.java).configureEach {
         if (!name.startsWith("compile") || name.contains("Test")) return@configureEach
@@ -41,17 +43,20 @@ fun Project.stripHeaderStubs(
         // Not declared as a task output: the Kotlin compile task pre-creates declared outputs as directories.
         val dump = project.layout.buildDirectory.file("header-stubs/$name.api")
         doLast {
-            val stubDirs = packageDirs.map { destinationDirectory.dir(it).get().asFile }.filter { it.exists() }
+            val destination = destinationDirectory.get().asFile
+            val stubDirs = packageDirs.map { destination.resolve(it) }.filter { it.exists() }
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
+                .filter { it.relativeTo(destination).invariantSeparatorsPath !in keepClasses }
             val classes = stubs.map { readMembers(it.readBytes()) }
             verifyHeaderStubs(classes, references.files.filter { it.isFile })
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
-            stubDirs.forEach { it.deleteRecursively() }
-            logger.info("Removed header stubs ${packageDirs} from ${destinationDirectory.get()}")
+            stubs.forEach { it.delete() }
+            stubDirs.forEach { dir -> dir.walkBottomUp().filter { it.isDirectory && it.listFiles().isNullOrEmpty() }.forEach { it.delete() } }
+            logger.info("Removed header stubs ${packageDirs} from $destination")
         }
     }
     tasks.withType(Jar::class.java).configureEach {
-        packageDirs.forEach { exclude("$it/**") }
+        exclude { element -> !element.isDirectory && packageDirs.any { element.path.startsWith("$it/") } && element.path !in keepClasses }
     }
 }
 

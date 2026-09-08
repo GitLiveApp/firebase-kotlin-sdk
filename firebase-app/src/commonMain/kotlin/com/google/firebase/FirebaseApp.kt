@@ -8,7 +8,7 @@ package com.google.firebase
  * The entry point of Firebase SDKs, mirroring `com.google.firebase.FirebaseApp` from the Firebase Android SDK.
  *
  * Not mirrored, because they take an Android `Context`: `initializeApp`, `getApps` and `getApplicationContext`
- * (use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code).
+ * (use `Firebase.initialize(context)` or `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code).
  */
 public expect class FirebaseApp {
     /** The unique name of this app. */

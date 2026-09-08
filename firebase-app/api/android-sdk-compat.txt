@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-app
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 33 public members available (33 identical, 0 mapped, 0 missing, 0 omitted)
+# 100% of 36 public members available (33 identical, 3 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.Firebase
   OK    static Firebase INSTANCE
@@ -20,9 +20,9 @@ com.google.firebase.FirebaseKt
   OK    static FirebaseApp app(Firebase, String)
   OK    static FirebaseApp getApp(Firebase)
   OK    static FirebaseOptions getOptions(Firebase)
-  PLAT  static FirebaseApp initialize(Firebase, Context)
-  PLAT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions)
-  PLAT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)
+  MAP   static FirebaseApp initialize(Firebase, Context)  [Context -> Object]
+  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions)  [Context -> Object]
+  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)  [Context -> Object]
 com.google.firebase.FirebaseNetworkException
   OK    FirebaseNetworkException(String)
 com.google.firebase.FirebaseOptions

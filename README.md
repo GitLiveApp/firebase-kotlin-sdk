@@ -57,14 +57,17 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 Rules of thumb for this layer:
 - It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
   API is built on top of it and remains the recommended way to write new multiplatform code.
-- On Android and the JVM nothing is added to your app: the library depends on the official Firebase Android SDK
-  (`firebase-java-sdk` on the JVM) and these declarations are only compiled against, so your Android code binds to the
-  real classes exactly as before. Other libraries depending on Firebase, the Firebase Gradle plugins and Play Services
-  all keep working.
+- On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads: the library
+  depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
+  against, so your Android code binds to the real classes exactly as before. Other libraries depending on Firebase, the
+  Firebase Gradle plugins and Play Services all keep working.
 - An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
-  can be adapted rather than failing at runtime. This includes everything taking an `android.content.Context`
-  (`FirebaseApp.initializeApp`, `getApps`): use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code. APIs that exist on Android, JVM and Apple but not on JS live in a
-  `nonJsMain` source set, so Android + iOS projects keep full source compatibility by declaring the same intermediate source set.
+  can be adapted rather than failing at runtime. This includes the members taking an `android.content.Context`
+  (`FirebaseApp.initializeApp`, `getApps`): use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code. The one
+  exception is the `Firebase.initialize(context, ...)` extensions, which exist with the context widened to `Any?` on every
+  platform (Android code passing a `Context` still binds to the SDK's own functions). APIs that exist on Android, JVM and
+  Apple but not on JS live in a `nonJsMain` source set, so Android + iOS projects keep full source compatibility by
+  declaring the same intermediate source set.
 - Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
   Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`); its percentage is the module's API coverage
   badge above. Members that are `@hide` in the Android SDK, or whose signature involves an Android/JVM-only type such as
@@ -141,6 +144,9 @@ initializeFirebase(Application())
 `Firebase.initialize(context, options, name)` initialises an additional named app and `Firebase.app(name)` returns it;
 `Firebase.apps(context)` lists the initialised apps and `FirebaseApp.delete()` removes one. The default app is named
 `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the underlying SDKs use different names for it.
+
+Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)`: the same
+three overloads exist there with the context typed as `Any?`, following the rules above per platform.
 
 ### Accessing the underlying Firebase SDK
 

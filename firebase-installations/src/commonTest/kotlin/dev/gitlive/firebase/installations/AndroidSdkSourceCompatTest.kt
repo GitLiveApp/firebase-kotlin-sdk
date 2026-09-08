@@ -5,7 +5,9 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
+import com.google.firebase.initialize
 import com.google.firebase.app
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
@@ -57,6 +59,16 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app, Firebase.app)
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
         assertEquals("fir-kotlin-sdk", app.options.projectId)
+    }
+
+    @Test
+    fun testInitializeNamedApp() {
+        val options = FirebaseOptions.Builder(FirebaseApp.getInstance().options).build()
+        val app = Firebase.initialize(context, options, "compat")
+        assertEquals("compat", app.name)
+        assertEquals(app, FirebaseApp.getInstance("compat"))
+        assertEquals(options.projectId, app.options.projectId)
+        app.delete()
     }
 
     @Test

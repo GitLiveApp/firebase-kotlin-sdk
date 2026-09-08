@@ -58,7 +58,7 @@ class SourceCompatReportTest {
         	public static final enum field BAD_CONFIG Lcom/google/firebase/installations/FirebaseInstallationsException${'$'}Status;
         }
 
-        public final class com/google/firebase/installations/InstallationsKt {
+        public final class com/google/firebase/installations/InstallationsCompatKt {
         	public static final fun getInstallations (Lcom/google/firebase/Firebase;)Lcom/google/firebase/installations/FirebaseInstallations;
         }
 
@@ -127,6 +127,7 @@ class SourceCompatReportTest {
         assertTrue(report.contains("OK    Builder setApiKey(String)"), report)
         assertTrue(report.contains("OK    static String DEFAULT_APP_NAME"), report)
         assertTrue(report.contains("MISS  FirebaseInstallations getInstallations()"), report) // a Kotlin property without receiver in api.txt
+        assertTrue(report.contains("OK    static FirebaseInstallations getInstallations(Firebase)"), report) // found in another file facade
         assertTrue(report.contains("MISS  long getSeconds()"), report)
         assertTrue(report.contains("# 72% of 11 public members available (8 identical, 0 mapped, 2 missing, 1 omitted)"), report)
     }

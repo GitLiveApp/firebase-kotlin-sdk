@@ -208,6 +208,8 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
+    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class"),
 )
 
 registerAndroidSourceCompat("firebase-common/api.txt")

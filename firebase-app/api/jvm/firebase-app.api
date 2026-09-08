@@ -1,3 +1,12 @@
+public final class com/google/firebase/FirebaseInitializeKt {
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+}
+
 public final class dev/gitlive/firebase/Firebase {
 	public static final field INSTANCE Ldev/gitlive/firebase/Firebase;
 }
