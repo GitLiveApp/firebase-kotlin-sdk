@@ -51,14 +51,39 @@ The Android API surface comes from
   packages count as unused unless the module sources mention "pipeline", to avoid
   false matches on generic names such as `where` and `limit`.
 
-## Modules without an api.txt
+## Authentication and Analytics (no api.txt)
 
-Authentication and Analytics are closed-source Android libraries and have no
-module in firebase-android-sdk. To measure them, list the public API another way,
-for example by downloading the `firebase-auth` / `firebase-analytics` AAR for the
-BOM version in `gradle/libs.versions.toml` from Google Maven
-(`https://dl.google.com/dl/android/maven2/com/google/firebase/...`), extracting
-`classes.jar`, and running `javap -public` over the `com.google.firebase.auth` /
-`com.google.firebase.analytics` classes. Apply the same counting rules by hand or
-extend the script with a parser for that output. Those two badges are otherwise
-left unchanged.
+These two Android libraries are closed source and have no module in
+firebase-android-sdk, so `api_coverage.py` leaves their badges alone. Their
+current figures (Authentication 166/314 = 53%, Analytics 26/160 = 16%) were
+produced in PR #874 by listing the public API from the AARs instead. To
+recalculate them:
+
+1. Find the BOM version in `gradle/libs.versions.toml` (`firebase-bom`) and read
+   the BOM POM from Google Maven
+   (`https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/<version>/firebase-bom-<version>.pom`)
+   to get the library versions. For BOM 34.18.0 these were `firebase-auth` 24.2.0
+   and `firebase-analytics` 23.2.0.
+2. Download the AARs from the same Maven repository and extract `classes.jar`.
+   - Authentication: `com/google/firebase/firebase-auth/<version>/firebase-auth-<version>.aar`,
+     package `com.google.firebase.auth`.
+   - Analytics: the `firebase-analytics` AAR is an empty shim; the API lives in
+     `com/google/android/gms/play-services-measurement-api/<version>/play-services-measurement-api-<version>.aar`
+     (23.2.0 for BOM 34.18.0), package `com.google.firebase.analytics`.
+3. List members with `javap -v` over every public class in that package. Skip
+   synthetic and bridge members, obfuscated `zz*` names, deprecated members, and
+   the `internal` and `connector` sub-packages.
+4. Apply the same counting rules as above: overloads collapse to one entry per
+   (class, name); a member counts when the module's `androidMain` invokes it or
+   the class is exposed through a public typealias (the auth exception classes
+   are). Kotlin facade functions (`FirebaseAuthKt`, `AnalyticsKt`) count when
+   androidMain imports them, and their DSL receiver classes such as
+   `ConsentBuilder` count by member name.
+5. The Analytics total includes the 118 string constants on
+   `FirebaseAnalytics.Event`, `Param` and `UserProperty`, which the Kotlin SDK
+   does not expose. Keep them for consistency with the api.txt badges, which
+   count constants too.
+6. Edit the two badges in `README.md` by hand, using the same colour rule.
+
+Google Maven and the Firebase docs are blocked in some sandboxes; if the
+downloads fail, say so rather than estimating.
