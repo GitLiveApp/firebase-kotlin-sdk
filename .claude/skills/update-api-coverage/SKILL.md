@@ -29,7 +29,7 @@ The Android API surface comes from
    If GitHub raw content is unreachable, save the api.txt files as
    `<module>.txt` in a directory and pass `--api-dir DIR`.
 
-2. Review `git diff README.md`. Badge colour is green at 80% and above, orange below.
+2. Review `git diff README.md`. Badge colour is green above 60%, orange otherwise.
 
 3. Commit the README change.
 

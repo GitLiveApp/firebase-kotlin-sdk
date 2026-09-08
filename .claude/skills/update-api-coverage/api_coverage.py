@@ -158,7 +158,7 @@ def update_readme(results):
     path = os.path.join(ROOT, 'README.md')
     s = open(path).read()
     for moddir, pct in results.items():
-        color = 'green' if pct >= 80 else 'orange'
+        color = 'green' if pct > 60 else 'orange'
         pat = re.compile(r'\[!\[\d+%\]\(https://img\.shields\.io/badge/-\d+%25-\w+\?style=flat-square\)\](\(/' + moddir + r'/)')
         s, n = pat.subn(lambda m: f'[![{pct}%](https://img.shields.io/badge/-{pct}%25-{color}?style=flat-square)]{m.group(1)}', s)
         if n != 1:
