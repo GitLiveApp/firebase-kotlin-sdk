@@ -211,7 +211,12 @@ def parse_javap(output, package):
 
 
 def android_sources(moddir):
-    return glob.glob(os.path.join(ROOT, moddir, 'src/androidMain/**/*.kt'), recursive=True)
+    files = glob.glob(os.path.join(ROOT, moddir, 'src/androidMain/**/*.kt'), recursive=True)
+    # Modules migrated to the com.google.firebase compatibility layer (they have api/android-sdk/) invoke the Android
+    # API from commonMain, through expect declarations that mirror it; their androidMain holds only header stubs.
+    if os.path.isdir(os.path.join(ROOT, moddir, 'api', 'android-sdk')):
+        files += glob.glob(os.path.join(ROOT, moddir, 'src/commonMain/**/*.kt'), recursive=True)
+    return files
 
 
 def public_typealiases(moddir):

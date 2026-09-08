@@ -39,7 +39,9 @@ The Android API surface comes from
   api.txt. Overloads collapse to one entry per (class, name). `@Deprecated`,
   `@RestrictTo`, non-public members, annotation types, `Companion` and `INSTANCE`
   are excluded. A Kotlin `property` and its synthetic `getX`/`setX`/`isX` count once.
-- A member is *invoked* when the module's `src/androidMain` Kotlin calls it
+- A member is *invoked* when the module's `src/androidMain` Kotlin (plus `src/commonMain`
+  for modules migrated to the `com.google.firebase` compatibility layer, i.e. those with an
+  `api/android-sdk/` directory, whose androidMain holds only header stubs) calls it
   (`name(`, `name {`, `::name`), reads or writes it as a Kotlin property
   (`.x` for `getX`, `.isX`, `.x =` for `setX`), references a field or enum constant
   by name, or constructs the class. Declarations in the wrapper (`fun name(`,
