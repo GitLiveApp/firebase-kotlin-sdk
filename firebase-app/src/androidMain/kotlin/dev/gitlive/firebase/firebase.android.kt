@@ -2,6 +2,9 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("FirebaseKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase
 
 import android.content.Context

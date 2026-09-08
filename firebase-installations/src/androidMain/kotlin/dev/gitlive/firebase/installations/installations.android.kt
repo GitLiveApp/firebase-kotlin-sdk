@@ -1,3 +1,6 @@
+@file:JvmName("InstallationsKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase.installations
 
 import com.google.firebase.installations.FirebaseInstallations as AndroidFirebaseInstallations

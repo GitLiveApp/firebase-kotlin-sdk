@@ -2,7 +2,13 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("FirebaseKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase
+
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 import com.google.firebase.app
 import com.google.firebase.FirebaseApp as CompatFirebaseApp

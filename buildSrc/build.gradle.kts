@@ -13,7 +13,7 @@ dependencies {
     // the Kotlin plugin needs the Android plugin in the same class loader.
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.android.gradle.plugin)
-    implementation(libs.asm.commons)
+    implementation(libs.asm) // header stub verification (utils/HeaderStubs.kt)
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
 }

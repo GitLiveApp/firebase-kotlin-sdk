@@ -1,4 +1,10 @@
+@file:JvmName("InstallationsKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase.installations
+
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
