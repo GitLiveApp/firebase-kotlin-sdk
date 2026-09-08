@@ -53,7 +53,3 @@ public final class dev/gitlive/firebase/FirebaseOptions {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class dev/gitlive/firebase/tasks/AwaitKt {
-	public static final fun await (Lcom/google/android/gms/tasks/Task;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-

@@ -11,8 +11,8 @@ package com.google.android.gms.tasks
  * On Android and the JVM this is the real Play Services class; on Apple and JS platforms a Kotlin implementation
  * is provided. Listeners on the Kotlin implementation are invoked on the thread that completes the task.
  *
- * The static-only `Tasks` helper class is intentionally not mirrored; use `await()` from
- * `dev.gitlive.firebase.tasks` or a [TaskCompletionSource] instead.
+ * The static-only `Tasks` helper class is intentionally not mirrored; use `kotlinx.coroutines.tasks.await`
+ * or a [TaskCompletionSource] instead.
  */
 public expect abstract class Task<TResult>() {
     public abstract val isComplete: Boolean

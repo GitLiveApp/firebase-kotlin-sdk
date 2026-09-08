@@ -45,7 +45,7 @@ in common code targeting Android, iOS, JVM and JS:
 
 ```kotlin
 import com.google.firebase.installations.FirebaseInstallations
-import dev.gitlive.firebase.tasks.await // multiplatform equivalent of kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.tasks.await
 
 FirebaseInstallations.getInstance().getId()
     .addOnSuccessListener { id -> println("Installation id: $id") }
@@ -68,10 +68,11 @@ Rules of thumb for this layer:
 - Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
   Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`); its percentage is the module's API coverage
   badge above. Members that are `@hide` in the Android SDK are not counted; anything else that is not mirrored counts against it.
-- `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper is not mirrored (use `await()` or
-  `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
+- `kotlinx.coroutines.tasks.await` from `kotlinx-coroutines-play-services` is mirrored the same way, so the usual
+  `Task.await()` import works from common code; `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper
+  is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, exceptions, `Task`) and
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, exceptions, `Task`, `Task.await()`) and
 `firebase-installations`; the other modules are migrated one by one.
 
 ### Initialization

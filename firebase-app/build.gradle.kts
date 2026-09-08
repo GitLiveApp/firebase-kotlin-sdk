@@ -177,6 +177,8 @@ kotlin {
             getByName("androidMain") {
                 dependencies {
                     api(libs.google.firebase.common)
+                    // kotlinx.coroutines.tasks.await is mirrored as a header stub, so consumers need the real facade
+                    api(libs.kotlinx.coroutines.play.services)
                 }
             }
         }
@@ -195,10 +197,11 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "17"
 }
 
-// The com.google.* declarations are header stubs on Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real
-// Firebase Android SDK / firebase-java-sdk classes are used at runtime.
+// The com.google.* and kotlinx.coroutines.tasks declarations are header stubs on Android and the JVM (see buildSrc
+// utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk / kotlinx-coroutines-play-services classes are
+// used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("com/google/android/gms", "com/google/firebase"),
+    packageDirs = listOf("com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
         configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")

@@ -14,7 +14,7 @@ import com.google.firebase.installations.internal.FidListenerHandle
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
-import dev.gitlive.firebase.tasks.await
+import kotlinx.coroutines.tasks.await
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

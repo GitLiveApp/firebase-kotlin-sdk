@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.tasks.await
+import kotlinx.coroutines.tasks.await
 import com.google.firebase.installations.FirebaseInstallations as CompatFirebaseInstallations
 import com.google.firebase.installations.installations as compatInstallations
 
