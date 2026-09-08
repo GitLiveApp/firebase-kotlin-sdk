@@ -128,10 +128,13 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
     }
 }
 
-/** Writes the stubs in the binary-compatibility-validator dump format so the source-compatibility report can read them. */
+/**
+ * Writes the stubs in the binary-compatibility-validator dump format so the source-compatibility report can read them.
+ * Companion objects are included (the Android SDK's Kotlin classes have them too); the mapping classes are not.
+ */
 private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
     for (stub in stubs.sortedBy { it.name }) {
-        if (stub.isKotlinOnly) continue
+        if (stub.name.contains("\$WhenMappings") || stub.name.contains("\$EntriesMappings")) continue
         val modifiers = buildList {
             if (stub.access and Opcodes.ACC_ABSTRACT != 0 && stub.access and Opcodes.ACC_INTERFACE == 0) add("abstract")
             if (stub.access and Opcodes.ACC_FINAL != 0) add("final")

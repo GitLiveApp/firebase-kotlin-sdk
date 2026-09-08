@@ -19,7 +19,8 @@ object AndroidSdkApiTxtParser {
         var members = mutableListOf<ApiMember>()
 
         fun flush() {
-            currentClass?.let { classes += ApiClass(it, members.toList(), currentDeprecated) }
+            // a Kotlin `property` line and the explicit getter `method` line describe the same member
+            currentClass?.let { classes += ApiClass(it, members.distinctBy { Triple(it.kind, it.name, it.parameters) }, currentDeprecated) }
             currentClass = null
             members = mutableListOf()
         }
@@ -88,6 +89,7 @@ object AndroidSdkApiTxtParser {
             "field", "enum_constant" -> {
                 val declaration = rest.substringBefore('=').trim()
                 val name = declaration.substringAfterLast(' ')
+                if (name == "Companion") return null // Kotlin companion holder, not part of the API surface
                 val type = TypeNames.fromApiTxt(declaration.substringBeforeLast(' '))
                 ApiMember(ApiMember.Kind.FIELD, name, emptyList(), type, isStatic || kind == "enum_constant", deprecated)
             }

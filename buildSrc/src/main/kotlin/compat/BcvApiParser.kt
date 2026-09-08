@@ -40,7 +40,7 @@ object BcvApiParser {
             }
             field.find(line)?.let { match ->
                 val modifiers = match.groupValues[1]
-                if ("synthetic" in modifiers) return@let
+                if ("synthetic" in modifiers || match.groupValues[2] == "Companion") return@let
                 members += ApiMember(ApiMember.Kind.FIELD, match.groupValues[2], emptyList(), TypeNames.fromFieldDescriptor(match.groupValues[3]), "static" in modifiers)
             }
         }

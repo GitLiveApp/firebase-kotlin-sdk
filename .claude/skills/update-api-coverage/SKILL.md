@@ -59,7 +59,8 @@ in the header of `api/android-sdk-compat.txt`, which `./gradlew :<module>:androi
 regenerates from the module's API dump and the vendored api.txt files: every public,
 non-deprecated api.txt member the layer provides counts as available, members listed in
 `api/android-sdk/exclusions.txt` count as unavailable unless their comment contains `@hide`
-(hidden in the Android SDK), in which case they are not counted at all. Regenerate the
+(hidden in the Android SDK) or `@platform` (the signature involves an Android/JVM-only type),
+in which case they are not counted at all. Regenerate the
 report before running the script when the module's API changed.
 
 ## Authentication and Analytics (no api.txt)

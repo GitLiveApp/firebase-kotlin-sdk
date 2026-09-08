@@ -43,6 +43,9 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
         jsDeleteApp(js)
     }
 
+    /** No-op: automatic resource management is an Android-only behaviour. */
+    public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
+
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.js == js
 
     override fun hashCode(): Int = js.hashCode()

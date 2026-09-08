@@ -1,12 +1,19 @@
 package compat
 
 /**
- * A line of a module's `api/android-sdk/exclusions.txt`: a class or `class#member` pattern. Lines whose comment
- * contains `@hide` describe members that are hidden in the Android SDK (`@hide` in their javadoc): they are reported
- * but not counted; the other exclusions are intentionally not mirrored and count as unavailable.
+ * A line of a module's `api/android-sdk/exclusions.txt`: a class pattern, a `class#member` pattern, or a
+ * `class#member(Type, Type)` pattern that selects one overload by the simple names of its parameter types
+ * (constructors are `class#<init>(...)`). [uncountedStatus] is the report status of a member that is excluded from
+ * the count: `HIDE` when the comment contains `@hide` (hidden in the Android SDK), `PLAT` when it contains `@platform`
+ * (the member's signature involves an Android/JVM-only type such as `Context`, `Parcel`, `Date` or `Instant`).
+ * Any other exclusion is intentionally not mirrored and counts as unavailable (`OMIT`).
  */
-data class Exclusion(val pattern: Regex, val hidden: Boolean) {
-    fun matches(name: String): Boolean = pattern.matches(name)
+data class Exclusion(val pattern: Regex, val uncountedStatus: String?) {
+    fun matchesClass(name: String): Boolean = pattern.matches(name)
+
+    fun matchesMember(className: String, member: ApiMember): Boolean =
+        pattern.matches("$className#${member.name}") ||
+            pattern.matches("$className#${member.name}(${member.parameters.joinToString(",") { it.substringAfterLast('.').replace('$', '.') }})")
 }
 
 /**
@@ -18,9 +25,11 @@ data class Exclusion(val pattern: Regex, val hidden: Boolean) {
  * - `MISS` not available (Android code using it will not compile against this SDK);
  * - `OMIT` intentionally not mirrored (listed in the module's exclusions), also counted as unavailable;
  * - `SKIP` deprecated in the Android SDK, not counted;
- * - `HIDE` hidden in the Android SDK (listed in the exclusions with `@hide`), not counted.
+ * - `HIDE` hidden in the Android SDK (listed in the exclusions with `@hide`), not counted;
+ * - `PLAT` involves an Android/JVM-only type (listed in the exclusions with `@platform`), not counted.
  *
- * Classes in an `internal` package, deprecated classes and classes excluded with `@hide` are not listed at all.
+ * Classes in an `internal` package, deprecated classes and classes excluded with `@hide` or `@platform` are not listed
+ * at all. A Kotlin `Companion` field is not a member of the API surface and is ignored.
  * The percentage in the header is the share of counted members that are available; it is also the module's API
  * coverage badge in the README.
  */
@@ -50,8 +59,8 @@ object SourceCompatReport {
         for (sdkClass in androidSdk.sortedBy { it.name }) {
             if (sdkClass.name.contains(".internal.") || sdkClass.isDeprecated) continue
             val outerName = sdkClass.name.substringBefore('$')
-            val classExclusion = exclusions.firstOrNull { it.matches(sdkClass.name) || it.matches(outerName) }
-            if (classExclusion?.hidden == true) continue
+            val classExclusion = exclusions.firstOrNull { it.matchesClass(sdkClass.name) || it.matchesClass(outerName) }
+            if (classExclusion?.uncountedStatus != null) continue
             val ourClass = oursByName[sdkClass.name]
             val note = when {
                 classExclusion != null -> "  (class omitted)"
@@ -61,10 +70,10 @@ object SourceCompatReport {
             body.appendLine(sdkClass.name.replace('$', '.') + note)
             for (member in sdkClass.members.sortedWith(compareBy({ it.kind }, { it.name }, { it.parameters.size }))) {
                 val rendered = member.render(sdkClass.name)
-                val exclusion = classExclusion ?: exclusions.firstOrNull { it.matches("${sdkClass.name}#${member.name}") }
+                val exclusion = classExclusion ?: exclusions.firstOrNull { it.matchesMember(sdkClass.name, member) }
                 when {
                     member.isDeprecated -> body.appendLine("  SKIP  $rendered")
-                    exclusion?.hidden == true -> body.appendLine("  HIDE  $rendered")
+                    exclusion?.uncountedStatus != null -> body.appendLine("  ${exclusion.uncountedStatus}  $rendered")
                     exclusion != null -> { omitted++; body.appendLine("  OMIT  $rendered") }
                     ourClass == null -> { missing++; body.appendLine("  MISS  $rendered") }
                     else -> {

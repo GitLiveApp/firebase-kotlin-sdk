@@ -35,6 +35,12 @@ class SourceCompatReportTest {
             field public static final String DEFAULT_APP_NAME = "[DEFAULT]";
           }
 
+          public final class Timestamp {
+            method public long getSeconds();
+            property public final long seconds;
+            field public static final com.google.firebase.installations.Timestamp.Companion Companion;
+          }
+
         }
     """.trimIndent()
 
@@ -82,15 +88,17 @@ class SourceCompatReportTest {
         assertEquals("<init>", builder.members[0].name)
         assertEquals("com.google.firebase.installations.FirebaseOptions.Builder", builder.members[1].type)
         assertEquals("java.lang.String", builder.members[3].type)
+        val timestamp = classes.getValue("com.google.firebase.installations.Timestamp")
+        assertEquals(listOf("getSeconds"), timestamp.members.map { it.name }) // property + getter deduped, Companion ignored
     }
 
     @Test
     fun parsesBcvDump() {
         val classes = BcvApiParser.parse(bcvDump).associateBy { it.name }
         val installations = classes.getValue("com.google.firebase.installations.FirebaseInstallations")
-        assertEquals(listOf("Companion", "delete", "getId", "getInstance", "getInstance"), installations.members.map { it.name })
-        assertTrue(installations.members[3].isStatic)
-        assertEquals(listOf("com.google.firebase.FirebaseApp"), installations.members[4].parameters)
+        assertEquals(listOf("delete", "getId", "getInstance", "getInstance"), installations.members.map { it.name }) // Companion ignored
+        assertTrue(installations.members[2].isStatic)
+        assertEquals(listOf("com.google.firebase.FirebaseApp"), installations.members[3].parameters)
         val builder = classes.getValue("com.google.firebase.installations.FirebaseOptions\$Builder")
         assertEquals("com.google.firebase.installations.FirebaseOptions.Builder", builder.members[1].type)
         assertEquals(listOf("java.lang.Object"), builder.members[2].parameters)
@@ -104,20 +112,23 @@ class SourceCompatReportTest {
             androidSdk = AndroidSdkApiTxtParser.parse(apiTxt),
             ours = BcvApiParser.parse(bcvDump),
             exclusions = listOf(
-                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#clearFidCache"), hidden = true),
-                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseOptions\\${'$'}Builder#initializeApp"), hidden = false),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#clearFidCache"), uncountedStatus = "HIDE"),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#getInstance\\(FirebaseApp\\)"), uncountedStatus = "PLAT"),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseOptions\\${'$'}Builder#initializeApp"), uncountedStatus = null),
             ),
         )
         assertTrue(report.contains("HIDE  void clearFidCache()"), report)
+        assertTrue(report.contains("OK    static FirebaseInstallations getInstance()"), report)
+        assertTrue(report.contains("PLAT  static FirebaseInstallations getInstance(FirebaseApp)"), report)
         assertTrue(report.contains("OMIT  static FirebaseApp initializeApp(Context)"), report)
         assertTrue(report.contains("OK    Task delete()"), report)
-        assertTrue(report.contains("OK    static FirebaseInstallations getInstance(FirebaseApp)"), report)
         assertTrue(report.contains("SKIP  void old(int[])"), report)
         assertTrue(report.contains("OK    static Status BAD_CONFIG"), report)
         assertTrue(report.contains("OK    Builder setApiKey(String)"), report)
         assertTrue(report.contains("OK    static String DEFAULT_APP_NAME"), report)
         assertTrue(report.contains("MISS  FirebaseInstallations getInstallations()"), report) // a Kotlin property without receiver in api.txt
-        assertTrue(report.contains("# 81% of 11 public members available (9 identical, 0 mapped, 1 missing, 1 omitted)"), report)
+        assertTrue(report.contains("MISS  long getSeconds()"), report)
+        assertTrue(report.contains("# 72% of 11 public members available (8 identical, 0 mapped, 2 missing, 1 omitted)"), report)
     }
 
     @Test
@@ -128,14 +139,16 @@ class SourceCompatReportTest {
             androidSdk = AndroidSdkApiTxtParser.parse(apiTxt),
             ours = BcvApiParser.parse(bcvDump),
             exclusions = listOf(
-                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.InstallationsKt"), hidden = false),
-                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallationsException.*"), hidden = true),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.InstallationsKt"), uncountedStatus = null),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallationsException.*"), uncountedStatus = "HIDE"),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.Timestamp"), uncountedStatus = "PLAT"),
             ),
         )
         assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object]"), report)
         assertTrue(report.contains("InstallationsKt  (class omitted)"), report)
         assertTrue(report.contains("OMIT  FirebaseInstallations getInstallations()"), report)
         assertTrue(!report.contains("BAD_CONFIG"), report)
+        assertTrue(!report.contains("getSeconds"), report)
         assertTrue(report.contains("# 72% of 11 public members available (7 identical, 1 mapped, 1 missing, 2 omitted)"), report)
     }
 
@@ -150,6 +163,6 @@ class SourceCompatReportTest {
         )
         assertTrue(report.contains("FirebaseInstallations  (class missing)"), report)
         assertTrue(report.contains("MISS  Task delete()"), report)
-        assertTrue(report.contains("# 0% of 12 public members available (0 identical, 0 mapped, 12 missing, 0 omitted)"), report)
+        assertTrue(report.contains("# 0% of 13 public members available (0 identical, 0 mapped, 13 missing, 0 omitted)"), report)
     }
 }

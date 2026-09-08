@@ -1,32 +1,32 @@
 # Android SDK source compatibility of firebase-app
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 50% of 52 public members available (26 identical, 0 mapped, 0 missing, 26 omitted)
+# 100% of 33 public members available (33 identical, 0 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.Firebase
   OK    static Firebase INSTANCE
 com.google.firebase.FirebaseApp
-  OMIT  Context getApplicationContext()
-  OMIT  static List getApps(Context)
+  PLAT  Context getApplicationContext()
+  PLAT  static List getApps(Context)
   OK    static FirebaseApp getInstance()
   OK    static FirebaseApp getInstance(String)
   OK    String getName()
   OK    FirebaseOptions getOptions()
-  OMIT  static FirebaseApp initializeApp(Context)
-  OMIT  static FirebaseApp initializeApp(Context, FirebaseOptions)
-  OMIT  static FirebaseApp initializeApp(Context, FirebaseOptions, String)
-  OMIT  void setAutomaticResourceManagementEnabled(boolean)
+  PLAT  static FirebaseApp initializeApp(Context)
+  PLAT  static FirebaseApp initializeApp(Context, FirebaseOptions)
+  PLAT  static FirebaseApp initializeApp(Context, FirebaseOptions, String)
+  OK    void setAutomaticResourceManagementEnabled(boolean)
   OK    static String DEFAULT_APP_NAME
 com.google.firebase.FirebaseKt
   OK    static FirebaseApp app(Firebase, String)
   OK    static FirebaseApp getApp(Firebase)
   OK    static FirebaseOptions getOptions(Firebase)
-  OMIT  static FirebaseApp initialize(Firebase, Context)
-  OMIT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions)
-  OMIT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)
+  PLAT  static FirebaseApp initialize(Firebase, Context)
+  PLAT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions)
+  PLAT  static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)
 com.google.firebase.FirebaseNetworkException
   OK    FirebaseNetworkException(String)
 com.google.firebase.FirebaseOptions
-  OMIT  static FirebaseOptions fromResource(Context)
+  PLAT  static FirebaseOptions fromResource(Context)
   OK    String getApiKey()
   OK    String getApplicationId()
   OK    String getDatabaseUrl()
@@ -46,21 +46,18 @@ com.google.firebase.FirebaseOptions.Builder
   OK    Builder setStorageBucket(String)
 com.google.firebase.FirebaseTooManyRequestsException
   OK    FirebaseTooManyRequestsException(String)
-com.google.firebase.Timestamp  (class omitted)
-  OMIT  Timestamp(Instant)
-  OMIT  Timestamp(Date)
-  OMIT  Timestamp(long, int)
-  OMIT  int compareTo(Timestamp)
-  OMIT  int describeContents()
-  OMIT  int getNanoseconds()
-  OMIT  int getNanoseconds()
-  OMIT  long getSeconds()
-  OMIT  long getSeconds()
-  OMIT  static Timestamp now()
-  OMIT  Date toDate()
-  OMIT  Instant toInstant()
-  OMIT  void writeToParcel(Parcel, int)
-  OMIT  static Creator CREATOR
-  OMIT  static Companion Companion
-com.google.firebase.Timestamp.Companion  (class omitted)
-  OMIT  Timestamp now()
+com.google.firebase.Timestamp
+  PLAT  Timestamp(Instant)
+  PLAT  Timestamp(Date)
+  OK    Timestamp(long, int)
+  OK    int compareTo(Timestamp)
+  PLAT  int describeContents()
+  OK    int getNanoseconds()
+  OK    long getSeconds()
+  OK    static Timestamp now()
+  PLAT  Date toDate()
+  PLAT  Instant toInstant()
+  PLAT  void writeToParcel(Parcel, int)
+  PLAT  static Creator CREATOR
+com.google.firebase.Timestamp.Companion
+  OK    Timestamp now()

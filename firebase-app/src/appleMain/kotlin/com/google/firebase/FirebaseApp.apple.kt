@@ -29,6 +29,9 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
         ios.deleteApp { }
     }
 
+    /** No-op: automatic resource management is an Android-only behaviour. */
+    public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
+
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.ios == ios
 
     override fun hashCode(): Int = ios.hashCode()

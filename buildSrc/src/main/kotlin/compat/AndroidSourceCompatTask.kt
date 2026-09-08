@@ -49,8 +49,9 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
     abstract val reportFile: RegularFileProperty
 
     /**
-     * One pattern per line (`*` wildcards, `#member` suffix for members); `//` starts a comment. A comment containing
-     * `@hide` marks the member as hidden in the Android SDK, which excludes it from the count instead of counting it as omitted.
+     * One pattern per line (`*` wildcards, `#member` or `#member(Type, Type)` suffix for members and overloads); `//`
+     * starts a comment. A comment containing `@hide` (hidden in the Android SDK) or `@platform` (signature involves an
+     * Android/JVM-only type) excludes the member from the count instead of counting it as omitted.
      */
     private fun RegularFileProperty.exclusions(): List<Exclusion> = orNull?.asFile?.takeIf { it.exists() }?.readLines().orEmpty()
         .mapNotNull { line ->
@@ -58,9 +59,16 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
             if (pattern.isEmpty()) {
                 null
             } else {
+                val comment = line.substringAfter("//", "")
                 Exclusion(
-                    pattern = Regex(pattern.replace(".", "\\.").replace("$", "\\$").replace("*", ".*")),
-                    hidden = line.substringAfter("//", "").contains("@hide"),
+                    pattern = Regex(
+                        pattern.replace(".", "\\.").replace("$", "\\$").replace("(", "\\(").replace(")", "\\)").replace(" ", "").replace("*", ".*"),
+                    ),
+                    uncountedStatus = when {
+                        comment.contains("@hide") -> "HIDE"
+                        comment.contains("@platform") -> "PLAT"
+                        else -> null
+                    },
                 )
             }
         }

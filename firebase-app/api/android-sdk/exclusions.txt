@@ -1,14 +1,19 @@
 // Firebase Android SDK APIs intentionally not mirrored by firebase-app (see README, "Using the Firebase Android SDK API from common code").
-com.google.firebase.FirebaseApp#initializeApp  // takes an android.content.Context: use dev.gitlive.firebase.Firebase.initialize from common code
-com.google.firebase.FirebaseApp#getApps  // takes an android.content.Context: use dev.gitlive.firebase.Firebase.apps from common code
-com.google.firebase.FirebaseKt#initialize  // takes an android.content.Context
-com.google.firebase.FirebaseApp#getApplicationContext  // android.content.Context has no multiplatform equivalent
-com.google.firebase.FirebaseApp#setAutomaticResourceManagementEnabled
-com.google.firebase.FirebaseOptions#fromResource  // reads Android resources
+// @platform: the signature involves an Android/JVM-only type, so the member cannot exist in common code (not counted).
+com.google.firebase.FirebaseApp#initializeApp  // @platform android.content.Context: use dev.gitlive.firebase.Firebase.initialize from common code
+com.google.firebase.FirebaseApp#getApps  // @platform android.content.Context: use dev.gitlive.firebase.Firebase.apps from common code
+com.google.firebase.FirebaseKt#initialize  // @platform android.content.Context
+com.google.firebase.FirebaseApp#getApplicationContext  // @platform android.content.Context
+com.google.firebase.FirebaseOptions#fromResource  // @platform reads Android resources through a Context
 com.google.firebase.FirebaseOptions.Builder#setRecaptchaSiteKey  // deprecated
+com.google.firebase.Timestamp#<init>(Date)  // @platform java.util.Date
+com.google.firebase.Timestamp#<init>(Instant)  // @platform java.time.Instant
+com.google.firebase.Timestamp#toDate  // @platform java.util.Date
+com.google.firebase.Timestamp#toInstant  // @platform java.time.Instant
+com.google.firebase.Timestamp#describeContents  // @platform android.os.Parcelable
+com.google.firebase.Timestamp#writeToParcel  // @platform android.os.Parcelable
+com.google.firebase.Timestamp#CREATOR  // @platform android.os.Parcelable
 com.google.firebase.provider.*  // @hide in the Android SDK (FirebaseInitProvider, an Android ContentProvider)
-com.google.firebase.Timestamp  // not mirrored yet: belongs with firebase-firestore, which is not migrated
-com.google.firebase.TimestampKt  // not mirrored yet: belongs with firebase-firestore, which is not migrated
 com.google.firebase.datastorage.*  // @hide in the Android SDK
 com.google.firebase.emulators.*  // @hide in the Android SDK
 com.google.firebase.events.*

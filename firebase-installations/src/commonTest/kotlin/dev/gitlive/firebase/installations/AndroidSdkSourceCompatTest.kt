@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.Timestamp
 import com.google.firebase.app
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
@@ -56,6 +57,17 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app, Firebase.app)
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
         assertEquals("fir-kotlin-sdk", app.options.projectId)
+    }
+
+    @Test
+    fun testTimestamp() {
+        val timestamp = Timestamp(1_700_000_000, 500)
+        assertEquals(1_700_000_000, timestamp.seconds)
+        assertEquals(500, timestamp.nanoseconds)
+        assertEquals(0, timestamp.compareTo(Timestamp(1_700_000_000, 500)))
+        assertTrue(timestamp < Timestamp(1_700_000_000, 501))
+        assertTrue(timestamp < Timestamp.now())
+        FirebaseApp.getInstance().setAutomaticResourceManagementEnabled(true)
     }
 
     @Test

@@ -29,6 +29,7 @@ public actual class FirebaseApp private constructor() {
     public actual val name: String get() = stub()
     public actual val options: FirebaseOptions get() = stub()
     public actual fun delete(): Unit = stub()
+    public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean): Unit = stub()
 
     public actual companion object {
         @JvmField

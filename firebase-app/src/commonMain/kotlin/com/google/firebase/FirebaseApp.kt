@@ -7,8 +7,8 @@ package com.google.firebase
 /**
  * The entry point of Firebase SDKs, mirroring `com.google.firebase.FirebaseApp` from the Firebase Android SDK.
  *
- * Not mirrored, because they take an Android `Context`: `initializeApp`, `getApps`, `getApplicationContext`
- * (use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code), and `setAutomaticResourceManagementEnabled`.
+ * Not mirrored, because they take an Android `Context`: `initializeApp`, `getApps` and `getApplicationContext`
+ * (use `dev.gitlive.firebase.Firebase.initialize` / `apps` from common code).
  */
 public expect class FirebaseApp {
     /** The unique name of this app. */
@@ -19,6 +19,12 @@ public expect class FirebaseApp {
 
     /** Deletes this app and frees its resources. A no-op if the app was already deleted. */
     public fun delete()
+
+    /**
+     * On Android, lets the SDK release resources while the app is in the background and reacquire them when it
+     * returns to the foreground. The other platforms have no equivalent, so this is a no-op there.
+     */
+    public fun setAutomaticResourceManagementEnabled(enabled: Boolean)
 
     public companion object {
         /** The name of the default app. */
