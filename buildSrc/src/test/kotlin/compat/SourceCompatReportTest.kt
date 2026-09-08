@@ -103,18 +103,40 @@ class SourceCompatReportTest {
             ref = "main",
             androidSdk = AndroidSdkApiTxtParser.parse(apiTxt),
             ours = BcvApiParser.parse(bcvDump),
-            exclusions = listOf(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#clearFidCache")),
+            exclusions = listOf(
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#clearFidCache"), hidden = true),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseOptions\\${'$'}Builder#initializeApp"), hidden = false),
+            ),
         )
-        assertTrue(report.contains("SKIP  void clearFidCache()"), report)
+        assertTrue(report.contains("HIDE  void clearFidCache()"), report)
+        assertTrue(report.contains("OMIT  static FirebaseApp initializeApp(Context)"), report)
         assertTrue(report.contains("OK    Task delete()"), report)
         assertTrue(report.contains("OK    static FirebaseInstallations getInstance(FirebaseApp)"), report)
         assertTrue(report.contains("SKIP  void old(int[])"), report)
         assertTrue(report.contains("OK    static Status BAD_CONFIG"), report)
         assertTrue(report.contains("OK    Builder setApiKey(String)"), report)
-        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object]"), report)
         assertTrue(report.contains("OK    static String DEFAULT_APP_NAME"), report)
         assertTrue(report.contains("MISS  FirebaseInstallations getInstallations()"), report) // a Kotlin property without receiver in api.txt
-        assertTrue(report.contains("# 90% of 11 public members available"), report)
+        assertTrue(report.contains("# 81% of 11 public members available (9 identical, 0 mapped, 1 missing, 1 omitted)"), report)
+    }
+
+    @Test
+    fun mapsParametersAndOmitsExcludedClasses() {
+        val report = SourceCompatReport.generate(
+            module = "test",
+            ref = "main",
+            androidSdk = AndroidSdkApiTxtParser.parse(apiTxt),
+            ours = BcvApiParser.parse(bcvDump),
+            exclusions = listOf(
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.InstallationsKt"), hidden = false),
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallationsException.*"), hidden = true),
+            ),
+        )
+        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object]"), report)
+        assertTrue(report.contains("InstallationsKt  (class omitted)"), report)
+        assertTrue(report.contains("OMIT  FirebaseInstallations getInstallations()"), report)
+        assertTrue(!report.contains("BAD_CONFIG"), report)
+        assertTrue(report.contains("# 72% of 11 public members available (7 identical, 1 mapped, 1 missing, 2 omitted)"), report)
     }
 
     @Test
@@ -128,6 +150,6 @@ class SourceCompatReportTest {
         )
         assertTrue(report.contains("FirebaseInstallations  (class missing)"), report)
         assertTrue(report.contains("MISS  Task delete()"), report)
-        assertTrue(report.contains("# 0% of 12 public members available"), report)
+        assertTrue(report.contains("# 0% of 12 public members available (0 identical, 0 mapped, 12 missing, 0 omitted)"), report)
     }
 }

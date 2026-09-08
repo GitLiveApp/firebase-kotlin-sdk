@@ -48,11 +48,22 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
     @get:OutputFile
     abstract val reportFile: RegularFileProperty
 
-    /** One pattern per line (`*` wildcards, `#member` suffix for members); `//` starts a comment. */
-    private fun RegularFileProperty.patterns(): List<Regex> = orNull?.asFile?.takeIf { it.exists() }?.readLines().orEmpty()
-        .map { it.substringBefore("//").trim() }
-        .filter { it.isNotEmpty() }
-        .map { Regex(it.replace(".", "\\.").replace("$", "\\$").replace("*", ".*")) }
+    /**
+     * One pattern per line (`*` wildcards, `#member` suffix for members); `//` starts a comment. A comment containing
+     * `@hide` marks the member as hidden in the Android SDK, which excludes it from the count instead of counting it as omitted.
+     */
+    private fun RegularFileProperty.exclusions(): List<Exclusion> = orNull?.asFile?.takeIf { it.exists() }?.readLines().orEmpty()
+        .mapNotNull { line ->
+            val pattern = line.substringBefore("//").trim()
+            if (pattern.isEmpty()) {
+                null
+            } else {
+                Exclusion(
+                    pattern = Regex(pattern.replace(".", "\\.").replace("$", "\\$").replace("*", ".*")),
+                    hidden = line.substringAfter("//", "").contains("@hide"),
+                )
+            }
+        }
 
     @TaskAction
     fun run() {
@@ -64,7 +75,7 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
         val androidSdk = sdkFiles.flatMap { AndroidSdkApiTxtParser.parse(it.readText()) }
         val ours = BcvApiParser.parse(bcvDump.get().asFile.readText()) +
             headerStubDumps.files.filter { it.isFile }.flatMap { BcvApiParser.parse(it.readText()) }
-        val exclusions = exclusionsFile.patterns()
+        val exclusions = exclusionsFile.exclusions()
         val report = SourceCompatReport.generate(moduleName.get(), ref, androidSdk, ours, exclusions)
         val target = reportFile.get().asFile
         if (check.get()) {

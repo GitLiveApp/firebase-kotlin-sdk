@@ -4,17 +4,22 @@
 
 package com.google.firebase.installations
 
+import cocoapods.FirebaseInstallations.FIRInstallationIDDidChangeNotification
 import cocoapods.FirebaseInstallations.FIRInstallations
 import cocoapods.FirebaseInstallations.FIRInstallationsAuthTokenResult
+import cocoapods.FirebaseInstallations.kFIRInstallationIDDidChangeNotificationAppNameKey
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import com.google.firebase.installations.internal.FidListener
+import com.google.firebase.installations.internal.FidListenerHandle
 import platform.Foundation.NSError
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.timeIntervalSince1970
 
 /** @property ios The underlying Firebase iOS SDK object. */
-public actual class FirebaseInstallations internal constructor(public val ios: FIRInstallations) {
+public actual class FirebaseInstallations internal constructor(public val ios: FIRInstallations, private val appName: String) {
 
     public actual fun getId(): Task<String> = task { completion ->
         ios.installationIDWithCompletion { id, error -> completion(id, error) }
@@ -28,10 +33,26 @@ public actual class FirebaseInstallations internal constructor(public val ios: F
         ios.deleteWithCompletion { error -> completion(null, error) }
     }
 
-    public actual companion object {
-        public actual fun getInstance(): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installations())
+    /**
+     * Observes the iOS SDK's installation-id-changed notification for this app and reports the current id, which the
+     * SDK generates anew when it was deleted.
+     */
+    public actual fun registerFidListener(listener: FidListener): FidListenerHandle {
+        val center = NSNotificationCenter.defaultCenter
+        val observer = center.addObserverForName(FIRInstallationIDDidChangeNotification, null, null) { notification ->
+            if (notification?.userInfo?.get(kFIRInstallationIDDidChangeNotificationAppNameKey) == appName) {
+                ios.installationIDWithCompletion { id, _ -> id?.let(listener::onFidChanged) }
+            }
+        }
+        return object : FidListenerHandle {
+            override fun unregister() = center.removeObserver(observer)
+        }
+    }
 
-        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp))
+    public actual companion object {
+        public actual fun getInstance(): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installations(), FirebaseApp.getInstance().name)
+
+        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp), app.name)
     }
 }
 

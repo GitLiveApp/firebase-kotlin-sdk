@@ -15,4 +15,7 @@ public external fun getInstallations(app: FirebaseApp? = definedExternally): Ins
 
 public external fun getToken(installations: Installations, forceRefresh: Boolean): Promise<String>
 
+/** Calls [callback] with the new installation id whenever it changes; the returned function unsubscribes. */
+public external fun onIdChange(installations: Installations, callback: (String) -> Unit): () -> Unit
+
 public external interface Installations

@@ -9,6 +9,8 @@ import com.google.firebase.app
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
 import com.google.firebase.installations.installations
+import com.google.firebase.installations.internal.FidListener
+import com.google.firebase.installations.internal.FidListenerHandle
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
@@ -77,6 +79,16 @@ class AndroidSdkSourceCompatTest {
             .addOnFailureListener { source.setException(it) }
         val result = source.task.await()
         assertTrue(result.token.isNotBlank())
+    }
+
+    @Test
+    fun testRegisterFidListener() = runTest {
+        val changes = mutableListOf<String>()
+        val handle: FidListenerHandle = FirebaseInstallations.getInstance().registerFidListener(FidListener { changes += it })
+        assertNotNull(handle)
+        handle.unregister()
+        handle.unregister() // a no-op after the first call, as on Android
+        assertTrue(changes.isEmpty())
     }
 
     @Test

@@ -7,12 +7,14 @@ package com.google.firebase.installations
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import com.google.firebase.installations.internal.FidListener
+import com.google.firebase.installations.internal.FidListenerHandle
 
 /**
  * Entry point for Firebase installations, mirroring `com.google.firebase.installations.FirebaseInstallations`
  * from the Firebase Android SDK.
  *
- * Not mirrored: `clearFidCache`, `registerFidListener` (internal API).
+ * Not mirrored: `clearFidCache` (hidden in the Android SDK, no equivalent on other platforms).
  */
 public expect class FirebaseInstallations {
     /**
@@ -35,6 +37,12 @@ public expect class FirebaseInstallations {
      * Messaging to not function properly.
      */
     public fun delete(): Task<Nothing?>
+
+    /**
+     * Registers a [FidListener] that receives the new installation id whenever it changes, for example when a new id
+     * is generated after [delete]. Unregister it through the returned handle.
+     */
+    public fun registerFidListener(listener: FidListener): FidListenerHandle
 
     public companion object {
         /** Returns the [FirebaseInstallations] instance of the default [FirebaseApp]. */

@@ -1,4 +1,3 @@
 // Firebase Android SDK APIs intentionally not mirrored by firebase-installations.
-com.google.firebase.installations.FirebaseInstallations#clearFidCache  // internal API
-com.google.firebase.installations.FirebaseInstallations#registerFidListener  // internal API
-com.google.firebase.installations.FirebaseInstallationsApi
+com.google.firebase.installations.FirebaseInstallations#clearFidCache  // @hide in the Android SDK; no equivalent on other platforms
+com.google.firebase.installations.FirebaseInstallationsApi  // @hide interop interface implemented by FirebaseInstallations

@@ -39,9 +39,7 @@ The Android API surface comes from
   api.txt. Overloads collapse to one entry per (class, name). `@Deprecated`,
   `@RestrictTo`, non-public members, annotation types, `Companion` and `INSTANCE`
   are excluded. A Kotlin `property` and its synthetic `getX`/`setX`/`isX` count once.
-- A member is *invoked* when the module's `src/androidMain` Kotlin (plus `src/commonMain`
-  for modules migrated to the `com.google.firebase` compatibility layer, i.e. those with an
-  `api/android-sdk/` directory, whose androidMain holds only header stubs) calls it
+- A member is *invoked* when the module's `src/androidMain` Kotlin calls it
   (`name(`, `name {`, `::name`), reads or writes it as a Kotlin property
   (`.x` for `getX`, `.isX`, `.x =` for `setX`), references a field or enum constant
   by name, or constructs the class. Declarations in the wrapper (`fun name(`,
@@ -52,6 +50,17 @@ The Android API surface comes from
 - Firestore `Pipeline*` classes and the `com.google.firebase.firestore.pipeline`
   packages count as unused unless the module sources mention "pipeline", to avoid
   false matches on generic names such as `where` and `limit`.
+
+## Modules with the `com.google.firebase` compatibility layer
+
+Modules that mirror the Android SDK API itself (they have an `api/android-sdk/` directory,
+e.g. firebase-installations) are not scanned for invocations. Their badge is the percentage
+in the header of `api/android-sdk-compat.txt`, which `./gradlew :<module>:androidSourceCompatDump`
+regenerates from the module's API dump and the vendored api.txt files: every public,
+non-deprecated api.txt member the layer provides counts as available, members listed in
+`api/android-sdk/exclusions.txt` count as unavailable unless their comment contains `@hide`
+(hidden in the Android SDK), in which case they are not counted at all. Regenerate the
+report before running the script when the module's API changed.
 
 ## Authentication and Analytics (no api.txt)
 

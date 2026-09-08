@@ -131,7 +131,9 @@ The SDK has two public API layers per module:
    - An Android API that cannot be mapped onto a platform is **omitted** on purpose so callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
-     vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`).
+     vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
+     percentage is the module's README badge. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
+     unavailable unless the comment says `@hide` (hidden in the Android SDK), which drops them from the count.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
    builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.

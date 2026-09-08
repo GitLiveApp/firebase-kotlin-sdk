@@ -7,6 +7,8 @@ package com.google.firebase.installations
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import com.google.firebase.installations.internal.FidListener
+import com.google.firebase.installations.internal.FidListenerHandle
 import dev.gitlive.firebase.installations.stub
 
 /*
@@ -18,6 +20,7 @@ public actual class FirebaseInstallations private constructor() {
     public actual fun getId(): Task<String> = stub()
     public actual fun getToken(forceRefresh: Boolean): Task<InstallationTokenResult> = stub()
     public actual fun delete(): Task<Nothing?> = stub()
+    public actual fun registerFidListener(listener: FidListener): FidListenerHandle = stub()
 
     public actual companion object {
         @JvmStatic

@@ -11,7 +11,8 @@ import org.gradle.api.Project
  * - `androidSourceCompatCheck` (part of `check`) fails if that report is out of date.
  *
  * `api/android-sdk/exclusions.txt` may list members (`com.google.firebase.FirebaseApp#getApplicationContext`) or
- * classes (`com.google.firebase.provider.*`) that are intentionally not mirrored; `//` starts a comment.
+ * classes (`com.google.firebase.provider.*`) that are intentionally not mirrored; `//` starts a comment. Omitted
+ * members still count against the module's percentage unless the comment contains `@hide` (hidden in the Android SDK).
  * The Android header stubs (removed from the compiled output, see `utils.stripHeaderStubs`) are read from the dump that
  * the Android compilation writes to `build/header-stubs/`.
  */

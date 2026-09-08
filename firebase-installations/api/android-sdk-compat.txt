@@ -1,15 +1,15 @@
 # Android SDK source compatibility of firebase-installations
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 10 public members available (10 identical, 0 mapped, 0 missing)
+# 100% of 11 public members available (11 identical, 0 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.installations.FirebaseInstallations
-  SKIP  void clearFidCache()
+  HIDE  void clearFidCache()
   OK    Task delete()
   OK    Task getId()
   OK    static FirebaseInstallations getInstance()
   OK    static FirebaseInstallations getInstance(FirebaseApp)
   OK    Task getToken(boolean)
-  SKIP  FidListenerHandle registerFidListener(FidListener)
+  OK    FidListenerHandle registerFidListener(FidListener)
 com.google.firebase.installations.InstallationTokenResult
   OK    InstallationTokenResult()
   OK    String getToken()

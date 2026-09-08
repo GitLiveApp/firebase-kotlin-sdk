@@ -8,12 +8,15 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import com.google.firebase.installations.internal.FidListener
+import com.google.firebase.installations.internal.FidListenerHandle
 import dev.gitlive.firebase.installations.externals.Installations
 import kotlin.js.Promise
 import dev.gitlive.firebase.installations.externals.delete as jsDelete
 import dev.gitlive.firebase.installations.externals.getId as jsGetId
 import dev.gitlive.firebase.installations.externals.getInstallations as jsGetInstallations
 import dev.gitlive.firebase.installations.externals.getToken as jsGetToken
+import dev.gitlive.firebase.installations.externals.onIdChange as jsOnIdChange
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class FirebaseInstallations internal constructor(public val js: Installations) {
@@ -23,6 +26,15 @@ public actual class FirebaseInstallations internal constructor(public val js: In
     public actual fun getToken(forceRefresh: Boolean): Task<InstallationTokenResult> = task { jsGetToken(js, forceRefresh).then { JsInstallationTokenResult(it) } }
 
     public actual fun delete(): Task<Nothing?> = task { jsDelete(js).then { null } }
+
+    public actual fun registerFidListener(listener: FidListener): FidListenerHandle {
+        val unsubscribe = rethrow { jsOnIdChange(js) { listener.onFidChanged(it) } }
+        return object : FidListenerHandle {
+            override fun unregister() {
+                unsubscribe()
+            }
+        }
+    }
 
     public actual companion object {
         public actual fun getInstance(): FirebaseInstallations = rethrow { FirebaseInstallations(jsGetInstallations()) }
