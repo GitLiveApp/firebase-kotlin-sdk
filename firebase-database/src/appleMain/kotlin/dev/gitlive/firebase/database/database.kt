@@ -31,14 +31,9 @@ import dev.gitlive.firebase.internal.ios
 import dev.gitlive.firebase.internal.reencodeTransformation
 import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import platform.Foundation.NSError
@@ -116,41 +111,43 @@ public actual open class Query internal actual constructor(
     internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
 
     internal open val ios: FIRDatabaseQuery = nativeQuery.ios
+
+    @Deprecated("Writes no longer depend on the persistence setting, so this accessor is unused; it will be removed in the next major version.")
     public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
 
-    public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey(), persistenceEnabled)
+    public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey(), nativeQuery.persistenceEnabled)
 
-    public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue(), persistenceEnabled)
+    public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue(), nativeQuery.persistenceEnabled)
 
-    public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), persistenceEnabled)
+    public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
+    public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), nativeQuery.persistenceEnabled)
 
-    public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
+    public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                trySend(DataSnapshot(snapShot!!, persistenceEnabled))
+                trySend(DataSnapshot(snapShot!!, nativeQuery.persistenceEnabled))
             },
         ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -161,7 +158,7 @@ public actual open class Query internal actual constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    trySend(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
+                    trySend(ChildEvent(DataSnapshot(snapShot!!, nativeQuery.persistenceEnabled), type, key))
                 },
             ) { close(DatabaseException(it.toString(), null)) }
         }
@@ -176,7 +173,7 @@ public actual open class Query internal actual constructor(
             if (error != null) {
                 deferred.completeExceptionally(DatabaseException(error.toString(), null))
             } else {
-                deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                deferred.complete(DataSnapshot(snapshot!!, nativeQuery.persistenceEnabled))
             }
         }
         return deferred.await()
@@ -198,15 +195,15 @@ internal actual class NativeDatabaseReference internal constructor(
     actual fun onDisconnect() = NativeOnDisconnect(ios, persistenceEnabled)
 
     actual suspend fun setValueEncoded(encodedValue: Any?) {
-        ios.await(persistenceEnabled) { setValue(encodedValue, it) }
+        ios.await { setValue(encodedValue, it) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { updateChildValues(encodedUpdate.ios, it) }
+        ios.await { updateChildValues(encodedUpdate.ios, it) }
     }
 
     actual suspend fun removeValue() {
-        ios.await(persistenceEnabled) { removeValueWithCompletionBlock(it) }
+        ios.await { removeValueWithCompletionBlock(it) }
     }
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot {
@@ -259,40 +256,30 @@ internal actual class NativeOnDisconnect internal constructor(
     val persistenceEnabled: Boolean,
 ) {
     actual suspend fun removeValue() {
-        ios.await(persistenceEnabled) { onDisconnectRemoveValueWithCompletionBlock(it) }
+        ios.await { onDisconnectRemoveValueWithCompletionBlock(it) }
     }
 
     actual suspend fun cancel() {
-        ios.await(persistenceEnabled) { cancelDisconnectOperationsWithCompletionBlock(it) }
+        ios.await { cancelDisconnectOperationsWithCompletionBlock(it) }
     }
 
     actual suspend fun setEncodedValue(encodedValue: Any?) {
-        ios.await(persistenceEnabled) { onDisconnectSetValue(encodedValue, it) }
+        ios.await { onDisconnectSetValue(encodedValue, it) }
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        ios.await(persistenceEnabled) { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
+        ios.await { onDisconnectUpdateChildValues(encodedUpdate.ios, it) }
     }
 }
 
 public val OnDisconnect.ios: FIRDatabaseReference get() = native.ios
+
+@Deprecated("Writes no longer depend on the persistence setting, so this accessor is unused; it will be removed in the next major version.")
 public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEnabled
 
 public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
 
-internal suspend inline fun <T, reified R> T.awaitResult(whileOnline: Boolean, function: T.(callback: (NSError?, R?) -> Unit) -> Unit): R {
-    val job = CompletableDeferred<R?>()
-    function { error, result ->
-        if (error == null) {
-            job.complete(result)
-        } else {
-            job.completeExceptionally(DatabaseException(error.toString(), null))
-        }
-    }
-    return job.run { if (whileOnline) awaitWhileOnline() else await() } as R
-}
-
-internal suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
+internal suspend inline fun <T> T.await(function: T.(callback: (NSError?, FIRDatabaseReference?) -> Unit) -> Unit) {
     val job = CompletableDeferred<Unit>()
     function { error, _ ->
         if (error == null) {
@@ -301,19 +288,5 @@ internal suspend inline fun <T> T.await(whileOnline: Boolean, function: T.(callb
             job.completeExceptionally(DatabaseException(error.toString(), null))
         }
     }
-    job.run { if (whileOnline) awaitWhileOnline() else await() }
-}
-
-@FlowPreview
-internal suspend fun <T> CompletableDeferred<T>.awaitWhileOnline(): T = coroutineScope {
-    val notConnected = Firebase.database
-        .reference(".info/connected")
-        .valueEvents
-        .filter { !it.value<Boolean>() }
-        .produceIn(this)
-
-    select {
-        onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
-    }
+    job.await()
 }
