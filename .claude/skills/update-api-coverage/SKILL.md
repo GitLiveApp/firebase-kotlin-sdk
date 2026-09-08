@@ -54,36 +54,34 @@ The Android API surface comes from
 ## Authentication and Analytics (no api.txt)
 
 These two Android libraries are closed source and have no module in
-firebase-android-sdk, so `api_coverage.py` leaves their badges alone. Their
-current figures (Authentication 166/314 = 53%, Analytics 26/160 = 16%) were
-produced in PR #874 by listing the public API from the AARs instead. To
-recalculate them:
+firebase-android-sdk, so the script lists their API from the AARs instead
+(this reproduces the method used in PR #874: Authentication 166/314 = 53%,
+Analytics 26/160 = 16%). It needs `javap` from a JDK and access to Google Maven:
 
-1. Find the BOM version in `gradle/libs.versions.toml` (`firebase-bom`) and read
-   the BOM POM from Google Maven
-   (`https://dl.google.com/dl/android/maven2/com/google/firebase/firebase-bom/<version>/firebase-bom-<version>.pom`)
-   to get the library versions. For BOM 34.18.0 these were `firebase-auth` 24.2.0
-   and `firebase-analytics` 23.2.0.
-2. Download the AARs from the same Maven repository and extract `classes.jar`.
-   - Authentication: `com/google/firebase/firebase-auth/<version>/firebase-auth-<version>.aar`,
-     package `com.google.firebase.auth`.
-   - Analytics: the `firebase-analytics` AAR is an empty shim; the API lives in
-     `com/google/android/gms/play-services-measurement-api/<version>/play-services-measurement-api-<version>.aar`
+1. The BOM version is read from `gradle/libs.versions.toml` and the BOM POM is
+   fetched from `https://dl.google.com/dl/android/maven2/` to resolve the library
+   versions (BOM 34.18.0: `firebase-auth` 24.2.0, `firebase-analytics` 23.2.0).
+2. The AARs are downloaded and `classes.jar` extracted:
+   - Authentication: `com.google.firebase:firebase-auth`, package `com.google.firebase.auth`.
+   - Analytics: the `firebase-analytics` AAR is an empty shim, so the script reads
+     the `play-services-measurement-api` version from the firebase-analytics POM
+     and downloads `com.google.android.gms:play-services-measurement-api`
      (23.2.0 for BOM 34.18.0), package `com.google.firebase.analytics`.
-3. List members with `javap -v` over every public class in that package. Skip
-   synthetic and bridge members, obfuscated `zz*` names, deprecated members, and
-   the `internal` and `connector` sub-packages.
-4. Apply the same counting rules as above: overloads collapse to one entry per
-   (class, name); a member counts when the module's `androidMain` invokes it or
-   the class is exposed through a public typealias (the auth exception classes
-   are). Kotlin facade functions (`FirebaseAuthKt`, `AnalyticsKt`) count when
-   androidMain imports them, and their DSL receiver classes such as
-   `ConsentBuilder` count by member name.
-5. The Analytics total includes the 118 string constants on
+3. `javap -v` runs over every class in that package and its sub-packages except
+   `internal` and `connector`. Non-public, synthetic, bridge and deprecated
+   members are dropped, as are obfuscated `zz*` names, `$`-suffixed helpers,
+   anonymous and lambda classes, and enum `values`/`valueOf`. The result feeds
+   the same counting rules as the api.txt modules; the Kotlin facade classes
+   (`FirebaseAuthKt`, `AnalyticsKt`) and DSL receivers such as `ConsentBuilder`
+   are ordinary classes here and count by member name.
+4. The Analytics total includes the 118 string constants on
    `FirebaseAnalytics.Event`, `Param` and `UserProperty`, which the Kotlin SDK
-   does not expose. Keep them for consistency with the api.txt badges, which
+   does not expose. They stay in for consistency with the api.txt badges, which
    count constants too.
-6. Edit the two badges in `README.md` by hand, using the same colour rule.
 
-Google Maven and the Firebase docs are blocked in some sandboxes; if the
-downloads fail, say so rather than estimating.
+If Google Maven is blocked in the sandbox, download the two AARs elsewhere, put
+them in a directory as `firebase-auth-<version>.aar` and
+`play-services-measurement-api-<version>.aar`, and pass `--aar-dir DIR`. If that
+is not possible either, run the script for the other modules only
+(`api_coverage.py --write database firestore ...`) and say the two badges were
+not recalculated rather than estimating them.
