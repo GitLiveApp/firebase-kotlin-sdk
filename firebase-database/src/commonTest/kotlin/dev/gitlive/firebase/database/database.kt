@@ -261,6 +261,8 @@ class FirebaseDatabaseTest {
         ensureDatabaseConnected()
     }
 
+    // Ignoring on Android Instrumented Tests due to bug in Firebase: https://github.com/firebase/firebase-android-sdk/issues/5870
+    @IgnoreForAndroidTest
     @Test
     fun testWriteWhileOfflineCompletesAfterReconnect() = runTest {
         ensureDatabaseConnected()
