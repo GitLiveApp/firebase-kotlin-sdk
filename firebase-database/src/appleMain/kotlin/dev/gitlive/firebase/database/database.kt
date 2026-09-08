@@ -111,41 +111,43 @@ public actual open class Query internal actual constructor(
     internal constructor(ios: FIRDatabaseQuery, persistenceEnabled: Boolean) : this(NativeQuery(ios, persistenceEnabled))
 
     internal open val ios: FIRDatabaseQuery = nativeQuery.ios
+
+    @Deprecated("Writes no longer depend on the persistence setting, so this accessor is unused; it will be removed in the next major version.")
     public val persistenceEnabled: Boolean = nativeQuery.persistenceEnabled
 
-    public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey(), persistenceEnabled)
+    public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey(), nativeQuery.persistenceEnabled)
 
-    public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue(), persistenceEnabled)
+    public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue(), nativeQuery.persistenceEnabled)
 
-    public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), persistenceEnabled)
+    public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: String, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), persistenceEnabled)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: String, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), persistenceEnabled)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), persistenceEnabled)
+    public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()), nativeQuery.persistenceEnabled)
 
-    public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), persistenceEnabled)
+    public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: String, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), persistenceEnabled)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key), nativeQuery.persistenceEnabled)
 
     public actual val valueEvents: Flow<DataSnapshot> get() = callbackFlow<DataSnapshot> {
         val handle = ios.observeEventType(
             FIRDataEventTypeValue,
             withBlock = { snapShot ->
-                trySend(DataSnapshot(snapShot!!, persistenceEnabled))
+                trySend(DataSnapshot(snapShot!!, nativeQuery.persistenceEnabled))
             },
         ) { close(DatabaseException(it.toString(), null)) }
         awaitClose { ios.removeObserverWithHandle(handle) }
@@ -156,7 +158,7 @@ public actual open class Query internal actual constructor(
             ios.observeEventType(
                 type.toEventType(),
                 andPreviousSiblingKeyWithBlock = { snapShot, key ->
-                    trySend(ChildEvent(DataSnapshot(snapShot!!, persistenceEnabled), type, key))
+                    trySend(ChildEvent(DataSnapshot(snapShot!!, nativeQuery.persistenceEnabled), type, key))
                 },
             ) { close(DatabaseException(it.toString(), null)) }
         }
@@ -171,7 +173,7 @@ public actual open class Query internal actual constructor(
             if (error != null) {
                 deferred.completeExceptionally(DatabaseException(error.toString(), null))
             } else {
-                deferred.complete(DataSnapshot(snapshot!!, persistenceEnabled))
+                deferred.complete(DataSnapshot(snapshot!!, nativeQuery.persistenceEnabled))
             }
         }
         return deferred.await()
@@ -271,6 +273,8 @@ internal actual class NativeOnDisconnect internal constructor(
 }
 
 public val OnDisconnect.ios: FIRDatabaseReference get() = native.ios
+
+@Deprecated("Writes no longer depend on the persistence setting, so this accessor is unused; it will be removed in the next major version.")
 public val OnDisconnect.persistenceEnabled: Boolean get() = native.persistenceEnabled
 
 public actual class DatabaseException actual constructor(message: String?, cause: Throwable?) : RuntimeException(message, cause)
