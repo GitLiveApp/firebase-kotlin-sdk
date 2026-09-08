@@ -11,6 +11,11 @@ data class ApiMember(
     val type: String?,
     val isStatic: Boolean,
     val isDeprecated: Boolean = false,
+    /**
+     * For this SDK's members: the message of a `DeprecationLevel.ERROR` deprecation. Such a member mirrors an Android-only
+     * member so that common code using it fails to compile with a message naming the replacement.
+     */
+    val deprecation: String? = null,
 ) {
     enum class Kind { CONSTRUCTOR, METHOD, FIELD }
 

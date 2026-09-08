@@ -6,6 +6,10 @@ package com.google.firebase
 
 import cocoapods.FirebaseCore.FIRApp
 import cocoapods.FirebaseCore.FIROptions
+import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
+import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
+import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
@@ -32,6 +36,9 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
     /** No-op: automatic resource management is an Android-only behaviour. */
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
 
+    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getApplicationContext(): Any = throw UnsupportedOperationException(APPLICATION_CONTEXT_ANDROID_ONLY)
+
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.ios == ios
 
     override fun hashCode(): Int = ios.hashCode()
@@ -45,24 +52,20 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(FIRApp.appNamed(name) ?: throw IllegalStateException("FirebaseApp with name $name does not exist."))
 
-        /** Platform extra: initialises like the Android SDK's `initializeApp(Context)`; the context is ignored. */
-        public fun initializeApp(context: Any?): FirebaseApp? {
-            FIRApp.configure()
-            return FIRApp.defaultApp()?.let { FirebaseApp(it) }
-        }
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?): FirebaseApp? = Firebase.initialize(context)
 
-        public fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp {
-            FIRApp.configureWithOptions(options.ios)
-            return getInstance()
-        }
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
 
-        public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp {
-            FIRApp.configureWithName(name, options.ios)
-            return getInstance(name)
-        }
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        /** Platform extra: like the Android SDK's `getApps(Context)`; the context is ignored. */
-        public fun getApps(context: Any?): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
+        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun getApps(context: Any?): List<FirebaseApp> = getApps()
+
+        /** All initialized apps (the Android SDK's `getApps(Context)`, which needs no context here). */
+        internal fun getApps(): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
     }
 }
 
@@ -115,5 +118,10 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
                 trackingID = this@Builder.gaTrackingId
             },
         )
+    }
+
+    public actual companion object {
+        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun fromResource(context: Any?): FirebaseOptions? = throw UnsupportedOperationException(FROM_RESOURCE_ANDROID_ONLY)
     }
 }

@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.FieldVisitor
@@ -22,6 +23,9 @@ import java.util.zip.ZipFile
  * consumers, D8 and every test runtime classpath bind to the real classes instead. Before deletion, every public member
  * of a stub is checked against the real class in the reference jars (the compile classpath) so the stubs cannot drift,
  * and a BCV-style dump of the stubs is written to `build/header-stubs/<compilation>.api` for the source-compatibility report.
+ * The exception is a member deprecated with `DeprecationLevel.ERROR` (or `HIDDEN`): it exists so that common code using
+ * an Android-only member gets a compile error naming the replacement, cannot be called, and so need not match the real
+ * class; the dump records its message so the report can count the member as provided.
  *
  * Rules for code in this module: the stubs' companion members compile to calls through the `Companion` object, which the
  * real classes do not have, so this module's own code must reach static SDK members through the SDK's Kotlin extensions
@@ -63,6 +67,27 @@ fun Project.stripHeaderStubs(
 private class Member(val name: String, val descriptor: String, val access: Int) {
     val isStatic get() = access and Opcodes.ACC_STATIC != 0
     val signature get() = "$name$descriptor"
+
+    /** The message of a `@kotlin.Deprecated` annotation with level `ERROR` or `HIDDEN`; such a member cannot be called. */
+    var deprecation: String? = null
+
+    /** Reads `@kotlin.Deprecated` and records the message when the level makes the member uncallable. */
+    fun annotationVisitor(descriptor: String): AnnotationVisitor? {
+        if (descriptor != "Lkotlin/Deprecated;") return null
+        return object : AnnotationVisitor(Opcodes.ASM9) {
+            var message = ""
+            var uncallable = false
+            override fun visit(name: String?, value: Any?) {
+                if (name == "message") message = value.toString()
+            }
+            override fun visitEnum(name: String?, descriptor: String?, value: String?) {
+                if (name == "level") uncallable = value == "ERROR" || value == "HIDDEN"
+            }
+            override fun visitEnd() {
+                if (uncallable) deprecation = message
+            }
+        }
+    }
 }
 
 private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
@@ -79,15 +104,19 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     }
 
     override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
-        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) != 0 && access and Opcodes.ACC_SYNTHETIC == 0 && name != "<clinit>") {
-            methods += Member(name, descriptor, access)
+        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || name == "<clinit>") return null
+        val member = Member(name, descriptor, access).also { methods += it }
+        return object : MethodVisitor(Opcodes.ASM9) {
+            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = member.annotationVisitor(descriptor)
         }
-        return null
     }
 
     override fun visitField(access: Int, name: String, descriptor: String, signature: String?, value: Any?): FieldVisitor? {
-        if (access and Opcodes.ACC_PUBLIC != 0 && access and Opcodes.ACC_SYNTHETIC == 0) fields += Member(name, descriptor, access)
-        return null
+        if (access and Opcodes.ACC_PUBLIC == 0 || access and Opcodes.ACC_SYNTHETIC != 0) return null
+        val member = Member(name, descriptor, access).also { fields += it }
+        return object : FieldVisitor(Opcodes.ASM9) {
+            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = member.annotationVisitor(descriptor)
+        }
     }
 
     /** Kotlin-only classes and members that have no counterpart on the real (Java) class and are never reached at runtime. */
@@ -112,7 +141,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
             }
             val real = readMembers(realBytes)
             for (member in stub.methods) {
-                if (member.name in kotlinOnlyMethods) continue
+                if (member.name in kotlinOnlyMethods || member.deprecation != null) continue
                 val match = real.methods.firstOrNull { it.signature == member.signature }
                 when {
                     match == null -> problems += "${stub.name}.${member.signature} does not exist on the real class"
@@ -120,7 +149,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
                 }
             }
             for (field in stub.fields) {
-                if (field.name == "Companion") continue
+                if (field.name == "Companion" || field.deprecation != null) continue
                 val match = real.fields.firstOrNull { it.signature == field.signature }
                 if (match == null || match.isStatic != field.isStatic) problems += "${stub.name}.${field.name} does not exist on the real class"
             }
@@ -135,7 +164,8 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
 
 /**
  * Writes the stubs in the binary-compatibility-validator dump format so the source-compatibility report can read them.
- * Companion objects are included (the Android SDK's Kotlin classes have them too); the mapping classes are not.
+ * Companion objects are included (the Android SDK's Kotlin classes have them too); the mapping classes are not. A member
+ * that is deprecated with an error carries its message as a trailing `// deprecated: ...` comment.
  */
 private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
     for (stub in stubs.sortedBy { it.name }) {
@@ -154,7 +184,7 @@ private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
                 if (field.access and Opcodes.ACC_FINAL != 0) add("final")
                 if (field.access and Opcodes.ACC_ENUM != 0) add("enum")
             }.joinToString(" ") { "$it " }
-            appendLine("\tpublic ${fieldModifiers}field ${field.name} ${field.descriptor}")
+            appendLine("\tpublic ${fieldModifiers}field ${field.name} ${field.descriptor}${field.deprecationComment()}")
         }
         for (method in stub.methods.sortedWith(compareBy({ it.name }, { it.descriptor }))) {
             if (method.name in kotlinOnlyMethods) continue
@@ -163,9 +193,11 @@ private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
                 if (method.access and Opcodes.ACC_FINAL != 0) add("final")
                 if (method.access and Opcodes.ACC_ABSTRACT != 0) add("abstract")
             }.joinToString(" ") { "$it " }
-            appendLine("\tpublic ${methodModifiers}fun ${method.name} ${method.descriptor}")
+            appendLine("\tpublic ${methodModifiers}fun ${method.name} ${method.descriptor}${method.deprecationComment()}")
         }
         appendLine("}")
         appendLine()
     }
 }
+
+private fun Member.deprecationComment(): String = deprecation?.let { "  // deprecated: ${it.replace('\n', ' ')}" }.orEmpty()

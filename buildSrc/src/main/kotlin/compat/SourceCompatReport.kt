@@ -21,7 +21,9 @@ data class Exclusion(val pattern: Regex, val uncountedStatus: String?) {
  *
  * Every public Android SDK member is classified as:
  * - `OK`   present with the same name, parameters and static-ness;
- * - `MAP`  present through an accepted mapping (e.g. `android.content.Context` widened to `Object`, or a different return type);
+ * - `MAP`  present through an accepted mapping (e.g. `android.content.Context` widened to `Object`, or a different return
+ *          type), or declared with an error-level deprecation whose message names the multiplatform replacement (an
+ *          Android-only member that common code cannot call, while Android code still binds to the real member);
  * - `MISS` not available (Android code using it will not compile against this SDK);
  * - `OMIT` intentionally not mirrored (listed in the module's exclusions), also counted as unavailable;
  * - `SKIP` deprecated in the Android SDK, not counted;
@@ -41,6 +43,8 @@ object SourceCompatReport {
         "android.content.Context" to "java.lang.Object",
         "android.app.Activity" to "java.lang.Object",
         "android.net.Uri" to "java.lang.String",
+        "java.util.Date" to "java.lang.Object",
+        "java.time.Instant" to "java.lang.Object",
     )
 
     fun generate(
@@ -127,6 +131,7 @@ object SourceCompatReport {
         if (member.type != null && match.type != null && member.type != match.type && !isAcceptedReturnType(member.type, match.type)) {
             notes += "returns ${match.type.substringAfterLast('.')}"
         }
+        match.deprecation?.let { notes += "deprecated: $it" }
         return (if (notes.isEmpty()) "OK" else "MAP") to notes.takeIf { it.isNotEmpty() }?.joinToString(", ")
     }
 

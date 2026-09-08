@@ -154,6 +154,45 @@ class SourceCompatReportTest {
     }
 
     @Test
+    fun countsErrorDeprecatedMembersAsMapped() {
+        val apiTxt = """
+            package com.google.firebase {
+              public class FirebaseApp {
+                method public android.content.Context getApplicationContext();
+                method public static com.google.firebase.FirebaseApp? initializeApp(android.content.Context);
+              }
+              public final class Timestamp {
+                ctor public Timestamp(java.util.Date);
+                ctor public Timestamp(java.time.Instant);
+                method public java.util.Date toDate();
+              }
+            }
+        """.trimIndent()
+        val stubDump = """
+            public final class com/google/firebase/FirebaseApp {
+            	public final fun getApplicationContext ()Ljava/lang/Object;  // deprecated: Android only
+            	public static final fun initializeApp (Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;  // deprecated: use Firebase.initialize(context), which ignores the context elsewhere
+            }
+
+            public final class com/google/firebase/Timestamp {
+            	public fun <init> (Ljava/lang/Object;)V  // deprecated: use Timestamp(seconds, nanoseconds)
+            	public final fun toDate ()Ljava/lang/Object;
+            }
+        """.trimIndent()
+        val ours = BcvApiParser.parse(stubDump)
+        assertEquals("Android only", ours[0].members[0].deprecation)
+        assertEquals(listOf("java.lang.Object"), ours[0].members[1].parameters)
+        assertEquals(null, ours[1].members[1].deprecation)
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), ours, emptyList())
+        assertTrue(report.contains("MAP   Context getApplicationContext()  [returns Object, deprecated: Android only]"), report)
+        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object, deprecated: use Firebase.initialize(context), which ignores the context elsewhere]"), report)
+        assertTrue(report.contains("MAP   Timestamp(Date)  [Date -> Object, deprecated: use Timestamp(seconds, nanoseconds)]"), report)
+        assertTrue(report.contains("MAP   Timestamp(Instant)  [Instant -> Object, deprecated: use Timestamp(seconds, nanoseconds)]"), report)
+        assertTrue(report.contains("MAP   Date toDate()  [returns Object]"), report)
+        assertTrue(report.contains("# 100% of 5 public members available (0 identical, 5 mapped, 0 missing, 0 omitted)"), report)
+    }
+
+    @Test
     fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",

@@ -127,14 +127,20 @@ The SDK has two public API layers per module:
    Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
    widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
    members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a
-   package-private Java helper (`firebase-app/src/androidMain/java`).
-   - An Android API that cannot be mapped onto a platform is **omitted** on purpose so callers get a compile error and adapt.
+   package-private Java helper (`firebase-app/src/androidMain/java`). The one exception to the signature rule is a member
+   annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be called, so an
+   Android-only member (`FirebaseApp.initializeApp(Context)`, `FirebaseOptions.fromResource`, `Timestamp(Date)`) can be mirrored
+   with the platform type widened to `Any` and a message naming the multiplatform replacement (messages live in
+   `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`); Android code still binds to the real member.
+   - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
+     callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
-     percentage is the module's README badge. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
+     percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its
+     message and counts as provided. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
      unavailable unless the comment says `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an
-     Android/JVM-only type such as `Context`, `Parcel`, `Date` or `Instant`), which drops them from the count; a single overload
+     Android/JVM-only type with no replacement, such as `Parcel`), which drops them from the count; a single overload
      is selected with `Class#member(Type, Type)`.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of

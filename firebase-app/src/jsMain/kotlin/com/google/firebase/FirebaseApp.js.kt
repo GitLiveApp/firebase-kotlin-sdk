@@ -4,13 +4,16 @@
 
 package com.google.firebase
 
+import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
+import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
+import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
 import kotlin.js.json
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.externals.FirebaseOptions as JsFirebaseOptions
 import dev.gitlive.firebase.externals.deleteApp as jsDeleteApp
 import dev.gitlive.firebase.externals.getApp as jsGetApp
 import dev.gitlive.firebase.externals.getApps as jsGetApps
-import dev.gitlive.firebase.externals.initializeApp as jsInitializeApp
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
@@ -46,6 +49,9 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
     /** No-op: automatic resource management is an Android-only behaviour. */
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
 
+    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getApplicationContext(): Any = throw UnsupportedOperationException(APPLICATION_CONTEXT_ANDROID_ONLY)
+
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.js == js
 
     override fun hashCode(): Int = js.hashCode()
@@ -59,15 +65,20 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(jsGetApp(name))
 
-        /** Platform extra: initialises like the Android SDK's `initializeApp(Context)`; the context is ignored. */
-        public fun initializeApp(context: Any?): FirebaseApp? = throw UnsupportedOperationException("Cannot initialize firebase without options in JS")
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?): FirebaseApp? = Firebase.initialize(context)
 
-        public fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson()))
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
 
-        public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson(), name))
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        /** Platform extra: like the Android SDK's `getApps(Context)`; the context is ignored. */
-        public fun getApps(context: Any?): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
+        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun getApps(context: Any?): List<FirebaseApp> = getApps()
+
+        /** All initialized apps (the Android SDK's `getApps(Context)`, which needs no context here). */
+        internal fun getApps(): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
     }
 }
 
@@ -148,5 +159,10 @@ public actual class FirebaseOptions internal constructor(
             gaTrackingId = gaTrackingId,
             authDomain = authDomain,
         )
+    }
+
+    public actual companion object {
+        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun fromResource(context: Any?): FirebaseOptions? = throw UnsupportedOperationException(FROM_RESOURCE_ANDROID_ONLY)
     }
 }

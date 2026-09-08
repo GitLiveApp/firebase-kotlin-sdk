@@ -28,7 +28,7 @@ import kotlin.test.assertTrue
 /**
  * Exercises the `com.google.firebase` layer exactly as Android app code would (Task API, static accessors,
  * listeners), on every platform. Initialisation goes through the dev.gitlive API because the Android SDK's
- * `initializeApp(Context)` cannot be called from common code.
+ * `initializeApp(Context)` is deprecated with an error in common code (it points at `Firebase.initialize(context)`).
  */
 @IgnoreForAndroidUnitTest
 @IgnoreForJvm

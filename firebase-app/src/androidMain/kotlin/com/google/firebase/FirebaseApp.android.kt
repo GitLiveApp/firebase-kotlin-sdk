@@ -4,14 +4,18 @@
 
 package com.google.firebase
 
-import android.content.Context
+import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
+import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
+import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
 import dev.gitlive.firebase.stub
 
 /*
  * Header stubs for the Firebase Android SDK core classes (see buildSrc utils/HeaderStubs.kt): they only satisfy the
  * `expect` declarations at compile time and are deleted from the compilation output, so the real classes from
  * com.google.firebase:firebase-common bind at runtime. Every member must exist on the real class with the same JVM
- * signature (verified by the build); members that only exist here (Context overloads) are for this module's own use.
+ * signature (verified by the build), except the `@Deprecated(level = ERROR)` members, which cannot be called: Android
+ * code calling `initializeApp(Context)` binds to the real member.
  */
 
 public actual open class FirebaseException : Exception {
@@ -31,6 +35,9 @@ public actual class FirebaseApp private constructor() {
     public actual fun delete(): Unit = stub()
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean): Unit = stub()
 
+    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getApplicationContext(): Any = stub()
+
     public actual companion object {
         @JvmField
         public actual val DEFAULT_APP_NAME: String = "[DEFAULT]"
@@ -42,16 +49,20 @@ public actual class FirebaseApp private constructor() {
         public actual fun getInstance(name: String): FirebaseApp = stub()
 
         @JvmStatic
-        public fun initializeApp(context: Context): FirebaseApp? = stub()
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?): FirebaseApp? = stub()
 
         @JvmStatic
-        public fun initializeApp(context: Context, options: FirebaseOptions): FirebaseApp = stub()
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = stub()
 
         @JvmStatic
-        public fun initializeApp(context: Context, options: FirebaseOptions, name: String): FirebaseApp = stub()
+        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
+        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = stub()
 
         @JvmStatic
-        public fun getApps(context: Context): List<FirebaseApp> = stub()
+        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun getApps(context: Any?): List<FirebaseApp> = stub()
     }
 }
 
@@ -74,5 +85,11 @@ public actual class FirebaseOptions private constructor() {
         public actual fun setStorageBucket(storageBucket: String?): Builder = stub()
         public actual fun setGaTrackingId(gaTrackingId: String?): Builder = stub()
         public actual fun build(): FirebaseOptions = stub()
+    }
+
+    public actual companion object {
+        @JvmStatic
+        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun fromResource(context: Any?): FirebaseOptions? = stub()
     }
 }
