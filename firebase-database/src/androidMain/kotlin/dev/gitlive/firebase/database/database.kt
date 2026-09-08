@@ -29,31 +29,14 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
-import kotlin.time.Duration.Companion.seconds
 
 public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
-
-internal suspend fun <T> Task<T>.awaitWhileOnline(database: FirebaseDatabase): T = merge(
-    flow { emit(await()) },
-    database
-        .reference(".info/connected")
-        .valueEvents
-        .debounce(2.seconds)
-        .filterNot { it.value<Boolean>() }
-        .map<DataSnapshot, T> { throw DatabaseException("Database not connected", null) },
-)
-    .first()
 
 public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }
@@ -235,18 +218,15 @@ internal actual class NativeDatabaseReference internal constructor(
     actual fun onDisconnect() = NativeOnDisconnect(android.onDisconnect(), persistenceEnabled, database)
 
     actual suspend fun setValueEncoded(encodedValue: Any?) {
-        android.setValue(encodedValue)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.setValue(encodedValue).await()
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        android.updateChildren(encodedUpdate.android)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.updateChildren(encodedUpdate.android).await()
     }
 
     actual suspend fun removeValue() {
-        android.removeValue()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.removeValue().await()
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -316,23 +296,19 @@ internal actual class NativeOnDisconnect internal constructor(
 ) {
 
     actual suspend fun removeValue() {
-        android.removeValue()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.removeValue().await()
     }
 
     actual suspend fun cancel() {
-        android.cancel()
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.cancel().await()
     }
 
     actual suspend fun setEncodedValue(encodedValue: Any?) {
-        android.setValue(encodedValue)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.setValue(encodedValue).await()
     }
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
-        android.updateChildren(encodedUpdate.android)
-            .run { if (persistenceEnabled) await() else awaitWhileOnline(database) }
+        android.updateChildren(encodedUpdate.android).await()
     }
 }
 

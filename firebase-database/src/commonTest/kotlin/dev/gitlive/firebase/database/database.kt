@@ -7,6 +7,7 @@ import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -258,6 +259,23 @@ class FirebaseDatabaseTest {
         database.verifyPurgeOutstandingWrites()
 
         ensureDatabaseConnected()
+    }
+
+    @Test
+    fun testWriteWhileOfflineCompletesAfterReconnect() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("FirebaseRealtimeDatabaseTest").child("writtenWhileOffline")
+
+        // The SDKs queue writes while offline and acknowledge them after reconnecting, so the
+        // suspending write must complete once the connection is back rather than fail while offline.
+        database.goOffline()
+        val write = async { reference.setValue("queued") }
+        database.goOnline()
+        write.await()
+        ensureDatabaseConnected()
+
+        assertEquals("queued", reference.valueEvents.first().value())
+        reference.removeValue()
     }
 
     @Test
