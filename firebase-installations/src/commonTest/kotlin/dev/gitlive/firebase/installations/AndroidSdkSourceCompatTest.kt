@@ -118,12 +118,12 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testTaskCompletionSource() = runTest {
         val source = TaskCompletionSource<Int>()
-        var completed: Task<Int>? = null
-        source.task.addOnCompleteListener(OnCompleteListener { completed = it })
+        // On Android the listener is posted to the main thread, so wait for it rather than assuming it has run.
+        val completed = TaskCompletionSource<Task<Int>>()
+        source.task.addOnCompleteListener(OnCompleteListener { completed.setResult(it) })
         source.setResult(42)
         assertEquals(42, source.task.await())
-        assertNotNull(completed)
-        assertEquals(42, completed?.result)
+        assertEquals(42, completed.task.await().result)
 
         val failing = TaskCompletionSource<Int>()
         failing.setException(IllegalStateException("boom"))
