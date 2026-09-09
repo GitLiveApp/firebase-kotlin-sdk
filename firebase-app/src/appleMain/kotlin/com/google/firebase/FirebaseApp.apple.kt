@@ -61,11 +61,8 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
         @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
         public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-        public actual fun getApps(context: Any?): List<FirebaseApp> = getApps()
-
-        /** All initialized apps (the Android SDK's `getApps(Context)`, which needs no context here). */
-        internal fun getApps(): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
+        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
+        public actual fun getApps(context: Any?): List<FirebaseApp> = Firebase.getApps(context)
     }
 }
 

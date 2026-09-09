@@ -6,7 +6,7 @@ com.google.firebase.Firebase
   OK    static Firebase INSTANCE
 com.google.firebase.FirebaseApp
   MAP   Context getApplicationContext()  [returns Object, deprecated: getApplicationContext returns an android.content.Context and can only be called from Android code]
-  MAP   static List getApps(Context)  [Context -> Object, deprecated: getApps takes an android.content.Context and can only be called from Android code; use dev.gitlive.firebase.Firebase.apps(context) from common code (the context is ignored on the other platforms)]
+  MAP   static List getApps(Context)  [Context -> Object, deprecated: getApps takes an android.content.Context and can only be called from Android code; use Firebase.getApps(context) from common code (the context is ignored on the other platforms)]
   OK    static FirebaseApp getInstance()
   OK    static FirebaseApp getInstance(String)
   OK    String getName()

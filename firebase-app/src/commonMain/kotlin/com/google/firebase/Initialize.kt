@@ -20,3 +20,10 @@ public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOpt
 
 /** Initializes the [FirebaseApp] called [name] with [options]; see [initialize]. */
 public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+
+/**
+ * The initialized apps, mirroring `FirebaseApp.getApps(Context)` from the Firebase Android SDK as a top-level function
+ * with the `Context` widened to `Any?` so that common code can call it (the static member itself cannot be given an
+ * `Any?` overload). On Android [context] must be an `android.content.Context`; on Apple platforms and JS it is ignored.
+ */
+public expect fun Firebase.getApps(context: Any? = null): List<FirebaseApp>

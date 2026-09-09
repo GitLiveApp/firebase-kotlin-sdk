@@ -8,6 +8,7 @@
 package dev.gitlive.firebase
 
 import android.content.Context
+import com.google.firebase.getApps
 import com.google.firebase.initialize
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
@@ -23,7 +24,7 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): 
 
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.initialize(context as Context, options.toCompat(), name))
 
-public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = FirebaseAppStatics.getApps(context as Context).map { FirebaseApp(it) }
+public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
 
 internal actual suspend fun CompatFirebaseApp.deleteAwaiting(): Unit = delete()
 

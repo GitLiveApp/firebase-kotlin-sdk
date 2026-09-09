@@ -16,7 +16,7 @@ internal const val INITIALIZE_APP_ANDROID_ONLY =
 
 internal const val GET_APPS_ANDROID_ONLY =
     "getApps takes an android.content.Context and can only be called from Android code; " +
-        "use dev.gitlive.firebase.Firebase.apps(context) from common code (the context is ignored on the other platforms)"
+        "use Firebase.getApps(context) from common code (the context is ignored on the other platforms)"
 
 internal const val APPLICATION_CONTEXT_ANDROID_ONLY =
     "getApplicationContext returns an android.content.Context and can only be called from Android code"

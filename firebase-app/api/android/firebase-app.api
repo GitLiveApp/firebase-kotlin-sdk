@@ -1,4 +1,6 @@
 public final class com/google/firebase/FirebaseInitializeKt {
+	public static final fun getApps (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;
+	public static synthetic fun getApps$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ljava/util/List;
 	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
 	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
 	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;

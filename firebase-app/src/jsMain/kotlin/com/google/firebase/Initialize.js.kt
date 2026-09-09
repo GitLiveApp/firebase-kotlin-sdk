@@ -4,6 +4,7 @@
 
 package com.google.firebase
 
+import dev.gitlive.firebase.externals.getApps as jsGetApps
 import dev.gitlive.firebase.externals.initializeApp as jsInitializeApp
 
 /** Not supported on JS, where the options cannot be read from a default configuration: always throws. */
@@ -14,3 +15,6 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): 
 
 /** Initializes the app named [name] with the given [options]; the [context] is ignored. */
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(jsInitializeApp(options.toJson(), name))
+
+/** All initialized apps; the [context] is ignored. */
+public actual fun Firebase.getApps(context: Any?): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }

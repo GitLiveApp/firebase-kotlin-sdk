@@ -13,7 +13,7 @@ import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
  *
  * The members taking or returning an Android `Context` (`initializeApp`, `getApps` and `getApplicationContext`) can
  * only be called from Android code: from common code they fail to compile with a message naming the replacement
- * (`Firebase.initialize(context)` or `dev.gitlive.firebase.Firebase.initialize` / `apps`).
+ * (`Firebase.initialize(context)` and `Firebase.getApps(context)`).
  */
 public expect class FirebaseApp {
     /** The unique name of this app. */
@@ -57,8 +57,8 @@ public expect class FirebaseApp {
         @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
         public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp
 
-        /** Android only: use `dev.gitlive.firebase.Firebase.apps` from common code. */
-        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        /** Android only: use [Firebase.getApps] from common code. */
+        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
         public fun getApps(context: Any?): List<FirebaseApp>
     }
 }

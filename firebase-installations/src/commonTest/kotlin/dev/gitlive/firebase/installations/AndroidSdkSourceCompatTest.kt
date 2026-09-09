@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
+import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
 import com.google.firebase.installations.installations
@@ -58,6 +59,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals("fir-kotlin-sdk", app.options.projectId)
         assertEquals(app, Firebase.app)
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
+        assertTrue(app in Firebase.getApps(context))
         assertEquals("fir-kotlin-sdk", app.options.projectId)
     }
 

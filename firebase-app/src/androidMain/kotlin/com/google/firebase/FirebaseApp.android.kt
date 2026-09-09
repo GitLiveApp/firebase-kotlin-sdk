@@ -61,7 +61,7 @@ public actual class FirebaseApp private constructor() {
         public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = stub()
 
         @JvmStatic
-        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
         public actual fun getApps(context: Any?): List<FirebaseApp> = stub()
     }
 }

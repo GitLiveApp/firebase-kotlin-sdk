@@ -20,4 +20,6 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): 
 
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = initialize(context.asAndroidContext(), options, name)
 
-private fun Any?.asAndroidContext(): Context = requireNotNull(this as? Context) { "An android.content.Context is required to initialize Firebase on Android, got $this" }
+public actual fun Firebase.getApps(context: Any?): List<FirebaseApp> = FirebaseAppStatics.getApps(context.asAndroidContext())
+
+private fun Any?.asAndroidContext(): Context = requireNotNull(this as? Context) { "An android.content.Context is required on Android, got $this" }

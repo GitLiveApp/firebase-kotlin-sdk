@@ -13,7 +13,6 @@ import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.externals.FirebaseOptions as JsFirebaseOptions
 import dev.gitlive.firebase.externals.deleteApp as jsDeleteApp
 import dev.gitlive.firebase.externals.getApp as jsGetApp
-import dev.gitlive.firebase.externals.getApps as jsGetApps
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
@@ -74,11 +73,8 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
         @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
         public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        @Deprecated(GET_APPS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-        public actual fun getApps(context: Any?): List<FirebaseApp> = getApps()
-
-        /** All initialized apps (the Android SDK's `getApps(Context)`, which needs no context here). */
-        internal fun getApps(): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
+        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
+        public actual fun getApps(context: Any?): List<FirebaseApp> = Firebase.getApps(context)
     }
 }
 
