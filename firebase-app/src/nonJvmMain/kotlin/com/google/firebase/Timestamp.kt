@@ -23,17 +23,17 @@ public actual class Timestamp actual constructor(
         require(seconds in MIN_SECONDS..MAX_SECONDS) { "Timestamp seconds out of range: $seconds" }
     }
 
-    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, ReplaceWith("Timestamp.fromInstant(time)", "com.google.firebase.Timestamp", "com.google.firebase.fromInstant"), DeprecationLevel.ERROR)
     public actual constructor(time: Any) : this(0, 0) {
         throw UnsupportedOperationException(TIMESTAMP_OF_DATE_ANDROID_ONLY)
     }
 
     actual override fun compareTo(other: Timestamp): Int = compareValuesBy(this, other, { it.seconds }, { it.nanoseconds })
 
-    @Deprecated(TO_DATE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    @Deprecated(TO_DATE_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
     public actual fun toDate(): Any = throw UnsupportedOperationException(TO_DATE_ANDROID_ONLY)
 
-    @Deprecated(TO_INSTANT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    @Deprecated(TO_INSTANT_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
     public actual fun toInstant(): Any = throw UnsupportedOperationException(TO_INSTANT_ANDROID_ONLY)
 
     override fun equals(other: Any?): Boolean = other is Timestamp && other.seconds == seconds && other.nanoseconds == nanoseconds

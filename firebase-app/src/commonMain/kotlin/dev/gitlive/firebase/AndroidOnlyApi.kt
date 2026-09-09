@@ -26,10 +26,11 @@ internal const val FROM_RESOURCE_ANDROID_ONLY =
         "use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms)"
 
 internal const val TIMESTAMP_OF_DATE_ANDROID_ONLY =
-    "the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(seconds, nanoseconds)"
+    "the java.util.Date and java.time.Instant constructors are JVM-only; " +
+        "use Timestamp.fromInstant(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)"
 
 internal const val TO_DATE_ANDROID_ONLY =
-    "toDate returns a java.util.Date, which is JVM-only; use seconds and nanoseconds"
+    "toDate returns a java.util.Date, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds"
 
 internal const val TO_INSTANT_ANDROID_ONLY =
-    "toInstant returns a java.time.Instant, which is JVM-only; use seconds and nanoseconds"
+    "toInstant returns a java.time.Instant, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds"

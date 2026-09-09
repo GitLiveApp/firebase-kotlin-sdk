@@ -61,6 +61,8 @@ kotlin {
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        // kotlin.time.Instant is exposed by the com.google.firebase.Timestamp conversions.
+        optIn.add("kotlin.time.ExperimentalTime")
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     targets.configureEach {

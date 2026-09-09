@@ -11,6 +11,11 @@ public final class com/google/firebase/FirebaseInitializeKt {
 	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
 }
 
+public final class com/google/firebase/TimestampInstantKt {
+	public static final fun fromInstant (Lcom/google/firebase/Timestamp$Companion;Lkotlin/time/Instant;)Lcom/google/firebase/Timestamp;
+	public static final fun toKotlinInstant (Lcom/google/firebase/Timestamp;)Lkotlin/time/Instant;
+}
+
 public final class dev/gitlive/firebase/Firebase {
 	public static final field INSTANCE Ldev/gitlive/firebase/Firebase;
 }

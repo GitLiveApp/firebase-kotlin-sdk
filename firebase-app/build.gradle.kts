@@ -60,6 +60,8 @@ kotlin {
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        // kotlin.time.Instant is exposed by the com.google.firebase.Timestamp conversions.
+        optIn.add("kotlin.time.ExperimentalTime")
         freeCompilerArgs.add("-Xexpect-actual-classes")
         freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
     }
@@ -209,7 +211,7 @@ stripHeaderStubs(
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
     // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
-    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class"),
+    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class", "com/google/firebase/TimestampInstantKt.class"),
 )
 
 registerAndroidSourceCompat("firebase-common/api.txt")

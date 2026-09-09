@@ -9,11 +9,13 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
+import com.google.firebase.fromInstant
 import com.google.firebase.fromResource
 import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
 import com.google.firebase.installations.installations
+import com.google.firebase.toKotlinInstant
 import com.google.firebase.installations.internal.FidListener
 import com.google.firebase.installations.internal.FidListenerHandle
 import dev.gitlive.firebase.apps
@@ -26,6 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 /**
  * Exercises the `com.google.firebase` layer exactly as Android app code would (Task API, static accessors,
@@ -84,6 +87,9 @@ class AndroidSdkSourceCompatTest {
         assertEquals(0, timestamp.compareTo(Timestamp(1_700_000_000, 500)))
         assertTrue(timestamp < Timestamp(1_700_000_000, 501))
         assertTrue(timestamp < Timestamp.now())
+        val instant = Instant.fromEpochSeconds(1_700_000_000, 500)
+        assertEquals(timestamp, Timestamp.fromInstant(instant))
+        assertEquals(instant, timestamp.toKotlinInstant())
         FirebaseApp.getInstance().setAutomaticResourceManagementEnabled(true)
     }
 

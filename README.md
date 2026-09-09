@@ -58,7 +58,7 @@ Rules of thumb for this layer:
 - It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
   API is built on top of it and remains the recommended way to write new multiplatform code.
 - On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
-  `Firebase.getApps(Any?)` and `Firebase.fromResource(Any?)`: the library
+  `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
   depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
   against, so your Android code binds to the real classes exactly as before. Other libraries depending on Firebase, the
   Firebase Gradle plugins and Play Services all keep working.
@@ -68,7 +68,8 @@ Rules of thumb for this layer:
   `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`) are declared with an error-level
   deprecation instead: common code using them fails to compile with a message naming the replacement
   (`Firebase.initialize(context)`, `Firebase.getApps(context)`, `Firebase.fromResource(context)`,
-  `Timestamp(seconds, nanoseconds)`), while Android code keeps binding to the real SDK member. The
+  `Timestamp.fromInstant(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`), while Android code
+  keeps binding to the real SDK member. The
   `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
   (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
   given an `Any?` overload, so such a member moves onto `Firebase` under the same name: `FirebaseApp.getApps(Context)`
