@@ -5,4 +5,4 @@
 com.google.firebase.Timestamp#describeContents  // @platform android.os.Parcelable
 com.google.firebase.Timestamp#writeToParcel  // @platform android.os.Parcelable
 com.google.firebase.Timestamp#CREATOR  // @platform android.os.Parcelable
-com.google.firebase.provider.*  // @hide in the Android SDK (FirebaseInitProvider, an Android ContentProvider)
+com.google.firebase.provider.*  // @platform FirebaseInitProvider is an android.content.ContentProvider (its static helpers are @hide and absent from api.txt)
