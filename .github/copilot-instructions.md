@@ -124,6 +124,8 @@ The SDK has two public API layers per module:
    on JS the modular JS SDK, and non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
    Android/JVM the `actual`s are **header stubs**: signature-identical declarations that are compiled against, verified against
    the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
+   A declaration that is identical on every platform (the `Task` listener interfaces, `FidListener`) is plain common code
+   rather than expect/actual: it is compiled, verified and stripped on Android/JVM like a stub and is real code elsewhere.
    Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
    widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
    members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a

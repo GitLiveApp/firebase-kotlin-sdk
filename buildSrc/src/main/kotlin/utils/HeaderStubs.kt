@@ -27,6 +27,10 @@ import java.util.zip.ZipFile
  * an Android-only member gets a compile error naming the replacement, cannot be called, and so need not match the real
  * class; the dump records its message so the report can count the member as provided.
  *
+ * A declaration that is identical on every platform (listener interfaces, a trivial exception subclass) does not need
+ * expect/actual at all: plain common code under these packages is compiled, verified and stripped on Android/JVM the
+ * same way, and is real code on the other platforms.
+ *
  * Rules for code in this module: the stubs' companion members compile to calls through the `Companion` object, which the
  * real classes do not have, so this module's own code must reach static SDK members through the SDK's Kotlin extensions
  * (real static facade methods) or a Java helper; consumers are unaffected because they compile against the real classes.

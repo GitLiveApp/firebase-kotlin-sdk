@@ -29,27 +29,27 @@ public expect abstract class Task<TResult>() {
     public abstract fun <TContinuationResult> onSuccessTask(successContinuation: SuccessContinuation<TResult, TContinuationResult>): Task<TContinuationResult>
 }
 
-public expect fun interface OnCompleteListener<TResult> {
+public fun interface OnCompleteListener<TResult> {
     public fun onComplete(task: Task<TResult>)
 }
 
-public expect fun interface OnSuccessListener<in TResult> {
+public fun interface OnSuccessListener<in TResult> {
     public fun onSuccess(result: TResult)
 }
 
-public expect fun interface OnFailureListener {
+public fun interface OnFailureListener {
     public fun onFailure(e: Exception)
 }
 
-public expect fun interface OnCanceledListener {
+public fun interface OnCanceledListener {
     public fun onCanceled()
 }
 
-public expect fun interface Continuation<TResult, TContinuationResult> {
+public fun interface Continuation<TResult, TContinuationResult> {
     public fun then(task: Task<TResult>): TContinuationResult
 }
 
-public expect fun interface SuccessContinuation<TResult, TContinuationResult> {
+public fun interface SuccessContinuation<TResult, TContinuationResult> {
     public fun then(result: TResult): Task<TContinuationResult>
 }
 
@@ -63,4 +63,4 @@ public expect class TaskCompletionSource<TResult>() {
 }
 
 /** Thrown by [Task.result] when the task failed. */
-public expect class RuntimeExecutionException(cause: Throwable) : RuntimeException
+public class RuntimeExecutionException(cause: Throwable) : RuntimeException(cause)

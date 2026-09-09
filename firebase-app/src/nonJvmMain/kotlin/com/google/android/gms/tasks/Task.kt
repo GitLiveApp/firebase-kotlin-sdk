@@ -23,30 +23,6 @@ public actual abstract class Task<TResult> actual constructor() {
     public actual abstract fun <TContinuationResult> onSuccessTask(successContinuation: SuccessContinuation<TResult, TContinuationResult>): Task<TContinuationResult>
 }
 
-public actual fun interface OnCompleteListener<TResult> {
-    public actual fun onComplete(task: Task<TResult>)
-}
-
-public actual fun interface OnSuccessListener<in TResult> {
-    public actual fun onSuccess(result: TResult)
-}
-
-public actual fun interface OnFailureListener {
-    public actual fun onFailure(e: Exception)
-}
-
-public actual fun interface OnCanceledListener {
-    public actual fun onCanceled()
-}
-
-public actual fun interface Continuation<TResult, TContinuationResult> {
-    public actual fun then(task: Task<TResult>): TContinuationResult
-}
-
-public actual fun interface SuccessContinuation<TResult, TContinuationResult> {
-    public actual fun then(result: TResult): Task<TContinuationResult>
-}
-
 public actual class TaskCompletionSource<TResult> actual constructor() {
     private val impl = TaskImpl<TResult>()
 
@@ -64,8 +40,6 @@ public actual class TaskCompletionSource<TResult> actual constructor() {
 
     public actual fun trySetException(e: Exception): Boolean = impl.trySetException(e)
 }
-
-public actual class RuntimeExecutionException actual constructor(cause: Throwable) : RuntimeException(cause)
 
 /** Pure Kotlin [Task] used on platforms without Play Services. Thread-safe; listeners run on the completing thread. */
 @OptIn(ExperimentalAtomicApi::class)
