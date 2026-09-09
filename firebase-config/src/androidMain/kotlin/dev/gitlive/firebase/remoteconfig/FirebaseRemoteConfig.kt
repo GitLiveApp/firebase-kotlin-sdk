@@ -5,9 +5,14 @@ package dev.gitlive.firebase.remoteconfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
+import com.google.firebase.remoteconfig.ConfigUpdate
+import com.google.firebase.remoteconfig.ConfigUpdateListener
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.android
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -60,6 +65,20 @@ public actual class FirebaseRemoteConfig internal constructor(internal val andro
     public actual suspend fun reset() {
         android.reset().await()
     }
+
+    public actual val configUpdates: Flow<dev.gitlive.firebase.remoteconfig.ConfigUpdate>
+        get() = callbackFlow {
+            val registration = android.addOnConfigUpdateListener(object : ConfigUpdateListener {
+                override fun onUpdate(configUpdate: ConfigUpdate) {
+                    trySend(dev.gitlive.firebase.remoteconfig.ConfigUpdate(configUpdate.updatedKeys))
+                }
+
+                override fun onError(error: com.google.firebase.remoteconfig.FirebaseRemoteConfigException) {
+                    // do not close the flow on transient errors; just drop the event
+                }
+            })
+            awaitClose { registration.remove() }
+        }
 
     private fun AndroidFirebaseRemoteConfigSettings.asCommon(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
         fetchTimeout = fetchTimeoutInSeconds.seconds,

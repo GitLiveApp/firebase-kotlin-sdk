@@ -1,3 +1,14 @@
+public final class dev/gitlive/firebase/remoteconfig/ConfigUpdate {
+	public fun <init> (Ljava/util/Set;)V
+	public final fun component1 ()Ljava/util/Set;
+	public final fun copy (Ljava/util/Set;)Ldev/gitlive/firebase/remoteconfig/ConfigUpdate;
+	public static synthetic fun copy$default (Ldev/gitlive/firebase/remoteconfig/ConfigUpdate;Ljava/util/Set;ILjava/lang/Object;)Ldev/gitlive/firebase/remoteconfig/ConfigUpdate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getUpdatedKeys ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class dev/gitlive/firebase/remoteconfig/FetchStatus : java/lang/Enum {
 	public static final field Failure Ldev/gitlive/firebase/remoteconfig/FetchStatus;
 	public static final field NoFetchYet Ldev/gitlive/firebase/remoteconfig/FetchStatus;
@@ -15,6 +26,7 @@ public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig {
 	public static synthetic fun fetch-dnQKTGw$default (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;Lkotlin/time/Duration;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun fetchAndActivate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAll ()Ljava/util/Map;
+	public final fun getConfigUpdates ()Lkotlinx/coroutines/flow/Flow;
 	public final fun getInfo ()Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigInfo;
 	public final fun getKeysByPrefix (Ljava/lang/String;)Ljava/util/Set;
 	public final fun getValue (Ljava/lang/String;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigValue;

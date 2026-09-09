@@ -6,6 +6,8 @@ import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.js
 import dev.gitlive.firebase.remoteconfig.externals.*
 import kotlinx.coroutines.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.datetime.Instant
 import kotlin.js.json
 import kotlin.time.Duration
@@ -68,6 +70,9 @@ public actual class FirebaseRemoteConfig internal constructor(internal val js: R
     public actual suspend fun setDefaults(vararg defaults: Pair<String, Any?>): Unit = rethrow {
         js.defaultConfig = json(*defaults)
     }
+
+    public actual val configUpdates: Flow<ConfigUpdate>
+        get() = emptyFlow() // not yet implemented for JS target
 
     private fun Settings.toFirebaseRemoteConfigSettings(): FirebaseRemoteConfigSettings = FirebaseRemoteConfigSettings(
         fetchTimeout = fetchTimeoutMillis.toLong().milliseconds,
