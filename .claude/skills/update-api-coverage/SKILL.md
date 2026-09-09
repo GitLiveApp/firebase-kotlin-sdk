@@ -51,6 +51,18 @@ The Android API surface comes from
   packages count as unused unless the module sources mention "pipeline", to avoid
   false matches on generic names such as `where` and `limit`.
 
+## Modules with the `com.google.firebase` compatibility layer
+
+Modules that mirror the Android SDK API itself (they have an `api/android-sdk/` directory,
+e.g. firebase-installations) are not scanned for invocations. Their badge is the percentage
+in the header of `api/android-sdk-compat.txt`, which `./gradlew :<module>:androidSourceCompatDump`
+regenerates from the module's API dump and the vendored api.txt files: every public,
+non-deprecated api.txt member the layer provides counts as available, members listed in
+`api/android-sdk/exclusions.txt` count as unavailable unless their comment contains `@hide`
+(hidden in the Android SDK) or `@platform` (the signature involves an Android/JVM-only type),
+in which case they are not counted at all. Regenerate the
+report before running the script when the module's API changed.
+
 ## Authentication and Analytics (no api.txt)
 
 These two Android libraries are closed source and have no module in
