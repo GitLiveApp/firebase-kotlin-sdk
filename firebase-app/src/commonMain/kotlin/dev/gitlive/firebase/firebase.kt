@@ -79,11 +79,6 @@ public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOpt
 /** Initializes and returns a FirebaseApp. */
 public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
 
-/** Returns options of default FirebaseApp */
-@Suppress("UnusedReceiverParameter")
-public val Firebase.options: FirebaseOptions
-    get() = Firebase.app.options
-
 /** Configurable Firebase options. */
 public data class FirebaseOptions(
     /** The Google App ID that is used to uniquely identify an instance of an app. */
