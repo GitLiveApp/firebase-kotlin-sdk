@@ -148,11 +148,17 @@ class FirebaseRemoteConfigTest {
         remoteConfig.settings {
             minimumFetchInterval = 1.minutes
         }
+        // A default stored under the same key as the remote value, so this also covers precedence:
+        // the fetched remote value has to win over the local default (#427).
+        remoteConfig.setDefaults("test_remote_string" to "Local default")
 
         remoteConfig.fetchAndActivate()
 
         val value: FirebaseRemoteConfigValue = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
+
+        // `all` has to apply the same precedence as `getValue` does.
+        assertEquals("Hello from remote!", remoteConfig.all["test_remote_string"]?.asString())
     }
 }

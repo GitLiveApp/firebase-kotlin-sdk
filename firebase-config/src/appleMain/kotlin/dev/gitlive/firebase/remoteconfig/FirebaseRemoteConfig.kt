@@ -35,14 +35,18 @@ public actual class FirebaseRemoteConfig internal constructor(internal val ios: 
     @Suppress("UNCHECKED_CAST")
     public actual val all: Map<String, FirebaseRemoteConfigValue>
         get() {
-            return listOf(
+            val keys = listOf(
                 FIRRemoteConfigSource.FIRRemoteConfigSourceStatic,
                 FIRRemoteConfigSource.FIRRemoteConfigSourceRemote,
                 FIRRemoteConfigSource.FIRRemoteConfigSourceDefault,
-            ).map { source ->
-                val keys = ios.allKeysFromSource(source) as List<String>
-                keys.map { it to FirebaseRemoteConfigValue(ios.configValueForKey(it, source)) }
-            }.flatten().toMap()
+            ).flatMapTo(mutableSetOf()) { source ->
+                ios.allKeysFromSource(source) as List<String>
+            }
+            // Resolve each key without pinning it to a source so that Firebase applies its own
+            // precedence (remote > default > static). Reading each source separately and merging
+            // the results let the last source listed win, which shadowed fetched remote values
+            // with the defaults.
+            return keys.associateWith { getValue(it) }
         }
 
     @OptIn(ExperimentalTime::class)
