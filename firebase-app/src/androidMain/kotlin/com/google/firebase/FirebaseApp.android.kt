@@ -89,7 +89,7 @@ public actual class FirebaseOptions private constructor() {
 
     public actual companion object {
         @JvmStatic
-        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, ReplaceWith("Firebase.fromResource(context)", "com.google.firebase.Firebase", "com.google.firebase.fromResource"), DeprecationLevel.ERROR)
         public actual fun fromResource(context: Any?): FirebaseOptions? = stub()
     }
 }

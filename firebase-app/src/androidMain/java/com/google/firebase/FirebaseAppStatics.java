@@ -18,4 +18,8 @@ final class FirebaseAppStatics {
     static List<FirebaseApp> getApps(Context context) {
         return FirebaseApp.getApps(context);
     }
+
+    static FirebaseOptions fromResource(Context context) {
+        return FirebaseOptions.fromResource(context);
+    }
 }

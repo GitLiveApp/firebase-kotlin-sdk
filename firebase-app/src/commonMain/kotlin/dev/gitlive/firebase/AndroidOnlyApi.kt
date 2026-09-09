@@ -22,8 +22,8 @@ internal const val APPLICATION_CONTEXT_ANDROID_ONLY =
     "getApplicationContext returns an android.content.Context and can only be called from Android code"
 
 internal const val FROM_RESOURCE_ANDROID_ONLY =
-    "fromResource reads Android resources through an android.content.Context and can only be called from Android code; " +
-        "use Firebase.initialize(context) from common code, which reads the platform's default configuration, or FirebaseOptions.Builder"
+    "fromResource takes an android.content.Context and can only be called from Android code; " +
+        "use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms)"
 
 internal const val TIMESTAMP_OF_DATE_ANDROID_ONLY =
     "the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(seconds, nanoseconds)"

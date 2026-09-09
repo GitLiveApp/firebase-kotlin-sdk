@@ -18,3 +18,6 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, n
 
 /** All initialized apps; the [context] is ignored. */
 public actual fun Firebase.getApps(context: Any?): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
+
+/** Always null: JS has no default configuration to read options from. */
+public actual fun Firebase.fromResource(context: Any?): FirebaseOptions? = null

@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
+import com.google.firebase.fromResource
 import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
@@ -60,6 +61,8 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app, Firebase.app)
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
         assertTrue(app in Firebase.getApps(context))
+        // Whether a default configuration exists depends on the test host; when it does its options must be usable.
+        Firebase.fromResource(context)?.let { assertTrue(it.applicationId.isNotBlank()) }
         assertEquals("fir-kotlin-sdk", app.options.projectId)
     }
 

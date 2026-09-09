@@ -118,7 +118,7 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
     }
 
     public actual companion object {
-        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-        public actual fun fromResource(context: Any?): FirebaseOptions? = throw UnsupportedOperationException(FROM_RESOURCE_ANDROID_ONLY)
+        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, ReplaceWith("Firebase.fromResource(context)", "com.google.firebase.Firebase", "com.google.firebase.fromResource"), DeprecationLevel.ERROR)
+        public actual fun fromResource(context: Any?): FirebaseOptions? = Firebase.fromResource(context)
     }
 }

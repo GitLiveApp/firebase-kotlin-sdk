@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import cocoapods.FirebaseCore.FIRApp
+import cocoapods.FirebaseCore.FIROptions
 
 /** Configures the default app from `GoogleService-Info.plist`; the [context] is ignored. */
 public actual fun Firebase.initialize(context: Any?): FirebaseApp? {
@@ -26,3 +27,6 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, n
 
 /** All initialized apps; the [context] is ignored. */
 public actual fun Firebase.getApps(context: Any?): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
+
+/** The options from `GoogleService-Info.plist`, or null when the bundle has none; the [context] is ignored. */
+public actual fun Firebase.fromResource(context: Any?): FirebaseOptions? = FIROptions.defaultOptions()?.let { FirebaseOptions(it) }

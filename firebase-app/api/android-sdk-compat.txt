@@ -26,7 +26,7 @@ com.google.firebase.FirebaseKt
 com.google.firebase.FirebaseNetworkException
   OK    FirebaseNetworkException(String)
 com.google.firebase.FirebaseOptions
-  MAP   static FirebaseOptions fromResource(Context)  [Context -> Object, deprecated: fromResource reads Android resources through an android.content.Context and can only be called from Android code; use Firebase.initialize(context) from common code, which reads the platform's default configuration, or FirebaseOptions.Builder]
+  MAP   static FirebaseOptions fromResource(Context)  [Context -> Object, deprecated: fromResource takes an android.content.Context and can only be called from Android code; use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms)]
   OK    String getApiKey()
   OK    String getApplicationId()
   OK    String getDatabaseUrl()
