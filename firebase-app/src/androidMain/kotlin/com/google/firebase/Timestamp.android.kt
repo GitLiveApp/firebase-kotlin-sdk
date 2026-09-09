@@ -15,7 +15,7 @@ import dev.gitlive.firebase.stub
  */
 
 public actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int) : Comparable<Timestamp> {
-    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, ReplaceWith("Timestamp.fromInstant(time)", "com.google.firebase.Timestamp", "com.google.firebase.fromInstant"), DeprecationLevel.ERROR)
+    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public actual constructor(time: Any) : this(0, 0)
 
     public actual val seconds: Long get() = stub()

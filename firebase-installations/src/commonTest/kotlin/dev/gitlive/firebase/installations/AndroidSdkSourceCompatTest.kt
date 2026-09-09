@@ -9,7 +9,6 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
-import com.google.firebase.fromInstant
 import com.google.firebase.fromResource
 import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
@@ -88,7 +87,7 @@ class AndroidSdkSourceCompatTest {
         assertTrue(timestamp < Timestamp(1_700_000_000, 501))
         assertTrue(timestamp < Timestamp.now())
         val instant = Instant.fromEpochSeconds(1_700_000_000, 500)
-        assertEquals(timestamp, Timestamp.fromInstant(instant))
+        assertEquals(timestamp, Timestamp(instant))
         assertEquals(instant, timestamp.toKotlinInstant())
         FirebaseApp.getInstance().setAutomaticResourceManagementEnabled(true)
     }

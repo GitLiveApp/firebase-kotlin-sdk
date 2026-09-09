@@ -27,7 +27,7 @@ internal const val FROM_RESOURCE_ANDROID_ONLY =
 
 internal const val TIMESTAMP_OF_DATE_ANDROID_ONLY =
     "the java.util.Date and java.time.Instant constructors are JVM-only; " +
-        "use Timestamp.fromInstant(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)"
+        "use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)"
 
 internal const val TO_DATE_ANDROID_ONLY =
     "toDate returns a java.util.Date, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds"

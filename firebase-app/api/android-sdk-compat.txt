@@ -47,8 +47,8 @@ com.google.firebase.FirebaseOptions.Builder
 com.google.firebase.FirebaseTooManyRequestsException
   OK    FirebaseTooManyRequestsException(String)
 com.google.firebase.Timestamp
-  MAP   Timestamp(Instant)  [Instant -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp.fromInstant(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
-  MAP   Timestamp(Date)  [Date -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp.fromInstant(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
+  MAP   Timestamp(Instant)  [Instant -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
+  MAP   Timestamp(Date)  [Date -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
   OK    Timestamp(long, int)
   OK    int compareTo(Timestamp)
   PLAT  int describeContents()

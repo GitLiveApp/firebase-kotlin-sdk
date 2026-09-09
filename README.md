@@ -68,7 +68,7 @@ Rules of thumb for this layer:
   `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`) are declared with an error-level
   deprecation instead: common code using them fails to compile with a message naming the replacement
   (`Firebase.initialize(context)`, `Firebase.getApps(context)`, `Firebase.fromResource(context)`,
-  `Timestamp.fromInstant(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`), while Android code
+  `Timestamp(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`), while Android code
   keeps binding to the real SDK member. The
   `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
   (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
@@ -85,7 +85,9 @@ Rules of thumb for this layer:
   is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one.
+`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+into a shared module, including the compiler-guided replacement of the Android-only members, see
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
 ### Initialization
 

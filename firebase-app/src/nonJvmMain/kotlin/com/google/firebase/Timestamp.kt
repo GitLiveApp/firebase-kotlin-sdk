@@ -23,7 +23,7 @@ public actual class Timestamp actual constructor(
         require(seconds in MIN_SECONDS..MAX_SECONDS) { "Timestamp seconds out of range: $seconds" }
     }
 
-    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, ReplaceWith("Timestamp.fromInstant(time)", "com.google.firebase.Timestamp", "com.google.firebase.fromInstant"), DeprecationLevel.ERROR)
+    @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public actual constructor(time: Any) : this(0, 0) {
         throw UnsupportedOperationException(TIMESTAMP_OF_DATE_ANDROID_ONLY)
     }

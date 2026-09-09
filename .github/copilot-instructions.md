@@ -137,7 +137,7 @@ The SDK has two public API layers per module:
    When the replacement is a static member that only needs its `Context` widened, it moves onto `Firebase` under the same
    name as a shipped top-level function (`Firebase.getApps(context)`, `Firebase.fromResource(context)`, next to
    `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
-   get a `kotlin.time` counterpart as shipped extensions (`Timestamp.fromInstant`, `Timestamp.toKotlinInstant` in
+   get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
    `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
