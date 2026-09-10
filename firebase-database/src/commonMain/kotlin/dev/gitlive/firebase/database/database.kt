@@ -362,6 +362,15 @@ public class DatabaseReference internal constructor(internal val nativeReference
             this.encodeDefaults = encodeDefaults
         }
     }
+
+    /**
+     * Sets the value at this location, suspending until the server has acknowledged the write.
+     *
+     * While the client is offline the SDK applies the value locally and queues it, so this call, like the other
+     * suspending writes, suspends until the connection is restored; wrap it in `withTimeout` to fail fast instead.
+     *
+     * @param value The value to write, encoded with [buildSettings]
+     */
     public suspend inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
         setValueEncoded(encode(value, buildSettings))
     }
