@@ -191,14 +191,16 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).await() }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = DataSnapshot(
-        jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
-            reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
-        }).await().snapshot,
-        database,
-    )
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = rethrow {
+        DataSnapshot(
+            jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+                reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
+            }).await().snapshot,
+            database,
+        )
+    }
 
-    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? {
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? = rethrow {
         val result = jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
             val mutableData = MutableData(js.key, currentData)
             when (val txResult = Transaction().update(mutableData)) {
@@ -206,7 +208,7 @@ internal actual class NativeDatabaseReference internal constructor(
                 Transaction.Result.Abort -> undefined
             }
         }).await()
-        return if (result.committed) DataSnapshot(result.snapshot, database) else null
+        if (result.committed) DataSnapshot(result.snapshot, database) else null
     }
 }
 
