@@ -111,6 +111,9 @@ class AndroidSdkSourceCompatTest {
         assertEquals(10, chained.fetchTimeoutInSeconds)
         assertEquals(20, chained.toBuilder().minimumFetchIntervalInSeconds)
         assertEquals(60, FirebaseRemoteConfigSettings.Builder().fetchTimeoutInSeconds)
+
+        // The iOS SDK keeps one instance per app name across app deletions, so the defaults are restored for the other tests.
+        remoteConfig.setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build()).await()
     }
 
     @Test

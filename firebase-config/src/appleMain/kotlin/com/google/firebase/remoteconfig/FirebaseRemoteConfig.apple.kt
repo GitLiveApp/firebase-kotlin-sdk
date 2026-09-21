@@ -73,8 +73,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
             },
         )
 
-    @Suppress("UNCHECKED_CAST")
-    public actual fun getKeysByPrefix(prefix: String): Set<String> = ios.keysWithPrefix(prefix) as Set<String>
+    /** The iOS SDK's `keysWithPrefix` only looks at the active config, so the defaults are included like the Android SDK does. */
+    public actual fun getKeysByPrefix(prefix: String): Set<String> = all.keys.filter { it.startsWith(prefix) }.toSet()
 
     public actual fun getLong(key: String): Long = getValue(key).asLong()
 
