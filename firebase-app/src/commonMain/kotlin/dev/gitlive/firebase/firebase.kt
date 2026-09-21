@@ -48,7 +48,6 @@ internal const val DELEGATES_TO_ANDROID_SDK_API =
  */
 public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.name"))
     public val name: String get() = compat.name
 
     /** Returns the specified [FirebaseOptions]. */

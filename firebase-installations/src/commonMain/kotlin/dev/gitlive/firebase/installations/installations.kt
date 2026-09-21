@@ -26,7 +26,6 @@ public val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(com.google.firebase.Firebase.compatInstallations)
 
 /** Returns the [FirebaseInstallations] instance of a given [FirebaseApp]. */
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.installations(app.compat)", "com.google.firebase.installations.installations"))
 public fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(com.google.firebase.Firebase.compatInstallations(app.compat))
 
 /**
@@ -46,7 +45,6 @@ public class FirebaseInstallations internal constructor(public val compat: Compa
      * Firebase Cloud Messaging, Firebase Remote Config, Firebase A/B Testing, or Firebase In-App
      * Messaging to not function properly.
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.delete().await()", "kotlinx.coroutines.tasks.await"))
     public suspend fun delete() {
         compat.delete().await()
     }
@@ -55,7 +53,6 @@ public class FirebaseInstallations internal constructor(public val compat: Compa
      * Returns a globally unique identifier of this Firebase app installation. This is a url-safe
      * base64 string of a 128-bit integer.
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.getId().await()", "kotlinx.coroutines.tasks.await"))
     public suspend fun getId(): String = compat.getId().await()
 
     /**
@@ -66,7 +63,6 @@ public class FirebaseInstallations internal constructor(public val compat: Compa
      *
      * @param forceRefresh Options to get an auth token either by force refreshing or not.
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.getToken(forceRefresh).await().token", "kotlinx.coroutines.tasks.await"))
     public suspend fun getToken(forceRefresh: Boolean): String = compat.getToken(forceRefresh).await().token
 }
 

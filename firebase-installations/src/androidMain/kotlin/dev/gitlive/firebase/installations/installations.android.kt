@@ -7,5 +7,4 @@ import com.google.firebase.installations.FirebaseInstallations as AndroidFirebas
 
 /** The underlying Firebase Android SDK object. */
 @Suppress("DEPRECATION")
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat"))
 public val FirebaseInstallations.android: AndroidFirebaseInstallations get() = compat
