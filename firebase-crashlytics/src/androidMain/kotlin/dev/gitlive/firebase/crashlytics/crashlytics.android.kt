@@ -10,4 +10,6 @@ package dev.gitlive.firebase.crashlytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics as AndroidFirebaseCrashlytics
 
 /** The underlying Firebase Android SDK object. */
+@Suppress("DEPRECATION")
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat"))
 public val FirebaseCrashlytics.android: AndroidFirebaseCrashlytics get() = compat

@@ -4,6 +4,7 @@
 
 @file:JvmName("CrashlyticsKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.crashlytics
 
@@ -22,6 +23,11 @@ import com.google.firebase.crashlytics.crashlytics as compatCrashlytics
 // which is a real static method on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseCrashlytics] instance of the default [FirebaseApp]. */
+/** Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer. */
+internal const val DELEGATES_TO_ANDROID_SDK_API =
+    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
+
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.crashlytics", "com.google.firebase.crashlytics.crashlytics"))
 public val Firebase.crashlytics: FirebaseCrashlytics
     get() = FirebaseCrashlytics(CompatFirebase.compatCrashlytics)
 
@@ -30,6 +36,7 @@ public val Firebase.crashlytics: FirebaseCrashlytics
  * every platform, so this is the same instance as [Firebase.crashlytics].
  */
 @Suppress("UNUSED_PARAMETER")
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.crashlytics", "com.google.firebase.crashlytics.crashlytics"))
 public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashlytics
 
 /**
@@ -43,6 +50,7 @@ public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashly
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.crashlytics.FirebaseCrashlytics] this wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.crashlytics.FirebaseCrashlytics"))
 public class FirebaseCrashlytics internal constructor(public val compat: CompatFirebaseCrashlytics) {
 
     /**
@@ -50,6 +58,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.recordException(exception)"))
     public fun recordException(exception: Throwable) {
         compat.recordException(exception)
     }
@@ -67,6 +76,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      * @param customKeys A dictionary of keys and the values to associate with the non fatal
      *                      exception, in addition to the app level custom keys.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.recordException(exception, customKeys)", "dev.gitlive.firebase.crashlytics.recordException"))
     public fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
         compat.recordException(exception, customKeys.toCustomKeysAndValues())
     }
@@ -82,6 +92,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * @param message the message to be logged
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.log(message)"))
     public fun log(message: String) {
         compat.log(message)
     }
@@ -96,6 +107,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * @param userId a unique identifier for the current user
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setUserId(userId)"))
     public fun setUserId(userId: String) {
         compat.setUserId(userId)
     }
@@ -118,31 +130,37 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: String) {
         compat.setCustomKey(key, value)
     }
 
     /** See [setCustomKey]. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: Boolean) {
         compat.setCustomKey(key, value)
     }
 
     /** See [setCustomKey]. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: Double) {
         compat.setCustomKey(key, value)
     }
 
     /** See [setCustomKey]. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: Float) {
         compat.setCustomKey(key, value)
     }
 
     /** See [setCustomKey]. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: Int) {
         compat.setCustomKey(key, value)
     }
 
     /** See [setCustomKey]. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKey(key, value)"))
     public fun setCustomKey(key: String, value: Long) {
         compat.setCustomKey(key, value)
     }
@@ -167,6 +185,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * @param customKeys A dictionary of keys and the values to associate with each key
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCustomKeys(customKeys)", "dev.gitlive.firebase.crashlytics.setCustomKeys"))
     public fun setCustomKeys(customKeys: Map<String, Any>) {
         compat.setCustomKeys(customKeys.toCustomKeysAndValues())
     }
@@ -187,6 +206,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *     for all app runs, add the `firebase_crashlytics_collection_enabled` flag to your
      *     app's AndroidManifest.xml.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.setCrashlyticsCollectionEnabled(enabled)"))
     public fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
         compat.setCrashlyticsCollectionEnabled(enabled)
     }
@@ -196,12 +216,14 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * @return true if a crash was recorded during the previous run of the app.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.didCrashOnPreviousExecution()"))
     public fun didCrashOnPreviousExecution(): Boolean = compat.didCrashOnPreviousExecution()
 
     /**
      * If automatic data collection is disabled, this method queues up all the reports on a device to
      * send to Crashlytics. Otherwise, this method is a no-op.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.sendUnsentReports()"))
     public fun sendUnsentReports() {
         compat.sendUnsentReports()
     }
@@ -210,6 +232,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      * If automatic data collection is disabled, this method queues up all the reports on a device for
      * deletion. Otherwise, this method is a no-op.
      */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.deleteUnsentReports()"))
     public fun deleteUnsentReports() {
         compat.deleteUnsentReports()
     }
@@ -225,6 +248,19 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
  * Exception that gets thrown when an operation on Firebase Crashlytics fails.
  */
 public open class FirebaseCrashlyticsException(message: String) : FirebaseException(message)
+
+/** Records a non-fatal report with [customKeys] attached to the event; see [CompatFirebaseCrashlytics.recordException]. */
+public fun CompatFirebaseCrashlytics.recordException(throwable: Throwable, customKeys: Map<String, Any>) {
+    recordException(throwable, customKeys.toCustomKeysAndValues())
+}
+
+/**
+ * Sets [customKeys] (`String`, `Boolean`, `Double`, `Float`, `Int` or `Long` values) that are attached to subsequent
+ * reports; see [CompatFirebaseCrashlytics.setCustomKeys].
+ */
+public fun CompatFirebaseCrashlytics.setCustomKeys(customKeys: Map<String, Any>) {
+    setCustomKeys(customKeys.toCustomKeysAndValues())
+}
 
 /** Values of other types are ignored, as before the compatibility layer. */
 private fun Map<String, Any>.toCustomKeysAndValues(): CustomKeysAndValues = CustomKeysAndValues.Builder().apply {
