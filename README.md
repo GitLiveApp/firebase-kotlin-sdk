@@ -36,59 +36,6 @@ The Firebase Kotlin SDK provides a common API to access Firebase for projects ta
 
 It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target. The library requires [additional initialization](https://github.com/GitLiveApp/firebase-java-sdk?tab=readme-ov-file#initializing-the-sdk) compared to the official Firebase SDKs.
 
-### Using the Firebase Android SDK API from common code
-
-Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
-`com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
-(including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
-in common code targeting Android, iOS, JVM and JS:
-
-```kotlin
-import com.google.firebase.installations.FirebaseInstallations
-import kotlinx.coroutines.tasks.await
-
-FirebaseInstallations.getInstance().getId()
-    .addOnSuccessListener { id -> println("Installation id: $id") }
-    .addOnFailureListener { e -> println("Failed: ${e.message}") }
-
-val token = FirebaseInstallations.getInstance().getToken(false).await().token
-```
-
-Rules of thumb for this layer:
-- It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
-  API is built on top of it and remains the recommended way to write new multiplatform code.
-- On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
-  `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
-  depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
-  against, so your Android code binds to the real classes exactly as before. Other libraries depending on Firebase, the
-  Firebase Gradle plugins and Play Services all keep working.
-- An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
-  can be adapted rather than failing at runtime. Members whose signature involves an Android/JVM-only type but which do
-  have a multiplatform replacement (`FirebaseApp.initializeApp(Context)`, `getApps`, `getApplicationContext`,
-  `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`) are declared with an error-level
-  deprecation instead: common code using them fails to compile with a message naming the replacement
-  (`Firebase.initialize(context)`, `Firebase.getApps(context)`, `Firebase.fromResource(context)`,
-  `Timestamp(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`), while Android code
-  keeps binding to the real SDK member. The
-  `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
-  (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
-  given an `Any?` overload, so such a member moves onto `Firebase` under the same name: `FirebaseApp.getApps(Context)`
-  becomes `Firebase.getApps(context)` and `FirebaseOptions.fromResource(Context)` becomes `Firebase.fromResource(context)`. APIs that exist on Android, JVM and Apple but not on JS live in a `nonJsMain` source set, so Android + iOS
-  projects keep full source compatibility by declaring the same intermediate source set.
-- Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
-  Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`); its percentage is the module's API coverage
-  badge above. The deprecated-with-an-error members above count as provided. Members that are `@hide` in the Android SDK,
-  or whose signature involves an Android/JVM-only type with no replacement to point at (`Parcelable`), are not counted;
-  anything else that is not mirrored counts against it.
-- `kotlinx.coroutines.tasks.await` from `kotlinx-coroutines-play-services` is mirrored the same way, so the usual
-  `Task.await()` import works from common code; `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper
-  is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
-
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
-into a shared module, including the compiler-guided replacement of the Android-only members, see
-[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
-
 ### Initialization
 
 `Firebase.initialize` is the one entry point for every platform, but what it does, and whether you need to call it
@@ -157,6 +104,31 @@ initializeFirebase(Application())
 
 Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)`: the same
 three overloads exist there with the context typed as `Any?`, following the rules above per platform.
+
+
+
+### Using the Firebase Android SDK API from common code
+
+Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
+`com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
+(including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
+in common code targeting Android, iOS, JVM and JS:
+
+```kotlin
+import com.google.firebase.installations.FirebaseInstallations
+import kotlinx.coroutines.tasks.await
+
+FirebaseInstallations.getInstance().getId()
+    .addOnSuccessListener { id -> println("Installation id: $id") }
+    .addOnFailureListener { e -> println("Failed: ${e.message}") }
+
+val token = FirebaseInstallations.getInstance().getToken(false).await().token
+```
+
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
+`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+into a shared module, including the compiler-guided replacement of the Android-only members, see
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
 ### Accessing the underlying Firebase SDK
 
