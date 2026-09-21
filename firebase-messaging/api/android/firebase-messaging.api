@@ -1,8 +1,23 @@
+public final class com/google/firebase/messaging/MessagingNonJsKt {
+	public static final fun isAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;)Z
+	public static final fun setAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;Z)V
+	public static final fun subscribeToTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
+	public static final fun unsubscribeFromTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
+}
+
+public final class com/google/firebase/messaging/RemoteMessageUriKt {
+	public static final fun getImageUrl (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
+	public static final fun getLink (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
+}
+
 public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
-	public fun <init> (Lcom/google/firebase/messaging/FirebaseMessaging;)V
 	public final fun deleteToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/messaging/FirebaseMessaging;
 	public final fun getToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
 	public final fun subscribeToTopic (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 	public final fun unsubscribeFromTopic (Ljava/lang/String;)V
 }
 
