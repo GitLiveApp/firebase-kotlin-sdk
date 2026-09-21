@@ -29,7 +29,7 @@ The following libraries are available for the various Firebase products.
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/2.7.0/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
 | [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/2.7.0/pom)               | [![49%](https://img.shields.io/badge/-49%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
 | [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/2.7.0/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.7.0/pom)     | [![88%](https://img.shields.io/badge/-88%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.7.0/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -97,8 +97,8 @@ Rules of thumb for this layer:
   `Task.await()` import works from common code; `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper
   is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations` and `firebase-crashlytics`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
