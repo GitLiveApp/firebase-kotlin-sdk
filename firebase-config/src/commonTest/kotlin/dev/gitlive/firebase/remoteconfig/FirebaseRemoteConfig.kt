@@ -23,6 +23,7 @@ expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
+@IgnoreForJvm
 class FirebaseRemoteConfigTest {
     private val defaults = arrayOf(
         "test_default_boolean" to true,
