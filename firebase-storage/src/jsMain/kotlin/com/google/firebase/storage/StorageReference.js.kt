@@ -35,7 +35,10 @@ public actual class StorageReference internal constructor(public val js: JsStora
     public actual val bucket: String get() = js.bucket
     public actual val name: String get() = js.name
     public actual val parent: StorageReference? get() = js.parent?.let { StorageReference(it) }
-    public actual val path: String get() = js.fullPath
+
+    /** With a leading slash, as the Android SDK's `getPath()`. */
+    public actual val path: String get() = "/" + js.fullPath
+
     public actual val root: StorageReference get() = StorageReference(js.root)
     public actual val storage: FirebaseStorage get() = FirebaseStorage(js.storage)
 

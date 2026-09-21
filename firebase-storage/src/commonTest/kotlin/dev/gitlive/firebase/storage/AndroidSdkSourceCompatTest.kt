@@ -68,7 +68,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app.compat, storage.app)
         assertEquals(30_000, storage.maxUploadRetryTimeMillis)
         assertEquals(30_000, storage.maxOperationRetryTimeMillis)
-        assertEquals(storage.reference, storage.getReference("").root)
+        assertEquals(storage.reference, storage.getReference("test").root)
         assertEquals("test", storage.getReference("test/compat.txt").parent?.name)
         assertEquals(storage, dev.gitlive.firebase.Firebase.storage(app).compat)
     }
@@ -155,7 +155,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals(1, secondPage.items.size)
         assertTrue(firstPage.items.first() != secondPage.items.first())
         assertEquals("compatList", folder.name)
-        assertEquals("test/compatList", folder.path)
+        assertEquals("/test/compatList", folder.path)
         assertEquals(storage.reference.bucket, folder.bucket)
     }
 

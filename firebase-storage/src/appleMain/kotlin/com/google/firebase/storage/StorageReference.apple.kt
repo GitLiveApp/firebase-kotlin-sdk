@@ -32,7 +32,10 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     public actual val bucket: String get() = ios.bucket()
     public actual val name: String get() = ios.name()
     public actual val parent: StorageReference? get() = ios.parent()?.let { StorageReference(it) }
-    public actual val path: String get() = ios.fullPath()
+
+    /** With a leading slash, as the Android SDK's `getPath()`. */
+    public actual val path: String get() = "/" + ios.fullPath()
+
     public actual val root: StorageReference get() = StorageReference(ios.root())
     public actual val storage: FirebaseStorage get() = FirebaseStorage(ios.storage())
 
