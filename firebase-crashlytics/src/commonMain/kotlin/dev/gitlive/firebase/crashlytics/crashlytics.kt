@@ -4,7 +4,6 @@
 
 @file:JvmName("CrashlyticsKt")
 @file:JvmMultifileClass
-@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.crashlytics
 
@@ -23,11 +22,6 @@ import com.google.firebase.crashlytics.crashlytics as compatCrashlytics
 // which is a real static method on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseCrashlytics] instance of the default [FirebaseApp]. */
-/** Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer. */
-internal const val DELEGATES_TO_ANDROID_SDK_API =
-    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
-
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.crashlytics", "com.google.firebase.crashlytics.crashlytics"))
 public val Firebase.crashlytics: FirebaseCrashlytics
     get() = FirebaseCrashlytics(CompatFirebase.compatCrashlytics)
 
@@ -36,7 +30,6 @@ public val Firebase.crashlytics: FirebaseCrashlytics
  * every platform, so this is the same instance as [Firebase.crashlytics].
  */
 @Suppress("UNUSED_PARAMETER")
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.crashlytics", "com.google.firebase.crashlytics.crashlytics"))
 public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashlytics
 
 /**
@@ -50,7 +43,6 @@ public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashly
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.crashlytics.FirebaseCrashlytics] this wraps.
  */
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.crashlytics.FirebaseCrashlytics"))
 public class FirebaseCrashlytics internal constructor(public val compat: CompatFirebaseCrashlytics) {
 
     /**
