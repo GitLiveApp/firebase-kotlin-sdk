@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**.
+This is a **multiplatform SDK for Firebase** that makes the Firebase Android SDK API (`com.google.firebase.*`) available from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**, by binding to the official Firebase platform SDKs, plus Kotlin-first extensions (`dev.gitlive.firebase.*`: suspend functions, `Flow`s, kotlinx.serialization) on top of it.
 
 All modules are published under the `dev.gitlive` group ID (e.g. `dev.gitlive:firebase-firestore`).
 
@@ -149,9 +149,10 @@ The SDK has two public API layers per module:
      unavailable unless the comment says `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an
      Android/JVM-only type with no replacement, such as `Parcel`), which drops them from the count; a single overload
      is selected with `Class#member(Type, Type)`.
-2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
-   `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — Kotlin-first extensions of the `com.google.firebase` classes
+   (suspend functions instead of `Task`, `Flow` instead of listeners, kotlinx.serialization), implemented in `commonMain`
+   *on top of* that layer, which is the primary API. In a module not yet migrated it is the existing wrapper API. New
+   modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
 
 A `dev.gitlive` entry point or class that only delegates to its `com.google.firebase` counterpart (at most with `.await()`)
 adds no value and is deprecated with `DELEGATES_TO_ANDROID_SDK_API` and a `ReplaceWith` naming the counterpart, spelled

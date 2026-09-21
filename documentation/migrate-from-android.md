@@ -13,7 +13,7 @@ and the Firebase JS SDK.
 
 > This guide covers the `com.google.firebase` API only, and the modules migrated so far: `firebase-app` (`FirebaseApp`,
 > `FirebaseOptions`, `Timestamp`, the exceptions, `Task` and `Task.await()`) and `firebase-installations`. The Kotlin-first
-> `dev.gitlive.firebase` API, which the SDK also provides, is described in the [README](../README.md#kotlin-first-design).
+> extensions the SDK adds on top of it are described in the [README](../README.md#kotlin-first-design).
 
 ## Checklist for a migration
 
@@ -257,9 +257,10 @@ Run the shared module's tests on the other targets to confirm the migrated code 
 
 ## What's next
 
-- New multiplatform code can use the Kotlin-first `dev.gitlive.firebase` API (suspend functions instead of `Task`,
-  `Flow` instead of listeners), which is built on the same `com.google.firebase` layer; a `dev.gitlive` object exposes
-  its `com.google` counterpart as `compat`. See [Kotlin-first design](../README.md#kotlin-first-design).
+- New multiplatform code is written against the `com.google.firebase` API, plus the Kotlin-first extensions the
+  `dev.gitlive.firebase` packages add to its classes (suspend functions instead of `Task`, `Flow` instead of listeners,
+  kotlinx.serialization). The earlier `dev.gitlive` wrappers of a migrated module are deprecated with a `ReplaceWith`
+  naming the `com.google.firebase` counterpart. See [Kotlin-first design](../README.md#kotlin-first-design).
 - The other Firebase modules are being migrated to the same structure one at a time. Until a module is, its Android
   SDK API is not available in common code and its `dev.gitlive` API is the multiplatform entry point.
 - [Using the Firebase Android SDK API from common code](../README.md#using-the-firebase-android-sdk-api-from-common-code)

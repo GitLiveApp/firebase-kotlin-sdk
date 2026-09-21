@@ -4,11 +4,14 @@
   <i>Development teams merge faster with GitLive</i><br/>
 <br/>
 <br/>
-The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the 
-<a href="https://firebase.google.com/docs/reference/kotlin/packages">Firebase Android SDK Kotlin Extensions</a> 
-but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting 
-<strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
-Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
+The Firebase Kotlin SDK brings the <a href="https://firebase.google.com/docs/reference/kotlin/packages">Firebase Android SDK API</a>
+to Kotlin Multiplatform: the same <code>com.google.firebase</code> packages are available from your common source targeting
+<strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, so code written against the
+Android SDK compiles unchanged, enabling the use of Firebase as a backend for
+<a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example. Kotlin-first extensions
+(suspend functions, <code>Flow</code>s, kotlinx.serialization) in the <code>dev.gitlive.firebase</code> packages build on it.
+The modules are moving to this shape one by one; until a module has, it offers the earlier <code>dev.gitlive.firebase</code>
+API, similar to the Firebase Android SDK Kotlin Extensions.
 
 ## Available libraries
 
@@ -38,10 +41,10 @@ It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase J
 
 ### Using the Firebase Android SDK API from common code
 
-Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
-`com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
-(including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
-in common code targeting Android, iOS, JVM and JS:
+The SDK ships the Firebase Android SDK API itself under its original `com.google.firebase` packages, as `expect` declarations
+implemented on every platform. Code written against the Android SDK (including `com.google.android.gms.tasks.Task` and its
+listeners) therefore compiles unchanged, without even changing imports, in common code targeting Android, iOS, JVM and JS. For
+the migrated modules this is the primary API; the `dev.gitlive.firebase` packages add Kotlin-first extensions on top of it:
 
 ```kotlin
 import com.google.firebase.installations.FirebaseInstallations
@@ -55,12 +58,15 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
 Rules of thumb for this layer:
-- It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
-  API is built on top of it. Its entry points and classes that only delegate to this layer (`Firebase.initialize`,
+- It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders), and it is the API to
+  write new multiplatform code against, together with the `dev.gitlive.firebase` extensions of its classes (suspend
+  functions, `Flow`s, kotlinx.serialization) where they add something. Where a `com.google.firebase` member is unusable
+  from common code, the layer itself provides the multiplatform form: `FirebaseOptions(applicationId = ..., apiKey = ...)`
+  instead of the `Builder`, `deleteApp()` instead of `delete()`, `Timestamp(instant)` instead of `Timestamp(Date)`.
+- The earlier `dev.gitlive.firebase` wrappers of a migrated module that only delegate to this layer (`Firebase.initialize`,
   `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data class, the `FirebaseApp` and
   `FirebaseInstallations` wrappers, `Firebase.installations`) are deprecated with a `ReplaceWith` naming the counterpart;
-  members reached through a wrapper instance are not, since `app.compat.name` is no improvement on `app.name`. What remains (suspend functions, `Flow`s, serialization, default arguments instead of
-  builders) is the recommended way to write new multiplatform code.
+  members reached through a wrapper instance are not, since `app.compat.name` is no improvement on `app.name`.
 - On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
   `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
   depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
@@ -197,7 +203,9 @@ cocoapods {
 
 ## Kotlin-first design
 
-Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get the full power of Kotlin including coroutines and serialization!
+The `dev.gitlive.firebase` packages complement the Android SDK API with the full power of Kotlin, including coroutines and
+serialization. In a migrated module they are extensions of the `com.google.firebase` classes; in the other modules they are
+the `dev.gitlive` API described here, until the module is migrated.
 
 <h3><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h3>
 
