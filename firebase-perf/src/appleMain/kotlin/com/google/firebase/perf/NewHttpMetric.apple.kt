@@ -5,15 +5,6 @@
 package com.google.firebase.perf
 
 import cocoapods.FirebasePerformance.FIRHTTPMethod
-import cocoapods.FirebasePerformance.FIRHTTPMethodCONNECT
-import cocoapods.FirebasePerformance.FIRHTTPMethodDELETE
-import cocoapods.FirebasePerformance.FIRHTTPMethodGET
-import cocoapods.FirebasePerformance.FIRHTTPMethodHEAD
-import cocoapods.FirebasePerformance.FIRHTTPMethodOPTIONS
-import cocoapods.FirebasePerformance.FIRHTTPMethodPATCH
-import cocoapods.FirebasePerformance.FIRHTTPMethodPOST
-import cocoapods.FirebasePerformance.FIRHTTPMethodPUT
-import cocoapods.FirebasePerformance.FIRHTTPMethodTRACE
 import cocoapods.FirebasePerformance.FIRHTTPMetric
 import com.google.firebase.perf.metrics.HttpMetric
 import platform.Foundation.NSURL
@@ -24,14 +15,14 @@ public actual fun FirebasePerformance.newHttpMetric(url: String, httpMethod: Str
 }
 
 private fun String.toFIRHTTPMethod(): FIRHTTPMethod = when (this) {
-    FirebasePerformance.HttpMethod.GET -> FIRHTTPMethodGET
-    FirebasePerformance.HttpMethod.PUT -> FIRHTTPMethodPUT
-    FirebasePerformance.HttpMethod.POST -> FIRHTTPMethodPOST
-    FirebasePerformance.HttpMethod.DELETE -> FIRHTTPMethodDELETE
-    FirebasePerformance.HttpMethod.HEAD -> FIRHTTPMethodHEAD
-    FirebasePerformance.HttpMethod.PATCH -> FIRHTTPMethodPATCH
-    FirebasePerformance.HttpMethod.OPTIONS -> FIRHTTPMethodOPTIONS
-    FirebasePerformance.HttpMethod.TRACE -> FIRHTTPMethodTRACE
-    FirebasePerformance.HttpMethod.CONNECT -> FIRHTTPMethodCONNECT
+    FirebasePerformance.HttpMethod.GET -> FIRHTTPMethod.FIRHTTPMethodGET
+    FirebasePerformance.HttpMethod.PUT -> FIRHTTPMethod.FIRHTTPMethodPUT
+    FirebasePerformance.HttpMethod.POST -> FIRHTTPMethod.FIRHTTPMethodPOST
+    FirebasePerformance.HttpMethod.DELETE -> FIRHTTPMethod.FIRHTTPMethodDELETE
+    FirebasePerformance.HttpMethod.HEAD -> FIRHTTPMethod.FIRHTTPMethodHEAD
+    FirebasePerformance.HttpMethod.PATCH -> FIRHTTPMethod.FIRHTTPMethodPATCH
+    FirebasePerformance.HttpMethod.OPTIONS -> FIRHTTPMethod.FIRHTTPMethodOPTIONS
+    FirebasePerformance.HttpMethod.TRACE -> FIRHTTPMethod.FIRHTTPMethodTRACE
+    FirebasePerformance.HttpMethod.CONNECT -> FIRHTTPMethod.FIRHTTPMethodCONNECT
     else -> throw IllegalArgumentException("Unsupported HTTP method: $this")
 }
