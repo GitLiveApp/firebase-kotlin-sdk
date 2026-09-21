@@ -1,4 +1,5 @@
 public final class com/google/firebase/FirebaseInitializeKt {
+	public static final fun deleteApp (Lcom/google/firebase/FirebaseApp;)Lcom/google/android/gms/tasks/Task;
 	public static final fun fromResource (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseOptions;
 	public static synthetic fun fromResource$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Lcom/google/firebase/FirebaseOptions;
 	public static final fun getApps (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;

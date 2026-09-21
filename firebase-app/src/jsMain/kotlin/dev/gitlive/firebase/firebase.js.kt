@@ -4,8 +4,6 @@
 
 package dev.gitlive.firebase
 
-import dev.gitlive.firebase.externals.deleteApp
-import kotlinx.coroutines.await
 import com.google.firebase.Firebase as CompatFirebase
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
@@ -20,10 +18,6 @@ public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFireb
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat()))
 
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat(), name))
-
-internal actual suspend fun CompatFirebaseApp.deleteAwaiting() {
-    deleteApp(js).await()
-}
 
 internal actual fun FirebaseOptions.toCompat(): CompatFirebaseOptions = toCompatBuilder().setAuthDomain(authDomain).build()
 

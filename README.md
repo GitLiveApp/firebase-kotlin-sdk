@@ -69,11 +69,12 @@ Rules of thumb for this layer:
 - An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
   can be adapted rather than failing at runtime. Members whose signature involves an Android/JVM-only type but which do
   have a multiplatform replacement (`FirebaseApp.initializeApp(Context)`, `getApps`, `getApplicationContext`,
-  `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`) are declared with an error-level
-  deprecation instead: common code using them fails to compile with a message naming the replacement
+  `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`), or that behave differently elsewhere
+  (`FirebaseApp.delete()` returns before the asynchronous deletion of the Apple and JS SDKs completes), are declared with
+  an error-level deprecation instead: common code using them fails to compile with a message naming the replacement
   (`Firebase.initialize(context)`, `Firebase.getApps(context)`, `Firebase.fromResource(context)`,
-  `Timestamp(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`), while Android code
-  keeps binding to the real SDK member. The
+  `Timestamp(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`, `deleteApp()` returning a
+  `Task`), while Android code keeps binding to the real SDK member. The
   `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
   (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
   given an `Any?` overload, so such a member moves onto `Firebase` under the same name: `FirebaseApp.getApps(Context)`

@@ -25,6 +25,10 @@ internal const val FROM_RESOURCE_ANDROID_ONLY =
     "fromResource takes an android.content.Context and can only be called from Android code; " +
         "use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms)"
 
+internal const val DELETE_ANDROID_ONLY =
+    "delete returns before the app is deleted on Apple platforms and JS, where deletion is asynchronous; " +
+        "use deleteApp() from common code, which returns a Task that completes once the app is deleted"
+
 internal const val TIMESTAMP_OF_DATE_ANDROID_ONLY =
     "the java.util.Date and java.time.Instant constructors are JVM-only; " +
         "use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)"

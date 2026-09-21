@@ -22,11 +22,12 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
 
 1. **Android types in your own signatures.** `android.content.Context`, `java.util.Date` or `java.time.Instant` in a
    class you are moving must become common types: the SDK takes the context as `Any?` and time as `kotlin.time.Instant`.
-2. **Members that take or return an Android type.** `FirebaseApp.initializeApp(Context)`, `getApps(Context)`,
-   `getApplicationContext()`, `FirebaseOptions.fromResource(Context)`, `Timestamp(Date)`, `Timestamp(Instant)`,
-   `toDate()` and `toInstant()` exist in common code but are deprecated with an error whose message names the
-   replacement, and where the replacement is a drop-in expression the IDE quick-fix applies it. Android code in
-   `androidMain` keeps calling them as before.
+2. **Members that take or return an Android type, or behave differently elsewhere.** `FirebaseApp.initializeApp(Context)`,
+   `getApps(Context)`, `getApplicationContext()`, `FirebaseOptions.fromResource(Context)`, `Timestamp(Date)`,
+   `Timestamp(Instant)`, `toDate()` and `toInstant()` exist in common code but are deprecated with an error whose
+   message names the replacement, and where the replacement is a drop-in expression the IDE quick-fix applies it. So is
+   `FirebaseApp.delete()`, which returns before the deletion completes on Apple platforms and JS: common code uses
+   `deleteApp()`, which returns a `Task`. Android code in `androidMain` keeps calling them as before.
 3. **`Parcelable`.** `Timestamp` is `Parcelable` on Android only. Passing it through an `Intent` or `Bundle` stays in
    `androidMain`; a `@Parcelize` class of your own that holds a `Timestamp` field keeps working in common code, because
    the Parcelize plugin only runs in the Android compilation.

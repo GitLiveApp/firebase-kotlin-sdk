@@ -23,8 +23,6 @@ public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): 
 
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.initialize(context as Context, options.toCompat(), name))
 
-internal actual suspend fun CompatFirebaseApp.deleteAwaiting(): Unit = delete()
-
 internal actual fun FirebaseOptions.toCompat(): CompatFirebaseOptions = toCompatBuilder().build()
 
 internal actual fun CompatFirebaseOptions.toPublic(): FirebaseOptions = toPublic(authDomain = null)

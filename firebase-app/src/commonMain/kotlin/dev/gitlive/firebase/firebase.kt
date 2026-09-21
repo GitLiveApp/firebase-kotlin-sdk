@@ -11,7 +11,9 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 import com.google.firebase.app
+import com.google.firebase.deleteApp
 import com.google.firebase.getApps
+import kotlinx.coroutines.tasks.await
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
@@ -59,7 +61,9 @@ public class FirebaseApp internal constructor(public val compat: CompatFirebaseA
      *
      * A no-op if delete was called before.
      */
-    public suspend fun delete(): Unit = compat.deleteAwaiting()
+    public suspend fun delete() {
+        compat.deleteApp().await()
+    }
 
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.compat == compat
 
@@ -144,9 +148,6 @@ public typealias FirebaseTooManyRequestsException = com.google.firebase.Firebase
  * Exception that gets thrown when an operation on Firebase fails.
  */
 public typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
-
-/** Deletes the app, waiting for the platform SDK to finish where it reports completion asynchronously. */
-internal expect suspend fun CompatFirebaseApp.deleteAwaiting()
 
 /** Converts to the Android-SDK-shaped options (platform specific because JS also carries [FirebaseOptions.authDomain]). */
 internal expect fun FirebaseOptions.toCompat(): CompatFirebaseOptions

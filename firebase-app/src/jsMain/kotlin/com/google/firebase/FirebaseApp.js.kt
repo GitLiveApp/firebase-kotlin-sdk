@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.DELETE_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
 import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
@@ -41,6 +42,7 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
 
     public actual val options: FirebaseOptions get() = FirebaseOptions(js.options)
 
+    @Deprecated(DELETE_ANDROID_ONLY, ReplaceWith("deleteApp()", "com.google.firebase.deleteApp"), DeprecationLevel.ERROR)
     public actual fun delete() {
         jsDeleteApp(js)
     }

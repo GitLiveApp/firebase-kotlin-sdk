@@ -4,6 +4,8 @@
 
 package com.google.firebase
 
+import com.google.android.gms.tasks.Task
+
 /**
  * Initializes the default [FirebaseApp], mirroring `Firebase.initialize(Context)` from the Firebase Android SDK with
  * the `Context` widened to `Any?` so that common code can pass the platform context through.
@@ -36,3 +38,10 @@ public expect fun Firebase.getApps(context: Any? = null): List<FirebaseApp>
  * returns null, as Android does when the resources are missing.
  */
 public expect fun Firebase.fromResource(context: Any? = null): FirebaseOptions?
+
+/**
+ * Deletes this app and frees its resources, completing once it is deleted; the multiplatform form of the Android
+ * SDK's `FirebaseApp.delete()`, which returns before the asynchronous deletion of the Apple and JS SDKs completes.
+ * A no-op that completes immediately if the app was already deleted.
+ */
+public expect fun FirebaseApp.deleteApp(): Task<Nothing?>

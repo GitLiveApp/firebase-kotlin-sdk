@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
+import com.google.firebase.deleteApp
 import com.google.firebase.fromResource
 import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
@@ -68,13 +69,14 @@ class AndroidSdkSourceCompatTest {
     }
 
     @Test
-    fun testInitializeNamedApp() {
+    fun testInitializeNamedApp() = runTest {
         val options = FirebaseOptions.Builder(FirebaseApp.getInstance().options).build()
         val app = Firebase.initialize(context, options, "compat")
         assertEquals("compat", app.name)
         assertEquals(app, FirebaseApp.getInstance("compat"))
         assertEquals(options.projectId, app.options.projectId)
-        app.delete()
+        app.deleteApp().await()
+        assertTrue(Firebase.getApps(context).none { it.name == "compat" })
     }
 
     @Test
