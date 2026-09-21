@@ -4,7 +4,6 @@
 
 @file:JvmName("AndroidFunctions")
 @file:JvmMultifileClass
-@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.functions
 
