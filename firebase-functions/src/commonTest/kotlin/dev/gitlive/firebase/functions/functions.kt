@@ -27,6 +27,7 @@ expect fun detailValue(details: Any?, key: String): Any?
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
+@Suppress("DEPRECATION") // exercises the deprecated delegating members
 class FirebaseFunctionsTest {
 
     data class ExpectedFunctionError(
