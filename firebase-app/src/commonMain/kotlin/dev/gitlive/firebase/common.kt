@@ -13,7 +13,6 @@ import kotlin.jvm.JvmName
 import com.google.firebase.options as compatOptions
 
 /** Returns options of default FirebaseApp */
-@Suppress("UnusedReceiverParameter", "DEPRECATION")
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.options", "com.google.firebase.options"))
+@Suppress("UnusedReceiverParameter")
 public val Firebase.options: FirebaseOptions
     get() = com.google.firebase.Firebase.compatOptions.toPublic()

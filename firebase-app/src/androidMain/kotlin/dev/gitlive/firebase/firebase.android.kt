@@ -4,7 +4,6 @@
 
 @file:JvmName("FirebaseKt")
 @file:JvmMultifileClass
-@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase
 
