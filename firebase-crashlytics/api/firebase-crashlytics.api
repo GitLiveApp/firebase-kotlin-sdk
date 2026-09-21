@@ -7,6 +7,9 @@ public final class dev/gitlive/firebase/crashlytics/CrashlyticsKt {
 public final class dev/gitlive/firebase/crashlytics/FirebaseCrashlytics {
 	public final fun deleteUnsentReports ()V
 	public final fun didCrashOnPreviousExecution ()Z
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/crashlytics/FirebaseCrashlytics;
+	public fun hashCode ()I
 	public final fun log (Ljava/lang/String;)V
 	public final fun recordException (Ljava/lang/Throwable;)V
 	public final fun recordException (Ljava/lang/Throwable;Ljava/util/Map;)V
@@ -20,6 +23,7 @@ public final class dev/gitlive/firebase/crashlytics/FirebaseCrashlytics {
 	public final fun setCustomKey (Ljava/lang/String;Z)V
 	public final fun setCustomKeys (Ljava/util/Map;)V
 	public final fun setUserId (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public class dev/gitlive/firebase/crashlytics/FirebaseCrashlyticsException : com/google/firebase/FirebaseException {

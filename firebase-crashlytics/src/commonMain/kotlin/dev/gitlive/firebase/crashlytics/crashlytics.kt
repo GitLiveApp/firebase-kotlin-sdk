@@ -1,14 +1,36 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
+@file:JvmName("CrashlyticsKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase.crashlytics
 
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+
+import com.google.firebase.crashlytics.CustomKeysAndValues
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import com.google.firebase.Firebase as CompatFirebase
+import com.google.firebase.crashlytics.FirebaseCrashlytics as CompatFirebaseCrashlytics
+import com.google.firebase.crashlytics.crashlytics as compatCrashlytics
+
+// The Android-SDK-shaped entry point is reached through the `Firebase.crashlytics` extension (FirebaseCrashlyticsKt),
+// which is a real static method on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseCrashlytics] instance of the default [FirebaseApp]. */
-public expect val Firebase.crashlytics: FirebaseCrashlytics
+public val Firebase.crashlytics: FirebaseCrashlytics
+    get() = FirebaseCrashlytics(CompatFirebase.compatCrashlytics)
 
-/** Returns the [FirebaseCrashlytics] instance of a given [FirebaseApp]. */
-public expect fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics
+/**
+ * Returns the [FirebaseCrashlytics] instance of a given [FirebaseApp]. Crashlytics only reports for the default app on
+ * every platform, so this is the same instance as [Firebase.crashlytics].
+ */
+@Suppress("UNUSED_PARAMETER")
+public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashlytics
 
 /**
  * The Firebase Crashlytics API provides methods to annotate and manage fatal crashes, non-fatal
@@ -18,14 +40,19 @@ public expect fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics
  *
  * Call [Firebase.crashlytics] to get the singleton instance of
  * [FirebaseCrashlytics].
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.crashlytics.FirebaseCrashlytics] this wraps.
  */
-public expect class FirebaseCrashlytics {
+public class FirebaseCrashlytics internal constructor(public val compat: CompatFirebaseCrashlytics) {
+
     /**
      * Records a non-fatal report to send to Crashlytics.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      */
-    public fun recordException(exception: Throwable)
+    public fun recordException(exception: Throwable) {
+        compat.recordException(exception)
+    }
 
     /**
      * Records a non-fatal report to send to Crashlytics.
@@ -40,7 +67,9 @@ public expect class FirebaseCrashlytics {
      * @param customKeys A dictionary of keys and the values to associate with the non fatal
      *                      exception, in addition to the app level custom keys.
      */
-    public fun recordException(exception: Throwable, customKeys: Map<String, Any>)
+    public fun recordException(exception: Throwable, customKeys: Map<String, Any>) {
+        compat.recordException(exception, customKeys.toCustomKeysAndValues())
+    }
 
     /**
      * Logs a message that's included in the next fatal, non-fatal, or ANR report.
@@ -53,7 +82,9 @@ public expect class FirebaseCrashlytics {
      *
      * @param message the message to be logged
      */
-    public fun log(message: String)
+    public fun log(message: String) {
+        compat.log(message)
+    }
 
     /**
      * Records a user ID (identifier) that's associated with subsequent fatal, non-fatal, and ANR
@@ -65,7 +96,9 @@ public expect class FirebaseCrashlytics {
      *
      * @param userId a unique identifier for the current user
      */
-    public fun setUserId(userId: String)
+    public fun setUserId(userId: String) {
+        compat.setUserId(userId)
+    }
 
     /**
      * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
@@ -85,107 +118,34 @@ public expect class FirebaseCrashlytics {
      * @param key A unique key
      * @param value A value to be associated with the given key
      */
-    public fun setCustomKey(key: String, value: String)
+    public fun setCustomKey(key: String, value: String) {
+        compat.setCustomKey(key, value)
+    }
 
-    /**
-     * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
-     * reports.
-     *
-     * Multiple calls to this method with the same key update the value for that key.
-     *
-     * The value of any key at the time of a fatal, non-fatal, or ANR event is associated with that
-     * event.
-     *
-     * Keys and associated values are visible in the session view on the Firebase Crashlytics
-     * console.
-     *
-     * Accepts a maximum of 64 key/value pairs. New keys beyond that limit are ignored. Keys or
-     * values that exceed 1024 characters are truncated.
-     *
-     * @param key A unique key
-     * @param value A value to be associated with the given key
-     */
-    public fun setCustomKey(key: String, value: Boolean)
+    /** See [setCustomKey]. */
+    public fun setCustomKey(key: String, value: Boolean) {
+        compat.setCustomKey(key, value)
+    }
 
-    /**
-     * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
-     * reports.
-     *
-     * Multiple calls to this method with the same key update the value for that key.
-     *
-     * The value of any key at the time of a fatal, non-fatal, or ANR event is associated with that
-     * event.
-     *
-     * Keys and associated values are visible in the session view on the Firebase Crashlytics
-     * console.
-     *
-     * Accepts a maximum of 64 key/value pairs. New keys beyond that limit are ignored. Keys or
-     * values that exceed 1024 characters are truncated.
-     *
-     * @param key A unique key
-     * @param value A value to be associated with the given key
-     */
-    public fun setCustomKey(key: String, value: Double)
+    /** See [setCustomKey]. */
+    public fun setCustomKey(key: String, value: Double) {
+        compat.setCustomKey(key, value)
+    }
 
-    /**
-     * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
-     * reports.
-     *
-     * Multiple calls to this method with the same key update the value for that key.
-     *
-     * The value of any key at the time of a fatal, non-fatal, or ANR event is associated with that
-     * event.
-     *
-     * Keys and associated values are visible in the session view on the Firebase Crashlytics
-     * console.
-     *
-     * Accepts a maximum of 64 key/value pairs. New keys beyond that limit are ignored. Keys or
-     * values that exceed 1024 characters are truncated.
-     *
-     * @param key A unique key
-     * @param value A value to be associated with the given key
-     */
-    public fun setCustomKey(key: String, value: Float)
+    /** See [setCustomKey]. */
+    public fun setCustomKey(key: String, value: Float) {
+        compat.setCustomKey(key, value)
+    }
 
-    /**
-     * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
-     * reports.
-     *
-     * Multiple calls to this method with the same key update the value for that key.
-     *
-     * The value of any key at the time of a fatal, non-fatal, or ANR event is associated with that
-     * event.
-     *
-     * Keys and associated values are visible in the session view on the Firebase Crashlytics
-     * console.
-     *
-     * Accepts a maximum of 64 key/value pairs. New keys beyond that limit are ignored. Keys or
-     * values that exceed 1024 characters are truncated.
-     *
-     * @param key A unique key
-     * @param value A value to be associated with the given key
-     */
-    public fun setCustomKey(key: String, value: Int)
+    /** See [setCustomKey]. */
+    public fun setCustomKey(key: String, value: Int) {
+        compat.setCustomKey(key, value)
+    }
 
-    /**
-     * Sets a custom key and value that are associated with subsequent fatal, non-fatal, and ANR
-     * reports.
-     *
-     * Multiple calls to this method with the same key update the value for that key.
-     *
-     * The value of any key at the time of a fatal, non-fatal, or ANR event is associated with that
-     * event.
-     *
-     * Keys and associated values are visible in the session view on the Firebase Crashlytics
-     * console.
-     *
-     * Accepts a maximum of 64 key/value pairs. New keys beyond that limit are ignored. Keys or
-     * values that exceed 1024 characters are truncated.
-     *
-     * @param key A unique key
-     * @param value A value to be associated with the given key
-     */
-    public fun setCustomKey(key: String, value: Long)
+    /** See [setCustomKey]. */
+    public fun setCustomKey(key: String, value: Long) {
+        compat.setCustomKey(key, value)
+    }
 
     /**
      * Sets multiple custom keys and values that are associated with subsequent fatal, non-fatal, and
@@ -207,7 +167,9 @@ public expect class FirebaseCrashlytics {
      *
      * @param customKeys A dictionary of keys and the values to associate with each key
      */
-    public fun setCustomKeys(customKeys: Map<String, Any>)
+    public fun setCustomKeys(customKeys: Map<String, Any>) {
+        compat.setCustomKeys(customKeys.toCustomKeysAndValues())
+    }
 
     /**
      * Enables or disables the automatic data collection configuration for Crashlytics.
@@ -225,29 +187,55 @@ public expect class FirebaseCrashlytics {
      *     for all app runs, add the `firebase_crashlytics_collection_enabled` flag to your
      *     app's AndroidManifest.xml.
      */
-    public fun setCrashlyticsCollectionEnabled(enabled: Boolean)
+    public fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
+        compat.setCrashlyticsCollectionEnabled(enabled)
+    }
 
     /**
      * Checks whether the app crashed on its previous run.
      *
      * @return true if a crash was recorded during the previous run of the app.
      */
-    public fun didCrashOnPreviousExecution(): Boolean
+    public fun didCrashOnPreviousExecution(): Boolean = compat.didCrashOnPreviousExecution()
 
     /**
      * If automatic data collection is disabled, this method queues up all the reports on a device to
      * send to Crashlytics. Otherwise, this method is a no-op.
      */
-    public fun sendUnsentReports()
+    public fun sendUnsentReports() {
+        compat.sendUnsentReports()
+    }
 
     /**
      * If automatic data collection is disabled, this method queues up all the reports on a device for
      * deletion. Otherwise, this method is a no-op.
      */
-    public fun deleteUnsentReports()
+    public fun deleteUnsentReports() {
+        compat.deleteUnsentReports()
+    }
+
+    override fun equals(other: Any?): Boolean = other is FirebaseCrashlytics && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebaseCrashlytics"
 }
 
 /**
  * Exception that gets thrown when an operation on Firebase Crashlytics fails.
  */
-public expect open class FirebaseCrashlyticsException : FirebaseException
+public open class FirebaseCrashlyticsException(message: String) : FirebaseException(message)
+
+/** Values of other types are ignored, as before the compatibility layer. */
+private fun Map<String, Any>.toCustomKeysAndValues(): CustomKeysAndValues = CustomKeysAndValues.Builder().apply {
+    forEach { (key, value) ->
+        when (value) {
+            is String -> putString(key, value)
+            is Boolean -> putBoolean(key, value)
+            is Double -> putDouble(key, value)
+            is Float -> putFloat(key, value)
+            is Int -> putInt(key, value)
+            is Long -> putLong(key, value)
+        }
+    }
+}.build()
