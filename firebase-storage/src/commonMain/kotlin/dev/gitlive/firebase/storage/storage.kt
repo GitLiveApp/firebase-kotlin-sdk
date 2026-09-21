@@ -1,101 +1,70 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.gitlive.firebase.storage
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
+import com.google.android.gms.tasks.OnCanceledListener
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.storage.OnPausedListener
+import com.google.firebase.storage.OnProgressListener
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.putFile
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-
-/** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
-public expect val Firebase.storage: FirebaseStorage
-
-/** Returns the [FirebaseStorage] instance of the default [FirebaseApp]. */
-public expect fun Firebase.storage(url: String): FirebaseStorage
-
-/** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-public expect fun Firebase.storage(app: FirebaseApp): FirebaseStorage
-
-/** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-public expect fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage
+import com.google.firebase.storage.FirebaseStorage as CompatFirebaseStorage
+import com.google.firebase.storage.ListResult as CompatListResult
+import com.google.firebase.storage.StorageMetadata as CompatStorageMetadata
+import com.google.firebase.storage.StorageReference as CompatStorageReference
 
 /**
- * FirebaseStorage is a service that supports uploading and downloading large objects to Google
- * Cloud Storage. Pass a custom instance of [FirebaseApp] to [Firebase.storage]
- * which will initialize it with a storage location.
+ * Entry point for Cloud Storage for Firebase.
  *
- * Otherwise, if you call [Firebase.storage] without a [FirebaseApp], the
- * [FirebaseStorage] instance will initialize with the default [FirebaseApp] obtainable from
- * [Firebase.storage]. The storage location in this case will come the JSON
- * configuration file downloaded from the web.
+ * @property compat The Android-SDK-shaped [com.google.firebase.storage.FirebaseStorage] this wraps.
  */
-public expect class FirebaseStorage {
-    /**
-     * Returns the maximum time to retry operations other than upload and download if a failure
-     * occurs.
-     *
-     * @return the maximum time. Defaults to 2 minutes (120,000 milliseconds).
-     */
-    public val maxOperationRetryTime: Duration
+public class FirebaseStorage internal constructor(public val compat: CompatFirebaseStorage) {
+    /** The maximum time to retry operations other than uploads and downloads. */
+    public val maxOperationRetryTime: Duration get() = compat.maxOperationRetryTimeMillis.milliseconds
 
-    /**
-     * Returns the maximum time to retry an upload if a failure occurs.
-     *
-     * @return the maximum time. Defaults to 10 minutes (600,000 milliseconds).
-     */
-    public val maxUploadRetryTime: Duration
+    /** The maximum time to retry uploads. */
+    public val maxUploadRetryTime: Duration get() = compat.maxUploadRetryTimeMillis.milliseconds
 
-    /**
-     * Sets the maximum time to retry operations other than upload and download if a failure occurs.
-     *
-     * @param maxOperationRetryTime the maximum time. Defaults to 2 minutes (120,000
-     *     milliseconds).
-     */
-    public fun setMaxOperationRetryTime(maxOperationRetryTime: Duration)
+    /** Sets the maximum time to retry operations other than uploads and downloads. */
+    public fun setMaxOperationRetryTime(maxOperationRetryTime: Duration) {
+        compat.maxOperationRetryTimeMillis = maxOperationRetryTime.inWholeMilliseconds
+    }
 
-    /**
-     * Sets the maximum time to retry an upload if a failure occurs.
-     *
-     * @param maxUploadRetryTime the maximum time in milliseconds. Defaults to 10 minutes (600,000
-     *     milliseconds).
-     */
-    public fun setMaxUploadRetryTime(maxUploadRetryTime: Duration)
+    /** Sets the maximum time to retry uploads. */
+    public fun setMaxUploadRetryTime(maxUploadRetryTime: Duration) {
+        compat.maxUploadRetryTimeMillis = maxUploadRetryTime.inWholeMilliseconds
+    }
 
-    /**
-     * Modifies this FirebaseStorage instance to communicate with the Storage emulator.
-     *
-     * Note: Call this method before using the instance to do any storage operations.
-     *
-     * @param host the emulator host (for example, 10.0.2.2)
-     * @param port the emulator port (for example, 9000)
-     */
-    public fun useEmulator(host: String, port: Int)
+    /** Routes requests to the Storage emulator at [host]:[port]. */
+    public fun useEmulator(host: String, port: Int) {
+        compat.useEmulator(host, port)
+    }
 
-    /**
-     * Creates a new [StorageReference] initialized at the root Firebase Storage location.
-     *
-     * @return An instance of [StorageReference].
-     */
-    public val reference: StorageReference
+    /** A reference to the root of the bucket. */
+    public val reference: StorageReference get() = StorageReference(compat.reference)
 
-    /**
-     * Creates a new [StorageReference] initialized with a child Firebase Storage location.
-     *
-     * @param location A relative path from the root to initialize the reference with, for instance
-     *     "path/to/object"
-     * @return An instance of [StorageReference] at the given child path.
-     */
-    public fun reference(location: String): StorageReference
+    /** A reference to [location]. */
+    public fun reference(location: String): StorageReference = StorageReference(compat.getReference(location))
 
-    /**
-     * Creates a [StorageReference] given a gs:// or https:// URL pointing to a Firebase Storage location.
-     *
-     * @param fullUrl A gs:// or http[s]:// URL used to initialize the reference. For example, you can pass
-     *     in a download URL retrieved from getDownloadUrl or the uri retrieved from toString An error is
-     *     thrown if fullUrl is not associated with the FirebaseApp used to initialize this FirebaseStorage.
-     * @return An instance of [StorageReference] at the given url.
-     */
-    public fun getReferenceFromUrl(fullUrl: String): StorageReference
+    /** A reference for a `gs://` or `https://` URL. */
+    public fun getReferenceFromUrl(fullUrl: String): StorageReference = StorageReference(compat.getReferenceFromUrl(fullUrl))
+
+    override fun equals(other: Any?): Boolean = other is FirebaseStorage && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebaseStorage($compat)"
 }
 
 @Deprecated("Deprecated to use Kotlin Duration", replaceWith = ReplaceWith("maxOperationRetryTime"))
@@ -115,282 +84,153 @@ public fun FirebaseStorage.setMaxUploadRetryTimeMillis(maxUploadRetryTimeMillis:
 }
 
 /**
- * Represents a reference to a Google Cloud Storage object. Developers can upload and download
- * objects, get/set object metadata, and delete an object at a specified path.
+ * A reference to an object or folder in Cloud Storage.
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.storage.StorageReference] this wraps.
  */
-public expect class StorageReference {
-    /**
-     * Returns the short name of this object.
-     *
-     * @return the name.
-     */
-    public val name: String
+public class StorageReference internal constructor(public val compat: CompatStorageReference) {
+    public val name: String get() = compat.name
+    public val path: String get() = compat.path
+    public val bucket: String get() = compat.bucket
+    public val parent: StorageReference? get() = compat.parent?.let { StorageReference(it) }
+    public val root: StorageReference get() = StorageReference(compat.root)
+    public val storage: FirebaseStorage get() = FirebaseStorage(compat.storage)
 
-    /**
-     * Returns the full path to this object, not including the Google Cloud Storage bucket.
-     *
-     * @return the path.
-     */
-    public val path: String
+    /** The object's metadata. */
+    public suspend fun getMetadata(): FirebaseStorageMetadata? = compat.getMetadata().await().toFirebaseStorageMetadata()
 
-    /**
-     * Return the Google Cloud Storage bucket that holds this object.
-     *
-     * @return the bucket.
-     */
-    public val bucket: String
+    /** Downloads the object into memory, failing if it is larger than [maxDownloadSizeBytes]. */
+    public suspend fun getData(maxDownloadSizeBytes: Long): Data = compat.getBytes(maxDownloadSizeBytes).await().toData()
 
-    /**
-     * Returns a new instance of [StorageReference] pointing to the parent location or null if
-     * this instance references the root location. For example:
-     *
-     * ```
-     * path = foo/bar/baz   parent = foo/bar
-     * path = foo           parent = (root)
-     * path = (root)        parent = (null)
-     * ```
-     *
-     * @return the parent [StorageReference].
-     */
-    public val parent: StorageReference?
+    /** Updates the object's settable metadata. */
+    public suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata? = compat.updateMetadata(metadata.toCompat()).await().toFirebaseStorageMetadata()
 
-    /**
-     * Returns a new instance of {@link StorageReference} pointing to the root location.
-     *
-     * @return the root {@link StorageReference}.
-     */
-    public val root: StorageReference
+    public fun child(path: String): StorageReference = StorageReference(compat.child(path))
 
-    /**
-     * Returns the [FirebaseStorage] service which created this reference.
-     *
-     * @return The [FirebaseStorage] service.
-     */
-    public val storage: FirebaseStorage
+    /** Deletes the object. */
+    public suspend fun delete() {
+        compat.delete().await()
+    }
 
-    /**
-     * Retrieves metadata associated with an object at this [StorageReference].
-     *
-     * @return the metadata.
-     */
-    public suspend fun getMetadata(): FirebaseStorageMetadata?
+    /** The public download URL of the object. */
+    public suspend fun getDownloadUrl(): String = compat.getDownloadUrl().await().toString()
 
-    /**
-     * Downloads the object at this [StorageReference] into memory.
-     *
-     * @param maxDownloadSizeBytes The maximum number of bytes to download.
-     * @return The downloaded data.
-     */
-    public suspend fun getData(maxDownloadSizeBytes: Long): Data
+    /** Lists up to [maxResults] items and prefixes, continuing from [pageToken] if given. */
+    public suspend fun list(maxResults: Int, pageToken: String? = null): ListResult = ListResult(
+        if (pageToken == null) compat.list(maxResults).await() else compat.list(maxResults, pageToken).await(),
+    )
 
-    /**
-     * Updates metadata associated with an object at this [StorageReference].
-     *
-     * @param metadata The new metadata for this object.
-     * @return the updated metadata.
-     */
-    public suspend fun updateMetadata(metadata: FirebaseStorageMetadata): FirebaseStorageMetadata?
+    /** Lists every item and prefix under this reference. */
+    public suspend fun listAll(): ListResult = ListResult(compat.listAll().await())
 
-    /**
-     * Returns a new instance of [StorageReference] pointing to a child location of the current
-     * reference. All leading and trailing slashes will be removed, and consecutive slashes will be
-     * compressed to single slashes. For example:
-     *
-     * ```
-     * child = /foo/bar     path = foo/bar
-     * child = foo/bar/     path = foo/bar
-     * child = foo///bar    path = foo/bar
-     * ```
-     *
-     * @param path The relative path from this reference.
-     * @return the child [StorageReference].
-     */
-    public fun child(path: String): StorageReference
+    /** Uploads [file] and suspends until the upload completes. */
+    public suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null) {
+        uploadFile(file, metadata).await()
+    }
 
-    /**
-     * Deletes the object at this {@link StorageReference}.
-     *
-     * @return A {@link Task} that indicates whether the operation succeeded or failed.
-     */
-    public suspend fun delete()
+    /** Uploads [data] and suspends until the upload completes. */
+    public suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null) {
+        uploadData(data, metadata).await()
+    }
 
-    /**
-     * Asynchronously retrieves a long lived download URL with a revokable token. This can be used to
-     * share the file with others, but can be revoked by a developer in the Firebase Console if
-     * desired.
-     *
-     * @return The String representing the download URL.
-     */
-    public suspend fun getDownloadUrl(): String
+    /** Uploads [data], reporting progress through the returned [ProgressFlow], which can pause, resume and cancel it. */
+    public fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata? = null): ProgressFlow = uploadData(data, metadata).asProgressFlow()
 
-    /**
-     * List items (files) and prefixes (folders) under this StorageReference.
-     *
-     * [list] is only available for projects using Firebase Rules Version 2.
-     *
-     * @param maxResults The maximum number of results to return in a single page.
-     * @param pageToken A page token from a previous [ListResult], or null to fetch the first page.
-     * @return A [ListResult] containing one page of items and prefixes under the current StorageReference.
-     */
-    public suspend fun list(maxResults: Int, pageToken: String? = null): ListResult
+    /** Uploads [file], reporting progress through the returned [ProgressFlow], which can pause, resume and cancel it. */
+    public fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow = uploadFile(file, metadata).asProgressFlow()
 
-    /**
-     * List all items (files) and prefixes (folders) under this StorageReference.
-     *
-     * This is a helper method for calling list() repeatedly until there are no more
-     * results. Consistency of the result is not guaranteed if objects are inserted or removed while
-     * this operation is executing.
-     *
-     * [listAll] is only available for projects using Firebase Rules Version 2.
-     *
-     * @return A [ListResult] that returns all items and prefixes under the current StorageReference.
-     */
-    public suspend fun listAll(): ListResult
+    private fun uploadData(data: Data, metadata: FirebaseStorageMetadata?): UploadTask = if (metadata != null) compat.putBytes(data.toByteArray(), metadata.toCompat()) else compat.putBytes(data.toByteArray())
 
-    /**
-     * Asynchronously uploads from a content URI to this [StorageReference].
-     *
-     * @param file The source of the upload. This is a [File]. A content
-     *     resolver will be used to load the data.
-     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
-     *     about the object being uploaded.
-     */
-    public suspend fun putFile(file: File, metadata: FirebaseStorageMetadata? = null)
+    private fun uploadFile(file: File, metadata: FirebaseStorageMetadata?): UploadTask = if (metadata != null) compat.putFile(file.platformFile, metadata.toCompat()) else compat.putFile(file.platformFile)
 
-    /**
-     * Asynchronously uploads byte data to this [StorageReference]. This is not recommended for
-     * large files. Instead upload a file via [putFile].
-     *
-     * @param data The [Data] to upload.
-     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
-     *     about the object being uploaded.
-     */
-    public suspend fun putData(data: Data, metadata: FirebaseStorageMetadata? = null)
+    override fun equals(other: Any?): Boolean = other is StorageReference && other.compat == compat
 
-    /**
-     * Asynchronously uploads byte data to this [StorageReference].
-     *
-     * @param data The [Data] to upload.
-     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
-     *     about the object being uploaded.
-     * @return A [ProgressFlow] that can be used to monitor and manage the upload.
-     */
-    public fun putDataResumable(data: Data, metadata: FirebaseStorageMetadata? = null): ProgressFlow
+    override fun hashCode(): Int = compat.hashCode()
 
-    /**
-     * Asynchronously uploads from a content URI to this [StorageReference].
-     *
-     * @param file The source of the upload. This is a [File]. A content
-     *     resolver will be used to load the data.
-     * @param metadata [FirebaseStorageMetadata] containing additional information (MIME type, etc.)
-     *     about the object being uploaded.
-     * @return A [ProgressFlow] that can be used to monitor and manage the upload.
-     */
-    public fun putFileResumable(file: File, metadata: FirebaseStorageMetadata? = null): ProgressFlow
+    override fun toString(): String = "StorageReference($compat)"
 }
 
-public expect class ListResult {
-    public val prefixes: List<StorageReference>
-    public val items: List<StorageReference>
-    public val pageToken: String?
+private fun UploadTask.asProgressFlow(): ProgressFlow {
+    val task = this
+    val flow: Flow<Progress> = callbackFlow {
+        val onCanceledListener = OnCanceledListener { cancel() }
+        val onCompleteListener = OnCompleteListener<UploadTask.TaskSnapshot> { close(it.exception) }
+        val onPausedListener = OnPausedListener<UploadTask.TaskSnapshot> { trySend(Progress.Paused(it.bytesTransferred, it.totalByteCount)) }
+        val onProgressListener = OnProgressListener<UploadTask.TaskSnapshot> { trySend(Progress.Running(it.bytesTransferred, it.totalByteCount)) }
+        task.addOnCanceledListener(onCanceledListener)
+        task.addOnCompleteListener(onCompleteListener)
+        task.addOnPausedListener(onPausedListener)
+        task.addOnProgressListener(onProgressListener)
+        awaitClose {
+            task.removeOnCanceledListener(onCanceledListener)
+            task.removeOnCompleteListener(onCompleteListener)
+            task.removeOnPausedListener(onPausedListener)
+            task.removeOnProgressListener(onProgressListener)
+        }
+    }
+    return object : ProgressFlow {
+        override suspend fun collect(collector: FlowCollector<Progress>) = collector.emitAll(flow)
+
+        override fun pause() {
+            task.pause()
+        }
+
+        override fun resume() {
+            task.resume()
+        }
+
+        override fun cancel() {
+            task.cancel()
+        }
+    }
 }
 
 /**
- * Represents a reference to a local file for all platforms. Every platform has its own constructor.
+ * A page of the items and prefixes under a reference.
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.storage.ListResult] this wraps.
  */
+public class ListResult internal constructor(public val compat: CompatListResult) {
+    public val prefixes: List<StorageReference> get() = compat.prefixes.map { StorageReference(it) }
+    public val items: List<StorageReference> get() = compat.items.map { StorageReference(it) }
+    public val pageToken: String? get() = compat.pageToken
+}
+
+/** A file on the platform: an `android.net.Uri` on Android and the JVM, an `NSURL` on Apple platforms, a `File` on JS. */
 public expect class File
 
-/**
- * Represents a reference to data for all platforms. Every platform has its own constructor.
- */
+/** Bytes on the platform: a `ByteArray` on Android and the JVM, an `NSData` on Apple platforms, a `Uint8Array` on JS. */
 public expect class Data
 
-/**
- * Represents the progress of an operation.
- */
-public sealed class Progress(public val bytesTransferred: Number, public val totalByteCount: Number) {
-    /** Represents the progress of an operation that is still running. */
-    public class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
+internal expect fun Data.toByteArray(): ByteArray
 
-    /** Represents the progress of an operation that is paused. */
+internal expect fun ByteArray.toData(): Data
+
+/** The platform file object the `com.google.firebase.storage` layer's `putFile` takes. */
+internal expect val File.platformFile: Any
+
+public sealed class Progress(public val bytesTransferred: Number, public val totalByteCount: Number) {
+    public class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
     public class Paused internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)
 }
 
-/**
- * A flow that emits [Progress] objects containing the state of an upload.
- */
 public interface ProgressFlow : Flow<Progress> {
     public fun pause()
     public fun resume()
     public fun cancel()
 }
 
-/**
- * Exception that gets thrown when an operation on Firebase Storage fails.
- */
-public expect class FirebaseStorageException : FirebaseException
+public typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 
-/**
- * Metadata for a [StorageReference]. Metadata stores default attributes such as size and
- * content type. You may also store custom metadata key value pairs. Metadata values may be used to
- * authorize operations using declarative validation rules.
- */
 public data class FirebaseStorageMetadata(
-    /**
-     * Returns the path of the [StorageReference] object.
-     *
-     * @return the MD5Hash of the [StorageReference] object
-     */
     var md5Hash: String? = null,
-
-    /**
-     * Returns the size of the [StorageReference] object in bytes.
-     *
-     * @return the Cache Control header for the [StorageReference]
-     */
     var cacheControl: String? = null,
-
-    /**
-     * Returns the content disposition of the [StorageReference]
-     *
-     * @return the content disposition of the [StorageReference]
-     */
     var contentDisposition: String? = null,
-
-    /**
-     * Returns the content encoding for the [StorageReference]
-     *
-     * @return the content encoding for the [StorageReference]
-     */
     var contentEncoding: String? = null,
-
-    /**
-     * Returns the content language for the [StorageReference]
-     *
-     * @return the content language for the [StorageReference]
-     */
     var contentLanguage: String? = null,
-
-    /**
-     * Returns the Content Type of this associated [StorageReference]
-     *
-     * @return the Content Type of this associated [StorageReference]
-     */
     var contentType: String? = null,
-
-    /**
-     * Returns custom metadata for a StorageReference
-     *
-     * @return the metadata stored in the object.
-     */
     var customMetadata: MutableMap<String, String> = mutableMapOf(),
 ) {
-    /**
-     * Sets custom metadata
-     *
-     * @param key the key of the new value
-     * @param value the value to set.
-     */
     public fun setCustomMetadata(key: String, value: String?) {
         value?.let {
             customMetadata[key] = it
@@ -398,9 +238,30 @@ public data class FirebaseStorageMetadata(
     }
 }
 
-/** Returns a [FirebaseStorageMetadata] object initialized using the [init] function. */
 public fun storageMetadata(init: FirebaseStorageMetadata.() -> Unit): FirebaseStorageMetadata {
     val metadata = FirebaseStorageMetadata()
     metadata.init()
     return metadata
+}
+
+internal fun FirebaseStorageMetadata.toCompat(): CompatStorageMetadata = CompatStorageMetadata.Builder()
+    .setCacheControl(cacheControl)
+    .setContentDisposition(contentDisposition)
+    .setContentEncoding(contentEncoding)
+    .setContentLanguage(contentLanguage)
+    .setContentType(contentType)
+    .apply { customMetadata.forEach { (key, value) -> setCustomMetadata(key, value) } }
+    .build()
+
+internal fun CompatStorageMetadata.toFirebaseStorageMetadata(): FirebaseStorageMetadata {
+    val sdkMetadata = this
+    return storageMetadata {
+        md5Hash = sdkMetadata.md5Hash
+        cacheControl = sdkMetadata.cacheControl
+        contentDisposition = sdkMetadata.contentDisposition
+        contentEncoding = sdkMetadata.contentEncoding
+        contentLanguage = sdkMetadata.contentLanguage
+        contentType = sdkMetadata.contentType
+        sdkMetadata.customMetadataKeys.forEach { setCustomMetadata(it, sdkMetadata.getCustomMetadata(it)) }
+    }
 }
