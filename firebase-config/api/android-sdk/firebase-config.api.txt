@@ -1,0 +1,146 @@
+// Source: https://raw.githubusercontent.com/firebase/firebase-android-sdk/fc5a2bee3a2f81f2f35652867628a3f4913e915d/firebase-config/api.txt
+// Signature format: 3.0
+package com.google.firebase.remoteconfig {
+
+  @com.google.auto.value.AutoValue public abstract class ConfigUpdate {
+    ctor public ConfigUpdate();
+    method public static com.google.firebase.remoteconfig.ConfigUpdate create(java.util.Set<java.lang.String!>);
+    method public abstract java.util.Set<java.lang.String!> getUpdatedKeys();
+  }
+
+  public interface ConfigUpdateListener {
+    method public void onError(com.google.firebase.remoteconfig.FirebaseRemoteConfigException);
+    method public void onUpdate(com.google.firebase.remoteconfig.ConfigUpdate);
+  }
+
+  public interface ConfigUpdateListenerRegistration {
+    method public void remove();
+  }
+
+  public class CustomSignals {
+  }
+
+  public static class CustomSignals.Builder {
+    ctor public CustomSignals.Builder();
+    method public com.google.firebase.remoteconfig.CustomSignals build();
+    method public com.google.firebase.remoteconfig.CustomSignals.Builder put(String, double);
+    method public com.google.firebase.remoteconfig.CustomSignals.Builder put(String, String?);
+    method public com.google.firebase.remoteconfig.CustomSignals.Builder put(String, long);
+  }
+
+  public class FirebaseRemoteConfig {
+    method public com.google.android.gms.tasks.Task<java.lang.Boolean!> activate();
+    method public com.google.firebase.remoteconfig.ConfigUpdateListenerRegistration addOnConfigUpdateListener(com.google.firebase.remoteconfig.ConfigUpdateListener);
+    method public com.google.android.gms.tasks.Task<com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo!> ensureInitialized();
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> fetch();
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> fetch(long);
+    method public com.google.android.gms.tasks.Task<java.lang.Boolean!> fetchAndActivate();
+    method public java.util.Map<java.lang.String!,com.google.firebase.remoteconfig.FirebaseRemoteConfigValue!> getAll();
+    method public boolean getBoolean(String);
+    method public double getDouble(String);
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo getInfo();
+    method public static com.google.firebase.remoteconfig.FirebaseRemoteConfig getInstance();
+    method public static com.google.firebase.remoteconfig.FirebaseRemoteConfig getInstance(com.google.firebase.FirebaseApp);
+    method public java.util.Set<java.lang.String!> getKeysByPrefix(String);
+    method public long getLong(String);
+    method public String getString(String);
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigValue getValue(String);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> reset();
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> setConfigSettingsAsync(com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> setCustomSignals(com.google.firebase.remoteconfig.CustomSignals);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> setDefaultsAsync(@XmlRes int);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> setDefaultsAsync(java.util.Map<java.lang.String!,java.lang.Object!>);
+    field public static final boolean DEFAULT_VALUE_FOR_BOOLEAN = false;
+    field public static final byte[]! DEFAULT_VALUE_FOR_BYTE_ARRAY;
+    field public static final double DEFAULT_VALUE_FOR_DOUBLE = 0.0;
+    field public static final long DEFAULT_VALUE_FOR_LONG = 0L; // 0x0L
+    field public static final String DEFAULT_VALUE_FOR_STRING = "";
+    field public static final int LAST_FETCH_STATUS_FAILURE = 1; // 0x1
+    field public static final int LAST_FETCH_STATUS_NO_FETCH_YET = 0; // 0x0
+    field public static final int LAST_FETCH_STATUS_SUCCESS = -1; // 0xffffffff
+    field public static final int LAST_FETCH_STATUS_THROTTLED = 2; // 0x2
+    field public static final int VALUE_SOURCE_DEFAULT = 1; // 0x1
+    field public static final int VALUE_SOURCE_REMOTE = 2; // 0x2
+    field public static final int VALUE_SOURCE_STATIC = 0; // 0x0
+  }
+
+  public class FirebaseRemoteConfigClientException extends com.google.firebase.remoteconfig.FirebaseRemoteConfigException {
+    ctor public FirebaseRemoteConfigClientException(String);
+    ctor public FirebaseRemoteConfigClientException(String, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    ctor public FirebaseRemoteConfigClientException(String, Throwable?);
+    ctor public FirebaseRemoteConfigClientException(String, Throwable?, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+  }
+
+  public class FirebaseRemoteConfigException extends com.google.firebase.FirebaseException {
+    ctor public FirebaseRemoteConfigException(String);
+    ctor public FirebaseRemoteConfigException(String, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    ctor public FirebaseRemoteConfigException(String, Throwable?);
+    ctor public FirebaseRemoteConfigException(String, Throwable?, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code getCode();
+  }
+
+  public enum FirebaseRemoteConfigException.Code {
+    method public int value();
+    enum_constant public static final com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code CONFIG_UPDATE_MESSAGE_INVALID;
+    enum_constant public static final com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code CONFIG_UPDATE_NOT_FETCHED;
+    enum_constant public static final com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code CONFIG_UPDATE_STREAM_ERROR;
+    enum_constant public static final com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code CONFIG_UPDATE_UNAVAILABLE;
+    enum_constant public static final com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code UNKNOWN;
+  }
+
+  public class FirebaseRemoteConfigFetchThrottledException extends com.google.firebase.remoteconfig.FirebaseRemoteConfigException {
+    ctor public FirebaseRemoteConfigFetchThrottledException(long);
+    method public long getThrottleEndTimeMillis();
+  }
+
+  public interface FirebaseRemoteConfigInfo {
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings getConfigSettings();
+    method public long getFetchTimeMillis();
+    method public int getLastFetchStatus();
+  }
+
+  public class FirebaseRemoteConfigServerException extends com.google.firebase.remoteconfig.FirebaseRemoteConfigException {
+    ctor public FirebaseRemoteConfigServerException(int, String);
+    ctor public FirebaseRemoteConfigServerException(int, String, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    ctor public FirebaseRemoteConfigServerException(int, String, Throwable?);
+    ctor public FirebaseRemoteConfigServerException(int, String, Throwable?, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    ctor public FirebaseRemoteConfigServerException(String, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    ctor public FirebaseRemoteConfigServerException(String, Throwable?, com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code);
+    method public int getHttpStatusCode();
+  }
+
+  public class FirebaseRemoteConfigSettings {
+    method public long getFetchTimeoutInSeconds();
+    method public long getMinimumFetchIntervalInSeconds();
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder toBuilder();
+  }
+
+  public static class FirebaseRemoteConfigSettings.Builder {
+    ctor public FirebaseRemoteConfigSettings.Builder();
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings build();
+    method public long getFetchTimeoutInSeconds();
+    method public long getMinimumFetchIntervalInSeconds();
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder setFetchTimeoutInSeconds(long) throws java.lang.IllegalArgumentException;
+    method public com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder setMinimumFetchIntervalInSeconds(long);
+  }
+
+  public interface FirebaseRemoteConfigValue {
+    method public boolean asBoolean() throws java.lang.IllegalArgumentException;
+    method public byte[] asByteArray();
+    method public double asDouble() throws java.lang.IllegalArgumentException;
+    method public long asLong() throws java.lang.IllegalArgumentException;
+    method public String asString();
+    method public int getSource();
+  }
+
+  public final class RemoteConfigKt {
+    method public static com.google.firebase.remoteconfig.CustomSignals customSignals(kotlin.jvm.functions.Function1<? super com.google.firebase.remoteconfig.CustomSignals.Builder,kotlin.Unit> builder);
+    method public static operator com.google.firebase.remoteconfig.FirebaseRemoteConfigValue get(com.google.firebase.remoteconfig.FirebaseRemoteConfig, String key);
+    method public static kotlinx.coroutines.flow.Flow<com.google.firebase.remoteconfig.ConfigUpdate> getConfigUpdates(com.google.firebase.remoteconfig.FirebaseRemoteConfig);
+    method public static com.google.firebase.remoteconfig.FirebaseRemoteConfig getRemoteConfig(com.google.firebase.Firebase);
+    method public static com.google.firebase.remoteconfig.FirebaseRemoteConfig remoteConfig(com.google.firebase.Firebase, com.google.firebase.FirebaseApp app);
+    method public static com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings remoteConfigSettings(kotlin.jvm.functions.Function1<? super com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder,kotlin.Unit> init);
+  }
+
+}
+
