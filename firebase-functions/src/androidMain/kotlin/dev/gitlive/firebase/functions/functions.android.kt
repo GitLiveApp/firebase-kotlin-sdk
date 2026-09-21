@@ -9,13 +9,10 @@
 package dev.gitlive.firebase.functions
 
 /** The underlying Firebase Android SDK object. */
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat"))
 public val FirebaseFunctions.android: com.google.firebase.functions.FirebaseFunctions get() = compat
 
 /** The underlying Firebase Android SDK object. */
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat"))
 public val HttpsCallableReference.android: com.google.firebase.functions.HttpsCallableReference get() = compat
 
 /** The underlying Firebase Android SDK object. */
-@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat"))
 public val HttpsCallableResult.android: com.google.firebase.functions.HttpsCallableResult get() = compat

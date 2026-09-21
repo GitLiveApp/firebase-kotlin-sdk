@@ -53,7 +53,6 @@ public inline fun <T> CompatHttpsCallableResult.data(strategy: DeserializationSt
 @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.functions.FirebaseFunctions"))
 public class FirebaseFunctions internal constructor(public val compat: CompatFirebaseFunctions) {
     /** Returns a reference to the callable HTTPS trigger with the given name. */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.getHttpsCallable(name).apply { timeout?.let { setTimeout(it) } }", "com.google.firebase.functions.setTimeout"))
     public fun httpsCallable(name: String, timeout: Duration? = null): HttpsCallableReference = HttpsCallableReference(compat.getHttpsCallable(name).apply { timeout?.let { compatSetTimeout(it) } })
 
     /**
@@ -64,7 +63,6 @@ public class FirebaseFunctions internal constructor(public val compat: CompatFir
      * @param host the emulator host (for example, 10.0.2.2)
      * @param port the emulator port (for example, 5001)
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.useEmulator(host, port)"))
     public fun useEmulator(host: String, port: Int) {
         compat.useEmulator(host, port)
     }
@@ -106,7 +104,6 @@ public class HttpsCallableReference internal constructor(public val compat: Comp
      * @return A Task that will be completed when the HTTPS request has completed.
      * @see FirebaseFunctionsException
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.invoke(data, buildSettings)", "dev.gitlive.firebase.functions.invoke"))
     public suspend inline operator fun <reified T> invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = HttpsCallableResult(compat.invoke(data, buildSettings))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(strategy, data) { this.encodeDefaults = encodeDefaults }"))
@@ -114,7 +111,6 @@ public class HttpsCallableReference internal constructor(public val compat: Comp
         this.encodeDefaults = encodeDefaults
     }
 
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.invoke(strategy, data, buildSettings)", "dev.gitlive.firebase.functions.invoke"))
     public suspend inline operator fun <T> invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): HttpsCallableResult = HttpsCallableResult(compat.invoke(strategy, data, buildSettings))
 
     /**
@@ -126,7 +122,6 @@ public class HttpsCallableReference internal constructor(public val compat: Comp
      *
      * @return A [HttpsCallableResult] that will contain the result.
      */
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.invoke()", "dev.gitlive.firebase.functions.invoke"))
     public suspend operator fun invoke(): HttpsCallableResult = HttpsCallableResult(compat.invoke())
 }
 
@@ -138,10 +133,8 @@ public class HttpsCallableReference internal constructor(public val compat: Comp
 @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.functions.HttpsCallableResult"))
 public class HttpsCallableResult(public val compat: CompatHttpsCallableResult) {
 
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.data<T>()", "dev.gitlive.firebase.functions.data"))
     public inline fun <reified T> data(): T = compat.data<T>()
 
-    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.data(strategy, buildSettings)", "dev.gitlive.firebase.functions.data"))
     public inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = compat.data(strategy, buildSettings)
 }
 
