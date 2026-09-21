@@ -11,3 +11,5 @@ actual val context: Any = testContext
 
 @Suppress("UNCHECKED_CAST")
 actual fun detailValue(details: Any?, key: String): Any? = (details as Map<Any?, Any?>)[key]
+
+actual annotation class IgnoreForAndroidUnitTest

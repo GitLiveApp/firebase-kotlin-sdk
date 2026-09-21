@@ -23,7 +23,7 @@ The following libraries are available for the various Firebase products.
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.7.0/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.7.0/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![63%](https://img.shields.io/badge/-63%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![93%](https://img.shields.io/badge/-93%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
 | [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/2.7.0/pom)         | [![5%](https://img.shields.io/badge/-5%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
 | [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/2.7.0/pom)             | [![64%](https://img.shields.io/badge/-64%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/2.7.0/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
@@ -86,7 +86,11 @@ Rules of thumb for this layer:
   `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
   (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
   given an `Any?` overload, so such a member moves onto `Firebase` under the same name: `FirebaseApp.getApps(Context)`
-  becomes `Firebase.getApps(context)` and `FirebaseOptions.fromResource(Context)` becomes `Firebase.fromResource(context)`. APIs that exist on Android, JVM and Apple but not on JS live in a `nonJsMain` source set, so Android + iOS
+  becomes `Firebase.getApps(context)` and `FirebaseOptions.fromResource(Context)` becomes `Firebase.fromResource(context)`.
+  An instance member whose replacement takes the same number of arguments cannot be deprecated either (a member shadows
+  a same-named extension), so the replacement is shipped as a same-named extension function taking the multiplatform
+  type and nothing else: `FirebaseFunctions.getHttpsCallableFromUrl(URL)` is `getHttpsCallableFromUrl(url: String)`
+  from common code, while `setTimeout(Long, TimeUnit)` is deprecated with an error pointing at `setTimeout(Duration)`. APIs that exist on Android, JVM and Apple but not on JS live in a `nonJsMain` source set, so Android + iOS
   projects keep full source compatibility by declaring the same intermediate source set.
 - Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
   Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`); its percentage is the module's API coverage
@@ -98,7 +102,7 @@ Rules of thumb for this layer:
   is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations` and `firebase-crashlytics`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+`firebase-installations`, `firebase-crashlytics` and `firebase-functions`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
