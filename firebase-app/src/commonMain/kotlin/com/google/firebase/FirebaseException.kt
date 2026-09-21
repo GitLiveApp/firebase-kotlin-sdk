@@ -7,7 +7,7 @@ package com.google.firebase
 /** Base class for all Firebase exceptions, mirroring `com.google.firebase.FirebaseException`. */
 public expect open class FirebaseException : Exception {
     public constructor(message: String)
-    public constructor(message: String, cause: Throwable)
+    public constructor(message: String, cause: Throwable?)
 }
 
 /** Exception thrown when a request to a Firebase service fails due to a network error. */

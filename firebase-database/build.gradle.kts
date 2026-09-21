@@ -1,8 +1,11 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import compat.registerAndroidSourceCompat
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -39,6 +42,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
         testOptions.configureTestOptions(project)
         packaging {
             resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -53,6 +57,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -178,6 +183,7 @@ kotlin {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")
             }
+            project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/androidMain/java")
         }
 
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
@@ -189,6 +195,30 @@ kotlin {
         }
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // Shipped: the nonJsMain extension binding to the SDK's keepSynced member, and the static members this module's
+    // own code reaches through DatabaseStatics.java.
+    keepClasses = listOf(
+        "com/google/firebase/database/QueryNonJsKt.class",
+        "com/google/firebase/database/DatabaseInternalsKt.class",
+        "com/google/firebase/database/DatabaseStatics.class",
+    ),
+)
+
+registerAndroidSourceCompat("firebase-database/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
