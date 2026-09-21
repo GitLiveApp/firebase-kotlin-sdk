@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -38,6 +41,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
         testOptions.configureTestOptions(project)
         packaging {
             resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -52,9 +56,12 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        // kotlin.time.Instant is exposed by the com.google.firebase.Timestamp conversions.
+        optIn.add("kotlin.time.ExperimentalTime")
         freeCompilerArgs.add("-Xexpect-actual-classes")
         freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
     }
@@ -172,6 +179,8 @@ kotlin {
             getByName("androidMain") {
                 dependencies {
                     api(libs.google.firebase.common)
+                    // kotlinx.coroutines.tasks.await is mirrored as a header stub, so consumers need the real facade
+                    api(libs.kotlinx.coroutines.play.services)
                 }
             }
         }
@@ -180,9 +189,32 @@ kotlin {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")
             }
+            project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/androidMain/java")
         }
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+// The com.google.* and kotlinx.coroutines.tasks declarations are header stubs on Android and the JVM (see buildSrc
+// utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk / kotlinx-coroutines-play-services classes are
+// used at runtime.
+stripHeaderStubs(
+    packageDirs = listOf("com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
+    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class", "com/google/firebase/TimestampInstantKt.class"),
+)
+
+registerAndroidSourceCompat("firebase-common/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

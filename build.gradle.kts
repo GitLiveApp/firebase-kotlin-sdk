@@ -10,10 +10,10 @@ import java.net.URL
 import java.io.InputStream
 
 plugins {
-    alias(libs.plugins.android.application) apply false
+    id("com.android.application") apply false // provided by buildSrc
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.multiplatform) apply false
-    alias(libs.plugins.native.cocoapods) apply false
+    id("org.jetbrains.kotlin.multiplatform") apply false // provided by buildSrc
+    id("org.jetbrains.kotlin.native.cocoapods") apply false // provided by buildSrc
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
     alias(libs.plugins.kotlinter) apply false

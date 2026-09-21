@@ -24,9 +24,12 @@ macos-deploymentTarget = "10.15"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"
 publish = "0.34.0"
+asm = "9.8"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-junit" }
