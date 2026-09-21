@@ -1,28 +1,137 @@
-public final class dev/gitlive/firebase/perf/FirebasePerformance {
-	public fun <init> ()V
+public final class com/google/firebase/perf/FirebasePerformance {
+	public static final field Companion Lcom/google/firebase/perf/FirebasePerformance$Companion;
+	public static final field MAX_TRACE_NAME_LENGTH I
+	public static final fun getInstance ()Lcom/google/firebase/perf/FirebasePerformance;
 	public final fun isPerformanceCollectionEnabled ()Z
-	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
+	public final fun newTrace (Ljava/lang/String;)Lcom/google/firebase/perf/metrics/Trace;
 	public final fun setPerformanceCollectionEnabled (Z)V
+	public static final fun startTrace (Ljava/lang/String;)Lcom/google/firebase/perf/metrics/Trace;
+	public fun toString ()Ljava/lang/String;
 }
 
-public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google/firebase/FirebaseException {
+public final class com/google/firebase/perf/FirebasePerformance$Companion {
+	public final fun getInstance ()Lcom/google/firebase/perf/FirebasePerformance;
+	public final fun startTrace (Ljava/lang/String;)Lcom/google/firebase/perf/metrics/Trace;
 }
 
-public final class dev/gitlive/firebase/perf/Performance_jvmKt {
-	public static final fun getPerformance (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/perf/FirebasePerformance;
-	public static final fun performance (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/perf/FirebasePerformance;
+public abstract interface annotation class com/google/firebase/perf/FirebasePerformance$HttpMethod : java/lang/annotation/Annotation {
+	public static final field CONNECT Ljava/lang/String;
+	public static final field Companion Lcom/google/firebase/perf/FirebasePerformance$HttpMethod$Companion;
+	public static final field DELETE Ljava/lang/String;
+	public static final field GET Ljava/lang/String;
+	public static final field HEAD Ljava/lang/String;
+	public static final field OPTIONS Ljava/lang/String;
+	public static final field PATCH Ljava/lang/String;
+	public static final field POST Ljava/lang/String;
+	public static final field PUT Ljava/lang/String;
+	public static final field TRACE Ljava/lang/String;
 }
 
-public final class dev/gitlive/firebase/perf/metrics/Trace {
-	public fun <init> ()V
+public final class com/google/firebase/perf/FirebasePerformance$HttpMethod$Companion {
+}
+
+public final class com/google/firebase/perf/HttpMetricTraceKt {
+	public static final fun trace (Lcom/google/firebase/perf/metrics/HttpMetric;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class com/google/firebase/perf/NewHttpMetric_jvmKt {
+	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
+}
+
+public final class com/google/firebase/perf/PerformanceKt {
+	public static final fun getPerformance (Lcom/google/firebase/Firebase;)Lcom/google/firebase/perf/FirebasePerformance;
+	public static final fun trace (Lcom/google/firebase/perf/metrics/Trace;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun trace (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class com/google/firebase/perf/metrics/AddTrace : java/lang/annotation/Annotation {
+	public abstract fun enabled ()Z
+	public abstract fun name ()Ljava/lang/String;
+}
+
+public final class com/google/firebase/perf/metrics/HttpMetric {
+	public static final field Companion Lcom/google/firebase/perf/metrics/HttpMetric$Companion;
+	public static final field MAX_ATTRIBUTE_KEY_LENGTH I
+	public static final field MAX_ATTRIBUTE_VALUE_LENGTH I
+	public static final field MAX_TRACE_CUSTOM_ATTRIBUTES I
+	public static final field MAX_TRACE_NAME_LENGTH I
+	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
+	public final fun getAttributes ()Ljava/util/Map;
+	public final fun getHttpMethod ()Ljava/lang/String;
+	public final fun getHttpResponseCode ()Ljava/lang/Integer;
+	public final fun getRequestPayloadSize ()Ljava/lang/Long;
+	public final fun getResponseContentType ()Ljava/lang/String;
+	public final fun getResponsePayloadSize ()Ljava/lang/Long;
+	public final fun getUrl ()Ljava/lang/String;
+	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun removeAttribute (Ljava/lang/String;)V
+	public final fun setHttpResponseCode (I)V
+	public final fun setRequestPayloadSize (J)V
+	public final fun setResponseContentType (Ljava/lang/String;)V
+	public final fun setResponsePayloadSize (J)V
+	public final fun start ()V
+	public final fun stop ()V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/google/firebase/perf/metrics/HttpMetric$Companion {
+}
+
+public final class com/google/firebase/perf/metrics/Trace {
+	public static final field Companion Lcom/google/firebase/perf/metrics/Trace$Companion;
+	public static final field MAX_ATTRIBUTE_KEY_LENGTH I
+	public static final field MAX_ATTRIBUTE_VALUE_LENGTH I
+	public static final field MAX_TRACE_CUSTOM_ATTRIBUTES I
+	public static final field MAX_TRACE_NAME_LENGTH I
 	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
 	public final fun getAttributes ()Ljava/util/Map;
 	public final fun getLongMetric (Ljava/lang/String;)J
+	public final fun getName ()Ljava/lang/String;
 	public final fun incrementMetric (Ljava/lang/String;J)V
 	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun putMetric (Ljava/lang/String;J)V
 	public final fun removeAttribute (Ljava/lang/String;)V
 	public final fun start ()V
 	public final fun stop ()V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/google/firebase/perf/metrics/Trace$Companion {
+}
+
+public final class dev/gitlive/firebase/perf/FirebasePerformance {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/perf/FirebasePerformance;
+	public fun hashCode ()I
+	public final fun isPerformanceCollectionEnabled ()Z
+	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
+	public final fun setPerformanceCollectionEnabled (Z)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google/firebase/FirebaseException {
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+}
+
+public final class dev/gitlive/firebase/perf/PerformanceKt {
+	public static final fun getPerformance (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/perf/FirebasePerformance;
+	public static final fun performance (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/perf/FirebasePerformance;
+}
+
+public final class dev/gitlive/firebase/perf/metrics/Trace {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
+	public final fun getAttributes ()Ljava/util/Map;
+	public final fun getCompat ()Lcom/google/firebase/perf/metrics/Trace;
+	public final fun getLongMetric (Ljava/lang/String;)J
+	public fun hashCode ()I
+	public final fun incrementMetric (Ljava/lang/String;J)V
+	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun putMetric (Ljava/lang/String;J)V
+	public final fun removeAttribute (Ljava/lang/String;)V
+	public final fun start ()V
+	public final fun stop ()V
+	public fun toString ()Ljava/lang/String;
 }
 

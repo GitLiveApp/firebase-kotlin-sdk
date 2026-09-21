@@ -1,12 +1,20 @@
+public final class com/google/firebase/perf/NewHttpMetricKt {
+	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
+}
+
 public final class dev/gitlive/firebase/perf/FirebasePerformance {
-	public fun <init> (Lcom/google/firebase/perf/FirebasePerformance;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/perf/FirebasePerformance;
+	public fun hashCode ()I
 	public final fun isPerformanceCollectionEnabled ()Z
 	public final fun newTrace (Ljava/lang/String;)Ldev/gitlive/firebase/perf/metrics/Trace;
 	public final fun setPerformanceCollectionEnabled (Z)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public class dev/gitlive/firebase/perf/FirebasePerformanceException : com/google/firebase/FirebaseException {
 	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
 }
 
 public final class dev/gitlive/firebase/perf/PerformanceKt {
@@ -16,20 +24,24 @@ public final class dev/gitlive/firebase/perf/PerformanceKt {
 }
 
 public final class dev/gitlive/firebase/perf/metrics/Trace {
+	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
 	public final fun getAttributes ()Ljava/util/Map;
+	public final fun getCompat ()Lcom/google/firebase/perf/metrics/Trace;
 	public final fun getLongMetric (Ljava/lang/String;)J
+	public fun hashCode ()I
 	public final fun incrementMetric (Ljava/lang/String;J)V
 	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun putMetric (Ljava/lang/String;J)V
 	public final fun removeAttribute (Ljava/lang/String;)V
 	public final fun start ()V
 	public final fun stop ()V
-	public final fun updateSession (Ldev/gitlive/firebase/perf/session/PerfSession;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/perf/metrics/TraceKt {
 	public static final fun getAndroid (Ldev/gitlive/firebase/perf/metrics/Trace;)Lcom/google/firebase/perf/metrics/Trace;
+	public static final fun updateSession (Ldev/gitlive/firebase/perf/metrics/Trace;Ldev/gitlive/firebase/perf/session/PerfSession;)V
 }
 
 public final class dev/gitlive/firebase/perf/session/PerfSession {
