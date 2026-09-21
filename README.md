@@ -4,14 +4,9 @@
   <i>Development teams merge faster with GitLive</i><br/>
 <br/>
 <br/>
-The Firebase Kotlin SDK brings the <a href="https://firebase.google.com/docs/reference/kotlin/packages">Firebase Android SDK API</a>
-to Kotlin Multiplatform: the same <code>com.google.firebase</code> packages are available from your common source targeting
-<strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, so code written against the
-Android SDK compiles unchanged, enabling the use of Firebase as a backend for
-<a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example. Kotlin-first extensions
-(suspend functions, <code>Flow</code>s, kotlinx.serialization) in the <code>dev.gitlive.firebase</code> packages build on it.
-The modules are moving to this shape one by one; until a module has, it offers the earlier <code>dev.gitlive.firebase</code>
-API, similar to the Firebase Android SDK Kotlin Extensions.
+The Firebase Kotlin SDK is a Kotlin Multiplatform SDK for Firebase, enabling you to use Firebase directly from your common source targeting 
+<strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
+Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
 
 ## Available libraries
 
@@ -38,72 +33,6 @@ Is the Firebase library or API you need missing? [Create an issue](https://githu
 The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android*, *JVM* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
 
 It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target. The library requires [additional initialization](https://github.com/GitLiveApp/firebase-java-sdk?tab=readme-ov-file#initializing-the-sdk) compared to the official Firebase SDKs.
-
-### Using the Firebase Android SDK API from common code
-
-The SDK ships the Firebase Android SDK API itself under its original `com.google.firebase` packages, as `expect` declarations
-implemented on every platform. Code written against the Android SDK (including `com.google.android.gms.tasks.Task` and its
-listeners) therefore compiles unchanged, without even changing imports, in common code targeting Android, iOS, JVM and JS. For
-the migrated modules this is the primary API; the `dev.gitlive.firebase` packages add Kotlin-first extensions on top of it:
-
-```kotlin
-import com.google.firebase.installations.FirebaseInstallations
-import kotlinx.coroutines.tasks.await
-
-FirebaseInstallations.getInstance().getId()
-    .addOnSuccessListener { id -> println("Installation id: $id") }
-    .addOnFailureListener { e -> println("Failed: ${e.message}") }
-
-val token = FirebaseInstallations.getInstance().getToken(false).await().token
-```
-
-Rules of thumb for this layer:
-- It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders), and it is the API to
-  write new multiplatform code against, together with the `dev.gitlive.firebase` extensions of its classes (suspend
-  functions, `Flow`s, kotlinx.serialization) where they add something. Where a `com.google.firebase` member is unusable
-  from common code, the layer itself provides the multiplatform form: `FirebaseOptions(applicationId = ..., apiKey = ...)`
-  instead of the `Builder`, `deleteApp()` instead of `delete()`, `Timestamp(instant)` instead of `Timestamp(Date)`.
-- The earlier `dev.gitlive.firebase` wrappers of a migrated module that only delegate to this layer (`Firebase.initialize`,
-  `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data class, the `FirebaseApp`,
-  `FirebaseInstallations`, `FirebaseCrashlytics` and `FirebaseFunctions` wrappers and their `Firebase.x` accessors) are
-  deprecated with a `ReplaceWith` naming the counterpart; members reached through a wrapper instance are not, since
-  `app.compat.name` is no improvement on `app.name`.
-- On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
-  `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
-  depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
-  against, so your Android code binds to the real classes exactly as before. Other libraries depending on Firebase, the
-  Firebase Gradle plugins and Play Services all keep working.
-- An Android API that has no equivalent on a platform is deliberately not declared, so code using it fails to compile and
-  can be adapted rather than failing at runtime. Members whose signature involves an Android/JVM-only type but which do
-  have a multiplatform replacement (`FirebaseApp.initializeApp(Context)`, `getApps`, `getApplicationContext`,
-  `FirebaseOptions.fromResource`, the `Date`/`Instant` members of `Timestamp`), or that behave differently elsewhere
-  (`FirebaseApp.delete()` returns before the asynchronous deletion of the Apple and JS SDKs completes), are declared with
-  an error-level deprecation instead: common code using them fails to compile with a message naming the replacement
-  (`Firebase.initialize(context)`, `Firebase.getApps(context)`, `Firebase.fromResource(context)`,
-  `Timestamp(instant)` and `Timestamp.toKotlinInstant()` with `kotlin.time.Instant`, `deleteApp()` returning a
-  `Task`), while Android code keeps binding to the real SDK member. The
-  `Firebase.initialize(context, ...)` extensions themselves exist with the context widened to `Any?` on every platform
-  (Android code passing a `Context` still binds to the SDK's own functions). A static member of a Java class cannot be
-  given an `Any?` overload, so such a member moves onto `Firebase` under the same name: `FirebaseApp.getApps(Context)`
-  becomes `Firebase.getApps(context)` and `FirebaseOptions.fromResource(Context)` becomes `Firebase.fromResource(context)`.
-  An instance member whose replacement takes the same number of arguments cannot be deprecated either (a member shadows
-  a same-named extension), so the replacement is shipped as a same-named extension function taking the multiplatform
-  type and nothing else: `FirebaseFunctions.getHttpsCallableFromUrl(URL)` is `getHttpsCallableFromUrl(url: String)`
-  from common code, while `setTimeout(Long, TimeUnit)` is deprecated with an error pointing at `setTimeout(Duration)`. APIs that exist on Android, JVM and Apple but not on JS live in a `nonJsMain` source set, so Android + iOS
-  projects keep full source compatibility by declaring the same intermediate source set.
-- Every migrated module records which Android SDK APIs it provides in `api/android-sdk-compat.txt`, generated from the
-  Android SDK's own `api.txt` (`./gradlew :<module>:androidSourceCompatDump`); its percentage is the module's API coverage
-  badge above. The deprecated-with-an-error members above count as provided. Members that are `@hide` in the Android SDK,
-  or whose signature involves an Android/JVM-only type with no replacement to point at (`Parcelable`), are not counted;
-  anything else that is not mirrored counts against it.
-- `kotlinx.coroutines.tasks.await` from `kotlinx-coroutines-play-services` is mirrored the same way, so the usual
-  `Task.await()` import works from common code; `Task<Void>` is spelled `Task<Nothing?>`; the static-only `Tasks` helper
-  is not mirrored (use `await()` or `TaskCompletionSource`); listeners on iOS/JS run on the thread that completes the task.
-
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations`, `firebase-crashlytics` and `firebase-functions`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
-into a shared module, including the compiler-guided replacement of the Android-only members, see
-[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
 ### Initialization
 
@@ -178,6 +107,39 @@ initializeFirebase(Application())
 once the app is gone). The default app is named `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the
 underlying SDKs use different names for it. These are the `com.google.firebase` declarations; the same names exist in
 `dev.gitlive.firebase` from earlier versions (with a `FirebaseOptions` data class), deprecated in favour of them.
+
+
+
+### Using the Firebase Android SDK API from common code
+
+The SDK ships the Firebase Android SDK API itself under its original `com.google.firebase` packages, as `expect` declarations
+implemented on every platform. Code written against the Android SDK (including `com.google.android.gms.tasks.Task` and its
+listeners) therefore compiles unchanged, without even changing imports, in common code targeting Android, iOS, JVM and JS. For
+the migrated modules this is the primary API; the `dev.gitlive.firebase` packages add Kotlin-first extensions on top of it:
+
+```kotlin
+import com.google.firebase.installations.FirebaseInstallations
+import kotlinx.coroutines.tasks.await
+
+FirebaseInstallations.getInstance().getId()
+    .addOnSuccessListener { id -> println("Installation id: $id") }
+    .addOnFailureListener { e -> println("Failed: ${e.message}") }
+
+val token = FirebaseInstallations.getInstance().getToken(false).await().token
+```
+
+Where a `com.google.firebase` member is unusable from common code, the layer itself provides the multiplatform form:
+`FirebaseOptions(applicationId = ..., apiKey = ...)` instead of the `Builder`, `deleteApp()` instead of `delete()`,
+`Timestamp(instant)` instead of `Timestamp(Date)`. The earlier `dev.gitlive.firebase` wrappers of a migrated module that only
+delegate to this layer (`Firebase.initialize`, `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data
+class, the `FirebaseApp`, `FirebaseInstallations`, `FirebaseCrashlytics` and `FirebaseFunctions` wrappers and their `Firebase.x`
+accessors) are deprecated with a `ReplaceWith` naming the counterpart; members reached through a wrapper instance are not,
+since `app.compat.name` is no improvement on `app.name`.
+
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations`, `firebase-crashlytics` and `firebase-functions`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+into a shared module, including the compiler-guided replacement of the Android-only members, see
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
 ### Accessing the underlying Firebase SDK
 
