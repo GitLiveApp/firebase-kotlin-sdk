@@ -4,9 +4,7 @@
   <i>Development teams merge faster with GitLive</i><br/>
 <br/>
 <br/>
-The Firebase Kotlin SDK is a Kotlin-first SDK for Firebase. It's API is similar to the 
-<a href="https://firebase.google.com/docs/reference/kotlin/packages">Firebase Android SDK Kotlin Extensions</a> 
-but also supports multiplatform projects, enabling you to use Firebase directly from your common source targeting 
+The Firebase Kotlin SDK is a Kotlin Multiplatform SDK for Firebase, enabling you to use Firebase directly from your common source targeting 
 <strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
 Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
 
