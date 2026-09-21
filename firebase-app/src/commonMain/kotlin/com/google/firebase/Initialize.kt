@@ -45,3 +45,18 @@ public expect fun Firebase.fromResource(context: Any? = null): FirebaseOptions?
  * A no-op that completes immediately if the app was already deleted.
  */
 public expect fun FirebaseApp.deleteApp(): Task<Nothing?>
+
+/**
+ * Creates [FirebaseOptions] from named values, the multiplatform form of the Android SDK's `FirebaseOptions.Builder`.
+ * [authDomain] is used by the JS SDK only and ignored on the other platforms.
+ */
+public expect fun FirebaseOptions(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String? = null,
+    gaTrackingId: String? = null,
+    storageBucket: String? = null,
+    projectId: String? = null,
+    gcmSenderId: String? = null,
+    authDomain: String? = null,
+): FirebaseOptions

@@ -4,6 +4,7 @@
 
 @file:JvmName("FirebaseKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase
 
@@ -13,6 +14,7 @@ import kotlin.jvm.JvmName
 import com.google.firebase.app
 import com.google.firebase.deleteApp
 import com.google.firebase.getApps
+import com.google.firebase.initialize as compatInitialize
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
@@ -48,6 +50,7 @@ internal const val DELEGATES_TO_ANDROID_SDK_API =
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.FirebaseApp] this app wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.FirebaseApp"))
 public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
     public val name: String get() = compat.name
@@ -86,15 +89,22 @@ public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(com.google.fire
 public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null): FirebaseApp? = com.google.firebase.Firebase.compatInitialize(context)?.let { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat()))
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options, name)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat(), name))
 
-/** Configurable Firebase options. */
+/** Configurable Firebase options; the `com.google.firebase.FirebaseOptions(...)` factory takes the same named values. */
+@Deprecated(
+    DELEGATES_TO_ANDROID_SDK_API,
+    ReplaceWith("com.google.firebase.FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId, authDomain)", "com.google.firebase.FirebaseOptions"),
+)
 public data class FirebaseOptions(
     /** The Google App ID that is used to uniquely identify an instance of an app. */
     val applicationId: String,
@@ -154,7 +164,18 @@ internal expect fun FirebaseOptions.toCompat(): CompatFirebaseOptions
 
 internal expect fun CompatFirebaseOptions.toPublic(): FirebaseOptions
 
-internal fun FirebaseOptions.toCompatBuilder(): CompatFirebaseOptions.Builder = CompatFirebaseOptions.Builder()
+internal fun FirebaseOptions.toCompatBuilder(): CompatFirebaseOptions.Builder = compatOptionsBuilder(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId)
+
+/** The Android-SDK-shaped builder for the given values; shipped, since the `com.google.firebase.FirebaseOptions(...)` factory uses it. */
+internal fun compatOptionsBuilder(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String?,
+    gaTrackingId: String?,
+    storageBucket: String?,
+    projectId: String?,
+    gcmSenderId: String?,
+): CompatFirebaseOptions.Builder = CompatFirebaseOptions.Builder()
     .setApplicationId(applicationId)
     .setApiKey(apiKey)
     .setDatabaseUrl(databaseUrl)

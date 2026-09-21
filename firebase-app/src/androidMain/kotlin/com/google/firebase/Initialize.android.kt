@@ -7,6 +7,7 @@
 package com.google.firebase
 
 import android.content.Context
+import dev.gitlive.firebase.compatOptionsBuilder
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 
@@ -31,5 +32,16 @@ public actual fun FirebaseApp.deleteApp(): Task<Nothing?> {
     FirebaseAppStatics.delete(this)
     return TaskCompletionSource<Nothing?>().apply { setResult(null) }.task
 }
+
+public actual fun FirebaseOptions(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String?,
+    gaTrackingId: String?,
+    storageBucket: String?,
+    projectId: String?,
+    gcmSenderId: String?,
+    authDomain: String?,
+): FirebaseOptions = compatOptionsBuilder(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId).build()
 
 private fun Any?.asAndroidContext(): Context = requireNotNull(this as? Context) { "An android.content.Context is required on Android, got $this" }

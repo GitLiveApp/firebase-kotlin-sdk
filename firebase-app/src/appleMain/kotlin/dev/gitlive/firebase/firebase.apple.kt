@@ -2,22 +2,16 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("DEPRECATION")
+
 package dev.gitlive.firebase
 
 import cocoapods.FirebaseCore.FIRApp
-import com.google.firebase.Firebase as CompatFirebase
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
-import com.google.firebase.initialize as compatInitialize
 
 /** The underlying Firebase iOS SDK app. */
 public val FirebaseApp.ios: FIRApp get() = compat.ios
-
-public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFirebase.compatInitialize(context)?.let { FirebaseApp(it) }
-
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat()))
-
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat(), name))
 
 internal actual fun FirebaseOptions.toCompat(): CompatFirebaseOptions = toCompatBuilder().build()
 

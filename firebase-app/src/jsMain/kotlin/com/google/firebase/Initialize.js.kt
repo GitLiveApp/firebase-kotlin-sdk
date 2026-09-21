@@ -6,6 +6,7 @@ package com.google.firebase
 
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import dev.gitlive.firebase.compatOptionsBuilder
 import dev.gitlive.firebase.externals.deleteApp as jsDeleteApp
 import dev.gitlive.firebase.externals.getApps as jsGetApps
 import dev.gitlive.firebase.externals.initializeApp as jsInitializeApp
@@ -30,3 +31,14 @@ public actual fun FirebaseApp.deleteApp(): Task<Nothing?> {
     jsDeleteApp(js).then({ source.setResult(null) }, { source.setException(FirebaseException(it.message ?: "The Firebase app could not be deleted", it)) })
     return source.task
 }
+
+public actual fun FirebaseOptions(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String?,
+    gaTrackingId: String?,
+    storageBucket: String?,
+    projectId: String?,
+    gcmSenderId: String?,
+    authDomain: String?,
+): FirebaseOptions = compatOptionsBuilder(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId).setAuthDomain(authDomain).build()

@@ -240,7 +240,7 @@ FirebaseInstallationRepository(applicationContext).ensureInitialized()
 FirebaseInstallationRepository(null).ensureInitialized()
 
 // jsMain: there is no default configuration, so pass options explicitly
-Firebase.initialize(null, FirebaseOptions.Builder().setApiKey("AIza...").setApplicationId("1:846484016111:web:abc123").setProjectId("fir-kotlin-sdk").build())
+Firebase.initialize(null, FirebaseOptions(applicationId = "1:846484016111:web:abc123", apiKey = "AIza...", projectId = "fir-kotlin-sdk"))
 ```
 
 The [Initialization](../README.md#initialization) section of the README has the full per-platform table, including the JVM.

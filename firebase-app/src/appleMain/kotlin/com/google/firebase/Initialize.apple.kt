@@ -8,6 +8,7 @@ import cocoapods.FirebaseCore.FIRApp
 import cocoapods.FirebaseCore.FIROptions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import dev.gitlive.firebase.compatOptionsBuilder
 
 /** Configures the default app from `GoogleService-Info.plist`; the [context] is ignored. */
 public actual fun Firebase.initialize(context: Any?): FirebaseApp? {
@@ -40,3 +41,14 @@ public actual fun FirebaseApp.deleteApp(): Task<Nothing?> {
     }
     return source.task
 }
+
+public actual fun FirebaseOptions(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String?,
+    gaTrackingId: String?,
+    storageBucket: String?,
+    projectId: String?,
+    gcmSenderId: String?,
+    authDomain: String?,
+): FirebaseOptions = compatOptionsBuilder(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId).build()

@@ -56,10 +56,10 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 
 Rules of thumb for this layer:
 - It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
-  API is built on top of it. Its entry points and classes that only delegate to this layer (`Firebase.app`,
-  `Firebase.apps`, `Firebase.installations` and the `FirebaseInstallations` wrapper) are deprecated with a `ReplaceWith`
-  naming the counterpart; members reached through a wrapper instance are not, since `app.compat.name` is no
-  improvement on `app.name`. What remains (suspend functions, `Flow`s, serialization, default arguments instead of
+  API is built on top of it. Its entry points and classes that only delegate to this layer (`Firebase.initialize`,
+  `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data class, the `FirebaseApp` and
+  `FirebaseInstallations` wrappers, `Firebase.installations`) are deprecated with a `ReplaceWith` naming the counterpart;
+  members reached through a wrapper instance are not, since `app.compat.name` is no improvement on `app.name`. What remains (suspend functions, `Flow`s, serialization, default arguments instead of
   builders) is the recommended way to write new multiplatform code.
 - On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
   `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
@@ -116,7 +116,13 @@ platform's entry point:
 
 ```kotlin
 // commonMain
-fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.getApps
+import com.google.firebase.initialize
+
+fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.getApps(context).firstOrNull() ?: Firebase.initialize(
     context,
     FirebaseOptions(
         applicationId = "1:846484016111:web:abc123",
@@ -157,11 +163,10 @@ initializeFirebase(Application())
 ```
 
 `Firebase.initialize(context, options, name)` initialises an additional named app and `Firebase.app(name)` returns it;
-`Firebase.apps(context)` lists the initialised apps and `FirebaseApp.delete()` removes one. The default app is named
-`FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the underlying SDKs use different names for it.
-
-Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)`: the same
-three overloads exist there with the context typed as `Any?`, following the rules above per platform.
+`Firebase.getApps(context)` lists the initialised apps and `FirebaseApp.deleteApp()` removes one (a `Task` that completes
+once the app is gone). The default app is named `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the
+underlying SDKs use different names for it. These are the `com.google.firebase` declarations: the same names exist in
+`dev.gitlive.firebase` from earlier versions (with a `FirebaseOptions` data class), deprecated in favour of them.
 
 ### Accessing the underlying Firebase SDK
 
