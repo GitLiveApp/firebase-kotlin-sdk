@@ -9,7 +9,6 @@ import kotlinx.coroutines.await
 import com.google.firebase.Firebase as CompatFirebase
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
-import com.google.firebase.getApps as compatGetApps
 import com.google.firebase.initialize as compatInitialize
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 
@@ -21,8 +20,6 @@ public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFireb
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat()))
 
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat(), name))
-
-public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = CompatFirebase.compatGetApps(context).map { FirebaseApp(it) }
 
 internal actual suspend fun CompatFirebaseApp.deleteAwaiting() {
     deleteApp(js).await()

@@ -28,7 +28,7 @@ public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
 public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
-    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp),
+    FIRRemoteConfig.remoteConfigWithApp(com.google.firebase.Firebase.app.ios as objcnames.classes.FIRApp),
 )
 
 public actual class FirebaseRemoteConfig internal constructor(internal val ios: FIRRemoteConfig) {

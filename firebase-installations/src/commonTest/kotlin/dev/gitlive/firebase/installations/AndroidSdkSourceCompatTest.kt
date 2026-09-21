@@ -17,7 +17,6 @@ import com.google.firebase.installations.installations
 import com.google.firebase.toKotlinInstant
 import com.google.firebase.installations.internal.FidListener
 import com.google.firebase.installations.internal.FidListenerHandle
-import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.tasks.await
@@ -40,7 +39,7 @@ class AndroidSdkSourceCompatTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        if (dev.gitlive.firebase.Firebase.apps(context).isEmpty()) {
+        if (Firebase.getApps(context).isEmpty()) {
             dev.gitlive.firebase.Firebase.initialize(
                 context,
                 dev.gitlive.firebase.FirebaseOptions(

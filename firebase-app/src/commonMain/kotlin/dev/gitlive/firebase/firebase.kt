@@ -11,6 +11,7 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 import com.google.firebase.app
+import com.google.firebase.getApps
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
@@ -20,6 +21,13 @@ import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
  * Acts as a target for extension methods provided by sdks.
  */
 public object Firebase
+
+/**
+ * Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer, which common
+ * code can use directly; each names its counterpart in a `ReplaceWith`.
+ */
+internal const val DELEGATES_TO_ANDROID_SDK_API =
+    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
 
 /**
  * The entry point of Firebase SDKs. It holds common configuration and state for Firebase APIs. Most
@@ -40,6 +48,7 @@ public object Firebase
  */
 public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
+    @Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("compat.name"))
     public val name: String get() = compat.name
 
     /** Returns the specified [FirebaseOptions]. */
@@ -57,18 +66,21 @@ public class FirebaseApp internal constructor(public val compat: CompatFirebaseA
 
     override fun hashCode(): Int = compat.hashCode()
 
-    override fun toString(): String = "FirebaseApp(name=$name)"
+    override fun toString(): String = "FirebaseApp(name=${compat.name})"
 }
 
 /** Returns the default firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app", "com.google.firebase.app"))
 public val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.Firebase.app)
 
 /** Returns a named firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app(name)", "com.google.firebase.app"))
 public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.app(name))
 
 /** Returns all firebase app instances. */
-public expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.getApps(context)", "com.google.firebase.getApps"))
+public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
 public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?

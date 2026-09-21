@@ -56,7 +56,10 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 
 Rules of thumb for this layer:
 - It mirrors the Android SDK's names *and* shapes (`Task<T>` results, listener interfaces, builders). The `dev.gitlive`
-  API is built on top of it and remains the recommended way to write new multiplatform code.
+  API is built on top of it. Its members that only delegate to this layer (`Firebase.app`, `Firebase.apps`,
+  `FirebaseApp.name`, the whole `dev.gitlive.firebase.installations` wrapper) are deprecated with a `ReplaceWith`
+  naming the counterpart; what remains (suspend functions, `Flow`s, serialization, default arguments instead of
+  builders) is the recommended way to write new multiplatform code.
 - On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
   `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
   depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled

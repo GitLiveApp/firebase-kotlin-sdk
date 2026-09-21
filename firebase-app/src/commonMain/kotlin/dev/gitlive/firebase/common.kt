@@ -10,8 +10,9 @@ package dev.gitlive.firebase
 
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+import com.google.firebase.options as compatOptions
 
 /** Returns options of default FirebaseApp */
 @Suppress("UnusedReceiverParameter")
 public val Firebase.options: FirebaseOptions
-    get() = Firebase.app.options
+    get() = com.google.firebase.Firebase.compatOptions.toPublic()
