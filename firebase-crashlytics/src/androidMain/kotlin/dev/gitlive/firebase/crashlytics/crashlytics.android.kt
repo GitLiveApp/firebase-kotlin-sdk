@@ -4,6 +4,7 @@
 
 @file:JvmName("CrashlyticsKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.crashlytics
 

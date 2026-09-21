@@ -260,9 +260,7 @@ Run the shared module's tests on the other targets to confirm the migrated code 
 - New multiplatform code is written against the `com.google.firebase` API, plus the Kotlin-first extensions the
   `dev.gitlive.firebase` packages add to its classes (suspend functions instead of `Task`, `Flow` instead of listeners,
   kotlinx.serialization). The earlier `dev.gitlive` wrappers of a migrated module are deprecated with a `ReplaceWith`
-  naming the `com.google.firebase` counterpart, except the firebase-app ones (`Firebase.initialize`, `Firebase.app`,
-  `FirebaseApp`, `FirebaseOptions`), which the modules not yet migrated still depend on and which follow once every
-  module is. See [Kotlin-first design](../README.md#kotlin-first-design).
+  naming the `com.google.firebase` counterpart. See [Kotlin-first design](../README.md#kotlin-first-design).
 - The other Firebase modules are being migrated to the same structure one at a time. Until a module is, its Android
   SDK API is not available in common code and its `dev.gitlive` API is the multiplatform entry point.
 - [Using the Firebase Android SDK API from common code](../README.md#using-the-firebase-android-sdk-api-from-common-code)

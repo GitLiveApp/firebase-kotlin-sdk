@@ -2,6 +2,8 @@
  * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:Suppress("DEPRECATION")
+
 package dev.gitlive.firebase.functions
 
 import dev.gitlive.firebase.DecodeSettings
@@ -39,11 +41,16 @@ public inline fun <reified T> CompatHttpsCallableResult.data(): T = decode<T>(va
 /** The [CompatHttpsCallableResult.data] deserialized with [strategy]. */
 public inline fun <T> CompatHttpsCallableResult.data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, data, buildSettings)
 
+/** Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer. */
+internal const val DELEGATES_TO_ANDROID_SDK_API =
+    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
+
 /**
  * FirebaseFunctions lets you call Cloud Functions for Firebase.
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.functions.FirebaseFunctions] this wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.functions.FirebaseFunctions"))
 public class FirebaseFunctions internal constructor(public val compat: CompatFirebaseFunctions) {
     /** Returns a reference to the callable HTTPS trigger with the given name. */
     public fun httpsCallable(name: String, timeout: Duration? = null): HttpsCallableReference = HttpsCallableReference(compat.getHttpsCallable(name).apply { timeout?.let { compatSetTimeout(it) } })
@@ -75,6 +82,7 @@ public fun FirebaseFunctions.httpsCallable(name: String, timeout: Long): HttpsCa
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.functions.HttpsCallableReference] this wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.functions.HttpsCallableReference"))
 public class HttpsCallableReference internal constructor(public val compat: CompatHttpsCallableReference) {
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("invoke(data) { this.encodeDefaults = encodeDefaults }"))
     public suspend inline operator fun <reified T> invoke(data: T, encodeDefaults: Boolean): HttpsCallableResult = invoke(data) {
@@ -122,6 +130,7 @@ public class HttpsCallableReference internal constructor(public val compat: Comp
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.functions.HttpsCallableResult] this wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.functions.HttpsCallableResult"))
 public class HttpsCallableResult(public val compat: CompatHttpsCallableResult) {
 
     public inline fun <reified T> data(): T = compat.data<T>()

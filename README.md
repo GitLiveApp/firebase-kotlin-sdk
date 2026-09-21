@@ -63,12 +63,11 @@ Rules of thumb for this layer:
   functions, `Flow`s, kotlinx.serialization) where they add something. Where a `com.google.firebase` member is unusable
   from common code, the layer itself provides the multiplatform form: `FirebaseOptions(applicationId = ..., apiKey = ...)`
   instead of the `Builder`, `deleteApp()` instead of `delete()`, `Timestamp(instant)` instead of `Timestamp(Date)`.
-- The earlier `dev.gitlive.firebase` wrappers of a migrated module that only delegate to this layer (so far the
-  `FirebaseInstallations` wrapper and `Firebase.installations`) are deprecated with a `ReplaceWith` naming the counterpart;
-  members reached through a wrapper instance are not, since `app.compat.name` is no improvement on `app.name`. The
-  firebase-app wrappers (`Firebase.initialize`, `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions`
-  data class, `FirebaseApp`) follow once every module is migrated, because the modules that are not yet take a
-  `FirebaseApp` from them.
+- The earlier `dev.gitlive.firebase` wrappers of a migrated module that only delegate to this layer (`Firebase.initialize`,
+  `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data class, the `FirebaseApp`,
+  `FirebaseInstallations`, `FirebaseCrashlytics` and `FirebaseFunctions` wrappers and their `Firebase.x` accessors) are
+  deprecated with a `ReplaceWith` naming the counterpart; members reached through a wrapper instance are not, since
+  `app.compat.name` is no improvement on `app.name`.
 - On Android and the JVM nothing is added to your app beyond the `Firebase.initialize(Any?, ...)` overloads,
   `Firebase.getApps(Any?)`, `Firebase.fromResource(Any?)` and the `Timestamp` / `kotlin.time.Instant` conversions: the library
   depends on the official Firebase Android SDK (`firebase-java-sdk` on the JVM) and these declarations are only compiled
@@ -178,8 +177,7 @@ initializeFirebase(Application())
 `Firebase.getApps(context)` lists the initialised apps and `FirebaseApp.deleteApp()` removes one (a `Task` that completes
 once the app is gone). The default app is named `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the
 underlying SDKs use different names for it. These are the `com.google.firebase` declarations; the same names exist in
-`dev.gitlive.firebase` from earlier versions (with a `FirebaseOptions` data class) and stay until every module is migrated,
-since the modules that are not yet take their `FirebaseApp` from them.
+`dev.gitlive.firebase` from earlier versions (with a `FirebaseOptions` data class), deprecated in favour of them.
 
 ### Accessing the underlying Firebase SDK
 

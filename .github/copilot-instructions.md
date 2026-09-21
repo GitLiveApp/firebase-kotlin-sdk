@@ -164,8 +164,8 @@ A `dev.gitlive` entry point or class that only delegates to its `com.google.fire
 adds no value and is deprecated with `DELEGATES_TO_ANDROID_SDK_API` and a `ReplaceWith` naming the counterpart, spelled
 with the fully qualified `com.google.firebase.Firebase` object since both layers have a `Firebase` object. Members reached
 through a wrapper instance are not deprecated: a `ReplaceWith` that only inserts `.compat` is churn, not a migration. The
-firebase-app wrappers (`Firebase.initialize`, `Firebase.app`, `Firebase.apps`, `FirebaseOptions`, `FirebaseApp`) are
-deprecated last, once every module is migrated, because the modules that are not yet take a `FirebaseApp` from them.
+wrapper deprecations of every migrated module land together, once every module is migrated, because the modules that
+are not yet take a `dev.gitlive` `FirebaseApp` from `Firebase.app` / `Firebase.initialize`.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

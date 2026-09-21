@@ -5,6 +5,7 @@
 // The facade name of the former androidMain file, kept for binary compatibility.
 @file:JvmName("AndroidFunctions")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.functions
 
@@ -18,10 +19,12 @@ import com.google.firebase.functions.functions as compatFunctions
 // real static methods on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseFunctions] instance of the default [FirebaseApp]. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.functions", "com.google.firebase.functions.functions"))
 public val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(com.google.firebase.Firebase.compatFunctions)
 
 /** Returns the [FirebaseFunctions] instance of a given [region]. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.functions(region)", "com.google.firebase.functions.functions"))
 public fun Firebase.functions(region: String): FirebaseFunctions = FirebaseFunctions(com.google.firebase.Firebase.compatFunctions(region))
 
 /** Returns the [FirebaseFunctions] instance of a given [FirebaseApp]. */

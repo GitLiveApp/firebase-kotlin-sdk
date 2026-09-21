@@ -4,6 +4,7 @@
 
 @file:JvmName("FirebaseKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase
 
@@ -26,10 +27,8 @@ import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 public object Firebase
 
 /**
- * Message for deprecating a `dev.gitlive` member that only delegates to the `com.google.firebase` layer, which common
- * code can use directly, with a `ReplaceWith` naming the counterpart. The firebase-app wrappers (`Firebase.initialize`,
- * `Firebase.app`, `Firebase.apps`, `FirebaseOptions`, `FirebaseApp`) are deprecated last: every module that is not yet
- * migrated takes a [FirebaseApp] from them.
+ * Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer, which common
+ * code can use directly; each names its counterpart in a `ReplaceWith`.
  */
 internal const val DELEGATES_TO_ANDROID_SDK_API =
     "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
@@ -51,6 +50,7 @@ internal const val DELEGATES_TO_ANDROID_SDK_API =
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.FirebaseApp] this app wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.FirebaseApp"))
 public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
     public val name: String get() = compat.name
@@ -76,25 +76,35 @@ public class FirebaseApp internal constructor(public val compat: CompatFirebaseA
 }
 
 /** Returns the default firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app", "com.google.firebase.app"))
 public val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.Firebase.app)
 
 /** Returns a named firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app(name)", "com.google.firebase.app"))
 public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.app(name))
 
 /** Returns all firebase app instances. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.getApps(context)", "com.google.firebase.getApps"))
 public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context)", "com.google.firebase.initialize"))
 public fun Firebase.initialize(context: Any? = null): FirebaseApp? = com.google.firebase.Firebase.compatInitialize(context)?.let { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options)", "com.google.firebase.initialize"))
 public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat()))
 
 /** Initializes and returns a FirebaseApp. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options, name)", "com.google.firebase.initialize"))
 public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat(), name))
 
 /** Configurable Firebase options; the `com.google.firebase.FirebaseOptions(...)` factory takes the same named values and returns the Android-SDK-shaped ones. */
+@Deprecated(
+    DELEGATES_TO_ANDROID_SDK_API,
+    ReplaceWith("com.google.firebase.FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId, authDomain)", "com.google.firebase.FirebaseOptions"),
+)
 public data class FirebaseOptions(
     /** The Google App ID that is used to uniquely identify an instance of an app. */
     val applicationId: String,
