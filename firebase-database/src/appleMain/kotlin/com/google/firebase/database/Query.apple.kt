@@ -84,6 +84,7 @@ public actual open class Query internal constructor(public open val ios: FIRData
     public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue())
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()))
     public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()))
+
     // With a null key the single-argument iOS methods are used: the childKey variants reject a nil key under orderByKey.
     public actual fun startAt(value: String?): Query = Query(ios.queryStartingAtValue(value))
     public actual fun startAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
