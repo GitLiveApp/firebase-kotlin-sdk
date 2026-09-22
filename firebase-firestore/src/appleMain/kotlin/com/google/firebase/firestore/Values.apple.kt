@@ -4,13 +4,13 @@
 
 package com.google.firebase.firestore
 
+import cocoapods.FirebaseCore.FIRTimestamp
 import cocoapods.FirebaseFirestoreInternal.FIRDocumentReference
 import cocoapods.FirebaseFirestoreInternal.FIRFieldPath
 import cocoapods.FirebaseFirestoreInternal.FIRFieldValue
 import cocoapods.FirebaseFirestoreInternal.FIRFilter
 import cocoapods.FirebaseFirestoreInternal.FIRFirestoreErrorDomain
 import cocoapods.FirebaseFirestoreInternal.FIRGeoPoint
-import cocoapods.FirebaseFirestoreInternal.FIRTimestamp
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.Timestamp
@@ -123,7 +123,7 @@ internal fun Throwable.toNSError(): NSError = NSError.errorWithDomain(
     mapOf<Any?, Any?>(NSLocalizedDescriptionKey to (message ?: toString())),
 )
 
-internal inline fun <T> task(crossinline start: ((T, NSError?) -> Unit) -> Unit): Task<T> {
+internal inline fun <T> task(crossinline start: ((T?, NSError?) -> Unit) -> Unit): Task<T> {
     val source = TaskCompletionSource<T>()
     start { result, error -> if (error == null) source.setResult(result) else source.setException(error.toFirestoreException()) }
     return source.task
