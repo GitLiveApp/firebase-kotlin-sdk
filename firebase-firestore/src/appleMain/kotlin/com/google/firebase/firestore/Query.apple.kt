@@ -141,9 +141,10 @@ public actual class CollectionReference internal constructor(override val ios: F
 
     public actual fun document(documentPath: String): DocumentReference = DocumentReference(ios.documentWithPath(documentPath))
 
+    /** Completes once the write is acknowledged, as on Android (addDocumentWithData returns the reference before that). */
     public actual fun add(data: Any): Task<DocumentReference> = task { completion ->
-        val reference = ios.addDocumentWithData(data.toIosData()) { error -> if (error != null) completion(null, error) }
-        if (reference != null) completion(DocumentReference(reference), null)
+        val reference = ios.documentWithAutoID()
+        reference.setData(data.toIosData()) { error -> completion(if (error == null) DocumentReference(reference) else null, error) }
     }
 }
 
