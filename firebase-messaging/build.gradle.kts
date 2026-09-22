@@ -2,7 +2,11 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -52,6 +56,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -85,13 +90,13 @@ kotlin {
 
     if (supportedPlatforms.contains(TargetPlatform.Ios)) {
         iosArm64()
-        iosX64()
-        iosSimulatorArm64()
+        iosX64().enableKeychainForTests()
+        iosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
-        tvosSimulatorArm64()
+        tvosX64().enableKeychainForTests()
+        tvosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
@@ -177,6 +182,44 @@ kotlin {
                 }
             }
         }
+    }
+}
+
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files(),
+    // firebase-java-sdk has no Cloud Messaging: the JVM actuals are real code, not stubs.
+    jvmStubs = false,
+    // Shipped facades: the nonJsMain extensions binding to the SDK's topic and auto-init members, and the String forms of the Uri members.
+    keepClasses = listOf(
+        "com/google/firebase/messaging/MessagingNonJsKt.class",
+        "com/google/firebase/messaging/RemoteMessageUriKt.class",
+    ),
+)
+
+registerAndroidSourceCompat("firebase-messaging/api.txt")
+
+// FirebaseMessaging stores its tokens in the keychain, which the simulator only grants to a binary with a keychain
+// access group, so the tests that configure a Firebase app link with the entitlements (as the auth tests do). It also
+// keys the keychain items by the main bundle's identifier, which a bare test executable lacks (FIRMessaging crashes
+// inserting nil into its keychain query), so an Info.plist with a bundle identifier is embedded as well.
+fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
+            "-sectcreate",
+            "__TEXT",
+            "__info_plist",
+            file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
+        )
     }
 }
 

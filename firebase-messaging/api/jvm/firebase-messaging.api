@@ -1,8 +1,122 @@
-public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
+public final class com/google/firebase/messaging/FirebaseMessaging {
+	public static final field Companion Lcom/google/firebase/messaging/FirebaseMessaging$Companion;
+	public static final field INSTANCE_ID_SCOPE Ljava/lang/String;
+	public final fun deleteToken ()Lcom/google/android/gms/tasks/Task;
+	public static final fun getInstance ()Lcom/google/firebase/messaging/FirebaseMessaging;
+	public final fun getToken ()Lcom/google/android/gms/tasks/Task;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/google/firebase/messaging/FirebaseMessaging$Companion {
+	public final fun getInstance ()Lcom/google/firebase/messaging/FirebaseMessaging;
+}
+
+public final class com/google/firebase/messaging/MessagingKt {
+	public static final fun getMessaging (Lcom/google/firebase/Firebase;)Lcom/google/firebase/messaging/FirebaseMessaging;
+	public static final fun remoteMessage (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/messaging/RemoteMessage;
+}
+
+public final class com/google/firebase/messaging/MessagingNonJs_jvmKt {
+	public static final fun isAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;)Z
+	public static final fun setAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;Z)V
+	public static final fun subscribeToTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
+	public static final fun unsubscribeFromTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
+}
+
+public final class com/google/firebase/messaging/RemoteMessage {
+	public static final field Companion Lcom/google/firebase/messaging/RemoteMessage$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCollapseKey ()Ljava/lang/String;
+	public final fun getData ()Ljava/util/Map;
+	public final fun getFrom ()Ljava/lang/String;
+	public final fun getMessageId ()Ljava/lang/String;
+	public final fun getMessageType ()Ljava/lang/String;
+	public final fun getNotification ()Lcom/google/firebase/messaging/RemoteMessage$Notification;
+	public final fun getOriginalPriority ()I
+	public final fun getPriority ()I
+	public final fun getSenderId ()Ljava/lang/String;
+	public final fun getSentTime ()J
+	public final fun getTo ()Ljava/lang/String;
+	public final fun getTtl ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/google/firebase/messaging/RemoteMessage$Builder {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun addData (Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun build ()Lcom/google/firebase/messaging/RemoteMessage;
+	public final fun clearData ()Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun setCollapseKey (Ljava/lang/String;)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun setData (Ljava/util/Map;)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun setMessageId (Ljava/lang/String;)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun setMessageType (Ljava/lang/String;)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+	public final fun setTtl (I)Lcom/google/firebase/messaging/RemoteMessage$Builder;
+}
+
+public final class com/google/firebase/messaging/RemoteMessage$Companion {
+	public final fun getPRIORITY_HIGH ()I
+	public final fun getPRIORITY_NORMAL ()I
+	public final fun getPRIORITY_UNKNOWN ()I
+}
+
+public abstract interface annotation class com/google/firebase/messaging/RemoteMessage$MessagePriority : java/lang/annotation/Annotation {
+}
+
+public final class com/google/firebase/messaging/RemoteMessage$Notification {
 	public fun <init> ()V
+	public final fun getBody ()Ljava/lang/String;
+	public final fun getBodyLocalizationArgs ()[Ljava/lang/String;
+	public final fun getBodyLocalizationKey ()Ljava/lang/String;
+	public final fun getChannelId ()Ljava/lang/String;
+	public final fun getClickAction ()Ljava/lang/String;
+	public final fun getColor ()Ljava/lang/String;
+	public final fun getDefaultLightSettings ()Z
+	public final fun getDefaultSound ()Z
+	public final fun getDefaultVibrateSettings ()Z
+	public final fun getEventTime ()Ljava/lang/Long;
+	public final fun getIcon ()Ljava/lang/String;
+	public final fun getLightSettings ()[I
+	public final fun getLocalOnly ()Z
+	public final fun getNotificationCount ()Ljava/lang/Integer;
+	public final fun getNotificationPriority ()Ljava/lang/Integer;
+	public final fun getSound ()Ljava/lang/String;
+	public final fun getSticky ()Z
+	public final fun getTag ()Ljava/lang/String;
+	public final fun getTicker ()Ljava/lang/String;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getTitleLocalizationArgs ()[Ljava/lang/String;
+	public final fun getTitleLocalizationKey ()Ljava/lang/String;
+	public final fun getVibrateTimings ()[J
+	public final fun getVisibility ()Ljava/lang/Integer;
+}
+
+public final class com/google/firebase/messaging/RemoteMessage_nonAndroidKt {
+	public static final fun getImageUrl (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
+	public static final fun getLink (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
+}
+
+public final class com/google/firebase/messaging/SendException : java/lang/Exception {
+	public static final field Companion Lcom/google/firebase/messaging/SendException$Companion;
+	public final fun getErrorCode ()I
+}
+
+public final class com/google/firebase/messaging/SendException$Companion {
+	public final fun getERROR_INVALID_PARAMETERS ()I
+	public final fun getERROR_SIZE ()I
+	public final fun getERROR_TOO_MANY_MESSAGES ()I
+	public final fun getERROR_TTL_EXCEEDED ()I
+	public final fun getERROR_UNKNOWN ()I
+}
+
+public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
 	public final fun deleteToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/messaging/FirebaseMessaging;
 	public final fun getToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
 	public final fun subscribeToTopic (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 	public final fun unsubscribeFromTopic (Ljava/lang/String;)V
 }
 
