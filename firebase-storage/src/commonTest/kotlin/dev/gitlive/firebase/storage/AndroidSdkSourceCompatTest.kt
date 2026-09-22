@@ -68,9 +68,9 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app.compat, storage.app)
         assertEquals(30_000, storage.maxUploadRetryTimeMillis)
         assertEquals(30_000, storage.maxOperationRetryTimeMillis)
-        // The Android SDK renders the root reference of getReference() with a trailing slash and root without, so compare the location.
+        // The SDKs render a root path as "/" or "", depending on how the reference was reached, so compare the bucket and the trimmed path.
         assertEquals(storage.reference.bucket, storage.getReference("test").root.bucket)
-        assertEquals(storage.reference.path, storage.getReference("test").root.path)
+        assertEquals(storage.reference.path.trim('/'), storage.getReference("test").root.path.trim('/'))
         assertEquals("test", storage.getReference("test/compat.txt").parent?.name)
         assertEquals(storage, dev.gitlive.firebase.Firebase.storage(app).compat)
     }
