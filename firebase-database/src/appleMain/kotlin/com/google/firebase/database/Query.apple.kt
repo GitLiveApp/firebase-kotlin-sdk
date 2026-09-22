@@ -5,11 +5,11 @@
 package com.google.firebase.database
 
 import cocoapods.FirebaseDatabase.FIRDataEventType
-import cocoapods.FirebaseDatabase.FIRDataEventTypeChildAdded
-import cocoapods.FirebaseDatabase.FIRDataEventTypeChildChanged
-import cocoapods.FirebaseDatabase.FIRDataEventTypeChildMoved
-import cocoapods.FirebaseDatabase.FIRDataEventTypeChildRemoved
-import cocoapods.FirebaseDatabase.FIRDataEventTypeValue
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildAdded
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildChanged
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildMoved
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildRemoved
+import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeValue
 import cocoapods.FirebaseDatabase.FIRDatabaseHandle
 import cocoapods.FirebaseDatabase.FIRDatabaseQuery
 import cocoapods.FirebaseDatabase.FIRDatabaseReference
@@ -273,7 +273,7 @@ private inline fun write(crossinline start: ((NSError?, FIRDatabaseReference?) -
     start { error, _ -> completion(null, error) }
 }
 
-internal inline fun <T> task(crossinline start: ((T, NSError?) -> Unit) -> Unit): Task<T> {
+internal inline fun <T> task(crossinline start: ((T?, NSError?) -> Unit) -> Unit): Task<T> {
     val source = TaskCompletionSource<T>()
     start { result, error -> if (error == null) source.setResult(result) else source.setException(error.toDatabaseError().toException()) }
     return source.task
