@@ -205,14 +205,20 @@ stripHeaderStubs(
 registerAndroidSourceCompat("firebase-messaging/api.txt")
 
 // FirebaseMessaging stores its tokens in the keychain, which the simulator only grants to a binary with a keychain
-// access group, so the tests that configure a Firebase app link with the entitlements (as the auth tests do).
+// access group, so the tests that configure a Firebase app link with the entitlements (as the auth tests do). It also
+// keys the keychain items by the main bundle's identifier, which a bare test executable lacks (FIRMessaging crashes
+// inserting nil into its keychain query), so an Info.plist with a bundle identifier is embedded as well.
 fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
     testRuns.configureEach {
         executionSource.binary.linkerOpts(
             "-sectcreate",
             "__TEXT",
             "__entitlements",
-            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
+            "-sectcreate",
+            "__TEXT",
+            "__info_plist",
+            file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
         )
     }
 }
