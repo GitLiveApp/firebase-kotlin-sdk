@@ -106,13 +106,13 @@ class AndroidSdkSourceCompatTest {
         reference.setValue(mapOf("name" to "compat", "count" to 5, "nested" to mapOf("flag" to true))).await()
 
         val snapshot: DataSnapshot = reference.get().await()
-        assertTrue(snapshot.exists())
+        assertTrue(snapshot.exists(), "snapshot.exists()")
         assertEquals("compatWrites", snapshot.key)
         assertEquals(reference, snapshot.ref)
         assertEquals(3, snapshot.childrenCount)
-        assertTrue(snapshot.hasChildren())
-        assertTrue(snapshot.hasChild("nested/flag"))
-        assertFalse(snapshot.hasChild("missing"))
+        assertTrue(snapshot.hasChildren(), "snapshot.hasChildren()")
+        assertTrue(snapshot.hasChild("nested/flag"), "snapshot.hasChild('nested/flag')")
+        assertFalse(snapshot.hasChild("missing"), "snapshot.hasChild('missing')")
         assertEquals("compat", snapshot.child("name").value)
         assertEquals(5L, (snapshot.child("count").value as Number).toLong())
         assertEquals(true, snapshot.child("nested/flag").getValue<Boolean>())
@@ -124,7 +124,7 @@ class AndroidSdkSourceCompatTest {
 
         reference.updateChildren(mapOf("count" to 6, "name" to null)).await()
         val updated = reference.snapshots.first()
-        assertFalse(updated.hasChild("name"))
+        assertFalse(updated.hasChild("name"), "updated.hasChild('name')")
         assertEquals(6L, (updated.child("count").value as Number).toLong())
 
         val completed = CompletableDeferred<DatabaseError?>()
@@ -133,7 +133,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals(7L, reference.child("count").values<Long>().first()?.let { (it as Number).toLong() })
 
         reference.removeValue().await()
-        assertFalse(reference.get().await().exists())
+        assertFalse(reference.get().await().exists(), "reference.get().await().exists()")
         assertNull(reference.get().await().value)
     }
 

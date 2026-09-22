@@ -17,6 +17,7 @@ import cocoapods.FirebaseDatabase.FIRTransactionResult
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 
 private const val IOS_PERMISSION_DENIED = 1L
 private const val IOS_UNAVAILABLE = 2L
@@ -83,36 +84,37 @@ public actual open class Query internal constructor(public open val ios: FIRData
     public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue())
     public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()))
     public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()))
+    // With a null key the single-argument iOS methods are used: the childKey variants reject a nil key under orderByKey.
     public actual fun startAt(value: String?): Query = Query(ios.queryStartingAtValue(value))
-    public actual fun startAt(value: String?, key: String?): Query = Query(ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
     public actual fun startAt(value: Double): Query = Query(ios.queryStartingAtValue(value))
-    public actual fun startAt(value: Double, key: String?): Query = Query(ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
     public actual fun startAt(value: Boolean): Query = Query(ios.queryStartingAtValue(value))
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
     public actual fun startAfter(value: String?): Query = Query(ios.queryStartingAfterValue(value))
-    public actual fun startAfter(value: String?, key: String?): Query = Query(ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
     public actual fun startAfter(value: Double): Query = Query(ios.queryStartingAfterValue(value))
-    public actual fun startAfter(value: Double, key: String?): Query = Query(ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
     public actual fun startAfter(value: Boolean): Query = Query(ios.queryStartingAfterValue(value))
-    public actual fun startAfter(value: Boolean, key: String?): Query = Query(ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
     public actual fun endAt(value: String?): Query = Query(ios.queryEndingAtValue(value))
-    public actual fun endAt(value: String?, key: String?): Query = Query(ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
     public actual fun endAt(value: Double): Query = Query(ios.queryEndingAtValue(value))
-    public actual fun endAt(value: Double, key: String?): Query = Query(ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
     public actual fun endAt(value: Boolean): Query = Query(ios.queryEndingAtValue(value))
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
     public actual fun endBefore(value: String?): Query = Query(ios.queryEndingBeforeValue(value))
-    public actual fun endBefore(value: String?, key: String?): Query = Query(ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
     public actual fun endBefore(value: Double): Query = Query(ios.queryEndingBeforeValue(value))
-    public actual fun endBefore(value: Double, key: String?): Query = Query(ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
     public actual fun endBefore(value: Boolean): Query = Query(ios.queryEndingBeforeValue(value))
-    public actual fun endBefore(value: Boolean, key: String?): Query = Query(ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
     public actual fun equalTo(value: String?): Query = Query(ios.queryEqualToValue(value))
-    public actual fun equalTo(value: String?, key: String?): Query = Query(ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: String?, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
     public actual fun equalTo(value: Double): Query = Query(ios.queryEqualToValue(value))
-    public actual fun equalTo(value: Double, key: String?): Query = Query(ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
     public actual fun equalTo(value: Boolean): Query = Query(ios.queryEqualToValue(value))
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
 
     /** The iOS SDK creates a new object per call, so queries are equal when they describe the same location and constraints. */
     override fun equals(other: Any?): Boolean = other is Query && (other.ios == ios || other.ios.description == ios.description)
@@ -266,7 +268,8 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
 }
 
 @Suppress("UNCHECKED_CAST")
-internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = this as Map<Any?, *>
+/** Null values become NSNull, which the SDK reads as a deletion. */
+internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = mapValues { (_, value) -> value ?: NSNull.`null`() }
 
 /** A write as a [Task] of the SDK's completion block. */
 private inline fun write(crossinline start: ((NSError?, FIRDatabaseReference?) -> Unit) -> Unit): Task<Nothing?> = task { completion ->
