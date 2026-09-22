@@ -16,7 +16,7 @@ import dev.gitlive.firebase.externals.getApp as jsGetApp
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
-    public actual constructor(message: String, cause: Throwable) : super("$message: ${cause.message}", cause)
+    public actual constructor(message: String, cause: Throwable?) : super(cause?.message?.let { "$message: $it" } ?: message, cause)
 }
 
 public actual class FirebaseNetworkException : FirebaseException {

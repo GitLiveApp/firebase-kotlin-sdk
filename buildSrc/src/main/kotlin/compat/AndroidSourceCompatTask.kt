@@ -50,8 +50,9 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
 
     /**
      * One pattern per line (`*` wildcards, `#member` or `#member(Type, Type)` suffix for members and overloads); `//`
-     * starts a comment. A comment containing `@hide` (hidden in the Android SDK) or `@platform` (signature involves an
-     * Android/JVM-only type) excludes the member from the count instead of counting it as omitted.
+     * starts a comment. A comment containing `@hide` (hidden in the Android SDK), `@platform` (signature involves an
+     * Android/JVM-only type) or `@unavailable` (the feature does not exist in the pinned iOS or JS SDK) excludes the
+     * member from the count instead of counting it as omitted.
      */
     private fun RegularFileProperty.exclusions(): List<Exclusion> = orNull?.asFile?.takeIf { it.exists() }?.readLines().orEmpty()
         .mapNotNull { line ->
@@ -67,6 +68,7 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
                     uncountedStatus = when {
                         comment.contains("@hide") -> "HIDE"
                         comment.contains("@platform") -> "PLAT"
+                        comment.contains("@unavailable") -> "UNAV"
                         else -> null
                     },
                 )
@@ -77,8 +79,15 @@ abstract class AndroidSourceCompatTask : DefaultTask() {
     fun run() {
         val sdkFiles = androidSdkApiFiles.files.filter { it.isFile }.sortedBy { it.name }
         if (sdkFiles.isEmpty()) throw GradleException("No Android SDK api.txt files found; run updateAndroidSdkApi first")
+        // The git ref of a downloaded api.txt, or the artifact coordinates of one generated from published classes.
         val ref = sdkFiles.firstNotNullOfOrNull { file ->
-            file.useLines { lines -> lines.firstOrNull { it.startsWith("// Source: ") } }?.substringAfter("firebase-android-sdk/")?.substringBefore('/')
+            file.useLines { lines -> lines.firstOrNull { it.startsWith("// Source: ") } }?.let { source ->
+                when {
+                    "firebase-android-sdk/" in source -> source.substringAfter("firebase-android-sdk/").substringBefore('/')
+                    " of " in source -> source.substringAfterLast(" of ")
+                    else -> null
+                }
+            }
         } ?: "unknown"
         val androidSdk = sdkFiles.flatMap { AndroidSdkApiTxtParser.parse(it.readText()) }
         val ours = BcvApiParser.parse(bcvDump.get().asFile.readText()) +
