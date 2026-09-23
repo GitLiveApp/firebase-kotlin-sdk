@@ -239,7 +239,7 @@ class DataTest {
 
     @Test
     fun toByteArrayReturnsACopy() {
-        val data = bytes.toData()
+        val data = bytes.copyOf().toData()
         data.toByteArray().fill(0)
 
         assertContentEquals(bytes, data.toByteArray())

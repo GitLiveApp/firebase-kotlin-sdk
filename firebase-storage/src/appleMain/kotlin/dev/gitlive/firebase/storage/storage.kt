@@ -236,7 +236,10 @@ public actual fun ByteArray.toData(): Data = Data(
     if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.convert()) },
 )
 
-public actual fun Data.toByteArray(): ByteArray = data.bytes?.readBytes(data.length.toInt()) ?: ByteArray(0)
+public actual fun Data.toByteArray(): ByteArray {
+    require(data.length <= Int.MAX_VALUE.toULong()) { "Data of ${data.length} bytes is too large for a ByteArray" }
+    return data.bytes?.readBytes(data.length.toInt()) ?: ByteArray(0)
+}
 
 public actual class FirebaseStorageException(message: String) : FirebaseException(message)
 
