@@ -28,7 +28,10 @@ import kotlin.js.JsException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
+import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.toByteArray
+import org.khronos.webgl.toInt8Array
 
 public actual val Firebase.storage: FirebaseStorage
     get() = FirebaseStorage(getStorage())
@@ -147,6 +150,13 @@ public actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListRe
 
 public actual typealias File = org.w3c.files.File
 public actual class Data(public val data: org.khronos.webgl.Uint8Array)
+
+public actual fun ByteArray.toData(): Data {
+    val bytes = toInt8Array()
+    return Data(Uint8Array(bytes.buffer, bytes.byteOffset, bytes.length))
+}
+
+public actual fun Data.toByteArray(): ByteArray = Int8Array(data.buffer, data.byteOffset, data.length).toByteArray()
 
 public actual open class FirebaseStorageException(code: String, cause: Throwable) : FirebaseException(code, cause)
 

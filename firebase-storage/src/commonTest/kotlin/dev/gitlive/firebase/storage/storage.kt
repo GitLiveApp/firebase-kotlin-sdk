@@ -16,6 +16,7 @@ import kotlinx.coroutines.withTimeout
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -80,6 +81,17 @@ class FirebaseStorageTest {
         val downloadedData = ref.getData(maxDownloadSizeBytes = 1024)
 
         assertTestDataEquals(downloadedData)
+    }
+
+    @Test
+    fun testUploadAndDownloadByteArray() = runTest {
+        val bytes = ByteArray(256) { it.toByte() }
+        val ref = storage.reference("test").child("testUploadAndDownloadByteArray.bin")
+        ref.putData(bytes.toData())
+
+        val downloadedData = ref.getData(maxDownloadSizeBytes = 1024)
+
+        assertContentEquals(bytes, downloadedData.toByteArray())
     }
 
     @Test
@@ -188,6 +200,49 @@ class FirebaseStorageTest {
         assertTrue("one.txt" in itemNames)
         assertTrue("two.txt" in itemNames)
         assertTrue("three.txt" in itemNames)
+    }
+}
+
+class DataTest {
+
+    // every byte value, including the negative ones that become 128..255 as unsigned bytes
+    private val bytes = ByteArray(256) { it.toByte() }
+
+    @Test
+    fun byteArrayRoundTripsThroughData() {
+        assertContentEquals(bytes, bytes.toData().toByteArray())
+    }
+
+    @Test
+    fun emptyByteArrayRoundTripsThroughData() {
+        assertContentEquals(ByteArray(0), ByteArray(0).toData().toByteArray())
+    }
+
+    @Test
+    fun toDataMatchesPlatformData() {
+        assertTestDataEquals("test".encodeToByteArray().toData())
+    }
+
+    @Test
+    fun toByteArrayMatchesPlatformData() {
+        assertContentEquals("test".encodeToByteArray(), createTestData().toByteArray())
+    }
+
+    @Test
+    fun toDataCopiesTheByteArray() {
+        val source = bytes.copyOf()
+        val data = source.toData()
+        source.fill(0)
+
+        assertContentEquals(bytes, data.toByteArray())
+    }
+
+    @Test
+    fun toByteArrayReturnsACopy() {
+        val data = bytes.toData()
+        data.toByteArray().fill(0)
+
+        assertContentEquals(bytes, data.toByteArray())
     }
 }
 

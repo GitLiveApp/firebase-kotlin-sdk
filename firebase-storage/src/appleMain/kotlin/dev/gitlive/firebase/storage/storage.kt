@@ -17,6 +17,11 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.ios
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -27,6 +32,7 @@ import kotlinx.coroutines.flow.emitAll
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import platform.Foundation.create
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -223,6 +229,14 @@ public actual class ListResult(internal val ios: FIRStorageListResult) {
 public actual class File(public val url: NSURL)
 
 public actual class Data(public val data: NSData)
+
+@OptIn(BetaInteropApi::class)
+public actual fun ByteArray.toData(): Data = Data(
+    // addressOf(0) throws on an empty array
+    if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.convert()) },
+)
+
+public actual fun Data.toByteArray(): ByteArray = data.bytes?.readBytes(data.length.toInt()) ?: ByteArray(0)
 
 public actual class FirebaseStorageException(message: String) : FirebaseException(message)
 
