@@ -10,9 +10,9 @@ import java.net.URL
 import java.io.InputStream
 
 plugins {
-    alias(libs.plugins.android.application) apply false
+    id("com.android.application") apply false // provided by buildSrc
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.multiplatform) apply false
+    id("org.jetbrains.kotlin.multiplatform") apply false // provided by buildSrc
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
     alias(libs.plugins.kotlinter) apply false
@@ -180,6 +180,7 @@ tasks.register("devRunAllTests") {
         val gradleTasks = mutableListOf<List<String>>()
         gradleTasks.addAll(EmulatorJobsMatrix().getJvmTestTaskList(rootProject = rootProject))
         gradleTasks.addAll(EmulatorJobsMatrix().getJsTestTaskList(rootProject = rootProject))
+        gradleTasks.addAll(EmulatorJobsMatrix().getWasmJsTestTaskList(rootProject = rootProject))
         gradleTasks.addAll(EmulatorJobsMatrix().getIosTestTaskList(rootProject = rootProject))
         gradleTasks.add(listOf("ciSdkManagerLicenses"))
         gradleTasks.addAll(EmulatorJobsMatrix().getEmulatorTaskList(rootProject = rootProject))

@@ -1,3 +1,21 @@
+public final class com/google/firebase/FirebaseInitializeKt {
+	public static final fun fromResource (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseOptions;
+	public static synthetic fun fromResource$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Lcom/google/firebase/FirebaseOptions;
+	public static final fun getApps (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Ljava/util/List;
+	public static synthetic fun getApps$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Ljava/util/List;
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;)Lcom/google/firebase/FirebaseApp;
+	public static final fun initialize (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+	public static synthetic fun initialize$default (Lcom/google/firebase/Firebase;Ljava/lang/Object;Lcom/google/firebase/FirebaseOptions;Ljava/lang/String;ILjava/lang/Object;)Lcom/google/firebase/FirebaseApp;
+}
+
+public final class com/google/firebase/TimestampInstantKt {
+	public static final fun Timestamp (Lkotlin/time/Instant;)Lcom/google/firebase/Timestamp;
+	public static final fun toKotlinInstant (Lcom/google/firebase/Timestamp;)Lkotlin/time/Instant;
+}
+
 public final class dev/gitlive/firebase/CommonKt {
 	public static final fun getOptions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/FirebaseOptions;
 }
@@ -9,6 +27,7 @@ public final class dev/gitlive/firebase/Firebase {
 public final class dev/gitlive/firebase/FirebaseApp {
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/FirebaseApp;
 	public final fun getName ()Ljava/lang/String;
 	public final fun getOptions ()Ldev/gitlive/firebase/FirebaseOptions;
 	public fun hashCode ()I

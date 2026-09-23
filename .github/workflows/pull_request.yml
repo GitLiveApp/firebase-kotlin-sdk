@@ -94,7 +94,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.wasm_js_test_jobs_matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/run_test_action
         with:
           gradle-tasks: ${{ matrix.gradle_tasks }}
@@ -106,6 +106,9 @@ jobs:
     needs: jobMatrixSetup
     if: fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix).gradle_tasks[0] != null
     runs-on: macos-latest
+    # The firestore simulator tests hung with no output for six hours (GitHub's job limit) twice on PR #875; the slowest
+    # iOS job takes ~30 minutes with warm caches, ~45 cold.
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}

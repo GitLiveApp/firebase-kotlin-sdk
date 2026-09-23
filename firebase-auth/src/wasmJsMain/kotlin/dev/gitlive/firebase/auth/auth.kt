@@ -212,7 +212,7 @@ internal fun ActionCodeSettings.toJson(): JsAny {
     return json
 }
 
-public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode, cause)
+public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode.toString(), cause)
 public actual val FirebaseAuthException.code: String? get() = authCode
 public actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthEmailException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
