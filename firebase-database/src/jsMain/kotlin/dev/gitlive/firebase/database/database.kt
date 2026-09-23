@@ -33,17 +33,12 @@ import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
 import dev.gitlive.firebase.internal.reencodeTransformation
 import dev.gitlive.firebase.js
-import kotlinx.coroutines.asDeferred
+import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlin.js.Promise
 import kotlin.js.json
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
 import dev.gitlive.firebase.database.externals.DatabaseReference as JsDatabaseReference
@@ -149,7 +144,7 @@ public actual open class Query internal actual constructor(
     }
 
     public actual suspend fun get(): DataSnapshot = rethrow {
-        DataSnapshot(get(publicJs).awaitWhileOnline(database), database)
+        DataSnapshot(get(publicJs).await(), database)
     }
 
     public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
@@ -188,18 +183,18 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual fun onDisconnect() = rethrow { NativeOnDisconnect(onDisconnect(js), database) }
 
-    actual suspend fun removeValue() = rethrow { remove(js).awaitWhileOnline(database) }
+    actual suspend fun removeValue() = rethrow { remove(js).await() }
 
     actual suspend fun setValueEncoded(encodedValue: Any?) = rethrow {
-        set(js, encodedValue).awaitWhileOnline(database)
+        set(js, encodedValue).await()
     }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).await() }
 
     actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = DataSnapshot(
         jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
             reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
-        }).awaitWhileOnline(database).snapshot,
+        }).await().snapshot,
         database,
     )
 }
@@ -240,12 +235,12 @@ internal actual class NativeOnDisconnect internal constructor(
     val database: Database,
 ) {
 
-    actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
-    actual suspend fun cancel() = rethrow { js.cancel().awaitWhileOnline(database) }
+    actual suspend fun removeValue() = rethrow { js.remove().await() }
+    actual suspend fun cancel() = rethrow { js.cancel().await() }
 
-    actual suspend fun setEncodedValue(encodedValue: Any?) = rethrow { js.set(encodedValue).awaitWhileOnline(database) }
+    actual suspend fun setEncodedValue(encodedValue: Any?) = rethrow { js.set(encodedValue).await() }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { js.update(encodedUpdate.js).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { js.update(encodedUpdate.js).await() }
 }
 
 public val OnDisconnect.js: dev.gitlive.firebase.database.externals.OnDisconnect get() = native.js
@@ -266,19 +261,5 @@ internal inline fun <R> rethrow(function: () -> R): R {
         throw e
     } catch (e: dynamic) {
         throw DatabaseException(e)
-    }
-}
-
-@PublishedApi
-internal suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineScope {
-    val notConnected = FirebaseDatabase(database)
-        .reference(".info/connected")
-        .valueEvents
-        .filter { !it.value<Boolean>() }
-        .produceIn(this)
-
-    select {
-        this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
 }
