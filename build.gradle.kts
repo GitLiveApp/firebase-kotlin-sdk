@@ -180,6 +180,7 @@ tasks.register("devRunAllTests") {
         val gradleTasks = mutableListOf<List<String>>()
         gradleTasks.addAll(EmulatorJobsMatrix().getJvmTestTaskList(rootProject = rootProject))
         gradleTasks.addAll(EmulatorJobsMatrix().getJsTestTaskList(rootProject = rootProject))
+        gradleTasks.addAll(EmulatorJobsMatrix().getWasmJsTestTaskList(rootProject = rootProject))
         gradleTasks.addAll(EmulatorJobsMatrix().getIosTestTaskList(rootProject = rootProject))
         gradleTasks.add(listOf("ciSdkManagerLicenses"))
         gradleTasks.addAll(EmulatorJobsMatrix().getEmulatorTaskList(rootProject = rootProject))

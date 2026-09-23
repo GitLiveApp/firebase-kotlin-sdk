@@ -94,7 +94,8 @@ public data class FirebaseOptions(
     val databaseUrl: String? = null,
 
     /**
-     * The tracking ID for Google Analytics, e.g. UA-12345678-1, used to configure Google Analytics.
+     * The tracking ID for Google Analytics, e.g. UA-12345678-1, used to configure Google Analytics. Not round tripped
+     * on Apple platforms, where firebase-ios-sdk 12 removed `FIROptions.trackingID`.
      */
     val gaTrackingId: String? = null,
 

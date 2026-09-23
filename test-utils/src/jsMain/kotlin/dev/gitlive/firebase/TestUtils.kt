@@ -12,6 +12,7 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = kotlinx.coroutines
 actual fun runBlockingTest(action: suspend CoroutineScope.() -> Unit) {
     kotlinx.coroutines.test.runTest { action() }
 }
+actual val runBlockingTestBlocks: Boolean = false
 
 actual fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any = json(*pairs.map { (key, value) -> ((key as? String) ?: JSON.stringify(key)) to value }.toTypedArray())
 actual fun nativeListOf(vararg elements: Any?): Any = elements

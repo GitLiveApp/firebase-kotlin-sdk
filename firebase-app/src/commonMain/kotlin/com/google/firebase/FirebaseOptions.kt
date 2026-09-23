@@ -30,7 +30,10 @@ public expect class FirebaseOptions {
     /** The Google Cloud Storage bucket name. */
     public val storageBucket: String?
 
-    /** The tracking ID for Google Analytics. */
+    /**
+     * The tracking ID for Google Analytics. Always `null` on Apple platforms, where firebase-ios-sdk 12 removed
+     * `FIROptions.trackingID`.
+     */
     public val gaTrackingId: String?
 
     /** Builder for constructing [FirebaseOptions]. */

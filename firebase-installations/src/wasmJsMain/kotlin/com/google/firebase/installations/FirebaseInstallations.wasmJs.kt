@@ -112,17 +112,16 @@ private fun Throwable.toInstallationsException(): FirebaseInstallationsException
 }
 
 /** A promise rejection carries the JS error itself rather than a [Throwable]. */
-private fun JsAny.toInstallationsException(): FirebaseInstallationsException = installationsException(jsGet(this, "code").toKotlin()?.toString(), jsGet(this, "message").toKotlin()?.toString(), cause = null)
+private fun JsAny.toInstallationsException(): FirebaseInstallationsException {
+    val message = jsGet(this, "message").toKotlin()?.toString()
+    return installationsException(jsGet(this, "code").toKotlin()?.toString(), message, toThrowableOrNull() ?: Exception(message))
+}
 
-private fun installationsException(code: String?, message: String?, cause: Throwable?): FirebaseInstallationsException {
+private fun installationsException(code: String?, message: String?, cause: Throwable): FirebaseInstallationsException {
     val status = when (code) {
         "installations/request-failed", "installations/not-registered" -> FirebaseInstallationsException.Status.UNAVAILABLE
         "installations/missing-app-config-values" -> FirebaseInstallationsException.Status.BAD_CONFIG
         else -> FirebaseInstallationsException.Status.UNAVAILABLE
     }
-    return if (cause == null) {
-        FirebaseInstallationsException("$code: $message", status)
-    } else {
-        FirebaseInstallationsException("$code: $message", status, cause)
-    }
+    return FirebaseInstallationsException("$code: $message", status, cause)
 }

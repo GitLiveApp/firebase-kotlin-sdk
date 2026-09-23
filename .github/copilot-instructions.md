@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**.
+This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS and Wasm)**.
 
 All modules are published under the `dev.gitlive` group ID (e.g. `dev.gitlive:firebase-firestore`).
 
@@ -20,11 +20,15 @@ src/
   androidMain/  ← wraps Firebase Android SDK (and is also used as the physical dir for `jvmMain` in some modules, e.g. firebase-firestore)
   appleMain/    ← shared Apple targets (iOS/tvOS/macOS) wrapping Firebase iOS SDK via Kotlin/Native
   jsMain/       ← wraps Firebase JS SDK
+  wasmJsMain/   ← wraps Firebase JS SDK for the wasmJs target (hand-mirrored from jsMain, see CLAUDE.md)
   jvmMain/      ← JVM desktop/server target (may map to src/androidMain/kotlin in some modules)
+  nonJsMain/    ← android + jvm + apple, only in modules using utils.applyFirebaseHierarchy()
+  nonJvmMain/   ← js + wasmJs + apple, only in modules using utils.applyFirebaseHierarchy()
   commonTest/   ← shared tests
   androidTest/
   appleTest/
   jsTest/
+  wasmJsTest/
   jvmTest/
 ```
 
@@ -44,7 +48,7 @@ These principles **must** be followed in all new and modified code.
 
 ### 1. Suspend functions instead of callbacks or Tasks
 
-Async operations that return a single value use `suspend fun`. Never use callbacks, `Task`, `Promise`, or listener patterns in `commonMain`.
+Async operations that return a single value use `suspend fun`. Never use callbacks, `Task`, `Promise`, or listener patterns in the `dev.gitlive.firebase` API in `commonMain` (the `com.google.firebase` source-compatibility layer described under "API Compatibility Goal" is the exception: it mirrors the Android SDK's `Task` and listeners exactly).
 
 ```kotlin
 // ✅ Correct
@@ -121,7 +125,8 @@ The SDK has two public API layers per module:
    [Firebase Android SDK API](https://firebase.google.com/docs/reference/kotlin/packages) exactly: same package, class, member and
    parameter names *and shapes*, including `com.google.android.gms.tasks.Task` return types and listener interfaces. Code written
    against the Android SDK must compile unchanged (no import changes) on every platform. On Apple the `actual`s wrap the iOS SDK,
-   on JS the modular JS SDK, and non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
+   on JS and wasmJs the modular JS SDK (hand-mirrored in `jsMain` and `wasmJsMain`, see "Mirrored source sets" in CLAUDE.md), and
+   the non-JVM platforms (Apple, JS, wasmJs) share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
    Android/JVM the `actual`s are **header stubs**: signature-identical declarations that are compiled against, verified against
    the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
    A declaration that is identical on every platform (the `Task` listener interfaces, `FidListener`) is plain common code
@@ -141,7 +146,7 @@ The SDK has two public API layers per module:
    `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
-   - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
+   - An API that maps onto Android, JVM and Apple but not JS/wasmJs goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
      percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its

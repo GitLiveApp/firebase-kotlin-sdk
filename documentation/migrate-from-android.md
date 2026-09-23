@@ -1,15 +1,15 @@
 # Migrating from the Firebase Android SDK to the Firebase Kotlin SDK
 
 This guide walks through moving code written against the [Firebase Android SDK](https://firebase.google.com/docs/android/setup)
-into the shared module of a Kotlin Multiplatform project, so that the same code runs on Android, iOS, JS and the JVM.
+into the shared module of a Kotlin Multiplatform project, so that the same code runs on Android, iOS, JS, Wasm (wasmJs) and the JVM.
 It follows the shape of JetBrains' [Migrating a Jetpack Compose app to Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform/migrate-from-android.html)
 guide: a checklist, then the migration step by step, with the compiler leading the way.
 
 The Firebase Kotlin SDK mirrors the Android SDK's `com.google.firebase.*` API in common code: same packages, classes,
 member names and shapes (`Task` results, listener interfaces, builders). Your imports don't change. On Android and the
 JVM the SDK adds nothing to your app: it depends on the official Firebase Android SDK, and your code keeps binding to
-the real classes exactly as before. On iOS and JS the same declarations are implemented on top of the Firebase iOS SDK
-and the Firebase JS SDK.
+the real classes exactly as before. On iOS, JS and Wasm the same declarations are implemented on top of the Firebase iOS
+SDK and the Firebase JS SDK.
 
 > This guide covers the `com.google.firebase` API only, and the modules migrated so far: `firebase-app` (`FirebaseApp`,
 > `FirebaseOptions`, `Timestamp`, the exceptions, `Task` and `Task.await()`) and `firebase-installations`. The Kotlin-first
@@ -63,7 +63,7 @@ In the shared module, depend on the Firebase Kotlin SDK module instead, in `comm
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("dev.gitlive:firebase-installations:2.7.0") // brings dev.gitlive:firebase-app
+            implementation("dev.gitlive:firebase-installations:<version>") // brings dev.gitlive:firebase-app
         }
     }
 }
@@ -74,9 +74,11 @@ What this changes per platform:
 - **Android**: the module depends on the official `com.google.firebase:firebase-installations` and `firebase-common`, so
   they are still on your app's classpath, and nothing else from `com.google.*` is added. Keep the Google Services Gradle
   plugin and `google-services.json` on the Android app as before; the BoM in the app module stays optional.
-- **iOS**: the Firebase iOS SDK is not linked transitively. Add the pods your app uses (`FirebaseCore`,
-  `FirebaseInstallations`) through CocoaPods or Swift Package Manager, and `GoogleService-Info.plist` to the app.
-- **JS**: the Firebase JS SDK is an npm dependency of the module; nothing to add.
+- **iOS**: `firebase-ios-sdk` (`FirebaseCore`, `FirebaseInstallations`) is inherited transitively through the SwiftPM
+  metadata the modules publish. Integrate the shared framework with direct integration as a static framework (see
+  [Running on iOS](../README.md#running-on-ios) and [ios-firebase-linking.md](ios-firebase-linking.md)), and add
+  `GoogleService-Info.plist` to the app. Don't also add Firebase through CocoaPods: mixing the two duplicates symbols.
+- **JS and Wasm**: the Firebase JS SDK is an npm dependency of the module; nothing to add.
 - **JVM**: the [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) is used, see [Initialization](../README.md#initialization).
 
 ## Step 3: Move the code and let the compiler guide you
@@ -136,8 +138,9 @@ class FirebaseInstallationRepository(private val context: Any?) {
 }
 ```
 
-> `kotlin.time.Instant` is still experimental in Kotlin 2.2, so opt in with `kotlin.time.ExperimentalTime` in the
-> module's compiler options, or annotate the file with `@OptIn(ExperimentalTime::class)`.
+> `kotlin.time.Instant` is stable since Kotlin 2.3 and this SDK line requires Kotlin 2.4, so no opt-in is needed unless
+> you compile with an older `apiVersion`; then opt in with `kotlin.time.ExperimentalTime` in the module's compiler
+> options, or annotate the file with `@OptIn(ExperimentalTime::class)`.
 
 Now compile the shared module for any target other than Android, for example `./gradlew :shared:compileKotlinIosSimulatorArm64`.
 Every remaining Android-only member is reported as an error that tells you what to use instead:
@@ -215,7 +218,7 @@ This is exactly the code compiled while writing this guide, for JS, the JVM and 
 The replacements are real functions on every platform, not stubs: on Android `Firebase.getApps(context)` calls
 `FirebaseApp.getApps(Context)` with the context you passed, on iOS it lists the configured `FIRApp`s and ignores the
 context, and `Firebase.fromResource` reads `google-services.json` resources on Android, `GoogleService-Info.plist` on iOS,
-and returns `null` on JS, where there is no default configuration.
+and returns `null` on JS and Wasm, where there is no default configuration.
 
 Two members have no multiplatform replacement:
 
@@ -238,21 +241,21 @@ FirebaseInstallationRepository(applicationContext).ensureInitialized()
 // iosMain, from the app delegate or the SwiftUI App init (Firebase.fromResource reads GoogleService-Info.plist)
 FirebaseInstallationRepository(null).ensureInitialized()
 
-// jsMain: there is no default configuration, so pass options explicitly
+// jsMain and wasmJsMain: there is no default configuration, so pass options explicitly
 Firebase.initialize(null, FirebaseOptions.Builder().setApiKey("AIza...").setApplicationId("1:846484016111:web:abc123").setProjectId("fir-kotlin-sdk").build())
 ```
 
 The [Initialization](../README.md#initialization) section of the README has the full per-platform table, including the JVM.
 
-## Step 6: Run on iOS and JS
+## Step 6: Run on iOS, JS and Wasm
 
 Run the shared module's tests on the other targets to confirm the migrated code behaves the same, for example
-`./gradlew :shared:iosSimulatorArm64Test :shared:jsTest`. Two behavioural differences to know about:
+`./gradlew :shared:iosSimulatorArm64Test :shared:jsTest :shared:wasmJsNodeTest`. Two behavioural differences to know about:
 
-- `Task` listeners on iOS and JS run on the thread that completes the task, where the Android SDK posts them to the
+- `Task` listeners on iOS, JS and Wasm run on the thread that completes the task, where the Android SDK posts them to the
   main thread. Code that touches UI from a listener should switch to the main dispatcher explicitly, or use `await()`
   from a coroutine on the main dispatcher.
-- `InstallationTokenResult.tokenExpirationTimestamp` is `0` on JS, because the Firebase JS SDK returns only the token string.
+- `InstallationTokenResult.tokenExpirationTimestamp` is `0` on JS and Wasm, because the Firebase JS SDK returns only the token string.
 
 ## What's next
 

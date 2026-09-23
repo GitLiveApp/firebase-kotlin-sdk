@@ -51,7 +51,7 @@ at all, depends on how the underlying Firebase SDK is initialised:
 On Android you usually need no call: with the Google Services Gradle plugin the official SDK initialises the default app itself
 at startup (through a `ContentProvider` merged into your manifest) and `Firebase.app` is ready to use. On iOS the default app has
 to be configured once at launch, either from Swift with `FirebaseApp.configure()` or from Kotlin as shown below, before any Firebase
-API is used. On JS and the JVM the options always have to be provided in code.
+API is used. On JS, Wasm and the JVM the options always have to be provided in code.
 
 The recommended pattern is a common function that takes the options and an optional platform context, called from each
 platform's entry point:
@@ -67,7 +67,7 @@ fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.apps(contex
         databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
         storageBucket = "fir-kotlin-sdk.appspot.com",
         gcmSenderId = "846484016111",
-        authDomain = "fir-kotlin-sdk.firebaseapp.com", // JS only, ignored elsewhere
+        authDomain = "fir-kotlin-sdk.firebaseapp.com", // JS and Wasm only, ignored elsewhere
     ),
 )
 ```
@@ -79,7 +79,7 @@ initializeFirebase(applicationContext)
 // iosMain, e.g. from the app delegate or the SwiftUI App init; or pass no options to read GoogleService-Info.plist
 initializeFirebase()
 
-// jsMain, before any other Firebase call
+// jsMain and wasmJsMain, before any other Firebase call
 initializeFirebase()
 ```
 
@@ -112,7 +112,7 @@ three overloads exist there with the context typed as `Any?`, following the rule
 Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
 `com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
 (including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
-in common code targeting Android, iOS, JVM and JS:
+in common code targeting Android, iOS, JVM, JS and Wasm (wasmJs):
 
 ```kotlin
 import com.google.firebase.installations.FirebaseInstallations
@@ -132,7 +132,7 @@ into a shared module, including the compiler-guided replacement of the Android-o
 
 ### Accessing the underlying Firebase SDK
 
-In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property.
+In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property. The *Wasm (wasmJs)* target binds to the same official Firebase JS SDK as the *JS* target and exposes it via the `js` property.
 
 These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
 
