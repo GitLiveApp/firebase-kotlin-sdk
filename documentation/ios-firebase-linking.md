@@ -37,7 +37,8 @@ app does not re-declare `firebase-ios-sdk`.
    Nothing extra is required to obtain the Firebase iOS SDK; it is inherited from the SDK's published
    SwiftPM metadata.
 2. **Integrate your shared framework into Xcode with _direct integration_.** Kotlin offers two ways
-   to get a KMP framework into Xcode; for an app that consumes this SDK, only one currently works:
+   to get a KMP framework into Xcode; for an app that consumes this SDK, direct integration is the
+   recommended one:
 
    - ✅ **[Direct integration](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html)**
      — add the `embedAndSignAppleFrameworkForXcode` run-script build phase (KGP exposes the
@@ -46,21 +47,25 @@ app does not re-declare `firebase-ios-sdk`.
      embeds/signs the framework. Setup steps and the exact script are in that guide (and the
      [CocoaPods→SwiftPM migration guide](https://kotlinlang.org/docs/multiplatform/multiplatform-cocoapods-spm-migration.html));
      background on SwiftPM import is [here](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-import.html).
-   - ❌ **[Remote / SwiftPM export](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html)**
+   - ⚠️ **[Remote / SwiftPM export](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html)**
      (packaging your shared module as its own Swift package via an exported XCFramework +
-     `Package.swift`) is **not currently supported** for apps consuming this SDK: your shared module
-     inherits `firebase-ios-sdk` as a SwiftPM dependency, and Kotlin does not yet support exporting a
-     module that *uses* SwiftPM import as a Swift package
-     ([KT-84420](https://youtrack.jetbrains.com/issue/KT-84420)). Use direct integration until that
-     lands.
+     `Package.swift`) needs **Kotlin 2.4.20+** in your build. From that version Kotlin can export a
+     module that *uses* SwiftPM import, and the generated `Package.swift` declares the inherited
+     `firebase-ios-sdk` products ([KT-84420](https://youtrack.jetbrains.com/issue/KT-84420)). The
+     feature is experimental, and the generated package refers to those dependencies by local path,
+     so it can be added to Xcode as a local package but can't be published as a versioned remote
+     package without editing the manifest. It has not been verified end to end with this SDK.
 3. **Build your shared framework as static** — set `isStatic = true` on your `binaries.framework`.
    Firebase's SwiftPM products are static libraries; a **dynamic** shared framework produces
    `@rpath/…framework` load commands that aren't satisfied at runtime, so the app crashes with a
    `dyld: Library not loaded` error. `isStatic = true` embeds the symbols and defers Firebase linkage
    to the final Xcode link.
 
-**Requirements:** Kotlin **2.4+** and Xcode **26.2+** (the SwiftPM import/integration toolchain;
-Xcode 27 betas are currently incompatible with KGP 2.4).
+**Requirements:** Kotlin **2.4+** and Xcode **26.2+** (the SwiftPM import/integration toolchain).
+For **Xcode 27**, use Kotlin **2.4.20+** in your build: earlier 2.4.x releases can't capture Xcode
+27's link step ([KT-87196](https://youtrack.jetbrains.com/issue/KT-87196)). Kotlin 2.4.x is
+officially tested up to Xcode 26.4; full Xcode 27 support is planned for Kotlin 2.5.0
+([KT-87869](https://youtrack.jetbrains.com/issue/KT-87869)).
 
 ### Known gotchas
 
@@ -73,6 +78,11 @@ Xcode 27 betas are currently incompatible with KGP 2.4).
   watchOS 7). Your app's deployment target must be **≥** these. The iOS and tvOS floors rose from
   13 in firebase-ios-sdk 12.0.0 — if your app still targets iOS 13 or 14, stay on a release of this
   SDK that pins `firebase-ios-sdk` 11.x.
+- **"module.modulemap has been modified since the module file … was built" (Kotlin 2.4.20).**
+  After the resolved `firebase-ios-sdk` version changes, for example when you upgrade
+  `dev.gitlive:firebase-*`, Kotlin 2.4.20 can reuse stale Xcode build state and fail with this error
+  ([KT-88106](https://youtrack.jetbrains.com/issue/KT-88106), fix planned for Kotlin 2.5.0). Delete
+  `build/kotlin/swiftPMXcodeDumps` in your root project, or run `./gradlew clean`.
 - **Don't mix package managers for Firebase.** All Firebase products share transitive C/C++
   dependencies (gRPC/abseil/leveldb/BoringSSL/nanopb). Linking some via SwiftPM and others via
   CocoaPods duplicates those symbols and causes `dyld` crashes — use one mechanism for the whole
