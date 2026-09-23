@@ -93,12 +93,10 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
         swiftPMDependencies {
