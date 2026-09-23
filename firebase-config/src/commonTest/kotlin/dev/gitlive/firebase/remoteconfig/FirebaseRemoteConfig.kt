@@ -77,7 +77,9 @@ class FirebaseRemoteConfigTest {
 
     @Test
     fun testNamedApp() = runTest {
-        val namedApp = Firebase.initialize(context, Firebase.apps(context).first().options, "named")
+        // Android keys Remote Config's local storage by app ID, so the named app needs its own
+        val options = Firebase.apps(context).first().options.copy(applicationId = "1:846484016111:ios:dd1f6688bad7af768c841b")
+        val namedApp = Firebase.initialize(context, options, "named")
         val namedRemoteConfig = Firebase.remoteConfig(namedApp)
         namedRemoteConfig.setDefaults("named_app_only" to "named")
 
