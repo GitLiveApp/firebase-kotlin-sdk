@@ -184,6 +184,10 @@ public actual class File(public val uri: Uri)
 
 public actual class Data(public val data: ByteArray)
 
+public actual fun ByteArray.toData(): Data = Data(copyOf())
+
+public actual fun Data.toByteArray(): ByteArray = data.copyOf()
+
 public actual typealias FirebaseStorageException = com.google.firebase.storage.StorageException
 
 internal fun FirebaseStorageMetadata.toStorageMetadata(): StorageMetadata = StorageMetadata.Builder()

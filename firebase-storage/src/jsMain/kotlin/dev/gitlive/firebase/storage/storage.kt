@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlin.js.Json
 import kotlin.js.json
+import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -160,6 +161,14 @@ public actual class ListResult(js: dev.gitlive.firebase.storage.externals.ListRe
 
 public actual typealias File = org.w3c.files.File
 public actual class Data(public val data: org.khronos.webgl.Uint8Array)
+
+// A Kotlin/JS ByteArray is an Int8Array at runtime
+public actual fun ByteArray.toData(): Data {
+    val bytes = copyOf().unsafeCast<Int8Array>()
+    return Data(Uint8Array(bytes.buffer, bytes.byteOffset, bytes.length))
+}
+
+public actual fun Data.toByteArray(): ByteArray = Int8Array(data.buffer, data.byteOffset, data.length).unsafeCast<ByteArray>().copyOf()
 
 public actual open class FirebaseStorageException(code: String, cause: Throwable) : FirebaseException(code, cause)
 
