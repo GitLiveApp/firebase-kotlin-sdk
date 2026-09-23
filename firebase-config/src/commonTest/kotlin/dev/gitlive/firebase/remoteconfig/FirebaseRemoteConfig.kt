@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -72,6 +73,17 @@ class FirebaseRemoteConfigTest {
         assertEquals("Hello World", value.asString())
         assertEquals(ValueSource.Default, value.getSource())
         assertEquals("Hello World", value.asByteArray().decodeToString())
+    }
+
+    @Test
+    fun testNamedApp() = runTest {
+        val namedApp = Firebase.initialize(context, Firebase.apps(context).first().options, "named")
+        val namedRemoteConfig = Firebase.remoteConfig(namedApp)
+        namedRemoteConfig.setDefaults("named_app_only" to "named")
+
+        assertEquals("named", namedRemoteConfig.getValue("named_app_only").asString())
+        assertFalse(remoteConfig.all.containsKey("named_app_only"))
+        namedRemoteConfig.reset()
     }
 
     @Test
