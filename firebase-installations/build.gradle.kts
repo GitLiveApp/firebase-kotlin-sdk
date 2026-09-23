@@ -97,12 +97,10 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64().enableKeychainForTests()
         tvosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
         swiftPMDependencies {

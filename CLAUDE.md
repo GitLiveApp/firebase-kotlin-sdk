@@ -47,7 +47,7 @@ Kotlin-first multiplatform Firebase SDK maintained by GitLive. Wraps official Fi
 
 ## KMP Targets
 
-Android, iOS (arm64, x64, simulatorArm64), macOS (arm64, x64), tvOS (arm64, x64, simulatorArm64), JVM, JS (IR, CommonJS), Wasm (wasmJs).
+Android, iOS (arm64, x64, simulatorArm64), macOS (arm64), tvOS (arm64, simulatorArm64), JVM, JS (IR, CommonJS), Wasm (wasmJs). `macosX64` and `tvosX64` were dropped in 3.0.0: Kotlin deprecated them in 2.3.20, makes them errors in 2.5.0 (KT-84955) and removes them in 2.5.20. `iosX64` is not deprecated and stays.
 
 ## Coding Conventions
 
