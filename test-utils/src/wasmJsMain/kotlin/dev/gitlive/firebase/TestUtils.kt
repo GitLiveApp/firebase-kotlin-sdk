@@ -11,6 +11,7 @@ actual fun runTest(test: suspend CoroutineScope.() -> Unit) = kotlinx.coroutines
 actual fun runBlockingTest(action: suspend CoroutineScope.() -> Unit) {
     kotlinx.coroutines.test.runTest { action() }
 }
+actual val runBlockingTestBlocks: Boolean = false
 
 actual fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any {
     val target = jsObject()
