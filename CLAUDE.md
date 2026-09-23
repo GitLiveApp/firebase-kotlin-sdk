@@ -37,7 +37,7 @@ Kotlin-first multiplatform Firebase SDK maintained by GitLive. Wraps official Fi
 
 ## Key Versions (gradle/libs.versions.toml)
 
-- Kotlin: 2.4.0 (required by the SwiftPM import used on Apple targets)
+- Kotlin: 2.4.20 (2.4+ is required by the SwiftPM import used on Apple targets)
 - Coroutines: 1.10.2
 - Serialization: 1.9.0
 - Firebase BOM: 34.18.0
@@ -66,6 +66,7 @@ Android, iOS (arm64, x64, simulatorArm64), macOS (arm64, x64), tvOS (arm64, x64,
 ## Important Notes
 
 - iOS/macOS/tvOS consume the Firebase iOS SDK via Kotlin's Swift Package Manager integration (`swiftPMDependencies`, Kotlin 2.4+). Firebase is not bundled in the klibs; each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, which consumers inherit transitively (only CocoaPods or manual integrations link it themselves). See `documentation/ios-firebase-linking.md`.
+- After changing `firebase-ios-sdk` in `gradle/libs.versions.toml`, run `rm -rf build/kotlin/swiftPMXcodeDumps` before building on macOS. Kotlin 2.4.20 keeps the SwiftPM xcodebuild state in shared folders under the root `build/kotlin/` and can reuse it after a version change, failing with "module.modulemap has been modified" (KT-88106, fix planned for Kotlin 2.5.0).
 - JS target uses Firebase Web SDK.
 - Binary compatibility is validated on every PR via the kotlinx binary compatibility validator — breaking changes require a major version bump.
 
