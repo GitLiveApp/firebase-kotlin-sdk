@@ -8,12 +8,10 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
-import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -31,6 +29,12 @@ class FirebaseStorageTest {
 
     lateinit var storage: FirebaseStorage
 
+    // One app is created for the whole class and never deleted. The iOS Storage SDK caches its
+    // instances by app name and bucket and never evicts them, so a recreated default app gets
+    // back the previous, already used instance, and calling useEmulator on it crashes the
+    // process ("Cannot connect to emulator after Storage SDK initialization"). useEmulator is
+    // only valid before the storage instance has been used, so it is applied here, on
+    // creation, rather than on every reuse.
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
@@ -43,20 +47,15 @@ class FirebaseStorageTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
-        )
-
-        storage = Firebase.storage(app).apply {
-            useEmulator(emulatorHost, 9199)
-            setMaxOperationRetryTime(30.seconds)
-            setMaxUploadRetryTime(30.seconds)
+        ).also {
+            Firebase.storage(it).apply {
+                useEmulator(emulatorHost, 9199)
+                setMaxOperationRetryTime(30.seconds)
+                setMaxUploadRetryTime(30.seconds)
+            }
         }
-    }
 
-    @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        storage = Firebase.storage(app)
     }
 
     @Test
