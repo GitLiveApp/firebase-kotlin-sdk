@@ -41,7 +41,7 @@ Kotlin-first multiplatform Firebase SDK maintained by GitLive. Wraps official Fi
 - Coroutines: 1.10.2
 - Serialization: 1.9.0
 - Firebase BOM: 34.18.0
-- firebase-ios-sdk: 12.17.0 (minimum deployment targets iOS 15 / tvOS 15 / macOS 10.15)
+- firebase-ios-sdk: 12.17.0 (minimum deployment targets iOS 15 / tvOS 15 / macOS 12; Firebase itself allows macOS 10.15, but Kotlin/Native builds macOS code for 12)
 - Java target: 17
 - Android minSdk: 23, compileSdk: 34
 
