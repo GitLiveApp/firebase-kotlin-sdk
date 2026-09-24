@@ -36,7 +36,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import java.util.WeakHashMap
 
-public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = com.google.firebase.database.FirebaseDatabase.getInstance()
+public val FirebaseDatabase.android: com.google.firebase.database.FirebaseDatabase get() = android
 
 public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase.getInstance(com.google.firebase.database.FirebaseDatabase.getInstance()) }

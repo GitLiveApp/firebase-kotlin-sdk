@@ -22,7 +22,7 @@ import platform.Foundation.NSError
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-public val FirebaseFunctions.ios: FIRFunctions get() = FIRFunctions.functions()
+public val FirebaseFunctions.ios: FIRFunctions get() = ios
 
 public actual val Firebase.functions: FirebaseFunctions
     get() = FirebaseFunctions(FIRFunctions.functions())

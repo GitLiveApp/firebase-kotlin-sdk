@@ -21,7 +21,7 @@ import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
 
-public val FirebaseAuth.ios: FIRAuth get() = FIRAuth.auth()
+public val FirebaseAuth.ios: FIRAuth get() = ios
 
 public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())

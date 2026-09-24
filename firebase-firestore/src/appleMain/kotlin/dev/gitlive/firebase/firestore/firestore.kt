@@ -20,7 +20,7 @@ import platform.Foundation.numberWithLong
 import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_queue_t
 
-public val FirebaseFirestore.ios: FIRFirestore get() = FIRFirestore.firestore()
+public val FirebaseFirestore.ios: FIRFirestore get() = native
 
 public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())

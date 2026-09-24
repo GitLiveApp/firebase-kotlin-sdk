@@ -31,7 +31,7 @@ import com.google.firebase.firestore.memoryEagerGcSettings as androidMemoryEager
 import com.google.firebase.firestore.memoryLruGcSettings as androidMemoryLruGcSettings
 import com.google.firebase.firestore.persistentCacheSettings as androidPersistentCacheSettings
 
-public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = AndroidFirebaseFirestore.getInstance()
+public val FirebaseFirestore.android: AndroidFirebaseFirestore get() = native
 
 public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(AndroidFirebaseFirestore.getInstance())
