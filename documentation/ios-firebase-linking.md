@@ -73,11 +73,12 @@ officially tested up to Xcode 26.4; full Xcode 27 support is planned for Kotlin 
   integration context, so `…Test` tasks that touch Firebase symbols may fail to resolve them when run
   standalone. If you hit this, run the affected tests through the Xcode-integrated build, or disable
   the pure-Gradle iOS test tasks that require Firebase.
-- **Deployment target.** This SDK targets **iOS 15 / tvOS 15 / macOS 10.15**, matching
+- **Deployment target.** This SDK targets **iOS 15 / tvOS 15 / macOS 12**. iOS and tvOS match
   firebase-ios-sdk 12's own declared minimums (iOS 15 / macCatalyst 15 / macOS 10.15 / tvOS 15 /
-  watchOS 7). Your app's deployment target must be **≥** these. The iOS and tvOS floors rose from
-  13 in firebase-ios-sdk 12.0.0 — if your app still targets iOS 13 or 14, stay on a release of this
-  SDK that pins `firebase-ios-sdk` 11.x.
+  watchOS 7). macOS is 12 rather than Firebase's 10.15 because Kotlin/Native builds macOS code for
+  macOS 12 and later. Your app's deployment target must be **≥** these. The iOS and tvOS floors rose
+  from 13 in firebase-ios-sdk 12.0.0 — if your app still targets iOS 13 or 14, stay on a release of
+  this SDK that pins `firebase-ios-sdk` 11.x.
 - **"module.modulemap has been modified since the module file … was built" (Kotlin 2.4.20).**
   After the resolved `firebase-ios-sdk` version changes, for example when you upgrade
   `dev.gitlive:firebase-*`, Kotlin 2.4.20 can reuse stale Xcode build state and fail with this error

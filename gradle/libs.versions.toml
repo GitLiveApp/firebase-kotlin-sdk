@@ -20,9 +20,11 @@ settings-api = "2.2"
 settings-language = "2.2"
 firebase-ios-sdk = "12.17.0"
 # firebase-ios-sdk 12 declares platforms: [.iOS(.v15), .macCatalyst(.v15), .macOS(.v10_15), .tvOS(.v15), .watchOS(.v7)]
+# Kotlin/Native builds for iOS 15 / macOS 12 / tvOS 15 (minVersion in konan.properties), so macOS uses its 12.0 floor
+# rather than Firebase's 10.15.
 ios-deploymentTarget = "15.0"
 tvos-deploymentTarget = "15.0"
-macos-deploymentTarget = "10.15"
+macos-deploymentTarget = "12.0"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"
 publish = "0.34.0"
