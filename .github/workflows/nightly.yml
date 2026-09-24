@@ -119,6 +119,9 @@ jobs:
   build-ios:
     needs: jobMatrixSetup
     runs-on: macos-latest
+    # Same limit as the PR workflow: the firestore simulator tests can hang with no output until GitHub's six-hour job
+    # limit, which holds the ci-nightly concurrency group for the whole time.
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.ios_test_jobs_matrix) }}
@@ -133,6 +136,7 @@ jobs:
   build-macos:
     needs: jobMatrixSetup
     runs-on: macos-latest
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.macos_test_jobs_matrix) }}
@@ -147,6 +151,7 @@ jobs:
   build-tvos:
     needs: jobMatrixSetup
     runs-on: macos-latest
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.jobMatrixSetup.outputs.tvos_test_jobs_matrix) }}
