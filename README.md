@@ -154,9 +154,26 @@ Requires a minimum deployment target of **iOS 15 / tvOS 15 / macOS 12**. iOS and
 
 **Recommended (Swift Package Manager, automatic).** Consume the SDK via Maven as usual (e.g. `implementation("dev.gitlive:firebase-auth:<version>")`) and integrate your shared framework into Xcode using [direct integration](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html) (the `embedAndSignAppleFrameworkForXcode` build phase). The Kotlin Gradle plugin resolves the inherited `firebase-ios-sdk` dependency, generates the Swift package, and links it for you (including for iOS/macOS/tvOS tests). Requires **Kotlin 2.4+** and **Xcode 26.2+**; Xcode 27 needs Kotlin 2.4.20+ in your build ([KT-87196](https://youtrack.jetbrains.com/issue/KT-87196)). Note: the [remote / SwiftPM-export](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html) method (packaging your shared module as its own Swift package) needs Kotlin 2.4.20+ ([KT-84420](https://youtrack.jetbrains.com/issue/KT-84420)), is experimental, and hasn't been verified end to end with this SDK; see [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md).
 
-You can optionally add your own `swiftPMDependencies { swiftPackage("firebase-ios-sdk", …) }` in your shared module to pin a specific Firebase version or pull in extra products.
+To add Firebase products this SDK doesn't use, or to require a newer `firebase-ios-sdk`, declare your own `swiftPMDependencies` in your shared module. The Kotlin Gradle plugin merges them with the inherited ones. The first argument is the package URL, and `from(...)` accepts that version up to the next major:
 
-**Alternative (link Firebase yourself).** If instead you integrate your framework into Xcode via CocoaPods or link Firebase manually, add the Firebase products matching the modules you use (`FirebaseCore` plus e.g. `FirebaseFirestore` for `firebase-firestore`) using any [Firebase installation method](https://firebase.google.com/docs/ios/installation-methods#integrate-manually) — SPM, CocoaPods, or manual/Carthage.
+```kotlin
+kotlin {
+    swiftPMDependencies {
+        swiftPackage(
+            url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+            version = from("12.17.0"),
+            products = listOf(product("FirebaseAppCheck")),
+        )
+    }
+}
+```
+
+**CocoaPods, or linking Firebase yourself.** Because each module publishes its `firebase-ios-sdk` dependency, the Kotlin Gradle plugin fails the two integrations in which you added Firebase to Xcode yourself:
+
+- The Kotlin CocoaPods plugin: `syncFramework` fails in `checkSwiftPMDependencies` with "You are using CocoaPods integration with SwiftPM dependencies".
+- Direct integration when your Xcode project doesn't include the generated linkage package: the build fails with "SwiftPM linkage package not integrated into Xcode project".
+
+Both errors print the command that switches your Xcode project over (the `integrateEmbedAndSign` and `integrateLinkagePackage` tasks); see Kotlin's [CocoaPods to SwiftPM migration guide](https://kotl.in/cocoapods-to-swiftpm-migration). Then remove the Firebase pods from your Podfile, because linking Firebase through both CocoaPods and SwiftPM duplicates its symbols.
 
 See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
 

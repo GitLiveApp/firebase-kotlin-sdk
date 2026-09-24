@@ -65,7 +65,7 @@ Android, iOS (arm64, x64, simulatorArm64), macOS (arm64), tvOS (arm64, simulator
 
 ## Important Notes
 
-- iOS/macOS/tvOS consume the Firebase iOS SDK via Kotlin's Swift Package Manager integration (`swiftPMDependencies`, Kotlin 2.4+). Firebase is not bundled in the klibs; each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, which consumers inherit transitively (only CocoaPods or manual integrations link it themselves). See `documentation/ios-firebase-linking.md`.
+- iOS/macOS/tvOS consume the Firebase iOS SDK via Kotlin's Swift Package Manager integration (`swiftPMDependencies`, Kotlin 2.4+). Firebase is not bundled in the klibs; each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, which consumers inherit transitively. Because of that metadata, the Kotlin Gradle plugin fails consumers on the Kotlin CocoaPods plugin, or on direct integration without the generated linkage package in Xcode, until they migrate to SwiftPM integration. See `documentation/ios-firebase-linking.md`.
 - After changing `firebase-ios-sdk` in `gradle/libs.versions.toml`, run `rm -rf build/kotlin/swiftPMXcodeDumps` before building on macOS. Kotlin 2.4.20 keeps the SwiftPM xcodebuild state in shared folders under the root `build/kotlin/` and can reuse it after a version change, failing with "module.modulemap has been modified" (KT-88106, fix planned for Kotlin 2.5.0).
 - JS target uses Firebase Web SDK.
 - Binary compatibility is validated on every PR via the kotlinx binary compatibility validator — breaking changes require a major version bump.

@@ -16,7 +16,8 @@ publication:
   (usage `swiftPMDependenciesMetadata`) referencing a **`<module>-<version>-swiftpm-metadata.json`**
   artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `12.17.0`, product
   `FirebaseCore`, deployment targets, and `isModulesDiscoveryEnabled = false`. The declared version
-  is a `from(...)` lower bound, so SwiftPM may resolve a newer patch within the same major.
+  is a `from(...)` lower bound, so SwiftPM may resolve any newer 12.x minor or patch release, up to
+  but not including 13.0.0.
 - A downstream KMP module that depends on `dev.gitlive:firebase-*` from Maven resolves this via its
   `swiftPMDependenciesMetadataClasspath`, aggregating the SwiftPM dependencies across the whole
   dependency graph — **without declaring any `swiftPMDependencies` of its own**. (Verified: a
@@ -69,10 +70,21 @@ officially tested up to Xcode 26.4; full Xcode 27 support is planned for Kotlin 
 
 ### Known gotchas
 
-- **iOS/macOS/tvOS test tasks.** The Kotlin/Native test runner links Firebase outside the Xcode
-  integration context, so `…Test` tasks that touch Firebase symbols may fail to resolve them when run
-  standalone. If you hit this, run the affected tests through the Xcode-integrated build, or disable
-  the pure-Gradle iOS test tasks that require Firebase.
+- **iOS/macOS/tvOS test tasks.** Kotlin/Native test tasks such as `iosSimulatorArm64Test` link the
+  inherited `firebase-ios-sdk` themselves: the Kotlin Gradle plugin adds the SwiftPM linker
+  arguments to test executables and sets the DYLD search paths when it runs them. This SDK's own CI
+  runs its Apple tests this way. Tests that use FirebaseAuth or FirebaseInstallations on a simulator
+  need a keychain entitlement linked into the test binary; see `enableKeychainForTests` in
+  `firebase-auth/build.gradle.kts`. Resources bundled inside Swift packages aren't available to
+  Kotlin/Native test runs yet ([KT-83877](https://youtrack.jetbrains.com/issue/KT-83877)).
+- **Kotlin CocoaPods plugin, or Firebase added to Xcode by hand.** Because the SDK publishes its
+  SwiftPM dependencies, the Kotlin Gradle plugin fails the CocoaPods plugin's `syncFramework`
+  (in `checkSwiftPMDependencies`), and fails direct integration when the Xcode project doesn't
+  include the generated linkage package ("SwiftPM linkage package not integrated into Xcode
+  project"). This is by design. Both errors print the command that runs the `integrateEmbedAndSign`
+  and `integrateLinkagePackage` tasks against your Xcode project; see Kotlin's
+  [CocoaPods to SwiftPM migration guide](https://kotl.in/cocoapods-to-swiftpm-migration). Afterwards
+  remove the Firebase pods from your Podfile (see "Don't mix package managers for Firebase" below).
 - **Deployment target.** This SDK targets **iOS 15 / tvOS 15 / macOS 12**. iOS and tvOS match
   firebase-ios-sdk 12's own declared minimums (iOS 15 / macCatalyst 15 / macOS 10.15 / tvOS 15 /
   watchOS 7). macOS is 12 rather than Firebase's 10.15 because Kotlin/Native builds macOS code for

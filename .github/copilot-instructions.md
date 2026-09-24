@@ -183,7 +183,7 @@ Migrated modules additionally expose `.compat`, the `com.google.firebase` object
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- The Firebase iOS SDK is **not** bundled into the published klibs. Each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, so a consuming KMP app inherits it transitively and does not re-declare it. Only projects that integrate their framework another way (CocoaPods, manual) link Firebase themselves.
+- The Firebase iOS SDK is **not** bundled into the published klibs. Each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, so a consuming KMP app inherits it transitively and does not re-declare it. Because of that metadata, the Kotlin Gradle plugin fails consumers that use the Kotlin CocoaPods plugin, or direct integration without the generated linkage package in their Xcode project; they have to migrate to SwiftPM integration (see `documentation/ios-firebase-linking.md`).
 - The Apple targets consume Firebase via the `swiftPMDependencies` block in each module's `build.gradle.kts` (Kotlin 2.4+); this also links Firebase for iOS/macOS/tvOS tests.
 
 ### JVM / Desktop
