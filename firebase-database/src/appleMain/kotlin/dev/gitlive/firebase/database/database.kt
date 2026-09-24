@@ -40,7 +40,7 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNull
 import platform.Foundation.allObjects
 
-public val FirebaseDatabase.ios: FIRDatabase get() = FIRDatabase.database()
+public val FirebaseDatabase.ios: FIRDatabase get() = ios
 
 public actual val Firebase.database: FirebaseDatabase
     by lazy { FirebaseDatabase(FIRDatabase.database()) }

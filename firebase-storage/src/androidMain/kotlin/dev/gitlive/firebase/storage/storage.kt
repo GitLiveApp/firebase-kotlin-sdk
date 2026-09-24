@@ -26,7 +26,7 @@ import kotlinx.coroutines.tasks.await
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-public val FirebaseStorage.android: com.google.firebase.storage.FirebaseStorage get() = com.google.firebase.storage.FirebaseStorage.getInstance()
+public val FirebaseStorage.android: com.google.firebase.storage.FirebaseStorage get() = android
 
 public actual val Firebase.storage: FirebaseStorage get() = FirebaseStorage(com.google.firebase.storage.FirebaseStorage.getInstance())
 
