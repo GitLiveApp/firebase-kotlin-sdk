@@ -20,9 +20,11 @@ inputs:
     required: false
     default: 'false'
   xcode-version:
-    description: 'Xcode version to select when apple is true'
+    description: >-
+      Xcode version to select when apple is true. 26.4.1 is the newest Xcode that Kotlin 2.4.x is tested
+      with (XcodeVersion.maxTested = 26.4); the runner image's default is newer.
     required: false
-    default: '26.2.0'
+    default: '26.4.1'
   boot-simulator:
     description: >-
       Runtime prefix of a simulator to boot before running the tests, e.g. "tvOS".
