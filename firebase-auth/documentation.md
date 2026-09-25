@@ -76,4 +76,4 @@ Phone authentication is not supported on the JVM target. The [Firebase Java SDK]
 
 ### Driving the flow yourself
 
-If you would rather not implement `PhoneVerificationProvider` at all, `PhoneAuthProvider.credential(verificationId, smsCode)` builds the credential directly from a verification id you obtained through the underlying official SDK.
+If you would rather not implement `PhoneVerificationProvider` at all, `PhoneAuthProvider.credential(verificationId, smsCode)` builds the credential directly from a verification id you obtained through the underlying official SDK. This works on Android, iOS and JS, but not on tvOS or the JVM, as described above.
