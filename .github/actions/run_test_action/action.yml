@@ -108,7 +108,11 @@ runs:
       shell: bash
       run: |
         cache=~/Library/Caches/org.swift.swiftpm
-        if [ -d "$cache" ] && [ -n "$(find "$cache" -newer "$RUNNER_TEMP/swiftpm-cache-restored" -print -quit)" ]; then
+        # A Firebase module resolves the shared lock group, which writes this lock file. It is the signal even when
+        # SwiftPM resolved entirely from a restored cache and wrote nothing new to it.
+        if compgen -G ".swiftpm-locks/*/swiftImport/Package.resolved" > /dev/null; then
+          echo "used=true" >> "$GITHUB_OUTPUT"
+        elif [ -d "$cache" ] && [ -n "$(find "$cache" -newer "$RUNNER_TEMP/swiftpm-cache-restored" -print -quit)" ]; then
           echo "used=true" >> "$GITHUB_OUTPUT"
         fi
 
