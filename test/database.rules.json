@@ -2,6 +2,11 @@
   "rules": {
     ".read": true,
     ".write": true,
+    "test": {
+      "compatQueries": {
+        ".indexOn": ["score", ".value"]
+      }
+    },
     "FirebaseRealtimeDatabaseTest": {
       "lastActivity": {
         ".validate": "!newData.exists() || newData.isNumber()"
