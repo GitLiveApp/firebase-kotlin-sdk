@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import utils.TargetPlatform
+import utils.supportsApple
 import utils.toTargetPlatforms
 
 /*
@@ -93,6 +94,14 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
+    }
+    if (supportedPlatforms.supportsApple()) {
+        swiftPMDependencies {
+            // No SwiftPM dependencies here. Without this, the shared "default" lock group makes every Apple test task
+            // resolve all Firebase products first (:firebase-analytics:fetchUmbrellaPackageIdentifierForDefault, KT-86560).
+            // Remove it if this module ever gains a direct or transitive SwiftPM dependency.
+            packageResolvedSynchronization = noSynchronization()
+        }
     }
 
     if (supportedPlatforms.contains(TargetPlatform.Js)) {

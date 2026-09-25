@@ -45,15 +45,21 @@ runs:
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
 
-    - name: SwiftPM cache
+    - name: Restore SwiftPM cache
+      id: swiftpm-cache
       if: inputs.apple == 'true'
-      uses: actions/cache@v5
+      uses: actions/cache/restore@v5
       with:
         path: |
           ~/Library/Caches/org.swift.swiftpm
         key: swiftpm-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
         restore-keys: |
           swiftpm-${{ runner.os }}-
+
+    - name: Mark SwiftPM cache restore time
+      if: inputs.apple == 'true'
+      shell: bash
+      run: touch "$RUNNER_TEMP/swiftpm-cache-restored"
 
     - uses: maxim-lobanov/setup-xcode@v1
       if: inputs.apple == 'true'
@@ -94,6 +100,31 @@ runs:
     - name: Run ${{ inputs.platform-name }} Tests
       shell: bash
       run: ./gradlew ${{ inputs.gradle-tasks }}
+
+    # Only a job that resolved packages writes the SwiftPM cache. The modules without SwiftPM dependencies
+    # (firebase-common, firebase-common-internal, test-utils) resolve nothing and finish first, so letting them
+    # save would store whatever was restored, or nothing, under a new key.
+    - name: Check whether SwiftPM used its cache
+      id: swiftpm-cache-used
+      if: inputs.apple == 'true' && steps.swiftpm-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cache=~/Library/Caches/org.swift.swiftpm
+        # A Firebase module resolves the shared lock group, which writes this lock file. It is the signal even when
+        # SwiftPM resolved entirely from a restored cache and wrote nothing new to it.
+        if compgen -G ".swiftpm-locks/*/swiftImport/Package.resolved" > /dev/null; then
+          echo "used=true" >> "$GITHUB_OUTPUT"
+        elif [ -d "$cache" ] && [ -n "$(find "$cache" -newer "$RUNNER_TEMP/swiftpm-cache-restored" -print -quit)" ]; then
+          echo "used=true" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Save SwiftPM cache
+      if: steps.swiftpm-cache-used.outputs.used == 'true'
+      uses: actions/cache/save@v5
+      with:
+        path: |
+          ~/Library/Caches/org.swift.swiftpm
+        key: ${{ steps.swiftpm-cache.outputs.cache-primary-key }}
 
     - name: Upload ${{ inputs.platform-name }} test artifact
       uses: actions/upload-artifact@v5
