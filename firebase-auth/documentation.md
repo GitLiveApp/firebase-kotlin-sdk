@@ -72,7 +72,7 @@ class JsPhoneVerificationProvider(
 
 #### JVM
 
-Phone authentication is not available on the JVM target. The [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) that backs it does not implement `PhoneAuthProvider`, so calling `verifyPhoneNumber` throws `NotImplementedError`.
+Phone authentication is not supported on the JVM target. The [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) that backs it does not implement `PhoneAuthProvider`, so neither `verifyPhoneNumber` nor `credential` works there.
 
 ### Driving the flow yourself
 
