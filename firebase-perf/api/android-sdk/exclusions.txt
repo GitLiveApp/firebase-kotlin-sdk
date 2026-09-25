@@ -1,0 +1,7 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-perf.
+com.google.firebase.perf.FirebasePerformance#MAX_ATTRIBUTE_KEY_LENGTH  // @hide shadowed by a private field of the SDK class, so not usable from app code; use Trace.MAX_ATTRIBUTE_KEY_LENGTH
+com.google.firebase.perf.FirebasePerformance#MAX_ATTRIBUTE_VALUE_LENGTH  // @hide shadowed by a private field of the SDK class; use Trace.MAX_ATTRIBUTE_VALUE_LENGTH
+com.google.firebase.perf.FirebasePerformance#MAX_TRACE_CUSTOM_ATTRIBUTES  // @hide shadowed by a private field of the SDK class; use Trace.MAX_TRACE_CUSTOM_ATTRIBUTES
+com.google.firebase.perf.metrics.Trace#describeContents  // @platform android.os.Parcelable
+com.google.firebase.perf.metrics.Trace#writeToParcel  // @platform android.os.Parcelable
+com.google.firebase.perf.metrics.Trace#CREATOR  // @platform android.os.Parcelable
