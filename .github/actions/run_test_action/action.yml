@@ -106,3 +106,26 @@ runs:
       with:
         name: ${{ inputs.platform-name }} ${{ env.ARCHIVE_KEY }} Firebase Debug Log
         path: "**/firebase-debug.log"
+
+    # What Kotlin's SwiftPM import resolved and passed to cinterop and the linker. Leaves out the xcodebuild
+    # DerivedData (swiftImportDd) and package checkouts (swiftPMCheckouts), which are large.
+    - name: Upload SwiftPM import diagnostics
+      uses: actions/upload-artifact@v5
+      if: failure() && inputs.apple == 'true'
+      with:
+        name: ${{ inputs.platform-name }} ${{ env.ARCHIVE_KEY }} SwiftPM import diagnostics
+        # .swiftpm-locks is a dot-directory, which upload-artifact skips unless hidden files are included
+        include-hidden-files: true
+        if-no-files-found: ignore
+        path: |
+          .swiftpm-locks/*/swiftImport/Package.resolved
+          build/kotlin/swiftSyntheticPackages/*/Package.swift
+          build/kotlin/swiftSyntheticPackages/*/Package.resolved
+          build/kotlin/swiftPMXcodeDumps/*/swiftImportClangDump/**
+          **/build/kotlin/swiftImport/Package.swift
+          **/build/kotlin/swiftImport/Package.resolved
+          **/build/kotlin/swiftImportClangDump/**
+          **/build/kotlin/swiftImportDefs/**
+          **/build/kotlin/swiftImportLdDump/**
+          **/build/kotlin/xcodebuildFingerprints/**
+          **/build/kotlin/syntheticPackageFingerprint
