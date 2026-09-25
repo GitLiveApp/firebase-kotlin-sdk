@@ -9,13 +9,14 @@ object BcvApiParser {
 
     private const val DEPRECATION_COMMENT = "  // deprecated: "
 
-    private val classHeader = Regex("""^public\s+((?:(?:final|abstract|open|static|synthetic|annotation|enum|interface)\s+)*)class\s+([\w/$]+)(?:\s*:\s*.*)?\s*\{$""")
+    private val classHeader = Regex("""^public\s+((?:(?:final|abstract|open|static|synthetic|annotation|enum|interface)\s+)*)class\s+([\w/$]+)(?:\s*:\s*([^{]*))?\s*\{$""")
     private val method = Regex("""^public\s+((?:(?:static|final|abstract|open|synthetic)\s+)*)fun\s+(\S+)\s+(\(.*)$""")
     private val field = Regex("""^public\s+((?:(?:static|final|enum|synthetic)\s+)*)field\s+(\S+)\s+(\S+)$""")
 
     fun parse(text: String): List<ApiClass> {
         val classes = mutableListOf<ApiClass>()
         var current: String? = null
+        var superTypes = emptyList<String>()
         var members = mutableListOf<ApiMember>()
         for (rawLine in text.lines()) {
             val trimmed = rawLine.trim()
@@ -25,11 +26,12 @@ object BcvApiParser {
             if (line.isEmpty()) continue
             classHeader.find(line)?.let {
                 current = it.groupValues[2].replace('/', '.')
+                superTypes = it.groupValues[3].split(',').map { type -> type.trim().replace('/', '.') }.filter { type -> type.isNotEmpty() }
                 members = mutableListOf()
                 return@let
             }
             if (line == "}") {
-                current?.let { classes += ApiClass(it, members.toList()) }
+                current?.let { classes += ApiClass(it, members.toList(), superTypes = superTypes) }
                 current = null
                 continue
             }
