@@ -41,7 +41,7 @@ Android is the only platform that can also complete the verification with no use
 #### iOS
 
 ```kotlin
-class ApplePhoneVerificationProvider(
+class IosPhoneVerificationProvider(
     private val code: CompletableDeferred<String>,
 ) : PhoneVerificationProvider {
     override val delegate: FIRAuthUIDelegateProtocol? = null
