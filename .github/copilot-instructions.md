@@ -152,6 +152,10 @@ The SDK has two public API layers per module:
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
    builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+   `firebase-analytics` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published
+   classes by `generateAndroidSdkApi*`), a plain common class in the stripped package with real bodies for the other platforms
+   (`FirebaseAnalytics` over an internal `NativeAnalytics` expect), a header stub for a platform class (`android.os.Bundle`) and a
+   module the JVM SDK lacks entirely (`jvmKeepClasses` ships the module's own no-op implementation).
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

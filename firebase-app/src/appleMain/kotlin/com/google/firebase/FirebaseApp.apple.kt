@@ -13,7 +13,7 @@ import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
-    public actual constructor(message: String, cause: Throwable) : super(message, cause)
+    public actual constructor(message: String, cause: Throwable?) : super(message, cause)
 }
 
 public actual class FirebaseNetworkException actual constructor(message: String) : FirebaseException(message)
