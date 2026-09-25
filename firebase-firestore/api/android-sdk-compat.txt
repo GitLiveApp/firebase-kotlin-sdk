@@ -1,0 +1,456 @@
+# Android SDK source compatibility of firebase-firestore
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 333 public members available (321 identical, 12 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.firestore.AggregateField
+  OK    static AverageAggregateField average(FieldPath)
+  OK    static AverageAggregateField average(String)
+  OK    static CountAggregateField count()
+  OK    String getAlias()
+  OK    String getFieldPath()
+  OK    String getOperator()
+  OK    static SumAggregateField sum(FieldPath)
+  OK    static SumAggregateField sum(String)
+com.google.firebase.firestore.AggregateField.AverageAggregateField
+com.google.firebase.firestore.AggregateField.CountAggregateField
+com.google.firebase.firestore.AggregateField.SumAggregateField
+com.google.firebase.firestore.AggregateQuery
+  OK    Task get(AggregateSource)
+  OK    List getAggregateFields()
+  OK    Query getQuery()
+com.google.firebase.firestore.AggregateQuerySnapshot
+  OK    Object get(AggregateField)
+  OK    Double get(AverageAggregateField)
+  OK    long get(CountAggregateField)
+  OK    long getCount()
+  OK    Double getDouble(AggregateField)
+  OK    Long getLong(AggregateField)
+  OK    AggregateQuery getQuery()
+com.google.firebase.firestore.AggregateSource
+  OK    static AggregateSource SERVER
+com.google.firebase.firestore.Blob
+  OK    int compareTo(Blob)
+  OK    static Blob fromBytes(byte[])
+  OK    byte[] toBytes()
+com.google.firebase.firestore.CollectionReference
+  OK    Task add(Object)
+  OK    DocumentReference document()
+  OK    DocumentReference document(String)
+  OK    String getId()
+  OK    DocumentReference getParent()
+  OK    String getPath()
+com.google.firebase.firestore.DocumentChange
+  OK    QueryDocumentSnapshot getDocument()
+  OK    int getNewIndex()
+  OK    int getOldIndex()
+  OK    Type getType()
+com.google.firebase.firestore.DocumentChange.Type
+  OK    static Type ADDED
+  OK    static Type MODIFIED
+  OK    static Type REMOVED
+com.google.firebase.firestore.DocumentId
+com.google.firebase.firestore.DocumentReference
+  OK    ListenerRegistration addSnapshotListener(EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)
+  OK    ListenerRegistration addSnapshotListener(MetadataChanges, EventListener)
+  OK    ListenerRegistration addSnapshotListener(SnapshotListenOptions, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)
+  OK    CollectionReference collection(String)
+  OK    Task delete()
+  OK    Task get()
+  OK    Task get(Source)
+  OK    FirebaseFirestore getFirestore()
+  HIDE  String getFullPath()
+  OK    String getId()
+  OK    CollectionReference getParent()
+  OK    String getPath()
+  OK    Task set(Object)
+  OK    Task set(Object, SetOptions)
+  OK    Task update(Map)
+  OK    Task update(FieldPath, Object, Object[])
+  OK    Task update(String, Object, Object[])
+com.google.firebase.firestore.DocumentSnapshot
+  OK    boolean contains(FieldPath)
+  OK    boolean contains(String)
+  OK    boolean exists()
+  OK    Object get(FieldPath)
+  OK    Object get(String)
+  OK    Object get(FieldPath, ServerTimestampBehavior)
+  PLAT  T get(FieldPath, Class)
+  OK    Object get(String, ServerTimestampBehavior)
+  PLAT  T get(String, Class)
+  PLAT  T get(FieldPath, Class, ServerTimestampBehavior)
+  PLAT  T get(String, Class, ServerTimestampBehavior)
+  OK    Blob getBlob(String)
+  OK    Boolean getBoolean(String)
+  OK    Map getData()
+  OK    Map getData(ServerTimestampBehavior)
+  PLAT  Date getDate(String)
+  PLAT  Date getDate(String, ServerTimestampBehavior)
+  OK    DocumentReference getDocumentReference(String)
+  OK    Double getDouble(String)
+  OK    GeoPoint getGeoPoint(String)
+  OK    String getId()
+  OK    Long getLong(String)
+  OK    SnapshotMetadata getMetadata()
+  OK    DocumentReference getReference()
+  OK    String getString(String)
+  OK    Timestamp getTimestamp(String)
+  OK    Timestamp getTimestamp(String, ServerTimestampBehavior)
+  UNAV  VectorValue getVectorValue(String)
+  PLAT  T toObject(Class)
+  PLAT  T toObject(Class, ServerTimestampBehavior)
+com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior
+  OK    static ServerTimestampBehavior ESTIMATE
+  OK    static ServerTimestampBehavior NONE
+  OK    static ServerTimestampBehavior PREVIOUS
+com.google.firebase.firestore.EventListener
+  OK    void onEvent(T, FirebaseFirestoreException)
+com.google.firebase.firestore.Exclude
+com.google.firebase.firestore.FieldPath
+  OK    static FieldPath documentId()
+  OK    static FieldPath fromDotSeparatedPath(String)
+  OK    static FieldPath of(String[])
+com.google.firebase.firestore.FieldValue
+  OK    static FieldValue arrayRemove(Object[])
+  OK    static FieldValue arrayUnion(Object[])
+  OK    static FieldValue delete()
+  OK    static FieldValue increment(double)
+  OK    static FieldValue increment(long)
+  UNAV  static FieldValue maximum(double)
+  UNAV  static FieldValue maximum(long)
+  UNAV  static FieldValue minimum(double)
+  UNAV  static FieldValue minimum(long)
+  OK    static FieldValue serverTimestamp()
+  UNAV  static VectorValue vector(double[])
+com.google.firebase.firestore.Filter
+  OK    Filter()
+  OK    static Filter and(Filter[])
+  OK    static Filter arrayContains(FieldPath, Object)
+  OK    static Filter arrayContains(String, Object)
+  OK    static Filter arrayContainsAny(FieldPath, List)
+  OK    static Filter arrayContainsAny(String, List)
+  OK    static Filter equalTo(FieldPath, Object)
+  OK    static Filter equalTo(String, Object)
+  OK    static Filter greaterThan(FieldPath, Object)
+  OK    static Filter greaterThan(String, Object)
+  OK    static Filter greaterThanOrEqualTo(FieldPath, Object)
+  OK    static Filter greaterThanOrEqualTo(String, Object)
+  OK    static Filter inArray(FieldPath, List)
+  OK    static Filter inArray(String, List)
+  OK    static Filter lessThan(FieldPath, Object)
+  OK    static Filter lessThan(String, Object)
+  OK    static Filter lessThanOrEqualTo(FieldPath, Object)
+  OK    static Filter lessThanOrEqualTo(String, Object)
+  OK    static Filter notEqualTo(FieldPath, Object)
+  OK    static Filter notEqualTo(String, Object)
+  OK    static Filter notInArray(FieldPath, List)
+  OK    static Filter notInArray(String, List)
+  OK    static Filter or(Filter[])
+com.google.firebase.firestore.FirebaseFirestore
+  OK    ListenerRegistration addSnapshotsInSyncListener(Runnable)
+  PLAT  ListenerRegistration addSnapshotsInSyncListener(Activity, Runnable)
+  PLAT  ListenerRegistration addSnapshotsInSyncListener(Executor, Runnable)
+  OK    WriteBatch batch()
+  OK    Task clearPersistence()
+  OK    CollectionReference collection(String)
+  OK    Query collectionGroup(String)
+  OK    Task disableNetwork()
+  OK    DocumentReference document(String)
+  OK    Task enableNetwork()
+  OK    FirebaseApp getApp()
+  OK    FirebaseFirestoreSettings getFirestoreSettings()
+  OK    static FirebaseFirestore getInstance()
+  OK    static FirebaseFirestore getInstance(FirebaseApp)
+  OK    static FirebaseFirestore getInstance(String)
+  OK    static FirebaseFirestore getInstance(FirebaseApp, String)
+  OK    Task getNamedQuery(String)
+  OK    PersistentCacheIndexManager getPersistentCacheIndexManager()
+  OK    LoadBundleTask loadBundle(byte[])
+  PLAT  LoadBundleTask loadBundle(InputStream)
+  PLAT  LoadBundleTask loadBundle(ByteBuffer)
+  UNAV  PipelineSource pipeline()
+  OK    Task runBatch(Function)
+  OK    Task runTransaction(Function)
+  OK    Task runTransaction(TransactionOptions, Function)
+  OK    void setFirestoreSettings(FirebaseFirestoreSettings)
+  SKIP  Task setIndexConfiguration(String)
+  OK    static void setLoggingEnabled(boolean)
+  OK    Task terminate()
+  OK    void useEmulator(String, int)
+  OK    Task waitForPendingWrites()
+com.google.firebase.firestore.FirebaseFirestoreException
+  OK    FirebaseFirestoreException(String, Code)
+  OK    FirebaseFirestoreException(String, Code, Throwable)
+  OK    Code getCode()
+com.google.firebase.firestore.FirebaseFirestoreException.Code
+  OK    static Code fromValue(int)
+  OK    int value()
+  OK    static Code ABORTED
+  OK    static Code ALREADY_EXISTS
+  OK    static Code CANCELLED
+  OK    static Code DATA_LOSS
+  OK    static Code DEADLINE_EXCEEDED
+  OK    static Code FAILED_PRECONDITION
+  OK    static Code INTERNAL
+  OK    static Code INVALID_ARGUMENT
+  OK    static Code NOT_FOUND
+  OK    static Code OK
+  OK    static Code OUT_OF_RANGE
+  OK    static Code PERMISSION_DENIED
+  OK    static Code RESOURCE_EXHAUSTED
+  OK    static Code UNAUTHENTICATED
+  OK    static Code UNAVAILABLE
+  OK    static Code UNIMPLEMENTED
+  OK    static Code UNKNOWN
+com.google.firebase.firestore.FirebaseFirestoreSettings
+  OK    LocalCacheSettings getCacheSettings()
+  SKIP  long getCacheSizeBytes()
+  OK    int getGrpcFlowControlWindow()
+  OK    String getHost()
+  SKIP  boolean isPersistenceEnabled()
+  OK    boolean isSslEnabled()
+  OK    static long CACHE_SIZE_UNLIMITED
+  OK    static int DEFAULT_GRPC_FLOW_CONTROL_WINDOW
+com.google.firebase.firestore.FirebaseFirestoreSettings.Builder
+  OK    Builder()
+  OK    Builder(FirebaseFirestoreSettings)
+  OK    FirebaseFirestoreSettings build()
+  SKIP  long getCacheSizeBytes()
+  OK    int getGrpcFlowControlWindow()
+  OK    String getHost()
+  SKIP  boolean isPersistenceEnabled()
+  OK    boolean isSslEnabled()
+  SKIP  Builder setCacheSizeBytes(long)
+  OK    Builder setGrpcFlowControlWindow(int)
+  OK    Builder setHost(String)
+  OK    Builder setLocalCacheSettings(LocalCacheSettings)
+  SKIP  Builder setPersistenceEnabled(boolean)
+  OK    Builder setSslEnabled(boolean)
+com.google.firebase.firestore.FirestoreKt
+  OK    static Flow dataObjects(DocumentReference, MetadataChanges)
+  OK    static Flow dataObjects(Query, MetadataChanges)
+  OK    static FirebaseFirestore firestore(Firebase, FirebaseApp)
+  OK    static FirebaseFirestore firestore(Firebase, String)
+  OK    static FirebaseFirestore firestore(Firebase, FirebaseApp, String)
+  OK    static FirebaseFirestoreSettings firestoreSettings(Function1)
+  OK    static T getField(DocumentSnapshot, FieldPath)
+  OK    static T getField(DocumentSnapshot, String)
+  OK    static T getField(DocumentSnapshot, FieldPath, ServerTimestampBehavior)
+  OK    static T getField(DocumentSnapshot, String, ServerTimestampBehavior)
+  OK    static FirebaseFirestore getFirestore(Firebase)
+  OK    static MemoryCacheSettings memoryCacheSettings(Function1)
+  OK    static MemoryEagerGcSettings memoryEagerGcSettings(Function1)
+  OK    static MemoryLruGcSettings memoryLruGcSettings(Function1)
+  OK    static PersistentCacheSettings persistentCacheSettings(Function1)
+  OK    static Flow snapshots(DocumentReference, MetadataChanges)
+  OK    static Flow snapshots(Query, MetadataChanges)
+  OK    static T toObject(DocumentSnapshot)
+  OK    static T toObject(QueryDocumentSnapshot)
+  OK    static T toObject(DocumentSnapshot, ServerTimestampBehavior)
+  OK    static T toObject(QueryDocumentSnapshot, ServerTimestampBehavior)
+  OK    static List toObjects(QuerySnapshot)
+  OK    static List toObjects(QuerySnapshot, ServerTimestampBehavior)
+com.google.firebase.firestore.GeoPoint
+  OK    GeoPoint(double, double)
+  OK    int compareTo(GeoPoint)
+  OK    double getLatitude()
+  OK    double getLongitude()
+com.google.firebase.firestore.IgnoreExtraProperties
+com.google.firebase.firestore.ListenSource
+  OK    static ListenSource CACHE
+  OK    static ListenSource DEFAULT
+com.google.firebase.firestore.ListenerRegistration
+  OK    void remove()
+com.google.firebase.firestore.LoadBundleTask
+  MAP   Task addOnCanceledListener(OnCanceledListener)  [inherited]
+  PLAT  Task addOnCanceledListener(Activity, OnCanceledListener)
+  PLAT  Task addOnCanceledListener(Executor, OnCanceledListener)
+  MAP   Task addOnCompleteListener(OnCompleteListener)  [inherited]
+  PLAT  Task addOnCompleteListener(Activity, OnCompleteListener)
+  PLAT  Task addOnCompleteListener(Executor, OnCompleteListener)
+  MAP   Task addOnFailureListener(OnFailureListener)  [inherited]
+  PLAT  Task addOnFailureListener(Activity, OnFailureListener)
+  PLAT  Task addOnFailureListener(Executor, OnFailureListener)
+  OK    LoadBundleTask addOnProgressListener(OnProgressListener)
+  PLAT  LoadBundleTask addOnProgressListener(Activity, OnProgressListener)
+  PLAT  LoadBundleTask addOnProgressListener(Executor, OnProgressListener)
+  MAP   Task addOnSuccessListener(OnSuccessListener)  [inherited]
+  PLAT  Task addOnSuccessListener(Activity, OnSuccessListener)
+  PLAT  Task addOnSuccessListener(Executor, OnSuccessListener)
+  MAP   Task continueWith(Continuation)  [inherited]
+  PLAT  Task continueWith(Executor, Continuation)
+  MAP   Task continueWithTask(Continuation)  [inherited]
+  PLAT  Task continueWithTask(Executor, Continuation)
+  MAP   Exception getException()  [inherited]
+  MAP   LoadBundleTaskProgress getResult()  [inherited]
+  PLAT  LoadBundleTaskProgress getResult(Class)
+  MAP   boolean isCanceled()  [inherited]
+  MAP   boolean isComplete()  [inherited]
+  MAP   boolean isSuccessful()  [inherited]
+  MAP   Task onSuccessTask(SuccessContinuation)  [inherited]
+  PLAT  Task onSuccessTask(Executor, SuccessContinuation)
+com.google.firebase.firestore.LoadBundleTaskProgress
+  OK    long getBytesLoaded()
+  OK    int getDocumentsLoaded()
+  OK    Exception getException()
+  OK    TaskState getTaskState()
+  OK    long getTotalBytes()
+  OK    int getTotalDocuments()
+com.google.firebase.firestore.LoadBundleTaskProgress.TaskState
+  OK    static TaskState ERROR
+  OK    static TaskState RUNNING
+  OK    static TaskState SUCCESS
+com.google.firebase.firestore.LocalCacheSettings
+com.google.firebase.firestore.MemoryCacheSettings
+  OK    MemoryGarbageCollectorSettings getGarbageCollectorSettings()
+  OK    static Builder newBuilder()
+com.google.firebase.firestore.MemoryCacheSettings.Builder
+  OK    MemoryCacheSettings build()
+  OK    Builder setGcSettings(MemoryGarbageCollectorSettings)
+com.google.firebase.firestore.MemoryEagerGcSettings
+  OK    static Builder newBuilder()
+com.google.firebase.firestore.MemoryEagerGcSettings.Builder
+  OK    MemoryEagerGcSettings build()
+com.google.firebase.firestore.MemoryGarbageCollectorSettings
+com.google.firebase.firestore.MemoryLruGcSettings
+  OK    long getSizeBytes()
+  OK    static Builder newBuilder()
+com.google.firebase.firestore.MemoryLruGcSettings.Builder
+  OK    MemoryLruGcSettings build()
+  OK    Builder setSizeBytes(long)
+com.google.firebase.firestore.MetadataChanges
+  OK    static MetadataChanges EXCLUDE
+  OK    static MetadataChanges INCLUDE
+com.google.firebase.firestore.OnProgressListener
+  OK    void onProgress(ProgressT)
+com.google.firebase.firestore.PersistentCacheIndexManager
+  OK    void deleteAllIndexes()
+  OK    void disableIndexAutoCreation()
+  OK    void enableIndexAutoCreation()
+com.google.firebase.firestore.PersistentCacheSettings
+  OK    long getSizeBytes()
+  OK    static Builder newBuilder()
+com.google.firebase.firestore.PersistentCacheSettings.Builder
+  OK    PersistentCacheSettings build()
+  OK    Builder setSizeBytes(long)
+com.google.firebase.firestore.PropertyName
+  OK    String value()
+com.google.firebase.firestore.Query
+  OK    ListenerRegistration addSnapshotListener(EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)
+  OK    ListenerRegistration addSnapshotListener(MetadataChanges, EventListener)
+  OK    ListenerRegistration addSnapshotListener(SnapshotListenOptions, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)
+  OK    AggregateQuery aggregate(AggregateField, AggregateField[])
+  OK    AggregateQuery count()
+  OK    Query endAt(DocumentSnapshot)
+  OK    Query endAt(Object[])
+  OK    Query endBefore(DocumentSnapshot)
+  OK    Query endBefore(Object[])
+  OK    Task get()
+  OK    Task get(Source)
+  OK    FirebaseFirestore getFirestore()
+  OK    Query limit(long)
+  OK    Query limitToLast(long)
+  OK    Query orderBy(FieldPath)
+  OK    Query orderBy(String)
+  OK    Query orderBy(FieldPath, Direction)
+  OK    Query orderBy(String, Direction)
+  OK    Query startAfter(DocumentSnapshot)
+  OK    Query startAfter(Object[])
+  OK    Query startAt(DocumentSnapshot)
+  OK    Query startAt(Object[])
+  OK    Query where(Filter)
+  OK    Query whereArrayContains(FieldPath, Object)
+  OK    Query whereArrayContains(String, Object)
+  OK    Query whereArrayContainsAny(FieldPath, List)
+  OK    Query whereArrayContainsAny(String, List)
+  OK    Query whereEqualTo(FieldPath, Object)
+  OK    Query whereEqualTo(String, Object)
+  OK    Query whereGreaterThan(FieldPath, Object)
+  OK    Query whereGreaterThan(String, Object)
+  OK    Query whereGreaterThanOrEqualTo(FieldPath, Object)
+  OK    Query whereGreaterThanOrEqualTo(String, Object)
+  OK    Query whereIn(FieldPath, List)
+  OK    Query whereIn(String, List)
+  OK    Query whereLessThan(FieldPath, Object)
+  OK    Query whereLessThan(String, Object)
+  OK    Query whereLessThanOrEqualTo(FieldPath, Object)
+  OK    Query whereLessThanOrEqualTo(String, Object)
+  OK    Query whereNotEqualTo(FieldPath, Object)
+  OK    Query whereNotEqualTo(String, Object)
+  OK    Query whereNotIn(FieldPath, List)
+  OK    Query whereNotIn(String, List)
+com.google.firebase.firestore.Query.Direction
+  OK    static Direction ASCENDING
+  OK    static Direction DESCENDING
+com.google.firebase.firestore.QueryDocumentSnapshot
+com.google.firebase.firestore.QuerySnapshot
+  OK    List getDocumentChanges()
+  OK    List getDocumentChanges(MetadataChanges)
+  OK    List getDocuments()
+  OK    SnapshotMetadata getMetadata()
+  OK    Query getQuery()
+  OK    boolean isEmpty()
+  OK    Iterator iterator()
+  OK    int size()
+  PLAT  List toObjects(Class)
+  PLAT  List toObjects(Class, ServerTimestampBehavior)
+com.google.firebase.firestore.ServerTimestamp
+com.google.firebase.firestore.SetOptions
+  OK    static SetOptions merge()
+  OK    static SetOptions mergeFieldPaths(List)
+  OK    static SetOptions mergeFields(String[])
+  OK    static SetOptions mergeFields(List)
+com.google.firebase.firestore.SnapshotListenOptions
+  PLAT  Activity getActivity()
+  PLAT  Executor getExecutor()
+  OK    MetadataChanges getMetadataChanges()
+  OK    ListenSource getSource()
+com.google.firebase.firestore.SnapshotListenOptions.Builder
+  OK    Builder()
+  OK    SnapshotListenOptions build()
+  PLAT  Builder setActivity(Activity)
+  PLAT  Builder setExecutor(Executor)
+  OK    Builder setMetadataChanges(MetadataChanges)
+  OK    Builder setSource(ListenSource)
+com.google.firebase.firestore.SnapshotMetadata
+  OK    boolean hasPendingWrites()
+  OK    boolean isFromCache()
+com.google.firebase.firestore.Source
+  OK    static Source CACHE
+  OK    static Source DEFAULT
+  OK    static Source SERVER
+com.google.firebase.firestore.ThrowOnExtraProperties
+com.google.firebase.firestore.Transaction
+  OK    Transaction delete(DocumentReference)
+  OK    DocumentSnapshot get(DocumentReference)
+  OK    Transaction set(DocumentReference, Object)
+  OK    Transaction set(DocumentReference, Object, SetOptions)
+  OK    Transaction update(DocumentReference, Map)
+  OK    Transaction update(DocumentReference, FieldPath, Object, Object[])
+  OK    Transaction update(DocumentReference, String, Object, Object[])
+com.google.firebase.firestore.Transaction.Function
+  OK    TResult apply(Transaction)
+com.google.firebase.firestore.TransactionOptions
+  OK    int getMaxAttempts()
+com.google.firebase.firestore.TransactionOptions.Builder
+  OK    Builder()
+  OK    Builder(TransactionOptions)
+  OK    TransactionOptions build()
+  OK    Builder setMaxAttempts(int)
+com.google.firebase.firestore.WriteBatch
+  OK    Task commit()
+  OK    WriteBatch delete(DocumentReference)
+  OK    WriteBatch set(DocumentReference, Object)
+  OK    WriteBatch set(DocumentReference, Object, SetOptions)
+  OK    WriteBatch update(DocumentReference, Map)
+  OK    WriteBatch update(DocumentReference, FieldPath, Object, Object[])
+  OK    WriteBatch update(DocumentReference, String, Object, Object[])
+com.google.firebase.firestore.WriteBatch.Function
+  OK    void apply(WriteBatch)
