@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**.
+This is a **multiplatform SDK for Firebase** that makes the Firebase Android SDK API (`com.google.firebase.*`) available from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**, by binding to the official Firebase platform SDKs, plus Kotlin-first extensions (`dev.gitlive.firebase.*`: suspend functions, `Flow`s, kotlinx.serialization) on top of it.
 
 All modules are published under the `dev.gitlive` group ID (e.g. `dev.gitlive:firebase-firestore`).
 
@@ -138,7 +138,13 @@ The SDK has two public API layers per module:
    name as a shipped top-level function (`Firebase.getApps(context)`, `Firebase.fromResource(context)`, next to
    `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
    get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
-   `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
+   `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level). An instance member whose
+   replacement has the same arity cannot be deprecated (a member shadows a same-named extension), so only the
+   replacement is shipped, as a same-named extension taking the multiplatform type (`getHttpsCallableFromUrl(url: String)`
+   in `FunctionsUrl.kt`); the report maps such a member to the extension. On Android the shipped facades reach the SDK's
+   JVM-only members through a package-private Java helper (`FunctionsJvmApi.java`): javac compiles after the stubs are
+   stripped, so the stub need not (and must not) declare members common code cannot call. Members the Android SDK has
+   but `firebase-java-sdk` lacks or keeps non-public are listed in `jvmMissingMembers` and verified against Android only.
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
@@ -149,9 +155,17 @@ The SDK has two public API layers per module:
      unavailable unless the comment says `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an
      Android/JVM-only type with no replacement, such as `Parcel`), which drops them from the count; a single overload
      is selected with `Class#member(Type, Type)`.
-2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
-   `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — Kotlin-first extensions of the `com.google.firebase` classes
+   (suspend functions instead of `Task`, `Flow` instead of listeners, kotlinx.serialization), implemented in `commonMain`
+   *on top of* that layer, which is the primary API. In a module not yet migrated it is the existing wrapper API. New
+   modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics` and `firebase-functions` are the reference.
+
+A `dev.gitlive` entry point or class that only delegates to its `com.google.firebase` counterpart (at most with `.await()`)
+adds no value and is deprecated with `DELEGATES_TO_ANDROID_SDK_API` and a `ReplaceWith` naming the counterpart, spelled
+with the fully qualified `com.google.firebase.Firebase` object since both layers have a `Firebase` object. Members reached
+through a wrapper instance are not deprecated: a `ReplaceWith` that only inserts `.compat` is churn, not a migration. The
+wrapper deprecations of every migrated module land together, once every module is migrated, because the modules that
+are not yet take a `dev.gitlive` `FirebaseApp` from `Firebase.app` / `Firebase.initialize`.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

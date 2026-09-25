@@ -1,5 +1,6 @@
 @file:JvmName("InstallationsKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase.installations
 
@@ -15,7 +16,12 @@ import com.google.firebase.installations.installations as compatInstallations
 // The Android-SDK-shaped entry points are reached through the `Firebase.installations` extensions (InstallationsKt),
 // which are real static methods on every platform, rather than the companion object of the header stub.
 
+/** Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer. */
+internal const val DELEGATES_TO_ANDROID_SDK_API =
+    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
+
 /** Returns the [FirebaseInstallations] instance of the default [FirebaseApp]. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.installations", "com.google.firebase.installations.installations"))
 public val Firebase.installations: FirebaseInstallations
     get() = FirebaseInstallations(com.google.firebase.Firebase.compatInstallations)
 
@@ -32,6 +38,7 @@ public fun Firebase.installations(app: FirebaseApp): FirebaseInstallations = Fir
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.installations.FirebaseInstallations] this wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.installations.FirebaseInstallations"))
 public class FirebaseInstallations internal constructor(public val compat: CompatFirebaseInstallations) {
     /**
      * Call to delete this Firebase app installation from the Firebase backend. This call may cause

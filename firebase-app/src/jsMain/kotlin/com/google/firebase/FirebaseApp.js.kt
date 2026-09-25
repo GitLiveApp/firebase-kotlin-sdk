@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.DELETE_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
 import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
@@ -41,6 +42,7 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
 
     public actual val options: FirebaseOptions get() = FirebaseOptions(js.options)
 
+    @Deprecated(DELETE_ANDROID_ONLY, ReplaceWith("deleteApp()", "com.google.firebase.deleteApp"), DeprecationLevel.ERROR)
     public actual fun delete() {
         jsDeleteApp(js)
     }
@@ -78,38 +80,21 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
     }
 }
 
-/** @property authDomain The auth domain (JS only). */
-public actual class FirebaseOptions internal constructor(
-    public actual val apiKey: String,
-    public actual val applicationId: String,
-    public actual val databaseUrl: String?,
-    public actual val gcmSenderId: String?,
-    public actual val projectId: String?,
-    public actual val storageBucket: String?,
-    public actual val gaTrackingId: String?,
-    public val authDomain: String?,
-) {
-    internal constructor(js: JsFirebaseOptions) : this(
-        apiKey = js.apiKey,
-        applicationId = js.appId,
-        databaseUrl = js.databaseURL,
-        gcmSenderId = js.messagingSenderId,
-        projectId = js.projectId,
-        storageBucket = js.storageBucket,
-        gaTrackingId = js.gaTrackingId,
-        authDomain = js.authDomain,
-    )
+/**
+ * @property js The underlying Firebase JS SDK options object.
+ * @property authDomain The auth domain (JS only).
+ */
+public actual class FirebaseOptions internal constructor(public val js: JsFirebaseOptions) {
+    public actual val apiKey: String get() = js.apiKey
+    public actual val applicationId: String get() = js.appId
+    public actual val databaseUrl: String? get() = js.databaseURL
+    public actual val gcmSenderId: String? get() = js.messagingSenderId
+    public actual val projectId: String? get() = js.projectId
+    public actual val storageBucket: String? get() = js.storageBucket
+    public actual val gaTrackingId: String? get() = js.gaTrackingId
+    public val authDomain: String? get() = js.authDomain
 
-    internal fun toJson(): Any = json(
-        "apiKey" to apiKey,
-        "appId" to applicationId,
-        "databaseURL" to (databaseUrl ?: undefined),
-        "storageBucket" to (storageBucket ?: undefined),
-        "projectId" to (projectId ?: undefined),
-        "gaTrackingId" to (gaTrackingId ?: undefined),
-        "messagingSenderId" to (gcmSenderId ?: undefined),
-        "authDomain" to (authDomain ?: undefined),
-    )
+    internal fun toJson(): Any = js
 
     override fun toString(): String = "FirebaseOptions(applicationId=$applicationId, projectId=$projectId)"
 
@@ -146,14 +131,16 @@ public actual class FirebaseOptions internal constructor(
         public fun setAuthDomain(authDomain: String?): Builder = apply { this.authDomain = authDomain }
 
         public actual fun build(): FirebaseOptions = FirebaseOptions(
-            apiKey = requireNotNull(apiKey) { "ApiKey must be set." },
-            applicationId = requireNotNull(applicationId) { "ApplicationId must be set." },
-            databaseUrl = databaseUrl,
-            gcmSenderId = gcmSenderId,
-            projectId = projectId,
-            storageBucket = storageBucket,
-            gaTrackingId = gaTrackingId,
-            authDomain = authDomain,
+            json(
+                "apiKey" to requireNotNull(apiKey) { "ApiKey must be set." },
+                "appId" to requireNotNull(applicationId) { "ApplicationId must be set." },
+                "databaseURL" to (databaseUrl ?: undefined),
+                "storageBucket" to (storageBucket ?: undefined),
+                "projectId" to (projectId ?: undefined),
+                "gaTrackingId" to (gaTrackingId ?: undefined),
+                "messagingSenderId" to (gcmSenderId ?: undefined),
+                "authDomain" to (authDomain ?: undefined),
+            ).unsafeCast<JsFirebaseOptions>(),
         )
     }
 

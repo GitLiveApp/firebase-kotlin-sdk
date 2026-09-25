@@ -1,0 +1,45 @@
+# Android SDK source compatibility of firebase-crashlytics
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 36 public members available (36 identical, 0 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.crashlytics.CustomKeysAndValues
+com.google.firebase.crashlytics.CustomKeysAndValues.Builder
+  OK    Builder()
+  OK    CustomKeysAndValues build()
+  OK    Builder putBoolean(String, boolean)
+  OK    Builder putDouble(String, double)
+  OK    Builder putFloat(String, float)
+  OK    Builder putInt(String, int)
+  OK    Builder putLong(String, long)
+  OK    Builder putString(String, String)
+com.google.firebase.crashlytics.FirebaseCrashlytics
+  OK    Task checkForUnsentReports()
+  OK    void deleteUnsentReports()
+  OK    boolean didCrashOnPreviousExecution()
+  OK    static FirebaseCrashlytics getInstance()
+  OK    boolean isCrashlyticsCollectionEnabled()
+  OK    void log(String)
+  OK    void recordException(Throwable)
+  OK    void recordException(Throwable, CustomKeysAndValues)
+  OK    void sendUnsentReports()
+  OK    void setCrashlyticsCollectionEnabled(boolean)
+  OK    void setCrashlyticsCollectionEnabled(Boolean)
+  OK    void setCustomKey(String, boolean)
+  OK    void setCustomKey(String, double)
+  OK    void setCustomKey(String, float)
+  OK    void setCustomKey(String, int)
+  OK    void setCustomKey(String, String)
+  OK    void setCustomKey(String, long)
+  OK    void setCustomKeys(CustomKeysAndValues)
+  OK    void setUserId(String)
+com.google.firebase.crashlytics.FirebaseCrashlyticsKt
+  OK    static FirebaseCrashlytics getCrashlytics(Firebase)
+  OK    static void recordException(FirebaseCrashlytics, Throwable, Function1)
+  OK    static void setCustomKeys(FirebaseCrashlytics, Function1)
+com.google.firebase.crashlytics.KeyValueBuilder
+  OK    void key(String, boolean)
+  OK    void key(String, double)
+  OK    void key(String, float)
+  OK    void key(String, int)
+  OK    void key(String, String)
+  OK    void key(String, long)

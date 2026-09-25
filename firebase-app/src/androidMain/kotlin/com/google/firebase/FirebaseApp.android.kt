@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.DELETE_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
 import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
@@ -32,6 +33,8 @@ public actual open class FirebaseApiNotAvailableException actual constructor(mes
 public actual class FirebaseApp private constructor() {
     public actual val name: String get() = stub()
     public actual val options: FirebaseOptions get() = stub()
+
+    @Deprecated(DELETE_ANDROID_ONLY, ReplaceWith("deleteApp()", "com.google.firebase.deleteApp"), DeprecationLevel.ERROR)
     public actual fun delete(): Unit = stub()
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean): Unit = stub()
 

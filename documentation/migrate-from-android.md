@@ -13,7 +13,7 @@ and the Firebase JS SDK.
 
 > This guide covers the `com.google.firebase` API only, and the modules migrated so far: `firebase-app` (`FirebaseApp`,
 > `FirebaseOptions`, `Timestamp`, the exceptions, `Task` and `Task.await()`) and `firebase-installations`. The Kotlin-first
-> `dev.gitlive.firebase` API, which the SDK also provides, is described in the [README](../README.md#kotlin-first-design).
+> extensions the SDK adds on top of it are described in the [README](../README.md#kotlin-first-design).
 
 ## Checklist for a migration
 
@@ -22,11 +22,12 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
 
 1. **Android types in your own signatures.** `android.content.Context`, `java.util.Date` or `java.time.Instant` in a
    class you are moving must become common types: the SDK takes the context as `Any?` and time as `kotlin.time.Instant`.
-2. **Members that take or return an Android type.** `FirebaseApp.initializeApp(Context)`, `getApps(Context)`,
-   `getApplicationContext()`, `FirebaseOptions.fromResource(Context)`, `Timestamp(Date)`, `Timestamp(Instant)`,
-   `toDate()` and `toInstant()` exist in common code but are deprecated with an error whose message names the
-   replacement, and where the replacement is a drop-in expression the IDE quick-fix applies it. Android code in
-   `androidMain` keeps calling them as before.
+2. **Members that take or return an Android type, or behave differently elsewhere.** `FirebaseApp.initializeApp(Context)`,
+   `getApps(Context)`, `getApplicationContext()`, `FirebaseOptions.fromResource(Context)`, `Timestamp(Date)`,
+   `Timestamp(Instant)`, `toDate()` and `toInstant()` exist in common code but are deprecated with an error whose
+   message names the replacement, and where the replacement is a drop-in expression the IDE quick-fix applies it. So is
+   `FirebaseApp.delete()`, which returns before the deletion completes on Apple platforms and JS: common code uses
+   `deleteApp()`, which returns a `Task`. Android code in `androidMain` keeps calling them as before.
 3. **`Parcelable`.** `Timestamp` is `Parcelable` on Android only. Passing it through an `Intent` or `Bundle` stays in
    `androidMain`; a `@Parcelize` class of your own that holds a `Timestamp` field keeps working in common code, because
    the Parcelize plugin only runs in the Android compilation.
@@ -239,7 +240,7 @@ FirebaseInstallationRepository(applicationContext).ensureInitialized()
 FirebaseInstallationRepository(null).ensureInitialized()
 
 // jsMain: there is no default configuration, so pass options explicitly
-Firebase.initialize(null, FirebaseOptions.Builder().setApiKey("AIza...").setApplicationId("1:846484016111:web:abc123").setProjectId("fir-kotlin-sdk").build())
+Firebase.initialize(null, FirebaseOptions(applicationId = "1:846484016111:web:abc123", apiKey = "AIza...", projectId = "fir-kotlin-sdk"))
 ```
 
 The [Initialization](../README.md#initialization) section of the README has the full per-platform table, including the JVM.
@@ -256,9 +257,10 @@ Run the shared module's tests on the other targets to confirm the migrated code 
 
 ## What's next
 
-- New multiplatform code can use the Kotlin-first `dev.gitlive.firebase` API (suspend functions instead of `Task`,
-  `Flow` instead of listeners), which is built on the same `com.google.firebase` layer; a `dev.gitlive` object exposes
-  its `com.google` counterpart as `compat`. See [Kotlin-first design](../README.md#kotlin-first-design).
+- New multiplatform code is written against the `com.google.firebase` API, plus the Kotlin-first extensions the
+  `dev.gitlive.firebase` packages add to its classes (suspend functions instead of `Task`, `Flow` instead of listeners,
+  kotlinx.serialization). The earlier `dev.gitlive` wrappers of a migrated module are deprecated with a `ReplaceWith`
+  naming the `com.google.firebase` counterpart. See [Kotlin-first design](../README.md#kotlin-first-design).
 - The other Firebase modules are being migrated to the same structure one at a time. Until a module is, its Android
   SDK API is not available in common code and its `dev.gitlive` API is the multiplatform entry point.
 - [Using the Firebase Android SDK API from common code](../README.md#using-the-firebase-android-sdk-api-from-common-code)
