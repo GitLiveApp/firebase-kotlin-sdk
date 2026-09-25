@@ -446,7 +446,7 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. Make sure Xcode 26.2+ is installed with the iOS/tvOS platforms (the Apple targets use Kotlin's Swift Package Manager integration, which requires Kotlin 2.4+; no CocoaPods installation is needed).
+2. Make sure Xcode 26.2+ is installed with the iOS/tvOS platforms (CI uses 26.4.1, the newest Xcode Kotlin 2.4 is tested with; the Apple targets use Kotlin's Swift Package Manager integration, which requires Kotlin 2.4+; no CocoaPods installation is needed).
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 
