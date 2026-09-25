@@ -53,6 +53,10 @@ class ApplePhoneVerificationProvider(
 
 There is no `timeout` here because there is nothing to time out — SMS auto retrieval is Android only, and the underlying `verifyPhoneNumber(_:uiDelegate:multiFactorSession:)` has no timeout parameter.
 
+#### tvOS
+
+Phone authentication is not supported on tvOS, because the Firebase Apple SDK does not provide it there. tvOS shares the iOS declaration of `PhoneVerificationProvider`, so the iOS implementation above compiles, but `verifyPhoneNumber` and `credential` throw `TvOsPhoneAuthNotSupportedException`, an `UnsupportedOperationException`.
+
 #### JS
 
 ```kotlin
