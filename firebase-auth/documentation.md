@@ -38,7 +38,7 @@ Android is the only platform that can also complete the verification with no use
 
 `timeout` and `unit` bound that auto retrieval window; they do not bound how long the user has to type. Resending replaces the verification id and invalidates the previous one, which the SDK accounts for — the code you return is always submitted against the most recent id.
 
-#### Apple
+#### iOS
 
 ```kotlin
 class ApplePhoneVerificationProvider(
