@@ -1,0 +1,377 @@
+# Android SDK source compatibility of firebase-auth
+# Android SDK api.txt ref: com.google.firebase:firebase-auth-interop:20.0.0, com.google.firebase:firebase-auth:24.2.0
+# 100% of 270 public members available (264 identical, 6 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.auth.ActionCodeEmailInfo
+  OK    ActionCodeEmailInfo()
+  MAP   String getEmail()  [inherited]
+  OK    String getPreviousEmail()
+com.google.firebase.auth.ActionCodeInfo
+  OK    ActionCodeInfo()
+  OK    String getEmail()
+  HIDE  String email
+com.google.firebase.auth.ActionCodeMultiFactorInfo
+  OK    ActionCodeMultiFactorInfo()
+  OK    MultiFactorInfo getMultiFactorInfo()
+com.google.firebase.auth.ActionCodeResult
+  SKIP  String getData(int)
+  OK    ActionCodeInfo getInfo()
+  OK    int getOperation()
+  OK    static int EMAIL
+  OK    static int ERROR
+  OK    static int FROM_EMAIL
+  OK    static int PASSWORD_RESET
+  OK    static int RECOVER_EMAIL
+  OK    static int REVERT_SECOND_FACTOR_ADDITION
+  OK    static int SIGN_IN_WITH_EMAIL_LINK
+  OK    static int VERIFY_BEFORE_CHANGE_EMAIL
+  OK    static int VERIFY_EMAIL
+com.google.firebase.auth.ActionCodeResult.ActionDataKey
+com.google.firebase.auth.ActionCodeResult.Operation
+com.google.firebase.auth.ActionCodeSettings
+  OK    boolean canHandleCodeInApp()
+  OK    boolean getAndroidInstallApp()
+  OK    String getAndroidMinimumVersion()
+  OK    String getAndroidPackageName()
+  OK    String getIOSBundle()
+  OK    String getLinkDomain()
+  OK    String getUrl()
+  OK    static Builder newBuilder()
+com.google.firebase.auth.ActionCodeSettings.Builder
+  OK    ActionCodeSettings build()
+  SKIP  String getDynamicLinkDomain()
+  OK    boolean getHandleCodeInApp()
+  OK    String getIOSBundleId()
+  OK    String getLinkDomain()
+  OK    String getUrl()
+  OK    Builder setAndroidPackageName(String, boolean, String)
+  SKIP  Builder setDynamicLinkDomain(String)
+  OK    Builder setHandleCodeInApp(boolean)
+  OK    Builder setIOSBundleId(String)
+  OK    Builder setLinkDomain(String)
+  OK    Builder setUrl(String)
+com.google.firebase.auth.ActionCodeUrl
+  OK    String getApiKey()
+  OK    String getCode()
+  OK    String getContinueUrl()
+  OK    String getLanguageCode()
+  OK    int getOperation()
+  OK    static ActionCodeUrl parseLink(String)
+com.google.firebase.auth.AdditionalUserInfo
+  OK    Map getProfile()
+  OK    String getProviderId()
+  OK    String getUsername()
+  OK    boolean isNewUser()
+com.google.firebase.auth.AuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.AuthKt
+  OK    static ActionCodeSettings actionCodeSettings(Function1)
+  OK    static FirebaseAuth auth(Firebase, FirebaseApp)
+  OK    static FirebaseAuth getAuth(Firebase)
+  OK    static AuthCredential oAuthCredential(String, Function1)
+  OK    static OAuthProvider oAuthProvider(String, Function1)
+  OK    static OAuthProvider oAuthProvider(String, FirebaseAuth, Function1)
+  OK    static UserProfileChangeRequest userProfileChangeRequest(Function1)
+com.google.firebase.auth.AuthResult
+  OK    AdditionalUserInfo getAdditionalUserInfo()
+  OK    AuthCredential getCredential()
+  OK    FirebaseUser getUser()
+com.google.firebase.auth.EmailAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.EmailAuthProvider
+  OK    static AuthCredential getCredential(String, String)
+  OK    static AuthCredential getCredentialWithLink(String, String)
+  OK    static String EMAIL_LINK_SIGN_IN_METHOD
+  OK    static String EMAIL_PASSWORD_SIGN_IN_METHOD
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.FacebookAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.FacebookAuthProvider
+  OK    static AuthCredential getCredential(String)
+  OK    static String FACEBOOK_SIGN_IN_METHOD
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.FederatedAuthProvider
+  OK    FederatedAuthProvider()
+com.google.firebase.auth.FirebaseAuth
+  OK    void addAuthStateListener(AuthStateListener)
+  OK    void addIdTokenListener(IdTokenListener)
+  OK    Task applyActionCode(String)
+  OK    Task checkActionCode(String)
+  OK    Task confirmPasswordReset(String, String)
+  OK    Task createUserWithEmailAndPassword(String, String)
+  SKIP  Task fetchSignInMethodsForEmail(String)
+  HIDE  Task getAccessToken(boolean)
+  OK    FirebaseApp getApp()
+  OK    FirebaseUser getCurrentUser()
+  OK    String getCustomAuthDomain()
+  OK    FirebaseAuthSettings getFirebaseAuthSettings()
+  OK    static FirebaseAuth getInstance()
+  OK    static FirebaseAuth getInstance(FirebaseApp)
+  OK    String getLanguageCode()
+  PLAT  Task getPendingAuthResult()
+  OK    String getTenantId()
+  HIDE  String getUid()
+  OK    Task initializeRecaptchaConfig()
+  OK    boolean isSignInWithEmailLink(String)
+  OK    void removeAuthStateListener(AuthStateListener)
+  OK    void removeIdTokenListener(IdTokenListener)
+  OK    Task revokeAccessToken(String)
+  OK    Task sendPasswordResetEmail(String)
+  OK    Task sendPasswordResetEmail(String, ActionCodeSettings)
+  OK    Task sendSignInLinkToEmail(String, ActionCodeSettings)
+  OK    void setCustomAuthDomain(String)
+  HIDE  Task setFirebaseUIVersion(String)
+  OK    void setLanguageCode(String)
+  OK    void setTenantId(String)
+  OK    Task signInAnonymously()
+  OK    Task signInWithCredential(AuthCredential)
+  OK    Task signInWithCustomToken(String)
+  OK    Task signInWithEmailAndPassword(String, String)
+  OK    Task signInWithEmailLink(String, String)
+  OK    void signOut()
+  PLAT  Task startActivityForSignInWithProvider(Activity, FederatedAuthProvider)
+  OK    Task updateCurrentUser(FirebaseUser)
+  OK    void useAppLanguage()
+  OK    void useEmulator(String, int)
+  OK    Task verifyPasswordResetCode(String)
+com.google.firebase.auth.FirebaseAuth.AuthStateListener
+  OK    void onAuthStateChanged(FirebaseAuth)
+com.google.firebase.auth.FirebaseAuth.IdTokenListener
+  OK    void onIdTokenChanged(FirebaseAuth)
+com.google.firebase.auth.FirebaseAuthActionCodeException
+  OK    FirebaseAuthActionCodeException(String, String)
+com.google.firebase.auth.FirebaseAuthEmailException
+  OK    FirebaseAuthEmailException(String, String)
+com.google.firebase.auth.FirebaseAuthException
+  OK    FirebaseAuthException(String, String)
+  OK    String getErrorCode()
+com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+  OK    FirebaseAuthInvalidCredentialsException(String, String)
+com.google.firebase.auth.FirebaseAuthInvalidUserException
+  OK    FirebaseAuthInvalidUserException(String, String)
+com.google.firebase.auth.FirebaseAuthMissingActivityForRecaptchaException
+  OK    FirebaseAuthMissingActivityForRecaptchaException()
+com.google.firebase.auth.FirebaseAuthMultiFactorException
+  OK    FirebaseAuthMultiFactorException(String, String, MultiFactorResolver)
+  OK    MultiFactorResolver getResolver()
+com.google.firebase.auth.FirebaseAuthProvider
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+  OK    FirebaseAuthRecentLoginRequiredException(String, String)
+com.google.firebase.auth.FirebaseAuthSettings
+  OK    FirebaseAuthSettings()
+  PLAT  void forceRecaptchaFlowForTesting(boolean)
+  OK    void setAppVerificationDisabledForTesting(boolean)
+  PLAT  void setAutoRetrievedSmsCodeForPhoneNumber(String, String)
+com.google.firebase.auth.FirebaseAuthUserCollisionException
+  OK    FirebaseAuthUserCollisionException(String, String)
+  OK    String getEmail()
+  OK    AuthCredential getUpdatedCredential()
+com.google.firebase.auth.FirebaseAuthWeakPasswordException
+  OK    FirebaseAuthWeakPasswordException(String, String, String)
+  OK    String getReason()
+com.google.firebase.auth.FirebaseAuthWebException
+  OK    FirebaseAuthWebException(String, String)
+com.google.firebase.auth.FirebaseUser
+  OK    FirebaseUser()
+  OK    Task delete()
+  MAP   String getDisplayName()  [inherited]
+  MAP   String getEmail()  [inherited]
+  OK    Task getIdToken(boolean)
+  OK    FirebaseUserMetadata getMetadata()
+  OK    MultiFactor getMultiFactor()
+  MAP   String getPhoneNumber()  [inherited]
+  PLAT  Uri getPhotoUrl()
+  OK    List getProviderData()
+  MAP   String getProviderId()  [inherited]
+  OK    String getTenantId()
+  MAP   String getUid()  [inherited]
+  OK    boolean isAnonymous()
+  OK    Task linkWithCredential(AuthCredential)
+  OK    Task reauthenticate(AuthCredential)
+  OK    Task reauthenticateAndRetrieveData(AuthCredential)
+  OK    Task reload()
+  OK    Task sendEmailVerification()
+  OK    Task sendEmailVerification(ActionCodeSettings)
+  PLAT  Task startActivityForLinkWithProvider(Activity, FederatedAuthProvider)
+  PLAT  Task startActivityForReauthenticateWithProvider(Activity, FederatedAuthProvider)
+  OK    Task unlink(String)
+  SKIP  Task updateEmail(String)
+  OK    Task updatePassword(String)
+  OK    Task updatePhoneNumber(PhoneAuthCredential)
+  OK    Task updateProfile(UserProfileChangeRequest)
+  OK    Task verifyBeforeUpdateEmail(String)
+  OK    Task verifyBeforeUpdateEmail(String, ActionCodeSettings)
+com.google.firebase.auth.FirebaseUserMetadata
+  OK    long getCreationTimestamp()
+  OK    long getLastSignInTimestamp()
+com.google.firebase.auth.GetTokenResult
+  OK    long getAuthTimestamp()
+  OK    Map getClaims()
+  OK    long getExpirationTimestamp()
+  OK    long getIssuedAtTimestamp()
+  OK    String getSignInProvider()
+  OK    String getToken()
+com.google.firebase.auth.GithubAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.GithubAuthProvider
+  OK    static AuthCredential getCredential(String)
+  OK    static String GITHUB_SIGN_IN_METHOD
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.GoogleAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.GoogleAuthProvider
+  OK    static AuthCredential getCredential(String, String)
+  OK    static String GOOGLE_SIGN_IN_METHOD
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.MultiFactor
+  OK    MultiFactor()
+  OK    Task enroll(MultiFactorAssertion, String)
+  OK    List getEnrolledFactors()
+  OK    Task getSession()
+  OK    Task unenroll(MultiFactorInfo)
+  OK    Task unenroll(String)
+com.google.firebase.auth.MultiFactorAssertion
+  OK    MultiFactorAssertion()
+  OK    String getFactorId()
+com.google.firebase.auth.MultiFactorInfo
+  OK    MultiFactorInfo()
+  OK    String getDisplayName()
+  OK    long getEnrollmentTimestamp()
+  OK    String getFactorId()
+  OK    String getUid()
+  PLAT  JSONObject toJson()
+  OK    static String FACTOR_ID_KEY
+com.google.firebase.auth.MultiFactorResolver
+  OK    MultiFactorResolver()
+  OK    FirebaseAuth getFirebaseAuth()
+  OK    List getHints()
+  OK    MultiFactorSession getSession()
+  OK    Task resolveSignIn(MultiFactorAssertion)
+com.google.firebase.auth.MultiFactorSession
+  OK    MultiFactorSession()
+com.google.firebase.auth.OAuthCredential
+  OK    OAuthCredential()
+  OK    String getAccessToken()
+  OK    String getIdToken()
+  OK    String getSecret()
+com.google.firebase.auth.OAuthProvider
+  SKIP  static AuthCredential getCredential(String, String, String)
+  OK    String getProviderId()
+  OK    static Builder newBuilder(String)
+  OK    static Builder newBuilder(String, FirebaseAuth)
+  OK    static CredentialBuilder newCredentialBuilder(String)
+com.google.firebase.auth.OAuthProvider.Builder
+  OK    Builder addCustomParameter(String, String)
+  OK    Builder addCustomParameters(Map)
+  OK    OAuthProvider build()
+  OK    Builder setScopes(List)
+com.google.firebase.auth.OAuthProvider.CredentialBuilder
+  OK    AuthCredential build()
+  OK    CredentialBuilder setAccessToken(String)
+  OK    CredentialBuilder setIdToken(String)
+  OK    CredentialBuilder setIdTokenWithRawNonce(String, String)
+com.google.firebase.auth.PhoneAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+  OK    String getSmsCode()
+com.google.firebase.auth.PhoneAuthOptions
+  OK    static Builder newBuilder()
+  OK    static Builder newBuilder(FirebaseAuth)
+com.google.firebase.auth.PhoneAuthOptions.Builder
+  OK    Builder(FirebaseAuth)
+  OK    PhoneAuthOptions build()
+  OK    Builder requireSmsValidation(boolean)
+  OK    Builder setActivity(Activity)
+  OK    Builder setCallbacks(OnVerificationStateChangedCallbacks)
+  OK    Builder setForceResendingToken(ForceResendingToken)
+  OK    Builder setMultiFactorHint(PhoneMultiFactorInfo)
+  OK    Builder setMultiFactorSession(MultiFactorSession)
+  OK    Builder setPhoneNumber(String)
+  OK    Builder setTimeout(Long, TimeUnit)
+com.google.firebase.auth.PhoneAuthProvider
+  OK    static PhoneAuthCredential getCredential(String, String)
+  SKIP  static PhoneAuthProvider getInstance()
+  SKIP  static PhoneAuthProvider getInstance(FirebaseAuth)
+  OK    static void verifyPhoneNumber(PhoneAuthOptions)
+  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks)
+  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks, ForceResendingToken)
+  OK    static String PHONE_SIGN_IN_METHOD
+  OK    static String PROVIDER_ID
+com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
+com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks
+  OK    OnVerificationStateChangedCallbacks()
+  OK    void onCodeAutoRetrievalTimeOut(String)
+  OK    void onCodeSent(String, ForceResendingToken)
+  OK    void onVerificationCompleted(PhoneAuthCredential)
+  OK    void onVerificationFailed(FirebaseException)
+com.google.firebase.auth.PhoneMultiFactorAssertion
+  OK    PhoneMultiFactorAssertion(PhoneAuthCredential)
+  OK    String getFactorId()
+com.google.firebase.auth.PhoneMultiFactorGenerator
+  OK    PhoneMultiFactorGenerator()
+  OK    static PhoneMultiFactorAssertion getAssertion(PhoneAuthCredential)
+  OK    static String FACTOR_ID
+com.google.firebase.auth.PhoneMultiFactorInfo
+  OK    PhoneMultiFactorInfo(String, String, long, String)
+  OK    String getDisplayName()
+  OK    long getEnrollmentTimestamp()
+  OK    String getFactorId()
+  OK    String getPhoneNumber()
+  OK    String getUid()
+  PLAT  JSONObject toJson()
+com.google.firebase.auth.SignInMethodQueryResult
+  OK    List getSignInMethods()
+com.google.firebase.auth.TotpMultiFactorAssertion
+  UNAV  TotpMultiFactorAssertion(String, TotpSecret, String)
+  OK    String getFactorId()
+com.google.firebase.auth.TotpMultiFactorGenerator
+  OK    static Task generateSecret(MultiFactorSession)
+  OK    static TotpMultiFactorAssertion getAssertionForEnrollment(TotpSecret, String)
+  OK    static TotpMultiFactorAssertion getAssertionForSignIn(String, String)
+  OK    static String FACTOR_ID
+com.google.firebase.auth.TotpMultiFactorInfo
+  OK    String getDisplayName()
+  OK    long getEnrollmentTimestamp()
+  OK    String getFactorId()
+  OK    String getUid()
+  PLAT  JSONObject toJson()
+com.google.firebase.auth.TotpSecret
+  UNAV  String generateQrCodeUrl()
+  OK    String generateQrCodeUrl(String, String)
+  UNAV  int getCodeIntervalSeconds()
+  UNAV  int getCodeLength()
+  UNAV  long getEnrollmentCompletionDeadline()
+  UNAV  String getHashAlgorithm()
+  UNAV  String getSessionInfo()
+  OK    String getSharedSecretKey()
+  OK    void openInOtpApp(String)
+  PLAT  void openInOtpApp(String, String, Activity)
+com.google.firebase.auth.TwitterAuthCredential
+  OK    String getProvider()
+  OK    String getSignInMethod()
+com.google.firebase.auth.TwitterAuthProvider
+  OK    static AuthCredential getCredential(String, String)
+  OK    static String PROVIDER_ID
+  OK    static String TWITTER_SIGN_IN_METHOD
+com.google.firebase.auth.UserInfo
+  OK    String getDisplayName()
+  OK    String getEmail()
+  OK    String getPhoneNumber()
+  PLAT  Uri getPhotoUrl()
+  OK    String getProviderId()
+  OK    String getUid()
+  OK    boolean isEmailVerified()
+com.google.firebase.auth.UserProfileChangeRequest
+  OK    String getDisplayName()
+  PLAT  Uri getPhotoUri()
+com.google.firebase.auth.UserProfileChangeRequest.Builder
+  OK    Builder()
+  OK    UserProfileChangeRequest build()
+  OK    Builder setDisplayName(String)
+  OK    Builder setPhotoUri(Uri)
