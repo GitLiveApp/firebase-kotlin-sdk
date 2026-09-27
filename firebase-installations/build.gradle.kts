@@ -2,7 +2,12 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -52,9 +57,12 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        // kotlin.time.Instant is exposed by the com.google.firebase.Timestamp conversions.
+        optIn.add("kotlin.time.ExperimentalTime")
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     targets.configureEach {
@@ -85,13 +93,13 @@ kotlin {
 
     if (supportedPlatforms.contains(TargetPlatform.Ios)) {
         iosArm64()
-        iosX64()
-        iosSimulatorArm64()
+        iosX64().enableKeychainForTests()
+        iosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
-        tvosSimulatorArm64()
+        tvosX64().enableKeychainForTests()
+        tvosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
@@ -181,6 +189,43 @@ kotlin {
                 kotlin.srcDir("src/androidMain/kotlin")
             }
         }
+    }
+}
+
+// The com.google.* declarations are header stubs on Android and the JVM (see buildSrc utils/HeaderStubs.kt).
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+)
+
+registerAndroidSourceCompat("firebase-installations/api.txt", "firebase-installations-interop/api.txt")
+
+if (supportedPlatforms.supportsApple()) {
+    tasks.create<Exec>("launchIosSimulator") {
+        commandLine("open", "-a", "Simulator")
+    }
+
+    tasks.withType<KotlinNativeSimulatorTest>().configureEach {
+        dependsOn("launchIosSimulator")
+        standalone.set(false)
+        device.set("booted")
+    }
+}
+
+// The Installations SDK keeps the installation id in the keychain, which a test binary can only use with entitlements.
+fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath
+        )
     }
 }
 

@@ -1,0 +1,63 @@
+# Android SDK source compatibility of firebase-app
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 46 public members available (33 identical, 13 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.Firebase
+  OK    static Firebase INSTANCE
+com.google.firebase.FirebaseApp
+  MAP   Context getApplicationContext()  [returns Object, deprecated: getApplicationContext returns an android.content.Context and can only be called from Android code]
+  MAP   static List getApps(Context)  [Context -> Object, deprecated: getApps takes an android.content.Context and can only be called from Android code; use Firebase.getApps(context) from common code (the context is ignored on the other platforms)]
+  OK    static FirebaseApp getInstance()
+  OK    static FirebaseApp getInstance(String)
+  OK    String getName()
+  OK    FirebaseOptions getOptions()
+  MAP   static FirebaseApp initializeApp(Context)  [Context -> Object, deprecated: initializeApp takes an android.content.Context and can only be called from Android code; use Firebase.initialize(context) from common code (the context is ignored on the other platforms)]
+  MAP   static FirebaseApp initializeApp(Context, FirebaseOptions)  [Context -> Object, deprecated: initializeApp takes an android.content.Context and can only be called from Android code; use Firebase.initialize(context) from common code (the context is ignored on the other platforms)]
+  MAP   static FirebaseApp initializeApp(Context, FirebaseOptions, String)  [Context -> Object, deprecated: initializeApp takes an android.content.Context and can only be called from Android code; use Firebase.initialize(context) from common code (the context is ignored on the other platforms)]
+  OK    void setAutomaticResourceManagementEnabled(boolean)
+  OK    static String DEFAULT_APP_NAME
+com.google.firebase.FirebaseKt
+  OK    static FirebaseApp app(Firebase, String)
+  OK    static FirebaseApp getApp(Firebase)
+  OK    static FirebaseOptions getOptions(Firebase)
+  MAP   static FirebaseApp initialize(Firebase, Context)  [Context -> Object]
+  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions)  [Context -> Object]
+  MAP   static FirebaseApp initialize(Firebase, Context, FirebaseOptions, String)  [Context -> Object]
+com.google.firebase.FirebaseNetworkException
+  OK    FirebaseNetworkException(String)
+com.google.firebase.FirebaseOptions
+  MAP   static FirebaseOptions fromResource(Context)  [Context -> Object, deprecated: fromResource takes an android.content.Context and can only be called from Android code; use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms)]
+  OK    String getApiKey()
+  OK    String getApplicationId()
+  OK    String getDatabaseUrl()
+  OK    String getGcmSenderId()
+  OK    String getProjectId()
+  OK    String getStorageBucket()
+com.google.firebase.FirebaseOptions.Builder
+  OK    Builder()
+  OK    Builder(FirebaseOptions)
+  OK    FirebaseOptions build()
+  OK    Builder setApiKey(String)
+  OK    Builder setApplicationId(String)
+  OK    Builder setDatabaseUrl(String)
+  OK    Builder setGcmSenderId(String)
+  OK    Builder setProjectId(String)
+  SKIP  Builder setRecaptchaSiteKey(String)
+  OK    Builder setStorageBucket(String)
+com.google.firebase.FirebaseTooManyRequestsException
+  OK    FirebaseTooManyRequestsException(String)
+com.google.firebase.Timestamp
+  MAP   Timestamp(Instant)  [Instant -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
+  MAP   Timestamp(Date)  [Date -> Object, deprecated: the java.util.Date and java.time.Instant constructors are JVM-only; use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
+  OK    Timestamp(long, int)
+  OK    int compareTo(Timestamp)
+  PLAT  int describeContents()
+  OK    int getNanoseconds()
+  OK    long getSeconds()
+  OK    static Timestamp now()
+  MAP   Date toDate()  [returns Object, deprecated: toDate returns a java.util.Date, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds]
+  MAP   Instant toInstant()  [returns Object, deprecated: toInstant returns a java.time.Instant, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds]
+  PLAT  void writeToParcel(Parcel, int)
+  PLAT  static Creator CREATOR
+com.google.firebase.Timestamp.Companion
+  OK    Timestamp now()

@@ -1,0 +1,8 @@
+// Firebase Android SDK APIs intentionally not mirrored by firebase-app (see README, "Using the Firebase Android SDK API from common code").
+// @platform: the signature involves an Android/JVM-only type and has no multiplatform replacement to point at (not counted).
+// Members that do have one (initializeApp, getApps, fromResource, the Date/Instant members of Timestamp) are declared with an
+// error-level deprecation naming it instead, so they are provided rather than excluded.
+com.google.firebase.Timestamp#describeContents  // @platform android.os.Parcelable
+com.google.firebase.Timestamp#writeToParcel  // @platform android.os.Parcelable
+com.google.firebase.Timestamp#CREATOR  // @platform android.os.Parcelable
+com.google.firebase.provider.*  // @platform FirebaseInitProvider is an android.content.ContentProvider (its static helpers are @hide and absent from api.txt)

@@ -183,7 +183,7 @@ internal fun ActionCodeSettings.toJson() = json(
     "ios" to (iOSBundleId?.run { json("bundleId" to iOSBundleId) } ?: undefined),
 )
 
-public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode, cause)
+public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode.toString(), cause)
 public actual val FirebaseAuthException.code: String? get() = authCode
 public actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthEmailException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
