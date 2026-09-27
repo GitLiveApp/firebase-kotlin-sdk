@@ -248,7 +248,6 @@ internal actual class NativeDatabaseReference internal constructor(
                     deferred.complete(null)
                 }
             },
-            withLocalEvents = false,
         )
         return deferred.await()
     }
