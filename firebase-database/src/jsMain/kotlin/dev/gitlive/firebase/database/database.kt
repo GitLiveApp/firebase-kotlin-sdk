@@ -243,35 +243,57 @@ public actual class DataSnapshot internal constructor(
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
 }
 
-public actual class MutableData internal constructor(
+public actual class MutableData private constructor(
+    private val root: Root,
+    private val path: List<String>,
     public actual val key: String?,
-    @PublishedApi internal var jsValue: dynamic,
 ) {
+    internal constructor(key: String?, value: Any?) : this(Root(value), emptyList(), key)
+
+    /** The transaction's JS value, shared by this instance and every child obtained from it. */
+    private class Root(var value: Any?)
+
+    /** The JS value at [path] under the root. */
+    internal var jsValue: Any?
+        get() = path.fold(root.value) { parent, segment -> if (isObject(parent)) parent.asDynamic()[segment].unsafeCast<Any?>() else null }
+        set(value) {
+            if (path.isEmpty()) {
+                root.value = value
+                return
+            }
+            if (!isObject(root.value)) root.value = json()
+            var parent: dynamic = root.value
+            for (segment in path.dropLast(1)) {
+                if (!isObject(parent[segment].unsafeCast<Any?>())) parent[segment] = json()
+                parent = parent[segment]
+            }
+            parent[path.last()] = value
+        }
+
     public actual var value: Any?
-        get() = jsValue.unsafeCast<Any?>()
+        get() = jsValue
         set(v) {
             jsValue = v
         }
 
     public actual fun child(path: String): MutableData {
-        val parts = path.split("/")
-        val childValue = parts.fold(jsValue) { current: dynamic, part -> current?.get(part) }
-        return MutableData(parts.last(), childValue)
+        val segments = path.split("/").filter { it.isNotEmpty() }
+        return MutableData(root, this.path + segments, segments.lastOrNull() ?: key)
     }
 
     public actual val hasChildren: Boolean
-        get() {
-            val v = jsValue
-            if (v == null || js("typeof v") != "object") return false
-            return (js("Object.keys(v)") as Array<*>).isNotEmpty()
-        }
+        get() = childKeys().isNotEmpty()
 
     public actual val children: Iterable<MutableData>
-        get() {
-            val v = jsValue
-            if (v == null || js("typeof v") != "object") return emptyList()
-            return (js("Object.keys(v)") as Array<String>).map { k -> MutableData(k, jsValue[k]) }
-        }
+        get() = childKeys().map { MutableData(root, path + it, it) }
+
+    private fun childKeys(): List<String> {
+        val current = jsValue
+        if (!isObject(current)) return emptyList()
+        return (js("Object.keys")(current).unsafeCast<Array<String>>()).filter { current.asDynamic()[it] != null }
+    }
+
+    private fun isObject(value: Any?): Boolean = value != null && jsTypeOf(value) == "object"
 }
 
 internal actual class NativeOnDisconnect internal constructor(

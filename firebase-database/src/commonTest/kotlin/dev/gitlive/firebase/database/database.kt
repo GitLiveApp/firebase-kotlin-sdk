@@ -210,6 +210,28 @@ class FirebaseDatabaseTest {
     }
 
     @Test
+    fun testMutableDataTransactionChildWritesToParent() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("users/user_1/post_id_6")
+        reference.setValue(mapOf("title" to "PostSix", "likes" to 6, "removed" to "soon"))
+
+        val snapshot = reference.runTransaction { currentData ->
+            val likes = currentData.child("likes")
+            val current = likes.value<Int?>() ?: return@runTransaction success(currentData)
+            assertEquals("likes", likes.key)
+            assertTrue(currentData.hasChildren)
+            assertEquals(setOf("likes", "removed", "title"), currentData.children.mapNotNull { it.key }.toSet())
+            likes.setValue(current + 1)
+            currentData.child("removed").value = null
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(DatabaseTest("PostSix", 7), snapshot.value(DatabaseTest.serializer()))
+        assertFalse(snapshot.child("removed").exists)
+    }
+
+    @Test
     fun testSetServerTimestamp() = runTest {
         ensureDatabaseConnected()
         val testReference = database.reference("testSetServerTimestamp")
