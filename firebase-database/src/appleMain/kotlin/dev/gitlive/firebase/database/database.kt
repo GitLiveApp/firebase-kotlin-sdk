@@ -13,6 +13,7 @@ import cocoapods.FirebaseDatabase.FIRDataSnapshot
 import cocoapods.FirebaseDatabase.FIRDatabase
 import cocoapods.FirebaseDatabase.FIRDatabaseQuery
 import cocoapods.FirebaseDatabase.FIRDatabaseReference
+import cocoapods.FirebaseDatabase.FIRMutableData
 import dev.gitlive.firebase.database.ChildEvent.Type
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
@@ -34,6 +35,9 @@ public val DatabaseReference.ios: FIRDatabaseReference get() = compat.ios
 
 /** The underlying Firebase iOS SDK object. */
 public val DataSnapshot.ios: FIRDataSnapshot get() = compat.ios
+
+/** The underlying Firebase iOS SDK object. */
+public val MutableData.ios: FIRMutableData get() = compat.ios
 
 /** The underlying Firebase iOS SDK reference the disconnect operations are registered on. */
 public val OnDisconnect.ios: FIRDatabaseReference get() = compat.ios

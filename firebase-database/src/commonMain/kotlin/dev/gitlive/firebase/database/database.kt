@@ -5,9 +5,9 @@
 package dev.gitlive.firebase.database
 
 import com.google.firebase.database.Logger
-import com.google.firebase.database.Transaction
 import com.google.firebase.database.childEvents
 import com.google.firebase.database.snapshots
+import com.google.firebase.database.transactionAbort
 import com.google.firebase.database.transactionSuccess
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
@@ -38,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase as CompatFirebaseDatabase
 import com.google.firebase.database.MutableData as CompatMutableData
 import com.google.firebase.database.OnDisconnect as CompatOnDisconnect
 import com.google.firebase.database.Query as CompatQuery
+import com.google.firebase.database.Transaction as CompatTransaction
 
 /**
  * The entry point for accessing a Firebase Database. You can get an instance by calling [Firebase.database]. To access a location in the database and read or write data, use [FirebaseDatabase.reference].
@@ -471,8 +472,8 @@ public class DatabaseReference internal constructor(override val compat: CompatD
     public suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot {
         val deferred = CompletableDeferred<DataSnapshot>()
         compat.runTransaction(
-            object : Transaction.Handler {
-                override fun doTransaction(currentData: CompatMutableData): Transaction.Result {
+            object : CompatTransaction.Handler {
+                override fun doTransaction(currentData: CompatMutableData): CompatTransaction.Result {
                     val valueToReencode = currentData.nativeValue
                     // Value may be null initially, so only reencode if this is allowed
                     if (strategy.descriptor.isNullable || valueToReencode != null) {
@@ -491,6 +492,185 @@ public class DatabaseReference internal constructor(override val compat: CompatD
             },
         )
         return deferred.await()
+    }
+
+    /**
+     * Run a transaction on the data at this location using [MutableData], which can read and write
+     * the data of any child location without serializing the whole tree.
+     *
+     * ```
+     * val snapshot = postRef.runTransaction { currentData ->
+     *     val post = currentData.value(Post.serializer().nullable)
+     *         ?: return@runTransaction success(currentData)
+     *     currentData.setValue(Post.serializer(), post.copy(starCount = post.starCount + 1))
+     *     success(currentData)
+     * }
+     * if (snapshot == null) {
+     *     // The transaction was aborted.
+     * }
+     * ```
+     *
+     * @param update A function which will be called, *possibly multiple times*, with the current
+     *     data at this location. It is responsible for inspecting that data and returning a
+     *     [Transaction.Result] specifying either the desired new data at the location or that the
+     *     transaction should be aborted. Since this function may be called repeatedly for the same
+     *     transaction, be extremely careful of any side effects it may trigger. Best practices are
+     *     to rely only on the data passed in via [MutableData].
+     * @return The committed [DataSnapshot], or null if the transaction was aborted.
+     * @throws DatabaseException if the transaction failed.
+     */
+    public suspend fun runTransaction(update: Transaction.(currentData: MutableData) -> Transaction.Result): DataSnapshot? {
+        val deferred = CompletableDeferred<DataSnapshot?>()
+        compat.runTransaction(
+            object : CompatTransaction.Handler {
+                override fun doTransaction(currentData: CompatMutableData): CompatTransaction.Result = when (val result = Transaction().update(MutableData(currentData))) {
+                    is Transaction.Result.Success -> transactionSuccess(result.data.compat)
+                    Transaction.Result.Abort -> transactionAbort()
+                }
+
+                override fun onComplete(error: CompatDatabaseError?, committed: Boolean, currentData: CompatDataSnapshot?) {
+                    when {
+                        error != null -> deferred.completeExceptionally(error.toException())
+                        committed -> deferred.complete(DataSnapshot(currentData!!))
+                        else -> deferred.complete(null)
+                    }
+                }
+            },
+        )
+        return deferred.await()
+    }
+}
+
+/**
+ * The data at a location inside a transaction started with [DatabaseReference.runTransaction]. Read
+ * it with [value] and write the new data with [setValue], at this location or at any [child] of it.
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.database.MutableData] this wraps.
+ */
+public class MutableData internal constructor(public val compat: CompatMutableData) {
+    /**
+     * @return The key name of this location, or null if it is the top-most location.
+     */
+    public val key: String? get() = compat.key
+
+    /**
+     * The data at this location as native types. Set this to the desired new data at the location.
+     * Setting it to null removes the data at this location.
+     *
+     * **Warning:** the value is passed to the platform SDK as is, without serialization, so it must
+     * only be null, a [Boolean], a number, a [String], or a [List] or [Map] of those. Use [setValue]
+     * for anything else, such as `@Serializable` classes, enums or [ServerValue]: assigning such a
+     * value here stores the class's properties by reflection on Android and the JVM (ignoring
+     * `@Serializable`), stores mangled property names on JS, and crashes with an uncatchable
+     * `NSException` on Apple platforms. To read the data as a Kotlin type, use [value] with a type
+     * argument or a deserialization strategy.
+     *
+     * @return The current data at this location as native types, or null if no data exists.
+     */
+    public var value: Any?
+        get() = compat.value
+
+        @DelicateDatabaseApi
+        set(value) {
+            compat.value = value
+        }
+
+    /**
+     * Deserializes the data at this location into [T].
+     *
+     * @return The current data at this location as [T].
+     */
+    public inline fun <reified T> value(): T = decode<T>(value = nativeValue)
+
+    /**
+     * Deserializes the data at this location with [strategy].
+     *
+     * @return The current data at this location as [T].
+     */
+    public inline fun <T> value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, nativeValue, buildSettings)
+
+    /**
+     * Serializes [value] and sets it as the data at this location.
+     *
+     * @param value The value to write, encoded with [buildSettings], or null to remove the data
+     */
+    public inline fun <reified T> setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        compat.value = encode(value, buildSettings)
+    }
+
+    /**
+     * Serializes [value] with [strategy] and sets it as the data at this location.
+     *
+     * @param value The value to write, encoded with [buildSettings]
+     */
+    public inline fun <T> setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+        compat.value = encode(strategy, value, buildSettings)
+    }
+
+    // Writes go through compat.value like DatabaseReference.setValue, which converts the encoded
+    // value to the platform's types (on JS, Long to a number), unlike the raw nativeValue.
+
+    /** The data as the platform SDK reads it, for the decoders. */
+    @PublishedApi
+    internal val nativeValue: Any? get() = compat.nativeValue
+
+    /**
+     * Used to obtain a MutableData instance that represents the data at the given relative path.
+     * Changes made to the child MutableData instance are part of the transaction.
+     *
+     * @param path A relative path from this location to the child location
+     * @return A MutableData instance representing the data at the given path
+     */
+    public fun child(path: String): MutableData = MutableData(compat.child(path))
+
+    /**
+     * Indicates whether this MutableData has any children.
+     *
+     * @return True if this MutableData has any children, otherwise false
+     */
+    public val hasChildren: Boolean get() = compat.hasChildren()
+
+    /**
+     * Gives access to all the immediate children of this MutableData.
+     *
+     * @return The immediate children of this MutableData
+     */
+    public val children: Iterable<MutableData> get() = compat.children.map { MutableData(it) }
+
+    override fun toString(): String = compat.toString()
+}
+
+/**
+ * Marks database APIs that pass values to the platform SDK without serialization, which store the
+ * wrong data or crash for anything but null, booleans, numbers, strings, and lists or maps of those.
+ * Prefer the serializing alternative named in the API's documentation.
+ */
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "Writes the value without serialization. Use setValue() instead unless the value is null, a Boolean, a number, a String, or a List or Map of those.",
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.PROPERTY_SETTER)
+public annotation class DelicateDatabaseApi
+
+/**
+ * The receiver of the [DatabaseReference.runTransaction] update function, which returns [success]
+ * to commit the new data or [abort] to leave it unchanged.
+ */
+public class Transaction internal constructor() {
+    /** Commits the data of [resultData]. */
+    public fun success(resultData: MutableData): Result = Result.Success(resultData)
+
+    /** Leaves the data unchanged. */
+    public fun abort(): Result = Result.Abort
+
+    /** The outcome of a transaction update function. */
+    public sealed class Result {
+        /** Commits the data of [data]. */
+        public class Success internal constructor(public val data: MutableData) : Result()
+
+        /** Leaves the data unchanged. */
+        public data object Abort : Result()
     }
 }
 
