@@ -272,8 +272,10 @@ public actual class MutableData private constructor(
 
     public actual var value: Any?
         get() = jsValue
+
+        @DelicateDatabaseApi
         set(v) {
-            jsValue = v
+            jsValue = v.toJs()
         }
 
     public actual fun child(path: String): MutableData {
@@ -294,6 +296,15 @@ public actual class MutableData private constructor(
     }
 
     private fun isObject(value: Any?): Boolean = value != null && jsTypeOf(value) == "object"
+
+    /** [this] as a plain JS value: Kotlin maps become objects, collections arrays, longs numbers. */
+    private fun Any?.toJs(): Any? = when (this) {
+        is Long -> toDouble()
+        is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
+        is Collection<*> -> map { it.toJs() }.toTypedArray()
+        is Array<*> -> map { it.toJs() }.toTypedArray()
+        else -> this
+    }
 }
 
 internal actual class NativeOnDisconnect internal constructor(

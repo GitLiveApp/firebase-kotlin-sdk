@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.serializer
 
 /** Returns the [FirebaseDatabase] instance of the default [FirebaseApp]. */
 public expect val Firebase.database: FirebaseDatabase
@@ -432,39 +431,18 @@ public class DatabaseReference internal constructor(internal val nativeReference
     public suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
 
     /**
-     * Run a transaction on the data at this location using [MutableData].
+     * Run a transaction on the data at this location using [MutableData], which can read and write
+     * the data of any child location without serializing the whole tree.
      *
      * ```
-     * private fun onStarClicked(postRef: DatabaseReference) {
-     *     // ...
-     *     val snapshot: DataSnapshot? = try {
-     *         postRef.runTransaction { currentData ->
-     *             val p: Post = currentData.value()
-     *                 ?: return@runTransaction success(currentData)
-     *
-     *             if (p.stars.containsKey(uid)) {
-     *                 // Unstar the post and remove self from stars
-     *                 p.starCount = p.starCount - 1
-     *                 p.stars.remove(uid)
-     *             } else {
-     *                 // Star the post and add self to stars
-     *                 p.starCount = p.starCount + 1
-     *                 p.stars[uid] = true
-     *             }
-     *
-     *             // Set value and report transaction success
-     *             currentData.value = p
-     *             success(currentData)
-     *         }
-     *     } catch(e: Throwable) {
-     *         println("post transaction failed: $e")
-     *         null
-     *     }
-     *     if (snapshot != null) {
-     *         // Snapshot was committed.
-     *     } else {
-     *         // Snapshot was not committed.
-     *     }
+     * val snapshot = postRef.runTransaction { currentData ->
+     *     val post = currentData.value<Post?>()
+     *         ?: return@runTransaction success(currentData)
+     *     currentData.setValue(post.copy(starCount = post.starCount + 1))
+     *     success(currentData)
+     * }
+     * if (snapshot == null) {
+     *     // The transaction was aborted.
      * }
      * ```
      *
@@ -475,6 +453,7 @@ public class DatabaseReference internal constructor(internal val nativeReference
      *     transaction, be extremely careful of any side effects it may trigger. Best practices are
      *     to rely only on the data passed in via [MutableData].
      * @return The committed [DataSnapshot], or null if the transaction was aborted.
+     * @throws DatabaseException if the transaction failed.
      */
     public suspend fun runTransaction(update: Transaction.(currentData: MutableData) -> Transaction.Result): DataSnapshot? = nativeReference.runTransaction(update)
 }
@@ -571,8 +550,17 @@ public expect class MutableData {
      * The data at this location as a native type. Set this to the desired new data
      * at the location. Setting this to null will remove the data at this location.
      *
+     * **Warning:** the value is passed to the platform SDK as is, without serialization, so it must
+     * only be null, a [Boolean], a number, a [String], or a [List] or [Map] of those. Use [setValue]
+     * for anything else, such as `@Serializable` classes, enums or [ServerValue]. Assigning such a
+     * value here stores the class's properties by reflection on Android and the JVM (ignoring
+     * `@Serializable`), stores mangled property names on JS, and crashes with an uncatchable
+     * `NSException` on Apple platforms. To read the data as a Kotlin type, use [value] with a type
+     * argument or a deserialization strategy.
+     *
      * @return The current data at this location as a native type, or null if no data exists.
      */
+    @set:DelicateDatabaseApi
     public var value: Any?
 
     /**
@@ -607,29 +595,56 @@ public expect class MutableData {
 }
 
 /**
- * Deserializes the data at this location into the type [T].
+ * Deserializes the data at this location into [T].
  *
- * @return The current data at this location deserialized as [T].
+ * @return The current data at this location as [T].
  */
-public inline fun <reified T> MutableData.value(
-    strategy: DeserializationStrategy<T> = serializer<T>(),
-    buildSettings: DecodeSettings.Builder.() -> Unit = {},
-): T = decode(strategy, value, buildSettings)
+public inline fun <reified T> MutableData.value(): T = decode<T>(value = value)
 
 /**
- * Serializes [newValue] into the type [T] and sets the value at this location.
+ * Deserializes the data at this location with [strategy].
+ *
+ * @return The current data at this location as [T].
  */
-public inline fun <reified T> MutableData.setValue(
-    newValue: T,
-    strategy: SerializationStrategy<T> = serializer<T>(),
-    buildSettings: EncodeSettings.Builder.() -> Unit = {},
-) {
-    value = encode(
-        strategy = strategy,
-        value = newValue,
-        buildSettings = buildSettings,
-    )
+public inline fun <T> MutableData.value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, value, buildSettings)
+
+/**
+ * Serializes [value] and sets it as the data at this location.
+ *
+ * @param value The value to write, encoded with [buildSettings], or null to remove the data
+ */
+public inline fun <reified T> MutableData.setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    setEncodedValue(encode(value, buildSettings))
 }
+
+/**
+ * Serializes [value] with [strategy] and sets it as the data at this location.
+ *
+ * @param value The value to write, encoded with [buildSettings]
+ */
+public inline fun <T> MutableData.setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    setEncodedValue(encode(strategy, value, buildSettings))
+}
+
+/** Writes an already encoded value, which is safe to pass to the platform SDK as is. */
+@PublishedApi
+@OptIn(DelicateDatabaseApi::class)
+internal fun MutableData.setEncodedValue(encodedValue: Any?) {
+    value = encodedValue
+}
+
+/**
+ * Marks database APIs that pass values to the platform SDK without serialization, which store the
+ * wrong data or crash for anything but null, booleans, numbers, strings, and lists or maps of those.
+ * Prefer the serializing alternative named in the API's documentation.
+ */
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "Writes the value without serialization. Use setValue() instead unless the value is null, a Boolean, a number, a String, or a List or Map of those.",
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.PROPERTY_SETTER)
+public annotation class DelicateDatabaseApi
 
 public class Transaction internal constructor() {
     public fun success(resultData: MutableData): Result = Result.Success(data = resultData)
