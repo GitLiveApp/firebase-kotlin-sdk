@@ -6,8 +6,13 @@ package com.google.firebase.auth
 
 import cocoapods.FirebaseAuth.FIRActionCodeInfo
 import cocoapods.FirebaseAuth.FIRActionCodeOperation
+import cocoapods.FirebaseAuth.FIRActionCodeOperationEmailLink
+import cocoapods.FirebaseAuth.FIRActionCodeOperationPasswordReset
+import cocoapods.FirebaseAuth.FIRActionCodeOperationRecoverEmail
+import cocoapods.FirebaseAuth.FIRActionCodeOperationRevertSecondFactorAddition
+import cocoapods.FirebaseAuth.FIRActionCodeOperationVerifyAndChangeEmail
+import cocoapods.FirebaseAuth.FIRActionCodeOperationVerifyEmail
 import cocoapods.FirebaseAuth.FIRActionCodeSettings
-import cocoapods.FirebaseAuth.FIRActionCodeURL
 import cocoapods.FirebaseAuth.FIRAdditionalUserInfo
 import cocoapods.FirebaseAuth.FIRAuth
 import cocoapods.FirebaseAuth.FIRAuthCredential
@@ -41,6 +46,8 @@ import platform.Foundation.NSDate
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
+import platform.Foundation.NSURLComponents
+import platform.Foundation.NSURLQueryItem
 import platform.Foundation.timeIntervalSince1970
 
 /** @property ios The underlying Firebase iOS SDK object. */
@@ -49,7 +56,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
     private val idTokenListeners = mutableMapOf<IdTokenListener, FIRIDTokenDidChangeListenerHandle>()
 
     public actual val app: FirebaseApp
-        get() = Firebase.getApps(null).firstOrNull { (it.ios as Any?) == ios.app } ?: FirebaseApp.getInstance()
+        get() = Firebase.getApps(null).firstOrNull { (it.ios as Any?) == ios.app() } ?: FirebaseApp.getInstance()
 
     public actual val currentUser: FirebaseUser? get() = ios.currentUser()?.let { FirebaseUserImpl(it, this) }
 
@@ -174,7 +181,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
 
     override fun hashCode(): Int = ios.hashCode()
 
-    override fun toString(): String = "FirebaseAuth(app=${ios.app?.name})"
+    override fun toString(): String = "FirebaseAuth(app=${ios.app()?.name})"
 
     public actual companion object {
         private val instances = mutableMapOf<FIRAuth, FirebaseAuth>()
@@ -332,12 +339,12 @@ private fun FIRActionCodeInfo.toCompat(): ActionCodeResult {
 }
 
 private fun FIRActionCodeOperation.toOperation(): Int = when (this) {
-    FIRActionCodeOperation.FIRActionCodeOperationPasswordReset -> ActionCodeResult.PASSWORD_RESET
-    FIRActionCodeOperation.FIRActionCodeOperationVerifyEmail -> ActionCodeResult.VERIFY_EMAIL
-    FIRActionCodeOperation.FIRActionCodeOperationRecoverEmail -> ActionCodeResult.RECOVER_EMAIL
-    FIRActionCodeOperation.FIRActionCodeOperationEmailLink -> ActionCodeResult.SIGN_IN_WITH_EMAIL_LINK
-    FIRActionCodeOperation.FIRActionCodeOperationVerifyAndChangeEmail -> ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL
-    FIRActionCodeOperation.FIRActionCodeOperationRevertSecondFactorAddition -> ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION
+    FIRActionCodeOperationPasswordReset -> ActionCodeResult.PASSWORD_RESET
+    FIRActionCodeOperationVerifyEmail -> ActionCodeResult.VERIFY_EMAIL
+    FIRActionCodeOperationRecoverEmail -> ActionCodeResult.RECOVER_EMAIL
+    FIRActionCodeOperationEmailLink -> ActionCodeResult.SIGN_IN_WITH_EMAIL_LINK
+    FIRActionCodeOperationVerifyAndChangeEmail -> ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL
+    FIRActionCodeOperationRevertSecondFactorAddition -> ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION
     else -> ActionCodeResult.ERROR
 }
 
@@ -447,6 +454,28 @@ internal actual fun nativeOAuthCredential(providerId: String, idToken: String?, 
     else -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken)
 }
 
-internal actual fun parseActionCodeUrl(link: String): ActionCodeUrl? = FIRActionCodeURL.actionCodeURLWithLink(link)?.let {
-    ActionCodeUrl(it.APIKey(), it.code(), it.continueURL()?.absoluteString, it.languageCode(), it.operation().toOperation())
+/**
+ * Parses an email action link the way FIRActionCodeURL does (its failable initializer is not reachable from Kotlin): the
+ * query of the link, or of the link it wraps, carries the API key, the code, the continue URL, the language and the mode.
+ */
+internal actual fun parseActionCodeUrl(link: String): ActionCodeUrl? {
+    val items = queryItems(link).ifEmpty { NSURLComponents(string = link)?.query?.let(::queryItems).orEmpty() }
+    if (items.isEmpty()) return null
+    items["link"]?.let { wrapped -> parseActionCodeUrl(wrapped)?.let { return it } }
+    val operation = when (items["mode"]) {
+        "resetPassword" -> ActionCodeResult.PASSWORD_RESET
+        "verifyEmail" -> ActionCodeResult.VERIFY_EMAIL
+        "recoverEmail" -> ActionCodeResult.RECOVER_EMAIL
+        "signIn" -> ActionCodeResult.SIGN_IN_WITH_EMAIL_LINK
+        "verifyAndChangeEmail" -> ActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL
+        "revertSecondFactorAddition" -> ActionCodeResult.REVERT_SECOND_FACTOR_ADDITION
+        else -> ActionCodeResult.ERROR
+    }
+    return ActionCodeUrl(items["apiKey"], items["oobCode"], items["continueUrl"], items["lang"] ?: items["languageCode"], operation)
 }
+
+private fun queryItems(url: String): Map<String, String> = NSURLComponents(string = url)?.queryItems
+    ?.filterIsInstance<NSURLQueryItem>()
+    ?.mapNotNull { item -> item.value?.let { item.name to it } }
+    ?.toMap()
+    .orEmpty()
