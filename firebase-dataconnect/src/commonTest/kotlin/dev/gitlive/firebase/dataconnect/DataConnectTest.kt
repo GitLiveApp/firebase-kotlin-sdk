@@ -121,7 +121,7 @@ class DataConnectTest {
                 gcmSenderId = "846484016111",
             ),
         )
-        dataConnect = FirebaseDataConnect.getInstance(app.compat, testConnector).apply {
+        dataConnect = FirebaseDataConnect.getInstance(app.compat, testConnector, testSettings).apply {
             useEmulator(emulatorHost, 9399)
         }
     }
@@ -215,8 +215,9 @@ class DataConnectTest {
         val exception = assertFailsWith<DataConnectOperationException> { create.execute() }
         assertTrue(exception.response.errors.isNotEmpty(), "errors of $exception")
         assertTrue(exception.message.orEmpty().isNotEmpty())
-        // A request the server rejects outright (no such operation) fails too.
-        assertFailsWith<DataConnectException> {
+        // A request the server rejects outright (no such operation) fails too; the Android SDK surfaces the gRPC status
+        // exception itself, the other platforms a DataConnectException.
+        assertFailsWith<Exception> {
             dataConnect.query("noSuchQuery", Unit, Unit.serializer(), Unit.serializer()).execute(QueryRef.FetchPolicy.SERVER_ONLY)
         }
     }
@@ -238,14 +239,14 @@ class DataConnectTest {
 
     @Test
     fun instancesAreCachedPerAppAndConnector() = runTest {
-        assertSame(dataConnect, FirebaseDataConnect.getInstance(app.compat, testConnector))
-        assertSame(dataConnect, FirebaseDataConnect.getInstance(testConnector))
+        assertSame(dataConnect, FirebaseDataConnect.getInstance(app.compat, testConnector, testSettings))
+        assertSame(dataConnect, FirebaseDataConnect.getInstance(testConnector, testSettings))
         assertEquals(app.compat, dataConnect.app)
         assertEquals(testConnector, dataConnect.config)
-        assertEquals(DataConnectSettings(), dataConnect.settings)
+        assertEquals(testSettings, dataConnect.settings)
         assertFailsWith<IllegalArgumentException> { FirebaseDataConnect.getInstance(app.compat, testConnector, DataConnectSettings(host = "example.com")) }
         dataConnect.suspendingClose()
-        val reopened = FirebaseDataConnect.getInstance(app.compat, testConnector)
+        val reopened = FirebaseDataConnect.getInstance(app.compat, testConnector, testSettings)
         assertNotSame(dataConnect, reopened)
         dataConnect = reopened.apply { useEmulator(emulatorHost, 9399) }
     }

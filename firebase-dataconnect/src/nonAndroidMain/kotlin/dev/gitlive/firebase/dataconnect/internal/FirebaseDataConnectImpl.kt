@@ -50,8 +50,13 @@ internal class FirebaseDataConnectImpl(
     private var executed = false
     private var closed = false
 
-    /** The data the server last returned for each query, kept undecoded so that any deserializer can read it. */
+    /**
+     * The data the server last returned for each query, kept undecoded so that any deserializer can read it. Like the
+     * Android SDK, the instance only caches when [DataConnectSettings.cacheSettings] is set; the storage is always memory.
+     */
     internal val cache = mutableMapOf<QueryKey, JsonElement>()
+
+    private val cacheEnabled = settings.cacheSettings != null
 
     /** Every execution of a query on the server, for the subscriptions. */
     internal val events = MutableSharedFlow<QueryEvent>()
@@ -111,7 +116,7 @@ internal class FirebaseDataConnectImpl(
         val response = runCatching { executeOnServer(key.operationName, key.variables, mutation) }
         if (!mutation) {
             val data = response.mapCatching { it.data?.takeIf { _ -> it.errors.isEmpty() } ?: throw it.toException(key.operationName) }
-            data.onSuccess { cache[key] = it }
+            if (cacheEnabled) data.onSuccess { cache[key] = it }
             events.emit(QueryEvent(key, data))
         }
         return response.getOrThrow()

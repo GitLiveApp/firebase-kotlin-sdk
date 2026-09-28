@@ -136,8 +136,8 @@ into a shared module, including the compiler-guided replacement of the Android-o
 `OptionalVariable`, `EnumValue`, `LocalDate`, `AnyValue` and the `serializers` package) on every platform. On Android the
 Android SDK runs; on the JVM, JS and Apple platforms the module's own implementation calls the Data Connect service over
 REST, as the Firebase JS SDK does, attaching the signed-in user's ID token (the Firebase iOS Data Connect SDK is Swift-only
-and cannot be called from Kotlin, and the Firebase Java SDK has no Data Connect). Those platforms keep query results in
-memory only (`CacheSettings.Storage.PERSISTENT` behaves like `MEMORY`) and do not send App Check tokens. The
+and cannot be called from Kotlin, and the Firebase Java SDK has no Data Connect). Those platforms cache query results in
+memory when `CacheSettings` are given (`CacheSettings.Storage.PERSISTENT` behaves like `MEMORY`) and do not send App Check tokens. The
 `java.time.LocalDate` conversions, `JavaTimeLocalDateSerializer` and `UUIDSerializer` exist on Android only; common code
 uses `kotlinx.datetime.LocalDate` with `KotlinxDatetimeLocalDateSerializer` and `kotlin.uuid.Uuid` with
 `dev.gitlive.firebase.dataconnect.serializers.UuidSerializer`, which writes the same 32 hexadecimal digits.
