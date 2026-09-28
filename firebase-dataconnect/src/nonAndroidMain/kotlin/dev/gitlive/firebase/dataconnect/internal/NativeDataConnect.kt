@@ -13,7 +13,6 @@ import com.google.firebase.dataconnect.DataSource
 import com.google.firebase.dataconnect.QueryRef
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 /**
@@ -43,14 +42,11 @@ internal expect class NativeDataConnect(app: FirebaseApp, config: ConnectorConfi
 internal class NativeQueryResult(val data: JsonElement, val source: DataSource)
 
 /**
- * The cache's maximum age for the platform SDK, in seconds. `Duration.ZERO`, the default, means the cached data never
- * goes stale: the Android SDK serves such data from the cache, whereas the JS and iOS SDKs would consider it stale at
- * once (they compare the age with the maximum), so it becomes an age no cache entry reaches.
+ * The cache's maximum age for the platform SDK, in seconds. Every SDK, the Android one included, considers an entry
+ * older than this stale, so with the default of zero `PREFER_CACHE` always goes to the server and only `CACHE_ONLY`
+ * (which accepts stale entries) is served from the cache.
  */
-internal val CacheSettings.maxAgeSeconds: Double
-    get() = if (maxAge == Duration.ZERO) NEVER_STALE_SECONDS else maxAge.toDouble(DurationUnit.SECONDS)
-
-private const val NEVER_STALE_SECONDS = 1e12
+internal val CacheSettings.maxAgeSeconds: Double get() = maxAge.toDouble(DurationUnit.SECONDS)
 
 /** An operation the SDK reported errors for, with the data it returned nonetheless and the errors, as the SDK sent them. */
 internal class NativeOperationFailure(
