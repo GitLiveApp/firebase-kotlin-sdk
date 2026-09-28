@@ -129,7 +129,7 @@ class DataConnectTest {
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
         if (::dataConnect.isInitialized) dataConnect.suspendingClose()
-        Firebase.apps(context).forEach { it.delete() }
+        if (deletesAppsBetweenTests) Firebase.apps(context).forEach { it.delete() }
     }
 
     private fun createPerson(variables: CreatePersonVariables) = dataConnect.mutation("createPerson", variables, CreatePersonData.serializer(), CreatePersonVariables.serializer())

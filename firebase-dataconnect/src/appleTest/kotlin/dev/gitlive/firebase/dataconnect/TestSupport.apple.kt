@@ -6,6 +6,7 @@ package dev.gitlive.firebase.dataconnect
 
 actual val emulatorHost: String = "localhost"
 actual val context: Any = Unit
+actual val deletesAppsBetweenTests: Boolean = false
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

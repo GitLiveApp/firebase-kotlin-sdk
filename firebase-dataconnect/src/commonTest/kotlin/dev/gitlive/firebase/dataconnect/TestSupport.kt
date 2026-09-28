@@ -18,6 +18,13 @@ expect val context: Any
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 expect annotation class IgnoreForAndroidUnitTest()
 
+/**
+ * Whether the tests delete their Firebase app after each test, as the other modules' tests do. Not on Apple: the iOS
+ * Data Connect SDK keeps its instances for the life of the process and looks Auth up on their app from background tasks
+ * shortly after an instance is created, which crashes the process if the app has been deleted meanwhile.
+ */
+expect val deletesAppsBetweenTests: Boolean
+
 /** The connector of the test project under `test/dataconnect`. */
 val testConnector = ConnectorConfig(connector = "kotlin", location = "us-central1", serviceId = "kotlin-sdk-test")
 
