@@ -228,7 +228,7 @@ public abstract interface class com/google/firebase/dataconnect/FirebaseDataConn
 	public abstract fun setVariablesSerializersModule (Lkotlinx/serialization/modules/SerializersModule;)V
 }
 
-public final class com/google/firebase/dataconnect/FirebaseDataConnect_nonAndroidKt {
+public final class com/google/firebase/dataconnect/FirebaseDataConnectKt {
 	public static final fun getInstance (Lcom/google/firebase/dataconnect/FirebaseDataConnect$Companion;Lcom/google/firebase/FirebaseApp;Lcom/google/firebase/dataconnect/ConnectorConfig;Lcom/google/firebase/dataconnect/DataConnectSettings;)Lcom/google/firebase/dataconnect/FirebaseDataConnect;
 	public static final fun getInstance (Lcom/google/firebase/dataconnect/FirebaseDataConnect$Companion;Lcom/google/firebase/dataconnect/ConnectorConfig;Lcom/google/firebase/dataconnect/DataConnectSettings;)Lcom/google/firebase/dataconnect/FirebaseDataConnect;
 	public static synthetic fun getInstance$default (Lcom/google/firebase/dataconnect/FirebaseDataConnect$Companion;Lcom/google/firebase/FirebaseApp;Lcom/google/firebase/dataconnect/ConnectorConfig;Lcom/google/firebase/dataconnect/DataConnectSettings;ILjava/lang/Object;)Lcom/google/firebase/dataconnect/FirebaseDataConnect;
