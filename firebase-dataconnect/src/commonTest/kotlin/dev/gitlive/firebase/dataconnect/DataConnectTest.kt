@@ -128,7 +128,7 @@ class DataConnectTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        dataConnect.suspendingClose()
+        if (::dataConnect.isInitialized) dataConnect.suspendingClose()
         Firebase.apps(context).forEach { it.delete() }
     }
 

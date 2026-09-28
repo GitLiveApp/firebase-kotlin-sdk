@@ -6,6 +6,7 @@ import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
 import utils.applyFirebaseHierarchy
 import utils.stripHeaderStubs
+import utils.supportsApple
 import utils.toTargetPlatforms
 
 /*
@@ -16,6 +17,7 @@ val supportedPlatforms = (project.property("firebase-dataconnect.supportedTarget
 
 plugins {
     id("com.android.library")
+    kotlin("native.cocoapods")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
@@ -107,6 +109,30 @@ kotlin {
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
         macosX64()
+    }
+    if (supportedPlatforms.supportsApple()) {
+        // Data Connect has no CocoaPods SDK (the iOS SDK is Swift-only and SwiftPM-only); the Apple targets call the service
+        // directly. The FirebaseAuth pod (which brings FirebaseCore) is declared so that the frameworks the firebase-app and
+        // firebase-auth dependencies link against are built and found when this module's test binaries are linked.
+        cocoapods {
+            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
+                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+            }
+            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
+                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+            }
+            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
+                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
+            }
+            framework {
+                baseName = "FirebaseDataConnect"
+            }
+            noPodspec()
+            pod("FirebaseAuth") {
+                version = libs.versions.firebase.cocoapods.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
+            }
+        }
     }
 
     if (supportedPlatforms.contains(TargetPlatform.Js)) {

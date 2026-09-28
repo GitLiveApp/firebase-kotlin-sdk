@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.dataconnect.internal
 
 import com.google.firebase.dataconnect.DataConnectException
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSHTTPURLResponse
 import platform.Foundation.NSMutableURLRequest
@@ -21,6 +22,7 @@ import platform.Foundation.setValue
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+@OptIn(BetaInteropApi::class)
 internal actual suspend fun httpPost(url: String, headers: Map<String, String>, body: String): HttpResponse = suspendCancellableCoroutine { continuation ->
     val request = NSMutableURLRequest(uRL = NSURL(string = url))
     request.setHTTPMethod("POST")

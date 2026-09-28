@@ -8,4 +8,6 @@ import dev.gitlive.firebase.testContext
 
 actual val emulatorHost: String = "localhost"
 actual val context: Any = testContext
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

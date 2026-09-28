@@ -2,6 +2,10 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+// The facade must be named like the Android SDK's, as this module's own code and tests, compiled against these stubs,
+// bind to it by name at runtime once the stubs are stripped.
+@file:JvmName("FirebaseDataConnectKt")
+
 package com.google.firebase.dataconnect
 
 import com.google.firebase.FirebaseApp
