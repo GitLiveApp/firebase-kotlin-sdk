@@ -1,0 +1,255 @@
+# Android SDK source compatibility of firebase-dataconnect
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 198 public members available (198 identical, 0 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.dataconnect.AnyValue
+  OK    AnyValue(boolean)
+  OK    AnyValue(double)
+  OK    AnyValue(String)
+  OK    AnyValue(List)
+  OK    AnyValue(Map)
+  OK    Object getValue()
+com.google.firebase.dataconnect.AnyValue.Companion
+com.google.firebase.dataconnect.AnyValueKt
+  OK    static T decode(AnyValue)
+  OK    static T decode(AnyValue, DeserializationStrategy, SerializersModule)
+  OK    static AnyValue encode(Companion, T)
+  OK    static AnyValue encode(Companion, T, SerializationStrategy, SerializersModule)
+  OK    static AnyValue fromAny(Companion, Object)
+  OK    static AnyValue fromNullableAny(Companion, Object)
+com.google.firebase.dataconnect.CacheSettings
+  OK    CacheSettings(Storage, long)
+  OK    long getMaxAge()
+  OK    Storage getStorage()
+com.google.firebase.dataconnect.CacheSettings.Storage
+  OK    static Storage MEMORY
+  OK    static Storage PERSISTENT
+com.google.firebase.dataconnect.CacheSettingsKt
+  OK    static CacheSettings copy(CacheSettings, Storage, long)
+com.google.firebase.dataconnect.ConnectorConfig
+  OK    ConnectorConfig(String, String, String)
+  OK    String getConnector()
+  OK    String getLocation()
+  OK    String getServiceId()
+com.google.firebase.dataconnect.ConnectorConfigKt
+  OK    static ConnectorConfig copy(ConnectorConfig, String, String, String)
+com.google.firebase.dataconnect.DataConnectException
+  OK    DataConnectException(String, Throwable)
+com.google.firebase.dataconnect.DataConnectOperationException
+  OK    DataConnectOperationException(String, Throwable, DataConnectOperationFailureResponse)
+  OK    DataConnectOperationFailureResponse getResponse()
+com.google.firebase.dataconnect.DataConnectOperationFailureResponse
+  OK    Data getData()
+  OK    List getErrors()
+  OK    Map getRawData()
+  OK    String toString()
+com.google.firebase.dataconnect.DataConnectOperationFailureResponse.ErrorInfo
+  OK    boolean equals(Object)
+  OK    String getMessage()
+  OK    List getPath()
+  OK    int hashCode()
+  OK    String toString()
+com.google.firebase.dataconnect.DataConnectPathSegment
+com.google.firebase.dataconnect.DataConnectSettings
+  OK    DataConnectSettings(String, boolean)
+  OK    DataConnectSettings(String, boolean, CacheSettings)
+  OK    CacheSettings getCacheSettings()
+  OK    String getHost()
+  OK    boolean getSslEnabled()
+com.google.firebase.dataconnect.DataConnectSettingsKt
+  OK    static DataConnectSettings copy(DataConnectSettings, String, boolean)
+  OK    static DataConnectSettings copy(DataConnectSettings, String, boolean, CacheSettings)
+com.google.firebase.dataconnect.DataSource
+  OK    static DataSource CACHE
+  OK    static DataSource SERVER
+com.google.firebase.dataconnect.EnumValue
+  OK    String getStringValue()
+  OK    T getValue()
+com.google.firebase.dataconnect.EnumValue.Known
+  OK    Known(T)
+  OK    Known copy(T)
+  OK    String getStringValue()
+  OK    T getValue()
+com.google.firebase.dataconnect.EnumValue.Unknown
+  OK    Unknown(String)
+  OK    Unknown copy(String)
+  OK    String getStringValue()
+  OK    Void getValue()
+com.google.firebase.dataconnect.ExperimentalFirebaseDataConnect
+com.google.firebase.dataconnect.FirebaseDataConnect
+  OK    void close()
+  OK    boolean equals(Object)
+  OK    FirebaseApp getApp()
+  OK    ConnectorConfig getConfig()
+  OK    DataConnectSettings getSettings()
+  OK    int hashCode()
+  OK    MutationRef mutation(String, Variables, DeserializationStrategy, SerializationStrategy, Function1)
+  OK    QueryRef query(String, Variables, DeserializationStrategy, SerializationStrategy, Function1)
+  OK    Object suspendingClose(Continuation)
+  OK    String toString()
+  OK    void useEmulator(String, int)
+com.google.firebase.dataconnect.FirebaseDataConnect.CallerSdkType
+  OK    static CallerSdkType Base
+  OK    static CallerSdkType Generated
+com.google.firebase.dataconnect.FirebaseDataConnect.Companion
+com.google.firebase.dataconnect.FirebaseDataConnect.MutationRefOptionsBuilder
+  OK    CallerSdkType getCallerSdkType()
+  OK    SerializersModule getDataSerializersModule()
+  OK    SerializersModule getVariablesSerializersModule()
+  OK    void setCallerSdkType(CallerSdkType)
+  OK    void setDataSerializersModule(SerializersModule)
+  OK    void setVariablesSerializersModule(SerializersModule)
+com.google.firebase.dataconnect.FirebaseDataConnect.QueryRefOptionsBuilder
+  OK    CallerSdkType getCallerSdkType()
+  OK    SerializersModule getDataSerializersModule()
+  OK    SerializersModule getVariablesSerializersModule()
+  OK    void setCallerSdkType(CallerSdkType)
+  OK    void setDataSerializersModule(SerializersModule)
+  OK    void setVariablesSerializersModule(SerializersModule)
+com.google.firebase.dataconnect.FirebaseDataConnectKt
+  OK    static FirebaseDataConnect getInstance(Companion, ConnectorConfig, DataConnectSettings)
+  OK    static FirebaseDataConnect getInstance(Companion, FirebaseApp, ConnectorConfig, DataConnectSettings)
+  OK    static MutableStateFlow getLogLevel(Companion)
+com.google.firebase.dataconnect.LocalDate
+  OK    LocalDate(int, int, int)
+  OK    int getDay()
+  OK    int getMonth()
+  OK    int getYear()
+com.google.firebase.dataconnect.LocalDateKt
+  OK    static LocalDate copy(LocalDate, int, int, int)
+  PLAT  static LocalDate toDataConnectLocalDate(LocalDate)
+  OK    static LocalDate toDataConnectLocalDate(LocalDate)
+  PLAT  static LocalDate toJavaLocalDate(LocalDate)
+  OK    static LocalDate toKotlinxLocalDate(LocalDate)
+com.google.firebase.dataconnect.LogLevel
+  OK    static LogLevel DEBUG
+  OK    static LogLevel NONE
+  OK    static LogLevel WARN
+com.google.firebase.dataconnect.MutationRef
+  OK    MutationRef copy(String, Variables, DeserializationStrategy, SerializationStrategy, CallerSdkType, SerializersModule, SerializersModule)
+  OK    Object execute(Continuation)
+  OK    MutationRef withDataDeserializer(DeserializationStrategy, SerializersModule)
+  OK    MutationRef withVariablesSerializer(NewVariables, SerializationStrategy, SerializersModule)
+com.google.firebase.dataconnect.MutationResult
+  OK    MutationRef getRef()
+com.google.firebase.dataconnect.OperationRef
+  OK    OperationRef copy(String, Variables, DeserializationStrategy, SerializationStrategy, CallerSdkType, SerializersModule, SerializersModule)
+  OK    boolean equals(Object)
+  OK    Object execute(Continuation)
+  OK    CallerSdkType getCallerSdkType()
+  OK    FirebaseDataConnect getDataConnect()
+  OK    DeserializationStrategy getDataDeserializer()
+  OK    SerializersModule getDataSerializersModule()
+  OK    String getOperationName()
+  OK    Variables getVariables()
+  OK    SerializationStrategy getVariablesSerializer()
+  OK    SerializersModule getVariablesSerializersModule()
+  OK    int hashCode()
+  OK    String toString()
+  OK    OperationRef withDataDeserializer(DeserializationStrategy, SerializersModule)
+  OK    OperationRef withVariablesSerializer(NewVariables, SerializationStrategy, SerializersModule)
+com.google.firebase.dataconnect.OperationResult
+  OK    boolean equals(Object)
+  OK    Data getData()
+  OK    OperationRef getRef()
+  OK    int hashCode()
+  OK    String toString()
+com.google.firebase.dataconnect.OptionalVariable
+  OK    T valueOrNull()
+  OK    T valueOrThrow()
+com.google.firebase.dataconnect.OptionalVariable.Serializer
+  OK    Serializer(KSerializer)
+  OK    OptionalVariable deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, OptionalVariable)
+com.google.firebase.dataconnect.OptionalVariable.Undefined
+  OK    Void valueOrNull()
+  OK    Void valueOrThrow()
+  OK    static Undefined INSTANCE
+com.google.firebase.dataconnect.OptionalVariable.Value
+  OK    Value(T)
+  OK    T getValue()
+  OK    T valueOrNull()
+  OK    T valueOrThrow()
+com.google.firebase.dataconnect.QueryRef
+  OK    QueryRef copy(String, Variables, DeserializationStrategy, SerializationStrategy, CallerSdkType, SerializersModule, SerializersModule)
+  OK    Object execute(Continuation)
+  OK    Object execute(FetchPolicy, Continuation)
+  OK    QuerySubscription subscribe()
+  OK    QueryRef withDataDeserializer(DeserializationStrategy, SerializersModule)
+  OK    QueryRef withVariablesSerializer(NewVariables, SerializationStrategy, SerializersModule)
+com.google.firebase.dataconnect.QueryRef.FetchPolicy
+  OK    static FetchPolicy CACHE_ONLY
+  OK    static FetchPolicy PREFER_CACHE
+  OK    static FetchPolicy SERVER_ONLY
+com.google.firebase.dataconnect.QueryResult
+  OK    DataSource getDataSource()
+  OK    QueryRef getRef()
+com.google.firebase.dataconnect.QuerySubscription
+  OK    boolean equals(Object)
+  OK    Flow getFlow()
+  OK    QueryRef getQuery()
+  OK    int hashCode()
+  OK    String toString()
+com.google.firebase.dataconnect.QuerySubscriptionResult
+  OK    boolean equals(Object)
+  OK    QueryRef getQuery()
+  OK    Object getResult()
+  OK    int hashCode()
+  OK    String toString()
+com.google.firebase.dataconnect.generated.GeneratedConnector
+  OK    T copy(FirebaseDataConnect)
+  OK    boolean equals(Object)
+  OK    FirebaseDataConnect getDataConnect()
+  OK    int hashCode()
+  OK    List mutations()
+  OK    List operations()
+  OK    List queries()
+  OK    String toString()
+com.google.firebase.dataconnect.generated.GeneratedMutation
+  OK    GeneratedMutation copy(Connector, String, DeserializationStrategy, SerializationStrategy)
+  OK    MutationRef ref(Variables)
+  OK    GeneratedMutation withDataDeserializer(DeserializationStrategy)
+  OK    GeneratedMutation withVariablesSerializer(SerializationStrategy)
+com.google.firebase.dataconnect.generated.GeneratedOperation
+  OK    GeneratedOperation copy(Connector, String, DeserializationStrategy, SerializationStrategy)
+  OK    boolean equals(Object)
+  OK    Connector getConnector()
+  OK    DeserializationStrategy getDataDeserializer()
+  OK    String getOperationName()
+  OK    SerializationStrategy getVariablesSerializer()
+  OK    int hashCode()
+  OK    OperationRef ref(Variables)
+  OK    String toString()
+  OK    GeneratedOperation withDataDeserializer(DeserializationStrategy)
+  OK    GeneratedOperation withVariablesSerializer(SerializationStrategy)
+com.google.firebase.dataconnect.generated.GeneratedQuery
+  OK    GeneratedQuery copy(Connector, String, DeserializationStrategy, SerializationStrategy)
+  OK    QueryRef ref(Variables)
+  OK    GeneratedQuery withDataDeserializer(DeserializationStrategy)
+  OK    GeneratedQuery withVariablesSerializer(SerializationStrategy)
+com.google.firebase.dataconnect.serializers.AnyValueSerializer
+  OK    AnyValue deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, AnyValue)
+  OK    static AnyValueSerializer INSTANCE
+com.google.firebase.dataconnect.serializers.EnumValueSerializer
+  OK    EnumValueSerializer(Iterable)
+  OK    EnumValue deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, EnumValue)
+com.google.firebase.dataconnect.serializers.KotlinxDatetimeLocalDateSerializer
+  OK    LocalDate deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, LocalDate)
+  OK    static KotlinxDatetimeLocalDateSerializer INSTANCE
+com.google.firebase.dataconnect.serializers.LocalDateSerializer
+  OK    LocalDate deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, LocalDate)
+  OK    static LocalDateSerializer INSTANCE
+com.google.firebase.dataconnect.serializers.TimestampSerializer
+  OK    Timestamp deserialize(Decoder)
+  OK    SerialDescriptor getDescriptor()
+  OK    void serialize(Encoder, Timestamp)
+  OK    static TimestampSerializer INSTANCE

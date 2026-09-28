@@ -1,0 +1,9 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-dataconnect (see README, "Using the Firebase Android SDK API from common code").
+
+# java.time and java.util.UUID have no common counterpart. From common code use toKotlinxLocalDate()/toDataConnectLocalDate()
+# with kotlinx.datetime.LocalDate and KotlinxDatetimeLocalDateSerializer, and dev.gitlive.firebase.dataconnect.serializers.UuidSerializer
+# with kotlin.uuid.Uuid, which serializes the same 32 hexadecimal digits as UUIDSerializer. On Android the SDK's own members are available.
+com.google.firebase.dataconnect.LocalDateKt#toJavaLocalDate  // @platform java.time.LocalDate
+com.google.firebase.dataconnect.LocalDateKt#toDataConnectLocalDate(java.time.LocalDate)  // @platform java.time.LocalDate
+com.google.firebase.dataconnect.serializers.JavaTimeLocalDateSerializer  // @platform java.time.LocalDate
+com.google.firebase.dataconnect.serializers.UUIDSerializer  // @platform java.util.UUID

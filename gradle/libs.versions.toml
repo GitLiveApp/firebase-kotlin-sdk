@@ -46,6 +46,7 @@ google-firebase-common = { module = "com.google.firebase:firebase-common"}
 google-firebase-config = { module = "com.google.firebase:firebase-config"}
 google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics"}
 google-firebase-database = { module = "com.google.firebase:firebase-database"}
+google-firebase-dataconnect = { module = "com.google.firebase:firebase-dataconnect"}
 google-firebase-firestore = { module = "com.google.firebase:firebase-firestore"}
 google-firebase-functions = { module = "com.google.firebase:firebase-functions"}
 google-firebase-installations = { module = "com.google.firebase:firebase-installations"}
@@ -59,6 +60,7 @@ kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-cor
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }

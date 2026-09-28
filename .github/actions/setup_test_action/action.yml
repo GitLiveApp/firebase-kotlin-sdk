@@ -57,4 +57,4 @@ runs:
       shell: bash
       run: |
         firebase emulators:start --config=./test/firebase.json &
-        wait-on tcp:127.0.0.1:9099 tcp:127.0.0.1:5001
+        wait-on tcp:127.0.0.1:9099 tcp:127.0.0.1:5001 tcp:127.0.0.1:9399

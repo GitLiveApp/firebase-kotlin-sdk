@@ -157,6 +157,11 @@ The SDK has two public API layers per module:
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
    builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+   `firebase-dataconnect` shows a module whose Android SDK API is already coroutine- and kotlinx-serialization-based, so it is
+   used as is from common code with almost no `dev.gitlive` layer: the `com.google.firebase.dataconnect` interfaces, value
+   types and serializers are plain common code (verified against the Android SDK and stripped on Android), and the other
+   platforms run the module's own implementation of the Data Connect REST protocol in `nonAndroidMain` (`jvmStubs = false`,
+   as the iOS SDK is Swift-only and the Java SDK has none). Its `test/dataconnect` project runs in the Data Connect emulator.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

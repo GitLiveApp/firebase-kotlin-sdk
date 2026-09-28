@@ -1,0 +1,11 @@
+type Person @table {
+  name: String!
+  age: Int
+  birthday: Date
+  createdAt: Timestamp!
+  status: Status
+  tags: [String!]
+  extra: Any
+}
+
+enum Status { ACTIVE, INACTIVE }

@@ -1,0 +1,19 @@
+mutation createPerson($name: String!, $age: Int, $birthday: Date, $status: Status, $tags: [String!], $extra: Any) @auth(level: PUBLIC) {
+  person_insert(data: { name: $name, age: $age, birthday: $birthday, status: $status, tags: $tags, extra: $extra, createdAt_expr: "request.time" })
+}
+
+query getPerson($id: UUID!) @auth(level: PUBLIC) {
+  person(id: $id) { id name age birthday createdAt status tags extra }
+}
+
+query listPeople @auth(level: PUBLIC) {
+  people { id name age }
+}
+
+mutation deletePerson($id: UUID!) @auth(level: PUBLIC) {
+  person_delete(id: $id)
+}
+
+mutation createPersonWithId($id: UUID!, $name: String!) @auth(level: PUBLIC) {
+  person_insert(data: { id: $id, name: $name, createdAt_expr: "request.time" })
+}
