@@ -1,3 +1,6 @@
+// Named apart from the main FirestoreKt facade, which this file would otherwise shadow on the test classpath.
+@file:JvmName("tests")
+
 package dev.gitlive.firebase.firestore
 
 import dev.gitlive.firebase.testContext
