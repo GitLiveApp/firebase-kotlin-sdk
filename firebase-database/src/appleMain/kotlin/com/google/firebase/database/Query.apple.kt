@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.TaskCompletionSource
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
+import platform.Foundation.numberWithBool
 
 private const val IOS_PERMISSION_DENIED = 1L
 private const val IOS_UNAVAILABLE = 2L
