@@ -2,7 +2,11 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.GeneratedAndroidSdkApi
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -52,6 +56,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -175,8 +180,67 @@ kotlin {
                 }
             }
         }
+
+        // The test written against the com.google.firebase.analytics API is shared by every test target but the JVM, where
+        // analytics is a no-op and firebase-java-sdk's android.os.Bundle has none of the setters it uses.
+        val androidSdkCompatTest = "src/androidSdkCompatTest/kotlin"
+        if (supportedPlatforms.contains(TargetPlatform.Js) || supportedPlatforms.supportsApple()) {
+            getByName("nonJvmTest") { kotlin.srcDir(androidSdkCompatTest) }
+        }
+        if (supportedPlatforms.contains(TargetPlatform.Android)) {
+            getByName("androidUnitTest") { kotlin.srcDir(androidSdkCompatTest) }
+            getByName("androidInstrumentedTest") { kotlin.srcDir(androidSdkCompatTest) }
+        }
     }
 }
+
+// android.os.Bundle and the com.google.firebase.analytics classes are header stubs on Android (verified against the platform and
+// the Analytics SDK). firebase-java-sdk has no analytics, so the JVM ships the module's own no-op implementation of the
+// com.google.firebase.analytics classes and only stubs android.os.Bundle (whose members it mostly lacks: they are never called).
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase", "android/os"),
+    androidReferenceJars = files({
+        val classpath = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+        val bootClasspath = extensions.findByType<com.android.build.gradle.LibraryExtension>()?.bootClasspath ?: emptyList<File>()
+        classpath + files(bootClasspath)
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    jvmKeepClasses = listOf("com/google/firebase/analytics/"),
+    jvmMissingMembers = listOf(
+        "android/os/Bundle.putString(Ljava/lang/String;Ljava/lang/String;)V",
+        "android/os/Bundle.putInt(Ljava/lang/String;I)V",
+        "android/os/Bundle.putLong(Ljava/lang/String;J)V",
+        "android/os/Bundle.putDouble(Ljava/lang/String;D)V",
+        "android/os/Bundle.putBoolean(Ljava/lang/String;Z)V",
+        "android/os/Bundle.putBundle(Ljava/lang/String;Landroid/os/Bundle;)V",
+        "android/os/Bundle.putAll(Landroid/os/Bundle;)V",
+        "android/os/Bundle.getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+        "android/os/Bundle.getInt(Ljava/lang/String;I)I",
+        "android/os/Bundle.getLong(Ljava/lang/String;)J",
+        "android/os/Bundle.getLong(Ljava/lang/String;J)J",
+        "android/os/Bundle.getDouble(Ljava/lang/String;)D",
+        "android/os/Bundle.getDouble(Ljava/lang/String;D)D",
+        "android/os/Bundle.getBoolean(Ljava/lang/String;Z)Z",
+        "android/os/Bundle.getBundle(Ljava/lang/String;)Landroid/os/Bundle;",
+        "android/os/Bundle.size()I",
+        "android/os/Bundle.isEmpty()Z",
+        "android/os/Bundle.remove(Ljava/lang/String;)V",
+        "android/os/Bundle.clear()V",
+        "android/os/Bundle.<init>()V",
+    ),
+)
+// firebase-analytics is not open source, so its api.txt is generated from the published classes rather than downloaded.
+registerAndroidSourceCompat(
+    generated = listOf(
+        GeneratedAndroidSdkApi(
+            name = "firebase-analytics",
+            artifacts = listOf("com.google.android.gms:play-services-measurement-api"),
+            packages = listOf("com/google/firebase/analytics/"),
+        ),
+    ),
+)
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

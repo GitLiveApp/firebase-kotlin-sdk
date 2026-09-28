@@ -1,37 +1,72 @@
+/*
+ * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.gitlive.firebase.analytics
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
+import kotlinx.coroutines.tasks.await
+import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.analytics.internal.toBundle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import com.google.firebase.analytics.FirebaseAnalytics as CompatFirebaseAnalytics
 
-public expect val Firebase.analytics: FirebaseAnalytics
-
-/** Returns the [FirebaseStorage] instance of a given [FirebaseApp]. */
-public expect fun Firebase.analytics(app: FirebaseApp): FirebaseAnalytics
-
-public expect class FirebaseAnalytics {
-    public fun logEvent(name: String, parameters: Map<String, Any>? = null)
-    public fun setUserProperty(name: String, value: String)
-    public fun setUserId(id: String?)
-    public fun setAnalyticsCollectionEnabled(enabled: Boolean)
-    public fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration)
-    public suspend fun getSessionId(): Long?
-    public fun resetAnalyticsData()
-    public fun setDefaultEventParameters(parameters: Map<String, String>)
-    public fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>)
-
-    public enum class ConsentType {
-        AD_PERSONALIZATION,
-        AD_STORAGE,
-        AD_USER_DATA,
-        ANALYTICS_STORAGE,
+/**
+ * Firebase Analytics for the app it was obtained from.
+ * @property compat The Android-SDK-shaped [com.google.firebase.analytics.FirebaseAnalytics] this wraps.
+ */
+public class FirebaseAnalytics internal constructor(public val compat: CompatFirebaseAnalytics) {
+    public fun logEvent(name: String, parameters: Map<String, Any>? = null) {
+        compat.logEvent(name, parameters?.toBundle())
     }
 
-    public enum class ConsentStatus {
-        GRANTED,
-        DENIED,
+    public fun setUserProperty(name: String, value: String) {
+        compat.setUserProperty(name, value)
     }
+
+    public fun setUserId(id: String?) {
+        compat.setUserId(id)
+    }
+
+    public fun setAnalyticsCollectionEnabled(enabled: Boolean) {
+        compat.setAnalyticsCollectionEnabled(enabled)
+    }
+
+    public fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
+        compat.setSessionTimeoutDuration(sessionTimeoutInterval.inWholeMilliseconds)
+    }
+
+    public suspend fun getSessionId(): Long? = compat.getSessionId().await()
+
+    public fun resetAnalyticsData() {
+        compat.resetAnalyticsData()
+    }
+
+    public fun setDefaultEventParameters(parameters: Map<String, String>) {
+        compat.setDefaultEventParameters(parameters.toBundle())
+    }
+
+    public fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
+        compat.setConsent(consentSettings.entries.associate { (type, status) -> type.compat to status.compat })
+    }
+
+    public enum class ConsentType(internal val compat: CompatFirebaseAnalytics.ConsentType) {
+        AD_PERSONALIZATION(CompatFirebaseAnalytics.ConsentType.AD_PERSONALIZATION),
+        AD_STORAGE(CompatFirebaseAnalytics.ConsentType.AD_STORAGE),
+        AD_USER_DATA(CompatFirebaseAnalytics.ConsentType.AD_USER_DATA),
+        ANALYTICS_STORAGE(CompatFirebaseAnalytics.ConsentType.ANALYTICS_STORAGE),
+    }
+
+    public enum class ConsentStatus(internal val compat: CompatFirebaseAnalytics.ConsentStatus) {
+        GRANTED(CompatFirebaseAnalytics.ConsentStatus.GRANTED),
+        DENIED(CompatFirebaseAnalytics.ConsentStatus.DENIED),
+    }
+
+    override fun equals(other: Any?): Boolean = other is FirebaseAnalytics && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
 @Deprecated("Use Kotlin Duration", replaceWith = ReplaceWith("setSessionTimeoutInterval(sessionTimeoutInterval.milliseconds)"))
@@ -51,7 +86,7 @@ public fun FirebaseAnalytics.logEvent(name: String, builder: FirebaseAnalyticsPa
     logEvent(name, params.parameters)
 }
 
-public expect class FirebaseAnalyticsException
+public class FirebaseAnalyticsException(message: String) : FirebaseException(message)
 
 public data class FirebaseAnalyticsParameters(
     val parameters: MutableMap<String, Any> = mutableMapOf(),

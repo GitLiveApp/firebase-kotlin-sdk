@@ -1,0 +1,210 @@
+// Source: generated from the published classes (the module is not open source) of com.google.android.gms:play-services-measurement-api:23.2.0
+// Signature format: 3.0
+package com.google.firebase.analytics {
+
+  public final class AnalyticsKt {
+    method public static final com.google.firebase.analytics.FirebaseAnalytics getANALYTICS();
+    method public static final com.google.firebase.analytics.FirebaseAnalytics getAnalytics(com.google.firebase.Firebase);
+    method public static final Object getLOCK();
+    method public static final void logEvent(com.google.firebase.analytics.FirebaseAnalytics, String, kotlin.jvm.functions.Function1);
+    method public static final void setANALYTICS(com.google.firebase.analytics.FirebaseAnalytics);
+    method public static final void setConsent(com.google.firebase.analytics.FirebaseAnalytics, kotlin.jvm.functions.Function1);
+  }
+
+  public final class ConsentBuilder {
+    ctor public ConsentBuilder();
+    method public final java.util.Map asMap();
+    method public final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus getAdPersonalization();
+    method public final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus getAdStorage();
+    method public final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus getAdUserData();
+    method public final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus getAnalyticsStorage();
+    method public final void setAdPersonalization(com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus);
+    method public final void setAdStorage(com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus);
+    method public final void setAdUserData(com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus);
+    method public final void setAnalyticsStorage(com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus);
+  }
+
+  public final class FirebaseAnalytics {
+    method public com.google.android.gms.tasks.Task getAppInstanceId();
+    method public String getFirebaseInstanceId();
+    method public static com.google.firebase.analytics.FirebaseAnalytics getInstance(android.content.Context);
+    method public com.google.android.gms.tasks.Task getSessionId();
+    method public void logEvent(String, android.os.Bundle);
+    method public void resetAnalyticsData();
+    method public void setAnalyticsCollectionEnabled(boolean);
+    method public void setConsent(java.util.Map);
+    method @Deprecated public void setCurrentScreen(android.app.Activity, String, String);
+    method public void setDefaultEventParameters(android.os.Bundle);
+    method public void setSessionTimeoutDuration(long);
+    method public void setUserId(String);
+    method public void setUserProperty(String, String);
+  }
+
+  public enum FirebaseAnalytics.ConsentStatus {
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus DENIED;
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus GRANTED;
+  }
+
+  public enum FirebaseAnalytics.ConsentType {
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentType AD_PERSONALIZATION;
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentType AD_STORAGE;
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentType AD_USER_DATA;
+    enum_constant public static final com.google.firebase.analytics.FirebaseAnalytics.ConsentType ANALYTICS_STORAGE;
+  }
+
+  public static class FirebaseAnalytics.Event {
+    ctor protected FirebaseAnalytics.Event();
+    field public static final String ADD_PAYMENT_INFO = "add_payment_info";
+    field public static final String ADD_SHIPPING_INFO = "add_shipping_info";
+    field public static final String ADD_TO_CART = "add_to_cart";
+    field public static final String ADD_TO_WISHLIST = "add_to_wishlist";
+    field public static final String AD_IMPRESSION = "ad_impression";
+    field public static final String APP_OPEN = "app_open";
+    field public static final String BEGIN_CHECKOUT = "begin_checkout";
+    field public static final String CAMPAIGN_DETAILS = "campaign_details";
+    field public static final String EARN_VIRTUAL_CURRENCY = "earn_virtual_currency";
+    field public static final String GENERATE_LEAD = "generate_lead";
+    field public static final String IN_APP_PURCHASE = "in_app_purchase";
+    field public static final String JOIN_GROUP = "join_group";
+    field public static final String LEVEL_END = "level_end";
+    field public static final String LEVEL_START = "level_start";
+    field public static final String LEVEL_UP = "level_up";
+    field public static final String LOGIN = "login";
+    field public static final String POST_SCORE = "post_score";
+    field public static final String PURCHASE = "purchase";
+    field public static final String REFUND = "refund";
+    field public static final String REMOVE_FROM_CART = "remove_from_cart";
+    field public static final String SCREEN_VIEW = "screen_view";
+    field public static final String SEARCH = "search";
+    field public static final String SELECT_CONTENT = "select_content";
+    field public static final String SELECT_ITEM = "select_item";
+    field public static final String SELECT_PROMOTION = "select_promotion";
+    field public static final String SHARE = "share";
+    field public static final String SIGN_UP = "sign_up";
+    field public static final String SPEND_VIRTUAL_CURRENCY = "spend_virtual_currency";
+    field public static final String TUTORIAL_BEGIN = "tutorial_begin";
+    field public static final String TUTORIAL_COMPLETE = "tutorial_complete";
+    field public static final String UNLOCK_ACHIEVEMENT = "unlock_achievement";
+    field public static final String VIEW_CART = "view_cart";
+    field public static final String VIEW_ITEM = "view_item";
+    field public static final String VIEW_ITEM_LIST = "view_item_list";
+    field public static final String VIEW_PROMOTION = "view_promotion";
+    field public static final String VIEW_SEARCH_RESULTS = "view_search_results";
+  }
+
+  public static class FirebaseAnalytics.Param {
+    ctor protected FirebaseAnalytics.Param();
+    field public static final String ACHIEVEMENT_ID = "achievement_id";
+    field public static final String ACLID = "aclid";
+    field public static final String AD_FORMAT = "ad_format";
+    field public static final String AD_PLATFORM = "ad_platform";
+    field public static final String AD_SOURCE = "ad_source";
+    field public static final String AD_UNIT_NAME = "ad_unit_name";
+    field public static final String AFFILIATION = "affiliation";
+    field public static final String CAMPAIGN = "campaign";
+    field public static final String CAMPAIGN_ID = "campaign_id";
+    field public static final String CHARACTER = "character";
+    field public static final String CONTENT = "content";
+    field public static final String CONTENT_TYPE = "content_type";
+    field public static final String COUPON = "coupon";
+    field public static final String CP1 = "cp1";
+    field public static final String CREATIVE_FORMAT = "creative_format";
+    field public static final String CREATIVE_NAME = "creative_name";
+    field public static final String CREATIVE_SLOT = "creative_slot";
+    field public static final String CURRENCY = "currency";
+    field public static final String DESTINATION = "destination";
+    field public static final String DISCOUNT = "discount";
+    field public static final String END_DATE = "end_date";
+    field public static final String EXTEND_SESSION = "extend_session";
+    field public static final String FLIGHT_NUMBER = "flight_number";
+    field public static final String FREE_TRIAL = "free_trial";
+    field public static final String GROUP_ID = "group_id";
+    field public static final String INDEX = "index";
+    field public static final String ITEMS = "items";
+    field public static final String ITEM_BRAND = "item_brand";
+    field public static final String ITEM_CATEGORY = "item_category";
+    field public static final String ITEM_CATEGORY2 = "item_category2";
+    field public static final String ITEM_CATEGORY3 = "item_category3";
+    field public static final String ITEM_CATEGORY4 = "item_category4";
+    field public static final String ITEM_CATEGORY5 = "item_category5";
+    field public static final String ITEM_ID = "item_id";
+    field public static final String ITEM_LIST_ID = "item_list_id";
+    field public static final String ITEM_LIST_NAME = "item_list_name";
+    field public static final String ITEM_NAME = "item_name";
+    field public static final String ITEM_VARIANT = "item_variant";
+    field public static final String LEVEL = "level";
+    field public static final String LEVEL_NAME = "level_name";
+    field public static final String LOCATION = "location";
+    field public static final String LOCATION_ID = "location_id";
+    field public static final String MARKETING_TACTIC = "marketing_tactic";
+    field public static final String MEDIUM = "medium";
+    field public static final String METHOD = "method";
+    field public static final String NUMBER_OF_NIGHTS = "number_of_nights";
+    field public static final String NUMBER_OF_PASSENGERS = "number_of_passengers";
+    field public static final String NUMBER_OF_ROOMS = "number_of_rooms";
+    field public static final String ORIGIN = "origin";
+    field public static final String PAYMENT_TYPE = "payment_type";
+    field public static final String PRICE = "price";
+    field public static final String PRICE_IS_DISCOUNTED = "price_is_discounted";
+    field public static final String PRODUCT_ID = "product_id";
+    field public static final String PRODUCT_NAME = "product_name";
+    field public static final String PROMOTION_ID = "promotion_id";
+    field public static final String PROMOTION_NAME = "promotion_name";
+    field public static final String QUANTITY = "quantity";
+    field public static final String SCORE = "score";
+    field public static final String SCREEN_CLASS = "screen_class";
+    field public static final String SCREEN_NAME = "screen_name";
+    field public static final String SEARCH_TERM = "search_term";
+    field public static final String SHIPPING = "shipping";
+    field public static final String SHIPPING_TIER = "shipping_tier";
+    field public static final String SOURCE = "source";
+    field public static final String SOURCE_PLATFORM = "source_platform";
+    field public static final String START_DATE = "start_date";
+    field public static final String SUBSCRIPTION = "subscription";
+    field public static final String SUCCESS = "success";
+    field public static final String TAX = "tax";
+    field public static final String TERM = "term";
+    field public static final String TRANSACTION_ID = "transaction_id";
+    field public static final String TRAVEL_CLASS = "travel_class";
+    field public static final String VALUE = "value";
+    field public static final String VIRTUAL_CURRENCY_NAME = "virtual_currency_name";
+  }
+
+  public static class FirebaseAnalytics.UserProperty {
+    ctor protected FirebaseAnalytics.UserProperty();
+    field public static final String ALLOW_AD_PERSONALIZATION_SIGNALS = "allow_personalized_ads";
+    field public static final String SIGN_UP_METHOD = "sign_up_method";
+  }
+
+  public class GoogleAnalyticsServerPreviewActivity extends android.app.Activity {
+    ctor public GoogleAnalyticsServerPreviewActivity();
+    method public void onCreate(android.os.Bundle);
+  }
+
+  public final class ParametersBuilder {
+    ctor public ParametersBuilder();
+    method public final android.os.Bundle getBundle();
+    method public final void param(String, double);
+    method public final void param(String, long);
+    method public final void param(String, android.os.Bundle);
+    method public final void param(String, String);
+    method public final void param(String, android.os.Bundle[]);
+  }
+
+}
+
+package com.google.firebase.analytics.connector {
+
+  public class AnalyticsConnectorImpl implements com.google.firebase.analytics.connector.AnalyticsConnector {
+  }
+
+}
+
+package com.google.firebase.analytics.ktxtesting {
+
+  public final class TestingKt {
+    method public static final void withAnalyticsForTest(com.google.firebase.analytics.FirebaseAnalytics, kotlin.jvm.functions.Function0);
+  }
+
+}
+

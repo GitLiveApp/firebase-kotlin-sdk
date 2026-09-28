@@ -14,7 +14,7 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/2.7.0/pom)                   | [![16%](https://img.shields.io/badge/-16%25-orange?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
+| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/2.7.0/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.7.0/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.7.0/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
@@ -123,8 +123,13 @@ FirebaseInstallations.getInstance().getId()
 val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations` and `firebase-analytics`; the other modules are migrated one by one. `firebase-analytics` also provides
+the subset of `android.os.Bundle` that events are built from (`putString`, `putLong`, `putDouble`, nested bundles and the
+`items` array), so `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
+`logEvent(name, Bundle().apply { putString(...) })` work in common code. On the JVM analytics is a no-op, as the
+[Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) has no analytics; on JS the session timeout, session ID
+and analytics data reset do nothing, as the JS SDK has no equivalent. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
