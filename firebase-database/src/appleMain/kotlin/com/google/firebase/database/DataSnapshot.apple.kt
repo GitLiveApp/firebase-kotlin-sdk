@@ -68,5 +68,15 @@ public actual class MutableData internal constructor(public val ios: FIRMutableD
     override fun toString(): String = "MutableData(key=$key, value=$value)"
 }
 
-/** The iOS SDK's `NSNull` is the absence of data. */
-private fun Any?.fromIos(): Any? = takeIf { it !is NSNull }
+/**
+ * The iOS SDK's values as Kotlin ones: `NSNull` is the absence of data, and a `char` `NSNumber` (a Kotlin `Byte`, the
+ * SDK's boolean, which Kotlin/Native only maps to `Boolean` for the CFBoolean singletons) is a boolean, also inside
+ * nested dictionaries and arrays.
+ */
+private fun Any?.fromIos(): Any? = when (this) {
+    null, is NSNull -> null
+    is Byte -> this != 0.toByte()
+    is Map<*, *> -> entries.associate { (key, value) -> key.toString() to value.fromIos() }
+    is List<*> -> map { it.fromIos() }
+    else -> this
+}
