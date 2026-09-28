@@ -1,0 +1,19 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-storage.
+com.google.firebase.storage.StreamDownloadTask*  // @platform streams to a java.io.InputStream (JVM-only)
+com.google.firebase.storage.StorageReference#getStream  // @platform returns a StreamDownloadTask (java.io.InputStream)
+com.google.firebase.storage.StorageReference#putStream  // @platform java.io.InputStream
+com.google.firebase.storage.StorageReference#putFile(Uri, StorageMetadata, Uri)  // @platform resumes an upload session of the Android SDK
+com.google.firebase.storage.StorageKt#component1(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
+com.google.firebase.storage.StorageKt#component2(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
+com.google.firebase.storage.StorageKt#component3(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
+com.google.firebase.storage.StorageKt#component4(UploadTask.TaskSnapshot)  // @platform android.net.Uri; the upload session is the uploadSessionUri String extension
+com.google.firebase.storage.StorageException#fromErrorStatus  // @platform com.google.android.gms.common.api.Status
+com.google.firebase.storage.StorageTask#getResult(Class)  // @platform java.lang.Class
+com.google.firebase.storage.StorageTask#syncObject  // @hide a protected lock, not an API
+com.google.firebase.storage.*Task#add*Listener(Activity, *)  // @platform android.app.Activity
+com.google.firebase.storage.*Task#add*Listener(Executor, *)  // @platform java.util.concurrent.Executor
+com.google.firebase.storage.StorageTask#continueWith(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.storage.StorageTask#continueWithTask(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.storage.StorageTask#onSuccessTask(Executor, SuccessContinuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.storage.FirebaseStorage#getMaxChunkUploadRetry  // Android-only: the Apple and JS SDKs have no chunk retry setting
+com.google.firebase.storage.FirebaseStorage#setMaxChunkUploadRetry  // Android-only, see above
