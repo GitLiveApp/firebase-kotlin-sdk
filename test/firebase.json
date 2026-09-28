@@ -29,6 +29,12 @@
     },
     "storage": {
       "port": 9199
+    },
+    "dataconnect": {
+      "port": 9399
     }
+  },
+  "dataconnect": {
+    "source": "dataconnect"
   }
 }

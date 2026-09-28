@@ -63,10 +63,12 @@ object AndroidSdkApiTxtParser {
         if (visibility != "public" && visibility != "protected") return null
         rest = words.getOrElse(1) { "" }
         var isStatic = false
+        var isFinal = false
         while (true) {
             val modifier = rest.substringBefore(' ')
             if (modifier in setOf("static", "final", "abstract", "default", "synchronized", "native", "open", "inline", "operator", "infix", "suspend")) {
                 if (modifier == "static") isStatic = true
+                if (modifier == "final") isFinal = true
                 rest = rest.substringAfter(' ').trim()
             } else {
                 break
@@ -91,7 +93,7 @@ object AndroidSdkApiTxtParser {
                 val name = declaration.substringAfterLast(' ')
                 if (name == "Companion") return null // Kotlin companion holder, not part of the API surface
                 val type = TypeNames.fromApiTxt(declaration.substringBeforeLast(' '))
-                ApiMember(ApiMember.Kind.FIELD, name, emptyList(), type, isStatic || kind == "enum_constant", deprecated)
+                ApiMember(ApiMember.Kind.FIELD, name, emptyList(), type, isStatic || kind == "enum_constant", deprecated, isFinal = isFinal || kind == "enum_constant")
             }
             "property" -> {
                 // Kotlin property: represented by its getter, which the BCV dump also shows.
@@ -120,8 +122,8 @@ object AndroidSdkApiTxtParser {
         }
         params += current.toString()
         return params.map { param ->
-            // "Type name" or "Type" (metalava may include parameter names)
-            val cleaned = annotation.replace(param.trim(), "").trim()
+            // "Type name", "Type" or "Type name = default" (metalava includes the names, and the defaults, of Kotlin parameters)
+            val cleaned = annotation.replace(param.trim(), "").substringBefore(" = ").trim()
             val type = cleaned.split(Regex("\\s+")).let { if (it.size > 1 && !cleaned.endsWith("...") && !cleaned.endsWith("]")) it.dropLast(1).joinToString(" ") else if (it.size > 1 && it.last().none { ch -> ch == '[' || ch == '.' }) it.dropLast(1).joinToString(" ") else cleaned }
             TypeNames.fromApiTxt(type)
         }

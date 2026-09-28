@@ -131,14 +131,18 @@ subprojects {
             "androidMainApi"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
+            // Modules without a JVM target (firebase-dataconnect: firebase-java-sdk has no Data Connect) have no jvm configurations.
+            val hasJvm = configurations.findByName("jvmMainApi") != null
             if (this@afterEvaluate.name != "firebase-crashlytics") {
-                "jvmMainApi"(libs.gitlive.firebase.java.sdk)
-                "jvmMainApi"(libs.kotlinx.coroutines.play.services) {
-                    exclude("com.google.android.gms")
+                if (hasJvm) {
+                    "jvmMainApi"(libs.gitlive.firebase.java.sdk)
+                    "jvmMainApi"(libs.kotlinx.coroutines.play.services) {
+                        exclude("com.google.android.gms")
+                    }
+                    "jvmTestImplementation"(kotlin("test-junit"))
+                    "jvmTestImplementation"(libs.junit)
                 }
                 "jsTestImplementation"(kotlin("test-js"))
-                "jvmTestImplementation"(kotlin("test-junit"))
-                "jvmTestImplementation"(libs.junit)
             }
             "androidInstrumentedTestImplementation"(kotlin("test-junit"))
             "androidUnitTestImplementation"(kotlin("test-junit"))
