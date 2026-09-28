@@ -22,4 +22,9 @@ final class FirebaseAppStatics {
     static FirebaseOptions fromResource(Context context) {
         return FirebaseOptions.fromResource(context);
     }
+
+    /** {@code delete()} is deprecated with an error in the header stub so that common code uses {@code deleteApp()}. */
+    static void delete(FirebaseApp app) {
+        app.delete();
+    }
 }

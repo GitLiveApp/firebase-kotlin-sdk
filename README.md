@@ -18,13 +18,13 @@ The following libraries are available for the various Firebase products.
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.7.0/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.7.0/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![63%](https://img.shields.io/badge/-63%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![93%](https://img.shields.io/badge/-93%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
 | [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/2.7.0/pom)         | [![5%](https://img.shields.io/badge/-5%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
 | [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/2.7.0/pom)             | [![64%](https://img.shields.io/badge/-64%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/2.7.0/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
 | [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/2.7.0/pom)               | [![49%](https://img.shields.io/badge/-49%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
 | [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/2.7.0/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.7.0/pom)     | [![88%](https://img.shields.io/badge/-88%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.7.0/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -56,7 +56,13 @@ platform's entry point:
 
 ```kotlin
 // commonMain
-fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.getApps
+import com.google.firebase.initialize
+
+fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.getApps(context).firstOrNull() ?: Firebase.initialize(
     context,
     FirebaseOptions(
         applicationId = "1:846484016111:web:abc123",
@@ -97,20 +103,19 @@ initializeFirebase(Application())
 ```
 
 `Firebase.initialize(context, options, name)` initialises an additional named app and `Firebase.app(name)` returns it;
-`Firebase.apps(context)` lists the initialised apps and `FirebaseApp.delete()` removes one. The default app is named
-`FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the underlying SDKs use different names for it.
-
-Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)`: the same
-three overloads exist there with the context typed as `Any?`, following the rules above per platform.
+`Firebase.getApps(context)` lists the initialised apps and `FirebaseApp.deleteApp()` removes one (a `Task` that completes
+once the app is gone). The default app is named `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the
+underlying SDKs use different names for it. These are the `com.google.firebase` declarations; the same names exist in
+`dev.gitlive.firebase` from earlier versions (with a `FirebaseOptions` data class), deprecated in favour of them.
 
 
 
 ### Using the Firebase Android SDK API from common code
 
-Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
-`com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
-(including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
-in common code targeting Android, iOS, JVM and JS:
+The SDK ships the Firebase Android SDK API itself under its original `com.google.firebase` packages, as `expect` declarations
+implemented on every platform. Code written against the Android SDK (including `com.google.android.gms.tasks.Task` and its
+listeners) therefore compiles unchanged, without even changing imports, in common code targeting Android, iOS, JVM and JS. For
+the migrated modules this is the primary API; the `dev.gitlive.firebase` packages add Kotlin-first extensions on top of it:
 
 ```kotlin
 import com.google.firebase.installations.FirebaseInstallations
@@ -123,8 +128,16 @@ FirebaseInstallations.getInstance().getId()
 val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+Where a `com.google.firebase` member is unusable from common code, the layer itself provides the multiplatform form:
+`FirebaseOptions(applicationId = ..., apiKey = ...)` instead of the `Builder`, `deleteApp()` instead of `delete()`,
+`Timestamp(instant)` instead of `Timestamp(Date)`. The earlier `dev.gitlive.firebase` wrappers of a migrated module that only
+delegate to this layer (`Firebase.initialize`, `Firebase.app`, `Firebase.apps`, `Firebase.options`, the `FirebaseOptions` data
+class, the `FirebaseApp`, `FirebaseInstallations`, `FirebaseCrashlytics` and `FirebaseFunctions` wrappers and their `Firebase.x`
+accessors) are deprecated with a `ReplaceWith` naming the counterpart; members reached through a wrapper instance are not,
+since `app.compat.name` is no improvement on `app.name`.
+
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations`, `firebase-crashlytics` and `firebase-functions`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
@@ -157,7 +170,9 @@ cocoapods {
 
 ## Kotlin-first design
 
-Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get the full power of Kotlin including coroutines and serialization!
+The `dev.gitlive.firebase` packages complement the Android SDK API with the full power of Kotlin, including coroutines and
+serialization. In a migrated module they are extensions of the `com.google.firebase` classes; in the other modules they are
+the `dev.gitlive` API described here, until the module is migrated.
 
 <h3><a href="https://kotlinlang.org/docs/tutorials/coroutines/async-programming.html#coroutines">Suspending functions</a></h3>
 

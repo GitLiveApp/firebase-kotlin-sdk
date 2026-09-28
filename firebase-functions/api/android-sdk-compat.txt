@@ -1,0 +1,80 @@
+# Android SDK source compatibility of firebase-functions
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 93% of 60 public members available (50 identical, 6 mapped, 0 missing, 4 omitted)
+#
+com.google.firebase.functions.FirebaseFunctions
+  OK    HttpsCallableReference getHttpsCallable(String)
+  OK    HttpsCallableReference getHttpsCallable(String, HttpsCallableOptions)
+  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL)  [extension function, URL -> String]
+  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)  [extension function, URL -> String]
+  OK    static FirebaseFunctions getInstance()
+  OK    static FirebaseFunctions getInstance(FirebaseApp)
+  OK    static FirebaseFunctions getInstance(String)
+  OK    static FirebaseFunctions getInstance(FirebaseApp, String)
+  OK    void useEmulator(String, int)
+  SKIP  void useFunctionsEmulator(String)
+com.google.firebase.functions.FirebaseFunctions.Companion
+  OK    FirebaseFunctions getInstance()
+  OK    FirebaseFunctions getInstance(FirebaseApp)
+  OK    FirebaseFunctions getInstance(String)
+  OK    FirebaseFunctions getInstance(FirebaseApp, String)
+com.google.firebase.functions.FirebaseFunctionsException
+  OK    Code getCode()
+  OK    Object getDetails()
+com.google.firebase.functions.FirebaseFunctionsException.Code
+  OK    static Code fromHttpStatus(int)
+  OK    static Code fromValue(int)
+  OK    static Code ABORTED
+  OK    static Code ALREADY_EXISTS
+  OK    static Code CANCELLED
+  OK    static Code DATA_LOSS
+  OK    static Code DEADLINE_EXCEEDED
+  OK    static Code FAILED_PRECONDITION
+  OK    static Code INTERNAL
+  OK    static Code INVALID_ARGUMENT
+  OK    static Code NOT_FOUND
+  OK    static Code OK
+  OK    static Code OUT_OF_RANGE
+  OK    static Code PERMISSION_DENIED
+  OK    static Code RESOURCE_EXHAUSTED
+  OK    static Code UNAUTHENTICATED
+  OK    static Code UNAVAILABLE
+  OK    static Code UNIMPLEMENTED
+  OK    static Code UNKNOWN
+com.google.firebase.functions.FirebaseFunctionsException.Code.Companion
+  OK    Code fromHttpStatus(int)
+  OK    Code fromValue(int)
+com.google.firebase.functions.FunctionsKt
+  OK    static FirebaseFunctions functions(Firebase, FirebaseApp)
+  OK    static FirebaseFunctions functions(Firebase, String)
+  OK    static FirebaseFunctions functions(Firebase, FirebaseApp, String)
+  OK    static FirebaseFunctions getFunctions(Firebase)
+  OK    static HttpsCallableReference getHttpsCallable(FirebaseFunctions, String, Function1)
+  MAP   static HttpsCallableReference getHttpsCallableFromUrl(FirebaseFunctions, URL, Function1)  [URL -> String]
+com.google.firebase.functions.HttpsCallableOptions
+  OK    boolean getLimitedUseAppCheckTokens()
+  OK    boolean limitedUseAppCheckTokens
+com.google.firebase.functions.HttpsCallableOptions.Builder
+  OK    Builder()
+  OK    HttpsCallableOptions build()
+  OK    boolean getLimitedUseAppCheckTokens()
+  OK    Builder setLimitedUseAppCheckTokens(boolean)
+  OK    boolean limitedUseAppCheckTokens
+com.google.firebase.functions.HttpsCallableReference
+  OK    Task call()
+  OK    Task call(Object)
+  OK    long getTimeout()
+  MAP   void setTimeout(long, TimeUnit)  [TimeUnit -> Object, deprecated: setTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; use setTimeout(timeout) with a kotlin.time.Duration from common code]
+  PLAT  Publisher stream()
+  PLAT  Publisher stream(Object data =)
+  MAP   HttpsCallableReference withTimeout(long, TimeUnit)  [TimeUnit -> Object, deprecated: withTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; use withTimeout(timeout) with a kotlin.time.Duration from common code]
+com.google.firebase.functions.HttpsCallableResult
+  OK    Object getData()
+  MAP   Object data  [property getData()]
+com.google.firebase.functions.StreamResponse  (class omitted)
+com.google.firebase.functions.StreamResponse.Message  (class omitted)
+  OMIT  Message(HttpsCallableResult)
+  OMIT  HttpsCallableResult getMessage()
+com.google.firebase.functions.StreamResponse.Result  (class omitted)
+  OMIT  Result(HttpsCallableResult)
+  OMIT  HttpsCallableResult getResult()
