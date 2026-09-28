@@ -1,31 +1,17 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.gitlive.firebase.messaging
 
-import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.messaging.externals.Messaging
-import dev.gitlive.firebase.messaging.externals.getMessaging
-import kotlinx.coroutines.await
+import com.google.firebase.messaging.FirebaseMessaging as CompatFirebaseMessaging
 
-public actual val Firebase.messaging: FirebaseMessaging
-    get() = FirebaseMessaging(getMessaging())
+/** The underlying Firebase JS SDK object. */
+public val FirebaseMessaging.js: Messaging get() = compat.js
 
-public val FirebaseMessaging.js: Messaging get() = js
+// This is not supported in the JS SDK
+// https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging
+internal actual fun CompatFirebaseMessaging.subscribeToTopicOrThrow(topic: String): Unit = throw NotImplementedError("Subscribing to topics is not supported in the JS SDK")
 
-public actual class FirebaseMessaging(internal val js: Messaging) {
-    public actual fun subscribeToTopic(topic: String) {
-        // This is not supported in the JS SDK
-        // https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging
-        throw NotImplementedError("Subscribing to topics is not supported in the JS SDK")
-    }
-
-    public actual fun unsubscribeFromTopic(topic: String) {
-        // This is not supported in the JS SDK
-        // https://firebase.google.com/docs/reference/js/messaging_.md#@firebase/messaging
-        throw NotImplementedError("Unsubscribing from topics is not supported in the JS SDK")
-    }
-
-    public actual suspend fun getToken(): String = dev.gitlive.firebase.messaging.externals.getToken(js).await()
-
-    public actual suspend fun deleteToken() {
-        dev.gitlive.firebase.messaging.externals.deleteToken(js).await()
-    }
-}
+internal actual fun CompatFirebaseMessaging.unsubscribeFromTopicOrThrow(topic: String): Unit = throw NotImplementedError("Unsubscribing from topics is not supported in the JS SDK")

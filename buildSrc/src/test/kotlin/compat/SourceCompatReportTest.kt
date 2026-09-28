@@ -193,6 +193,70 @@ class SourceCompatReportTest {
     }
 
     @Test
+    fun mapsFieldsToPropertiesAndMethodsToExtensions() {
+        val apiTxt = """
+            package com.google.firebase.functions {
+              public final class FirebaseFunctions {
+                method public com.google.firebase.functions.HttpsCallableReference getHttpsCallable(String name);
+                method public com.google.firebase.functions.HttpsCallableReference getHttpsCallableFromUrl(java.net.URL url);
+                method public com.google.firebase.functions.HttpsCallableReference getHttpsCallableFromUrl(java.net.URL url, com.google.firebase.functions.HttpsCallableOptions options);
+              }
+              public final class HttpsCallableReference {
+                method public long getTimeout();
+                method public void setTimeout(long timeout, java.util.concurrent.TimeUnit units);
+                property public final long timeout;
+              }
+              public final class HttpsCallableResult {
+                method public Object? getData();
+                field public final Object? data;
+              }
+              public static final class HttpsCallableOptions.Builder {
+                method public boolean getLimitedUseAppCheckTokens();
+                field public boolean limitedUseAppCheckTokens;
+                field public boolean other;
+              }
+              public final class FunctionsKt {
+                method public static com.google.firebase.functions.HttpsCallableReference getHttpsCallableFromUrl(com.google.firebase.functions.FirebaseFunctions, java.net.URL url, kotlin.jvm.functions.Function1<? super com.google.firebase.functions.HttpsCallableOptions.Builder,kotlin.Unit> init);
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public final class com/google/firebase/functions/FirebaseFunctions {
+            	public final fun getHttpsCallable (Ljava/lang/String;)Lcom/google/firebase/functions/HttpsCallableReference;
+            }
+
+            public final class com/google/firebase/functions/FunctionsUrlKt {
+            	public static final fun getHttpsCallableFromUrl (Lcom/google/firebase/functions/FirebaseFunctions;Ljava/lang/String;)Lcom/google/firebase/functions/HttpsCallableReference;
+            	public static final fun getHttpsCallableFromUrl (Lcom/google/firebase/functions/FirebaseFunctions;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/functions/HttpsCallableReference;
+            }
+
+            public final class com/google/firebase/functions/HttpsCallableReference {
+            	public final fun getTimeout ()J
+            	public final fun setTimeout (JLjava/lang/Object;)V  // deprecated: use setTimeout(Duration)
+            }
+
+            public final class com/google/firebase/functions/HttpsCallableResult {
+            	public final fun getData ()Ljava/lang/Object;
+            }
+
+            public final class com/google/firebase/functions/HttpsCallableOptions${'$'}Builder {
+            	public final fun getLimitedUseAppCheckTokens ()Z
+            	public final fun getOther ()Z
+            	public final fun setLimitedUseAppCheckTokens (Z)Lcom/google/firebase/functions/HttpsCallableOptions${'$'}Builder;
+            }
+        """.trimIndent()
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
+        assertTrue(report.contains("MAP   HttpsCallableReference getHttpsCallableFromUrl(URL)  [extension function, URL -> String]"), report)
+        assertTrue(report.contains("MISS  HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)"), report)
+        assertTrue(report.contains("MAP   static HttpsCallableReference getHttpsCallableFromUrl(FirebaseFunctions, URL, Function1)  [URL -> String]"), report)
+        assertTrue(report.contains("MAP   void setTimeout(long, TimeUnit)  [TimeUnit -> Object, deprecated: use setTimeout(Duration)]"), report)
+        assertTrue(report.contains("MAP   Object data  [property getData()]"), report)
+        assertTrue(report.contains("MAP   boolean limitedUseAppCheckTokens  [property getLimitedUseAppCheckTokens()]"), report)
+        assertTrue(report.contains("MISS  boolean other  [read-only property in this SDK]"), report)
+        assertTrue(report.contains("# 81% of 11 public members available (4 identical, 5 mapped, 2 missing, 0 omitted)"), report)
+    }
+
+    @Test
     fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",
