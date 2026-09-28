@@ -15,7 +15,7 @@ The following libraries are available for the various Firebase products.
 | Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/2.7.0/pom)                   | [![16%](https://img.shields.io/badge/-16%25-orange?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
 | [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.7.0/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.7.0/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
 | [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![63%](https://img.shields.io/badge/-63%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
@@ -123,8 +123,12 @@ FirebaseInstallations.getInstance().getId()
 val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations` and `firebase-auth`; the other modules are migrated one by one. A member marked `@unavailable` in a
+module's `api/android-sdk/exclusions.txt` (such as Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out
+of the coverage count. On the JVM the layer binds to the [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk),
+which ports only part of the Android auth API; the members it lacks are listed in `firebase-auth/api/jvm/firebase-java-sdk-missing.txt`
+and fail with a `NoSuchMethodError` or `NoClassDefFoundError` when called on the JVM. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
