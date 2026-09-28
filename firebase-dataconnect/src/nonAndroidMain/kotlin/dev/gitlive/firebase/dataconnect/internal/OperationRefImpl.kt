@@ -4,7 +4,6 @@
 
 package dev.gitlive.firebase.dataconnect.internal
 
-import com.google.firebase.dataconnect.DataConnectException
 import com.google.firebase.dataconnect.DataSource
 import com.google.firebase.dataconnect.FirebaseDataConnect
 import com.google.firebase.dataconnect.MutationRef
@@ -41,6 +40,12 @@ internal abstract class OperationRefImpl<Data, Variables>(
 
     internal fun decode(data: JsonElement): Data = decodeData(data, dataDeserializer, dataSerializersModule)
 
+    /** Decodes the data the SDK returned, or maps the failure it reported, into this reference's types. */
+    internal fun decodeResult(result: Result<JsonElement>): Data = result.fold(
+        onSuccess = { decodeData(operationName, it, ::decode) },
+        onFailure = { throw if (it is NativeOperationFailure) it.toException(operationName, ::decode) else it },
+    )
+
     protected abstract val kind: String
 
     private val identity
@@ -72,11 +77,8 @@ internal class QueryRefImpl<Data, Variables>(
     override suspend fun execute(): QueryResult<Data, Variables> = execute(QueryRef.FetchPolicy.PREFER_CACHE)
 
     override suspend fun execute(fetchPolicy: QueryRef.FetchPolicy): QueryResult<Data, Variables> {
-        val cached = if (fetchPolicy == QueryRef.FetchPolicy.SERVER_ONLY) null else dataConnect.cache[key]
-        if (cached != null) return QueryResultImpl(this, decode(cached), DataSource.CACHE)
-        if (fetchPolicy == QueryRef.FetchPolicy.CACHE_ONLY) throw DataConnectException("no cached data for query $operationName; execute it with another FetchPolicy first")
-        val response = dataConnect.execute(key, mutation = false)
-        return QueryResultImpl(this, response.decodeOrThrow(operationName, ::decode), DataSource.SERVER)
+        val result = runCatching { dataConnect.executeQuery(key, fetchPolicy) }
+        return QueryResultImpl(this, decodeResult(result.map { it.data }), result.getOrThrow().source)
     }
 
     override fun subscribe(): QuerySubscription<Data, Variables> = QuerySubscriptionImpl(this)
@@ -114,10 +116,7 @@ internal class MutationRefImpl<Data, Variables>(
 
     override val kind: String get() = "MutationRef"
 
-    override suspend fun execute(): MutationResult<Data, Variables> {
-        val response = dataConnect.execute(key, mutation = true)
-        return MutationResultImpl(this, response.decodeOrThrow(operationName, ::decode))
-    }
+    override suspend fun execute(): MutationResult<Data, Variables> = MutationResultImpl(this, decodeResult(runCatching { dataConnect.executeMutation(key) }))
 
     override fun copy(
         operationName: String,
@@ -177,12 +176,13 @@ internal class QuerySubscriptionImpl<Data, Variables>(override val query: QueryR
         val collector = launch {
             dataConnect.events
                 .onSubscription {
-                    dataConnect.cache[key]?.let { send(QuerySubscriptionResultImpl(query, runCatching { QueryResultImpl(query, query.decode(it), DataSource.CACHE) })) }
-                    launch { runCatching { dataConnect.execute(key, mutation = false) } }
+                    runCatching { dataConnect.executeQuery(key, QueryRef.FetchPolicy.CACHE_ONLY) }
+                        .onSuccess { cached -> send(QuerySubscriptionResultImpl(query, runCatching { QueryResultImpl(query, query.decodeResult(Result.success(cached.data)), DataSource.CACHE) })) }
+                    launch { runCatching { dataConnect.executeQuery(key, QueryRef.FetchPolicy.SERVER_ONLY) } }
                 }
                 .filter { it.key == key }
                 .collect { event ->
-                    send(QuerySubscriptionResultImpl(query, event.data.mapCatching { QueryResultImpl(query, query.decode(it), DataSource.SERVER) }))
+                    send(QuerySubscriptionResultImpl(query, runCatching { QueryResultImpl(query, query.decodeResult(event.data), DataSource.SERVER) }))
                 }
         }
         awaitClose { collector.cancel() }

@@ -133,11 +133,12 @@ into a shared module, including the compiler-guided replacement of the Android-o
 
 `firebase-dataconnect` provides the whole `com.google.firebase.dataconnect` API of the Firebase Data Connect Android SDK
 (the one Firebase SDK built on kotlinx.serialization: `query(operationName, variables, dataDeserializer, variablesSerializer)`,
-`OptionalVariable`, `EnumValue`, `LocalDate`, `AnyValue` and the `serializers` package) on every platform. On Android the
-Android SDK runs; on the JVM, JS and Apple platforms the module's own implementation calls the Data Connect service over
-REST, as the Firebase JS SDK does, attaching the signed-in user's ID token (the Firebase iOS Data Connect SDK is Swift-only
-and cannot be called from Kotlin, and the Firebase Java SDK has no Data Connect). Those platforms cache query results in
-memory when `CacheSettings` are given (`CacheSettings.Storage.PERSISTENT` behaves like `MEMORY`) and do not send App Check tokens. The
+`OptionalVariable`, `EnumValue`, `LocalDate`, `AnyValue` and the `serializers` package) on Android, iOS, tvOS and JS. On
+Android the Android SDK runs; on JS the Firebase JS SDK's `firebase/data-connect` (`CacheSettings.Storage.PERSISTENT`
+behaves like `MEMORY`, and `DataConnectSettings.host`/`sslEnabled` are ignored, as the JS SDK has no such settings); on
+Apple the Firebase iOS Data Connect SDK, through the small Objective-C wrapper package under `firebase-dataconnect/apple`
+that the Kotlin SwiftPM import builds (the SDK is Swift-only). There is no JVM target, as the Firebase Java SDK has no
+Data Connect. The
 `java.time.LocalDate` conversions, `JavaTimeLocalDateSerializer` and `UUIDSerializer` exist on Android only; common code
 uses `kotlinx.datetime.LocalDate` with `KotlinxDatetimeLocalDateSerializer` and `kotlin.uuid.Uuid` with
 `dev.gitlive.firebase.dataconnect.serializers.UuidSerializer`, which writes the same 32 hexadecimal digits.

@@ -140,6 +140,13 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     /** Names of the class's own non-public fields: they shadow an inherited public constant of the same name. */
     val hiddenFields = mutableSetOf<String>()
 
+    /**
+     * Whether the class has a default-arguments constructor (a synthetic one with a bit mask and a trailing marker), i.e.
+     * a constructor with default values; Kotlin callers of such a constructor go through it, never through the no-arg
+     * convenience constructor the compiler emits for Java callers when every parameter has a default (see [verifyHeaderStubs]).
+     */
+    var hasDefaultArgumentsConstructor = false
+
     override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String?, interfaces: Array<out String>?) {
         this.name = name
         this.access = access
@@ -155,6 +162,7 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
             if (access and Opcodes.ACC_BRIDGE == 0 && !name.contains('$') && name != "<init>") reifiedInlineMethods += Member(name, descriptor, access)
             // A constructor with an inline value class parameter (kotlin.time.Duration) is synthetic too, with a trailing
             // marker parameter (unlike the default-arguments constructor, whose marker follows the bit mask): real API.
+            if (name == "<init>" && descriptor.isDefaultArgumentsConstructor) hasDefaultArgumentsConstructor = true
             if (name != "<init>" || !descriptor.isInlineClassConstructor) return null
         }
         val member = Member(name, descriptor, access).also { methods += it }
@@ -192,7 +200,10 @@ private val kotlinOnlyMethods = setOf("getEntries")
 
 /** The descriptor of a constructor with an inline value class parameter: it ends with a marker that no bit mask precedes. */
 private val String.isInlineClassConstructor: Boolean
-    get() = endsWith("Lkotlin/jvm/internal/DefaultConstructorMarker;)V") && !endsWith("ILkotlin/jvm/internal/DefaultConstructorMarker;)V")
+    get() = endsWith("Lkotlin/jvm/internal/DefaultConstructorMarker;)V") && !isDefaultArgumentsConstructor
+
+/** The descriptor of the synthetic constructor Kotlin calls when default arguments are used: a bit mask, then the marker. */
+private val String.isDefaultArgumentsConstructor: Boolean get() = endsWith("ILkotlin/jvm/internal/DefaultConstructorMarker;)V")
 
 /** Kotlin-generated names (`getX$module` of an internal member, `foo$default`, `access$bar`) that never exist on a Java class. */
 private val String.isKotlinMangled: Boolean get() = contains('$')
@@ -244,6 +255,9 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
                 val match = reals.firstNotNullOfOrNull { candidate -> candidate.methods.firstOrNull { it.signature == member.signature } }
                     ?: reals.firstNotNullOfOrNull { candidate -> candidate.methods.firstOrNull { it.isFluentSetterOf(member) } }
                 when {
+                    // Since Kotlin 2.4 a class whose constructor parameters all have defaults gets a no-arg constructor for
+                    // Java callers; an SDK compiled with an older Kotlin lacks it, and Kotlin callers never bind to it.
+                    match == null && member.signature == "<init>()V" && stub.hasDefaultArgumentsConstructor -> Unit
                     match == null -> problems += "${stub.name}.${member.signature} does not exist on the real class"
                     match.isStatic != member.isStatic -> problems += "${stub.name}.${member.signature} is ${if (match.isStatic) "static" else "not static"} on the real class"
                 }

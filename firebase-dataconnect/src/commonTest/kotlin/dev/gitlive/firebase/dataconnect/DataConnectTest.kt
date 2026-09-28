@@ -43,8 +43,8 @@ import kotlin.uuid.Uuid
 
 /**
  * Executes the operations of the `kotlin` connector of `test/dataconnect` against the Data Connect emulator, through
- * the `com.google.firebase.dataconnect` API only: on Android the Android SDK runs them, elsewhere this module's REST
- * implementation does.
+ * the `com.google.firebase.dataconnect` API only: on Android the Android SDK runs them, on JS the Firebase JS SDK and on
+ * Apple the Firebase iOS Data Connect SDK through this module's Objective-C wrapper.
  */
 @IgnoreForAndroidUnitTest
 class DataConnectTest {

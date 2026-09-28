@@ -6,7 +6,9 @@ package dev.gitlive.firebase.dataconnect.internal
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.dataconnect.ConnectorConfig
+import com.google.firebase.dataconnect.DataConnectException
 import com.google.firebase.dataconnect.DataConnectSettings
+import com.google.firebase.dataconnect.DataSource
 import com.google.firebase.dataconnect.FirebaseDataConnect
 import com.google.firebase.dataconnect.MutationRef
 import com.google.firebase.dataconnect.QueryRef
@@ -33,12 +35,16 @@ internal object DataConnectInstances {
     }
 }
 
-/** A query's identity for the cache and the subscriptions: the operation and its encoded variables. */
+/** A query's identity for the subscriptions: the operation and its encoded variables. */
 internal data class QueryKey(val operationName: String, val variables: JsonObject)
 
 /** An execution of a query on the server, as seen by the subscriptions to equivalent queries. */
 internal class QueryEvent(val key: QueryKey, val data: Result<JsonElement>)
 
+/**
+ * The `com.google.firebase.dataconnect` instance over the platform SDK ([NativeDataConnect]). Like the Android SDK, a
+ * query is only served from the cache when the instance was created with [DataConnectSettings.cacheSettings].
+ */
 internal class FirebaseDataConnectImpl(
     override val app: FirebaseApp,
     override val config: ConnectorConfig,
@@ -46,27 +52,17 @@ internal class FirebaseDataConnectImpl(
     private val onClose: () -> Unit,
 ) : FirebaseDataConnect {
 
-    private var emulator: Pair<String, Int>? = null
+    private val native = NativeDataConnect(app, config, settings)
+    private val cacheEnabled = settings.cacheSettings != null
     private var executed = false
     private var closed = false
-
-    /**
-     * The data the server last returned for each query, kept undecoded so that any deserializer can read it. Like the
-     * Android SDK, the instance only caches when [DataConnectSettings.cacheSettings] is set; the storage is always memory.
-     */
-    internal val cache = mutableMapOf<QueryKey, JsonElement>()
-
-    private val cacheEnabled = settings.cacheSettings != null
 
     /** Every execution of a query on the server, for the subscriptions. */
     internal val events = MutableSharedFlow<QueryEvent>()
 
-    internal val baseUrl: String
-        get() = emulator?.let { (host, port) -> "http://$host:$port" } ?: "${if (settings.sslEnabled) "https" else "http"}://${settings.host}"
-
     override fun useEmulator(host: String, port: Int) {
         check(!executed) { "useEmulator() must be called before any operation is executed" }
-        emulator = host to port
+        native.useEmulator(host, port)
     }
 
     override fun <Data, Variables> query(
@@ -109,23 +105,33 @@ internal class FirebaseDataConnectImpl(
         )
     }
 
-    /** Runs an operation on the server; queries update the cache and notify their subscriptions. */
-    internal suspend fun execute(key: QueryKey, mutation: Boolean): OperationResponse {
-        check(!closed) { "FirebaseDataConnect instance has been closed" }
-        executed = true
-        val response = runCatching { executeOnServer(key.operationName, key.variables, mutation) }
-        if (!mutation) {
-            val data = response.mapCatching { it.data?.takeIf { _ -> it.errors.isEmpty() } ?: throw it.toException(key.operationName) }
-            if (cacheEnabled) data.onSuccess { cache[key] = it }
-            events.emit(QueryEvent(key, data))
+    /** Runs a query on the platform SDK; an execution on the server notifies the subscriptions to equivalent queries. */
+    internal suspend fun executeQuery(key: QueryKey, fetchPolicy: QueryRef.FetchPolicy): NativeQueryResult {
+        checkOpen()
+        val policy = when {
+            cacheEnabled -> fetchPolicy
+            fetchPolicy == QueryRef.FetchPolicy.CACHE_ONLY -> throw DataConnectException("no cached data for query ${key.operationName}: the FirebaseDataConnect instance has no CacheSettings")
+            else -> QueryRef.FetchPolicy.SERVER_ONLY
         }
-        return response.getOrThrow()
+        executed = true
+        val result = runCatching { native.executeQuery(key.operationName, key.variables, policy) }
+        if (result.isFailure || result.getOrThrow().source == DataSource.SERVER) events.emit(QueryEvent(key, result.map { it.data }))
+        return result.getOrThrow()
     }
 
+    internal suspend fun executeMutation(key: QueryKey): JsonElement {
+        checkOpen()
+        executed = true
+        return native.executeMutation(key.operationName, key.variables)
+    }
+
+    private fun checkOpen() = check(!closed) { "FirebaseDataConnect instance has been closed" }
+
     override fun close() {
+        if (closed) return
         closed = true
-        cache.clear()
         onClose()
+        native.close()
     }
 
     override suspend fun suspendingClose() {
@@ -146,6 +152,3 @@ internal class FirebaseDataConnectImpl(
         override var dataSerializersModule: kotlinx.serialization.modules.SerializersModule? = null
     }
 }
-
-/** The exception a response with errors, or without data, decodes to (used for the cache and subscriptions, which keep the raw JSON). */
-private fun OperationResponse.toException(operationName: String): Throwable = runCatching { decodeOrThrow(operationName) { it } }.exceptionOrNull() ?: IllegalStateException("operation $operationName returned no data")

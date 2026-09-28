@@ -51,7 +51,9 @@ fun Project.registerAndroidSourceCompat(vararg androidSdkApiFiles: String, gener
     val configure: AndroidSourceCompatTask.(Boolean) -> Unit = { checkMode ->
         group = "api"
         moduleName.set(project.name)
-        bcvDump.set(layout.projectDirectory.file("api/android/${project.name}.api"))
+        // binary-compatibility-validator writes a module with a single JVM-like target (android without jvm) to api/<module>.api.
+        val androidDump = layout.projectDirectory.file("api/android/${project.name}.api")
+        bcvDump.set(if (androidDump.asFile.parentFile.isDirectory) androidDump else layout.projectDirectory.file("api/${project.name}.api"))
         this.androidSdkApiFiles.from(fileTree(sdkDir) { include("*.api.txt") })
         sdkDir.file("exclusions.txt").takeIf { it.asFile.exists() }?.let { exclusionsFile.set(it) }
         headerStubDumps.from(layout.buildDirectory.file("header-stubs/compileReleaseKotlinAndroid.api"))

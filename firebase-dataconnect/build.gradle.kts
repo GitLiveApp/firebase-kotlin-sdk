@@ -17,7 +17,6 @@ val supportedPlatforms = (project.property("firebase-dataconnect.supportedTarget
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
@@ -103,35 +102,26 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        // Data Connect has no CocoaPods SDK (the iOS SDK is Swift-only and SwiftPM-only); the Apple targets call the service
-        // directly. The FirebaseAuth pod (which brings FirebaseCore) is declared so that the frameworks the firebase-app and
-        // firebase-auth dependencies link against are built and found when this module's test binaries are linked.
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseDataConnect"
-            }
-            noPodspec()
-            pod("FirebaseAuth") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        // The Firebase iOS Data Connect SDK is Swift-only, which Kotlin/Native cannot import, so the Apple targets import the
+        // local Swift package under apple/, which wraps it in an Objective-C API (the workaround JetBrains recommends for
+        // Swift-only packages). The package depends on the Data Connect SDK, which depends on firebase-ios-sdk; the shared
+        // Package.resolved keeps the latter at the version the other modules import.
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            localSwiftPackage(
+                directory = layout.projectDirectory.dir("apple/FirebaseDataConnectObjC"),
+                products = listOf("FirebaseDataConnectObjC"),
+            )
         }
     }
 
@@ -194,20 +184,19 @@ kotlin {
             }
         }
 
-        // The Android SDK is the only Data Connect SDK with a Kotlin API (the iOS SDK is Swift-only, the JVM SDK has none),
-        // so every other target ships the module's own implementation over the Data Connect REST service, which encodes
-        // variables and decodes data with kotlinx-serialization-json and attaches the signed-in user's ID token.
+        // JS and Apple run the Firebase JS SDK and the Firebase iOS Data Connect SDK; variables and data cross to them as
+        // JSON, encoded and decoded with kotlinx-serialization-json, which stays out of the common API. There is no JVM
+        // target: firebase-java-sdk has no Data Connect.
         getByName("nonAndroidMain") {
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
-                implementation(project(":firebase-auth"))
             }
         }
     }
 }
 
 // The com.google.firebase.dataconnect classes are header stubs on Android, verified against the Data Connect SDK and stripped;
-// firebase-java-sdk has no Data Connect, so on the JVM (as on the other platforms) they are the module's own implementation.
+// on the other platforms they are the module's own classes over the platform SDK (there is no JVM target).
 stripHeaderStubs(
     packageDirs = listOf("com/google/firebase/dataconnect"),
     androidReferenceJars = files({

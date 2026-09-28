@@ -4,8 +4,10 @@
 
 package dev.gitlive.firebase.dataconnect
 
-import kotlin.test.Ignore
+import org.junit.Ignore
 
 actual val emulatorHost: String = "10.0.2.2"
 actual val context: Any = ""
+
+// org.junit.Ignore itself: kotlin.test.Ignore is a type alias on the JVM, which an actual type alias may not point to.
 actual typealias IgnoreForAndroidUnitTest = Ignore
