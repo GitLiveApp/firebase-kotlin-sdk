@@ -71,6 +71,7 @@ public external fun onValue(
     query: Query,
     callback: ValueSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
+    options: Any? = definedExternally,
 ): Unsubscribe
 
 public external fun onDisconnect(ref: DatabaseReference): OnDisconnect
@@ -78,6 +79,8 @@ public external fun onDisconnect(ref: DatabaseReference): OnDisconnect
 public external fun orderByChild(path: String): QueryConstraint
 
 public external fun orderByKey(): QueryConstraint
+
+public external fun orderByPriority(): QueryConstraint
 
 public external fun orderByValue(): QueryConstraint
 
@@ -87,11 +90,17 @@ public external fun query(query: Query, vararg queryConstraints: QueryConstraint
 
 public external fun ref(db: Database, path: String? = definedExternally): DatabaseReference
 
+public external fun refFromURL(db: Database, url: String): DatabaseReference
+
 public external fun remove(ref: DatabaseReference): Promise<Unit>
 
 public external fun serverTimestamp(): Any
 
 public external fun set(ref: DatabaseReference, value: Any?): Promise<Unit>
+
+public external fun setPriority(ref: DatabaseReference, priority: Any?): Promise<Unit>
+
+public external fun setWithPriority(ref: DatabaseReference, value: Any?, priority: Any?): Promise<Unit>
 
 public external fun startAfter(value: Any?, key: String? = definedExternally): QueryConstraint
 
@@ -111,6 +120,7 @@ public external interface Database {
 
 public external interface Query {
     public val ref: DatabaseReference
+    public fun isEqual(other: Query?): Boolean
 }
 
 public external interface QueryConstraint
@@ -125,12 +135,15 @@ public external interface ThenableReference : DatabaseReference
 
 public external interface DataSnapshot {
     public val key: String?
+    public val priority: Any?
     public val size: Int
     public val ref: DatabaseReference
     public fun `val`(): Any
+    public fun exportVal(): Any?
     public fun exists(): Boolean
     public fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
     public fun child(path: String): DataSnapshot
+    public fun hasChild(path: String): Boolean
     public fun hasChildren(): Boolean
 }
 
@@ -138,6 +151,7 @@ public external interface OnDisconnect {
     public fun cancel(): Promise<Unit>
     public fun remove(): Promise<Unit>
     public fun set(value: Any?): Promise<Unit>
+    public fun setWithPriority(value: Any?, priority: Any?): Promise<Unit>
     public fun update(value: Any): Promise<Unit>
 }
 

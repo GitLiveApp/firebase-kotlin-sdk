@@ -1,0 +1,3 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-database.
+com.google.firebase.database.DataSnapshot#getValue(Class)  // @platform java.lang.Class: reflective mapping to custom classes is Android-only
+com.google.firebase.database.MutableData#getValue(Class)  // @platform java.lang.Class: reflective mapping to custom classes is Android-only
