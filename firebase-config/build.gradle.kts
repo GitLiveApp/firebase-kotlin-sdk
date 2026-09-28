@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -52,6 +55,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -179,6 +183,27 @@ kotlin {
         }
     }
 }
+
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // The nonJsMain extensions binding to the SDK's real-time update and custom signal members are shipped.
+    keepClasses = listOf("com/google/firebase/remoteconfig/RemoteConfigNonJsKt.class"),
+    // firebase-java-sdk has no custom signals.
+    jvmMissingMembers = listOf(
+        "com/google/firebase/remoteconfig/CustomSignals",
+        "com/google/firebase/remoteconfig/CustomSignals\$Builder",
+        "com/google/firebase/remoteconfig/FirebaseRemoteConfig.setCustomSignals(Lcom/google/firebase/remoteconfig/CustomSignals;)Lcom/google/android/gms/tasks/Task;",
+        "com/google/firebase/remoteconfig/RemoteConfigUpdatesKt.customSignals(Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/remoteconfig/CustomSignals;",
+    ),
+)
+
+registerAndroidSourceCompat("firebase-config/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

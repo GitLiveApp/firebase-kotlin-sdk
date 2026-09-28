@@ -1,133 +1,122 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.gitlive.firebase.remoteconfig
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
+import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig as CompatFirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo as CompatFirebaseRemoteConfigInfo
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings as CompatFirebaseRemoteConfigSettings
+import com.google.firebase.remoteconfig.remoteConfig as compatRemoteConfig
+
+// The Android-SDK-shaped entry points are reached through the `Firebase.remoteConfig` extensions (RemoteConfigKt),
+// which are real static methods on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebaseRemoteConfig] instance of the default [FirebaseApp]. */
-public expect val Firebase.remoteConfig: FirebaseRemoteConfig
+public val Firebase.remoteConfig: FirebaseRemoteConfig
+    get() = FirebaseRemoteConfig(com.google.firebase.Firebase.compatRemoteConfig)
 
 /** Returns the [FirebaseRemoteConfig] instance of a given [FirebaseApp]. */
-public expect fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig
+public fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(com.google.firebase.Firebase.compatRemoteConfig(app.compat))
 
 /**
  * Entry point for the Firebase Remote Config API.
  *
- * Callers should first get the singleton object using [Firebase.remoteConfig], and then call
- * operations on that singleton object. The singleton contains the complete set of Remote Config
- * parameter values available to your app. The singleton also stores values fetched from the Remote
- * Config server until they are made available for use with a call to [activate].
+ * @property compat The Android-SDK-shaped [com.google.firebase.remoteconfig.FirebaseRemoteConfig] this wraps.
  */
-public expect class FirebaseRemoteConfig {
-    /**
-     * Returns a [Map] of Firebase Remote Config key value pairs.
-     *
-     * Evaluates the values of the parameters in the following order:
-     *
-     * - The activated value, if the last successful [activate] contained the key.
-     * - The default value, if the key was set with [setDefaults].
-     */
+public class FirebaseRemoteConfig internal constructor(public val compat: CompatFirebaseRemoteConfig) {
+    /** Returns a map of Firebase Remote Config key value pairs. */
     public val all: Map<String, FirebaseRemoteConfigValue>
+        get() = compat.all.mapValues { FirebaseRemoteConfigValue(it.value) }
 
-    /**
-     * Returns the state of this [FirebaseRemoteConfig] instance as a [FirebaseRemoteConfigInfo].
-     */
+    /** Returns the state of this [FirebaseRemoteConfig] instance. */
     public val info: FirebaseRemoteConfigInfo
+        get() = compat.info.toCommon()
 
     /**
-     * Asynchronously activates the most recently fetched configs, so that the fetched key value pairs
-     * take effect.
+     * Asynchronously activates the most recently fetched configs, so that the fetched key value pairs take effect.
      *
-     * @return true result if the current call activated the fetched
-     *     configs; if the fetched configs were already activated by a previous call, it instead
-     *     returns a false result.
+     * @return true if there was a Fetched Config, and it was activated; false if no Fetched Config was found, or the
+     *   Fetched Config was already activated.
      */
-    public suspend fun activate(): Boolean
+    public suspend fun activate(): Boolean = compat.activate().await()
 
-    /**
-     * Ensures the last activated config are available to the app.
-     */
-    public suspend fun ensureInitialized()
+    /** Ensures the last activated config is available to the getters. */
+    public suspend fun ensureInitialized() {
+        compat.ensureInitialized().await()
+    }
 
     /**
      * Starts fetching configs, adhering to the specified minimum fetch interval.
      *
-     * The fetched configs only take effect after the next [activate] call.
-     *
-     * Depending on the time elapsed since the last fetch from the Firebase Remote Config backend,
-     * configs are either served from local storage, or fetched from the backend.
-     *
-     * Note: Also initializes the Firebase installations SDK that creates installation IDs to
-     * identify Firebase installations and periodically sends data to Firebase servers. Remote Config
-     * requires installation IDs for Fetch requests. To stop the periodic sync, call [FirebaseInstallations.delete]. Sending a Fetch request
-     * after deletion will create a new installation ID for this Firebase installation and resume the
-     * periodic sync.
-     *
-     * @param minimumFetchInterval If configs in the local storage were fetched more than
-     *     this long ago (rounded down to seconds), configs are served from the backend instead of local storage.
+     * @param minimumFetchInterval If a fetch was made less than this interval ago, the cached config is used; the
+     *   configured [FirebaseRemoteConfigSettings.minimumFetchInterval] when null.
      */
-    public suspend fun fetch(minimumFetchInterval: Duration? = null)
+    public suspend fun fetch(minimumFetchInterval: Duration? = null) {
+        if (minimumFetchInterval == null) compat.fetch().await() else compat.fetch(minimumFetchInterval.inWholeSeconds).await()
+    }
 
     /**
      * Asynchronously fetches and then activates the fetched configs.
      *
-     * If the time elapsed since the last fetch from the Firebase Remote Config backend is more
-     * than the default minimum fetch interval, configs are fetched from the backend.
-     *
-     * After the fetch is complete, the configs are activated so that the fetched key value pairs
-     * take effect.
-     *
-     * @return [Boolean] with a true result if the current call activated the fetched
-     *     configs; if no configs were fetched from the backend and the local fetched configs have
-     *     already been activated, returns a [Boolean] with a false result.
+     * @return true if the fetched config was activated; false otherwise.
      */
-    public suspend fun fetchAndActivate(): Boolean
+    public suspend fun fetchAndActivate(): Boolean = compat.fetchAndActivate().await()
 
-    /**
-     * Returns a [Set] of all Firebase Remote Config parameter keys with the given prefix.
-     *
-     * @param prefix The key prefix to look for. If the prefix is empty, all keys are returned.
-     * @return [Set] of Remote Config parameter keys that start with the specified prefix.
-     */
-    public fun getKeysByPrefix(prefix: String): Set<String>
+    /** Returns the set of parameter keys that start with the given prefix. */
+    public fun getKeysByPrefix(prefix: String): Set<String> = compat.getKeysByPrefix(prefix)
 
-    /**
-     * Returns the parameter value for the given key as a [FirebaseRemoteConfigValue].
-     *
-     * Evaluates the value of the parameter in the following order:
-     *
-     * - The activated value, if the last successful [activate] contained the key.
-     * - The default value, if the key was set with [setDefaults].
-     * - A [FirebaseRemoteConfigValue] that returns the static value for each type.
-     *
-     * @param key A Firebase Remote Config parameter key.
-     * @return [FirebaseRemoteConfigValue] representing the value of the Firebase Remote Config
-     *     parameter with the given key.
-     */
-    public fun getValue(key: String): FirebaseRemoteConfigValue
+    /** Returns the parameter value for the given key. */
+    public fun getValue(key: String): FirebaseRemoteConfigValue = FirebaseRemoteConfigValue(compat.getValue(key))
 
-    /**
-     * Deletes all activated, fetched and defaults configs and resets all Firebase Remote Config
-     * settings.
-     */
-    public suspend fun reset()
+    /** Deletes all activated, fetched and defaults configs and resets the settings (a no-op on Apple and JS). */
+    public suspend fun reset() {
+        compat.reset().await()
+    }
 
-    /**
-     * Asynchronously changes the settings for this [FirebaseRemoteConfig] instance.
-     *
-     * @param init A builder to set the settings.
-     */
-    public suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit)
+    /** Asynchronously changes the settings for this [FirebaseRemoteConfig] instance. */
+    public suspend fun settings(init: FirebaseRemoteConfigSettings.() -> Unit) {
+        val settings = FirebaseRemoteConfigSettings().apply(init)
+        val compatSettings = CompatFirebaseRemoteConfigSettings.Builder()
+            .setFetchTimeoutInSeconds(settings.fetchTimeout.inWholeSeconds)
+            .setMinimumFetchIntervalInSeconds(settings.minimumFetchInterval.inWholeSeconds)
+            .build()
+        compat.setConfigSettingsAsync(compatSettings).await()
+    }
 
-    /**
-     * Asynchronously sets default configs using the given [Map].
-     *
-     * @param defaults [Map] of key value pairs representing Firebase Remote Config parameter
-     *     keys and values.
-     */
-    public suspend fun setDefaults(vararg defaults: Pair<String, Any?>)
+    /** Asynchronously sets default configs using the given map. */
+    public suspend fun setDefaults(vararg defaults: Pair<String, Any?>) {
+        compat.setDefaultsAsync(defaults.toMap()).await()
+    }
+
+    override fun equals(other: Any?): Boolean = other is FirebaseRemoteConfig && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebaseRemoteConfig($compat)"
+
+    @OptIn(ExperimentalTime::class)
+    private fun CompatFirebaseRemoteConfigInfo.toCommon(): FirebaseRemoteConfigInfo = FirebaseRemoteConfigInfo(
+        configSettings = FirebaseRemoteConfigSettings(
+            fetchTimeout = configSettings.fetchTimeoutInSeconds.seconds,
+            minimumFetchInterval = configSettings.minimumFetchIntervalInSeconds.seconds,
+        ),
+        fetchTime = Instant.fromEpochMilliseconds(fetchTimeMillis),
+        lastFetchStatus = when (lastFetchStatus) {
+            CompatFirebaseRemoteConfig.LAST_FETCH_STATUS_SUCCESS -> FetchStatus.Success
+            CompatFirebaseRemoteConfig.LAST_FETCH_STATUS_NO_FETCH_YET -> FetchStatus.NoFetchYet
+            CompatFirebaseRemoteConfig.LAST_FETCH_STATUS_THROTTLED -> FetchStatus.Throttled
+            CompatFirebaseRemoteConfig.LAST_FETCH_STATUS_FAILURE -> FetchStatus.Failure
+            else -> error("Unknown last fetch status value: $lastFetchStatus")
+        },
+    )
 }
 
 @Deprecated("Replaced with Kotlin Duration", replaceWith = ReplaceWith("fetch(minimumFetchIntervalInSeconds.seconds)"))
@@ -148,22 +137,7 @@ public inline operator fun <reified T> FirebaseRemoteConfig.get(key: String): T 
     } as T
 }
 
-/**
- * Exception that gets thrown when an operation on Firebase Remote Config fails.
- */
-public expect open class FirebaseRemoteConfigException : FirebaseException
-
-/**
- * Exception that gets thrown when an operation on Firebase Remote Config fails.
- */
-public expect class FirebaseRemoteConfigClientException : FirebaseRemoteConfigException
-
-/**
- * Exception that gets thrown when an operation on Firebase Remote Config fails.
- */
-public expect class FirebaseRemoteConfigFetchThrottledException : FirebaseRemoteConfigException
-
-/**
- * Exception that gets thrown when an operation on Firebase Remote Config fails.
- */
-public expect class FirebaseRemoteConfigServerException : FirebaseRemoteConfigException
+public typealias FirebaseRemoteConfigException = com.google.firebase.remoteconfig.FirebaseRemoteConfigException
+public typealias FirebaseRemoteConfigClientException = com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
+public typealias FirebaseRemoteConfigFetchThrottledException = com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
+public typealias FirebaseRemoteConfigServerException = com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException

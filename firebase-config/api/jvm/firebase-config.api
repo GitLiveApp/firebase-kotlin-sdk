@@ -1,3 +1,8 @@
+public final class com/google/firebase/remoteconfig/RemoteConfigNonJsKt {
+	public static final fun addOnConfigUpdateListener (Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;Lcom/google/firebase/remoteconfig/ConfigUpdateListener;)Lcom/google/firebase/remoteconfig/ConfigUpdateListenerRegistration;
+	public static final fun setCustomSignals (Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;Lcom/google/firebase/remoteconfig/CustomSignals;)Lcom/google/android/gms/tasks/Task;
+}
+
 public final class dev/gitlive/firebase/remoteconfig/FetchStatus : java/lang/Enum {
 	public static final field Failure Ldev/gitlive/firebase/remoteconfig/FetchStatus;
 	public static final field NoFetchYet Ldev/gitlive/firebase/remoteconfig/FetchStatus;
@@ -11,16 +16,20 @@ public final class dev/gitlive/firebase/remoteconfig/FetchStatus : java/lang/Enu
 public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig {
 	public final fun activate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun ensureInitialized (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
 	public final fun fetch-dnQKTGw (Lkotlin/time/Duration;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun fetch-dnQKTGw$default (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;Lkotlin/time/Duration;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun fetchAndActivate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getAll ()Ljava/util/Map;
+	public final fun getCompat ()Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;
 	public final fun getInfo ()Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigInfo;
 	public final fun getKeysByPrefix (Ljava/lang/String;)Ljava/util/Set;
 	public final fun getValue (Ljava/lang/String;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigValue;
+	public fun hashCode ()I
 	public final fun reset (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setDefaults ([Lkotlin/Pair;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun settings (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigInfo {
@@ -41,6 +50,8 @@ public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigInfo {
 
 public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigKt {
 	public static final fun fetch (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getRemoteConfig (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
+	public static final fun remoteConfig (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
 }
 
 public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigSettings {
@@ -69,7 +80,11 @@ public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigValue {
 	public final fun asDouble ()D
 	public final fun asLong ()J
 	public final fun asString ()Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/remoteconfig/FirebaseRemoteConfigValue;
 	public final fun getSource ()Ldev/gitlive/firebase/remoteconfig/ValueSource;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/remoteconfig/ValueSource : java/lang/Enum {
@@ -83,7 +98,5 @@ public final class dev/gitlive/firebase/remoteconfig/ValueSource : java/lang/Enu
 
 public final class dev/gitlive/firebase/remoteconfig/android {
 	public static final fun getAndroid (Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;)Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;
-	public static final fun getRemoteConfig (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
-	public static final fun remoteConfig (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig;
 }
 
