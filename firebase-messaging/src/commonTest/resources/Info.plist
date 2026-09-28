@@ -10,5 +10,9 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<!-- The test executable is not an app bundle: UNUserNotificationCenter has no bundle proxy for it, so FIRMessaging
+	     must not swizzle the notification delegate (FIRMessagingRemoteNotificationsProxy crashes on start otherwise). -->
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 </dict>
 </plist>
