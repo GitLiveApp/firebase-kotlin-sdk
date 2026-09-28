@@ -181,7 +181,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
 
     override fun hashCode(): Int = ios.hashCode()
 
-    override fun toString(): String = "FirebaseAuth(app=${ios.app()?.name})"
+    override fun toString(): String = "FirebaseAuth(app=${app.name})"
 
     public actual companion object {
         private val instances = mutableMapOf<FIRAuth, FirebaseAuth>()
@@ -449,8 +449,8 @@ internal actual fun nativeTwitterCredential(token: String, secret: String): Any 
 
 internal actual fun nativeOAuthCredential(providerId: String, idToken: String?, accessToken: String?, rawNonce: String?): Any = when {
     idToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, accessToken = requireNotNull(accessToken) { "An ID token or an access token is required" })
-    accessToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce)
     rawNonce == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, accessToken = accessToken)
+    accessToken == null -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce)
     else -> FIROAuthProvider.credentialWithProviderID(providerID = providerId, IDToken = idToken, rawNonce = rawNonce, accessToken = accessToken)
 }
 
