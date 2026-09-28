@@ -15,11 +15,15 @@ import cocoapods.FirebaseDatabase.FIRDatabaseQuery
 import cocoapods.FirebaseDatabase.FIRDatabaseReference
 import cocoapods.FirebaseDatabase.FIRTransactionResult
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingAtBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingBeforeBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEqualToBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAfterBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAtBoolean
+import dev.gitlive.firebase.internal.withFoundationBooleans
 import com.google.android.gms.tasks.TaskCompletionSource
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
-import platform.Foundation.NSNumber
-import platform.Foundation.numberWithBool
 
 private const val IOS_PERMISSION_DENIED = 1L
 private const val IOS_UNAVAILABLE = 2L
@@ -88,36 +92,38 @@ public actual open class Query internal constructor(public open val ios: FIRData
     public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()))
 
     // With a null key the single-argument iOS methods are used: the childKey variants reject a nil key under orderByKey.
+    // Boolean bounds go through the booleanQuery cinterop shim so the SDK receives a CFBoolean rather than the number
+    // Kotlin/Native boxes a Boolean as, which would not match the booleans toIos() stores.
     public actual fun startAt(value: String?): Query = Query(ios.queryStartingAtValue(value))
     public actual fun startAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
     public actual fun startAt(value: Double): Query = Query(ios.queryStartingAtValue(value))
     public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
-    public actual fun startAt(value: Boolean): Query = Query(ios.queryStartingAtValue(value))
-    public actual fun startAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: Boolean): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, key) as FIRDatabaseQuery)
     public actual fun startAfter(value: String?): Query = Query(ios.queryStartingAfterValue(value))
     public actual fun startAfter(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
     public actual fun startAfter(value: Double): Query = Query(ios.queryStartingAfterValue(value))
     public actual fun startAfter(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
-    public actual fun startAfter(value: Boolean): Query = Query(ios.queryStartingAfterValue(value))
-    public actual fun startAfter(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: Boolean): Query = Query(GitLiveQueryStartingAfterBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun startAfter(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAfterBoolean(ios, value, key) as FIRDatabaseQuery)
     public actual fun endAt(value: String?): Query = Query(ios.queryEndingAtValue(value))
     public actual fun endAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
     public actual fun endAt(value: Double): Query = Query(ios.queryEndingAtValue(value))
     public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
-    public actual fun endAt(value: Boolean): Query = Query(ios.queryEndingAtValue(value))
-    public actual fun endAt(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: Boolean): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, key) as FIRDatabaseQuery)
     public actual fun endBefore(value: String?): Query = Query(ios.queryEndingBeforeValue(value))
     public actual fun endBefore(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
     public actual fun endBefore(value: Double): Query = Query(ios.queryEndingBeforeValue(value))
     public actual fun endBefore(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
-    public actual fun endBefore(value: Boolean): Query = Query(ios.queryEndingBeforeValue(value))
-    public actual fun endBefore(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: Boolean): Query = Query(GitLiveQueryEndingBeforeBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun endBefore(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingBeforeBoolean(ios, value, key) as FIRDatabaseQuery)
     public actual fun equalTo(value: String?): Query = Query(ios.queryEqualToValue(value))
     public actual fun equalTo(value: String?, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
     public actual fun equalTo(value: Double): Query = Query(ios.queryEqualToValue(value))
     public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
-    public actual fun equalTo(value: Boolean): Query = Query(ios.queryEqualToValue(value))
-    public actual fun equalTo(value: Boolean, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: Boolean): Query = Query(GitLiveQueryEqualToBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(GitLiveQueryEqualToBoolean(ios, value, key) as FIRDatabaseQuery)
 
     /** The iOS SDK creates a new object per call, so queries are equal when they describe the same location and constraints. */
     override fun equals(other: Any?): Boolean = other is Query && (other.ios == ios || other.ios.description == ios.description)
@@ -275,15 +281,19 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
 internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = mapValues { (_, value) -> value.toIos() }
 
 /**
- * A Kotlin value as the iOS SDK expects it: `null` as `NSNull` (a deletion in an update), and a `Boolean` as a boolean
- * `NSNumber` explicitly, so that it is stored as a JSON boolean rather than as the number the default boxing can produce;
- * maps and lists are converted recursively.
+ * A Kotlin value as the iOS SDK expects it: `null` as `NSNull` (a deletion in an update), and booleans as CFBooleans.
+ *
+ * Kotlin/Native boxes a `Boolean` as an `NSNumber` that Foundation's JSON serializer, which the SDK writes with, emits
+ * as the number `1`/`0`, and bridges every CFBoolean entering Kotlin back to a `Boolean`, so a genuine boolean can only
+ * reach the SDK inside a Foundation container Kotlin never unwraps: containers holding booleans are rebuilt by
+ * [withFoundationBooleans], and a bare boolean is written in the SDK's `{".value": x}` leaf form, which resolves to a
+ * plain scalar write. Containers without booleans are converted recursively as before.
  */
 internal fun Any?.toIos(): Any = when (this) {
     null -> NSNull.`null`()
-    is Boolean -> NSNumber.numberWithBool(this)
-    is Map<*, *> -> entries.associate { (key, value) -> key to value.toIos() }
-    is List<*> -> map { it.toIos() }
+    is Boolean -> mapOf(".value" to this).withFoundationBooleans() ?: this
+    is Map<*, *> -> withFoundationBooleans().takeIf { it !== this } ?: entries.associate { (key, value) -> key to value.toIos() }
+    is List<*> -> withFoundationBooleans().takeIf { it !== this } ?: map { it.toIos() }
     else -> this
 }
 
