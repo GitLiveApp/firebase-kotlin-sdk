@@ -54,9 +54,23 @@ public final class DataConnectBridge: NSObject {
     super.init()
   }
 
+  /// The emulator each SDK instance has been pointed at. The SDK keeps one instance per app, connector and settings for
+  /// the life of the process, and every `useEmulator` call on it recreates its gRPC clients and cache; the cache's
+  /// auth-state listener then looks Auth up on the app asynchronously, which crashes if the app is deleted in between
+  /// (as a test tearing down does). Pointing an instance at the emulator it already uses is therefore skipped.
+  private static var emulators: [ObjectIdentifier: (host: String, port: Int)] = [:]
+  private static let emulatorsLock = NSLock()
+
   /// Points the instance at the emulator; must be called before any operation runs.
   @objc(useEmulator:port:)
   public func useEmulator(host: String, port: Int) {
+    let key = ObjectIdentifier(dataConnect)
+    Self.emulatorsLock.lock()
+    defer { Self.emulatorsLock.unlock() }
+    if let current = Self.emulators[key], current.host == host, current.port == port {
+      return
+    }
+    Self.emulators[key] = (host: host, port: port)
     dataConnect.useEmulator(host: host, port: port)
   }
 
