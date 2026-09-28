@@ -13,9 +13,17 @@ import platform.Foundation.NSLocalizedDescriptionKey
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseCrashlytics internal constructor(public val ios: FIRCrashlytics) {
 
+    /**
+     * The iOS SDK only invokes the completion when automatic data collection is disabled (with it enabled, reports are
+     * sent at startup and there is nothing to check), so the task completes with false then, as on Android.
+     */
     public actual fun checkForUnsentReports(): Task<Boolean> {
         val source = TaskCompletionSource<Boolean>()
-        ios.checkForUnsentReportsWithCompletion { hasUnsentReports -> source.setResult(hasUnsentReports) }
+        if (ios.isCrashlyticsCollectionEnabled()) {
+            source.setResult(false)
+        } else {
+            ios.checkForUnsentReportsWithCompletion { hasUnsentReports -> source.setResult(hasUnsentReports) }
+        }
         return source.task
     }
 
