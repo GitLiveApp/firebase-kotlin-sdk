@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import platform.Foundation.NSError
 import platform.Foundation.NSNull
+import platform.Foundation.NSNumber
 
 private const val IOS_PERMISSION_DENIED = 1L
 private const val IOS_UNAVAILABLE = 2L
@@ -151,16 +152,16 @@ public actual open class DatabaseReference internal constructor(override val ios
 
     public actual fun onDisconnect(): OnDisconnect = OnDisconnect(ios)
 
-    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.setValue(value, withCompletionBlock = it) }
+    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), withCompletionBlock = it) }
 
     public actual fun setValue(value: Any?, listener: CompletionListener?) {
-        ios.setValue(value, withCompletionBlock = listener.completion())
+        ios.setValue(value.toIos(), withCompletionBlock = listener.completion())
     }
 
-    public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = write { ios.setValue(value, andPriority = priority, withCompletionBlock = it) }
+    public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
 
     public actual fun setValue(value: Any?, priority: Any?, listener: CompletionListener?) {
-        ios.setValue(value, andPriority = priority, withCompletionBlock = listener.completion())
+        ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
     }
 
     public actual fun setPriority(priority: Any?): Task<Nothing?> = write { ios.setPriority(priority, withCompletionBlock = it) }
@@ -218,10 +219,10 @@ public actual open class DatabaseReference internal constructor(override val ios
 
 /** @property ios The underlying Firebase iOS SDK reference the operations are registered on. */
 public actual class OnDisconnect internal constructor(public val ios: FIRDatabaseReference) {
-    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.onDisconnectSetValue(value, withCompletionBlock = it) }
+    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = it) }
 
     public actual fun setValue(value: Any?, listener: DatabaseReference.CompletionListener?) {
-        ios.onDisconnectSetValue(value, withCompletionBlock = listener.completion())
+        ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = listener.completion())
     }
 
     public actual fun setValue(value: Any?, priority: String?): Task<Nothing?> = write { setWithPriority(value, priority, it) }
@@ -230,10 +231,10 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
         setWithPriority(value, priority, listener.completion())
     }
 
-    public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = write { ios.onDisconnectSetValue(value, andPriority = priority, withCompletionBlock = it) }
+    public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
 
     public actual fun setValue(value: Any?, priority: Double, listener: DatabaseReference.CompletionListener?) {
-        ios.onDisconnectSetValue(value, andPriority = priority, withCompletionBlock = listener.completion())
+        ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
     }
 
     public actual fun setValue(value: Any?, priority: Map<*, *>?, listener: DatabaseReference.CompletionListener?) {
@@ -242,7 +243,7 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
 
     /** The iOS SDK's priority form takes a non-null priority. */
     private fun setWithPriority(value: Any?, priority: Any?, completion: (NSError?, FIRDatabaseReference?) -> Unit) {
-        if (priority == null) ios.onDisconnectSetValue(value, withCompletionBlock = completion) else ios.onDisconnectSetValue(value, andPriority = priority, withCompletionBlock = completion)
+        if (priority == null) ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = completion) else ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = completion)
     }
 
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { ios.onDisconnectUpdateChildValues(update.toIosMap(), withCompletionBlock = it) }
@@ -270,7 +271,20 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
 
 @Suppress("UNCHECKED_CAST")
 /** Null values become NSNull, which the SDK reads as a deletion. */
-internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = mapValues { (_, value) -> value ?: NSNull.`null`() }
+internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = mapValues { (_, value) -> value.toIos() }
+
+/**
+ * A Kotlin value as the iOS SDK expects it: `null` as `NSNull` (a deletion in an update), and a `Boolean` as a boolean
+ * `NSNumber` explicitly, so that it is stored as a JSON boolean rather than as the number the default boxing can produce;
+ * maps and lists are converted recursively.
+ */
+internal fun Any?.toIos(): Any = when (this) {
+    null -> NSNull.`null`()
+    is Boolean -> NSNumber.numberWithBool(this)
+    is Map<*, *> -> entries.associate { (key, value) -> key to value.toIos() }
+    is List<*> -> map { it.toIos() }
+    else -> this
+}
 
 /** A write as a [Task] of the SDK's completion block. */
 private inline fun write(crossinline start: ((NSError?, FIRDatabaseReference?) -> Unit) -> Unit): Task<Nothing?> = task { completion ->

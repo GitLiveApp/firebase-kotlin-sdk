@@ -6,7 +6,9 @@ package com.google.firebase.database
 
 import cocoapods.FirebaseDatabase.FIRDataSnapshot
 import cocoapods.FirebaseDatabase.FIRMutableData
+import kotlinx.cinterop.toKString
 import platform.Foundation.NSNull
+import platform.Foundation.NSNumber
 import platform.Foundation.allObjects
 
 /** @property ios The underlying Firebase iOS SDK object. */
@@ -43,7 +45,7 @@ public actual class MutableData internal constructor(public val ios: FIRMutableD
     public actual var value: Any?
         get() = ios.value.fromIos()
         set(value) {
-            ios.setValue(value)
+            ios.setValue(value?.toIos())
         }
 
     @Suppress("UNCHECKED_CAST")
@@ -68,6 +70,9 @@ public actual class MutableData internal constructor(public val ios: FIRMutableD
     override fun toString(): String = "MutableData(key=$key, value=$value)"
 }
 
+/** The `@encode` types of a boolean `NSNumber` (`char` on Intel, `bool` on Apple silicon). */
+private val booleanObjCTypes = setOf("c", "B")
+
 /**
  * The iOS SDK's values as Kotlin ones: `NSNull` is the absence of data, and a `char` `NSNumber` (a Kotlin `Byte`, the
  * SDK's boolean, which Kotlin/Native only maps to `Boolean` for the CFBoolean singletons) is a boolean, also inside
@@ -76,6 +81,7 @@ public actual class MutableData internal constructor(public val ios: FIRMutableD
 private fun Any?.fromIos(): Any? = when (this) {
     null, is NSNull -> null
     is Byte -> this != 0.toByte()
+    is NSNumber -> if (objCType?.toKString() in booleanObjCTypes) boolValue else this
     is Map<*, *> -> entries.associate { (key, value) -> key.toString() to value.fromIos() }
     is List<*> -> map { it.fromIos() }
     else -> this
