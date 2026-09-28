@@ -267,9 +267,12 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     override fun toString(): String = "FirebaseUser(uid=$uid)"
 }
 
+/** The iOS SDK names the Firebase provider `Firebase` where the Android SDK's [FirebaseUser.providerId] is `firebase`. */
+private fun String.asAndroidProviderId(): String = if (equals("Firebase", ignoreCase = true)) "firebase" else this
+
 internal class FirebaseUserImpl(override val ios: FIRUser, override val auth: FirebaseAuth) : FirebaseUser() {
     override val uid: String get() = ios.uid()
-    override val providerId: String get() = ios.providerID()
+    override val providerId: String get() = ios.providerID().asAndroidProviderId()
     override val displayName: String? get() = ios.displayName()
     override val email: String? get() = ios.email()
     override val phoneNumber: String? get() = ios.phoneNumber()
