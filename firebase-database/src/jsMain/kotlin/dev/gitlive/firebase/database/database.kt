@@ -9,6 +9,7 @@ import dev.gitlive.firebase.database.externals.Database
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.js
 import com.google.firebase.database.DataSnapshot as CompatDataSnapshot
+import com.google.firebase.database.toJs
 import com.google.firebase.database.MutableData as CompatMutableData
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
 import dev.gitlive.firebase.database.externals.OnDisconnect as JsOnDisconnect
@@ -42,5 +43,5 @@ internal actual val CompatDataSnapshot.nativeValue: Any? get() = js.`val`()
 internal actual var CompatMutableData.nativeValue: Any?
     get() = jsValue
     set(value) {
-        jsValue = value
+        jsValue = value.toJs()
     }
