@@ -270,13 +270,12 @@ public actual class MutableData private constructor(
             parent[path.last()] = value
         }
 
-    public actual var value: Any?
-        get() = jsValue
+    public actual val value: Any? get() = jsValue
 
-        @DelicateDatabaseApi
-        set(v) {
-            jsValue = v.toJs()
-        }
+    @PublishedApi
+    internal actual fun setEncodedValue(encodedValue: Any?) {
+        jsValue = encodedValue.toJs()
+    }
 
     public actual fun child(path: String): MutableData {
         val segments = path.split("/").filter { it.isNotEmpty() }

@@ -261,24 +261,23 @@ class FirebaseDatabaseTest {
         assertFalse(snapshot.child("removed").exists)
     }
 
-    @OptIn(DelicateDatabaseApi::class)
     @Test
-    fun testMutableDataTransactionAssignValue() = runTest {
+    fun testMutableDataTransactionReadsRawLeafValues() = runTest {
         ensureDatabaseConnected()
-        val data = DatabaseTest("PostSeven", 7)
-        val reference = database.reference("users/user_1/post_id_7")
-        setupDatabase(reference, data, DatabaseTest.serializer())
+        val reference = database.reference("mutableDataTransaction/rawLeaves")
+        reference.setValue(mapOf("title" to "PostEight", "likes" to 8, "flag" to true))
 
+        var seen: Triple<Any?, Any?, Boolean?>? = null
         val snapshot = reference.runTransaction { currentData ->
-            val likes = (currentData.child("likes").value as? Number)?.toInt()
-                ?: return@runTransaction success(currentData)
-            currentData.value = mapOf("title" to "assigned", "likes" to 0)
-            currentData.child("likes").value = likes + 1
+            // Apple reads booleans back as the numbers 1 and 0, which value<Boolean>() accepts
+            seen = Triple(currentData.child("title").value, currentData.child("likes").value, currentData.child("flag").value<Boolean?>())
             success(currentData)
         }
 
         assertNotNull(snapshot)
-        assertEquals(DatabaseTest("assigned", data.likes + 1), snapshot.value(DatabaseTest.serializer()))
+        assertEquals("PostEight", seen?.first)
+        assertEquals(8L, (seen?.second as? Number)?.toLong())
+        assertEquals(true, seen?.third)
     }
 
     @Test

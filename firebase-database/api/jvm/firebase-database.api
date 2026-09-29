@@ -33,7 +33,6 @@ public final class dev/gitlive/firebase/database/DataSnapshot {
 }
 
 public final class dev/gitlive/firebase/database/DatabaseKt {
-	public static final fun setEncodedValue (Ldev/gitlive/firebase/database/MutableData;Ljava/lang/Object;)V
 	public static final fun setValue (Ldev/gitlive/firebase/database/MutableData;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
 	public static synthetic fun setValue$default (Ldev/gitlive/firebase/database/MutableData;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public static final fun value (Ldev/gitlive/firebase/database/MutableData;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -59,9 +58,6 @@ public final class dev/gitlive/firebase/database/DatabaseReference : dev/gitlive
 	public final fun updateEncodedChildren (Ldev/gitlive/firebase/internal/EncodedObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public abstract interface annotation class dev/gitlive/firebase/database/DelicateDatabaseApi : java/lang/annotation/Annotation {
-}
-
 public final class dev/gitlive/firebase/database/FirebaseDatabase {
 	public static final field Companion Ldev/gitlive/firebase/database/FirebaseDatabase$Companion;
 	public final fun goOffline ()V
@@ -84,7 +80,7 @@ public final class dev/gitlive/firebase/database/MutableData {
 	public final fun getHasChildren ()Z
 	public final fun getKey ()Ljava/lang/String;
 	public final fun getValue ()Ljava/lang/Object;
-	public final fun setValue (Ljava/lang/Object;)V
+	public final fun setEncodedValue (Ljava/lang/Object;)V
 }
 
 public final class dev/gitlive/firebase/database/OnDisconnect {

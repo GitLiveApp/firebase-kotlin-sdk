@@ -330,13 +330,12 @@ public actual class MutableData internal constructor(
 ) {
     public actual val key: String? get() = android.key
 
-    public actual var value: Any?
-        get() = android.value
+    public actual val value: Any? get() = android.value
 
-        @DelicateDatabaseApi
-        set(value) {
-            android.value = value
-        }
+    @PublishedApi
+    internal actual fun setEncodedValue(encodedValue: Any?) {
+        android.value = encodedValue
+    }
 
     public actual fun child(path: String): MutableData = MutableData(android.child(path))
     public actual val hasChildren: Boolean get() = android.hasChildren()

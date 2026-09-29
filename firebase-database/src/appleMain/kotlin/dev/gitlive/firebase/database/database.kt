@@ -284,13 +284,12 @@ public actual class MutableData internal constructor(
 ) {
     public actual val key: String? get() = ios.key
 
-    public actual var value: Any?
-        get() = ios.value?.takeIf { it !is NSNull }
+    public actual val value: Any? get() = ios.value?.takeIf { it !is NSNull }
 
-        @DelicateDatabaseApi
-        set(value) {
-            ios.value = value
-        }
+    @PublishedApi
+    internal actual fun setEncodedValue(encodedValue: Any?) {
+        ios.value = encodedValue
+    }
 
     public actual fun child(path: String): MutableData = MutableData(ios.childDataByAppendingPath(path))
 

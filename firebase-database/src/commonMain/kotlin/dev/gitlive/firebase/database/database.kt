@@ -547,21 +547,18 @@ public expect class MutableData {
     public val key: String?
 
     /**
-     * The data at this location as a native type. Set this to the desired new data
-     * at the location. Setting this to null will remove the data at this location.
-     *
-     * **Warning:** the value is passed to the platform SDK as is, without serialization, so it must
-     * only be null, a [Boolean], a number, a [String], or a [List] or [Map] of those. Use [setValue]
-     * for anything else, such as `@Serializable` classes, enums or [ServerValue]. Assigning such a
-     * value here stores the class's properties by reflection on Android and the JVM (ignoring
-     * `@Serializable`), stores mangled property names on JS, and crashes with an uncatchable
-     * `NSException` on Apple platforms. To read the data as a Kotlin type, use [value] with a type
-     * argument or a deserialization strategy.
+     * The data at this location as a native type: null, a [Boolean], a number, a [String], or a
+     * [List] or [Map] of those for a location with children. Apple platforms read booleans back as
+     * the numbers 1 and 0. To read the data as a Kotlin type, use [value] with a type argument or a
+     * deserialization strategy, which also handles those booleans. To change it, use [setValue].
      *
      * @return The current data at this location as a native type, or null if no data exists.
      */
-    @set:DelicateDatabaseApi
-    public var value: Any?
+    public val value: Any?
+
+    /** Writes an already encoded value, which is safe to pass to the platform SDK as is. */
+    @PublishedApi
+    internal fun setEncodedValue(encodedValue: Any?)
 
     /**
      * Used to obtain a MutableData instance that represents the data at the given relative path.
@@ -625,26 +622,6 @@ public inline fun <reified T> MutableData.setValue(value: T?, buildSettings: Enc
 public inline fun <T> MutableData.setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
     setEncodedValue(encode(strategy, value, buildSettings))
 }
-
-/** Writes an already encoded value, which is safe to pass to the platform SDK as is. */
-@PublishedApi
-@OptIn(DelicateDatabaseApi::class)
-internal fun MutableData.setEncodedValue(encodedValue: Any?) {
-    value = encodedValue
-}
-
-/**
- * Marks database APIs that pass values to the platform SDK without serialization, which store the
- * wrong data or crash for anything but null, booleans, numbers, strings, and lists or maps of those.
- * Prefer the serializing alternative named in the API's documentation.
- */
-@RequiresOptIn(
-    level = RequiresOptIn.Level.WARNING,
-    message = "Writes the value without serialization. Use setValue() instead unless the value is null, a Boolean, a number, a String, or a List or Map of those.",
-)
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.PROPERTY_SETTER)
-public annotation class DelicateDatabaseApi
 
 public class Transaction internal constructor() {
     public fun success(resultData: MutableData): Result = Result.Success(data = resultData)
