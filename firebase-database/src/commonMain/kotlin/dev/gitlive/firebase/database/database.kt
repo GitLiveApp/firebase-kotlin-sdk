@@ -554,26 +554,14 @@ public class MutableData internal constructor(public val compat: CompatMutableDa
     public val key: String? get() = compat.key
 
     /**
-     * The data at this location as native types. Set this to the desired new data at the location.
-     * Setting it to null removes the data at this location.
-     *
-     * **Warning:** the value is passed to the platform SDK as is, without serialization, so it must
-     * only be null, a [Boolean], a number, a [String], or a [List] or [Map] of those. Use [setValue]
-     * for anything else, such as `@Serializable` classes, enums or [ServerValue]: assigning such a
-     * value here stores the class's properties by reflection on Android and the JVM (ignoring
-     * `@Serializable`), stores mangled property names on JS, and crashes with an uncatchable
-     * `NSException` on Apple platforms. To read the data as a Kotlin type, use [value] with a type
-     * argument or a deserialization strategy.
+     * The data at this location as native types: null, a [Boolean], a number, a [String], or a
+     * [List] or [Map] of those for a location with children. Apple platforms read booleans back as
+     * the numbers 1 and 0. To read the data as a Kotlin type, use [value] with a type argument or a
+     * deserialization strategy, which also handles those booleans. To change it, use [setValue].
      *
      * @return The current data at this location as native types, or null if no data exists.
      */
-    public var value: Any?
-        get() = compat.value
-
-        @DelicateDatabaseApi
-        set(value) {
-            compat.value = value
-        }
+    public val value: Any? get() = compat.value
 
     /**
      * Deserializes the data at this location into [T].
@@ -639,19 +627,6 @@ public class MutableData internal constructor(public val compat: CompatMutableDa
 
     override fun toString(): String = compat.toString()
 }
-
-/**
- * Marks database APIs that pass values to the platform SDK without serialization, which store the
- * wrong data or crash for anything but null, booleans, numbers, strings, and lists or maps of those.
- * Prefer the serializing alternative named in the API's documentation.
- */
-@RequiresOptIn(
-    level = RequiresOptIn.Level.WARNING,
-    message = "Writes the value without serialization. Use setValue() instead unless the value is null, a Boolean, a number, a String, or a List or Map of those.",
-)
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.PROPERTY_SETTER)
-public annotation class DelicateDatabaseApi
 
 /**
  * The receiver of the [DatabaseReference.runTransaction] update function, which returns [success]
