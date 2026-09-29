@@ -254,10 +254,9 @@ class FirebaseDatabaseTest {
         val reference = database.reference("mutableDataTransaction/rawLeaves")
         reference.setValue(mapOf("title" to "PostEight", "likes" to 8, "flag" to true))
 
-        var seen: Triple<Any?, Any?, Boolean?>? = null
+        var seen: Triple<Any?, Any?, Any?>? = null
         val snapshot = reference.runTransaction { currentData ->
-            // Apple reads booleans back as the numbers 1 and 0, which value<Boolean>() accepts
-            seen = Triple(currentData.child("title").value, currentData.child("likes").value, currentData.child("flag").value<Boolean?>())
+            seen = Triple(currentData.child("title").value, currentData.child("likes").value, currentData.child("flag").value)
             success(currentData)
         }
 

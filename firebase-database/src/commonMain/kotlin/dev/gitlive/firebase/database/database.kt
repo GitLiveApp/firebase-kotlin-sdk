@@ -555,9 +555,8 @@ public class MutableData internal constructor(public val compat: CompatMutableDa
 
     /**
      * The data at this location as native types: null, a [Boolean], a number, a [String], or a
-     * [List] or [Map] of those for a location with children. Apple platforms read booleans back as
-     * the numbers 1 and 0. To read the data as a Kotlin type, use [value] with a type argument or a
-     * deserialization strategy, which also handles those booleans. To change it, use [setValue].
+     * [List] or [Map] of those for a location with children. To read the data as a Kotlin type, use
+     * [value] with a type argument or a deserialization strategy. To change it, use [setValue].
      *
      * @return The current data at this location as native types, or null if no data exists.
      */
