@@ -26,6 +26,9 @@ public val DatabaseReference.android: com.google.firebase.database.DatabaseRefer
 public val DataSnapshot.android: com.google.firebase.database.DataSnapshot get() = compat
 
 /** The underlying Firebase Android SDK object. */
+public val MutableData.android: com.google.firebase.database.MutableData get() = compat
+
+/** The underlying Firebase Android SDK object. */
 public val OnDisconnect.android: com.google.firebase.database.OnDisconnect get() = compat
 
 @Deprecated("Writes no longer depend on the persistence setting, so this accessor is unused; it will be removed in the next major version.")
