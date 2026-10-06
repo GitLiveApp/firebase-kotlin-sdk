@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
 import utils.applyFirebaseHierarchy
@@ -221,5 +222,19 @@ mavenPublishing {
                 comments.set("A business-friendly OSS license")
             }
         }
+    }
+}
+
+// Temporary, for the console check: run on the booted simulator so that its log can be read afterwards, and show the
+// test's output in the Gradle log.
+if (supportedPlatforms.supportsApple()) {
+    tasks.register<Exec>("launchIosSimulator") {
+        commandLine("open", "-a", "Simulator")
+    }
+    tasks.withType<KotlinNativeSimulatorTest>().configureEach {
+        dependsOn("launchIosSimulator")
+        standalone.set(false)
+        device.set("booted")
+        testLogging { showStandardStreams = true }
     }
 }

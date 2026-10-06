@@ -27,19 +27,36 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26.2.0'
-      - name: Stream Firebase logs
-        # Firebase logs through os_log, which never reaches the test process's stdout, so capture the unified log.
+      - name: Boot the simulator
         run: |
-          log stream --level debug --style compact --predicate 'subsystem == "com.google.firebase"' > firebase-unified.log 2>&1 &
+          open -a Simulator
+          for i in $(seq 1 90); do
+            xcrun simctl list devices booted -j | grep -q '"state" : "Booted"' && break
+            sleep 2
+          done
+          xcrun simctl list devices booted
+      - name: Stream Firebase logs
+        # Firebase logs through os_log inside the simulator, which has its own logd, so stream from there.
+        run: |
+          xcrun simctl spawn booted log stream --level debug --style compact --predicate 'subsystem == "com.google.firebase"' > firebase-unified.log 2>&1 &
           echo $! > log-stream.pid
       - name: First run (records the non-fatals)
         run: ./gradlew :firebase-crashlytics:iosSimulatorArm64Test --tests "dev.gitlive.firebase.crashlytics.ConsoleCheckTest"
+      - name: First run results
+        if: always()
+        run: cat firebase-crashlytics/build/test-results/iosSimulatorArm64Test/*.xml || true
       - name: Second run (uploads the first run's report)
         run: ./gradlew :firebase-crashlytics:cleanIosSimulatorArm64Test :firebase-crashlytics:iosSimulatorArm64Test --tests "dev.gitlive.firebase.crashlytics.ConsoleCheckTest"
+      - name: Second run results
+        if: always()
+        run: cat firebase-crashlytics/build/test-results/iosSimulatorArm64Test/*.xml || true
       - name: Firebase logs
         if: always()
         run: |
           sleep 5
           kill "$(cat log-stream.pid)" || true
           sleep 2
+          echo "===== streamed ====="
           cat firebase-unified.log
+          echo "===== log show ====="
+          xcrun simctl spawn booted log show --last 30m --info --debug --style compact --predicate 'subsystem == "com.google.firebase"' | tail -300
