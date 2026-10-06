@@ -1,0 +1,170 @@
+# Android SDK source compatibility of firebase-analytics
+# Android SDK api.txt ref: com.google.android.gms:play-services-measurement-api:23.2.0
+# 100% of 153 public members available (152 identical, 1 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.analytics.AnalyticsKt
+  HIDE  static FirebaseAnalytics getANALYTICS()
+  OK    static FirebaseAnalytics getAnalytics(Firebase)
+  HIDE  static Object getLOCK()
+  OK    static void logEvent(FirebaseAnalytics, String, Function1)
+  HIDE  static void setANALYTICS(FirebaseAnalytics)
+  OK    static void setConsent(FirebaseAnalytics, Function1)
+com.google.firebase.analytics.ConsentBuilder
+  OK    ConsentBuilder()
+  OK    Map asMap()
+  OK    ConsentStatus getAdPersonalization()
+  OK    ConsentStatus getAdStorage()
+  OK    ConsentStatus getAdUserData()
+  OK    ConsentStatus getAnalyticsStorage()
+  OK    void setAdPersonalization(ConsentStatus)
+  OK    void setAdStorage(ConsentStatus)
+  OK    void setAdUserData(ConsentStatus)
+  OK    void setAnalyticsStorage(ConsentStatus)
+com.google.firebase.analytics.FirebaseAnalytics
+  OK    Task getAppInstanceId()
+  OK    String getFirebaseInstanceId()
+  MAP   static FirebaseAnalytics getInstance(Context)  [Context -> Object, deprecated: getInstance takes an android.content.Context and can only be called from Android code; use Firebase.analytics from common code]
+  OK    Task getSessionId()
+  OK    void logEvent(String, Bundle)
+  OK    void resetAnalyticsData()
+  OK    void setAnalyticsCollectionEnabled(boolean)
+  OK    void setConsent(Map)
+  SKIP  void setCurrentScreen(Activity, String, String)
+  OK    void setDefaultEventParameters(Bundle)
+  OK    void setSessionTimeoutDuration(long)
+  OK    void setUserId(String)
+  OK    void setUserProperty(String, String)
+com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus
+  OK    static ConsentStatus DENIED
+  OK    static ConsentStatus GRANTED
+com.google.firebase.analytics.FirebaseAnalytics.ConsentType
+  OK    static ConsentType AD_PERSONALIZATION
+  OK    static ConsentType AD_STORAGE
+  OK    static ConsentType AD_USER_DATA
+  OK    static ConsentType ANALYTICS_STORAGE
+com.google.firebase.analytics.FirebaseAnalytics.Event
+  OK    Event()
+  OK    static String ADD_PAYMENT_INFO
+  OK    static String ADD_SHIPPING_INFO
+  OK    static String ADD_TO_CART
+  OK    static String ADD_TO_WISHLIST
+  OK    static String AD_IMPRESSION
+  OK    static String APP_OPEN
+  OK    static String BEGIN_CHECKOUT
+  OK    static String CAMPAIGN_DETAILS
+  OK    static String EARN_VIRTUAL_CURRENCY
+  OK    static String GENERATE_LEAD
+  OK    static String IN_APP_PURCHASE
+  OK    static String JOIN_GROUP
+  OK    static String LEVEL_END
+  OK    static String LEVEL_START
+  OK    static String LEVEL_UP
+  OK    static String LOGIN
+  OK    static String POST_SCORE
+  OK    static String PURCHASE
+  OK    static String REFUND
+  OK    static String REMOVE_FROM_CART
+  OK    static String SCREEN_VIEW
+  OK    static String SEARCH
+  OK    static String SELECT_CONTENT
+  OK    static String SELECT_ITEM
+  OK    static String SELECT_PROMOTION
+  OK    static String SHARE
+  OK    static String SIGN_UP
+  OK    static String SPEND_VIRTUAL_CURRENCY
+  OK    static String TUTORIAL_BEGIN
+  OK    static String TUTORIAL_COMPLETE
+  OK    static String UNLOCK_ACHIEVEMENT
+  OK    static String VIEW_CART
+  OK    static String VIEW_ITEM
+  OK    static String VIEW_ITEM_LIST
+  OK    static String VIEW_PROMOTION
+  OK    static String VIEW_SEARCH_RESULTS
+com.google.firebase.analytics.FirebaseAnalytics.Param
+  OK    Param()
+  OK    static String ACHIEVEMENT_ID
+  OK    static String ACLID
+  OK    static String AD_FORMAT
+  OK    static String AD_PLATFORM
+  OK    static String AD_SOURCE
+  OK    static String AD_UNIT_NAME
+  OK    static String AFFILIATION
+  OK    static String CAMPAIGN
+  OK    static String CAMPAIGN_ID
+  OK    static String CHARACTER
+  OK    static String CONTENT
+  OK    static String CONTENT_TYPE
+  OK    static String COUPON
+  OK    static String CP1
+  OK    static String CREATIVE_FORMAT
+  OK    static String CREATIVE_NAME
+  OK    static String CREATIVE_SLOT
+  OK    static String CURRENCY
+  OK    static String DESTINATION
+  OK    static String DISCOUNT
+  OK    static String END_DATE
+  OK    static String EXTEND_SESSION
+  OK    static String FLIGHT_NUMBER
+  OK    static String FREE_TRIAL
+  OK    static String GROUP_ID
+  OK    static String INDEX
+  OK    static String ITEMS
+  OK    static String ITEM_BRAND
+  OK    static String ITEM_CATEGORY
+  OK    static String ITEM_CATEGORY2
+  OK    static String ITEM_CATEGORY3
+  OK    static String ITEM_CATEGORY4
+  OK    static String ITEM_CATEGORY5
+  OK    static String ITEM_ID
+  OK    static String ITEM_LIST_ID
+  OK    static String ITEM_LIST_NAME
+  OK    static String ITEM_NAME
+  OK    static String ITEM_VARIANT
+  OK    static String LEVEL
+  OK    static String LEVEL_NAME
+  OK    static String LOCATION
+  OK    static String LOCATION_ID
+  OK    static String MARKETING_TACTIC
+  OK    static String MEDIUM
+  OK    static String METHOD
+  OK    static String NUMBER_OF_NIGHTS
+  OK    static String NUMBER_OF_PASSENGERS
+  OK    static String NUMBER_OF_ROOMS
+  OK    static String ORIGIN
+  OK    static String PAYMENT_TYPE
+  OK    static String PRICE
+  OK    static String PRICE_IS_DISCOUNTED
+  OK    static String PRODUCT_ID
+  OK    static String PRODUCT_NAME
+  OK    static String PROMOTION_ID
+  OK    static String PROMOTION_NAME
+  OK    static String QUANTITY
+  OK    static String SCORE
+  OK    static String SCREEN_CLASS
+  OK    static String SCREEN_NAME
+  OK    static String SEARCH_TERM
+  OK    static String SHIPPING
+  OK    static String SHIPPING_TIER
+  OK    static String SOURCE
+  OK    static String SOURCE_PLATFORM
+  OK    static String START_DATE
+  OK    static String SUBSCRIPTION
+  OK    static String SUCCESS
+  OK    static String TAX
+  OK    static String TERM
+  OK    static String TRANSACTION_ID
+  OK    static String TRAVEL_CLASS
+  OK    static String VALUE
+  OK    static String VIRTUAL_CURRENCY_NAME
+com.google.firebase.analytics.FirebaseAnalytics.UserProperty
+  OK    UserProperty()
+  OK    static String ALLOW_AD_PERSONALIZATION_SIGNALS
+  OK    static String SIGN_UP_METHOD
+com.google.firebase.analytics.ParametersBuilder
+  OK    ParametersBuilder()
+  OK    Bundle getBundle()
+  OK    void param(String, double)
+  OK    void param(String, long)
+  OK    void param(String, Bundle)
+  OK    void param(String, String)
+  OK    void param(String, Bundle[])

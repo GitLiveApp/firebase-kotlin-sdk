@@ -11,8 +11,10 @@ public final class dev/gitlive/firebase/analytics/AnalyticsKt {
 }
 
 public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
-	public fun <init> (Lcom/google/firebase/analytics/FirebaseAnalytics;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/analytics/FirebaseAnalytics;
 	public final fun getSessionId (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
 	public final fun logEvent (Ljava/lang/String;Ljava/util/Map;)V
 	public static synthetic fun logEvent$default (Ldev/gitlive/firebase/analytics/FirebaseAnalytics;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)V
 	public final fun resetAnalyticsData ()V
@@ -22,6 +24,7 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalytics {
 	public final fun setSessionTimeoutInterval-LRDsOJo (J)V
 	public final fun setUserId (Ljava/lang/String;)V
 	public final fun setUserProperty (Ljava/lang/String;Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class dev/gitlive/firebase/analytics/FirebaseAnalytics$ConsentStatus : java/lang/Enum {
@@ -102,7 +105,7 @@ public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsEvents {
 	public static final field VIEW_SEARCH_RESULTS Ljava/lang/String;
 }
 
-public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsException : java/lang/Exception {
+public final class dev/gitlive/firebase/analytics/FirebaseAnalyticsException : com/google/firebase/FirebaseException {
 	public fun <init> (Ljava/lang/String;)V
 }
 
