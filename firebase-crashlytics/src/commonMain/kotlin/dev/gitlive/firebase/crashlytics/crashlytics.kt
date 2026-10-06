@@ -46,7 +46,9 @@ public fun Firebase.crashlytics(app: FirebaseApp): FirebaseCrashlytics = crashly
 public class FirebaseCrashlytics internal constructor(public val compat: CompatFirebaseCrashlytics) {
 
     /**
-     * Records a non-fatal report to send to Crashlytics.
+     * Records a non-fatal report to send to Crashlytics, with the exception's class, message and stack trace. On Apple
+     * platforms the stack frames are reported as code addresses of the Kotlin framework, which Crashlytics symbolicates
+     * from its dSYM.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      */

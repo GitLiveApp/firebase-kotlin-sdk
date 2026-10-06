@@ -36,7 +36,10 @@ public expect class FirebaseCrashlytics {
      */
     public fun log(message: String)
 
-    /** Records a non-fatal report. */
+    /**
+     * Records a non-fatal report with the exception's class, message and stack trace. On Apple platforms the stack
+     * frames are reported as code addresses of the Kotlin framework, which Crashlytics symbolicates from its dSYM.
+     */
     public fun recordException(throwable: Throwable)
 
     /**
