@@ -1,0 +1,528 @@
+// Source: generated from the published classes (the module is not open source) of com.google.firebase:firebase-auth-interop:20.0.0, com.google.firebase:firebase-auth:24.2.0
+// Signature format: 3.0
+package com.google.firebase.auth {
+
+  public abstract class ActionCodeEmailInfo extends com.google.firebase.auth.ActionCodeInfo {
+    ctor public ActionCodeEmailInfo();
+    method public String getEmail();
+    method public abstract String getPreviousEmail();
+  }
+
+  public class ActionCodeInfo {
+    ctor public ActionCodeInfo();
+    method public String getEmail();
+    field protected String email;
+  }
+
+  public abstract class ActionCodeMultiFactorInfo extends com.google.firebase.auth.ActionCodeInfo {
+    ctor public ActionCodeMultiFactorInfo();
+    method public abstract com.google.firebase.auth.MultiFactorInfo getMultiFactorInfo();
+  }
+
+  public interface ActionCodeResult {
+    method @Deprecated public String getData(int);
+    method public com.google.firebase.auth.ActionCodeInfo getInfo();
+    method public int getOperation();
+    field public static final int EMAIL = 0;
+    field public static final int ERROR = 3;
+    field public static final int FROM_EMAIL = 1;
+    field public static final int PASSWORD_RESET = 0;
+    field public static final int RECOVER_EMAIL = 2;
+    field public static final int REVERT_SECOND_FACTOR_ADDITION = 6;
+    field public static final int SIGN_IN_WITH_EMAIL_LINK = 4;
+    field public static final int VERIFY_BEFORE_CHANGE_EMAIL = 5;
+    field public static final int VERIFY_EMAIL = 1;
+  }
+
+  public static @interface ActionCodeResult.ActionDataKey {
+  }
+
+  public static @interface ActionCodeResult.Operation {
+  }
+
+  public class ActionCodeSettings {
+    method public boolean canHandleCodeInApp();
+    method public boolean getAndroidInstallApp();
+    method public String getAndroidMinimumVersion();
+    method public String getAndroidPackageName();
+    method public String getIOSBundle();
+    method public String getLinkDomain();
+    method public String getUrl();
+    method public static com.google.firebase.auth.ActionCodeSettings.Builder newBuilder();
+  }
+
+  public static class ActionCodeSettings.Builder {
+    method public com.google.firebase.auth.ActionCodeSettings build();
+    method @Deprecated public String getDynamicLinkDomain();
+    method public boolean getHandleCodeInApp();
+    method public String getIOSBundleId();
+    method public String getLinkDomain();
+    method public String getUrl();
+    method public com.google.firebase.auth.ActionCodeSettings.Builder setAndroidPackageName(String, boolean, String);
+    method @Deprecated public com.google.firebase.auth.ActionCodeSettings.Builder setDynamicLinkDomain(String);
+    method public com.google.firebase.auth.ActionCodeSettings.Builder setHandleCodeInApp(boolean);
+    method public com.google.firebase.auth.ActionCodeSettings.Builder setIOSBundleId(String);
+    method public com.google.firebase.auth.ActionCodeSettings.Builder setLinkDomain(String);
+    method public com.google.firebase.auth.ActionCodeSettings.Builder setUrl(String);
+  }
+
+  public class ActionCodeUrl {
+    method public String getApiKey();
+    method public String getCode();
+    method public String getContinueUrl();
+    method public String getLanguageCode();
+    method public int getOperation();
+    method public static com.google.firebase.auth.ActionCodeUrl parseLink(String);
+  }
+
+  public interface AdditionalUserInfo {
+    method public java.util.Map getProfile();
+    method public String getProviderId();
+    method public String getUsername();
+    method public boolean isNewUser();
+  }
+
+  public abstract class AuthCredential {
+    method public abstract String getProvider();
+    method public abstract String getSignInMethod();
+  }
+
+  public final class AuthKt {
+    method public static final com.google.firebase.auth.ActionCodeSettings actionCodeSettings(kotlin.jvm.functions.Function1);
+    method public static final com.google.firebase.auth.FirebaseAuth auth(com.google.firebase.Firebase, com.google.firebase.FirebaseApp);
+    method public static final com.google.firebase.auth.FirebaseAuth getAuth(com.google.firebase.Firebase);
+    method public static final com.google.firebase.auth.AuthCredential oAuthCredential(String, kotlin.jvm.functions.Function1);
+    method public static final com.google.firebase.auth.OAuthProvider oAuthProvider(String, com.google.firebase.auth.FirebaseAuth, kotlin.jvm.functions.Function1);
+    method public static final com.google.firebase.auth.OAuthProvider oAuthProvider(String, kotlin.jvm.functions.Function1);
+    method public static final com.google.firebase.auth.UserProfileChangeRequest userProfileChangeRequest(kotlin.jvm.functions.Function1);
+  }
+
+  public interface AuthResult {
+    method public com.google.firebase.auth.AdditionalUserInfo getAdditionalUserInfo();
+    method public com.google.firebase.auth.AuthCredential getCredential();
+    method public com.google.firebase.auth.FirebaseUser getUser();
+  }
+
+  public class EmailAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class EmailAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String, String);
+    method public static com.google.firebase.auth.AuthCredential getCredentialWithLink(String, String);
+    field public static final String EMAIL_LINK_SIGN_IN_METHOD = "emailLink";
+    field public static final String EMAIL_PASSWORD_SIGN_IN_METHOD = "password";
+    field public static final String PROVIDER_ID = "password";
+  }
+
+  public class FacebookAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class FacebookAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String);
+    field public static final String FACEBOOK_SIGN_IN_METHOD = "facebook.com";
+    field public static final String PROVIDER_ID = "facebook.com";
+  }
+
+  public abstract class FederatedAuthProvider {
+    ctor public FederatedAuthProvider();
+  }
+
+  public class FirebaseAuth {
+    method public void addAuthStateListener(com.google.firebase.auth.FirebaseAuth.AuthStateListener);
+    method public void addIdTokenListener(com.google.firebase.auth.FirebaseAuth.IdTokenListener);
+    method public com.google.android.gms.tasks.Task applyActionCode(String);
+    method public com.google.android.gms.tasks.Task checkActionCode(String);
+    method public com.google.android.gms.tasks.Task confirmPasswordReset(String, String);
+    method public com.google.android.gms.tasks.Task createUserWithEmailAndPassword(String, String);
+    method @Deprecated public com.google.android.gms.tasks.Task fetchSignInMethodsForEmail(String);
+    method public com.google.android.gms.tasks.Task getAccessToken(boolean);
+    method public com.google.firebase.FirebaseApp getApp();
+    method public com.google.firebase.auth.FirebaseUser getCurrentUser();
+    method public String getCustomAuthDomain();
+    method public com.google.firebase.auth.FirebaseAuthSettings getFirebaseAuthSettings();
+    method public static com.google.firebase.auth.FirebaseAuth getInstance();
+    method public static com.google.firebase.auth.FirebaseAuth getInstance(com.google.firebase.FirebaseApp);
+    method public String getLanguageCode();
+    method public com.google.android.gms.tasks.Task getPendingAuthResult();
+    method public String getTenantId();
+    method public String getUid();
+    method public com.google.android.gms.tasks.Task initializeRecaptchaConfig();
+    method public boolean isSignInWithEmailLink(String);
+    method public void removeAuthStateListener(com.google.firebase.auth.FirebaseAuth.AuthStateListener);
+    method public void removeIdTokenListener(com.google.firebase.auth.FirebaseAuth.IdTokenListener);
+    method public com.google.android.gms.tasks.Task revokeAccessToken(String);
+    method public com.google.android.gms.tasks.Task sendPasswordResetEmail(String);
+    method public com.google.android.gms.tasks.Task sendPasswordResetEmail(String, com.google.firebase.auth.ActionCodeSettings);
+    method public com.google.android.gms.tasks.Task sendSignInLinkToEmail(String, com.google.firebase.auth.ActionCodeSettings);
+    method public void setCustomAuthDomain(String);
+    method public com.google.android.gms.tasks.Task setFirebaseUIVersion(String);
+    method public void setLanguageCode(String);
+    method public void setTenantId(String);
+    method public com.google.android.gms.tasks.Task signInAnonymously();
+    method public com.google.android.gms.tasks.Task signInWithCredential(com.google.firebase.auth.AuthCredential);
+    method public com.google.android.gms.tasks.Task signInWithCustomToken(String);
+    method public com.google.android.gms.tasks.Task signInWithEmailAndPassword(String, String);
+    method public com.google.android.gms.tasks.Task signInWithEmailLink(String, String);
+    method public void signOut();
+    method public com.google.android.gms.tasks.Task startActivityForSignInWithProvider(android.app.Activity, com.google.firebase.auth.FederatedAuthProvider);
+    method public com.google.android.gms.tasks.Task updateCurrentUser(com.google.firebase.auth.FirebaseUser);
+    method public void useAppLanguage();
+    method public void useEmulator(String, int);
+    method public com.google.android.gms.tasks.Task verifyPasswordResetCode(String);
+  }
+
+  public static interface FirebaseAuth.AuthStateListener {
+    method public void onAuthStateChanged(com.google.firebase.auth.FirebaseAuth);
+  }
+
+  public static interface FirebaseAuth.IdTokenListener {
+    method public void onIdTokenChanged(com.google.firebase.auth.FirebaseAuth);
+  }
+
+  public final class FirebaseAuthActionCodeException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthActionCodeException(String, String);
+  }
+
+  public class FirebaseAuthEmailException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthEmailException(String, String);
+  }
+
+  public class FirebaseAuthException extends com.google.firebase.FirebaseException {
+    ctor public FirebaseAuthException(String, String);
+    method public String getErrorCode();
+  }
+
+  public class FirebaseAuthInvalidCredentialsException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthInvalidCredentialsException(String, String);
+  }
+
+  public final class FirebaseAuthInvalidUserException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthInvalidUserException(String, String);
+  }
+
+  public class FirebaseAuthMissingActivityForRecaptchaException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthMissingActivityForRecaptchaException();
+  }
+
+  public class FirebaseAuthMultiFactorException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthMultiFactorException(String, String, com.google.firebase.auth.MultiFactorResolver);
+    method public com.google.firebase.auth.MultiFactorResolver getResolver();
+  }
+
+  public interface FirebaseAuthProvider {
+    field public static final String PROVIDER_ID = "firebase";
+  }
+
+  public final class FirebaseAuthRecentLoginRequiredException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthRecentLoginRequiredException(String, String);
+  }
+
+  public abstract class FirebaseAuthSettings {
+    ctor public FirebaseAuthSettings();
+    method public abstract void forceRecaptchaFlowForTesting(boolean);
+    method public abstract void setAppVerificationDisabledForTesting(boolean);
+    method public abstract void setAutoRetrievedSmsCodeForPhoneNumber(String, String);
+  }
+
+  public final class FirebaseAuthUserCollisionException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthUserCollisionException(String, String);
+    method public final String getEmail();
+    method public final com.google.firebase.auth.AuthCredential getUpdatedCredential();
+  }
+
+  public final class FirebaseAuthWeakPasswordException extends com.google.firebase.auth.FirebaseAuthInvalidCredentialsException {
+    ctor public FirebaseAuthWeakPasswordException(String, String, String);
+    method public final String getReason();
+  }
+
+  public class FirebaseAuthWebException extends com.google.firebase.auth.FirebaseAuthException {
+    ctor public FirebaseAuthWebException(String, String);
+  }
+
+  public abstract class FirebaseUser implements com.google.firebase.auth.UserInfo {
+    ctor public FirebaseUser();
+    method public com.google.android.gms.tasks.Task delete();
+    method public abstract String getDisplayName();
+    method public abstract String getEmail();
+    method public com.google.android.gms.tasks.Task getIdToken(boolean);
+    method public abstract com.google.firebase.auth.FirebaseUserMetadata getMetadata();
+    method public abstract com.google.firebase.auth.MultiFactor getMultiFactor();
+    method public abstract String getPhoneNumber();
+    method public abstract android.net.Uri getPhotoUrl();
+    method public abstract java.util.List getProviderData();
+    method public abstract String getProviderId();
+    method public abstract String getTenantId();
+    method public abstract String getUid();
+    method public abstract boolean isAnonymous();
+    method public com.google.android.gms.tasks.Task linkWithCredential(com.google.firebase.auth.AuthCredential);
+    method public com.google.android.gms.tasks.Task reauthenticate(com.google.firebase.auth.AuthCredential);
+    method public com.google.android.gms.tasks.Task reauthenticateAndRetrieveData(com.google.firebase.auth.AuthCredential);
+    method public com.google.android.gms.tasks.Task reload();
+    method public com.google.android.gms.tasks.Task sendEmailVerification();
+    method public com.google.android.gms.tasks.Task sendEmailVerification(com.google.firebase.auth.ActionCodeSettings);
+    method public com.google.android.gms.tasks.Task startActivityForLinkWithProvider(android.app.Activity, com.google.firebase.auth.FederatedAuthProvider);
+    method public com.google.android.gms.tasks.Task startActivityForReauthenticateWithProvider(android.app.Activity, com.google.firebase.auth.FederatedAuthProvider);
+    method public com.google.android.gms.tasks.Task unlink(String);
+    method @Deprecated public com.google.android.gms.tasks.Task updateEmail(String);
+    method public com.google.android.gms.tasks.Task updatePassword(String);
+    method public com.google.android.gms.tasks.Task updatePhoneNumber(com.google.firebase.auth.PhoneAuthCredential);
+    method public com.google.android.gms.tasks.Task updateProfile(com.google.firebase.auth.UserProfileChangeRequest);
+    method public com.google.android.gms.tasks.Task verifyBeforeUpdateEmail(String);
+    method public com.google.android.gms.tasks.Task verifyBeforeUpdateEmail(String, com.google.firebase.auth.ActionCodeSettings);
+  }
+
+  public interface FirebaseUserMetadata {
+    method public long getCreationTimestamp();
+    method public long getLastSignInTimestamp();
+  }
+
+  public class GetTokenResult {
+    method public long getAuthTimestamp();
+    method public java.util.Map getClaims();
+    method public long getExpirationTimestamp();
+    method public long getIssuedAtTimestamp();
+    method public String getSignInProvider();
+    method public String getToken();
+  }
+
+  public class GithubAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class GithubAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String);
+    field public static final String GITHUB_SIGN_IN_METHOD = "github.com";
+    field public static final String PROVIDER_ID = "github.com";
+  }
+
+  public class GoogleAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class GoogleAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String, String);
+    field public static final String GOOGLE_SIGN_IN_METHOD = "google.com";
+    field public static final String PROVIDER_ID = "google.com";
+  }
+
+  public abstract class MultiFactor {
+    ctor public MultiFactor();
+    method public abstract com.google.android.gms.tasks.Task enroll(com.google.firebase.auth.MultiFactorAssertion, String);
+    method public abstract java.util.List getEnrolledFactors();
+    method public abstract com.google.android.gms.tasks.Task getSession();
+    method public abstract com.google.android.gms.tasks.Task unenroll(com.google.firebase.auth.MultiFactorInfo);
+    method public abstract com.google.android.gms.tasks.Task unenroll(String);
+  }
+
+  public abstract class MultiFactorAssertion {
+    ctor public MultiFactorAssertion();
+    method public abstract String getFactorId();
+  }
+
+  public abstract class MultiFactorInfo {
+    ctor public MultiFactorInfo();
+    method public abstract String getDisplayName();
+    method public abstract long getEnrollmentTimestamp();
+    method public abstract String getFactorId();
+    method public abstract String getUid();
+    method public abstract org.json.JSONObject toJson();
+    field public static final String FACTOR_ID_KEY = "factorIdKey";
+  }
+
+  public abstract class MultiFactorResolver {
+    ctor public MultiFactorResolver();
+    method public abstract com.google.firebase.auth.FirebaseAuth getFirebaseAuth();
+    method public abstract java.util.List getHints();
+    method public abstract com.google.firebase.auth.MultiFactorSession getSession();
+    method public abstract com.google.android.gms.tasks.Task resolveSignIn(com.google.firebase.auth.MultiFactorAssertion);
+  }
+
+  public abstract class MultiFactorSession {
+    ctor public MultiFactorSession();
+  }
+
+  public abstract class OAuthCredential extends com.google.firebase.auth.AuthCredential {
+    ctor public OAuthCredential();
+    method public abstract String getAccessToken();
+    method public abstract String getIdToken();
+    method public abstract String getSecret();
+  }
+
+  public class OAuthProvider extends com.google.firebase.auth.FederatedAuthProvider {
+    method @Deprecated public static com.google.firebase.auth.AuthCredential getCredential(String, String, String);
+    method public String getProviderId();
+    method public static com.google.firebase.auth.OAuthProvider.Builder newBuilder(String);
+    method public static com.google.firebase.auth.OAuthProvider.Builder newBuilder(String, com.google.firebase.auth.FirebaseAuth);
+    method public static com.google.firebase.auth.OAuthProvider.CredentialBuilder newCredentialBuilder(String);
+  }
+
+  public static class OAuthProvider.Builder {
+    method public com.google.firebase.auth.OAuthProvider.Builder addCustomParameter(String, String);
+    method public com.google.firebase.auth.OAuthProvider.Builder addCustomParameters(java.util.Map);
+    method public com.google.firebase.auth.OAuthProvider build();
+    method public com.google.firebase.auth.OAuthProvider.Builder setScopes(java.util.List);
+  }
+
+  public static class OAuthProvider.CredentialBuilder {
+    method public com.google.firebase.auth.AuthCredential build();
+    method public com.google.firebase.auth.OAuthProvider.CredentialBuilder setAccessToken(String);
+    method public com.google.firebase.auth.OAuthProvider.CredentialBuilder setIdToken(String);
+    method public com.google.firebase.auth.OAuthProvider.CredentialBuilder setIdTokenWithRawNonce(String, String);
+  }
+
+  public class PhoneAuthCredential extends com.google.firebase.auth.AuthCredential implements java.lang.Cloneable {
+    method public String getProvider();
+    method public String getSignInMethod();
+    method public String getSmsCode();
+  }
+
+  public final class PhoneAuthOptions {
+    method public static com.google.firebase.auth.PhoneAuthOptions.Builder newBuilder();
+    method public static com.google.firebase.auth.PhoneAuthOptions.Builder newBuilder(com.google.firebase.auth.FirebaseAuth);
+  }
+
+  public static final class PhoneAuthOptions.Builder {
+    ctor public PhoneAuthOptions.Builder(com.google.firebase.auth.FirebaseAuth);
+    method public final com.google.firebase.auth.PhoneAuthOptions build();
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder requireSmsValidation(boolean);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setActivity(android.app.Activity);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setCallbacks(com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setForceResendingToken(com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setMultiFactorHint(com.google.firebase.auth.PhoneMultiFactorInfo);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setMultiFactorSession(com.google.firebase.auth.MultiFactorSession);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setPhoneNumber(String);
+    method public final com.google.firebase.auth.PhoneAuthOptions.Builder setTimeout(Long, java.util.concurrent.TimeUnit);
+  }
+
+  public class PhoneAuthProvider {
+    method public static com.google.firebase.auth.PhoneAuthCredential getCredential(String, String);
+    method @Deprecated public static com.google.firebase.auth.PhoneAuthProvider getInstance();
+    method @Deprecated public static com.google.firebase.auth.PhoneAuthProvider getInstance(com.google.firebase.auth.FirebaseAuth);
+    method public static void verifyPhoneNumber(com.google.firebase.auth.PhoneAuthOptions);
+    method @Deprecated public void verifyPhoneNumber(String, long, java.util.concurrent.TimeUnit, android.app.Activity, com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks);
+    method @Deprecated public void verifyPhoneNumber(String, long, java.util.concurrent.TimeUnit, android.app.Activity, com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks, com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken);
+    field public static final String PHONE_SIGN_IN_METHOD = "phone";
+    field public static final String PROVIDER_ID = "phone";
+  }
+
+  public static class PhoneAuthProvider.ForceResendingToken {
+  }
+
+  public abstract static class PhoneAuthProvider.OnVerificationStateChangedCallbacks {
+    ctor public PhoneAuthProvider.OnVerificationStateChangedCallbacks();
+    method public void onCodeAutoRetrievalTimeOut(String);
+    method public void onCodeSent(String, com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken);
+    method public abstract void onVerificationCompleted(com.google.firebase.auth.PhoneAuthCredential);
+    method public abstract void onVerificationFailed(com.google.firebase.FirebaseException);
+  }
+
+  public class PhoneMultiFactorAssertion extends com.google.firebase.auth.MultiFactorAssertion {
+    ctor public PhoneMultiFactorAssertion(com.google.firebase.auth.PhoneAuthCredential);
+    method public String getFactorId();
+  }
+
+  public class PhoneMultiFactorGenerator {
+    ctor public PhoneMultiFactorGenerator();
+    method public static com.google.firebase.auth.PhoneMultiFactorAssertion getAssertion(com.google.firebase.auth.PhoneAuthCredential);
+    field public static final String FACTOR_ID = "phone";
+  }
+
+  public class PhoneMultiFactorInfo extends com.google.firebase.auth.MultiFactorInfo {
+    ctor public PhoneMultiFactorInfo(String, String, long, String);
+    method public String getDisplayName();
+    method public long getEnrollmentTimestamp();
+    method public String getFactorId();
+    method public String getPhoneNumber();
+    method public String getUid();
+    method public org.json.JSONObject toJson();
+  }
+
+  public class PlayGamesAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class PlayGamesAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String);
+    field public static final String PLAY_GAMES_SIGN_IN_METHOD = "playgames.google.com";
+    field public static final String PROVIDER_ID = "playgames.google.com";
+  }
+
+  public interface SignInMethodQueryResult {
+    method public java.util.List getSignInMethods();
+  }
+
+  public class TotpMultiFactorAssertion extends com.google.firebase.auth.MultiFactorAssertion {
+    ctor public TotpMultiFactorAssertion(String, com.google.firebase.auth.TotpSecret, String);
+    method public String getFactorId();
+  }
+
+  public final class TotpMultiFactorGenerator {
+    method public static com.google.android.gms.tasks.Task generateSecret(com.google.firebase.auth.MultiFactorSession);
+    method public static com.google.firebase.auth.TotpMultiFactorAssertion getAssertionForEnrollment(com.google.firebase.auth.TotpSecret, String);
+    method public static com.google.firebase.auth.TotpMultiFactorAssertion getAssertionForSignIn(String, String);
+    field public static final String FACTOR_ID = "totp";
+  }
+
+  public class TotpMultiFactorInfo extends com.google.firebase.auth.MultiFactorInfo {
+    method public String getDisplayName();
+    method public long getEnrollmentTimestamp();
+    method public String getFactorId();
+    method public String getUid();
+    method public org.json.JSONObject toJson();
+  }
+
+  public interface TotpSecret {
+    method public String generateQrCodeUrl();
+    method public String generateQrCodeUrl(String, String);
+    method public int getCodeIntervalSeconds();
+    method public int getCodeLength();
+    method public long getEnrollmentCompletionDeadline();
+    method public String getHashAlgorithm();
+    method public String getSessionInfo();
+    method public String getSharedSecretKey();
+    method public void openInOtpApp(String);
+    method public void openInOtpApp(String, String, android.app.Activity);
+  }
+
+  public class TwitterAuthCredential extends com.google.firebase.auth.AuthCredential {
+    method public String getProvider();
+    method public String getSignInMethod();
+  }
+
+  public class TwitterAuthProvider {
+    method public static com.google.firebase.auth.AuthCredential getCredential(String, String);
+    field public static final String PROVIDER_ID = "twitter.com";
+    field public static final String TWITTER_SIGN_IN_METHOD = "twitter.com";
+  }
+
+  public interface UserInfo {
+    method public String getDisplayName();
+    method public String getEmail();
+    method public String getPhoneNumber();
+    method public android.net.Uri getPhotoUrl();
+    method public String getProviderId();
+    method public String getUid();
+    method public boolean isEmailVerified();
+  }
+
+  public class UserProfileChangeRequest {
+    method public String getDisplayName();
+    method public android.net.Uri getPhotoUri();
+  }
+
+  public static class UserProfileChangeRequest.Builder {
+    ctor public UserProfileChangeRequest.Builder();
+    method public com.google.firebase.auth.UserProfileChangeRequest build();
+    method public com.google.firebase.auth.UserProfileChangeRequest.Builder setDisplayName(String);
+    method public com.google.firebase.auth.UserProfileChangeRequest.Builder setPhotoUri(android.net.Uri);
+  }
+
+}
+
