@@ -76,7 +76,10 @@ public class FirebaseRemoteConfig internal constructor(public val compat: Compat
     /** Returns the parameter value for the given key. */
     public fun getValue(key: String): FirebaseRemoteConfigValue = FirebaseRemoteConfigValue(compat.getValue(key))
 
-    /** Deletes all activated, fetched and defaults configs and resets the settings (a no-op on Apple and JS). */
+    /**
+     * Deletes all activated, fetched and defaults configs and resets the settings. On Apple and JS the activated values
+     * stay, as those SDKs expose no way to drop them: only the defaults are cleared and the settings restored.
+     */
     public suspend fun reset() {
         compat.reset().await()
     }

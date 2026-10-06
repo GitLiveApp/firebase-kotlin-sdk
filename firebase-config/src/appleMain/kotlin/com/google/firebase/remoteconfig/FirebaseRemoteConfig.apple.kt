@@ -82,8 +82,14 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
 
     public actual fun getValue(key: String): FirebaseRemoteConfigValue = IosRemoteConfigValue(ios.configValueForKey(key))
 
-    /** The iOS SDK has no reset; the returned task completes without doing anything. */
-    public actual fun reset(): Task<Nothing?> = completedTask()
+    /**
+     * The iOS SDK has no reset: the defaults are cleared and the settings restored, but the activated values stay, as the
+     * SDK exposes no way to drop them.
+     */
+    public actual fun reset(): Task<Nothing?> {
+        ios.setDefaults(emptyMap<Any?, Any?>())
+        return setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build())
+    }
 
     public actual fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?> {
         ios.configSettings = FIRRemoteConfigSettings().apply {

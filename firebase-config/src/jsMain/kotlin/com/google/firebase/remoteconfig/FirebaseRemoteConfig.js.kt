@@ -68,8 +68,14 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
 
     public actual fun getValue(key: String): FirebaseRemoteConfigValue = rethrow { JsRemoteConfigValue(getValue(js, key)) }
 
-    /** The JS SDK has no reset; the returned task completes without doing anything. */
-    public actual fun reset(): Task<Nothing?> = completedTask()
+    /**
+     * The JS SDK has no reset: the defaults are cleared and the settings restored, but the activated values stay, as the
+     * SDK exposes no way to drop them.
+     */
+    public actual fun reset(): Task<Nothing?> = rethrow {
+        js.defaultConfig = json()
+        setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build())
+    }
 
     public actual fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?> = rethrow {
         js.settings.fetchTimeoutMillis = settings.fetchTimeoutInSeconds * MILLIS_PER_SECOND

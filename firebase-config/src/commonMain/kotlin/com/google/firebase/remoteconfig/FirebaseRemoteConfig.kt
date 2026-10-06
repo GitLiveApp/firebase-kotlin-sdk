@@ -54,8 +54,8 @@ public expect class FirebaseRemoteConfig {
     public fun getValue(key: String): FirebaseRemoteConfigValue
 
     /**
-     * Clears the fetched, active and default config and the settings. The Apple and JS SDKs have no such operation, so
-     * the returned task completes without doing anything there.
+     * Clears the fetched, active and default config and the settings. The Apple and JS SDKs expose no way to drop the
+     * activated values, so there only the defaults are cleared and the settings restored.
      */
     public fun reset(): Task<Nothing?>
 
