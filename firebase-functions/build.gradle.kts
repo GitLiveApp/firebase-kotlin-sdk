@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -38,6 +41,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
         testOptions.configureTestOptions(project)
         packaging {
             resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -52,6 +56,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -184,9 +189,44 @@ kotlin {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")
             }
+            project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/androidMain/java")
         }
     }
 }
+
+// The Java helper compiled for the JVM target must match the Kotlin JVM target.
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+// The com.google.* declarations are header stubs on Android/JVM (see buildSrc utils/HeaderStubs.kt).
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // The String / Duration counterparts of the SDK's java.net.URL and TimeUnit members are real code from their own facades.
+    keepClasses = listOf(
+        "com/google/firebase/functions/FunctionsUrlKt.class",
+        "com/google/firebase/functions/HttpsCallableTimeoutKt.class",
+        "com/google/firebase/functions/FunctionsJvmApi.class",
+    ),
+    // firebase-java-sdk keeps these package-private / private (they are public in the Android SDK).
+    jvmMissingMembers = listOf(
+        "com/google/firebase/functions/FirebaseFunctionsException.<init>(Ljava/lang/String;Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;Ljava/lang/Object;)V",
+        "com/google/firebase/functions/FirebaseFunctionsException.<init>(Ljava/lang/String;Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+        "com/google/firebase/functions/FirebaseFunctionsException\$Code.fromValue(I)Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;",
+        "com/google/firebase/functions/FirebaseFunctionsException\$Code.fromHttpStatus(I)Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;",
+        "com/google/firebase/functions/HttpsCallableOptions.limitedUseAppCheckTokens",
+        "com/google/firebase/functions/HttpsCallableOptions\$Builder.limitedUseAppCheckTokens",
+    ),
+)
+
+registerAndroidSourceCompat("firebase-functions/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

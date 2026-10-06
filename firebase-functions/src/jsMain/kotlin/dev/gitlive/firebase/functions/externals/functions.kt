@@ -15,6 +15,8 @@ public external fun getFunctions(
 
 public external fun httpsCallable(functions: Functions, name: String, options: Json?): HttpsCallable
 
+public external fun httpsCallableFromURL(functions: Functions, url: String, options: Json?): HttpsCallable
+
 public external interface Functions
 
 public external interface HttpsCallableResult {
