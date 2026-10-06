@@ -7,13 +7,14 @@ package dev.gitlive.firebase.database
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
-import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
 import dev.gitlive.firebase.database.ChildEvent.Type.MOVED
 import dev.gitlive.firebase.database.ChildEvent.Type.REMOVED
+import dev.gitlive.firebase.internal.EncodedObject
+import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.encode
 import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
@@ -311,6 +312,8 @@ internal expect class NativeDatabaseReference : NativeQuery {
     suspend fun removeValue()
 
     suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot
+
+    suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot?
 }
 
 /**
@@ -426,6 +429,33 @@ public class DatabaseReference internal constructor(internal val nativeReference
      * @param handler An object to handle running the transaction
      */
     public suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit = {}, transactionUpdate: (currentData: T) -> T): DataSnapshot = nativeReference.runTransaction(strategy, buildSettings, transactionUpdate)
+
+    /**
+     * Run a transaction on the data at this location using [MutableData], which can read and write
+     * the data of any child location without serializing the whole tree.
+     *
+     * ```
+     * val snapshot = postRef.runTransaction { currentData ->
+     *     val post = currentData.value<Post?>()
+     *         ?: return@runTransaction success(currentData)
+     *     currentData.setValue(post.copy(starCount = post.starCount + 1))
+     *     success(currentData)
+     * }
+     * if (snapshot == null) {
+     *     // The transaction was aborted.
+     * }
+     * ```
+     *
+     * @param update A function which will be called, *possibly multiple times*, with the current
+     *     data at this location. It is responsible for inspecting that data and returning a
+     *     [Transaction.Result] specifying either the desired new data at the location or that the
+     *     transaction should be aborted. Since this function may be called repeatedly for the same
+     *     transaction, be extremely careful of any side effects it may trigger. Best practices are
+     *     to rely only on the data passed in via [MutableData].
+     * @return The committed [DataSnapshot], or null if the transaction was aborted.
+     * @throws DatabaseException if the transaction failed.
+     */
+    public suspend fun runTransaction(update: Transaction.(currentData: MutableData) -> Transaction.Result): DataSnapshot? = nativeReference.runTransaction(update)
 }
 
 /**
@@ -509,6 +539,100 @@ public expect class DataSnapshot {
  * Exception that gets thrown when an operation on Firebase Database fails.
  */
 public expect class DatabaseException(message: String?, cause: Throwable?) : RuntimeException
+
+public expect class MutableData {
+    /**
+     * @return The key name of this location, or null if it is the top-most location.
+     */
+    public val key: String?
+
+    /**
+     * The data at this location as a native type: null, a [Boolean], a number, a [String], or a
+     * [List] or [Map] of those for a location with children. Apple platforms read booleans back as
+     * the numbers 1 and 0. To read the data as a Kotlin type, use [value] with a type argument or a
+     * deserialization strategy, which also handles those booleans. To change it, use [setValue].
+     *
+     * @return The current data at this location as a native type, or null if no data exists.
+     */
+    public val value: Any?
+
+    /** Writes an already encoded value, which is safe to pass to the platform SDK as is. */
+    @PublishedApi
+    internal fun setEncodedValue(encodedValue: Any?)
+
+    /**
+     * Used to obtain a MutableData instance that represents the data at the given relative path.
+     * Note that changes made to the child MutableData instance will be visible to the parent.
+     *
+     * @param path A relative path from this location to the child location
+     * @return A MutableData instance representing the data at the given path
+     */
+    public fun child(path: String): MutableData
+
+    /**
+     * Indicates whether this MutableData has any children.
+     *
+     * @return True if this MutableData has any children, otherwise false
+     */
+    public val hasChildren: Boolean
+
+    /**
+     * Gives access to all the immediate children of this MutableData. Can be used in native for
+     * loops:
+     *
+     * ```
+     * for (MutableData child : parent.getChildren()) {
+     *     ...
+     * }
+     * ```
+     *
+     * @return The immediate children of this MutableData
+     */
+    public val children: Iterable<MutableData>
+}
+
+/**
+ * Deserializes the data at this location into [T].
+ *
+ * @return The current data at this location as [T].
+ */
+public inline fun <reified T> MutableData.value(): T = decode<T>(value = value)
+
+/**
+ * Deserializes the data at this location with [strategy].
+ *
+ * @return The current data at this location as [T].
+ */
+public inline fun <T> MutableData.value(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, value, buildSettings)
+
+/**
+ * Serializes [value] and sets it as the data at this location.
+ *
+ * @param value The value to write, encoded with [buildSettings], or null to remove the data
+ */
+public inline fun <reified T> MutableData.setValue(value: T?, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    setEncodedValue(encode(value, buildSettings))
+}
+
+/**
+ * Serializes [value] with [strategy] and sets it as the data at this location.
+ *
+ * @param value The value to write, encoded with [buildSettings]
+ */
+public inline fun <T> MutableData.setValue(strategy: SerializationStrategy<T>, value: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}) {
+    setEncodedValue(encode(strategy, value, buildSettings))
+}
+
+public class Transaction internal constructor() {
+    public fun success(resultData: MutableData): Result = Result.Success(data = resultData)
+
+    public fun abort(): Result = Result.Abort
+
+    public sealed class Result {
+        public data class Success internal constructor(val data: MutableData) : Result()
+        public object Abort : Result()
+    }
+}
 
 internal expect class NativeOnDisconnect {
     suspend fun removeValue()

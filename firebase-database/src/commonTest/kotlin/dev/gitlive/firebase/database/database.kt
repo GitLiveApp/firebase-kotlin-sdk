@@ -13,12 +13,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.nullable
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
@@ -149,6 +152,135 @@ class FirebaseDatabaseTest {
     }
 
     @Test
+    fun testMutableDataTransactionSuccess() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/counter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value<Double?>() ?: 0.0
+            currentData.setValue(current + 1.0)
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(6.0, snapshot.value<Double>())
+    }
+
+    @Test
+    fun testMutableDataTransactionAbort() = runTest {
+        ensureDatabaseConnected()
+        val userRef = database.reference("mutableDataTransaction/abortCounter")
+        userRef.setValue(5.0)
+
+        val snapshot = userRef.runTransaction { abort() }
+
+        assertNull(snapshot)
+        val unchanged = userRef.valueEvents.first().value<Double>()
+        assertEquals(5.0, unchanged)
+    }
+
+    @Test
+    fun testMutableDataTransactionWithSerializableType() = runTest {
+        ensureDatabaseConnected()
+        val data = DatabaseTest("PostFive", 5)
+        val userRef = database.reference("users/user_1/post_id_5")
+        setupDatabase(userRef, data, DatabaseTest.serializer())
+
+        val newTitle = "title"
+        val increment = 1
+
+        val snapshot = userRef.runTransaction { currentData ->
+            val current = currentData.value(DatabaseTest.serializer().nullable)
+                ?: return@runTransaction success(currentData)
+
+            currentData.setValue(
+                current.copy(
+                    title = newTitle,
+                    likes = current.likes + increment,
+                ),
+            )
+            success(currentData)
+        }
+
+        assertNotNull(snapshot, "Transaction result is null")
+        val result = snapshot.value(DatabaseTest.serializer())
+        assertEquals(newTitle, result.title)
+        assertEquals(data.likes + increment, result.likes)
+    }
+
+    @Test
+    fun testMutableDataTransactionChildWritesToParent() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("users/user_1/post_id_6")
+        reference.setValue(mapOf("title" to "PostSix", "likes" to 6, "removed" to "soon"))
+
+        val snapshot = reference.runTransaction { currentData ->
+            val likes = currentData.child("likes")
+            val current = likes.value<Int?>() ?: return@runTransaction success(currentData)
+            assertEquals("likes", likes.key)
+            assertTrue(currentData.hasChildren)
+            assertEquals(setOf("likes", "removed", "title"), currentData.children.mapNotNull { it.key }.toSet())
+            likes.setValue(current + 1)
+            currentData.child("removed").setValue<String?>(null)
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(DatabaseTest("PostSix", 7), snapshot.value(DatabaseTest.serializer()))
+        assertFalse(snapshot.child("removed").exists)
+    }
+
+    @Test
+    fun testMutableDataTransactionSetValuePlainTypes() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("mutableDataTransaction/plainTypes")
+        reference.setValue(mapOf("removed" to "soon"))
+
+        val snapshot = reference.runTransaction { currentData ->
+            currentData.child("boolean").setValue(true)
+            currentData.child("int").setValue(1)
+            currentData.child("long").setValue(2L)
+            currentData.child("double").setValue(3.5)
+            currentData.child("string").setValue("text")
+            currentData.child("list").setValue(listOf(1, 2))
+            currentData.child("map").setValue(mapOf<String, Any?>("nested" to "value", "flag" to false))
+            currentData.child("removed").setValue<String?>(null)
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals(true, snapshot.child("boolean").value<Boolean>())
+        assertEquals(1, snapshot.child("int").value<Int>())
+        assertEquals(2L, snapshot.child("long").value<Long>())
+        assertEquals(3.5, snapshot.child("double").value<Double>())
+        assertEquals("text", snapshot.child("string").value<String>())
+        assertEquals(listOf(1, 2), snapshot.child("list").value<List<Int>>())
+        assertEquals("value", snapshot.child("map/nested").value<String>())
+        assertEquals(false, snapshot.child("map/flag").value<Boolean>())
+        assertFalse(snapshot.child("removed").exists)
+    }
+
+    @Test
+    fun testMutableDataTransactionReadsRawLeafValues() = runTest {
+        ensureDatabaseConnected()
+        val reference = database.reference("mutableDataTransaction/rawLeaves")
+        reference.setValue(mapOf("title" to "PostEight", "likes" to 8, "flag" to true))
+
+        var seen: Triple<Any?, Any?, Boolean?>? = null
+        val snapshot = reference.runTransaction { currentData ->
+            // Apple reads booleans back as the numbers 1 and 0, which value<Boolean>() accepts
+            seen = Triple(currentData.child("title").value, currentData.child("likes").value, currentData.child("flag").value<Boolean?>())
+            success(currentData)
+        }
+
+        assertNotNull(snapshot)
+        assertEquals("PostEight", seen?.first)
+        assertEquals(8L, (seen?.second as? Number)?.toLong())
+        assertEquals(true, seen?.third)
+    }
+
+    @Test
     fun testSetServerTimestamp() = runTest {
         ensureDatabaseConnected()
         val testReference = database.reference("testSetServerTimestamp")
@@ -198,6 +330,29 @@ class FirebaseDatabaseTest {
         child.setValue(2)
         assertFailsWith<DatabaseException> {
             reference.updateChildren(mapOf("lastActivity" to "stringNotAllowed"))
+        }
+    }
+
+    @Test
+    fun testTransactionThrowsDatabaseException() = runTest {
+        ensureDatabaseConnected()
+        val ref = database.reference("FirebaseRealtimeDatabaseTest/lastActivity")
+        ref.setValue(1)
+        assertFailsWith<DatabaseException> {
+            ref.runTransaction(DatabaseTest.serializer()) { it.copy(likes = it.likes + 1) }
+        }
+    }
+
+    @Test
+    fun testMutableDataTransactionThrowsDatabaseException() = runTest {
+        ensureDatabaseConnected()
+        val ref = database.reference("FirebaseRealtimeDatabaseTest/lastActivity")
+        ref.setValue(1)
+        assertFailsWith<DatabaseException> {
+            ref.runTransaction { currentData ->
+                currentData.setValue("stringNotAllowed")
+                success(currentData)
+            }
         }
     }
 

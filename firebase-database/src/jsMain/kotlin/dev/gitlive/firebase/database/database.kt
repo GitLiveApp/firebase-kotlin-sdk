@@ -191,12 +191,25 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).await() }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = DataSnapshot(
-        jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
-            reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
-        }).await().snapshot,
-        database,
-    )
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = rethrow {
+        DataSnapshot(
+            jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+                reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
+            }).await().snapshot,
+            database,
+        )
+    }
+
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? = rethrow {
+        val result = jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+            val mutableData = MutableData(js.key, currentData)
+            when (val txResult = Transaction().update(mutableData)) {
+                is Transaction.Result.Success -> txResult.data.jsValue
+                Transaction.Result.Abort -> undefined
+            }
+        }).await()
+        if (result.committed) DataSnapshot(result.snapshot, database) else null
+    }
 }
 
 public val DataSnapshot.js: JsDataSnapshot get() = js
@@ -228,6 +241,69 @@ public actual class DataSnapshot internal constructor(
     }
     public actual val ref: DatabaseReference
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
+}
+
+public actual class MutableData private constructor(
+    private val root: Root,
+    private val path: List<String>,
+    public actual val key: String?,
+) {
+    internal constructor(key: String?, value: Any?) : this(Root(value), emptyList(), key)
+
+    /** The transaction's JS value, shared by this instance and every child obtained from it. */
+    private class Root(var value: Any?)
+
+    /** The JS value at [path] under the root. */
+    internal var jsValue: Any?
+        get() = path.fold(root.value) { parent, segment -> if (isObject(parent)) parent.asDynamic()[segment].unsafeCast<Any?>() else null }
+        set(value) {
+            if (path.isEmpty()) {
+                root.value = value
+                return
+            }
+            if (!isObject(root.value)) root.value = json()
+            var parent: dynamic = root.value
+            for (segment in path.dropLast(1)) {
+                if (!isObject(parent[segment].unsafeCast<Any?>())) parent[segment] = json()
+                parent = parent[segment]
+            }
+            parent[path.last()] = value
+        }
+
+    public actual val value: Any? get() = jsValue
+
+    @PublishedApi
+    internal actual fun setEncodedValue(encodedValue: Any?) {
+        jsValue = encodedValue.toJs()
+    }
+
+    public actual fun child(path: String): MutableData {
+        val segments = path.split("/").filter { it.isNotEmpty() }
+        return MutableData(root, this.path + segments, segments.lastOrNull() ?: key)
+    }
+
+    public actual val hasChildren: Boolean
+        get() = childKeys().isNotEmpty()
+
+    public actual val children: Iterable<MutableData>
+        get() = childKeys().map { MutableData(root, path + it, it) }
+
+    private fun childKeys(): List<String> {
+        val current = jsValue
+        if (!isObject(current)) return emptyList()
+        return (js("Object.keys")(current).unsafeCast<Array<String>>()).filter { current.asDynamic()[it] != null }
+    }
+
+    private fun isObject(value: Any?): Boolean = value != null && jsTypeOf(value) == "object"
+
+    /** [this] as a plain JS value: Kotlin maps become objects, collections arrays, longs numbers. */
+    private fun Any?.toJs(): Any? = when (this) {
+        is Long -> toDouble()
+        is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
+        is Collection<*> -> map { it.toJs() }.toTypedArray()
+        is Array<*> -> map { it.toJs() }.toTypedArray()
+        else -> this
+    }
 }
 
 internal actual class NativeOnDisconnect internal constructor(
