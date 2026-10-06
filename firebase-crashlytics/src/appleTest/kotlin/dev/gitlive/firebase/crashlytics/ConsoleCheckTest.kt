@@ -22,7 +22,7 @@ import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
 /** A Kotlin exception type of our own, so the console shows how a non-stdlib class name reads as the error domain. */
-class ConsoleCheckException(message: String) : RuntimeException(message)
+class ConsoleCheckException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 /**
  * Not a real test: records non-fatals into the fir-kotlin-sdk project so they can be looked at in the Crashlytics
@@ -63,7 +63,7 @@ class ConsoleCheckTest {
         crashlytics.setUserId("console-check")
         crashlytics.setCustomKey("recorded_at", NSDate().toString())
         crashlytics.log("console-check: recording two non-fatals")
-        crashlytics.recordException(ConsoleCheckException("Recorded by ConsoleCheckTest on the iOS simulator"))
+        crashlytics.recordException(ConsoleCheckException("Recorded by ConsoleCheckTest on the iOS simulator", IllegalArgumentException("The cause of the console check")))
         crashlytics.recordException(
             IllegalStateException("A second exception type, to show the grouping by Kotlin class"),
             mapOf("attempt" to 1, "source" to "ConsoleCheckTest"),

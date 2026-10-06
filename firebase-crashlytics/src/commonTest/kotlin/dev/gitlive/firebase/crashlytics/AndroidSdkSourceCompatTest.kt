@@ -84,6 +84,7 @@ class AndroidSdkSourceCompatTest {
         val mapKeys = mapOf("string" to "value", "boolean" to true, "double" to 1.5, "float" to 2.5f, "int" to 3, "long" to 4L, "byte" to 5.toByte())
         crashlytics.setCustomKeys(mapKeys)
         crashlytics.recordException(Exception("Test Exception"), mapKeys)
+        crashlytics.recordException(IllegalStateException("Test Exception with a cause", RuntimeException("Test Cause")))
 
         // Give the SDK time to persist the events before the test process exits.
         delay(1.seconds)

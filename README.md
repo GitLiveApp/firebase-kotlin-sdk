@@ -155,6 +155,16 @@ cocoapods {
 }
 ```
 
+#### Crashlytics stack traces on iOS
+
+`recordException` reports a Kotlin exception's own stack frames as code addresses of your Kotlin framework (its class as
+the issue name and its message as the reason), the way Kotlin/Native crash reporters such as CrashKiOS do. Crashlytics
+symbolicates those addresses from the framework's dSYM, so upload it along with your app's, for example with the
+Crashlytics run script pointed at the framework's dSYM or with
+`Pods/FirebaseCrashlytics/upload-symbols -gsp GoogleService-Info.plist -p ios shared.framework.dSYM`. Without the dSYM
+the frames show as addresses in the console. Release builds of Kotlin frameworks keep enough debug information for
+function names; line numbers need a debug build.
+
 ## Kotlin-first design
 
 Unlike the Kotlin Extensions for the Firebase Android SDK this project does not extend a Java based SDK so we get the full power of Kotlin including coroutines and serialization!

@@ -5,10 +5,13 @@
 package com.google.firebase.crashlytics
 
 import cocoapods.FirebaseCrashlytics.FIRCrashlytics
+import cocoapods.FirebaseCrashlytics.FIRExceptionModel
+import cocoapods.FirebaseCrashlytics.FIRStackFrame
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import platform.Foundation.NSError
 import platform.Foundation.NSLocalizedDescriptionKey
+import kotlin.experimental.ExperimentalNativeApi
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseCrashlytics internal constructor(public val ios: FIRCrashlytics) {
@@ -35,8 +38,18 @@ public actual class FirebaseCrashlytics internal constructor(public val ios: FIR
 
     public actual fun log(message: String): Unit = ios.log(message)
 
-    public actual fun recordException(throwable: Throwable): Unit = ios.recordError(throwable.asNSError())
+    /**
+     * Records the exception as a Crashlytics exception model: its class as the name, its message as the reason and its
+     * own stack frames as code addresses, which Crashlytics symbolicates from the Kotlin framework's dSYM (see the README),
+     * each cause following after a `Caused by:` frame. Recording an `NSError` instead would only capture the native stack
+     * of this call.
+     */
+    public actual fun recordException(throwable: Throwable): Unit = ios.recordExceptionModel(throwable.asExceptionModel())
 
+    /**
+     * Only an `NSError` takes per-event keys in the iOS SDK, and it carries the native stack of this call rather than the
+     * exception's own frames, so the exception is attached as `KotlinException` with its message as the description.
+     */
     public actual fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues): Unit = ios.recordError(throwable.asNSError(), keysAndValues.asNSDictionary())
 
     public actual fun sendUnsentReports(): Unit = ios.sendUnsentReports()
@@ -115,6 +128,27 @@ public actual class KeyValueBuilder internal actual constructor() {
 
 @Suppress("UNCHECKED_CAST")
 private fun CustomKeysAndValues.asNSDictionary(): Map<Any?, *> = keysAndValues as Map<Any?, *>
+
+/**
+ * The exception's class, message and stack frames as a Crashlytics exception model. The frames are the exception's own
+ * code addresses (not the native stack of the recording call), for Crashlytics to symbolicate from the framework's dSYM,
+ * as the Kotlin/Native crash reporters (CrashKiOS, Sentry) submit them; the frames of each cause follow after a frame
+ * naming it, as Crashlytics models a single stack.
+ */
+@OptIn(ExperimentalNativeApi::class)
+private fun Throwable.asExceptionModel(): FIRExceptionModel {
+    val frames = mutableListOf<FIRStackFrame>()
+    val seen = mutableSetOf<Throwable>()
+    var throwable: Throwable? = this
+    while (throwable != null && seen.add(throwable)) {
+        if (throwable !== this) frames += FIRStackFrame.stackFrameWithSymbol("Caused by: ${throwable.description()}", "", 0)
+        throwable.getStackTraceAddresses().mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
+        throwable = throwable.cause
+    }
+    return FIRExceptionModel(name = this::class.qualifiedName ?: "KotlinException", reason = message ?: "").apply { stackTrace = frames }
+}
+
+private fun Throwable.description(): String = (this::class.qualifiedName ?: "KotlinException") + (message?.let { ": $it" } ?: "")
 
 /** Wraps a Kotlin exception as an `NSError` carrying it as `KotlinException`, with the message as the description. */
 private fun Throwable.asNSError(): NSError {
