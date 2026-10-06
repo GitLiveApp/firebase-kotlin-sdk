@@ -30,14 +30,15 @@ fun Project.registerAndroidSourceCompat(vararg androidSdkApiFiles: String) {
     val configure: AndroidSourceCompatTask.(Boolean) -> Unit = { checkMode ->
         group = "api"
         moduleName.set(project.name)
-        bcvDump.set(layout.projectDirectory.file("api/android/${project.name}.api"))
+        // binary-compatibility-validator writes api/<target>/<module>.api with several JVM targets, api/<module>.api with one.
+        bcvDump.set(layout.projectDirectory.file(if (layout.projectDirectory.dir("api/android").asFile.isDirectory) "api/android/${project.name}.api" else "api/${project.name}.api"))
         this.androidSdkApiFiles.from(fileTree(sdkDir) { include("*.api.txt") })
         sdkDir.file("exclusions.txt").takeIf { it.asFile.exists() }?.let { exclusionsFile.set(it) }
         headerStubDumps.from(layout.buildDirectory.file("header-stubs/compileReleaseKotlinAndroid.api"))
         dependsOn(provider { tasks.findByName("compileReleaseKotlinAndroid") })
         check.set(checkMode)
         reportFile.set(layout.projectDirectory.file("api/android-sdk-compat.txt"))
-        mustRunAfter("androidApiDump")
+        mustRunAfter(tasks.matching { it.name == "androidApiDump" || it.name == "apiDump" })
     }
     tasks.register("androidSourceCompatDump", AndroidSourceCompatTask::class.java) {
         description = "Writes api/android-sdk-compat.txt: which Firebase Android SDK APIs this module provides"
