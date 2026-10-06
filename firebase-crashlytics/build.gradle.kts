@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
 import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
 import utils.applyFirebaseHierarchy
@@ -221,5 +222,24 @@ mavenPublishing {
                 comments.set("A business-friendly OSS license")
             }
         }
+    }
+}
+
+// The Crashlytics SDK refuses to start in a process without a bundle identifier ("An application must have a valid
+// bundle identifier in its Info.plist"), which a bare test executable has none of, so the simulator tests embed one as a
+// bundled app has; without it the SDK silently dropped everything the tests recorded. The entitlements let the
+// Installations SDK use the keychain, so the reports carry a Firebase installation id (as in firebase-installations).
+kotlin.targets.withType<KotlinNativeTargetWithSimulatorTests>().configureEach {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__info_plist",
+            file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
+        )
     }
 }
