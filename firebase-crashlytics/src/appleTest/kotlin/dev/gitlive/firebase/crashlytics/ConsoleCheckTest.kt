@@ -59,7 +59,7 @@ class ConsoleCheckTest {
         println("console-check: did crash on previous execution = ${crashlytics.didCrashOnPreviousExecution()}")
 
         crashlytics.setUserId("console-check")
-        crashlytics.setCustomKey("recorded_at", NSDate().description)
+        crashlytics.setCustomKey("recorded_at", NSDate().toString())
         crashlytics.log("console-check: recording two non-fatals")
         crashlytics.recordException(ConsoleCheckException("Recorded by ConsoleCheckTest on the iOS simulator"))
         crashlytics.recordException(
