@@ -249,6 +249,12 @@ kotlin.targets.withType<KotlinNativeTargetWithSimulatorTests>().configureEach {
             "__TEXT",
             "__info_plist",
             file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
+            // The Installations SDK keeps the installation id in the keychain, which needs entitlements (as in
+            // firebase-installations); without it Crashlytics reports carry no Firebase installation id.
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
         )
     }
 }
