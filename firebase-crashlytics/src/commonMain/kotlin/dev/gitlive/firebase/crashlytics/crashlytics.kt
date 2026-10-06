@@ -63,7 +63,9 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      * pairs. New keys beyond that limit are ignored. Keys or values that exceed 1024 characters are
      * truncated.
      *
-     * The values of event keys override the values of app level custom keys if they're identical.
+     * The values of event keys override the values of app level custom keys if they're identical. On Apple platforms,
+     * where the SDK has no per-event keys, they are logged as `key = value` lines just before the event, so they show in
+     * its logs rather than its keys.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      * @param customKeys A dictionary of keys and the values to associate with the non fatal

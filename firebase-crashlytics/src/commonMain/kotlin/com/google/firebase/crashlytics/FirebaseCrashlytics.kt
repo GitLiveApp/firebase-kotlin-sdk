@@ -44,7 +44,8 @@ public expect class FirebaseCrashlytics {
 
     /**
      * Records a non-fatal report with [keysAndValues] attached to the event, in addition to the app level custom keys;
-     * the event keys override app level keys of the same name.
+     * the event keys override app level keys of the same name. On Apple platforms, where the SDK has no per-event keys,
+     * they are logged as `key = value` lines just before the event, so they show in its logs rather than its keys.
      */
     public fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues)
 

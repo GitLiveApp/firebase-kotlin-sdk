@@ -9,8 +9,6 @@ import cocoapods.FirebaseCrashlytics.FIRExceptionModel
 import cocoapods.FirebaseCrashlytics.FIRStackFrame
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
-import platform.Foundation.NSError
-import platform.Foundation.NSLocalizedDescriptionKey
 import kotlin.experimental.ExperimentalNativeApi
 
 /** @property ios The underlying Firebase iOS SDK object. */
@@ -47,10 +45,15 @@ public actual class FirebaseCrashlytics internal constructor(public val ios: FIR
     public actual fun recordException(throwable: Throwable): Unit = ios.recordExceptionModel(throwable.asExceptionModel())
 
     /**
-     * Only an `NSError` takes per-event keys in the iOS SDK, and it carries the native stack of this call rather than the
-     * exception's own frames, so the exception is attached as `KotlinException` with its message as the description.
+     * Records the exception as [recordException] does, with the keys logged just before it as `key = value` lines, so
+     * that they show in the event's logs. The iOS SDK takes per-event keys only on an `NSError`, which carries the native
+     * stack of the recording call instead of the exception's frames, and its custom keys are session state that the
+     * report carries as one final map, so neither attaches keys to a single event.
      */
-    public actual fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues): Unit = ios.recordError(throwable.asNSError(), keysAndValues.asNSDictionary())
+    public actual fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues) {
+        keysAndValues.keysAndValues.forEach { (key, value) -> ios.log("$key = $value") }
+        ios.recordExceptionModel(throwable.asExceptionModel())
+    }
 
     public actual fun sendUnsentReports(): Unit = ios.sendUnsentReports()
 
@@ -149,10 +152,3 @@ private fun Throwable.asExceptionModel(): FIRExceptionModel {
 }
 
 private fun Throwable.description(): String = (this::class.qualifiedName ?: "KotlinException") + (message?.let { ": $it" } ?: "")
-
-/** Wraps a Kotlin exception as an `NSError` carrying it as `KotlinException`, with the message as the description. */
-private fun Throwable.asNSError(): NSError {
-    val userInfo = mutableMapOf<Any?, Any>("KotlinException" to this)
-    message?.let { userInfo[NSLocalizedDescriptionKey] = it }
-    return NSError.errorWithDomain(this::class.qualifiedName, 0, userInfo)
-}
