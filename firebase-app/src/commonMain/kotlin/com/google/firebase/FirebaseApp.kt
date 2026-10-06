@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.DELETE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
 import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
 
@@ -22,7 +23,11 @@ public expect class FirebaseApp {
     /** The options this app was configured with. */
     public val options: FirebaseOptions
 
-    /** Deletes this app and frees its resources. A no-op if the app was already deleted. */
+    /**
+     * Deletes this app and frees its resources; a no-op if the app was already deleted. Android only: it returns
+     * before the deletion completes on Apple platforms and JS, so common code uses [deleteApp], which returns a `Task`.
+     */
+    @Deprecated(DELETE_ANDROID_ONLY, ReplaceWith("deleteApp()", "com.google.firebase.deleteApp"), DeprecationLevel.ERROR)
     public fun delete()
 
     /**

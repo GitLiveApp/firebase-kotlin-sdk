@@ -7,6 +7,7 @@ package com.google.firebase
 import cocoapods.FirebaseCore.FIRApp
 import cocoapods.FirebaseCore.FIROptions
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
+import dev.gitlive.firebase.DELETE_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
 import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
@@ -29,6 +30,7 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
 
     public actual val options: FirebaseOptions get() = FirebaseOptions(ios.options)
 
+    @Deprecated(DELETE_ANDROID_ONLY, ReplaceWith("deleteApp()", "com.google.firebase.deleteApp"), DeprecationLevel.ERROR)
     public actual fun delete() {
         ios.deleteApp { }
     }

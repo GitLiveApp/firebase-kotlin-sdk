@@ -4,6 +4,7 @@
 
 @file:JvmName("FirebaseKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase
 
@@ -11,6 +12,10 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 import com.google.firebase.app
+import com.google.firebase.deleteApp
+import com.google.firebase.getApps
+import com.google.firebase.initialize as compatInitialize
+import kotlinx.coroutines.tasks.await
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
@@ -20,6 +25,13 @@ import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
  * Acts as a target for extension methods provided by sdks.
  */
 public object Firebase
+
+/**
+ * Message of the deprecated `dev.gitlive` members that only delegate to the `com.google.firebase` layer, which common
+ * code can use directly; each names its counterpart in a `ReplaceWith`.
+ */
+internal const val DELEGATES_TO_ANDROID_SDK_API =
+    "Only delegates to the com.google.firebase layer, which common code can use directly; see the ReplaceWith"
 
 /**
  * The entry point of Firebase SDKs. It holds common configuration and state for Firebase APIs. Most
@@ -38,6 +50,7 @@ public object Firebase
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.FirebaseApp] this app wraps.
  */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.FirebaseApp"))
 public class FirebaseApp internal constructor(public val compat: CompatFirebaseApp) {
     /** Returns the unique name of this app. */
     public val name: String get() = compat.name
@@ -51,35 +64,47 @@ public class FirebaseApp internal constructor(public val compat: CompatFirebaseA
      *
      * A no-op if delete was called before.
      */
-    public suspend fun delete(): Unit = compat.deleteAwaiting()
+    public suspend fun delete() {
+        compat.deleteApp().await()
+    }
 
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.compat == compat
 
     override fun hashCode(): Int = compat.hashCode()
 
-    override fun toString(): String = "FirebaseApp(name=$name)"
+    override fun toString(): String = "FirebaseApp(name=${compat.name})"
 }
 
 /** Returns the default firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app", "com.google.firebase.app"))
 public val Firebase.app: FirebaseApp
     get() = FirebaseApp(com.google.firebase.Firebase.app)
 
 /** Returns a named firebase app instance. */
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.app(name)", "com.google.firebase.app"))
 public fun Firebase.app(name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.app(name))
 
 /** Returns all firebase app instances. */
-public expect fun Firebase.apps(context: Any? = null): List<FirebaseApp>
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.getApps(context)", "com.google.firebase.getApps"))
+public fun Firebase.apps(context: Any? = null): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null): FirebaseApp?
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null): FirebaseApp? = com.google.firebase.Firebase.compatInitialize(context)?.let { FirebaseApp(it) }
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat()))
 
 /** Initializes and returns a FirebaseApp. */
-public expect fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp
+@Deprecated(DELEGATES_TO_ANDROID_SDK_API, ReplaceWith("com.google.firebase.Firebase.initialize(context, options, name)", "com.google.firebase.initialize"))
+public fun Firebase.initialize(context: Any? = null, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.compatInitialize(context, options.toCompat(), name))
 
-/** Configurable Firebase options. */
+/** Configurable Firebase options; the `com.google.firebase.FirebaseOptions(...)` factory takes the same named values and returns the Android-SDK-shaped ones. */
+@Deprecated(
+    DELEGATES_TO_ANDROID_SDK_API,
+    ReplaceWith("com.google.firebase.FirebaseOptions(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId, authDomain)", "com.google.firebase.FirebaseOptions"),
+)
 public data class FirebaseOptions(
     /** The Google App ID that is used to uniquely identify an instance of an app. */
     val applicationId: String,
@@ -134,15 +159,23 @@ public typealias FirebaseTooManyRequestsException = com.google.firebase.Firebase
  */
 public typealias FirebaseApiNotAvailableException = com.google.firebase.FirebaseApiNotAvailableException
 
-/** Deletes the app, waiting for the platform SDK to finish where it reports completion asynchronously. */
-internal expect suspend fun CompatFirebaseApp.deleteAwaiting()
-
 /** Converts to the Android-SDK-shaped options (platform specific because JS also carries [FirebaseOptions.authDomain]). */
 internal expect fun FirebaseOptions.toCompat(): CompatFirebaseOptions
 
 internal expect fun CompatFirebaseOptions.toPublic(): FirebaseOptions
 
-internal fun FirebaseOptions.toCompatBuilder(): CompatFirebaseOptions.Builder = CompatFirebaseOptions.Builder()
+internal fun FirebaseOptions.toCompatBuilder(): CompatFirebaseOptions.Builder = compatOptionsBuilder(applicationId, apiKey, databaseUrl, gaTrackingId, storageBucket, projectId, gcmSenderId)
+
+/** The Android-SDK-shaped builder for the given values; shipped, since the `com.google.firebase.FirebaseOptions(...)` factory uses it. */
+internal fun compatOptionsBuilder(
+    applicationId: String,
+    apiKey: String,
+    databaseUrl: String?,
+    gaTrackingId: String?,
+    storageBucket: String?,
+    projectId: String?,
+    gcmSenderId: String?,
+): CompatFirebaseOptions.Builder = CompatFirebaseOptions.Builder()
     .setApplicationId(applicationId)
     .setApiKey(apiKey)
     .setDatabaseUrl(databaseUrl)
