@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
@@ -236,5 +237,18 @@ if (supportedPlatforms.supportsApple()) {
         standalone.set(false)
         device.set("booted")
         testLogging { showStandardStreams = true }
+    }
+}
+
+// The Crashlytics SDK refuses to start in a process without a bundle identifier ("An application must have a valid
+// bundle identifier in its Info.plist"), which a bare test executable has none of: embed one, as a bundled app has.
+kotlin.targets.withType<KotlinNativeTargetWithSimulatorTests>().configureEach {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__info_plist",
+            file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
+        )
     }
 }

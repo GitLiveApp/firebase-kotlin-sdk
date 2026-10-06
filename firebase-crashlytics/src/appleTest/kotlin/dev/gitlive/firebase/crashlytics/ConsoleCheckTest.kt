@@ -55,6 +55,8 @@ class ConsoleCheckTest {
             ),
         )
         val crashlytics = Firebase.crashlytics(app)
+        // Crashlytics initialises on a background queue after the app is configured; give it a moment.
+        delay(5.seconds)
         println("console-check: collection enabled = ${crashlytics.compat.isCrashlyticsCollectionEnabled}")
         println("console-check: did crash on previous execution = ${crashlytics.didCrashOnPreviousExecution()}")
 
