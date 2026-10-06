@@ -8,6 +8,7 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
+import platform.Foundation.NSDecimalNumber
 import kotlin.collections.get
 
 internal actual fun FirebaseDecoderImpl.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder = when (descriptor.kind) {
@@ -37,4 +38,11 @@ private fun FirebaseDecoderImpl.decodeAsMap(isNestedPolymorphic: Boolean): Compo
             map[desc.getElementName(index)]
         }
     }
+}
+
+// Kotlin/Native bridges a plain NSNumber to a Kotlin Number, but not NSDecimalNumber.
+// Parse stringValue, since NSDecimalNumber.doubleValue is not correctly rounded.
+internal actual fun normalizePlatformNumber(value: Any?): Any? = when (value) {
+    is NSDecimalNumber -> value.stringValue.let { it.toLongOrNull() ?: it.toDouble() }
+    else -> value
 }

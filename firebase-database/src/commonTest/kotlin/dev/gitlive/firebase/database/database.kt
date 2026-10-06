@@ -42,6 +42,9 @@ class FirebaseDatabaseTest {
     @Serializable
     data class DatabaseTest(val title: String, val likes: Int = 0)
 
+    @Serializable
+    data class HighPrecisionTest(val value: Double = 0.0, val nullableValue: Double? = null)
+
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
@@ -95,6 +98,23 @@ class FirebaseDatabaseTest {
         val snapshot = testReference.get()
 
         assertEquals(testValue, snapshot.value<String>())
+    }
+
+    @Test
+    fun testGetHighPrecisionDoubleFromServer() = runTest {
+        ensureDatabaseConnected()
+        // Apple returns this value from the server as an NSDecimalNumber
+        val highPrecisionDouble = 0.029661016538739204
+        database.reference("highPrecision").setValue(HighPrecisionTest(highPrecisionDouble, highPrecisionDouble))
+
+        // Read through a fresh app so the value comes from the server, not the local cache
+        Firebase.apps(context).forEach { it.delete() }
+        initializeFirebase()
+        ensureDatabaseConnected()
+
+        val snapshot = database.reference("highPrecision").get()
+        assertEquals(HighPrecisionTest(highPrecisionDouble, highPrecisionDouble), snapshot.value<HighPrecisionTest>())
+        assertEquals(highPrecisionDouble, snapshot.child("value").value<Double>())
     }
 
     @Test
