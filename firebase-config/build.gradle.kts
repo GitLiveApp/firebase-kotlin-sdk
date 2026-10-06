@@ -199,7 +199,7 @@ stripHeaderStubs(
         "com/google/firebase/remoteconfig/CustomSignals",
         "com/google/firebase/remoteconfig/CustomSignals\$Builder",
         "com/google/firebase/remoteconfig/FirebaseRemoteConfig.setCustomSignals(Lcom/google/firebase/remoteconfig/CustomSignals;)Lcom/google/android/gms/tasks/Task;",
-        "com/google/firebase/remoteconfig/RemoteConfigUpdatesKt.customSignals(Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/remoteconfig/CustomSignals;",
+        "com/google/firebase/remoteconfig/RemoteConfigKt.customSignals(Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/remoteconfig/CustomSignals;",
     ),
 )
 

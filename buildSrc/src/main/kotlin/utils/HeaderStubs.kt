@@ -148,9 +148,10 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     /**
      * Kotlin-only classes and members that have no counterpart on the real (Java) class and are never reached at runtime,
      * including the non-public classes of plain common code (private implementations, lambdas), which only its own
-     * stripped code uses.
+     * stripped code uses, and the synthetic parts of a multifile facade (`Facade__PartKt`), whose members the facade
+     * itself declares.
      */
-    val isKotlinOnly get() = name.endsWith("\$Companion") || name.contains("\$WhenMappings") || name.contains("\$EntriesMappings") || access and Opcodes.ACC_PUBLIC == 0 || isAnonymous
+    val isKotlinOnly get() = name.endsWith("\$Companion") || name.contains("\$WhenMappings") || name.contains("\$EntriesMappings") || access and Opcodes.ACC_PUBLIC == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || isAnonymous
 
     /** An anonymous object or lambda class (`Outer$fn$1`), an implementation detail of plain common code. */
     val isAnonymous get() = anonymousClass.containsMatchIn(name)
