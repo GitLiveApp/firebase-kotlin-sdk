@@ -226,20 +226,27 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
  */
 public open class FirebaseCrashlyticsException(message: String) : FirebaseException(message)
 
-/** Records a non-fatal report with [customKeys] attached to the event; see [CompatFirebaseCrashlytics.recordException]. */
+/**
+ * Records a non-fatal report with [customKeys] attached to the event; see [CompatFirebaseCrashlytics.recordException].
+ * `String`, `Boolean`, `Double`, `Float`, `Int` and `Long` values keep their type, any other value is attached as its
+ * `toString()`.
+ */
 public fun CompatFirebaseCrashlytics.recordException(throwable: Throwable, customKeys: Map<String, Any>) {
     recordException(throwable, customKeys.toCustomKeysAndValues())
 }
 
 /**
- * Sets [customKeys] (`String`, `Boolean`, `Double`, `Float`, `Int` or `Long` values) that are attached to subsequent
- * reports; see [CompatFirebaseCrashlytics.setCustomKeys].
+ * Sets [customKeys] that are attached to subsequent reports; see [CompatFirebaseCrashlytics.setCustomKeys]. `String`,
+ * `Boolean`, `Double`, `Float`, `Int` and `Long` values keep their type, any other value is attached as its `toString()`.
  */
 public fun CompatFirebaseCrashlytics.setCustomKeys(customKeys: Map<String, Any>) {
     setCustomKeys(customKeys.toCustomKeysAndValues())
 }
 
-/** Values of other types are ignored, as before the compatibility layer. */
+/**
+ * The Android SDK's builder takes six value types; a value of any other type is attached as its `toString()`, which is
+ * what Crashlytics stores for every custom key anyway, rather than dropped.
+ */
 private fun Map<String, Any>.toCustomKeysAndValues(): CustomKeysAndValues = CustomKeysAndValues.Builder().apply {
     forEach { (key, value) ->
         when (value) {
@@ -249,6 +256,7 @@ private fun Map<String, Any>.toCustomKeysAndValues(): CustomKeysAndValues = Cust
             is Float -> putFloat(key, value)
             is Int -> putInt(key, value)
             is Long -> putLong(key, value)
+            else -> putString(key, value.toString())
         }
     }
 }.build()
