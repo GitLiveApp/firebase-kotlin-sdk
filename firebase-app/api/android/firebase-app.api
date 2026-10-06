@@ -16,6 +16,58 @@ public final class com/google/firebase/TimestampInstantKt {
 	public static final fun toKotlinInstant (Lcom/google/firebase/Timestamp;)Lkotlin/time/Instant;
 }
 
+public abstract class com/google/firebase/serialization/FirebaseFormat : kotlinx/serialization/SerialFormat {
+	public synthetic fun <init> (Lkotlinx/serialization/modules/SerializersModule;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun convertToCustomClass (Ljava/lang/Object;Lkotlin/reflect/KClass;Ljava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun convertToCustomClass$default (Lcom/google/firebase/serialization/FirebaseFormat;Ljava/lang/Object;Lkotlin/reflect/KClass;Ljava/lang/Object;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun convertToPlainValue (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun decodeFromPlainValue (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun decodeFromPlainValue$default (Lcom/google/firebase/serialization/FirebaseFormat;Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun encodeToPlainValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
+	public final fun serializerFor (Lkotlin/reflect/KType;)Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/google/firebase/serialization/FirebaseFormat$Database : com/google/firebase/serialization/FirebaseFormat {
+	public fun <init> (Lcom/google/firebase/serialization/MappingAnnotations;Lkotlin/jvm/functions/Function1;Lkotlinx/serialization/modules/SerializersModule;)V
+	public synthetic fun <init> (Lcom/google/firebase/serialization/MappingAnnotations;Lkotlin/jvm/functions/Function1;Lkotlinx/serialization/modules/SerializersModule;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getAnnotations ()Lcom/google/firebase/serialization/MappingAnnotations;
+	public final fun getException ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class com/google/firebase/serialization/FirebaseFormat$Firestore : com/google/firebase/serialization/FirebaseFormat {
+	public fun <init> (Lcom/google/firebase/serialization/FirebaseFormat$Firestore$Bindings;Lkotlinx/serialization/modules/SerializersModule;)V
+	public synthetic fun <init> (Lcom/google/firebase/serialization/FirebaseFormat$Firestore$Bindings;Lkotlinx/serialization/modules/SerializersModule;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getBindings ()Lcom/google/firebase/serialization/FirebaseFormat$Firestore$Bindings;
+}
+
+public abstract interface class com/google/firebase/serialization/FirebaseFormat$Firestore$Bindings {
+	public abstract fun documentId (Ljava/lang/Object;)Ljava/lang/String;
+	public abstract fun documentPath (Ljava/lang/Object;)Ljava/lang/String;
+	public abstract fun getAnnotations ()Lcom/google/firebase/serialization/MappingAnnotations;
+	public abstract fun getDocumentReferenceType ()Lkotlin/reflect/KClass;
+	public abstract fun getNativeTypes ()Ljava/util/List;
+	public abstract fun serverTimestamp ()Ljava/lang/Object;
+}
+
+public final class com/google/firebase/serialization/FirebaseFormat$Functions : com/google/firebase/serialization/FirebaseFormat {
+	public fun <init> ()V
+	public fun <init> (Lkotlinx/serialization/modules/SerializersModule;)V
+	public synthetic fun <init> (Lkotlinx/serialization/modules/SerializersModule;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/google/firebase/serialization/MappingAnnotations {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getDocumentId ()Lkotlin/reflect/KClass;
+	public final fun getExclude ()Lkotlin/reflect/KClass;
+	public final fun getIgnoreExtraProperties ()Lkotlin/reflect/KClass;
+	public final fun getPropertyName ()Lkotlin/jvm/functions/Function1;
+	public final fun getServerTimestamp ()Lkotlin/reflect/KClass;
+	public final fun getThrowOnExtraProperties ()Lkotlin/reflect/KClass;
+}
+
 public final class dev/gitlive/firebase/CommonKt {
 	public static final fun getOptions (Ldev/gitlive/firebase/Firebase;)Ldev/gitlive/firebase/FirebaseOptions;
 }
