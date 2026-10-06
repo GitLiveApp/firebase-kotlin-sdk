@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -38,6 +41,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
         }
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
 
         testOptions.configureTestOptions(project)
         packaging {
@@ -53,6 +57,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -173,11 +178,34 @@ kotlin {
             }
         }
 
-//        getByName("jvmMain") {
-//            kotlin.srcDir("src/androidMain/kotlin")
-//        }
+        // The JVM target does not share the Android sources: firebase-java-sdk has no Performance Monitoring, so the
+        // JVM actuals of the com.google.firebase.perf layer are real (in-memory) implementations in jvmMain.
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files(),
+    jvmStubs = false,
+    // Shipped facades: the nonJsMain extension binding to the SDK's newHttpMetric member, and the per-app instance lookup.
+    keepClasses = listOf(
+        "com/google/firebase/perf/NewHttpMetricKt.class",
+        "com/google/firebase/perf/PerformanceInstanceKt.class",
+        "com/google/firebase/perf/PerformanceStatics.class",
+    ),
+)
+
+registerAndroidSourceCompat("firebase-perf/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

@@ -1,0 +1,66 @@
+# Android SDK source compatibility of firebase-perf
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 50 public members available (49 identical, 1 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.perf.FirebasePerformance
+  OK    static FirebasePerformance getInstance()
+  OK    boolean isPerformanceCollectionEnabled()
+  OK    HttpMetric newHttpMetric(String, String)
+  MAP   HttpMetric newHttpMetric(URL, String)  [URL -> String]
+  OK    Trace newTrace(String)
+  OK    void setPerformanceCollectionEnabled(boolean)
+  OK    static Trace startTrace(String)
+  HIDE  static int MAX_ATTRIBUTE_KEY_LENGTH
+  HIDE  static int MAX_ATTRIBUTE_VALUE_LENGTH
+  HIDE  static int MAX_TRACE_CUSTOM_ATTRIBUTES
+  OK    static int MAX_TRACE_NAME_LENGTH
+com.google.firebase.perf.FirebasePerformance.HttpMethod
+  OK    static String CONNECT
+  OK    static String DELETE
+  OK    static String GET
+  OK    static String HEAD
+  OK    static String OPTIONS
+  OK    static String PATCH
+  OK    static String POST
+  OK    static String PUT
+  OK    static String TRACE
+com.google.firebase.perf.PerformanceKt
+  OK    static FirebasePerformance getPerformance(Firebase)
+  OK    static void trace(HttpMetric, Function1)
+  OK    static T trace(Trace, Function1)
+  OK    static T trace(String, Function1)
+com.google.firebase.perf.metrics.AddTrace
+  OK    boolean enabled()
+  OK    String name()
+com.google.firebase.perf.metrics.HttpMetric
+  OK    String getAttribute(String)
+  OK    Map getAttributes()
+  OK    void putAttribute(String, String)
+  OK    void removeAttribute(String)
+  OK    void setHttpResponseCode(int)
+  OK    void setRequestPayloadSize(long)
+  OK    void setResponseContentType(String)
+  OK    void setResponsePayloadSize(long)
+  OK    void start()
+  OK    void stop()
+  OK    static int MAX_ATTRIBUTE_KEY_LENGTH
+  OK    static int MAX_ATTRIBUTE_VALUE_LENGTH
+  OK    static int MAX_TRACE_CUSTOM_ATTRIBUTES
+  OK    static int MAX_TRACE_NAME_LENGTH
+com.google.firebase.perf.metrics.Trace
+  PLAT  int describeContents()
+  OK    String getAttribute(String)
+  OK    Map getAttributes()
+  OK    long getLongMetric(String)
+  OK    void incrementMetric(String, long)
+  OK    void putAttribute(String, String)
+  OK    void putMetric(String, long)
+  OK    void removeAttribute(String)
+  OK    void start()
+  OK    void stop()
+  PLAT  void writeToParcel(Parcel, int)
+  PLAT  static Creator CREATOR
+  OK    static int MAX_ATTRIBUTE_KEY_LENGTH
+  OK    static int MAX_ATTRIBUTE_VALUE_LENGTH
+  OK    static int MAX_TRACE_CUSTOM_ATTRIBUTES
+  OK    static int MAX_TRACE_NAME_LENGTH

@@ -16,6 +16,8 @@ data class ApiMember(
      * member so that common code using it fails to compile with a message naming the replacement.
      */
     val deprecation: String? = null,
+    /** For fields: false when the field is assignable (`public boolean x;` rather than `public final boolean x;`). */
+    val isFinal: Boolean = true,
 ) {
     enum class Kind { CONSTRUCTOR, METHOD, FIELD }
 
