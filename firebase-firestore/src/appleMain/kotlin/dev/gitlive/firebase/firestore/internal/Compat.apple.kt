@@ -14,7 +14,6 @@ import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.Transaction
-import com.google.firebase.firestore.get
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.ios
 import kotlinx.coroutines.runBlocking
