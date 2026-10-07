@@ -7,6 +7,7 @@ package com.google.firebase.messaging
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseException
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.messaging.externals.Messaging
 import dev.gitlive.firebase.messaging.externals.deleteToken
 import dev.gitlive.firebase.messaging.externals.getMessaging
@@ -18,6 +19,20 @@ public actual class FirebaseMessaging internal constructor(public val js: Messag
     public actual fun deleteToken(): Task<Nothing?> = task { deleteToken(js).then { null } }
 
     public actual fun getToken(): Task<String> = task { getToken(js) }
+
+    /** A no-op: the JS SDK has no client-side topic subscription (a web token is subscribed from a server with the Admin SDK). */
+    @UnsupportedOnJs
+    public actual fun subscribeToTopic(topic: String): Task<Nothing?> = completedTask()
+
+    /** A no-op: the JS SDK has no client-side topic subscription (a web token is subscribed from a server with the Admin SDK). */
+    @UnsupportedOnJs
+    public actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = completedTask()
+
+    /** Always false: the JS SDK only generates a token in [getToken]. Setting it does nothing. */
+    @UnsupportedOnJs
+    public actual var isAutoInitEnabled: Boolean
+        get() = false
+        set(_) = Unit
 
     override fun equals(other: Any?): Boolean = other is FirebaseMessaging && other.js == js
 
@@ -32,6 +47,8 @@ public actual class FirebaseMessaging internal constructor(public val js: Messag
         public actual fun getInstance(): FirebaseMessaging = rethrow { FirebaseMessaging(getMessaging()) }
     }
 }
+
+private fun completedTask(): Task<Nothing?> = TaskCompletionSource<Nothing?>().apply { setResult(null) }.task
 
 private inline fun <T> task(start: () -> Promise<T>): Task<T> {
     val source = TaskCompletionSource<T>()

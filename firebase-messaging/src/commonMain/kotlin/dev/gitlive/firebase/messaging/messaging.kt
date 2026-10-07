@@ -53,7 +53,7 @@ public class FirebaseMessaging internal constructor(public val compat: CompatFir
     override fun toString(): String = "FirebaseMessaging($compat)"
 }
 
-/** The topic members exist off JS only (nonJsMain), so the wrapper reaches them through these. */
+/** The wrapper keeps throwing on JS, where the layer's topic members are no-ops. */
 internal expect fun CompatFirebaseMessaging.subscribeToTopicOrThrow(topic: String)
 
 internal expect fun CompatFirebaseMessaging.unsubscribeFromTopicOrThrow(topic: String)

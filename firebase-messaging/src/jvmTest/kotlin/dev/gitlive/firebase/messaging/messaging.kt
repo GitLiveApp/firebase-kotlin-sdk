@@ -12,7 +12,7 @@ import dev.gitlive.firebase.testContext
 import kotlin.test.BeforeTest
 
 /** The JVM has no Cloud Messaging: only the parts that need no registration are tested. */
-class JvmMessagingNonJsTest : MessagingNonJsTest() {
+class JvmFirebaseMessagingTest : FirebaseMessagingTest() {
     @BeforeTest
     fun initializeFirebase() {
         Firebase.apps(testContext).firstOrNull() ?: Firebase.initialize(

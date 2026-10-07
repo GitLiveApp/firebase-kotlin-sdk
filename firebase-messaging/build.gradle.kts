@@ -195,11 +195,8 @@ stripHeaderStubs(
     jvmReferenceJars = files(),
     // firebase-java-sdk has no Cloud Messaging: the JVM actuals are real code, not stubs.
     jvmStubs = false,
-    // Shipped facades: the nonJsMain extensions binding to the SDK's topic and auto-init members, and the String forms of the Uri members.
-    keepClasses = listOf(
-        "com/google/firebase/messaging/MessagingNonJsKt.class",
-        "com/google/firebase/messaging/RemoteMessageUriKt.class",
-    ),
+    // Shipped facade: the String forms of the Uri members.
+    keepClasses = listOf("com/google/firebase/messaging/RemoteMessageUriKt.class"),
 )
 
 registerAndroidSourceCompat("firebase-messaging/api.txt")

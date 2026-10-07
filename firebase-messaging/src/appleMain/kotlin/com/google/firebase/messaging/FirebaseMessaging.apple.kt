@@ -18,6 +18,16 @@ public actual class FirebaseMessaging internal constructor(public val ios: FIRMe
         ios.tokenWithCompletion { token, error -> completion(token ?: "", error) }
     }
 
+    public actual fun subscribeToTopic(topic: String): Task<Nothing?> = task { completion -> ios.subscribeToTopic(topic) { error -> completion(null, error) } }
+
+    public actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = task { completion -> ios.unsubscribeFromTopic(topic) { error -> completion(null, error) } }
+
+    public actual var isAutoInitEnabled: Boolean
+        get() = ios.isAutoInitEnabled()
+        set(value) {
+            ios.autoInitEnabled = value
+        }
+
     override fun equals(other: Any?): Boolean = other is FirebaseMessaging && other.ios == ios
 
     override fun hashCode(): Int = ios.hashCode()

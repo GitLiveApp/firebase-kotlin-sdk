@@ -29,8 +29,3 @@ class IOSFirebaseMessagingTest : FirebaseMessagingTest() {
     @BeforeTest
     fun initialize() = initializeFirebase()
 }
-
-class IOSMessagingNonJsTest : MessagingNonJsTest() {
-    @BeforeTest
-    fun initialize() = initializeFirebase()
-}

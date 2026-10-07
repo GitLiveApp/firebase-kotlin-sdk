@@ -17,14 +17,9 @@ public actual class FirebaseMessaging private constructor() {
     public actual fun deleteToken(): Task<Nothing?> = stub()
     public actual fun getToken(): Task<String> = stub()
 
-    /** Not in the common API (JS has no topics); the shipped nonJsMain extension binds to this member. */
-    public fun subscribeToTopic(topic: String): Task<Nothing?> = stub()
-
-    /** Not in the common API (JS has no topics); the shipped nonJsMain extension binds to this member. */
-    public fun unsubscribeFromTopic(topic: String): Task<Nothing?> = stub()
-
-    /** Not in the common API (JS has no auto-init); the shipped nonJsMain extension binds to this member. */
-    public var isAutoInitEnabled: Boolean
+    public actual fun subscribeToTopic(topic: String): Task<Nothing?> = stub()
+    public actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = stub()
+    public actual var isAutoInitEnabled: Boolean
         get() = stub()
         set(_) = stub()
 

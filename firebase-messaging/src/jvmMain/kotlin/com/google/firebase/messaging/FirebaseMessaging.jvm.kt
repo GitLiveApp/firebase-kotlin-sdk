@@ -13,6 +13,13 @@ public actual class FirebaseMessaging private constructor() {
 
     public actual fun getToken(): Task<String> = unsupported()
 
+    public actual fun subscribeToTopic(topic: String): Task<Nothing?> = unsupported()
+
+    public actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = unsupported()
+
+    /** Kept in memory: there is no registration to initialise on the JVM. */
+    public actual var isAutoInitEnabled: Boolean = true
+
     override fun toString(): String = "FirebaseMessaging"
 
     public actual companion object {
