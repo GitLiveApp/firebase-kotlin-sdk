@@ -4,8 +4,6 @@
 
 package dev.gitlive.firebase.messaging
 
-import com.google.firebase.messaging.subscribeToTopic
-import com.google.firebase.messaging.unsubscribeFromTopic
 import com.google.firebase.messaging.FirebaseMessaging as CompatFirebaseMessaging
 
 internal actual fun CompatFirebaseMessaging.subscribeToTopicOrThrow(topic: String) {

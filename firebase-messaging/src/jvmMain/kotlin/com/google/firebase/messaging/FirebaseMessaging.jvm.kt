@@ -8,22 +8,24 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 
 /** firebase-java-sdk has no Cloud Messaging: every operation fails with an [UnsupportedOperationException]. */
-public actual class FirebaseMessaging private constructor() {
-    public actual fun deleteToken(): Task<Nothing?> = unsupported()
+internal actual class NativeMessaging private constructor() {
+    actual fun deleteToken(): Task<Nothing?> = unsupported()
 
-    public actual fun getToken(): Task<String> = unsupported()
+    actual fun getToken(): Task<String> = unsupported()
+
+    actual fun subscribeToTopic(topic: String): Task<Nothing?> = unsupported()
+
+    actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = unsupported()
+
+    /** Kept in memory: there is no registration to initialise on the JVM. */
+    actual var isAutoInitEnabled: Boolean = true
 
     override fun toString(): String = "FirebaseMessaging"
 
-    public actual companion object {
-        @Deprecated("The registration token has no scope any more; getToken() returns the FCM token")
-        @JvmField
-        public actual val INSTANCE_ID_SCOPE: String = "FCM"
+    actual companion object {
+        private val instance = NativeMessaging()
 
-        private val instance = FirebaseMessaging()
-
-        @JvmStatic
-        public actual fun getInstance(): FirebaseMessaging = instance
+        actual fun getInstance(): NativeMessaging = instance
     }
 }
 

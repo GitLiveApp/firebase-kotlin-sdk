@@ -6,7 +6,6 @@ package dev.gitlive.firebase.messaging
 
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.isAutoInitEnabled
 import com.google.firebase.messaging.messaging
 import kotlin.test.Test
 import kotlin.test.assertEquals

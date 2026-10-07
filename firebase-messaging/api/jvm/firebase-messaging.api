@@ -4,7 +4,10 @@ public final class com/google/firebase/messaging/FirebaseMessaging {
 	public final fun deleteToken ()Lcom/google/android/gms/tasks/Task;
 	public static final fun getInstance ()Lcom/google/firebase/messaging/FirebaseMessaging;
 	public final fun getToken ()Lcom/google/android/gms/tasks/Task;
-	public fun toString ()Ljava/lang/String;
+	public final fun isAutoInitEnabled ()Z
+	public final fun setAutoInitEnabled (Z)V
+	public final fun subscribeToTopic (Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
+	public final fun unsubscribeFromTopic (Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
 }
 
 public final class com/google/firebase/messaging/FirebaseMessaging$Companion {
@@ -14,13 +17,6 @@ public final class com/google/firebase/messaging/FirebaseMessaging$Companion {
 public final class com/google/firebase/messaging/MessagingKt {
 	public static final fun getMessaging (Lcom/google/firebase/Firebase;)Lcom/google/firebase/messaging/FirebaseMessaging;
 	public static final fun remoteMessage (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/messaging/RemoteMessage;
-}
-
-public final class com/google/firebase/messaging/MessagingNonJs_jvmKt {
-	public static final fun isAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;)Z
-	public static final fun setAutoInitEnabled (Lcom/google/firebase/messaging/FirebaseMessaging;Z)V
-	public static final fun subscribeToTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
-	public static final fun unsubscribeFromTopic (Lcom/google/firebase/messaging/FirebaseMessaging;Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
 }
 
 public final class com/google/firebase/messaging/RemoteMessage {

@@ -53,6 +53,11 @@ fun Project.stripHeaderStubs(
      * real implementations that are shipped, and only the Android compilations are stubs.
      */
     jvmStubs: Boolean = true,
+    /**
+     * Class files under [packageDirs] that are stripped like the stubs but not verified against the SDK: this module's
+     * own platform helpers behind a stub, which never run where the stub is replaced by the real class.
+     */
+    unverifiedClasses: List<String> = emptyList(),
 ) {
     tasks.withType(KotlinCompile::class.java).configureEach {
         if (!name.startsWith("compile") || name.contains("Test")) return@configureEach
@@ -67,7 +72,7 @@ fun Project.stripHeaderStubs(
             val stubDirs = packageDirs.map { destination.resolve(it) }.filter { it.exists() }
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
                 .filter { it.relativeTo(destination).invariantSeparatorsPath !in keepClasses }
-            val classes = stubs.map { readMembers(it.readBytes()) }
+            val classes = stubs.filter { it.relativeTo(destination).invariantSeparatorsPath !in unverifiedClasses }.map { readMembers(it.readBytes()) }
             verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated = if (android) emptySet() else jvmMissingMembers.toSet())
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
             stubs.forEach { it.delete() }
@@ -126,7 +131,9 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     }
 
     override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
-        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || name == "<clinit>") return null
+        // An `internal` member compiles to a public method named `name$module`: only this module's code can call it, and
+        // that code is itself stripped on the platforms where the stub is replaced by the real class.
+        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || name == "<clinit>" || name.contains('$')) return null
         val member = Member(name, descriptor, access).also { methods += it }
         return object : MethodVisitor(Opcodes.ASM9) {
             override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = member.annotationVisitor(descriptor)

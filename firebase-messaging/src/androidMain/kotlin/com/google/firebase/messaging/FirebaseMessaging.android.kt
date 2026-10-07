@@ -5,38 +5,12 @@
 package com.google.firebase.messaging
 
 import android.net.Uri
-import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.messaging.stub
 
 /*
  * Header stubs for com.google.firebase:firebase-messaging (see buildSrc utils/HeaderStubs.kt): compiled against,
  * verified to match the real classes, and deleted from the output so the real SDK binds at runtime.
  */
-
-public actual class FirebaseMessaging private constructor() {
-    public actual fun deleteToken(): Task<Nothing?> = stub()
-    public actual fun getToken(): Task<String> = stub()
-
-    /** Not in the common API (JS has no topics); the shipped nonJsMain extension binds to this member. */
-    public fun subscribeToTopic(topic: String): Task<Nothing?> = stub()
-
-    /** Not in the common API (JS has no topics); the shipped nonJsMain extension binds to this member. */
-    public fun unsubscribeFromTopic(topic: String): Task<Nothing?> = stub()
-
-    /** Not in the common API (JS has no auto-init); the shipped nonJsMain extension binds to this member. */
-    public var isAutoInitEnabled: Boolean
-        get() = stub()
-        set(_) = stub()
-
-    public actual companion object {
-        @Deprecated("The registration token has no scope any more; getToken() returns the FCM token")
-        @JvmField
-        public actual val INSTANCE_ID_SCOPE: String = "FCM"
-
-        @JvmStatic
-        public actual fun getInstance(): FirebaseMessaging = stub()
-    }
-}
 
 public actual class RemoteMessage private constructor() {
     public actual val collapseKey: String? get() = stub()

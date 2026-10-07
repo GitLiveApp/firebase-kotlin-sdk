@@ -8,8 +8,8 @@ import com.google.android.gms.tasks.Task
 
 /**
  * Firebase Cloud Messaging, as the Android SDK's `com.google.firebase.messaging.FirebaseMessaging`. Topic
- * subscriptions and auto-init exist on Android, the JVM and Apple platforms, as extensions in `nonJsMain`; the JS SDK
- * has neither. Receiving messages is platform code on every platform (`FirebaseMessagingService` on Android).
+ * subscriptions and auto-init exist on Android, the JVM and Apple platforms as members of the `nonJsMain` actual, which
+ * common code targeting those platforms only resolves against; the JS SDK has neither. Receiving messages is platform code on every platform (`FirebaseMessagingService` on Android).
  */
 public expect class FirebaseMessaging {
     /** Deletes the registration token of this app instance, so it stops receiving messages. */

@@ -10,25 +10,35 @@ import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseException
 import platform.Foundation.NSError
 
-/** @property ios The underlying Firebase iOS SDK object. */
-public actual class FirebaseMessaging internal constructor(public val ios: FIRMessaging) {
-    public actual fun deleteToken(): Task<Nothing?> = task { completion -> ios.deleteTokenWithCompletion { error -> completion(null, error) } }
+/** The underlying Firebase iOS SDK object. */
+public val FirebaseMessaging.ios: FIRMessaging get() = native.ios
 
-    public actual fun getToken(): Task<String> = task { completion ->
+/** @property ios The underlying Firebase iOS SDK object. */
+internal actual class NativeMessaging(val ios: FIRMessaging) {
+    actual fun deleteToken(): Task<Nothing?> = task { completion -> ios.deleteTokenWithCompletion { error -> completion(null, error) } }
+
+    actual fun getToken(): Task<String> = task { completion ->
         ios.tokenWithCompletion { token, error -> completion(token ?: "", error) }
     }
 
-    override fun equals(other: Any?): Boolean = other is FirebaseMessaging && other.ios == ios
+    actual fun subscribeToTopic(topic: String): Task<Nothing?> = task { completion -> ios.subscribeToTopic(topic) { error -> completion(null, error) } }
+
+    actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = task { completion -> ios.unsubscribeFromTopic(topic) { error -> completion(null, error) } }
+
+    actual var isAutoInitEnabled: Boolean
+        get() = ios.isAutoInitEnabled()
+        set(value) {
+            ios.autoInitEnabled = value
+        }
+
+    override fun equals(other: Any?): Boolean = other is NativeMessaging && other.ios == ios
 
     override fun hashCode(): Int = ios.hashCode()
 
     override fun toString(): String = "FirebaseMessaging($ios)"
 
-    public actual companion object {
-        @Deprecated("The registration token has no scope any more; getToken() returns the FCM token")
-        public actual val INSTANCE_ID_SCOPE: String = "FCM"
-
-        public actual fun getInstance(): FirebaseMessaging = FirebaseMessaging(FIRMessaging.messaging())
+    actual companion object {
+        actual fun getInstance(): NativeMessaging = NativeMessaging(FIRMessaging.messaging())
     }
 }
 
