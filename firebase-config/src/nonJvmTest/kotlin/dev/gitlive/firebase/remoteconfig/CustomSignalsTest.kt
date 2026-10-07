@@ -9,7 +9,6 @@ import com.google.firebase.remoteconfig.CustomSignals
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.customSignals
 import com.google.firebase.remoteconfig.remoteConfig
-import com.google.firebase.remoteconfig.setCustomSignals
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
@@ -19,8 +18,8 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * The custom signal part of the `com.google.firebase.remoteconfig` layer: the JS SDK does not have it, and
- * firebase-java-sdk lacks it too, so this test exists for Android and Apple only.
+ * The custom signal part of the `com.google.firebase.remoteconfig` layer. firebase-java-sdk lacks custom signals, so the
+ * test cannot compile for the JVM: it is here for Apple and JS, and in androidInstrumentedTest for Android.
  */
 class CustomSignalsTest {
 

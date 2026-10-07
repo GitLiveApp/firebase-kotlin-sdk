@@ -17,6 +17,8 @@ import dev.gitlive.firebase.remoteconfig.externals.fetchConfig
 import dev.gitlive.firebase.remoteconfig.externals.getAll
 import dev.gitlive.firebase.remoteconfig.externals.getRemoteConfig
 import dev.gitlive.firebase.remoteconfig.externals.getValue
+import dev.gitlive.firebase.remoteconfig.externals.onConfigUpdate
+import dev.gitlive.firebase.remoteconfig.externals.setCustomSignals
 import kotlin.js.Promise
 import kotlin.js.json
 
@@ -26,6 +28,20 @@ private const val MILLIS_PER_SECOND = 1000
 public actual class FirebaseRemoteConfig internal constructor(public val js: RemoteConfig) {
 
     public actual fun activate(): Task<Boolean> = task { activate(js) }
+
+    public actual fun addOnConfigUpdateListener(listener: ConfigUpdateListener): ConfigUpdateListenerRegistration = rethrow {
+        val unsubscribe = onConfigUpdate(
+            js,
+            json(
+                "next" to { update: dev.gitlive.firebase.remoteconfig.externals.ConfigUpdate ->
+                    listener.onUpdate(ConfigUpdate.create(arrayFrom(update.getUpdatedKeys()).toSet()))
+                },
+                "error" to { error: Throwable -> listener.onError(error.toRemoteConfigException()) },
+                "complete" to { },
+            ).unsafeCast<dev.gitlive.firebase.remoteconfig.externals.ConfigUpdateObserver>(),
+        )
+        ConfigUpdateListenerRegistration { unsubscribe() }
+    }
 
     public actual fun ensureInitialized(): Task<FirebaseRemoteConfigInfo> = task { ensureInitialized(js).then { info } }
 
@@ -77,6 +93,8 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
         setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build())
     }
 
+    public actual fun setCustomSignals(customSignals: CustomSignals): Task<Nothing?> = task { setCustomSignals(js, customSignals.js).then { null } }
+
     public actual fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?> = rethrow {
         js.settings.fetchTimeoutMillis = settings.fetchTimeoutInSeconds * MILLIS_PER_SECOND
         js.settings.minimumFetchIntervalMillis = settings.minimumFetchIntervalInSeconds * MILLIS_PER_SECOND
@@ -95,6 +113,9 @@ public actual class FirebaseRemoteConfig internal constructor(public val js: Rem
         val objectKeys = js("Object.keys")
         return objectKeys(getAll(js)).unsafeCast<Array<String>>().toSet()
     }
+
+    /** The elements of a JS `Set` (or any iterable) as an array. */
+    private fun arrayFrom(iterable: dynamic): Array<String> = js("Array.from")(iterable).unsafeCast<Array<String>>()
 
     override fun equals(other: Any?): Boolean = other is FirebaseRemoteConfig && other.js == js
 

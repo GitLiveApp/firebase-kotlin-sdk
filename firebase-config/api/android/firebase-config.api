@@ -1,8 +1,3 @@
-public final class com/google/firebase/remoteconfig/RemoteConfigNonJsKt {
-	public static final fun addOnConfigUpdateListener (Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;Lcom/google/firebase/remoteconfig/ConfigUpdateListener;)Lcom/google/firebase/remoteconfig/ConfigUpdateListenerRegistration;
-	public static final fun setCustomSignals (Lcom/google/firebase/remoteconfig/FirebaseRemoteConfig;Lcom/google/firebase/remoteconfig/CustomSignals;)Lcom/google/android/gms/tasks/Task;
-}
-
 public final class dev/gitlive/firebase/remoteconfig/FetchStatus : java/lang/Enum {
 	public static final field Failure Ldev/gitlive/firebase/remoteconfig/FetchStatus;
 	public static final field NoFetchYet Ldev/gitlive/firebase/remoteconfig/FetchStatus;

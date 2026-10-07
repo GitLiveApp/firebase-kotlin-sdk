@@ -16,7 +16,7 @@ import kotlin.jvm.JvmName
 /*
  * The real-time update and custom signal extensions of the Android SDK's RemoteConfigKt, as plain code that is a
  * header stub on Android and the JVM: part of the RemoteConfigKt multifile facade (see RemoteConfig.kt), so that it is
- * named like the SDK's facade it binds to. The JS SDK has neither, hence nonJsMain.
+ * named like the SDK's facade it binds to.
  */
 
 /** Real-time config updates as a [Flow]; each emission means the backend has a newer config to fetch and activate. */

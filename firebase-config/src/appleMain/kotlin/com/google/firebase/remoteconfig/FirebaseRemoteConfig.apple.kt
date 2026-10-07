@@ -36,6 +36,18 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
 
     public actual fun activate(): Task<Boolean> = task { completion -> ios.activateWithCompletion { changed, error -> completion(changed, error) } }
 
+    @Suppress("UNCHECKED_CAST")
+    public actual fun addOnConfigUpdateListener(listener: ConfigUpdateListener): ConfigUpdateListenerRegistration {
+        val registration = ios.addOnConfigUpdateListener { update, error ->
+            if (error != null) {
+                listener.onError(error.toRemoteConfigException())
+            } else if (update != null) {
+                listener.onUpdate(ConfigUpdate.create(update.updatedKeys as Set<String>))
+            }
+        }
+        return ConfigUpdateListenerRegistration { registration.remove() }
+    }
+
     public actual fun ensureInitialized(): Task<FirebaseRemoteConfigInfo> = task { completion -> ios.ensureInitializedWithCompletionHandler { error -> completion(info, error) } }
 
     public actual fun fetch(): Task<Nothing?> = task { completion -> ios.fetchWithCompletionHandler { _, error -> completion(null, error) } }
@@ -89,6 +101,10 @@ public actual class FirebaseRemoteConfig internal constructor(public val ios: FI
     public actual fun reset(): Task<Nothing?> {
         ios.setDefaults(emptyMap<Any?, Any?>())
         return setConfigSettingsAsync(FirebaseRemoteConfigSettings.Builder().build())
+    }
+
+    public actual fun setCustomSignals(customSignals: CustomSignals): Task<Nothing?> = task { completion ->
+        ios.setCustomSignals(customSignals.signals.mapKeys { it.key }) { error -> completion(null, error) }
     }
 
     public actual fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?> {

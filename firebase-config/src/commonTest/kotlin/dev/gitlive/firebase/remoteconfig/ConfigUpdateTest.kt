@@ -9,7 +9,6 @@ import com.google.firebase.remoteconfig.ConfigUpdate
 import com.google.firebase.remoteconfig.ConfigUpdateListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
-import com.google.firebase.remoteconfig.addOnConfigUpdateListener
 import com.google.firebase.remoteconfig.remoteConfig
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -20,10 +19,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** The real-time update part of the `com.google.firebase.remoteconfig` layer, which the JS SDK does not have; custom signals are in CustomSignalsTest. */
+/** The real-time update part of the `com.google.firebase.remoteconfig` layer; custom signals are in CustomSignalsTest. */
 @IgnoreForAndroidUnitTest
 @IgnoreForJvm
-class RemoteConfigNonJsTest {
+class ConfigUpdateTest {
 
     @BeforeTest
     fun initializeFirebase() {

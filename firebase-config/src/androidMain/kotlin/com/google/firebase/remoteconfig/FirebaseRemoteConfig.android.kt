@@ -17,6 +17,7 @@ import dev.gitlive.firebase.remoteconfig.stub
 
 public actual class FirebaseRemoteConfig private constructor() {
     public actual fun activate(): Task<Boolean> = stub()
+    public actual fun addOnConfigUpdateListener(listener: ConfigUpdateListener): ConfigUpdateListenerRegistration = stub()
     public actual fun ensureInitialized(): Task<FirebaseRemoteConfigInfo> = stub()
     public actual fun fetch(): Task<Nothing?> = stub()
     public actual fun fetch(minimumFetchIntervalInSeconds: Long): Task<Nothing?> = stub()
@@ -31,17 +32,12 @@ public actual class FirebaseRemoteConfig private constructor() {
     public actual fun getValue(key: String): FirebaseRemoteConfigValue = stub()
     public actual fun reset(): Task<Nothing?> = stub()
     public actual fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?> = stub()
+    public actual fun setCustomSignals(customSignals: CustomSignals): Task<Nothing?> = stub()
 
     @Deprecated(SET_DEFAULTS_XML_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public actual fun setDefaultsAsync(resourceId: Int): Task<Nothing?> = stub()
 
     public actual fun setDefaultsAsync(defaults: Map<String, Any?>): Task<Nothing?> = stub()
-
-    /** Not in the common API (JS has no real-time updates); the shipped nonJsMain extension binds to this member. */
-    public fun addOnConfigUpdateListener(listener: ConfigUpdateListener): ConfigUpdateListenerRegistration = stub()
-
-    /** Not in the common API (JS has no custom signals); the shipped nonJsMain extension binds to this member. */
-    public fun setCustomSignals(customSignals: CustomSignals): Task<Nothing?> = stub()
 
     public actual companion object {
         /** The value returned for a boolean key that is not set. */

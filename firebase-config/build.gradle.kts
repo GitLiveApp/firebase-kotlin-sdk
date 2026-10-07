@@ -192,8 +192,6 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // The nonJsMain extensions binding to the SDK's real-time update and custom signal members are shipped.
-    keepClasses = listOf("com/google/firebase/remoteconfig/RemoteConfigNonJsKt.class"),
     // firebase-java-sdk has no custom signals.
     jvmMissingMembers = listOf(
         "com/google/firebase/remoteconfig/CustomSignals",

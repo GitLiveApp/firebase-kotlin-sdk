@@ -10,12 +10,13 @@ import dev.gitlive.firebase.remoteconfig.SET_DEFAULTS_XML_ANDROID_ONLY
 
 /**
  * The entry point of Firebase Remote Config, as the Android SDK's `com.google.firebase.remoteconfig.FirebaseRemoteConfig`.
- * Real-time config updates (`addOnConfigUpdateListener`, `configUpdates`) and custom signals (`setCustomSignals`) exist
- * on Android, the JVM and Apple platforms, as extensions in `nonJsMain`; the JS SDK has neither.
  */
 public expect class FirebaseRemoteConfig {
     /** Makes the most recently fetched config available to the getters; true if it changed the active config. */
     public fun activate(): Task<Boolean>
+
+    /** Starts listening for real-time config updates; [ConfigUpdateListenerRegistration.remove] stops them. */
+    public fun addOnConfigUpdateListener(listener: ConfigUpdateListener): ConfigUpdateListenerRegistration
 
     /** Completes with the [FirebaseRemoteConfigInfo] once the config has been loaded from disk. */
     public fun ensureInitialized(): Task<FirebaseRemoteConfigInfo>
@@ -61,6 +62,9 @@ public expect class FirebaseRemoteConfig {
 
     /** Applies [settings]. */
     public fun setConfigSettingsAsync(settings: FirebaseRemoteConfigSettings): Task<Nothing?>
+
+    /** Sets the custom signals sent with fetches, which the backend can target conditions on; a null value removes a signal. */
+    public fun setCustomSignals(customSignals: CustomSignals): Task<Nothing?>
 
     /** Android-only: reads the defaults from an XML resource. */
     @Deprecated(SET_DEFAULTS_XML_ANDROID_ONLY, level = DeprecationLevel.ERROR)

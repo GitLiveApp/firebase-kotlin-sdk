@@ -5,8 +5,8 @@
 package com.google.firebase.remoteconfig
 
 /**
- * Custom signals: key-value pairs the backend can target conditions on, as the Android SDK's `CustomSignals`. The JS
- * SDK has no custom signals, so this class exists on Android, the JVM and Apple platforms.
+ * Custom signals: key-value pairs the backend can target conditions on, as the Android SDK's `CustomSignals`.
+ * firebase-java-sdk has no custom signals, so setting them fails at runtime on the JVM.
  */
 public expect class CustomSignals {
     public class Builder {
