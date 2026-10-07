@@ -13,6 +13,13 @@ import dev.gitlive.firebase.firestore.internal.DEFAULT_MAX_ATTEMPTS
  * and Apple platforms and are declared in the `nonJs` source set, as the JS SDK only reads asynchronously.
  */
 public expect class Transaction {
+    /**
+     * Reads [documentRef] inside the transaction. The JS SDK reads inside a transaction asynchronously, so on JS this
+     * throws [UnsupportedOperationException]: code that also targets JS uses the suspending
+     * `dev.gitlive.firebase.firestore.Transaction.get` instead.
+     */
+    public fun get(documentRef: DocumentReference): DocumentSnapshot
+
     /** Writes [data] (a map of field values) to [documentRef], replacing the document. */
     public fun set(documentRef: DocumentReference, data: Any): Transaction
 

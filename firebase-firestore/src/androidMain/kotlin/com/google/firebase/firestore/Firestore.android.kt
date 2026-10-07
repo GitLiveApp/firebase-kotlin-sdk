@@ -292,8 +292,7 @@ public actual class SnapshotMetadata private constructor() {
 }
 
 public actual class Transaction private constructor() {
-    /** Not in the common API (the JS SDK reads asynchronously); the nonJsMain extension binds to this member. */
-    public fun get(documentRef: DocumentReference): DocumentSnapshot = stub()
+    public actual fun get(documentRef: DocumentReference): DocumentSnapshot = stub()
     public actual fun set(documentRef: DocumentReference, data: Any): Transaction = stub()
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction = stub()
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): Transaction = stub()

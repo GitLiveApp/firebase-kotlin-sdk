@@ -8,8 +8,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.get
 import com.google.firebase.firestore.memoryCacheSettings
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
@@ -18,10 +18,13 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertTrue
 
-/** The `com.google.firebase.firestore` members that the JS SDK cannot provide: the synchronous `Transaction.get`. */
+/** The synchronous `Transaction.get`, which the JS SDK cannot provide: there it throws. */
+@OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
-class FirestoreNonJsTest {
+class TransactionGetTest {
 
     private lateinit var app: dev.gitlive.firebase.FirebaseApp
     private lateinit var firestore: FirebaseFirestore
@@ -55,14 +58,20 @@ class FirestoreNonJsTest {
     fun testTransactionGet() = runTest {
         val document = firestore.collection("compat").document("test").collection("nonJs").document("counter")
         document.set(mapOf("count" to 1L)).await()
-        val previous = firestore.runTransaction { transaction ->
+        val increment = { transaction: com.google.firebase.firestore.Transaction ->
             val snapshot = transaction.get(document)
             val count = snapshot.getLong("count") ?: 0L
             transaction.update(document, "count", count + 1)
             count
-        }.await()
-        assertEquals(1L, previous)
-        assertEquals(2L, document.get().await().getLong("count"))
+        }
+        if (transactionGetIsSynchronous) {
+            assertEquals(1L, firestore.runTransaction(increment).await())
+            assertEquals(2L, document.get().await().getLong("count"))
+        } else {
+            val failure = assertFails { firestore.runTransaction(increment).await() }
+            assertTrue(generateSequence(failure) { it.cause }.any { it is UnsupportedOperationException || it.message?.contains("asynchronously") == true }, failure.toString())
+            assertEquals(1L, document.get().await().getLong("count"))
+        }
         document.delete().await()
     }
 }

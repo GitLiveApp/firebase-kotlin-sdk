@@ -4,6 +4,7 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.UnsupportedOnJs
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
 import dev.gitlive.firebase.firestore.externals.addDoc
@@ -222,6 +223,10 @@ public actual class DocumentReference internal constructor(public val js: JsDocu
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class Transaction internal constructor(public val js: JsTransaction) {
+    /** Throws: the JS SDK reads inside a transaction asynchronously; use the suspending `dev.gitlive.firebase.firestore.Transaction.get`. */
+    @UnsupportedOnJs
+    public actual fun get(documentRef: DocumentReference): DocumentSnapshot = throw UnsupportedOperationException(TRANSACTION_GET_ASYNC_ON_JS)
+
     public actual fun set(documentRef: DocumentReference, data: Any): Transaction = rethrow { js.set(documentRef.js, data.toJs()!!) }.let { this }
 
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction = rethrow { js.set(documentRef.js, data.toJs()!!, options.toJs()) }.let { this }
@@ -259,3 +264,5 @@ public actual class WriteBatch internal constructor(public val js: JsWriteBatch)
         public actual fun apply(batch: WriteBatch)
     }
 }
+
+internal const val TRANSACTION_GET_ASYNC_ON_JS = "The Firebase JS SDK reads inside a transaction asynchronously: use the suspending dev.gitlive.firebase.firestore.Transaction.get"

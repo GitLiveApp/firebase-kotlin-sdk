@@ -1,7 +1,3 @@
-public final class com/google/firebase/firestore/TransactionNonJsKt {
-	public static final fun get (Lcom/google/firebase/firestore/Transaction;Lcom/google/firebase/firestore/DocumentReference;)Lcom/google/firebase/firestore/DocumentSnapshot;
-}
-
 public abstract class dev/gitlive/firebase/firestore/BaseTimestamp {
 	public static final field Companion Ldev/gitlive/firebase/firestore/BaseTimestamp$Companion;
 }

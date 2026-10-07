@@ -227,10 +227,8 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Shipped: the nonJsMain extension binding to the SDK's Transaction.get, and the static members this module's own
-    // code reaches through FirestoreStatics.java.
+    // Shipped: the static members this module's own code reaches through FirestoreStatics.java.
     keepClasses = listOf(
-        "com/google/firebase/firestore/TransactionNonJsKt.class",
         "com/google/firebase/firestore/FirestoreInternalsKt.class",
         "com/google/firebase/firestore/FirestoreStatics.class",
     ),

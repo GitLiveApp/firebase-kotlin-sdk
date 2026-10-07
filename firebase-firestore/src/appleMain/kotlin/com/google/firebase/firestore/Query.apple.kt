@@ -232,7 +232,7 @@ public actual class DocumentReference internal constructor(public val ios: FIRDo
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class Transaction internal constructor(public val ios: FIRTransaction) {
     /** Reads [documentRef] inside the transaction; the nonJsMain `Transaction.get` extension. */
-    internal fun getDocument(documentRef: DocumentReference): DocumentSnapshot = memScoped {
+    public actual fun get(documentRef: DocumentReference): DocumentSnapshot = memScoped {
         val errorPointer: CPointer<ObjCObjectVar<NSError?>> = alloc<ObjCObjectVar<NSError?>>().ptr
         val snapshot = ios.getDocument(documentRef.ios, errorPointer)
         errorPointer.pointed.value?.let { throw it.toFirestoreException() }
