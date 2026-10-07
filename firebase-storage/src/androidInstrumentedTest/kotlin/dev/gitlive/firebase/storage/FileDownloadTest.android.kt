@@ -7,3 +7,5 @@ package dev.gitlive.firebase.storage
 import androidx.test.platform.app.InstrumentationRegistry
 
 actual fun temporaryFile(name: String): Any = java.io.File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, name)
+
+actual val supportsFileDownloads: Boolean = true

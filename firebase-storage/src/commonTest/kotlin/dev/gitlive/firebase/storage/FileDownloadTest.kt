@@ -13,20 +13,27 @@ import com.google.firebase.storage.getFile
 import com.google.firebase.storage.maxDownloadRetryTimeMillis
 import com.google.firebase.storage.putFile
 import dev.gitlive.firebase.apps
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.tasks.await
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 /** A file the platform test can write and read: a java.io.File on Android and the JVM, an NSURL on Apple platforms. */
 expect fun temporaryFile(name: String): Any
 
-/** The file download part of the `com.google.firebase.storage` layer, which the JS SDK does not have. */
+/** Whether the platform SDK downloads to files; the JS SDK does not. */
+expect val supportsFileDownloads: Boolean
+
+/** The file download part of the `com.google.firebase.storage` layer; on JS, whose SDK has no file downloads, the download fails. */
+@OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
-class StorageNonJsTest {
+class FileDownloadTest {
 
     private lateinit var app: dev.gitlive.firebase.FirebaseApp
     private lateinit var storage: FirebaseStorage
@@ -63,6 +70,11 @@ class StorageNonJsTest {
         ref.putBytes("file contents".encodeToByteArray()).await()
         val destination = temporaryFile("compatDownload.txt")
         val task: FileDownloadTask = ref.getFile(destination)
+        if (!supportsFileDownloads) {
+            assertIs<UnsupportedOperationException>(assertFails { task.await() })
+            assertTrue(ref.activeDownloadTasks.isEmpty())
+            return@runTest
+        }
         val (bytesTransferred, totalByteCount) = task.await()
         assertEquals(13, totalByteCount)
         assertEquals(13, bytesTransferred)

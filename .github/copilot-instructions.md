@@ -141,7 +141,7 @@ The SDK has two public API layers per module:
    `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
-   - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
+   - An API that maps onto Android, JVM and Apple but not JS is still declared in common; its JS actual does nothing (or fails where it must return a value) and carries `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
      percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its

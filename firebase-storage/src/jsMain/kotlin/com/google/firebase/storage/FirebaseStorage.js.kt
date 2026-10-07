@@ -20,6 +20,9 @@ public actual class FirebaseStorage internal constructor(public val js: JsFireba
             js.maxOperationRetryTime = value.toDouble()
         }
 
+    /** The JS SDK has no file downloads: kept for the maxDownloadRetryTimeMillis extension. */
+    internal var maxDownloadRetryTimeMillisValue: Long = DEFAULT_RETRY_TIME_MILLIS
+
     public actual var maxUploadRetryTimeMillis: Long
         get() = js.maxUploadRetryTime.toLong()
         set(value) {
@@ -52,3 +55,6 @@ public actual class FirebaseStorage internal constructor(public val js: JsFireba
         public actual fun getInstance(app: FirebaseApp, url: String): FirebaseStorage = rethrow { FirebaseStorage(getStorage(app.js, url)) }
     }
 }
+
+/** The Android SDK's default retry time, 10 minutes. */
+private const val DEFAULT_RETRY_TIME_MILLIS = 600_000L
