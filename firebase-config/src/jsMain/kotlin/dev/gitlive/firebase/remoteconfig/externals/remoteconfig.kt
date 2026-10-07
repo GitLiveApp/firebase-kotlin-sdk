@@ -45,3 +45,18 @@ public external interface Value {
     public fun asString(): String?
     public fun getSource(): String
 }
+
+public external fun onConfigUpdate(remoteConfig: RemoteConfig, observer: ConfigUpdateObserver): () -> Unit
+
+public external fun setCustomSignals(remoteConfig: RemoteConfig, customSignals: Json): Promise<Unit>
+
+public external interface ConfigUpdateObserver {
+    public var next: (ConfigUpdate) -> Unit
+    public var error: (Throwable) -> Unit
+    public var complete: () -> Unit
+}
+
+public external interface ConfigUpdate {
+    /** A JS `Set` of the updated keys. */
+    public fun getUpdatedKeys(): dynamic
+}

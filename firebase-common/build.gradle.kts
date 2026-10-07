@@ -152,7 +152,7 @@ kotlin {
         if (supportedPlatforms.contains(TargetPlatform.Js)) {
             getByName("jsMain") {
                 dependencies {
-                    api(npm("firebase", "10.12.2"))
+                    api(npm("firebase", "12.19.0"))
                 }
             }
         }

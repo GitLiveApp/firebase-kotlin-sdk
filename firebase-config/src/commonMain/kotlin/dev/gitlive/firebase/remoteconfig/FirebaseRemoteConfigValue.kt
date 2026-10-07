@@ -1,57 +1,50 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
 package dev.gitlive.firebase.remoteconfig
 
-/** Wrapper for a Remote Config parameter value, with methods to get it as different types. */
-public expect class FirebaseRemoteConfigValue {
-    /**
-     * Gets the value as a [Boolean].
-     *
-     * @return [Boolean] representation of this parameter value.
-     */
-    public fun asBoolean(): Boolean
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig as CompatFirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue as CompatFirebaseRemoteConfigValue
 
-    /**
-     * Gets the value as a [ByteArray].
-     *
-     * @return [ByteArray] representation of this parameter value.
-     */
-    public fun asByteArray(): ByteArray
+/**
+ * Wrapper for a Remote Config parameter value, with methods to get it as different types.
+ *
+ * @property compat The Android-SDK-shaped [com.google.firebase.remoteconfig.FirebaseRemoteConfigValue] this wraps.
+ */
+public class FirebaseRemoteConfigValue internal constructor(public val compat: CompatFirebaseRemoteConfigValue) {
+    /** Gets the value as a boolean. */
+    public fun asBoolean(): Boolean = compat.asBoolean()
 
-    /**
-     * Gets the value as a [Double].
-     *
-     * @return [Double] representation of this parameter value.
-     */
-    public fun asDouble(): Double
+    /** Gets the value as a byte array. */
+    public fun asByteArray(): ByteArray = compat.asByteArray()
 
-    /**
-     * Gets the value as a [Long].
-     *
-     * @return [Long] representation of this parameter value.
-     */
-    public fun asLong(): Long
+    /** Gets the value as a double. */
+    public fun asDouble(): Double = compat.asDouble()
 
-    /**
-     * Gets the value as a [String].
-     *
-     * @return [String] representation of this parameter value.
-     */
-    public fun asString(): String
+    /** Gets the value as a long. */
+    public fun asLong(): Long = compat.asLong()
 
-    /**
-     * Indicates at which source this value came from.
-     *
-     * @return [ValueSource.Remote] if the value was retrieved from the server, [ValueSource.Default] if the value was set as a default, or [ValueSource.Stataic] if no value was found and a static default value was returned instead.
-     */
-    public fun getSource(): ValueSource
+    /** Gets the value as a string. */
+    public fun asString(): String = compat.asString()
+
+    /** Indicates at which source this value came from. */
+    public fun getSource(): ValueSource = when (compat.source) {
+        CompatFirebaseRemoteConfig.VALUE_SOURCE_STATIC -> ValueSource.Static
+        CompatFirebaseRemoteConfig.VALUE_SOURCE_DEFAULT -> ValueSource.Default
+        CompatFirebaseRemoteConfig.VALUE_SOURCE_REMOTE -> ValueSource.Remote
+        else -> error("Unknown value source: ${compat.source}")
+    }
+
+    override fun equals(other: Any?): Boolean = other is FirebaseRemoteConfigValue && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebaseRemoteConfigValue(${asString()})"
 }
 
 public enum class ValueSource {
-    /** Indicates that the value returned is the static default value. */
     Static,
-
-    /** Indicates that the value returned was retrieved from the defaults set by the client. */
     Default,
-
-    /** Indicates that the value returned was retrieved from the Firebase Remote Config server. */
     Remote,
 }
