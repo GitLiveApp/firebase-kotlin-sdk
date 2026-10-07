@@ -215,10 +215,8 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Shipped: the nonJsMain extension binding to the SDK's keepSynced member, and the static members this module's
-    // own code reaches through DatabaseStatics.java.
+    // Shipped: the static members this module's own code reaches through DatabaseStatics.java.
     keepClasses = listOf(
-        "com/google/firebase/database/QueryNonJsKt.class",
         "com/google/firebase/database/DatabaseInternalsKt.class",
         "com/google/firebase/database/DatabaseStatics.class",
     ),

@@ -61,8 +61,7 @@ public actual open class Query {
     public actual fun removeEventListener(listener: ChildEventListener): Unit = stub()
     public actual fun get(): Task<DataSnapshot> = stub()
 
-    /** Not in the common API (JS has no offline cache); the shipped nonJsMain extension binds to this member. */
-    public fun keepSynced(keepSynced: Boolean): Unit = stub()
+    public actual fun keepSynced(keepSynced: Boolean): Unit = stub()
     public actual fun orderByChild(path: String): Query = stub()
     public actual fun orderByKey(): Query = stub()
     public actual fun orderByPriority(): Query = stub()

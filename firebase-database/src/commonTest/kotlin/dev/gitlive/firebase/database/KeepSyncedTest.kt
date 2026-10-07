@@ -5,7 +5,7 @@
 package dev.gitlive.firebase.database
 
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.keepSynced
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
@@ -16,9 +16,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** The offline synchronization part of the `com.google.firebase.database` layer, which the JS SDK does not have. */
+/** The offline synchronization part of the `com.google.firebase.database` layer; a no-op on JS, whose SDK has no persistent cache. */
+@OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
-class DatabaseNonJsTest {
+class KeepSyncedTest {
 
     private lateinit var database: FirebaseDatabase
 

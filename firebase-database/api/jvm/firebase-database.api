@@ -1,7 +1,3 @@
-public final class com/google/firebase/database/QueryNonJsKt {
-	public static final fun keepSynced (Lcom/google/firebase/database/Query;Z)V
-}
-
 public final class dev/gitlive/firebase/database/ChildEvent {
 	public final fun component1 ()Ldev/gitlive/firebase/database/DataSnapshot;
 	public final fun component2 ()Ldev/gitlive/firebase/database/ChildEvent$Type;

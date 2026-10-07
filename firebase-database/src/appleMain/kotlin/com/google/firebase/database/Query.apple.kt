@@ -79,8 +79,7 @@ public actual open class Query internal constructor(public open val ios: FIRData
         ios.getDataWithCompletionBlock { error, snapshot -> completion(snapshot?.let { DataSnapshot(it) }, error) }
     }
 
-    /** Keeps the data of this query synchronized in the persistent cache. */
-    internal fun keepSyncedValue(keepSynced: Boolean) {
+    public actual fun keepSynced(keepSynced: Boolean) {
         ios.keepSynced(keepSynced)
     }
 

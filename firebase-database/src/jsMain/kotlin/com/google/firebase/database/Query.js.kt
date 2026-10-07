@@ -7,6 +7,7 @@ package com.google.firebase.database
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import dev.gitlive.firebase.Unsubscribe
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.database.externals.Database
 import dev.gitlive.firebase.database.externals.QueryConstraint
 import dev.gitlive.firebase.database.externals.onChildAdded
@@ -86,6 +87,10 @@ public actual open class Query internal constructor(public open val js: JsQuery,
     }
 
     public actual fun get(): Task<DataSnapshot> = task { jsGet(js).then { DataSnapshot(it, jsDatabase) } }
+
+    /** A no-op: the JS SDK has no persistent cache to keep a query synchronized in. */
+    @UnsupportedOnJs
+    public actual fun keepSynced(keepSynced: Boolean): Unit = Unit
 
     private fun constrained(constraint: QueryConstraint): Query = rethrow { Query(query(js, constraint), jsDatabase) }
 

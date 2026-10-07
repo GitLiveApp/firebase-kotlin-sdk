@@ -32,6 +32,12 @@ public expect open class Query {
     /** Reads the data at this location from the server, falling back to the cache when offline. */
     public fun get(): Task<DataSnapshot>
 
+    /**
+     * Keeps the data of this query synchronized in the persistent cache, even while it has no listener. A no-op on JS,
+     * whose SDK has no persistent cache.
+     */
+    public fun keepSynced(keepSynced: Boolean)
+
     /** Orders the children by the value at [path] within each of them. */
     public fun orderByChild(path: String): Query
 
