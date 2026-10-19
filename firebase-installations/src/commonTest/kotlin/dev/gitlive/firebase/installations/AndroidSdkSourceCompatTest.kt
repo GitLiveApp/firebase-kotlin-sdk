@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
+import com.google.firebase.deleteApp
 import com.google.firebase.fromResource
 import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
@@ -17,8 +18,6 @@ import com.google.firebase.installations.installations
 import com.google.firebase.toKotlinInstant
 import com.google.firebase.installations.internal.FidListener
 import com.google.firebase.installations.internal.FidListenerHandle
-import dev.gitlive.firebase.apps
-import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.tasks.await
 import kotlin.test.BeforeTest
@@ -31,8 +30,8 @@ import kotlin.time.Instant
 
 /**
  * Exercises the `com.google.firebase` layer exactly as Android app code would (Task API, static accessors,
- * listeners), on every platform. Initialisation goes through the dev.gitlive API because the Android SDK's
- * `initializeApp(Context)` is deprecated with an error in common code (it points at `Firebase.initialize(context)`).
+ * listeners), on every platform, including the `FirebaseOptions(...)` factory and `Firebase.initialize(context, options)`
+ * that replace the Android SDK's `FirebaseOptions.Builder` and `initializeApp(Context, ...)` in common code.
  */
 @IgnoreForAndroidUnitTest
 @IgnoreForJvm
@@ -40,16 +39,17 @@ class AndroidSdkSourceCompatTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        if (dev.gitlive.firebase.Firebase.apps(context).isEmpty()) {
-            dev.gitlive.firebase.Firebase.initialize(
+        if (Firebase.getApps(context).isEmpty()) {
+            Firebase.initialize(
                 context,
-                dev.gitlive.firebase.FirebaseOptions(
+                FirebaseOptions(
                     applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
                     apiKey = "AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0",
                     databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                     storageBucket = "fir-kotlin-sdk.appspot.com",
                     projectId = "fir-kotlin-sdk",
                     gcmSenderId = "846484016111",
+                    authDomain = "fir-kotlin-sdk.firebaseapp.com",
                 ),
             )
         }
@@ -69,13 +69,14 @@ class AndroidSdkSourceCompatTest {
     }
 
     @Test
-    fun testInitializeNamedApp() {
+    fun testInitializeNamedApp() = runTest {
         val options = FirebaseOptions.Builder(FirebaseApp.getInstance().options).build()
         val app = Firebase.initialize(context, options, "compat")
         assertEquals("compat", app.name)
         assertEquals(app, FirebaseApp.getInstance("compat"))
         assertEquals(options.projectId, app.options.projectId)
-        app.delete()
+        app.deleteApp().await()
+        assertTrue(Firebase.getApps(context).none { it.name == "compat" })
     }
 
     @Test

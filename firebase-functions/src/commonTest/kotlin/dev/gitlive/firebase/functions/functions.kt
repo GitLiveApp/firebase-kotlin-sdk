@@ -23,6 +23,11 @@ expect val emulatorHost: String
 expect val context: Any
 expect fun detailValue(details: Any?, key: String): Any?
 
+/** Android unit tests have no `Context` and no network, so the tests that need Firebase are skipped there. */
+expect annotation class IgnoreForAndroidUnitTest()
+
+@IgnoreForAndroidUnitTest
+@Suppress("DEPRECATION") // exercises the deprecated delegating members
 class FirebaseFunctionsTest {
 
     data class ExpectedFunctionError(

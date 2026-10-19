@@ -21,6 +21,7 @@ expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
+@Suppress("DEPRECATION") // exercises the deprecated delegating members
 class FirebaseCrashlyticsTest {
 
     lateinit var crashlytics: FirebaseCrashlytics

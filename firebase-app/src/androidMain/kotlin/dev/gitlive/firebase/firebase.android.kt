@@ -4,12 +4,10 @@
 
 @file:JvmName("FirebaseKt")
 @file:JvmMultifileClass
+@file:Suppress("DEPRECATION")
 
 package dev.gitlive.firebase
 
-import android.content.Context
-import com.google.firebase.getApps
-import com.google.firebase.initialize
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
 
@@ -18,16 +16,6 @@ public val FirebaseApp.android: CompatFirebaseApp get() = compat
 
 // The Firebase Android SDK's own Kotlin extensions (FirebaseKt) are used for initialisation: unlike the header stubs'
 // companion members they are real static methods at runtime.
-public actual fun Firebase.initialize(context: Any?): FirebaseApp? = com.google.firebase.Firebase.initialize(context as Context)?.let { FirebaseApp(it) }
-
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.initialize(context as Context, options.toCompat()))
-
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(com.google.firebase.Firebase.initialize(context as Context, options.toCompat(), name))
-
-public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = com.google.firebase.Firebase.getApps(context).map { FirebaseApp(it) }
-
-internal actual suspend fun CompatFirebaseApp.deleteAwaiting(): Unit = delete()
-
 internal actual fun FirebaseOptions.toCompat(): CompatFirebaseOptions = toCompatBuilder().build()
 
 internal actual fun CompatFirebaseOptions.toPublic(): FirebaseOptions = toPublic(authDomain = null)

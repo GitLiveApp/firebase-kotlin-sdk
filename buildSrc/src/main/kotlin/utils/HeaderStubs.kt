@@ -41,6 +41,12 @@ fun Project.stripHeaderStubs(
     jvmReferenceJars: FileCollection,
     /** Class files under [packageDirs] (e.g. `com/google/firebase/FirebaseInitializeKt.class`) that are real code and are shipped. */
     keepClasses: List<String> = emptyList(),
+    /**
+     * Members of the Android SDK that `firebase-java-sdk` (the JVM target's reference) does not have or keeps non-public,
+     * as `internal/class/Name.member(descriptor)` (a field: `internal/class/Name.field`). They are verified against the
+     * Android SDK only; JVM code using them fails to compile against the java SDK, as it would without this layer.
+     */
+    jvmMissingMembers: List<String> = emptyList(),
 ) {
     tasks.withType(KotlinCompile::class.java).configureEach {
         if (!name.startsWith("compile") || name.contains("Test")) return@configureEach
@@ -56,7 +62,7 @@ fun Project.stripHeaderStubs(
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
                 .filter { it.relativeTo(destination).invariantSeparatorsPath !in keepClasses }
             val classes = stubs.map { readMembers(it.readBytes()) }
-            verifyHeaderStubs(classes, references.files.filter { it.isFile })
+            verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated = if (android) emptySet() else jvmMissingMembers.toSet())
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
             stubs.forEach { it.delete() }
             stubDirs.forEach { dir -> dir.walkBottomUp().filter { it.isDirectory && it.listFiles().isNullOrEmpty() }.forEach { it.delete() } }
@@ -131,7 +137,7 @@ private fun readMembers(bytes: ByteArray): ClassMembers = ClassMembers().also { 
 
 private val kotlinOnlyMethods = setOf("getEntries")
 
-private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<File>) {
+private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<File>, tolerated: Set<String>) {
     val problems = mutableListOf<String>()
     val zips = referenceJars.map { ZipFile(it) }
     try {
@@ -145,7 +151,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
             }
             val real = readMembers(realBytes)
             for (member in stub.methods) {
-                if (member.name in kotlinOnlyMethods || member.deprecation != null) continue
+                if (member.name in kotlinOnlyMethods || member.deprecation != null || "${stub.name}.${member.signature}" in tolerated) continue
                 val match = real.methods.firstOrNull { it.signature == member.signature }
                 when {
                     match == null -> problems += "${stub.name}.${member.signature} does not exist on the real class"
@@ -153,7 +159,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
                 }
             }
             for (field in stub.fields) {
-                if (field.name == "Companion" || field.deprecation != null) continue
+                if (field.name == "Companion" || field.deprecation != null || "${stub.name}.${field.name}" in tolerated) continue
                 val match = real.fields.firstOrNull { it.signature == field.signature }
                 if (match == null || match.isStatic != field.isStatic) problems += "${stub.name}.${field.name} does not exist on the real class"
             }

@@ -19,6 +19,7 @@ expect annotation class IgnoreForJvm()
 
 @IgnoreForAndroidUnitTest
 @IgnoreForJvm
+@Suppress("DEPRECATION") // exercises the deprecated delegating members
 class FirebaseInstallationsTest {
 
     @BeforeTest
