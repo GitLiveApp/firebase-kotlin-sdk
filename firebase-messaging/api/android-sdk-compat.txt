@@ -1,0 +1,85 @@
+# Android SDK source compatibility of firebase-messaging
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 91% of 67 public members available (61 identical, 0 mapped, 0 missing, 6 omitted)
+#
+com.google.firebase.messaging.FirebaseMessaging
+  SKIP  Task deleteToken()
+  OMIT  boolean deliveryMetricsExportToBigQueryEnabled()
+  OK    static FirebaseMessaging getInstance()
+  SKIP  Task getToken()
+  OK    boolean isAutoInitEnabled()
+  OMIT  boolean isNotificationDelegationEnabled()
+  OMIT  Task register()
+  SKIP  void send(RemoteMessage)
+  OK    void setAutoInitEnabled(boolean)
+  OMIT  void setDeliveryMetricsExportToBigQuery(boolean)
+  OMIT  Task setNotificationDelegationEnabled(boolean)
+  OK    Task subscribeToTopic(String)
+  OMIT  Task unregister()
+  OK    Task unsubscribeFromTopic(String)
+  SKIP  static String INSTANCE_ID_SCOPE
+com.google.firebase.messaging.MessagingKt
+  OK    static FirebaseMessaging getMessaging(Firebase)
+  OK    static RemoteMessage remoteMessage(String, Function1)
+com.google.firebase.messaging.RemoteMessage
+  OK    String getCollapseKey()
+  OK    Map getData()
+  OK    String getFrom()
+  OK    String getMessageId()
+  OK    String getMessageType()
+  OK    Notification getNotification()
+  OK    int getOriginalPriority()
+  OK    int getPriority()
+  SKIP  String getSenderId()
+  OK    long getSentTime()
+  SKIP  String getTo()
+  OK    int getTtl()
+  PLAT  void writeToParcel(Parcel, int)
+  OK    static int PRIORITY_HIGH
+  OK    static int PRIORITY_NORMAL
+  OK    static int PRIORITY_UNKNOWN
+com.google.firebase.messaging.RemoteMessage.Builder
+  OK    Builder(String)
+  OK    Builder addData(String, String)
+  OK    RemoteMessage build()
+  OK    Builder clearData()
+  OK    Builder setCollapseKey(String)
+  OK    Builder setData(Map)
+  OK    Builder setMessageId(String)
+  OK    Builder setMessageType(String)
+  OK    Builder setTtl(int)
+com.google.firebase.messaging.RemoteMessage.MessagePriority
+com.google.firebase.messaging.RemoteMessage.Notification
+  OK    String getBody()
+  OK    String[] getBodyLocalizationArgs()
+  OK    String getBodyLocalizationKey()
+  OK    String getChannelId()
+  OK    String getClickAction()
+  OK    String getColor()
+  OK    boolean getDefaultLightSettings()
+  OK    boolean getDefaultSound()
+  OK    boolean getDefaultVibrateSettings()
+  OK    Long getEventTime()
+  OK    String getIcon()
+  OK    Uri getImageUrl()
+  OK    int[] getLightSettings()
+  OK    Uri getLink()
+  OK    boolean getLocalOnly()
+  OK    Integer getNotificationCount()
+  OK    Integer getNotificationPriority()
+  OK    String getSound()
+  OK    boolean getSticky()
+  OK    String getTag()
+  OK    String getTicker()
+  OK    String getTitle()
+  OK    String[] getTitleLocalizationArgs()
+  OK    String getTitleLocalizationKey()
+  OK    long[] getVibrateTimings()
+  OK    Integer getVisibility()
+com.google.firebase.messaging.SendException
+  OK    int getErrorCode()
+  OK    static int ERROR_INVALID_PARAMETERS
+  OK    static int ERROR_SIZE
+  OK    static int ERROR_TOO_MANY_MESSAGES
+  OK    static int ERROR_TTL_EXCEEDED
+  OK    static int ERROR_UNKNOWN

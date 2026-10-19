@@ -1,0 +1,9 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-messaging.
+com.google.firebase.messaging.FirebaseMessagingService  // @platform an android.app.Service: received messages are handled by platform code on every platform
+com.google.firebase.messaging.FirebaseMessaging#register  // added after firebase-messaging 25.1.2, the version this SDK depends on
+com.google.firebase.messaging.FirebaseMessaging#unregister  // added after firebase-messaging 25.1.2, the version this SDK depends on
+com.google.firebase.messaging.FirebaseMessaging#deliveryMetricsExportToBigQueryEnabled  // Android-only: the Apple and JS SDKs export delivery metrics through their own configuration
+com.google.firebase.messaging.FirebaseMessaging#setDeliveryMetricsExportToBigQuery  // Android-only, see above
+com.google.firebase.messaging.FirebaseMessaging#isNotificationDelegationEnabled  // Android-only: proxy notifications are an Android feature
+com.google.firebase.messaging.FirebaseMessaging#setNotificationDelegationEnabled  // Android-only, see above
+com.google.firebase.messaging.RemoteMessage#writeToParcel  // @platform android.os.Parcelable
