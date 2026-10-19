@@ -141,7 +141,7 @@ The SDK has two public API layers per module:
    `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
-   - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
+   - An API that maps onto Android, JVM and Apple but not JS is still declared in common; its JS actual does nothing (or fails where it must return a value) and carries `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
      percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its
@@ -151,7 +151,7 @@ The SDK has two public API layers per module:
      is selected with `Class#member(Type, Type)`.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations` and `firebase-storage` are the reference.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

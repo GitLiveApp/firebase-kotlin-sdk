@@ -16,6 +16,8 @@ data class ApiMember(
      * member so that common code using it fails to compile with a message naming the replacement.
      */
     val deprecation: String? = null,
+    /** For fields: false when the field is assignable (`public boolean x;` rather than `public final boolean x;`). */
+    val isFinal: Boolean = true,
 ) {
     enum class Kind { CONSTRUCTOR, METHOD, FIELD }
 
@@ -39,6 +41,8 @@ data class ApiClass(
     val name: String,
     val members: List<ApiMember>,
     val isDeprecated: Boolean = false,
+    /** The dotted names of the superclass and interfaces, when the source records them (a BCV or header-stub dump). */
+    val superTypes: List<String> = emptyList(),
 )
 
 /** Maps Java type names as written in api.txt / JVM descriptors to one canonical dotted form. */

@@ -1,3 +1,19 @@
+public final class com/google/firebase/storage/StorageDownloadsKt {
+	public static final fun getActiveDownloadTasks (Lcom/google/firebase/storage/StorageReference;)Ljava/util/List;
+	public static final fun getFile (Lcom/google/firebase/storage/StorageReference;Ljava/lang/Object;)Lcom/google/firebase/storage/FileDownloadTask;
+	public static final fun getMaxDownloadRetryTimeMillis (Lcom/google/firebase/storage/FirebaseStorage;)J
+	public static final fun setMaxDownloadRetryTimeMillis (Lcom/google/firebase/storage/FirebaseStorage;J)V
+}
+
+public final class com/google/firebase/storage/StorageFilesKt {
+	public static final fun putFile (Lcom/google/firebase/storage/StorageReference;Ljava/lang/Object;)Lcom/google/firebase/storage/UploadTask;
+	public static final fun putFile (Lcom/google/firebase/storage/StorageReference;Ljava/lang/Object;Lcom/google/firebase/storage/StorageMetadata;)Lcom/google/firebase/storage/UploadTask;
+}
+
+public final class com/google/firebase/storage/StorageTaskUriKt {
+	public static final fun getUploadSessionUri (Lcom/google/firebase/storage/UploadTask$TaskSnapshot;)Ljava/lang/String;
+}
+
 public final class dev/gitlive/firebase/storage/Data {
 	public fun <init> ([B)V
 	public final fun getData ()[B
@@ -9,14 +25,17 @@ public final class dev/gitlive/firebase/storage/File {
 }
 
 public final class dev/gitlive/firebase/storage/FirebaseStorage {
-	public fun <init> (Lcom/google/firebase/storage/FirebaseStorage;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompat ()Lcom/google/firebase/storage/FirebaseStorage;
 	public final fun getMaxOperationRetryTime-UwyO8pc ()J
 	public final fun getMaxUploadRetryTime-UwyO8pc ()J
 	public final fun getReference ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getReferenceFromUrl (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
+	public fun hashCode ()I
 	public final fun reference (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun setMaxOperationRetryTime-LRDsOJo (J)V
 	public final fun setMaxUploadRetryTime-LRDsOJo (J)V
+	public fun toString ()Ljava/lang/String;
 	public final fun useEmulator (Ljava/lang/String;I)V
 }
 
@@ -54,7 +73,7 @@ public final class dev/gitlive/firebase/storage/FirebaseStorageMetadata {
 }
 
 public final class dev/gitlive/firebase/storage/ListResult {
-	public fun <init> (Lcom/google/firebase/storage/ListResult;)V
+	public final fun getCompat ()Lcom/google/firebase/storage/ListResult;
 	public final fun getItems ()Ljava/util/List;
 	public final fun getPageToken ()Ljava/lang/String;
 	public final fun getPrefixes ()Ljava/util/List;
@@ -87,10 +106,11 @@ public final class dev/gitlive/firebase/storage/StorageKt {
 }
 
 public final class dev/gitlive/firebase/storage/StorageReference {
-	public fun <init> (Lcom/google/firebase/storage/StorageReference;)V
 	public final fun child (Ljava/lang/String;)Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun delete (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBucket ()Ljava/lang/String;
+	public final fun getCompat ()Lcom/google/firebase/storage/StorageReference;
 	public final fun getData (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getDownloadUrl (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getMetadata (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -99,6 +119,7 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public final fun getPath ()Ljava/lang/String;
 	public final fun getRoot ()Ldev/gitlive/firebase/storage/StorageReference;
 	public final fun getStorage ()Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public fun hashCode ()I
 	public final fun list (ILjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun list$default (Ldev/gitlive/firebase/storage/StorageReference;ILjava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun listAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -110,6 +131,7 @@ public final class dev/gitlive/firebase/storage/StorageReference {
 	public static synthetic fun putFile$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun putFileResumable (Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;)Ldev/gitlive/firebase/storage/ProgressFlow;
 	public static synthetic fun putFileResumable$default (Ldev/gitlive/firebase/storage/StorageReference;Ldev/gitlive/firebase/storage/File;Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;ILjava/lang/Object;)Ldev/gitlive/firebase/storage/ProgressFlow;
+	public fun toString ()Ljava/lang/String;
 	public final fun updateMetadata (Ldev/gitlive/firebase/storage/FirebaseStorageMetadata;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
