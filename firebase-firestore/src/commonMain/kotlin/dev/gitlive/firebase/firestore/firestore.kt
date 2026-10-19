@@ -7,63 +7,66 @@ package dev.gitlive.firebase.firestore
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.internal.EncodedObject
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.firestore.internal.NativeCollectionReferenceWrapper
-import dev.gitlive.firebase.firestore.internal.NativeDocumentReference
-import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
-import dev.gitlive.firebase.firestore.internal.NativeFirebaseFirestoreWrapper
-import dev.gitlive.firebase.firestore.internal.NativeQueryWrapper
-import dev.gitlive.firebase.firestore.internal.NativeTransactionWrapper
-import dev.gitlive.firebase.firestore.internal.NativeWriteBatchWrapper
+import com.google.firebase.firestore.AggregateSource
+import com.google.firebase.firestore.aggregateAverage
+import com.google.firebase.firestore.aggregateSum
+import com.google.firebase.firestore.fieldPathDocumentId
+import com.google.firebase.firestore.fieldPathOf
+import com.google.firebase.firestore.setFirestoreLoggingEnabled
 import dev.gitlive.firebase.firestore.internal.SetOptions
+import dev.gitlive.firebase.firestore.internal.getAwait
+import dev.gitlive.firebase.firestore.internal.nativeData
+import dev.gitlive.firebase.firestore.internal.nativeGet
+import dev.gitlive.firebase.firestore.internal.runSuspendTransaction
+import dev.gitlive.firebase.firestore.internal.toCompat
+import dev.gitlive.firebase.firestore.internal.toCompatMap
+import dev.gitlive.firebase.firestore.internal.wrapperSnapshots
 import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.encodeAsObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlin.jvm.JvmName
+import com.google.firebase.firestore.CollectionReference as CompatCollectionReference
+import com.google.firebase.firestore.DocumentChange as CompatDocumentChange
+import com.google.firebase.firestore.DocumentReference as CompatDocumentReference
+import com.google.firebase.firestore.DocumentSnapshot as CompatDocumentSnapshot
+import com.google.firebase.firestore.FieldPath as CompatFieldPath
+import com.google.firebase.firestore.FirebaseFirestore as CompatFirebaseFirestore
+import com.google.firebase.firestore.Query as CompatQuery
+import com.google.firebase.firestore.QuerySnapshot as CompatQuerySnapshot
+import com.google.firebase.firestore.SnapshotMetadata as CompatSnapshotMetadata
+import com.google.firebase.firestore.Transaction as CompatTransaction
+import com.google.firebase.firestore.WriteBatch as CompatWriteBatch
 
-/** Returns the [FirebaseFirestore] instance of the default [FirebaseApp]. */
-public expect val Firebase.firestore: FirebaseFirestore
-
-/** Returns the [FirebaseFirestore] instance of a given [FirebaseApp]. */
-public expect fun Firebase.firestore(app: FirebaseApp, databaseId: String? = null): FirebaseFirestore
-
-internal expect class NativeFirebaseFirestore
-
-public class FirebaseFirestore internal constructor(private val wrapper: NativeFirebaseFirestoreWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.FirebaseFirestore] this wraps. */
+public class FirebaseFirestore internal constructor(public val compat: CompatFirebaseFirestore) {
 
     public companion object {}
-
-    internal constructor(native: NativeFirebaseFirestore) : this(NativeFirebaseFirestoreWrapper(native))
-
-    // Important to leave this as a get property since on JS it is initialized lazily
-    internal val native: NativeFirebaseFirestore get() = wrapper.native
 
     public var settings: FirebaseFirestoreSettings
         @Deprecated("Property can only be written.", level = DeprecationLevel.ERROR)
         get() = throw NotImplementedError()
         set(value) {
-            wrapper.applySettings(value)
+            value.applyTo(compat)
         }
 
-    public fun collection(collectionPath: String): CollectionReference = CollectionReference(wrapper.collection(collectionPath))
-    public fun collectionGroup(collectionId: String): Query = Query(wrapper.collectionGroup(collectionId))
-    public fun document(documentPath: String): DocumentReference = DocumentReference(wrapper.document(documentPath))
-    public fun batch(): WriteBatch = WriteBatch(wrapper.batch())
+    public fun collection(collectionPath: String): CollectionReference = CollectionReference(compat.collection(collectionPath))
+    public fun collectionGroup(collectionId: String): Query = Query(compat.collectionGroup(collectionId))
+    public fun document(documentPath: String): DocumentReference = DocumentReference(compat.document(documentPath))
+    public fun batch(): WriteBatch = WriteBatch(compat.batch())
     public fun setLoggingEnabled(loggingEnabled: Boolean) {
-        wrapper.setLoggingEnabled(loggingEnabled)
+        setFirestoreLoggingEnabled(loggingEnabled)
     }
     public suspend fun clearPersistence() {
-        wrapper.clearPersistence()
+        compat.clearPersistence().await()
     }
-    public suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = wrapper.runTransaction { func(Transaction(this)) }
+    public suspend fun <T> runTransaction(func: suspend Transaction.() -> T): T = compat.runSuspendTransaction { func(Transaction(it)) }
     public fun useEmulator(host: String, port: Int) {
-        wrapper.useEmulator(host, port)
+        compat.useEmulator(host, port)
     }
 
     @Deprecated("Use SettingsBuilder instead", replaceWith = ReplaceWith("settings = firestoreSettings { }", "dev.gitlive.firebase.firestore.firestoreSettings"))
@@ -94,19 +97,25 @@ public class FirebaseFirestore internal constructor(private val wrapper: NativeF
     }
 
     public suspend fun disableNetwork() {
-        wrapper.disableNetwork()
+        compat.disableNetwork().await()
     }
     public suspend fun enableNetwork() {
-        wrapper.enableNetwork()
+        compat.enableNetwork().await()
     }
 
     public suspend fun terminate() {
-        wrapper.terminate()
+        compat.terminate().await()
     }
 
     public suspend fun waitForPendingWrites() {
-        wrapper.waitForPendingWrites()
+        compat.waitForPendingWrites().await()
     }
+
+    override fun equals(other: Any?): Boolean = other is FirebaseFirestore && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
 public expect class FirebaseFirestoreSettings {
@@ -136,15 +145,13 @@ public expect class FirebaseFirestoreSettings {
 
 public expect fun firestoreSettings(settings: FirebaseFirestoreSettings? = null, builder: FirebaseFirestoreSettings.Builder.() -> Unit): FirebaseFirestoreSettings
 
-internal expect class NativeTransaction
+/** Applies these settings to [firestore], including the platform-specific callback executor or dispatch queue. */
+internal expect fun FirebaseFirestoreSettings.applyTo(firestore: CompatFirebaseFirestore)
 
-public data class Transaction internal constructor(internal val nativeWrapper: NativeTransactionWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.Transaction] this wraps. */
+public data class Transaction internal constructor(public val compat: CompatTransaction) {
 
     public companion object {}
-
-    internal constructor(native: NativeTransaction) : this(NativeTransactionWrapper(native))
-
-    internal val native: NativeTransaction = nativeWrapper.native
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(documentRef, data, merge) { this.encodeDefaults = encodeDefaults }"))
     public fun set(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean, merge: Boolean = false): Transaction = set(documentRef, data, merge) {
@@ -183,7 +190,9 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public inline fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = setEncoded(documentRef, encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
     @PublishedApi
-    internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): Transaction = Transaction(nativeWrapper.setEncoded(documentRef, encodedData, setOptions))
+    internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): Transaction = apply {
+        setOptions.toCompat()?.let { compat.set(documentRef.compat, encodedData.toCompatMap(), it) } ?: compat.set(documentRef.compat, encodedData.toCompatMap())
+    }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, data) { this.encodeDefaults = encodeDefaults }"))
     public fun update(documentRef: DocumentReference, data: Any, encodeDefaults: Boolean): Transaction = update(documentRef, data) {
@@ -235,43 +244,46 @@ public data class Transaction internal constructor(internal val nativeWrapper: N
     public fun updateFields(
         documentRef: DocumentReference,
         fieldsAndValuesUpdateDSL: FieldsAndValuesUpdateDSL.() -> Unit,
-    ): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues))
+    ): Transaction = apply {
+        FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues.takeIf { it.isNotEmpty() }?.performUpdate(
+            updateAsField = { field, value, moreFieldsAndValues -> compat.update(documentRef.compat, field, value, *moreFieldsAndValues) },
+            updateAsFieldPath = { fieldPath, value, moreFieldsAndValues -> compat.update(documentRef.compat, fieldPath, value, *moreFieldsAndValues) },
+        )
+    }
 
     @PublishedApi
-    internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = Transaction(nativeWrapper.updateEncoded(documentRef, encodedData))
+    internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = apply { compat.update(documentRef.compat, encodedData.toCompatMap()) }
 
-    public fun delete(documentRef: DocumentReference): Transaction = Transaction(nativeWrapper.delete(documentRef))
-    public suspend fun get(documentRef: DocumentReference): DocumentSnapshot = DocumentSnapshot(nativeWrapper.get(documentRef))
+    public fun delete(documentRef: DocumentReference): Transaction = apply { compat.delete(documentRef.compat) }
+    public suspend fun get(documentRef: DocumentReference): DocumentSnapshot = DocumentSnapshot(compat.getAwait(documentRef.compat))
 }
 
-internal expect open class NativeQuery
-
-public open class Query internal constructor(internal val nativeQuery: NativeQueryWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.Query] this wraps. */
+public open class Query internal constructor(public open val compat: CompatQuery) {
 
     public companion object {}
 
-    internal constructor(native: NativeQuery) : this(NativeQueryWrapper(native))
+    public fun limit(limit: Number): Query = Query(compat.limit(limit.toLong()))
+    public fun limitToLast(limit: Number): Query = Query(compat.limitToLast(limit.toLong()))
 
-    internal open val native: NativeQuery = nativeQuery.native
+    public suspend fun count(): Long = compat.count().get(AggregateSource.SERVER).await().count
+    public suspend fun sum(field: String): Double = aggregate(aggregateSum(field)) ?: 0.0
+    public suspend fun sum(field: FieldPath): Double = aggregate(aggregateSum(field.compat)) ?: 0.0
+    public suspend fun average(field: String): Double? = aggregate(aggregateAverage(field))
+    public suspend fun average(field: FieldPath): Double? = aggregate(aggregateAverage(field.compat))
 
-    public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
-    public fun limitToLast(limit: Number): Query = Query(nativeQuery.limitToLast(limit))
+    private suspend fun aggregate(field: com.google.firebase.firestore.AggregateField): Double? = compat.aggregate(field).get(AggregateSource.SERVER).await().getDouble(field)
 
-    public suspend fun count(): Long = nativeQuery.count()
-    public suspend fun sum(field: String): Double = nativeQuery.sum(field)
-    public suspend fun sum(field: FieldPath): Double = nativeQuery.sum(field.encoded)
-    public suspend fun average(field: String): Double? = nativeQuery.average(field)
-    public suspend fun average(field: FieldPath): Double? = nativeQuery.average(field.encoded)
-    public val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
-    public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
+    public val snapshots: Flow<QuerySnapshot> get() = snapshots()
+    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map { QuerySnapshot(it) }
+    public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = QuerySnapshot(compat.get(source.toCompat()).await())
 
-    public fun where(builder: FilterBuilder.() -> Filter?): Query = builder(FilterBuilder())?.let { Query(nativeQuery.where(it)) } ?: this
+    public fun where(builder: FilterBuilder.() -> Filter?): Query = builder(FilterBuilder())?.let { Query(compat.where(it.toCompat())) } ?: this
 
-    public fun orderBy(field: String, direction: Direction = Direction.ASCENDING): Query = Query(nativeQuery.orderBy(field, direction))
-    public fun orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING): Query = Query(nativeQuery.orderBy(field.encoded, direction))
+    public fun orderBy(field: String, direction: Direction = Direction.ASCENDING): Query = Query(compat.orderBy(field, direction))
+    public fun orderBy(field: FieldPath, direction: Direction = Direction.ASCENDING): Query = Query(compat.orderBy(field.compat, direction))
 
-    public fun startAfter(document: DocumentSnapshot): Query = Query(nativeQuery.startAfter(document.native))
+    public fun startAfter(document: DocumentSnapshot): Query = Query(compat.startAfter(document.compat))
 
     @Deprecated("Deprecated. Use `startAfterFieldValues` instead", replaceWith = ReplaceWith("startAfterFieldValues { fieldValues.forEach { add(it) } }"))
     public fun startAfter(vararg fieldValues: Any?): Query = startAfter(*fieldValues) {}
@@ -291,9 +303,9 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      * The order of the field values must match the order of the [orderBy] clauses of the query
      * @param builder closure for configuring the [FieldValuesDSL]
      */
-    public fun startAfterFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.startAfter(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+    public fun startAfterFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(compat.startAfter(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
-    public fun startAt(document: DocumentSnapshot): Query = Query(nativeQuery.startAt(document.native))
+    public fun startAt(document: DocumentSnapshot): Query = Query(compat.startAt(document.compat))
 
     @Deprecated("Deprecated. Use `startAtFieldValues` instead", replaceWith = ReplaceWith("startAtFieldValues { fieldValues.forEach { add(it) } }"))
     public fun startAt(vararg fieldValues: Any?): Query = startAt(*fieldValues) {}
@@ -312,9 +324,9 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      * The order of the field values must match the order of the [orderBy] clauses of the query
      * @param builder closure for configuring the [FieldValuesDSL]
      */
-    public fun startAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.startAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+    public fun startAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(compat.startAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
-    public fun endBefore(document: DocumentSnapshot): Query = Query(nativeQuery.endBefore(document.native))
+    public fun endBefore(document: DocumentSnapshot): Query = Query(compat.endBefore(document.compat))
 
     @Deprecated("Deprecated. Use `endBefore` instead", replaceWith = ReplaceWith("endBeforeFieldValues { fieldValues.forEach { add(it) } }"))
     public fun endBefore(vararg fieldValues: Any?): Query = endBefore(*fieldValues) {}
@@ -333,9 +345,9 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      * The order of the field values must match the order of the [orderBy] clauses of the query
      * @param builder closure for configuring the [FieldValuesDSL]
      */
-    public fun endBeforeFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.endBefore(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+    public fun endBeforeFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(compat.endBefore(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
 
-    public fun endAt(document: DocumentSnapshot): Query = Query(nativeQuery.endAt(document.native))
+    public fun endAt(document: DocumentSnapshot): Query = Query(compat.endAt(document.compat))
 
     @Deprecated("Deprecated. Use `endAtFieldValues` instead", replaceWith = ReplaceWith("endAtFieldValues { fieldValues.forEach { add(it) } }"))
     public fun endAt(vararg fieldValues: Any?): Query = endAt(*fieldValues) {}
@@ -354,7 +366,13 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      * The order of the field values must match the order of the [orderBy] clauses of the query
      * @param builder closure for configuring the [FieldValuesDSL]
      */
-    public fun endAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.endAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+    public fun endAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(compat.endAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+
+    override fun equals(other: Any?): Boolean = other is Query && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
@@ -409,15 +427,10 @@ public fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContain
     )
 }
 
-internal expect class NativeWriteBatch
-
-public data class WriteBatch internal constructor(internal val nativeWrapper: NativeWriteBatchWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.WriteBatch] this wraps. */
+public data class WriteBatch internal constructor(public val compat: CompatWriteBatch) {
 
     public companion object {}
-
-    internal constructor(native: NativeWriteBatch) : this(NativeWriteBatchWrapper(native))
-
-    internal val native: NativeWriteBatch = nativeWrapper.native
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(documentRef, data, merge) { this.encodeDefaults = encodeDefaults }"))
     public inline fun <reified T : Any> set(documentRef: DocumentReference, data: T, encodeDefaults: Boolean, merge: Boolean = false): WriteBatch = set(documentRef, data, merge) {
@@ -456,7 +469,9 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
     public inline fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = setEncoded(documentRef, encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
     @PublishedApi
-    internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): WriteBatch = WriteBatch(nativeWrapper.setEncoded(documentRef, encodedData, setOptions))
+    internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): WriteBatch = apply {
+        setOptions.toCompat()?.let { compat.set(documentRef.compat, encodedData.toCompatMap(), it) } ?: compat.set(documentRef.compat, encodedData.toCompatMap())
+    }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(documentRef, data) { this.encodeDefaults = encodeDefaults }"))
     public inline fun <reified T : Any> update(documentRef: DocumentReference, data: T, encodeDefaults: Boolean): WriteBatch = update(documentRef, data) {
@@ -508,41 +523,44 @@ public data class WriteBatch internal constructor(internal val nativeWrapper: Na
     public fun updateFields(
         documentRef: DocumentReference,
         fieldsAndValuesUpdateDSL: FieldsAndValuesUpdateDSL.() -> Unit,
-    ): WriteBatch = WriteBatch(
-        nativeWrapper.updateEncoded(
-            documentRef,
-            FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues,
-        ),
-    )
+    ): WriteBatch = apply {
+        FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues.takeIf { it.isNotEmpty() }?.performUpdate(
+            updateAsField = { field, value, moreFieldsAndValues -> compat.update(documentRef.compat, field, value, *moreFieldsAndValues) },
+            updateAsFieldPath = { fieldPath, value, moreFieldsAndValues -> compat.update(documentRef.compat, fieldPath, value, *moreFieldsAndValues) },
+        )
+    }
 
     @PublishedApi
-    internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): WriteBatch = WriteBatch(nativeWrapper.updateEncoded(documentRef, encodedData))
+    internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): WriteBatch = apply { compat.update(documentRef.compat, encodedData.toCompatMap()) }
 
-    public fun delete(documentRef: DocumentReference): WriteBatch = WriteBatch(nativeWrapper.delete(documentRef))
+    public fun delete(documentRef: DocumentReference): WriteBatch = apply { compat.delete(documentRef.compat) }
     public suspend fun commit() {
-        nativeWrapper.commit()
+        compat.commit().await()
     }
 }
 
-/** A class representing a platform specific Firebase DocumentReference. */
-internal expect class NativeDocumentReferenceType
+/** The Android-SDK-shaped document reference the platform SDKs read and write. */
+internal typealias NativeDocumentReferenceType = CompatDocumentReference
 
-/** A class representing a Firebase DocumentReference. */
+/**
+ * A class representing a Firebase DocumentReference.
+ * @property compat The Android-SDK-shaped [com.google.firebase.firestore.DocumentReference] this wraps.
+ */
 @Serializable(with = DocumentReferenceSerializer::class)
-public data class DocumentReference internal constructor(internal val native: NativeDocumentReference) {
+public data class DocumentReference internal constructor(public val compat: CompatDocumentReference) {
 
     public companion object {}
 
-    internal val nativeValue get() = native.nativeValue
+    internal val nativeValue: NativeDocumentReferenceType get() = compat
 
-    val id: String get() = native.id
-    val path: String get() = native.path
-    val snapshots: Flow<DocumentSnapshot> get() = native.snapshots.map(::DocumentSnapshot)
-    val parent: CollectionReference get() = CollectionReference(native.parent)
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    val id: String get() = compat.id
+    val path: String get() = compat.path
+    val snapshots: Flow<DocumentSnapshot> get() = snapshots()
+    val parent: CollectionReference get() = CollectionReference(compat.parent)
+    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::DocumentSnapshot)
 
-    public fun collection(collectionPath: String): CollectionReference = CollectionReference(native.collection(collectionPath))
-    public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(native.get(source))
+    public fun collection(collectionPath: String): CollectionReference = CollectionReference(compat.collection(collectionPath))
+    public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(compat.get(source.toCompat()).await())
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("set(data, merge) { this.encodeDefaults = encodeDefaults }"))
     public suspend inline fun <reified T : Any> set(data: T, encodeDefaults: Boolean, merge: Boolean = false) {
@@ -624,7 +642,7 @@ public data class DocumentReference internal constructor(internal val native: Na
 
     @PublishedApi
     internal suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) {
-        native.setEncoded(encodedData, setOptions)
+        (setOptions.toCompat()?.let { compat.set(encodedData.toCompatMap(), it) } ?: compat.set(encodedData.toCompatMap())).await()
     }
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("update(data) { this.encodeDefaults = encodeDefaults }"))
@@ -651,7 +669,7 @@ public data class DocumentReference internal constructor(internal val native: Na
 
     @PublishedApi
     internal suspend fun updateEncoded(encodedData: EncodedObject) {
-        native.updateEncoded(encodedData)
+        compat.update(encodedData.toCompatMap()).await()
     }
 
     @JvmName("updateFields")
@@ -685,29 +703,27 @@ public data class DocumentReference internal constructor(internal val native: Na
     public suspend fun updateFields(
         fieldsAndValuesUpdateDSL: FieldsAndValuesUpdateDSL.() -> Unit,
     ) {
-        native.updateEncoded(FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues)
+        FieldsAndValuesUpdateDSL().apply(fieldsAndValuesUpdateDSL).fieldsAndValues.takeIf { it.isNotEmpty() }?.performUpdate(
+            updateAsField = { field, value, moreFieldsAndValues -> compat.update(field, value, *moreFieldsAndValues) },
+            updateAsFieldPath = { fieldPath, value, moreFieldsAndValues -> compat.update(fieldPath, value, *moreFieldsAndValues) },
+        )?.await()
     }
 
     public suspend fun delete() {
-        native.delete()
+        compat.delete().await()
     }
 }
 
-internal expect class NativeCollectionReference : NativeQuery
-
-public data class CollectionReference internal constructor(internal val nativeWrapper: NativeCollectionReferenceWrapper) : Query(nativeWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.CollectionReference] this wraps. */
+public data class CollectionReference internal constructor(override val compat: CompatCollectionReference) : Query(compat) {
 
     public companion object {}
 
-    internal constructor(native: NativeCollectionReference) : this(NativeCollectionReferenceWrapper(native))
+    val path: String get() = compat.path
+    val document: DocumentReference get() = DocumentReference(compat.document())
+    val parent: DocumentReference? get() = compat.parent?.let(::DocumentReference)
 
-    override val native: NativeCollectionReference = nativeWrapper.native
-
-    val path: String get() = nativeWrapper.path
-    val document: DocumentReference get() = DocumentReference(nativeWrapper.document)
-    val parent: DocumentReference? get() = nativeWrapper.parent?.let(::DocumentReference)
-
-    public fun document(documentPath: String): DocumentReference = DocumentReference(nativeWrapper.document(documentPath))
+    public fun document(documentPath: String): DocumentReference = DocumentReference(compat.document(documentPath))
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("add(data) { this.encodeDefaults = encodeDefaults }"))
     public suspend inline fun <reified T : Any> add(data: T, encodeDefaults: Boolean): DocumentReference = add(data) {
@@ -726,92 +742,78 @@ public data class CollectionReference internal constructor(internal val nativeWr
     )
 
     @PublishedApi
-    internal suspend fun addEncoded(data: EncodedObject): DocumentReference = DocumentReference(nativeWrapper.addEncoded(data))
+    internal suspend fun addEncoded(data: EncodedObject): DocumentReference = DocumentReference(compat.add(data.toCompatMap()).await())
 }
 
-public expect class FirebaseFirestoreException : FirebaseException
+/** A failed Firestore operation; the Android-SDK-shaped [com.google.firebase.firestore.FirebaseFirestoreException]. */
+public typealias FirebaseFirestoreException = com.google.firebase.firestore.FirebaseFirestoreException
 
-public expect val FirebaseFirestoreException.code: FirestoreExceptionCode
+/** The error codes of Firestore; the Android-SDK-shaped [com.google.firebase.firestore.FirebaseFirestoreException.Code]. */
+public typealias FirestoreExceptionCode = com.google.firebase.firestore.FirebaseFirestoreException.Code
 
-public expect enum class FirestoreExceptionCode {
-    OK,
-    CANCELLED,
-    UNKNOWN,
-    INVALID_ARGUMENT,
-    DEADLINE_EXCEEDED,
-    NOT_FOUND,
-    ALREADY_EXISTS,
-    PERMISSION_DENIED,
-    RESOURCE_EXHAUSTED,
-    FAILED_PRECONDITION,
-    ABORTED,
-    OUT_OF_RANGE,
-    UNIMPLEMENTED,
-    INTERNAL,
-    UNAVAILABLE,
-    DATA_LOSS,
-    UNAUTHENTICATED,
+/** The sort direction of an `orderBy`; the Android-SDK-shaped [com.google.firebase.firestore.Query.Direction]. */
+public typealias Direction = com.google.firebase.firestore.Query.Direction
+
+/** The kind of a [DocumentChange]; the Android-SDK-shaped [com.google.firebase.firestore.DocumentChange.Type]. */
+public typealias ChangeType = com.google.firebase.firestore.DocumentChange.Type
+
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.QuerySnapshot] this wraps. */
+public class QuerySnapshot(public val compat: CompatQuerySnapshot) {
+    public val documents: List<DocumentSnapshot> get() = compat.documents.map { DocumentSnapshot(it) }
+    public val documentChanges: List<DocumentChange> get() = compat.documentChanges.map { DocumentChange(it) }
+    public val metadata: SnapshotMetadata get() = SnapshotMetadata(compat.metadata)
+
+    override fun equals(other: Any?): Boolean = other is QuerySnapshot && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
-public expect enum class Direction {
-    ASCENDING,
-    DESCENDING,
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.DocumentChange] this wraps. */
+public class DocumentChange(public val compat: CompatDocumentChange) {
+    public val document: DocumentSnapshot get() = DocumentSnapshot(compat.document)
+    public val newIndex: Int get() = compat.newIndex
+    public val oldIndex: Int get() = compat.oldIndex
+    public val type: ChangeType get() = compat.type
+
+    override fun equals(other: Any?): Boolean = other is DocumentChange && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
-public expect class QuerySnapshot {
-    public val documents: List<DocumentSnapshot>
-    public val documentChanges: List<DocumentChange>
-    public val metadata: SnapshotMetadata
-}
-
-public expect enum class ChangeType {
-    ADDED,
-    MODIFIED,
-    REMOVED,
-}
-
-public expect class DocumentChange {
-    public val document: DocumentSnapshot
-    public val newIndex: Int
-    public val oldIndex: Int
-    public val type: ChangeType
-}
-
-internal expect class NativeDocumentSnapshot
-
-public data class DocumentSnapshot internal constructor(internal val nativeWrapper: NativeDocumentSnapshotWrapper) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.DocumentSnapshot] this wraps. */
+public data class DocumentSnapshot internal constructor(public val compat: CompatDocumentSnapshot) {
 
     public companion object {}
 
-    internal constructor(native: NativeDocumentSnapshot) : this(NativeDocumentSnapshotWrapper(native))
+    val exists: Boolean get() = compat.exists()
+    val id: String get() = compat.id
+    val reference: DocumentReference get() = DocumentReference(compat.reference)
+    val metadata: SnapshotMetadata get() = SnapshotMetadata(compat.metadata)
 
-    internal val native: NativeDocumentSnapshot = nativeWrapper.native
-
-    val exists: Boolean get() = nativeWrapper.exists
-    val id: String get() = nativeWrapper.id
-    val reference: DocumentReference get() = DocumentReference(nativeWrapper.reference)
-    val metadata: SnapshotMetadata get() = nativeWrapper.metadata
-
-    public fun contains(field: String): Boolean = nativeWrapper.contains(field)
-    public fun contains(fieldPath: FieldPath): Boolean = nativeWrapper.contains(fieldPath.encoded)
+    public fun contains(field: String): Boolean = compat.contains(field)
+    public fun contains(fieldPath: FieldPath): Boolean = compat.contains(fieldPath.compat)
 
     public inline fun <reified T> get(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(value = getEncoded(field, serverTimestampBehavior), buildSettings)
     public inline fun <T> get(field: String, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, getEncoded(field, serverTimestampBehavior), buildSettings)
 
     @PublishedApi
-    internal fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = nativeWrapper.getEncoded(field, serverTimestampBehavior)
+    internal fun getEncoded(field: String, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = compat.nativeGet(field, serverTimestampBehavior.toCompat())
 
     public inline fun <reified T> get(fieldPath: FieldPath, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(value = getEncoded(fieldPath, serverTimestampBehavior), buildSettings)
     public inline fun <T> get(fieldPath: FieldPath, strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, getEncoded(fieldPath, serverTimestampBehavior), buildSettings)
 
     @PublishedApi
-    internal fun getEncoded(fieldPath: FieldPath, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = nativeWrapper.getEncoded(fieldPath.encoded, serverTimestampBehavior)
+    internal fun getEncoded(fieldPath: FieldPath, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = compat.nativeGet(fieldPath.compat, serverTimestampBehavior.toCompat())
 
     public inline fun <reified T> data(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(encodedData(serverTimestampBehavior), buildSettings)
     public inline fun <T> data(strategy: DeserializationStrategy<T>, serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, encodedData(serverTimestampBehavior), buildSettings)
 
     @PublishedApi
-    internal fun encodedData(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = nativeWrapper.encodedData(serverTimestampBehavior)
+    internal fun encodedData(serverTimestampBehavior: ServerTimestampBehavior = ServerTimestampBehavior.NONE): Any? = compat.nativeData(serverTimestampBehavior.toCompat())
 }
 
 public enum class ServerTimestampBehavior {
@@ -820,25 +822,54 @@ public enum class ServerTimestampBehavior {
     PREVIOUS,
 }
 
-public expect class SnapshotMetadata {
-    public val hasPendingWrites: Boolean
-    public val isFromCache: Boolean
+internal fun ServerTimestampBehavior.toCompat(): CompatDocumentSnapshot.ServerTimestampBehavior = when (this) {
+    ServerTimestampBehavior.ESTIMATE -> CompatDocumentSnapshot.ServerTimestampBehavior.ESTIMATE
+    ServerTimestampBehavior.NONE -> CompatDocumentSnapshot.ServerTimestampBehavior.NONE
+    ServerTimestampBehavior.PREVIOUS -> CompatDocumentSnapshot.ServerTimestampBehavior.PREVIOUS
 }
 
-public expect class FieldPath(vararg fieldNames: String) {
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.SnapshotMetadata] this wraps. */
+public class SnapshotMetadata(public val compat: CompatSnapshotMetadata) {
+    public val hasPendingWrites: Boolean get() = compat.hasPendingWrites()
+    public val isFromCache: Boolean get() = compat.isFromCache
+
+    override fun equals(other: Any?): Boolean = other is SnapshotMetadata && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
+}
+
+/** @property compat The Android-SDK-shaped [com.google.firebase.firestore.FieldPath] this wraps. */
+public class FieldPath internal constructor(public val compat: CompatFieldPath) {
+    public constructor(vararg fieldNames: String) : this(fieldPathOf(*fieldNames))
+
     public companion object {
-        public val documentId: FieldPath
+        public val documentId: FieldPath get() = FieldPath(fieldPathDocumentId())
     }
 
     @Deprecated("Use companion object instead", replaceWith = ReplaceWith("FieldPath.documentId"))
-    public val documentId: FieldPath
-    public val encoded: EncodedFieldPath
+    public val documentId: FieldPath get() = FieldPath.documentId
+    public val encoded: EncodedFieldPath get() = compat
+
+    override fun equals(other: Any?): Boolean = other is FieldPath && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = compat.toString()
 }
 
-public expect class EncodedFieldPath
+/** The Android-SDK-shaped field path the platform SDKs take. */
+public typealias EncodedFieldPath = CompatFieldPath
 
 public enum class Source {
     CACHE,
     SERVER,
     DEFAULT,
+}
+
+internal fun Source.toCompat(): com.google.firebase.firestore.Source = when (this) {
+    Source.CACHE -> com.google.firebase.firestore.Source.CACHE
+    Source.SERVER -> com.google.firebase.firestore.Source.SERVER
+    Source.DEFAULT -> com.google.firebase.firestore.Source.DEFAULT
 }

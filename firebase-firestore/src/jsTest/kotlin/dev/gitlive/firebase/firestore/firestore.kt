@@ -14,3 +14,5 @@ actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = (js("Object").entrie
     it[0] as String to it[1]
 }
 actual fun Map<String, Any?>.asEncoded(): Any = json(*entries.map { (key, value) -> key to value }.toTypedArray())
+
+actual val transactionGetIsSynchronous: Boolean = false

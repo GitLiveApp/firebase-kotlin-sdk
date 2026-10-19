@@ -27,6 +27,9 @@ import kotlin.time.Duration.Companion.milliseconds
 expect val emulatorHost: String
 expect val context: Any
 
+/** Whether the platform SDK reads inside a transaction synchronously; the JS SDK does not. */
+expect val transactionGetIsSynchronous: Boolean
+
 /** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
 

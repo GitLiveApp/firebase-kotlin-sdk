@@ -15,3 +15,5 @@ actual val context: Any = InstrumentationRegistry.getInstrumentation().targetCon
 @Suppress("UNCHECKED_CAST")
 actual fun encodedAsMap(encoded: Any?): Map<String, Any?> = encoded as Map<String, Any?>
 actual fun Map<String, Any?>.asEncoded(): Any = this
+
+actual val transactionGetIsSynchronous: Boolean = true

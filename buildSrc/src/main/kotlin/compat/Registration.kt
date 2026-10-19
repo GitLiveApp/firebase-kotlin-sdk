@@ -13,7 +13,8 @@ import org.gradle.api.Project
  * `api/android-sdk/exclusions.txt` may list members (`com.google.firebase.FirebaseApp#getApplicationContext`), single
  * overloads (`com.google.firebase.Timestamp#<init>(Date)`) or classes (`com.google.firebase.provider.*`) that are
  * intentionally not mirrored; `//` starts a comment. Omitted members still count against the module's percentage unless
- * the comment contains `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an Android/JVM-only type).
+ * the comment contains `@hide` (hidden in the Android SDK), `@platform` (the signature involves an Android/JVM-only type)
+ * or `@unavailable` (the feature does not exist in the pinned iOS or JS SDK).
  * The Android header stubs (removed from the compiled output, see `utils.stripHeaderStubs`) are read from the dump that
  * the Android compilation writes to `build/header-stubs/`.
  */
