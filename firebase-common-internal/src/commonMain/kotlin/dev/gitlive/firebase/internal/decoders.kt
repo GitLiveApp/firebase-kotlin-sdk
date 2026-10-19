@@ -35,6 +35,9 @@ internal fun <T> decode(strategy: DeserializationStrategy<T>, value: Any?, decod
 internal expect fun FirebaseDecoderImpl.structureDecoder(descriptor: SerialDescriptor, polymorphicIsNested: Boolean): CompositeDecoder
 internal expect fun getPolymorphicType(value: Any?, discriminator: String): String
 
+// Converts platform number types that are not bridged to a Kotlin Number
+internal expect fun normalizePlatformNumber(value: Any?): Any?
+
 @PublishedApi
 internal class FirebaseDecoderImpl(val value: Any?, internal val settings: DecodeSettings) : FirebaseDecoder {
 
@@ -165,56 +168,56 @@ internal open class FirebaseCompositeDecoder(
 
 private fun decodeString(value: Any?) = value.toString()
 
-private fun decodeDouble(value: Any?) = when (value) {
+private fun decodeDouble(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toDouble()
     is String -> value.toDouble()
     else -> throw SerializationException("Expected $value to be double")
 }
 
-private fun decodeLong(value: Any?) = when (value) {
+private fun decodeLong(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toLong()
     is String -> value.toLong()
     else -> throw SerializationException("Expected $value to be long")
 }
 
-private fun decodeByte(value: Any?) = when (value) {
+private fun decodeByte(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toByte()
     is String -> value.toByte()
     else -> throw SerializationException("Expected $value to be byte")
 }
 
-private fun decodeFloat(value: Any?) = when (value) {
+private fun decodeFloat(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toFloat()
     is String -> value.toFloat()
     else -> throw SerializationException("Expected $value to be float")
 }
 
-private fun decodeInt(value: Any?) = when (value) {
+private fun decodeInt(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toInt()
     is String -> value.toInt()
     else -> throw SerializationException("Expected $value to be int")
 }
 
-private fun decodeShort(value: Any?) = when (value) {
+private fun decodeShort(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toShort()
     is String -> value.toShort()
     else -> throw SerializationException("Expected $value to be short")
 }
 
-private fun decodeBoolean(value: Any?) = when (value) {
+private fun decodeBoolean(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Boolean -> value
     is Number -> value.toInt() != 0
     is String -> value.toBoolean()
     else -> throw SerializationException("Expected $value to be boolean")
 }
 
-private fun decodeChar(value: Any?) = when (value) {
+private fun decodeChar(raw: Any?) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toInt().toChar()
     is String -> value[0]
     else -> throw SerializationException("Expected $value to be char")
 }
 
-private fun decodeEnum(value: Any?, enumDescriptor: SerialDescriptor) = when (value) {
+private fun decodeEnum(raw: Any?, enumDescriptor: SerialDescriptor) = when (val value = normalizePlatformNumber(raw)) {
     is Number -> value.toInt()
     is String -> enumDescriptor.getElementIndexOrThrow(value)
     else -> throw SerializationException("Expected $value to be enum")

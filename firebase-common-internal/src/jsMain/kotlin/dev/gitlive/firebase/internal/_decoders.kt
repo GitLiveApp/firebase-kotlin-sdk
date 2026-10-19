@@ -59,3 +59,5 @@ private fun FirebaseDecoderImpl.decodeAsMap(isNestedPolymorphic: Boolean): Compo
         }
     }
 }
+
+internal actual fun normalizePlatformNumber(value: Any?): Any? = value
