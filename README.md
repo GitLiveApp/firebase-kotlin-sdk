@@ -139,16 +139,31 @@ These properties are only accessible from the equivalent target's source set. Fo
 
 On android, some modules (`config`) require you to enable [Core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) if you have a *minSDK lower than API 26*.
 
-### Running on iOS
+### Running on Apple platforms
 
-On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+On iOS, tvOS and macOS the SDK uses the official [Firebase Apple SDK](https://github.com/firebase/firebase-ios-sdk)
+through the Kotlin Gradle Plugin's [SwiftPM import](https://kotl.in/cocoapods-to-swiftpm-migration). Each module declares
+the Firebase Swift packages it needs, and they are published with the module, so your project gets them as transitive
+dependencies. This requires Kotlin 2.4 or later, and the minimum deployment targets are iOS 15, tvOS 15 and macOS 12.
 
-Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
-```kotlin
-cocoapods {
-   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
-}
+Your Xcode project links these packages through the linkage package that the Kotlin Gradle Plugin generates. If your
+project doesn't use SwiftPM import yet, run this once, with the paths of your Xcode project and Kotlin module:
+
+```shell
+XCODEPROJ_PATH='iosApp/iosApp.xcodeproj' GRADLE_PROJECT_PATH=':shared' ./gradlew :shared:integrateEmbedAndSign :shared:integrateLinkagePackage
 ```
+
+Kotlin/Native test binaries link the packages without extra setup.
+
+> [!IMPORTANT]
+> The Kotlin CocoaPods plugin can't be combined with SwiftPM dependencies, including transitive ones. If your project
+> uses `kotlin("native.cocoapods")`, migrate it to SwiftPM import before updating this SDK. Firebase no longer
+> publishes new versions to CocoaPods after Firebase 12
+> ([Firebase announcement](https://firebase.google.com/docs/ios/cocoapods-deprecation)).
+
+The `ios` extension properties use the Objective-C classes that SwiftPM import generates, in packages named after the
+module, for example `swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestore`. With CocoaPods these classes were in
+`cocoapods.*` packages, such as `cocoapods.FirebaseFirestoreInternal.FIRFirestore`.
 
 ## Kotlin-first design
 
@@ -430,7 +445,7 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
+2. To build the Apple targets, install Xcode on a Mac
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 
