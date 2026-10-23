@@ -4,15 +4,15 @@
 
 package dev.gitlive.firebase.storage
 
-import cocoapods.FirebaseStorage.FIRStorage
-import cocoapods.FirebaseStorage.FIRStorageListResult
-import cocoapods.FirebaseStorage.FIRStorageMetadata
-import cocoapods.FirebaseStorage.FIRStorageReference
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusProgress
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusResume
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusFailure
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusPause
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusProgress
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusResume
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusSuccess
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -41,11 +41,11 @@ public actual fun Firebase.storage(url: String): FirebaseStorage = FirebaseStora
 )
 
 public actual fun Firebase.storage(app: FirebaseApp): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp),
+    FIRStorage.storageForApp(app.ios),
 )
 
 public actual fun Firebase.storage(app: FirebaseApp, url: String): FirebaseStorage = FirebaseStorage(
-    FIRStorage.storageForApp(app.ios as objcnames.classes.FIRApp, url),
+    FIRStorage.storageForApp(app.ios, url),
 )
 
 public actual class FirebaseStorage(internal val ios: FIRStorage) {

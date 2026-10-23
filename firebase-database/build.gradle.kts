@@ -14,7 +14,6 @@ val supportedPlatforms = (project.property("firebase-database.supportedTargets")
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
@@ -100,24 +99,22 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        swiftPMDependencies {
             if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+                iosMinimumDeploymentTarget = libs.versions.ios.deploymentTarget.get()
             }
             if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+                tvosMinimumDeploymentTarget = libs.versions.tvos.deploymentTarget.get()
             }
             if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
+                macosMinimumDeploymentTarget = libs.versions.macos.deploymentTarget.get()
             }
-            framework {
-                baseName = "FirebaseDatabase"
-            }
-            noPodspec()
-            pod("FirebaseDatabase") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.spm.get()),
+                products = listOf(product("FirebaseDatabase")),
+            )
         }
     }
 

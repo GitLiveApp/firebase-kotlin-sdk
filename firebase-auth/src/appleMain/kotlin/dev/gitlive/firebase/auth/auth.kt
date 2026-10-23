@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import swiftPMImport.dev.gitlive.firebase.auth.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -27,7 +27,7 @@ public actual val Firebase.auth: FirebaseAuth
     get() = FirebaseAuth(FIRAuth.auth())
 
 public actual fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth(
-    FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp),
+    FIRAuth.authWithApp(app.ios),
 )
 
 public actual class FirebaseAuth internal constructor(internal val ios: FIRAuth) {

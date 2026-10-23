@@ -6,8 +6,8 @@
 
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestoreInternal.*
-import cocoapods.FirebaseFirestoreInternal.FIRDocumentChangeType.*
+import swiftPMImport.dev.gitlive.firebase.firestore.*
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRDocumentChangeType.*
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
@@ -26,7 +26,7 @@ public actual val Firebase.firestore: FirebaseFirestore get() =
     FirebaseFirestore(FIRFirestore.firestore())
 
 public actual fun Firebase.firestore(app: FirebaseApp, databaseId: String?): FirebaseFirestore = FirebaseFirestore(
-    databaseId?.let { FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp, it) } ?: FIRFirestore.firestoreForApp(app.ios as objcnames.classes.FIRApp),
+    databaseId?.let { FIRFirestore.firestoreForApp(app.ios, it) } ?: FIRFirestore.firestoreForApp(app.ios),
 )
 
 public val LocalCacheSettings.ios: FIRLocalCacheSettingsProtocol get() = when (this) {

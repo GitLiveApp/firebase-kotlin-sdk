@@ -4,10 +4,10 @@
 
 package com.google.firebase.installations
 
-import cocoapods.FirebaseInstallations.FIRInstallationIDDidChangeNotification
-import cocoapods.FirebaseInstallations.FIRInstallations
-import cocoapods.FirebaseInstallations.FIRInstallationsAuthTokenResult
-import cocoapods.FirebaseInstallations.kFIRInstallationIDDidChangeNotificationAppNameKey
+import swiftPMImport.dev.gitlive.firebase.installations.FIRInstallationIDDidChangeNotification
+import swiftPMImport.dev.gitlive.firebase.installations.FIRInstallations
+import swiftPMImport.dev.gitlive.firebase.installations.FIRInstallationsAuthTokenResult
+import swiftPMImport.dev.gitlive.firebase.installations.kFIRInstallationIDDidChangeNotificationAppNameKey
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
@@ -52,7 +52,7 @@ public actual class FirebaseInstallations internal constructor(public val ios: F
     public actual companion object {
         public actual fun getInstance(): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installations(), FirebaseApp.getInstance().name)
 
-        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios as objcnames.classes.FIRApp), app.name)
+        public actual fun getInstance(app: FirebaseApp): FirebaseInstallations = FirebaseInstallations(FIRInstallations.installationsWithApp(app.ios), app.name)
     }
 }
 

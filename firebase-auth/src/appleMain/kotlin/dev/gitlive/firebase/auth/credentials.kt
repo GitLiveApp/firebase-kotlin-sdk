@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.*
+import swiftPMImport.dev.gitlive.firebase.auth.*
 
 public actual open class AuthCredential(public open val ios: FIRAuthCredential) {
     public actual val providerId: String

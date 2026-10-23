@@ -4,8 +4,8 @@
 
 package com.google.firebase
 
-import cocoapods.FirebaseCore.FIRApp
-import cocoapods.FirebaseCore.FIROptions
+import swiftPMImport.dev.gitlive.firebase.app.FIRApp
+import swiftPMImport.dev.gitlive.firebase.app.FIROptions
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY

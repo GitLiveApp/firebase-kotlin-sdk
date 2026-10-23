@@ -6,9 +6,9 @@
 
 package dev.gitlive.firebase.functions
 
-import cocoapods.FirebaseFunctions.FIRFunctions
-import cocoapods.FirebaseFunctions.FIRHTTPSCallable
-import cocoapods.FirebaseFunctions.FIRHTTPSCallableResult
+import swiftPMImport.dev.gitlive.firebase.functions.FIRFunctions
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallable
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
@@ -30,14 +30,14 @@ public actual val Firebase.functions: FirebaseFunctions
 public actual fun Firebase.functions(region: String): FirebaseFunctions = FirebaseFunctions(FIRFunctions.functionsForRegion(region))
 
 public actual fun Firebase.functions(app: FirebaseApp): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp),
+    FIRFunctions.functionsForApp(app.ios),
 )
 
 public actual fun Firebase.functions(
     app: FirebaseApp,
     region: String,
 ): FirebaseFunctions = FirebaseFunctions(
-    FIRFunctions.functionsForApp(app.ios as objcnames.classes.FIRApp, region = region),
+    FIRFunctions.functionsForApp(app.ios, region = region),
 )
 
 public actual data class FirebaseFunctions internal constructor(internal val ios: FIRFunctions) {

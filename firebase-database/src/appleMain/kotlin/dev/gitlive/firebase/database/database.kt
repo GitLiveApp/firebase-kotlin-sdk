@@ -4,18 +4,18 @@
 
 package dev.gitlive.firebase.database
 
-import cocoapods.FirebaseDatabase.FIRDataEventType
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildAdded
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildChanged
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildMoved
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeChildRemoved
-import cocoapods.FirebaseDatabase.FIRDataEventType.FIRDataEventTypeValue
-import cocoapods.FirebaseDatabase.FIRDataSnapshot
-import cocoapods.FirebaseDatabase.FIRDatabase
-import cocoapods.FirebaseDatabase.FIRDatabaseQuery
-import cocoapods.FirebaseDatabase.FIRDatabaseReference
-import cocoapods.FirebaseDatabase.FIRMutableData
-import cocoapods.FirebaseDatabase.FIRTransactionResult
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildAdded
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildChanged
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildMoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildRemoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeValue
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataSnapshot
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabase
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseQuery
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseReference
+import swiftPMImport.dev.gitlive.firebase.database.FIRMutableData
+import swiftPMImport.dev.gitlive.firebase.database.FIRTransactionResult
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.Firebase
@@ -49,11 +49,11 @@ public actual val Firebase.database: FirebaseDatabase
 public actual fun Firebase.database(url: String): FirebaseDatabase = FirebaseDatabase(FIRDatabase.databaseWithURL(url))
 
 public actual fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp),
+    FIRDatabase.databaseForApp(app.ios),
 )
 
 public actual fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase(
-    FIRDatabase.databaseForApp(app.ios as objcnames.classes.FIRApp, url),
+    FIRDatabase.databaseForApp(app.ios, url),
 )
 
 public actual class FirebaseDatabase internal constructor(internal val ios: FIRDatabase) {

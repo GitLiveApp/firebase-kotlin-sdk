@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase
 
-import cocoapods.FirebaseCore.FIRApp
+import swiftPMImport.dev.gitlive.firebase.app.FIRApp
 import kotlinx.coroutines.CompletableDeferred
 import com.google.firebase.Firebase as CompatFirebase
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
