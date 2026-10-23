@@ -157,8 +157,9 @@ Kotlin/Native test binaries link the packages without extra setup.
 
 > [!IMPORTANT]
 > The Kotlin CocoaPods plugin can't be combined with SwiftPM dependencies, including transitive ones. If your project
-> uses `kotlin("native.cocoapods")`, migrate it to SwiftPM import before updating this SDK. Firebase no longer
-> publishes new versions to CocoaPods after Firebase 12
+> uses `kotlin("native.cocoapods")`, migrate it to SwiftPM import before updating this SDK, as described in
+> [Migrating from CocoaPods to SwiftPM import](documentation/migrate-from-cocoapods.md). Firebase no longer publishes
+> new versions to CocoaPods after Firebase 12
 > ([Firebase announcement](https://firebase.google.com/docs/ios/cocoapods-deprecation)).
 
 The `ios` extension properties use the Objective-C classes that SwiftPM import generates, in packages named after the
