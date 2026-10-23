@@ -75,7 +75,8 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
     public actual val gcmSenderId: String? get() = ios.GCMSenderID
     public actual val projectId: String? get() = ios.projectID
     public actual val storageBucket: String? get() = ios.storageBucket
-    public actual val gaTrackingId: String? get() = ios.trackingID
+    // Firebase Apple SDK 13 removed FIROptions.trackingID, so there is no tracking ID on Apple platforms.
+    public actual val gaTrackingId: String? get() = null
 
     override fun toString(): String = "FirebaseOptions(applicationId=$applicationId, projectId=$projectId)"
 
@@ -112,7 +113,6 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
                 databaseURL = this@Builder.databaseUrl
                 projectID = this@Builder.projectId
                 storageBucket = this@Builder.storageBucket
-                trackingID = this@Builder.gaTrackingId
             },
         )
     }

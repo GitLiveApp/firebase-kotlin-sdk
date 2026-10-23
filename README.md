@@ -445,7 +445,7 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. To build the Apple targets, install Xcode on a Mac
+2. To build the Apple targets, install Xcode 26.2 or later on a Mac (Firebase 13 requires it)
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 

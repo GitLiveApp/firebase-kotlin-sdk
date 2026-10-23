@@ -71,6 +71,10 @@ public sealed class ActionCodeResult {
     public class RevertSecondFactorAddition internal constructor(public val email: String, public val multiFactorInfo: MultiFactorInfo?) : ActionCodeResult()
 }
 
+/**
+ * Settings for email action links. [dynamicLinkDomain] is ignored on Apple platforms, where the Firebase SDK removed it
+ * together with Dynamic Links; use [linkDomain] instead.
+ */
 public data class ActionCodeSettings(
     val url: String,
     val androidPackageName: AndroidPackageName? = null,
