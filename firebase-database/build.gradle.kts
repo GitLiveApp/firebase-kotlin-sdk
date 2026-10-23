@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import utils.TargetPlatform
-import utils.supportsApple
 import utils.toTargetPlatforms
 
 /*
@@ -17,6 +16,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
+    id("dev.gitlive.firebase-swiftpm")
     alias(libs.plugins.publish)
 }
 
@@ -98,24 +98,8 @@ kotlin {
         macosArm64()
         macosX64()
     }
-    if (supportedPlatforms.supportsApple()) {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        swiftPMDependencies {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                iosMinimumDeploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvosMinimumDeploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                macosMinimumDeploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            swiftPackage(
-                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
-                version = from(libs.versions.firebase.spm.get()),
-                products = listOf(product("FirebaseDatabase")),
-            )
-        }
+    firebaseSwiftPM {
+        products("FirebaseDatabase")
     }
 
     if (supportedPlatforms.contains(TargetPlatform.Js)) {

@@ -178,13 +178,15 @@ Migrated modules additionally expose `.compat`, the `com.google.firebase` object
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- Each module declares the Firebase Apple SDK packages it uses in `swiftPMDependencies {}` (Kotlin Gradle Plugin SwiftPM
-  import). They are published with the module and reach consumers as transitive dependencies; test binaries link them too.
+- Each module declares the Firebase Apple SDK products it uses with the `dev.gitlive.firebase-swiftpm` plugin
+  (`build-logic/src/main/kotlin/dev.gitlive.firebase-swiftpm.gradle.kts`), e.g. `firebaseSwiftPM { products("FirebaseAuth") }`.
+  The plugin sets up Kotlin Gradle Plugin SwiftPM import with the Firebase version and deployment targets from
+  `gradle/libs.versions.toml`. The packages are published with the module and reach consumers as transitive
+  dependencies; test binaries link them too.
 - Imported Objective-C classes live in `swiftPMImport.dev.gitlive.firebase.<module>`, e.g.
   `swiftPMImport.dev.gitlive.firebase.auth.FIRAuth`. FirebaseCore classes such as `FIRApp` come from `firebase-app`'s
   namespace in every module.
-- Keep the Firebase version (`firebase-spm` in `gradle/libs.versions.toml`) and the Apple deployment targets in sync
-  across modules, and commit `.swiftpm-locks/default/swiftImport/Package.resolved` when it changes.
+- Commit `.swiftpm-locks/default/swiftImport/Package.resolved` when it changes.
 
 ### JVM / Desktop
 - Uses [`firebase-java-sdk`](https://github.com/GitLiveApp/firebase-java-sdk), which mirrors the Android SDK API.
