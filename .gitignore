@@ -13,3 +13,11 @@ Firebase*.zip
 /kotlin-js-store/yarn.lock
 
 .kotlin/
+
+# SwiftPM import: commit only the lock file. The synthetic package next to it is regenerated on every
+# build, and the plugin's own .gitignore excludes the package checkout.
+.swiftpm-locks/*/swiftImport/*
+!.swiftpm-locks/*/swiftImport/Package.resolved
+# SwiftPM and SourceKit-LSP build output
+.build/
+.swiftpm/
