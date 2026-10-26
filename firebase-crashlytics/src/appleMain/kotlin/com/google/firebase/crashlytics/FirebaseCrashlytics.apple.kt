@@ -145,10 +145,27 @@ private fun Throwable.asExceptionModel(): FIRExceptionModel {
     var throwable: Throwable? = this
     while (throwable != null && seen.add(throwable)) {
         if (throwable !== this) frames += FIRStackFrame.stackFrameWithSymbol("Caused by: ${throwable.description()}", "", 0)
-        throwable.getStackTraceAddresses().mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
+        throwable.frameAddresses().mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
         throwable = throwable.cause
     }
     return FIRExceptionModel(name = this::class.qualifiedName ?: "KotlinException", reason = message ?: "").apply { stackTrace = frames }
 }
+
+/**
+ * The addresses of this throwable's stack frames without the leading frames of the exception constructors, so the
+ * first frame, which Crashlytics names and groups the issue by, is where the exception was created rather than
+ * `kotlin.Throwable.<init>`. Kotlin/Native captures the stack inside the constructor chain; the frames are matched by
+ * their symbols, a constructor of a class named like an exception.
+ */
+@OptIn(ExperimentalNativeApi::class)
+private fun Throwable.frameAddresses(): List<Long> {
+    val addresses = getStackTraceAddresses()
+    val symbols = getStackTrace()
+    if (symbols.size != addresses.size) return addresses
+    val first = symbols.indexOfFirst { !exceptionConstructorFrame.containsMatchIn(it) }.coerceAtLeast(0)
+    return addresses.drop(first)
+}
+
+private val exceptionConstructorFrame = Regex("""kfun:[\w.]*(Throwable|Exception|Error)#<init>\(""")
 
 private fun Throwable.description(): String = (this::class.qualifiedName ?: "KotlinException") + (message?.let { ": $it" } ?: "")
