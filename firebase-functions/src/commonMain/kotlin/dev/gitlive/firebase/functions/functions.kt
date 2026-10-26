@@ -25,10 +25,10 @@ import com.google.firebase.functions.setTimeout as compatSetTimeout
  * Executes this callable HTTPS trigger with [data], serialized with kotlinx.serialization, and suspends until the
  * result arrives. A failed call throws a [FirebaseFunctionsException]. See [CompatHttpsCallableReference.call].
  */
-public suspend inline operator fun <reified T> CompatHttpsCallableReference.invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): CompatHttpsCallableResult = call(encode(data, buildSettings)!!).await()
+public suspend inline operator fun <reified T> CompatHttpsCallableReference.invoke(data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): CompatHttpsCallableResult = call(encode(data, buildSettings)).await()
 
 /** Executes this callable HTTPS trigger with [data] serialized by [strategy]; see [invoke]. */
-public suspend inline operator fun <T> CompatHttpsCallableReference.invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): CompatHttpsCallableResult = call(encode(strategy, data, buildSettings)!!).await()
+public suspend inline operator fun <T> CompatHttpsCallableReference.invoke(strategy: SerializationStrategy<T>, data: T, buildSettings: EncodeSettings.Builder.() -> Unit = {}): CompatHttpsCallableResult = call(encode(strategy, data, buildSettings)).await()
 
 /** Executes this callable HTTPS trigger without arguments and suspends until the result arrives; see [invoke]. */
 public suspend operator fun CompatHttpsCallableReference.invoke(): CompatHttpsCallableResult = call().await()
@@ -141,3 +141,13 @@ public typealias FirebaseFunctionsException = com.google.firebase.functions.Fire
  * https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto#L26
  */
 public typealias FunctionsExceptionCode = com.google.firebase.functions.FirebaseFunctionsException.Code
+
+/** `code` is a member of [FirebaseFunctionsException] now; this extension keeps an explicit import of it compiling. */
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+@Deprecated("code is a member of FirebaseFunctionsException; drop the import of this extension.", ReplaceWith("code"))
+public val FirebaseFunctionsException.code: FunctionsExceptionCode get() = this.code
+
+/** `details` is a member of [FirebaseFunctionsException] now; this extension keeps an explicit import of it compiling. */
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+@Deprecated("details is a member of FirebaseFunctionsException; drop the import of this extension.", ReplaceWith("details"))
+public val FirebaseFunctionsException.details: Any? get() = this.details

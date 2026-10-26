@@ -32,6 +32,8 @@ public final class dev/gitlive/firebase/functions/FirebaseFunctions {
 public final class dev/gitlive/firebase/functions/FunctionsKt {
 	public static final fun data (Lcom/google/firebase/functions/HttpsCallableResult;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static synthetic fun data$default (Lcom/google/firebase/functions/HttpsCallableResult;Lkotlinx/serialization/DeserializationStrategy;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun getCode (Lcom/google/firebase/functions/FirebaseFunctionsException;)Lcom/google/firebase/functions/FirebaseFunctionsException$Code;
+	public static final fun getDetails (Lcom/google/firebase/functions/FirebaseFunctionsException;)Ljava/lang/Object;
 	public static final fun httpsCallable (Ldev/gitlive/firebase/functions/FirebaseFunctions;Ljava/lang/String;J)Ldev/gitlive/firebase/functions/HttpsCallableReference;
 	public static final fun invoke (Lcom/google/firebase/functions/HttpsCallableReference;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun invoke (Lcom/google/firebase/functions/HttpsCallableReference;Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

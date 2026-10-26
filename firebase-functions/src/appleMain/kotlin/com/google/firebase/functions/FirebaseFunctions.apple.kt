@@ -14,6 +14,7 @@ import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
 import platform.Foundation.NSError
+import platform.Foundation.NSNull
 import platform.Foundation.NSURL
 
 /** @property ios The underlying Firebase iOS SDK object. */
@@ -88,7 +89,8 @@ public actual class HttpsCallableReference internal constructor(private val crea
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class HttpsCallableResult internal constructor(public val ios: FIRHTTPSCallableResult) {
-    public actual val data: Any? get() = ios.data()
+    /** The iOS SDK keeps a JSON `null` result as `NSNull`; it is `null` here, as on the other platforms. */
+    public actual val data: Any? get() = ios.data().takeUnless { it is NSNull }
 
     override fun equals(other: Any?): Boolean = other is HttpsCallableResult && other.ios == ios
 
