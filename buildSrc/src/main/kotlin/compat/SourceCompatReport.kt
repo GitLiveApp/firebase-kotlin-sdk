@@ -179,5 +179,9 @@ object SourceCompatReport {
         ours.zip(theirs).filter { (ours, theirs) -> ours != theirs }.map { (ours, theirs) -> "${theirs.substringAfterLast('.')} -> ${ours.substringAfterLast('.')}" }
 
     private fun isAcceptedReturnType(theirs: String, ours: String): Boolean =
-        theirs == "java.lang.Void" && ours == "java.lang.Void" || (theirs == "java.util.List" && ours == "java.util.List")
+        theirs == "java.lang.Void" && ours == "java.lang.Void" || (theirs == "java.util.List" && ours == "java.util.List") ||
+            (isTypeVariable(theirs) && ours == "java.lang.Object")
+
+    /** A method type parameter such as `T`, which the BCV dump shows erased. */
+    private fun isTypeVariable(type: String): Boolean = type.length <= 2 && type.first().isUpperCase() && !type.contains('.')
 }
