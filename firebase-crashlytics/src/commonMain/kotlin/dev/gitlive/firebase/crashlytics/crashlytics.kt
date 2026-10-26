@@ -64,7 +64,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      * truncated.
      *
      * The values of event keys override the values of app level custom keys if they're identical. On Apple platforms,
-     * where the SDK has no per-event keys, they are logged as `key = value` lines just before the event, so they show in
+     * where the SDK has no per-event keys, they are logged as `🔑 key = value` lines just before the event, so they show in
      * its logs rather than its keys.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.

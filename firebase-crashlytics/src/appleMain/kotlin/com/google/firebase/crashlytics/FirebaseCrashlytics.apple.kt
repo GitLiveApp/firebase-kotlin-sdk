@@ -45,13 +45,13 @@ public actual class FirebaseCrashlytics internal constructor(public val ios: FIR
     public actual fun recordException(throwable: Throwable): Unit = ios.recordExceptionModel(throwable.asExceptionModel())
 
     /**
-     * Records the exception as [recordException] does, with the keys logged just before it as `key = value` lines, so
+     * Records the exception as [recordException] does, with the keys logged just before it as `🔑 key = value` lines, so
      * that they show in the event's logs. The iOS SDK takes per-event keys only on an `NSError`, which carries the native
      * stack of the recording call instead of the exception's frames, and its custom keys are session state that the
      * report carries as one final map, so neither attaches keys to a single event.
      */
     public actual fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues) {
-        keysAndValues.keysAndValues.forEach { (key, value) -> ios.log("$key = $value") }
+        keysAndValues.keysAndValues.forEach { (key, value) -> ios.log("🔑 $key = $value") }
         ios.recordExceptionModel(throwable.asExceptionModel())
     }
 
