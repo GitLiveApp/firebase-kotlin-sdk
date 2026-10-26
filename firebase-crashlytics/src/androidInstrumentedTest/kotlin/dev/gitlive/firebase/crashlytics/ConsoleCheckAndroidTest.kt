@@ -25,9 +25,17 @@ class ConsoleCheckAndroidTest {
     fun recordNonFatalsForTheConsole() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         fun dump(label: String) {
-            val dir = File(context.filesDir, ".com.google.firebase.crashlytics.files")
-            println("console-check: $label: ${dir.walkTopDown().filter { it.isFile }.map { it.relativeTo(dir).path + " (" + it.length() + " bytes)" }.toList()}")
+            val dir = context.filesDir
+            val entries = dir.walkTopDown().filter { it != dir }.map { (if (it.isDirectory) "[dir] " else "") + it.relativeTo(dir).path + (if (it.isFile) " (" + it.length() + " bytes)" else "") }.toList()
+            println("console-check: $label: ${entries.filter { it.contains("crashlytics", ignoreCase = true) || !it.contains("/") }}")
         }
+        // The Crashlytics SDK logs at debug level only when its internal Logger is set to, which Log.isLoggable cannot do from a test.
+        runCatching {
+            val loggerClass = Class.forName("com.google.firebase.crashlytics.internal.Logger")
+            val logger = loggerClass.getMethod("getLogger").invoke(null)
+            loggerClass.getDeclaredField("logLevel").apply { isAccessible = true }.setInt(logger, android.util.Log.VERBOSE)
+            println("console-check: Crashlytics debug logging enabled")
+        }.onFailure { println("console-check: could not enable Crashlytics debug logging: $it") }
         dump("before")
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
