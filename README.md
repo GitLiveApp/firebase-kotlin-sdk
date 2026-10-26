@@ -1,9 +1,4 @@
-<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"> <a href="https://git.live"><img src="https://img.shields.io/endpoint?style=flatsquare&url=https%3A%2F%2Fapp.git.live%2Fbadge%3Forg%3DGitLiveApp%26repo%3Dfirebase-kotlin-sdk"></a></h1>
-<img align="left" width="75px" src="https://avatars2.githubusercontent.com/u/42865805?s=200&v=4"> 
-  <b>Built and maintained with 🧡 by <a href="https://git.live">GitLive</a></b><br/>
-  <i>Development teams merge faster with GitLive</i><br/>
-<br/>
-<br/>
+<h1 align="left">Firebase Kotlin SDK <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gitliveapp/firebase-kotlin-sdk?style=flat-square"></h1>
 The Firebase Kotlin SDK is a Kotlin Multiplatform SDK for Firebase, enabling you to use Firebase directly from your common source targeting 
 <strong>iOS</strong>, <strong>Android</strong>, <strong>Desktop</strong> or <strong>Web</strong>, enabling the use of 
 Firebase as a backend for <a href="https://www.jetbrains.com/lp/compose-multiplatform/">Compose Multiplatform</a>, for example.
@@ -275,18 +270,29 @@ val storedCity = db.collection("cities").document("UK").get().data(AbstractCity.
 
 [Firestore](https://firebase.google.com/docs/reference/kotlin/com/google/firebase/firestore/FieldValue?hl=en#serverTimestamp()) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes:
 
+In case using the Realtime Database:
+
 ```kotlin
 @Serializable
 data class Post(
-    // In case using Realtime Database.
-    val timestamp = ServerValue.TIMESTAMP,
-    // In case using Cloud Firestore.
-    val timestamp: Timestamp = Timestamp.ServerTimestamp,
+    val timestamp: ServerValue = ServerValue.TIMESTAMP,
+)
+```
+
+In case using Cloud Firestore:
+
+```kotlin
+@Serializable
+data class Post(
+    // `Timestamp.ServerTimestamp` is a `BaseTimestamp`, not a `Timestamp`, so declare the field as
+    // `BaseTimestamp` for it to hold either the sentinel or a concrete `Timestamp` read back from
+    // the server.
+    val timestamp: BaseTimestamp = Timestamp.ServerTimestamp,
     // or
-    val alternativeTimestamp = FieldValue.serverTimestamp,
+    val alternativeTimestamp: FieldValue = FieldValue.serverTimestamp,
     // or
-    @Serializable(with = DoubleAsTimestampSerializer::class),
-    val doubleTimestamp: Double = DoubleAsTimestampSerializer.serverTimestamp
+    @Serializable(with = DoubleAsTimestampSerializer::class)
+    val doubleTimestamp: Double = DoubleAsTimestampSerializer.SERVER_TIMESTAMP,
 )
 ```
 
