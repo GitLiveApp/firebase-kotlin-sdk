@@ -4,9 +4,19 @@ name: Crashlytics console check
 
 on:
   workflow_dispatch:
+    inputs:
+      ios:
+        description: Run the iOS simulator job
+        type: boolean
+        default: true
+      android:
+        description: Run the Android emulator job
+        type: boolean
+        default: true
 
 jobs:
   record-and-upload:
+    if: ${{ inputs.ios }}
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
@@ -75,6 +85,7 @@ jobs:
           xcrun simctl spawn booted log show --last 30m --info --debug --style compact --predicate 'subsystem == "com.google.firebase"' | tail -300
 
   android-record-and-upload:
+    if: ${{ inputs.android }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
