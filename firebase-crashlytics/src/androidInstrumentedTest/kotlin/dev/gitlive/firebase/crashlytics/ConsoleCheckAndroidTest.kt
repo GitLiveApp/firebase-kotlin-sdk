@@ -26,7 +26,7 @@ class ConsoleCheckAndroidTest {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
-                applicationId = "1:846484016111:ios:dd1f6688bad7af768c841a",
+                applicationId = "1:846484016111:android:b741561c813fa2678c841a",
                 apiKey = "AIzaSyB7pZ7tXymW9WC_ozAppbEs9WBffSmfX9c",
                 databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
                 storageBucket = "fir-kotlin-sdk.appspot.com",
