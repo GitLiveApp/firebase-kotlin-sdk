@@ -18,7 +18,11 @@ import kotlin.time.Duration.Companion.seconds
 
 class ConsoleCheckAndroidException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
-/** Records the same two non-fatals as the iOS ConsoleCheckTest through the Android SDK, so the console shows its real per-event keys. */
+/**
+ * Records the same two non-fatals as the iOS ConsoleCheckTest through the Android SDK, so the console shows its real
+ * per-event keys. Crashlytics finalizes and uploads the session on the next launch, so the workflow runs this test twice
+ * with `am instrument` on an emulator the APK stays installed on (Gradle's managed device reinstalls it every time).
+ */
 class ConsoleCheckAndroidTest {
 
     @Test
@@ -62,18 +66,8 @@ class ConsoleCheckAndroidTest {
 
         delay(15.seconds)
         dump("after recording")
-
-        // The managed device reinstalls the test APK for every Gradle invocation, so the "next launch" that finalizes
-        // and uploads the session is simulated here: a new app instance initializes a new Crashlytics, which closes the
-        // previous instance's session and sends it.
-        app.delete()
-        val relaunched = Firebase.initialize(context, options)
-        val crashlytics2 = Firebase.crashlytics(relaunched)
-        delay(10.seconds)
-        dump("after relaunch")
-        crashlytics2.sendUnsentReports()
-        delay(30.seconds)
-        dump("after upload")
+        delay(15.seconds)
+        dump("after waiting")
         println("console-check: done")
     }
 }

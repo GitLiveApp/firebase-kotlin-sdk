@@ -88,18 +88,23 @@ jobs:
         uses: ./.github/actions/setup_test_action
       - name: Apply Android licenses
         run: ./gradlew ciSdkManagerLicenses
-      - name: First run (records the non-fatals)
-        run: ./gradlew :firebase-crashlytics:gradleManagedDeviceDebugAndroidTest --no-parallel --max-workers=1 -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect -Pandroid.testInstrumentationRunnerArguments.class=dev.gitlive.firebase.crashlytics.ConsoleCheckAndroidTest
-      - name: First run results
-        if: always()
-        run: |
-          find firebase-crashlytics/build -path "*androidTest*" \( -name "*.xml" -o -name "logcat*.txt" \) | head -20
-          cat $(find firebase-crashlytics/build -path "*androidTest*" -name "TEST-*.xml" | head -3) || true
-          grep -h "console-check\|FirebaseCrashlytics\|Crashlytics" $(find firebase-crashlytics/build -path "*androidTest*" -name "logcat*.txt") | tail -150 || true
-      - name: Second run (uploads the first run's report)
-        run: ./gradlew :firebase-crashlytics:gradleManagedDeviceDebugAndroidTest --rerun --no-parallel --max-workers=1 -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect -Pandroid.testInstrumentationRunnerArguments.class=dev.gitlive.firebase.crashlytics.ConsoleCheckAndroidTest
-      - name: Second run results
-        if: always()
-        run: |
-          cat $(find firebase-crashlytics/build -path "*androidTest*" -name "TEST-*.xml" | head -3) || true
-          grep -h "console-check\|FirebaseCrashlytics\|Crashlytics" $(find firebase-crashlytics/build -path "*androidTest*" -name "logcat*.txt") | tail -150 || true
+      - name: Build the test APK
+        run: ./gradlew :firebase-crashlytics:packageDebugAndroidTest && find firebase-crashlytics/build/outputs/apk -name "*.apk"
+      - name: Run the test twice on an emulator (the second launch uploads the first's session)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            set -x
+            APK=$(find firebase-crashlytics/build/outputs/apk/androidTest -name "*.apk" | head -1)
+            adb install -r "$APK"
+            adb shell setprop log.tag.FirebaseCrashlytics VERBOSE
+            for run in first second; do
+              adb logcat -c
+              adb shell am instrument -w -e class dev.gitlive.firebase.crashlytics.ConsoleCheckAndroidTest dev.gitlive.firebase.crashlytics.test/androidx.test.runner.AndroidJUnitRunner
+              echo "===== $run run logcat"
+              adb logcat -d | grep -i "console-check\|FirebaseCrashlytics\|AndroidRuntime" | tail -250
+            done
