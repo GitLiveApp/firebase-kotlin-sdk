@@ -177,15 +177,32 @@ Both errors print the command that switches your Xcode project over (the `integr
 
 See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
 
-#### Crashlytics stack traces on iOS
+#### Crashlytics on iOS
 
-`recordException` reports a Kotlin exception's own stack frames as code addresses of your Kotlin framework (its class as
-the issue name and its message as the reason), the way Kotlin/Native crash reporters such as CrashKiOS do. Crashlytics
-symbolicates those addresses from the framework's dSYM, so upload it along with your app's, for example with the
-Crashlytics run script pointed at the framework's dSYM or with the `upload-symbols` tool from the SwiftPM checkout of
-`firebase-ios-sdk` (`Crashlytics/upload-symbols -gsp GoogleService-Info.plist -p ios shared.framework.dSYM`). Without the dSYM
-the frames show as addresses in the console. Release builds of Kotlin frameworks keep enough debug information for
-function names; line numbers need a debug build.
+The Firebase iOS SDK has no API for recording a Kotlin exception, so on Apple targets `recordException` maps it onto what
+the SDK does have, and a few things look different from Android in the Crashlytics console:
+
+- **Issue title and stack trace.** The exception is recorded as a Crashlytics exception model, the way Kotlin/Native
+  crash reporters such as CrashKiOS do: its class is the issue name, its message the reason, and its stack frames are the
+  code addresses the Kotlin runtime captured. Crashlytics symbolicates those addresses from your Kotlin framework's dSYM,
+  so upload it along with your app's, for example with the Crashlytics run script pointed at the framework's dSYM or
+  with the `upload-symbols` tool from the SwiftPM checkout of `firebase-ios-sdk`
+  (`Crashlytics/upload-symbols -gsp GoogleService-Info.plist -p ios shared.framework.dSYM`). Without the dSYM the frames
+  show as addresses. Release builds of Kotlin frameworks keep enough debug information for function names; line numbers
+  need a debug build.
+- **First frame.** Kotlin/Native captures the stack trace inside the exception's constructor, so the frames through the
+  thrown class's own `<init>` are dropped and the first frame is the line that created the exception, which is also the
+  frame the console names the issue after once it is symbolicated.
+- **Causes.** Each cause follows the main stack after a `Caused by: <cause>` frame, with the frames it shares with the
+  stack above it trimmed, as a JVM stack trace prints them. The console shows one stack trace, not a chain of exceptions.
+- **Per-event keys.** The iOS SDK attaches per-event keys only to an `NSError`, which records the native stack of the
+  call that reported it rather than the Kotlin exception's frames. `recordException(exception, customKeys)` therefore
+  writes each key as a `🔑 key = value` log line immediately before recording the exception, so the keys appear in the
+  event's Logs tab instead of its Keys tab. Session-level keys set with `setCustomKey` and `setCustomKeys` work as on
+  Android.
+- **Uncaught exceptions.** This SDK does not install a Kotlin uncaught exception hook. An uncaught Kotlin exception
+  terminates the app through the Kotlin runtime, and Crashlytics reports that as a native crash with the runtime's
+  termination frames rather than the Kotlin stack trace; a crash reporter such as CrashKiOS fills that gap.
 
 ## Kotlin-first design
 

@@ -38,9 +38,9 @@ public actual class FirebaseCrashlytics internal constructor(public val ios: FIR
 
     /**
      * Records the exception as a Crashlytics exception model: its class as the name, its message as the reason and its
-     * own stack frames as code addresses, which Crashlytics symbolicates from the Kotlin framework's dSYM (see the README),
-     * each cause following after a `Caused by:` frame. Recording an `NSError` instead would only capture the native stack
-     * of this call.
+     * own stack frames as code addresses, which Crashlytics symbolicates from the Kotlin framework's dSYM, each cause
+     * following after a `Caused by:` frame. Recording an `NSError` instead would only capture the native stack of this
+     * call. See [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in the README.
      */
     public actual fun recordException(throwable: Throwable): Unit = ios.recordExceptionModel(throwable.asExceptionModel())
 
@@ -48,7 +48,8 @@ public actual class FirebaseCrashlytics internal constructor(public val ios: FIR
      * Records the exception as [recordException] does, with the keys logged just before it as `🔑 key = value` lines, so
      * that they show in the event's logs. The iOS SDK takes per-event keys only on an `NSError`, which carries the native
      * stack of the recording call instead of the exception's frames, and its custom keys are session state that the
-     * report carries as one final map, so neither attaches keys to a single event.
+     * report carries as one final map, so neither attaches keys to a single event. See [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in
+     * the README.
      */
     public actual fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues) {
         keysAndValues.keysAndValues.forEach { (key, value) -> ios.log("🔑 $key = $value") }

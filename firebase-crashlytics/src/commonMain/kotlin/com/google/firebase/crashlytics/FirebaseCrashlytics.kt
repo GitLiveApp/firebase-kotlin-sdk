@@ -38,14 +38,16 @@ public expect class FirebaseCrashlytics {
 
     /**
      * Records a non-fatal report with the exception's class, message and stack trace. On Apple platforms the stack
-     * frames are reported as code addresses of the Kotlin framework, which Crashlytics symbolicates from its dSYM.
+     * frames are reported as code addresses of the Kotlin framework, which Crashlytics symbolicates from its dSYM; see
+     * [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in the README.
      */
     public fun recordException(throwable: Throwable)
 
     /**
      * Records a non-fatal report with [keysAndValues] attached to the event, in addition to the app level custom keys;
      * the event keys override app level keys of the same name. On Apple platforms, where the SDK has no per-event keys,
-     * they are logged as `🔑 key = value` lines just before the event, so they show in its logs rather than its keys.
+     * they are logged as `🔑 key = value` lines just before the event, so they show in its logs rather than its keys; see
+     * [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in the README.
      */
     public fun recordException(throwable: Throwable, keysAndValues: CustomKeysAndValues)
 

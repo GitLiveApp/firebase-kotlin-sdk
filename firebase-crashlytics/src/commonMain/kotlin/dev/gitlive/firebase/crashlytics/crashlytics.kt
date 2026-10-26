@@ -48,7 +48,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
     /**
      * Records a non-fatal report to send to Crashlytics, with the exception's class, message and stack trace. On Apple
      * platforms the stack frames are reported as code addresses of the Kotlin framework, which Crashlytics symbolicates
-     * from its dSYM.
+     * from its dSYM; see [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in the README.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      */
@@ -65,7 +65,7 @@ public class FirebaseCrashlytics internal constructor(public val compat: CompatF
      *
      * The values of event keys override the values of app level custom keys if they're identical. On Apple platforms,
      * where the SDK has no per-event keys, they are logged as `🔑 key = value` lines just before the event, so they show in
-     * its logs rather than its keys.
+     * its logs rather than its keys; see [Crashlytics on iOS](https://github.com/GitLiveApp/firebase-kotlin-sdk#crashlytics-on-ios) in the README.
      *
      * @param exception a [Throwable] to be recorded as a non-fatal event.
      * @param customKeys A dictionary of keys and the values to associate with the non fatal
