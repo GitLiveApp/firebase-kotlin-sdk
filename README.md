@@ -24,7 +24,7 @@ The following libraries are available for the various Firebase products.
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/3.0.0-alpha02/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
 | [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-alpha02/pom)               | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
 | [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/3.0.0-alpha02/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-alpha02/pom)     | [![88%](https://img.shields.io/badge/-88%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-alpha02/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -126,7 +126,7 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations` and `firebase-config`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+`firebase-installations`, `firebase-crashlytics` and `firebase-config`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
@@ -176,6 +176,33 @@ kotlin {
 Both errors print the command that switches your Xcode project over (the `integrateEmbedAndSign` and `integrateLinkagePackage` tasks); see Kotlin's [CocoaPods to SwiftPM migration guide](https://kotl.in/cocoapods-to-swiftpm-migration). Then remove the Firebase pods from your Podfile, because linking Firebase through both CocoaPods and SwiftPM duplicates its symbols.
 
 See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
+
+#### Crashlytics on iOS
+
+The Firebase iOS SDK has no API for recording a Kotlin exception, so on Apple targets `recordException` maps it onto what
+the SDK does have, and a few things look different from Android in the Crashlytics console:
+
+- **Issue title and stack trace.** The exception is recorded as a Crashlytics exception model, the way Kotlin/Native
+  crash reporters such as CrashKiOS do: its class is the issue name, its message the reason, and its stack frames are the
+  code addresses the Kotlin runtime captured. Crashlytics symbolicates those addresses from your Kotlin framework's dSYM,
+  so upload it along with your app's, for example with the Crashlytics run script pointed at the framework's dSYM or
+  with the `upload-symbols` tool from the SwiftPM checkout of `firebase-ios-sdk`
+  (`Crashlytics/upload-symbols -gsp GoogleService-Info.plist -p ios shared.framework.dSYM`). Without the dSYM the frames
+  show as addresses. Release builds of Kotlin frameworks keep enough debug information for function names; line numbers
+  need a debug build.
+- **First frame.** Kotlin/Native captures the stack trace inside the exception's constructor, so the frames through the
+  thrown class's own `<init>` are dropped and the first frame is the line that created the exception, which is also the
+  frame the console names the issue after once it is symbolicated.
+- **Causes.** Each cause follows the main stack after a `Caused by: <cause>` frame, with the frames it shares with the
+  stack above it trimmed, as a JVM stack trace prints them. The console shows one stack trace, not a chain of exceptions.
+- **Per-event keys.** The iOS SDK attaches per-event keys only to an `NSError`, which records the native stack of the
+  call that reported it rather than the Kotlin exception's frames. `recordException(exception, customKeys)` therefore
+  writes each key as a `🔑 key = value` log line immediately before recording the exception, so the keys appear in the
+  event's Logs tab instead of its Keys tab. Session-level keys set with `setCustomKey` and `setCustomKeys` work as on
+  Android.
+- **Uncaught exceptions.** This SDK does not install a Kotlin uncaught exception hook. An uncaught Kotlin exception
+  terminates the app through the Kotlin runtime, and Crashlytics reports that as a native crash with the runtime's
+  termination frames rather than the Kotlin stack trace; a crash reporter such as CrashKiOS fills that gap.
 
 ## Kotlin-first design
 
