@@ -37,17 +37,15 @@ class ConsoleCheckAndroidTest {
             println("console-check: Crashlytics debug logging enabled")
         }.onFailure { println("console-check: could not enable Crashlytics debug logging: $it") }
         dump("before")
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
-            context,
-            FirebaseOptions(
-                applicationId = "1:846484016111:android:b741561c813fa2678c841a",
-                apiKey = "AIzaSyB7pZ7tXymW9WC_ozAppbEs9WBffSmfX9c",
-                databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
-                storageBucket = "fir-kotlin-sdk.appspot.com",
-                projectId = "fir-kotlin-sdk",
-                gcmSenderId = "846484016111",
-            ),
+        val options = FirebaseOptions(
+            applicationId = "1:846484016111:android:b741561c813fa2678c841a",
+            apiKey = "AIzaSyB7pZ7tXymW9WC_ozAppbEs9WBffSmfX9c",
+            databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
+            storageBucket = "fir-kotlin-sdk.appspot.com",
+            projectId = "fir-kotlin-sdk",
+            gcmSenderId = "846484016111",
         )
+        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(context, options)
         val crashlytics = Firebase.crashlytics(app)
         println("console-check: collection enabled = ${crashlytics.compat.isCrashlyticsCollectionEnabled}")
         println("console-check: did crash on previous execution = ${crashlytics.didCrashOnPreviousExecution()}")
@@ -64,9 +62,18 @@ class ConsoleCheckAndroidTest {
 
         delay(15.seconds)
         dump("after recording")
-        crashlytics.sendUnsentReports()
+
+        // The managed device reinstalls the test APK for every Gradle invocation, so the "next launch" that finalizes
+        // and uploads the session is simulated here: a new app instance initializes a new Crashlytics, which closes the
+        // previous instance's session and sends it.
+        app.delete()
+        val relaunched = Firebase.initialize(context, options)
+        val crashlytics2 = Firebase.crashlytics(relaunched)
+        delay(10.seconds)
+        dump("after relaunch")
+        crashlytics2.sendUnsentReports()
         delay(30.seconds)
-        dump("after waiting")
+        dump("after upload")
         println("console-check: done")
     }
 }
