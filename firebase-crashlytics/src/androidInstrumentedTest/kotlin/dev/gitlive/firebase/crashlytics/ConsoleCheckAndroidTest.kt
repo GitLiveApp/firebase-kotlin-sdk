@@ -9,8 +9,9 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
-import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.util.Date
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
@@ -21,8 +22,13 @@ class ConsoleCheckAndroidException(message: String, cause: Throwable? = null) : 
 class ConsoleCheckAndroidTest {
 
     @Test
-    fun recordNonFatalsForTheConsole() = runTest {
+    fun recordNonFatalsForTheConsole() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
+        fun dump(label: String) {
+            val dir = File(context.filesDir, ".com.google.firebase.crashlytics.files")
+            println("console-check: $label: ${dir.walkTopDown().filter { it.isFile }.map { it.relativeTo(dir).path + " (" + it.length() + " bytes)" }.toList()}")
+        }
+        dump("before")
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
             context,
             FirebaseOptions(
@@ -49,8 +55,10 @@ class ConsoleCheckAndroidTest {
         )
 
         delay(15.seconds)
+        dump("after recording")
         crashlytics.sendUnsentReports()
         delay(30.seconds)
+        dump("after waiting")
         println("console-check: done")
     }
 }
