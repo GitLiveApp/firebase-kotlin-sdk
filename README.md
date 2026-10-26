@@ -22,7 +22,7 @@ The following libraries are available for the various Firebase products.
 | [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/3.0.0-alpha02/pom)         | [![5%](https://img.shields.io/badge/-5%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
 | [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/3.0.0-alpha02/pom)             | [![64%](https://img.shields.io/badge/-64%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
 | [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/3.0.0-alpha02/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-alpha02/pom)               | [![49%](https://img.shields.io/badge/-49%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-alpha02/pom)               | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
 | [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/3.0.0-alpha02/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
 | [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-alpha02/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
@@ -126,7 +126,7 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations` and `firebase-crashlytics`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+`firebase-installations`, `firebase-crashlytics` and `firebase-config`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
@@ -302,18 +302,29 @@ val storedCity = db.collection("cities").document("UK").get().data(AbstractCity.
 
 [Firestore](https://firebase.google.com/docs/reference/kotlin/com/google/firebase/firestore/FieldValue?hl=en#serverTimestamp()) and the [Realtime Database](https://firebase.google.com/docs/reference/android/com/google/firebase/database/ServerValue#TIMESTAMP) provide a sentinel value you can use to set a field in your document to a server timestamp. So you can use these values in custom classes:
 
+In case using the Realtime Database:
+
 ```kotlin
 @Serializable
 data class Post(
-    // In case using Realtime Database.
-    val timestamp = ServerValue.TIMESTAMP,
-    // In case using Cloud Firestore.
-    val timestamp: Timestamp = Timestamp.ServerTimestamp,
+    val timestamp: ServerValue = ServerValue.TIMESTAMP,
+)
+```
+
+In case using Cloud Firestore:
+
+```kotlin
+@Serializable
+data class Post(
+    // `Timestamp.ServerTimestamp` is a `BaseTimestamp`, not a `Timestamp`, so declare the field as
+    // `BaseTimestamp` for it to hold either the sentinel or a concrete `Timestamp` read back from
+    // the server.
+    val timestamp: BaseTimestamp = Timestamp.ServerTimestamp,
     // or
-    val alternativeTimestamp = FieldValue.serverTimestamp,
+    val alternativeTimestamp: FieldValue = FieldValue.serverTimestamp,
     // or
-    @Serializable(with = DoubleAsTimestampSerializer::class),
-    val doubleTimestamp: Double = DoubleAsTimestampSerializer.serverTimestamp
+    @Serializable(with = DoubleAsTimestampSerializer::class)
+    val doubleTimestamp: Double = DoubleAsTimestampSerializer.SERVER_TIMESTAMP,
 )
 ```
 

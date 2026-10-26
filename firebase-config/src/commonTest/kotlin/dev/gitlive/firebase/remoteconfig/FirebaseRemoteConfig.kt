@@ -24,6 +24,7 @@ expect val context: Any
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
+@IgnoreForJvm
 class FirebaseRemoteConfigTest {
     private val defaults = arrayOf(
         "test_default_boolean" to true,
@@ -162,11 +163,16 @@ class FirebaseRemoteConfigTest {
         remoteConfig.settings {
             minimumFetchInterval = 1.minutes
         }
+        // A default under the same key as the remote value: the fetched value has to win over it (#427).
+        remoteConfig.setDefaults("test_remote_string" to "Local default")
 
         remoteConfig.fetchAndActivate()
 
         val value: FirebaseRemoteConfigValue = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
+
+        // `all` has to apply the same precedence as `getValue`.
+        assertEquals("Hello from remote!", remoteConfig.all["test_remote_string"]?.asString())
     }
 }
