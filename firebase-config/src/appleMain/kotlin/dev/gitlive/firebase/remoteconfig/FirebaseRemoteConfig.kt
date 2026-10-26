@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.remoteconfig
 
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfig
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfig
 
 /** The underlying Firebase iOS SDK object. */
 public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = compat.ios
