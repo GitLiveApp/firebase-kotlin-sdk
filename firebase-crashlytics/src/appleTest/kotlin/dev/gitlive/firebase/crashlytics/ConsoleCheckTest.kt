@@ -65,8 +65,8 @@ class ConsoleCheckTest {
         crashlytics.log("console-check: recording two non-fatals")
         crashlytics.recordException(ConsoleCheckException("Recorded by ConsoleCheckTest on the iOS simulator", IllegalArgumentException("The cause of the console check")))
         crashlytics.recordException(
-            IllegalStateException("A second exception type, to show the grouping by Kotlin class"),
-            mapOf("attempt" to 1, "source" to "ConsoleCheckTest"),
+            IllegalStateException("Keyed non-fatal: its per-event keys are the key = value lines in the Logs tab"),
+            mapOf("attempt" to 2, "source" to "ConsoleCheckTest", "requested_at" to NSDate().toString(), "retries" to 3L, "flag" to true),
         )
 
         delay(10.seconds)
