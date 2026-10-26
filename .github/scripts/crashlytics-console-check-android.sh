@@ -17,6 +17,12 @@ for run in first second; do
   adb shell am instrument -w -e class dev.gitlive.firebase.crashlytics.ConsoleCheckAndroidTest $PKG/androidx.test.runner.AndroidJUnitRunner || true
   echo "===== $run run logcat"
   adb logcat -d | grep -i "console-check\|FirebaseCrashlytics\|AndroidRuntime\|TransportRuntime" | tail -250 || true
+  echo "===== $run run persisted session files (the test APK is debuggable, so run-as can read them)"
+  for f in $(adb shell run-as $PKG find files/.crashlytics.v3 -type f | tr -d '\r'); do
+    echo "== $f"
+    adb shell run-as $PKG cat "$f" | head -c 6000 || true
+    echo
+  done
 done
 echo "===== forcing DataTransport's scheduled upload job"
 for i in 1 2 3 4; do
