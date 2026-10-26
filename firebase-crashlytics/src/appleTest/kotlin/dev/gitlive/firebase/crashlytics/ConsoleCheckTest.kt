@@ -65,7 +65,7 @@ class ConsoleCheckTest {
         crashlytics.log("console-check: recording two non-fatals")
         crashlytics.recordException(ConsoleCheckException("Recorded by ConsoleCheckTest on the iOS simulator", IllegalArgumentException("The cause of the console check")))
         crashlytics.recordException(
-            IllegalStateException("Keyed non-fatal: its per-event keys are the key = value lines in the Logs tab"),
+            IllegalStateException("Keyed non-fatal: its per-event keys are the 🔑 key = value lines in the Logs tab"),
             mapOf("attempt" to 2, "source" to "ConsoleCheckTest", "requested_at" to NSDate().toString(), "retries" to 3L, "flag" to true),
         )
 
