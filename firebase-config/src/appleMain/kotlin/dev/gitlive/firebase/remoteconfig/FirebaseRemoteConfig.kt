@@ -1,17 +1,16 @@
 package dev.gitlive.firebase.remoteconfig
 
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfig
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigErrorDomain
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigErrorInternalError
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigErrorThrottled
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigFetchAndActivateStatus
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigFetchStatus
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigSettings
-import cocoapods.FirebaseRemoteConfig.FIRRemoteConfigSource
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfig
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigErrorDomain
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigErrorInternalError
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigErrorThrottled
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigFetchAndActivateStatus
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigFetchStatus
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigSettings
+import swiftPMImport.dev.gitlive.firebase.config.FIRRemoteConfigSource
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
-import dev.gitlive.firebase.app
 import dev.gitlive.firebase.ios
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.datetime.Instant
@@ -22,13 +21,13 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
-public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = FIRRemoteConfig.remoteConfig()
+public val FirebaseRemoteConfig.ios: FIRRemoteConfig get() = ios
 
 public actual val Firebase.remoteConfig: FirebaseRemoteConfig
     get() = FirebaseRemoteConfig(FIRRemoteConfig.remoteConfig())
 
 public actual fun Firebase.remoteConfig(app: FirebaseApp): FirebaseRemoteConfig = FirebaseRemoteConfig(
-    FIRRemoteConfig.remoteConfigWithApp(Firebase.app.ios as objcnames.classes.FIRApp),
+    FIRRemoteConfig.remoteConfigWithApp(app.ios as objcnames.classes.FIRApp),
 )
 
 public actual class FirebaseRemoteConfig internal constructor(internal val ios: FIRRemoteConfig) {

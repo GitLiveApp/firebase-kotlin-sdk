@@ -4,10 +4,10 @@
 
 package com.google.firebase.functions
 
-import cocoapods.FirebaseFunctions.FIRFunctions
-import cocoapods.FirebaseFunctions.FIRHTTPSCallable
-import cocoapods.FirebaseFunctions.FIRHTTPSCallableOptions
-import cocoapods.FirebaseFunctions.FIRHTTPSCallableResult
+import swiftPMImport.dev.gitlive.firebase.functions.FIRFunctions
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallable
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableOptions
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableResult
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp

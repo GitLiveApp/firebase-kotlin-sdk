@@ -2,7 +2,11 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -15,7 +19,6 @@ val supportedPlatforms = (project.property("firebase-crashlytics.supportedTarget
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }
@@ -53,6 +56,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -89,32 +93,23 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseCrashlytics"
-            }
-            noPodspec()
-            pod("FirebaseCrashlytics") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.ios.sdk.get()),
+                products = listOf(product("FirebaseCrashlytics")),
+                importedClangModules = listOf("FirebaseCrashlytics"),
+            )
         }
     }
 
@@ -124,6 +119,9 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
@@ -160,6 +158,19 @@ kotlin {
 //        }
     }
 }
+
+// The com.google.* declarations are header stubs on Android (see buildSrc utils/HeaderStubs.kt).
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+)
+
+registerAndroidSourceCompat("firebase-crashlytics/api.txt")
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
@@ -204,5 +215,24 @@ mavenPublishing {
                 comments.set("A business-friendly OSS license")
             }
         }
+    }
+}
+
+// The Crashlytics SDK refuses to start in a process without a bundle identifier ("An application must have a valid
+// bundle identifier in its Info.plist"), which a bare test executable has none of, so the simulator tests embed one as a
+// bundled app has; without it the SDK silently dropped everything the tests recorded. The entitlements let the
+// Installations SDK use the keychain, so the reports carry a Firebase installation id (as in firebase-installations).
+kotlin.targets.withType<KotlinNativeTargetWithSimulatorTests>().configureEach {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
+            "-sectcreate",
+            "__TEXT",
+            "__info_plist",
+            file("$projectDir/src/commonTest/resources/Info.plist").absolutePath,
+            "-sectcreate",
+            "__TEXT",
+            "__entitlements",
+            file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
+        )
     }
 }

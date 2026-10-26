@@ -4,8 +4,8 @@
 
 package com.google.firebase
 
-import cocoapods.FirebaseCore.FIRApp
-import cocoapods.FirebaseCore.FIROptions
+import swiftPMImport.dev.gitlive.firebase.app.FIRApp
+import swiftPMImport.dev.gitlive.firebase.app.FIROptions
 import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
 import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
 import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
@@ -75,7 +75,10 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
     public actual val gcmSenderId: String? get() = ios.GCMSenderID
     public actual val projectId: String? get() = ios.projectID
     public actual val storageBucket: String? get() = ios.storageBucket
-    public actual val gaTrackingId: String? get() = ios.trackingID
+
+    // FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0, where it had long been
+    // deprecated as unused, so gaTrackingId cannot be round tripped on apple targets
+    public actual val gaTrackingId: String? get() = null
 
     override fun toString(): String = "FirebaseOptions(applicationId=$applicationId, projectId=$projectId)"
 
@@ -112,7 +115,7 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
                 databaseURL = this@Builder.databaseUrl
                 projectID = this@Builder.projectId
                 storageBucket = this@Builder.storageBucket
-                trackingID = this@Builder.gaTrackingId
+                // gaTrackingId is dropped here - FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0
             },
         )
     }

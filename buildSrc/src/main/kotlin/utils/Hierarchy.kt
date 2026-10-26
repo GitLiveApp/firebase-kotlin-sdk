@@ -8,8 +8,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *
  * - `nonJsMain` (android, jvm, apple): Android SDK APIs that can be mapped onto the mobile/desktop SDKs but not onto
  *   the JS SDK live here, so android+ios projects keep source compatibility for them.
- * - `nonJvmMain` (js, apple): shared pure-Kotlin implementations of Android SDK types that Android/JVM get from the
- *   real Play Services classes (e.g. `com.google.android.gms.tasks.Task`).
+ * - `nonJvmMain` (js, wasmJs, apple): shared pure-Kotlin implementations of Android SDK types that Android/JVM get from
+ *   the real Play Services classes (e.g. `com.google.android.gms.tasks.Task`).
+ *
+ * wasmJs binds to the JS SDK like js, so it is outside `nonJsMain`.
  */
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun KotlinMultiplatformExtension.applyFirebaseHierarchy() {
@@ -24,6 +26,7 @@ fun KotlinMultiplatformExtension.applyFirebaseHierarchy() {
             }
             group("nonJvm") {
                 withJs()
+                withWasmJs()
                 group("apple") {
                     withApple()
                 }

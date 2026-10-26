@@ -4,9 +4,9 @@
 
 package dev.gitlive.firebase.functions
 
-import cocoapods.FirebaseFunctions.FIRFunctions
-import cocoapods.FirebaseFunctions.FIRHTTPSCallable
-import cocoapods.FirebaseFunctions.FIRHTTPSCallableResult
+import swiftPMImport.dev.gitlive.firebase.functions.FIRFunctions
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallable
+import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableResult
 
 /** The underlying Firebase iOS SDK object. */
 public val FirebaseFunctions.ios: FIRFunctions get() = compat.ios

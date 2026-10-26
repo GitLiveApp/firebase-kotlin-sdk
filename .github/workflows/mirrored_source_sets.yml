@@ -1,0 +1,75 @@
+# Warns when one side of a hand-mirrored source set changes without the other.
+# See "Mirrored source sets" in CLAUDE.md. Advisory only — it never fails the build,
+# because a genuinely one-sided change is legitimate (a platform lacking an API).
+
+name: Mirrored Source Sets
+
+on:
+  pull_request:
+    branches: [ master, v3.0.0 ]
+
+concurrency:
+  group: ci-mirrored-source-sets-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check mirrored source sets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Compare changed source sets
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          changed=$(git diff --name-only "$BASE_SHA...$HEAD_SHA" -- '*.kt')
+          [ -n "$changed" ] || { echo "No Kotlin files changed."; exit 0; }
+
+          warned=0
+
+          # $1 = label, $2 = left path fragment, $3 = right path fragment, $4 = module filter regex
+          compare() {
+            local label="$1" left="$2" right="$3" filter="${4:-.}"
+            local l r
+            l=$(echo "$changed" | grep -E "/src/$left/"   | grep -E "$filter" | cut -d/ -f1 | sort -u || true)
+            r=$(echo "$changed" | grep -E "/src/$right/"  | grep -E "$filter" | cut -d/ -f1 | sort -u || true)
+
+            local only_left only_right
+            only_left=$(comm -23 <(echo "$l") <(echo "$r") | grep -v '^$' || true)
+            only_right=$(comm -13 <(echo "$l") <(echo "$r") | grep -v '^$' || true)
+
+            for m in $only_left; do
+              echo "::warning title=$label out of sync::$m: $left changed but $right did not."
+              warned=1
+            done
+            for m in $only_right; do
+              echo "::warning title=$label out of sync::$m: $right changed but $left did not."
+              warned=1
+            done
+          }
+
+          # All modules with a JS target mirror jsMain into wasmJsMain, and jsTest
+          # into wasmJsTest.
+          compare "jsMain/wasmJsMain" "jsMain" "wasmJsMain"
+          compare "jsTest/wasmJsTest" "jsTest" "wasmJsTest"
+
+          # Only these four fork androidMain into jvmMain; the rest share source via srcDir.
+          # androidUnitTest/jvmTest is deliberately NOT compared: those files are per-platform
+          # `actual` test config (context, @Ignore aliasing), not mirrored logic.
+          compare "androidMain/jvmMain" "androidMain" "jvmMain" \
+            '^(firebase-auth|firebase-analytics|firebase-crashlytics|firebase-messaging)/'
+
+          if [ "$warned" -eq 1 ]; then
+            echo
+            echo "One side of a mirrored source set changed without the other."
+            echo "See 'Mirrored source sets' in CLAUDE.md."
+            echo "If the change is deliberately one-sided, say so in the PR description."
+          else
+            echo "Mirrored source sets are consistent."
+          fi

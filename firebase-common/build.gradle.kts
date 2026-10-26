@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import utils.TargetPlatform
+import utils.supportsApple
 import utils.toTargetPlatforms
 
 /*
@@ -89,12 +90,18 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
+    }
+    if (supportedPlatforms.supportsApple()) {
+        swiftPMDependencies {
+            // No SwiftPM dependencies here. Without this, the shared "default" lock group makes every Apple test task
+            // resolve all Firebase products first (:firebase-analytics:fetchUmbrellaPackageIdentifierForDefault, KT-86560).
+            // Remove it if this module ever gains a direct or transitive SwiftPM dependency.
+            packageResolvedSynchronization = noSynchronization()
+        }
     }
 
     if (supportedPlatforms.contains(TargetPlatform.Js)) {
@@ -117,12 +124,29 @@ kotlin {
         }
     }
 
+    if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
+            }
+        }
+    }
+
     sourceSets {
         all {
             languageSettings.apply {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
@@ -157,6 +181,14 @@ kotlin {
             }
         }
 
+        if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+            getByName("wasmJsMain") {
+                dependencies {
+                    api(npm("firebase", "10.12.2"))
+                }
+            }
+        }
+
         if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")
@@ -166,7 +198,6 @@ kotlin {
                 dependencies {
                     implementation(kotlin("test-junit"))
                 }
-                kotlin.srcDir("src/androidAndroidTest/kotlin")
             }
         }
     }
