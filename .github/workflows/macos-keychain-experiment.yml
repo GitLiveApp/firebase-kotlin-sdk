@@ -45,6 +45,19 @@ jobs:
       - name: First run results
         if: always()
         run: cat firebase-crashlytics/build/test-results/iosSimulatorArm64Test/*.xml || true
+      - name: Upload the test binary's dSYM to Crashlytics
+        if: always()
+        run: |
+          set -x
+          BIN_DIR=firebase-crashlytics/build/bin/iosSimulatorArm64/debugTest
+          ls -la "$BIN_DIR"
+          DSYM="$BIN_DIR/test.kexe.dSYM"
+          if [ ! -d "$DSYM" ]; then xcrun dsymutil "$BIN_DIR/test.kexe" -o "$DSYM"; fi
+          xcrun dwarfdump --uuid "$DSYM"
+          xcrun dwarfdump --uuid "$BIN_DIR/test.kexe"
+          UPLOAD=$(find firebase-crashlytics/build/cocoapods -type f -name upload-symbols | head -1)
+          echo "upload-symbols: $UPLOAD"
+          "$UPLOAD" -ai 1:846484016111:ios:dd1f6688bad7af768c841a -p ios "$DSYM"
       - name: Second run (uploads the first run's report)
         run: ./gradlew :firebase-crashlytics:cleanIosSimulatorArm64Test :firebase-crashlytics:iosSimulatorArm64Test --tests "dev.gitlive.firebase.crashlytics.ConsoleCheckTest"
       - name: Second run results
