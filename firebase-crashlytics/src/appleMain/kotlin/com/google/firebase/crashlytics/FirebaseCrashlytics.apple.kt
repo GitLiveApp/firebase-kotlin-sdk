@@ -135,37 +135,47 @@ private fun CustomKeysAndValues.asNSDictionary(): Map<Any?, *> = keysAndValues a
 /**
  * The exception's class, message and stack frames as a Crashlytics exception model. The frames are the exception's own
  * code addresses (not the native stack of the recording call), for Crashlytics to symbolicate from the framework's dSYM,
- * as the Kotlin/Native crash reporters (CrashKiOS, Sentry) submit them; the frames of each cause follow after a frame
- * naming it, as Crashlytics models a single stack.
+ * as the Kotlin/Native crash reporters (CrashKiOS, NSExceptionKt) submit them. The frames of each cause follow after a
+ * frame naming it, as Crashlytics models a single stack, without the tail they share with the exception's own frames:
+ * below the point where the cause was created the two stacks are the same.
  */
 @OptIn(ExperimentalNativeApi::class)
 private fun Throwable.asExceptionModel(): FIRExceptionModel {
     val frames = mutableListOf<FIRStackFrame>()
-    val seen = mutableSetOf<Throwable>()
-    var throwable: Throwable? = this
-    while (throwable != null && seen.add(throwable)) {
-        if (throwable !== this) frames += FIRStackFrame.stackFrameWithSymbol("Caused by: ${throwable.description()}", "", 0)
-        throwable.frameAddresses().mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
-        throwable = throwable.cause
+    val own = frameAddresses()
+    own.mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
+    val seen = mutableSetOf(this)
+    var cause = this.cause
+    while (cause != null && seen.add(cause)) {
+        frames += FIRStackFrame.stackFrameWithSymbol("Caused by: ${cause.description()}", "", 0)
+        cause.frameAddresses().dropCommonTail(own).mapTo(frames) { FIRStackFrame.stackFrameWithAddress(it.toULong()) }
+        cause = cause.cause
     }
     return FIRExceptionModel(name = this::class.qualifiedName ?: "KotlinException", reason = message ?: "").apply { stackTrace = frames }
 }
 
 /**
- * The addresses of this throwable's stack frames without the leading frames of the exception constructors, so the
- * first frame, which Crashlytics names and groups the issue by, is where the exception was created rather than
- * `kotlin.Throwable.<init>`. Kotlin/Native captures the stack inside the constructor chain; the frames are matched by
- * their symbols, a constructor of a class named like an exception.
+ * The addresses of this throwable's stack frames without the leading frames of its constructors, so the first frame,
+ * which Crashlytics names and groups the issue by, is where the exception was created rather than
+ * `kotlin.Throwable.<init>`. Kotlin/Native captures the stack inside the constructor chain, so the frames up to and
+ * including the throwable's own class's `<init>` are dropped (its superclass constructors sit above it), the rule
+ * NSExceptionKt applies; when no such frame is found, nothing is dropped.
  */
 @OptIn(ExperimentalNativeApi::class)
 private fun Throwable.frameAddresses(): List<Long> {
     val addresses = getStackTraceAddresses()
     val symbols = getStackTrace()
     if (symbols.size != addresses.size) return addresses
-    val first = symbols.indexOfFirst { !exceptionConstructorFrame.containsMatchIn(it) }.coerceAtLeast(0)
-    return addresses.drop(first)
+    val init = "kfun:${this::class.qualifiedName ?: Throwable::class.qualifiedName}#<init>"
+    val lastInit = symbols.indexOfLast { it.contains(init) }
+    return addresses.drop(lastInit + 1)
 }
 
-private val exceptionConstructorFrame = Regex("""kfun:[\w.]*(Throwable|Exception|Error)#<init>\(""")
+/** This list without the trailing elements it shares with [other]. */
+private fun List<Long>.dropCommonTail(other: List<Long>): List<Long> {
+    var common = 0
+    while (common < size && common < other.size && this[size - 1 - common] == other[other.size - 1 - common]) common++
+    return dropLast(common)
+}
 
 private fun Throwable.description(): String = (this::class.qualifiedName ?: "KotlinException") + (message?.let { ": $it" } ?: "")
