@@ -44,6 +44,7 @@ public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigKt {
 }
 
 public final class dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfigSettings {
+	public fun <init> ()V
 	public synthetic fun <init> (JJILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-UwyO8pc ()J

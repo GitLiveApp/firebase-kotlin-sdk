@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.crashlytics
 
-import cocoapods.FirebaseCrashlytics.FIRCrashlytics
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRCrashlytics
 
 /** The underlying Firebase iOS SDK object. */
 public val FirebaseCrashlytics.ios: FIRCrashlytics get() = compat.ios

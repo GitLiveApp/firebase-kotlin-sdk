@@ -1,9 +1,9 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRAggregateField
-import cocoapods.FirebaseFirestoreInternal.FIRAggregateQuerySnapshot
-import cocoapods.FirebaseFirestoreInternal.FIRAggregateSource
-import cocoapods.FirebaseFirestoreInternal.FIRFilter
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateField
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateQuerySnapshot
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateSource
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRFilter
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter

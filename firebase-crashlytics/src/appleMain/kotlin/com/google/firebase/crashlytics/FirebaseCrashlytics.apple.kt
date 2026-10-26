@@ -4,9 +4,9 @@
 
 package com.google.firebase.crashlytics
 
-import cocoapods.FirebaseCrashlytics.FIRCrashlytics
-import cocoapods.FirebaseCrashlytics.FIRExceptionModel
-import cocoapods.FirebaseCrashlytics.FIRStackFrame
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRCrashlytics
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRExceptionModel
+import swiftPMImport.dev.gitlive.firebase.crashlytics.FIRStackFrame
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import kotlin.experimental.ExperimentalNativeApi

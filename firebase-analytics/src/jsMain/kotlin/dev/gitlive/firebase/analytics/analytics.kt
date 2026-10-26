@@ -5,9 +5,8 @@ import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.analytics.externals.getAnalytics
 import dev.gitlive.firebase.js
-import kotlinx.coroutines.await
-import kotlin.time.Duration
 import kotlin.js.json
+import kotlin.time.Duration
 
 public actual val Firebase.analytics: FirebaseAnalytics
     get() = FirebaseAnalytics(getAnalytics())
@@ -37,31 +36,23 @@ public actual class FirebaseAnalytics(internal val js: dev.gitlive.firebase.anal
         dev.gitlive.firebase.analytics.externals.setAnalyticsCollectionEnabled(js, enabled)
     }
 
-    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
-        dev.gitlive.firebase.analytics.externals.setSessionTimeoutInterval(js, sessionTimeoutInterval.inWholeMilliseconds)
-    }
+    public actual fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration): Unit = throw UnsupportedOperationException("Setting the session timeout is not supported in the Firebase JS SDK")
 
-    public actual suspend fun getSessionId(): Long? = rethrow { dev.gitlive.firebase.analytics.externals.getSessionId(js).await() }
+    public actual suspend fun getSessionId(): Long? = throw UnsupportedOperationException("Getting the session ID is not supported in the Firebase JS SDK")
 
-    public actual fun resetAnalyticsData() {
-        dev.gitlive.firebase.analytics.externals.resetAnalyticsData(js)
-    }
+    public actual fun resetAnalyticsData(): Unit = throw UnsupportedOperationException("Resetting analytics data is not supported in the Firebase JS SDK")
 
     public actual fun setDefaultEventParameters(parameters: Map<String, String>) {
-        dev.gitlive.firebase.analytics.externals.setDefaultEventParameters(js, parameters)
+        dev.gitlive.firebase.analytics.externals.setDefaultEventParameters(json(*parameters.map { it.key to it.value }.toTypedArray()))
     }
 
     public actual fun setConsent(consentSettings: Map<ConsentType, ConsentStatus>) {
-        val consent = dev.gitlive.firebase.analytics.externals.ConsentSettings()
-        consentSettings.forEach {
-            when (it.key) {
-                ConsentType.AD_PERSONALIZATION -> consent.ad_personalization = it.value.name
-                ConsentType.AD_STORAGE -> consent.ad_storage = it.value.name
-                ConsentType.AD_USER_DATA -> consent.ad_user_data = it.value.name
-                ConsentType.ANALYTICS_STORAGE -> consent.analytics_storage = it.value.name
-            }
-        }
-        dev.gitlive.firebase.analytics.externals.setConsent(js, consent)
+        val consent = json(
+            *consentSettings.map { (type, status) ->
+                type.name.lowercase() to status.name.lowercase()
+            }.toTypedArray(),
+        )
+        dev.gitlive.firebase.analytics.externals.setConsent(consent)
     }
 
     public actual enum class ConsentType {
