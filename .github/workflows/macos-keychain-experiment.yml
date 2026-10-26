@@ -97,14 +97,4 @@ jobs:
           arch: x86_64
           target: google_apis
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: |
-            set -x
-            APK=$(find firebase-crashlytics/build/outputs/apk/androidTest -name "*.apk" | head -1)
-            adb install -r "$APK"
-            adb shell setprop log.tag.FirebaseCrashlytics VERBOSE
-            for run in first second; do
-              adb logcat -c
-              adb shell am instrument -w -e class dev.gitlive.firebase.crashlytics.ConsoleCheckAndroidTest dev.gitlive.firebase.crashlytics.test/androidx.test.runner.AndroidJUnitRunner
-              echo "===== $run run logcat"
-              adb logcat -d | grep -i "console-check\|FirebaseCrashlytics\|AndroidRuntime" | tail -250
-            done
+          script: bash .github/scripts/crashlytics-console-check-android.sh
