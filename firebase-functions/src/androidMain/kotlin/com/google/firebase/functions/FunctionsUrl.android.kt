@@ -8,7 +8,7 @@ package com.google.firebase.functions
 
 /*
  * Unlike the header stubs around it, this file is shipped (see keepClasses in the build file): the SDK's members take a
- * java.net.URL, which common code cannot name, so these same-named extensions take a String and call them through
+ * java.net.URL, which common code cannot construct, so these same-named extensions take a String and call them through
  * FunctionsJvmApi.
  */
 

@@ -17,3 +17,11 @@ internal const val SET_TIMEOUT_JVM_ONLY =
 internal const val WITH_TIMEOUT_JVM_ONLY =
     "withTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; " +
         "use withTimeout(timeout) with a kotlin.time.Duration from common code"
+
+internal const val GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY =
+    "getHttpsCallableFromUrl(URL) takes a java.net.URL and can only be called from Android/JVM code; " +
+        "use getHttpsCallableFromUrl(url) with the URL as a String from common code"
+
+internal const val URL_JVM_ONLY =
+    "java.net.URL is a JVM-only type with no multiplatform counterpart: pass the URL as a String " +
+        "(getHttpsCallableFromUrl(url) takes one)"

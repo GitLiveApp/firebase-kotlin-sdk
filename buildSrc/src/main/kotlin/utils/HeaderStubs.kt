@@ -25,7 +25,9 @@ import java.util.zip.ZipFile
  * and a BCV-style dump of the stubs is written to `build/header-stubs/<compilation>.api` for the source-compatibility report.
  * The exception is a member deprecated with `DeprecationLevel.ERROR` (or `HIDDEN`): it exists so that common code using
  * an Android-only member gets a compile error naming the replacement, cannot be called, and so need not match the real
- * class; the dump records its message so the report can count the member as provided.
+ * class; the dump records its message so the report can count the member as provided. A whole class so deprecated is
+ * likewise not verified: it stands in for a JVM-only type (`java.net.URL`) so that the SDK members taking it can be
+ * declared, deprecated, in common code, and nothing in the reference jars corresponds to it.
  *
  * A declaration that is identical on every platform (listener interfaces, a trivial exception subclass) does not need
  * expect/actual at all: plain common code under these packages is compiled, verified and stripped on Android/JVM the
@@ -87,22 +89,22 @@ private class Member(val name: String, val descriptor: String, val access: Int) 
 
     /** The message of a `@kotlin.Deprecated` annotation with level `ERROR` or `HIDDEN`; such a member cannot be called. */
     var deprecation: String? = null
+}
 
-    /** Reads `@kotlin.Deprecated` and records the message when the level makes the member uncallable. */
-    fun annotationVisitor(descriptor: String): AnnotationVisitor? {
-        if (descriptor != "Lkotlin/Deprecated;") return null
-        return object : AnnotationVisitor(Opcodes.ASM9) {
-            var message = ""
-            var uncallable = false
-            override fun visit(name: String?, value: Any?) {
-                if (name == "message") message = value.toString()
-            }
-            override fun visitEnum(name: String?, descriptor: String?, value: String?) {
-                if (name == "level") uncallable = value == "ERROR" || value == "HIDDEN"
-            }
-            override fun visitEnd() {
-                if (uncallable) deprecation = message
-            }
+/** Reads a `@kotlin.Deprecated` annotation and passes its message to [onUncallable] when the level makes the declaration uncallable. */
+private fun deprecationVisitor(descriptor: String, onUncallable: (String) -> Unit): AnnotationVisitor? {
+    if (descriptor != "Lkotlin/Deprecated;") return null
+    return object : AnnotationVisitor(Opcodes.ASM9) {
+        var message = ""
+        var uncallable = false
+        override fun visit(name: String?, value: Any?) {
+            if (name == "message") message = value.toString()
+        }
+        override fun visitEnum(name: String?, descriptor: String?, value: String?) {
+            if (name == "level") uncallable = value == "ERROR" || value == "HIDDEN"
+        }
+        override fun visitEnd() {
+            if (uncallable) onUncallable(message)
         }
     }
 }
@@ -115,6 +117,9 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     val methods = mutableListOf<Member>()
     val fields = mutableListOf<Member>()
 
+    /** The message of a `@kotlin.Deprecated` annotation with level `ERROR` or `HIDDEN` on the class itself; such a class cannot be used. */
+    var deprecation: String? = null
+
     /** Names of the class's own non-public fields: they shadow an inherited public constant of the same name. */
     val hiddenFields = mutableSetOf<String>()
 
@@ -125,11 +130,13 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
         this.interfaces = interfaces?.toList().orEmpty()
     }
 
+    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { deprecation = it }
+
     override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
         if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || name == "<clinit>") return null
         val member = Member(name, descriptor, access).also { methods += it }
         return object : MethodVisitor(Opcodes.ASM9) {
-            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = member.annotationVisitor(descriptor)
+            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { member.deprecation = it }
         }
     }
 
@@ -141,7 +148,7 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
         }
         val member = Member(name, descriptor, access).also { fields += it }
         return object : FieldVisitor(Opcodes.ASM9) {
-            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = member.annotationVisitor(descriptor)
+            override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { member.deprecation = it }
         }
     }
 
@@ -192,7 +199,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
     }
     try {
         for (stub in stubs) {
-            if (stub.isKotlinOnly || stub.name in tolerated) continue
+            if (stub.isKotlinOnly || stub.deprecation != null || stub.name in tolerated) continue
             val real = realClass(stub.name)
             val reals = when {
                 real != null -> inherited(real)

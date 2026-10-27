@@ -10,9 +10,10 @@ import kotlin.jvm.JvmName
 
 /*
  * Multiplatform counterparts of `FirebaseFunctions.getHttpsCallableFromUrl(java.net.URL, ...)` taking the URL as a
- * String, since `java.net.URL` is JVM-only. Shipped on Android and the JVM too (see keepClasses in the build file): a
- * member cannot be given such an overload without shadowing these, so they are extension functions of the same name and
- * Android code passing a URL keeps binding to the SDK's members.
+ * String, since `java.net.URL` is JVM-only (the members themselves are declared deprecated with an error pointing here).
+ * Shipped on Android and the JVM too (see keepClasses in the build file): a member cannot be given such an overload
+ * without shadowing these, so they are extension functions of the same name and Android code passing a URL keeps
+ * binding to the SDK's members.
  */
 
 /** A reference to the callable HTTPS trigger at [url], e.g. `https://us-central1-project.cloudfunctions.net/function`. */

@@ -11,6 +11,7 @@ import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableResult
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
+import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
 import platform.Foundation.NSError
@@ -23,6 +24,14 @@ public actual class FirebaseFunctions internal constructor(public val ios: FIRFu
     public actual fun getHttpsCallable(name: String): HttpsCallableReference = HttpsCallableReference { ios.HTTPSCallableWithName(name) }
 
     public actual fun getHttpsCallable(name: String, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference { ios.HTTPSCallableWithName(name, options.toIos()) }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getHttpsCallableFromUrl(url: java.net.URL): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getHttpsCallableFromUrl(url: java.net.URL, options: HttpsCallableOptions): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
 
     internal fun httpsCallableFromUrl(url: NSURL, options: HttpsCallableOptions?): HttpsCallableReference = HttpsCallableReference {
         if (options == null) ios.HTTPSCallableWithURL(url) else ios.HTTPSCallableWithURL(url, options.toIos())

@@ -7,6 +7,7 @@ package com.google.firebase.functions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
+import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.externals.Functions
@@ -26,6 +27,14 @@ public actual class FirebaseFunctions internal constructor(public val js: Functi
     public actual fun getHttpsCallable(name: String): HttpsCallableReference = HttpsCallableReference(js, name, fromUrl = false, limitedUseAppCheckTokens = false)
 
     public actual fun getHttpsCallable(name: String, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference(js, name, fromUrl = false, limitedUseAppCheckTokens = options.limitedUseAppCheckTokens)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getHttpsCallableFromUrl(url: java.net.URL): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getHttpsCallableFromUrl(url: java.net.URL, options: HttpsCallableOptions): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
 
     internal fun httpsCallableFromUrl(url: String, options: HttpsCallableOptions?): HttpsCallableReference = HttpsCallableReference(js, url, fromUrl = true, limitedUseAppCheckTokens = options?.limitedUseAppCheckTokens ?: false)
 

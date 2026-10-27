@@ -5,8 +5,8 @@
 com.google.firebase.functions.FirebaseFunctions
   OK    HttpsCallableReference getHttpsCallable(String)
   OK    HttpsCallableReference getHttpsCallable(String, HttpsCallableOptions)
-  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL)  [extension function, URL -> String]
-  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)  [extension function, URL -> String]
+  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL)  [deprecated: getHttpsCallableFromUrl(URL) takes a java.net.URL and can only be called from Android/JVM code; use getHttpsCallableFromUrl(url) with the URL as a String from common code]
+  MAP   HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)  [deprecated: getHttpsCallableFromUrl(URL) takes a java.net.URL and can only be called from Android/JVM code; use getHttpsCallableFromUrl(url) with the URL as a String from common code]
   OK    static FirebaseFunctions getInstance()
   OK    static FirebaseFunctions getInstance(FirebaseApp)
   OK    static FirebaseFunctions getInstance(String)

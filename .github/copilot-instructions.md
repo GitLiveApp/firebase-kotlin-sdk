@@ -143,12 +143,16 @@ The SDK has two public API layers per module:
    `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
    get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
    `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level). An instance member whose
-   replacement has the same arity cannot be deprecated (a member shadows a same-named extension), so only the
-   replacement is shipped, as a same-named extension taking the multiplatform type (`getHttpsCallableFromUrl(url: String)`
-   in `FunctionsUrl.kt`); the report maps such a member to the extension. On Android the shipped facades reach the SDK's
-   JVM-only members through a package-private Java helper (`FunctionsJvmApi.java`): javac compiles after the stubs are
-   stripped, so the stub need not (and must not) declare members common code cannot call. Members the Android SDK has
-   but `firebase-java-sdk` lacks or keeps non-public are listed in `jvmMissingMembers` and verified against Android only.
+   replacement has the same arity cannot have its JVM-only parameter widened to `Any` (the member would shadow a
+   same-named extension), so the replacement is shipped as a same-named extension taking the multiplatform type
+   (`getHttpsCallableFromUrl(url: String)` in `FunctionsUrl.kt`) and the member is deprecated with its real parameter
+   type, which an error-deprecated, memberless stand-in class provides in common code (`java.net.URL` in
+   `firebase-functions/src/commonMain/kotlin/java/net`, listed in the stub `packageDirs` so it is stripped on
+   Android/JVM; the verifier skips an error-deprecated class). A stand-in only lets the member be declared: it is not a
+   compatibility layer for the JDK type, so it gets no members. On Android the shipped facades reach the SDK's JVM-only
+   members through a package-private Java helper (`FunctionsJvmApi.java`), which compiles after the stubs are stripped.
+   Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are listed in `jvmMissingMembers` and
+   verified against Android only.
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS/wasmJs is still declared in common; its JS and wasmJs actuals do nothing (or fail where they must return a value) and carry `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.
