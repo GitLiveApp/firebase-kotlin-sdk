@@ -222,15 +222,6 @@ stripHeaderStubs(
         "com/google/firebase/functions/HttpsCallableTimeoutKt.class",
         "com/google/firebase/functions/FunctionsJvmApi.class",
     ),
-    // firebase-java-sdk keeps these package-private / private (they are public in the Android SDK).
-    jvmMissingMembers = listOf(
-        "com/google/firebase/functions/FirebaseFunctionsException.<init>(Ljava/lang/String;Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;Ljava/lang/Object;)V",
-        "com/google/firebase/functions/FirebaseFunctionsException.<init>(Ljava/lang/String;Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;Ljava/lang/Object;Ljava/lang/Throwable;)V",
-        "com/google/firebase/functions/FirebaseFunctionsException\$Code.fromValue(I)Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;",
-        "com/google/firebase/functions/FirebaseFunctionsException\$Code.fromHttpStatus(I)Lcom/google/firebase/functions/FirebaseFunctionsException\$Code;",
-        "com/google/firebase/functions/HttpsCallableOptions.limitedUseAppCheckTokens",
-        "com/google/firebase/functions/HttpsCallableOptions\$Builder.limitedUseAppCheckTokens",
-    ),
 )
 
 registerAndroidSourceCompat("firebase-functions/api.txt")
