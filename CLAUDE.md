@@ -59,7 +59,7 @@ Android, iOS (arm64, x64, simulatorArm64), macOS (arm64), tvOS (arm64, simulator
   - `@Serializable` data classes for Firestore/Database models
   - These apply to the `dev.gitlive.firebase` API. The `com.google.firebase.*` source-compatibility layer (firebase-app, firebase-installations) mirrors the Firebase Android SDK exactly, `Task` and listener interfaces included; see "API Compatibility Goal" in `.github/copilot-instructions.md`.
 - **Visibility:** `explicitApi()` is enforced — all public declarations need explicit visibility modifiers.
-- **Expect/actual:** Public APIs declared as `expect` in `commonMain`; platform implementations in `androidMain`, `appleMain`, `jsMain`, `wasmJsMain`, `jvmMain`. Modules using `utils.applyFirebaseHierarchy()` (firebase-app, firebase-installations) also have `nonJsMain` (android, jvm, apple) and `nonJvmMain` (js, wasmJs, apple).
+- **Expect/actual:** Public APIs declared as `expect` in `commonMain`; platform implementations in `androidMain`, `appleMain`, `jsMain`, `wasmJsMain`, `jvmMain`. Modules using `utils.applyFirebaseHierarchy()` (firebase-app, firebase-installations) also have `nonJvmMain` (js, wasmJs, apple).
 - **After any public API change:** run `./gradlew apiDump` to update `.api` files (and `androidSourceCompatDump` for firebase-app / firebase-installations) and commit them alongside the change.
 - **KDoc** required on all public APIs.
 
