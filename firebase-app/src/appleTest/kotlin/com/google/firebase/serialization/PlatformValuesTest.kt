@@ -4,14 +4,14 @@
 
 package com.google.firebase.serialization
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.serialization.Serializable
 import platform.Foundation.NSJSONSerialization
 import platform.Foundation.NSNull
-import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
-import platform.Foundation.numberWithBool
+import platform.Foundation.dataUsingEncoding
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -42,20 +42,38 @@ class PlatformValuesTest {
         val encoded = functions.encodeToPlainValue(Flags(on = true, off = false, count = 1))
         assertPlain(mapOf("on" to true, "off" to false, "count" to 1), encoded)
         assertEquals(Flags(true, false, 1), functions.decodeFromPlainValue(encoded))
-        assertEquals("{\"on\":true}", json(functions.convertToPlainValue(mapOf("on" to true))))
-        assertEquals("[false,1]", json(database.convertToPlainValue(listOf(false, 1))))
+        assertEquals("{\"count\":1,\"off\":false,\"on\":true}", json(encoded))
+        val nested = mapOf("a" to listOf(true, mapOf("b" to false), null), "n" to null, "s" to "x", "d" to 1.5)
+        assertEquals("{\"a\":[true,{\"b\":false},null],\"d\":1.5,\"n\":null,\"s\":\"x\"}", json(database.convertToPlainValue(nested)))
     }
 
     @Test
     fun readsFoundationBooleansAsBooleans() {
-        val stored = mapOf("on" to NSNumber.numberWithBool(true), "count" to 1)
-        assertPlain(mapOf("on" to true, "count" to 1), firestore.convertToPlainValue(stored))
-        assertEquals(true, firestore.decodeFromPlainValue<Boolean>(NSNumber.numberWithBool(true)))
-        assertEquals(true, toKotlin(functions.convertToPlainValue(true)))
+        val stored = parse("{\"on\":true,\"off\":false,\"count\":1,\"nested\":{\"flags\":[true,null]}}")
+        assertPlain(mapOf("on" to true, "off" to false, "count" to 1, "nested" to mapOf("flags" to listOf(true, null))), stored)
+        assertEquals(Flags(true, false, 1), firestore.decodeFromPlainValue(stored))
+        assertEquals(true, firestore.decodeFromPlainValue<Boolean>(parse("true")))
+        val reused = functions.convertToPlainValue(mapOf("on" to true, "nested" to (stored as Map<*, *>)["nested"]))
+        assertEquals("{\"nested\":{\"flags\":[true,null]},\"on\":true}", json(reused))
     }
 
+    @OptIn(BetaInteropApi::class)
     private fun json(value: Any?): String {
-        val data = NSJSONSerialization.dataWithJSONObject(value!!, 0u, null)!!
+        val data = NSJSONSerialization.dataWithJSONObject(value!!, SORTED_KEYS, null)!!
         return NSString.create(data = data, encoding = NSUTF8StringEncoding).toString()
+    }
+
+    @OptIn(BetaInteropApi::class)
+    private fun parse(json: String): Any? {
+        val data = NSString.create(string = json).dataUsingEncoding(NSUTF8StringEncoding)!!
+        return NSJSONSerialization.JSONObjectWithData(data, FRAGMENTS_ALLOWED, null)
+    }
+
+    private companion object {
+        /** NSJSONWritingSortedKeys. */
+        const val SORTED_KEYS = 2uL
+
+        /** NSJSONReadingFragmentsAllowed. */
+        const val FRAGMENTS_ALLOWED = 4uL
     }
 }

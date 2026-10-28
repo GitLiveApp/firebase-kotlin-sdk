@@ -50,16 +50,14 @@ internal expect class PlainList() {
 
 /**
  * A leaf of the platform's Firebase SDK as the decoder reads it: the Kotlin counterpart of a primitive (the JS SDK's
- * primitives on wasmJs; a JS `undefined` and Foundation's `NSNull` are `null`; a Foundation boolean is a `Boolean`),
- * and any other value as it is.
+ * primitives on wasmJs; a JS `undefined` and Foundation's `NSNull` are `null`), and any other value as it is.
  */
 internal expect fun platformLeaf(value: Any): Any?
 
 /**
  * The platform SDK's representation of a leaf the format produced: on JS a JS number for a [Long], which is a Kotlin
- * object there; on wasmJs the JS value of a Kotlin primitive or string; on Apple a Foundation boolean for a [Boolean];
- * the value itself elsewhere. The writers of [PlainMap] and [PlainList] apply it to every element, and the format
- * applies it to a root value.
+ * object there; on wasmJs the JS value of a Kotlin primitive or string; the value itself elsewhere. The writers of
+ * [PlainMap] and [PlainList] apply it to every element, and the format applies it to a root value.
  */
 internal expect fun toPlatformLeaf(value: Any?): Any?
 
