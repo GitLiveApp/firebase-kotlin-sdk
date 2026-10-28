@@ -43,6 +43,8 @@ fun Project.stripHeaderStubs(
     jvmReferenceJars: FileCollection,
     /** Class files under [packageDirs] (e.g. `com/google/firebase/FirebaseInitializeKt.class`) that are real code and are shipped. */
     keepClasses: List<String> = emptyList(),
+    /** Directories under [packageDirs] (e.g. `com/google/firebase/serialization`) whose classes are all real code and are shipped. */
+    keepPackageDirs: List<String> = emptyList(),
     /**
      * Members of the Android SDK that `firebase-java-sdk` (the JVM target's reference) does not have or keeps non-public,
      * as `internal/class/Name.member(descriptor)` (a field: `internal/class/Name.field`; a whole class: `internal/class/Name`).
@@ -56,6 +58,7 @@ fun Project.stripHeaderStubs(
      */
     jvmStubs: Boolean = true,
 ) {
+    fun isKept(path: String) = path in keepClasses || keepPackageDirs.any { path.startsWith("$it/") }
     tasks.withType(KotlinCompile::class.java).configureEach {
         if (!name.startsWith("compile") || name.contains("Test")) return@configureEach
         val android = name.contains("Android")
@@ -68,7 +71,7 @@ fun Project.stripHeaderStubs(
             val destination = destinationDirectory.get().asFile
             val stubDirs = packageDirs.map { destination.resolve(it) }.filter { it.exists() }
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
-                .filter { it.relativeTo(destination).invariantSeparatorsPath !in keepClasses }
+                .filter { !isKept(it.relativeTo(destination).invariantSeparatorsPath) }
             val classes = stubs.map { readMembers(it.readBytes()) }
             verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated = if (android) emptySet() else jvmMissingMembers.toSet())
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
@@ -79,7 +82,7 @@ fun Project.stripHeaderStubs(
     }
     tasks.withType(Jar::class.java).configureEach {
         if (!jvmStubs && name.startsWith("jvm")) return@configureEach
-        exclude { element -> !element.isDirectory && packageDirs.any { element.path.startsWith("$it/") } && element.path !in keepClasses }
+        exclude { element -> !element.isDirectory && packageDirs.any { element.path.startsWith("$it/") } && !isKept(element.path) }
     }
 }
 
