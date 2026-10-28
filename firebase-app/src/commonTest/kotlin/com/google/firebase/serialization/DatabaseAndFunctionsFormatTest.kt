@@ -73,7 +73,7 @@ class FunctionsFormatTest {
 
     @Test
     fun acceptsWhatTheAndroidSdkAcceptsAsCallData() {
-        val data = mapOf("a" to listOf(1, 2L, 3.5, 4.5f), "b" to mapOf("c" to null, "d" to true), "e" to "s")
+        val data = mapOf("a" to listOf(1, 2, 3.5, 4.5f), "b" to mapOf("c" to null, "d" to true), "e" to "s")
         assertPlain(data, functions.convertToPlainValue(data))
         assertPlain(1, functions.convertToPlainValue(1.toShort()))
     }

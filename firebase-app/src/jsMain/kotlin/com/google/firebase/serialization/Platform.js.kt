@@ -22,7 +22,7 @@ internal actual class PlainMap private constructor(private val map: Map<*, *>?, 
     actual operator fun get(key: String): Any? = if (map != null) map[key] else js[key].unsafeCast<Any?>()
 
     actual operator fun set(key: String, element: Any?) {
-        define(js, key, element.toJsLeaf())
+        define(js, key, toPlatformLeaf(element))
     }
 
     actual companion object {
@@ -43,7 +43,7 @@ internal actual class PlainList private constructor(private val list: List<*>?, 
     actual operator fun get(index: Int): Any? = if (list != null) list[index] else js[index].unsafeCast<Any?>()
 
     actual operator fun set(index: Int, element: Any?) {
-        js[index] = element.toJsLeaf()
+        js[index] = toPlatformLeaf(element)
     }
 
     actual companion object {
@@ -58,7 +58,9 @@ internal actual class PlainList private constructor(private val list: List<*>?, 
 internal actual fun platformLeaf(value: Any): Any? = if (value === undefined) null else value
 
 /** A JS number for a Kotlin Long, which is a Kotlin object on Kotlin/JS; everything else is its own JS value. */
-private fun Any?.toJsLeaf(): Any? = if (this is Long) toDouble() else this
+internal actual fun toPlatformLeaf(value: Any?): Any? = if (value is Long) value.toDouble() else value
+
+internal actual val functionsSdkEncodesLongs: Boolean = false
 
 private fun isJsArray(value: Any): Boolean = js("Array.isArray(value)").unsafeCast<Boolean>()
 

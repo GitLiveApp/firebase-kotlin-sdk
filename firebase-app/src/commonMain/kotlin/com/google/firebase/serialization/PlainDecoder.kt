@@ -41,8 +41,11 @@ internal class PlainDecoder(
 ) : Decoder {
     private val rules = format.rules
 
-    /** The value to decode, as the decoder reads the platform SDK's values (see [asRead]). */
-    private val value: Any? = value.asRead()
+    /** The value to decode, as the decoder reads the platform SDK's values (see [asRead] and [Rules.readValue]). */
+    private val value: Any? = when (val read = value.asRead()) {
+        null, is String, is Number, is Boolean -> read
+        else -> rules.readValue(read)
+    }
 
     override val serializersModule: SerializersModule get() = format.serializersModule
 
@@ -168,7 +171,7 @@ internal class PlainDecoder(
         if (descriptor.kind == SerialKind.CONTEXTUAL) {
             val type = descriptor.capturedKClass
             return when {
-                type == Any::class -> toKotlin(value) as T
+                type == Any::class -> toKotlin(value, rules) as T
                 type != null && rules.isNativeType(type) -> if (type.isInstance(value)) {
                     value as T
                 } else {

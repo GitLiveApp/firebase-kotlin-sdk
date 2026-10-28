@@ -54,6 +54,25 @@ internal expect class PlainList() {
  */
 internal expect fun platformLeaf(value: Any): Any?
 
+/**
+ * The platform SDK's representation of a leaf the format produced: on JS a JS number for a [Long], which is a Kotlin
+ * object there; on wasmJs the JS value of a Kotlin primitive or string; the value itself elsewhere. The writers of
+ * [PlainMap] and [PlainList] apply it to every element, and the format applies it to a root value.
+ */
+internal expect fun toPlatformLeaf(value: Any?): Any?
+
+/**
+ * Whether the platform's Cloud Functions SDK encodes a [Long] losslessly itself: the Android, JVM and iOS SDKs wrap one
+ * as a protobuf `Int64Value`, the JS SDK sends a number, so the format writes the wrapper there (see [int64Value]).
+ */
+internal expect val functionsSdkEncodesLongs: Boolean
+
+/** The protobuf `Int64Value` JSON the callable protocol takes for a 64-bit integer. */
+internal fun int64Value(value: Long): Any = PlainMap().also {
+    it["@type"] = "type.googleapis.com/google.protobuf.Int64Value"
+    it["value"] = value.toString()
+}.value
+
 /** [platformLeaf] for any value; Kotlin primitives, the usual leaves, skip the platform check. */
 internal fun Any?.asRead(): Any? = when (this) {
     null, is String, is Number, is Boolean -> this
@@ -62,16 +81,17 @@ internal fun Any?.asRead(): Any? = when (this) {
 
 /**
  * The Kotlin value of a plain value, for a value read into `Any`: a map-like value becomes a [Map] and a list-like value
- * a [List], recursively, with the leaves [asRead]; a value that already is a Kotlin value is returned as it is.
+ * a [List], recursively, with the leaves [asRead] and, given [rules], read through [Rules.readValue]; a value that
+ * already is a Kotlin value is returned as it is.
  */
-internal fun toKotlin(value: Any?): Any? {
+internal fun toKotlin(value: Any?, rules: Rules? = null): Any? {
     val read = value.asRead() ?: return null
     PlainMap.of(read)?.let { map ->
         var changed = read !is Map<*, *>
         val result = LinkedHashMap<String, Any?>(map.size)
         for (key in map.keys) {
             val element = map[key]
-            result[key] = toKotlin(element).also { if (it !== element) changed = true }
+            result[key] = toKotlin(element, rules).also { if (it !== element) changed = true }
         }
         return if (changed) result else read
     }
@@ -80,9 +100,9 @@ internal fun toKotlin(value: Any?): Any? {
         val result = ArrayList<Any?>(list.size)
         for (index in 0 until list.size) {
             val element = list[index]
-            result.add(toKotlin(element).also { if (it !== element) changed = true })
+            result.add(toKotlin(element, rules).also { if (it !== element) changed = true })
         }
         return if (changed) result else read
     }
-    return read
+    return if (rules == null || read is String || read is Number || read is Boolean) read else rules.readValue(read)
 }

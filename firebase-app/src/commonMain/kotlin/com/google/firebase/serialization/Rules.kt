@@ -64,6 +64,12 @@ internal sealed class Rules {
 
     open fun isNativeValue(value: Any): Boolean = false
 
+    /** The platform SDK's value for an [isNativeValue] value the format writes; see [FirebaseFormat.Firestore.Bindings.toSdkValue]. */
+    open fun writeNative(value: Any): Any = value
+
+    /** A value the platform SDK returned, as the decoder reads it; see [FirebaseFormat.Firestore.Bindings.fromSdkValue]. */
+    open fun readValue(value: Any): Any = value
+
     /** The deepest path encoded before the value is taken to be a cycle, or `null` for no limit. */
     open val maxDepth: Int? = null
 
@@ -100,6 +106,8 @@ internal sealed class Rules {
 
         override fun isNativeType(type: KClass<*>) = type == Timestamp::class || bindings.nativeTypes.any { it == type }
         override fun isNativeValue(value: Any) = value is Timestamp || bindings.nativeTypes.any { it.isInstance(value) }
+        override fun writeNative(value: Any) = bindings.toSdkValue(value)
+        override fun readValue(value: Any) = bindings.fromSdkValue(value)
 
         override fun expectedList(value: Any) = "Expected a List, but got a ${javaClassString(value)}"
         override val arrayTarget = "Converting to Arrays is not supported, please use Lists instead"
@@ -150,7 +158,7 @@ internal sealed class Rules {
         override fun deserializeError(path: ErrorPath, reason: String) = IllegalArgumentException(reason)
         override fun mappingError(reason: String) = IllegalArgumentException(reason)
 
-        override fun encodeNumber(value: Number, path: ErrorPath): Any = value
+        override fun encodeNumber(value: Number, path: ErrorPath): Any = if (value is Long && !functionsSdkEncodesLongs) int64Value(value) else value
         override fun encodeSmallNumber(value: Number, type: String, path: ErrorPath): Any = value
 
         override fun rejectChar(value: Char, path: ErrorPath) = rejectValue(value, path)

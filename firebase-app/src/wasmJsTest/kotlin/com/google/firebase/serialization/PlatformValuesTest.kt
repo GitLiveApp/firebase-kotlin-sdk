@@ -47,9 +47,21 @@ class PlatformValuesTest {
     fun producesTheJsSdksValues() {
         val encoded = functions.encodeToPlainValue(JsReply("a", 2, listOf("x", "y"), JsNested(true)))
         assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true}}""", jsonStringify(encoded as JsAny?))
-        val converted = functions.convertToPlainValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null, "__proto__" to 1))
+        val converted = firestore.convertToPlainValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null, "__proto__" to 1))
         assertEquals("""{"a":[1,2.5],"b":{"c":"d"},"e":null,"__proto__":1}""", jsonStringify(converted as JsAny?))
         assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true,"missing":null,"nothing":null}}""", jsonStringify(functions.convertToPlainValue(reply()) as JsAny?))
+    }
+
+    @Test
+    @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+    fun writesRootValuesAndLongsAsTheJsSdkTakesThem() {
+        assertEquals("\"a\"", jsonStringify(functions.encodeToPlainValue("a") as JsAny?))
+        assertEquals("5", jsonStringify(firestore.convertToPlainValue(5L) as JsAny?))
+        // The JS Functions SDK sends a number, so the format writes the Int64Value wrapper the callable protocol takes
+        assertEquals(
+            """{"id":{"@type":"type.googleapis.com/google.protobuf.Int64Value","value":"9007199254740993"}}""",
+            jsonStringify(functions.convertToPlainValue(mapOf("id" to 9007199254740993L)) as JsAny?),
+        )
     }
 
     @Test

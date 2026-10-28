@@ -5,7 +5,11 @@
 package com.google.firebase.serialization
 
 // The Android SDK, firebase-java-sdk and (through Kotlin/Native's interop with Foundation) the iOS SDK exchange Kotlin
-// collections, so the plain values are the Kotlin ones.
+// collections, so the plain values are the Kotlin ones, and their Cloud Functions serializers wrap a Long themselves.
+
+internal actual fun toPlatformLeaf(value: Any?): Any? = value
+
+internal actual val functionsSdkEncodesLongs: Boolean = true
 
 internal actual class PlainMap private constructor(private val map: Map<*, *>) {
     actual constructor() : this(HashMap<String, Any?>())

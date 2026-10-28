@@ -44,10 +44,17 @@ public final class com/google/firebase/serialization/FirebaseFormat$Firestore : 
 public abstract interface class com/google/firebase/serialization/FirebaseFormat$Firestore$Bindings {
 	public abstract fun documentId (Ljava/lang/Object;)Ljava/lang/String;
 	public abstract fun documentPath (Ljava/lang/Object;)Ljava/lang/String;
+	public fun fromSdkValue (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun getAnnotations ()Lcom/google/firebase/serialization/MappingAnnotations;
 	public abstract fun getDocumentReferenceType ()Lkotlin/reflect/KClass;
 	public abstract fun getNativeTypes ()Ljava/util/List;
 	public abstract fun serverTimestamp ()Ljava/lang/Object;
+	public fun toSdkValue (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/google/firebase/serialization/FirebaseFormat$Firestore$Bindings$DefaultImpls {
+	public static fun fromSdkValue (Lcom/google/firebase/serialization/FirebaseFormat$Firestore$Bindings;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun toSdkValue (Lcom/google/firebase/serialization/FirebaseFormat$Firestore$Bindings;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/google/firebase/serialization/FirebaseFormat$Functions : com/google/firebase/serialization/FirebaseFormat {

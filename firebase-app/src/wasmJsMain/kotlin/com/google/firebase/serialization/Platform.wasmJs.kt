@@ -34,6 +34,8 @@ internal actual class PlainMap private constructor(private val map: Map<*, *>?, 
         jsDefine(js!!, key, element.toJs())
     }
 
+    // toJs() converts Kotlin primitives, strings and Longs and passes JS values (the structures built here) through.
+
     actual companion object {
         actual fun of(value: Any): PlainMap? = when {
             value is Map<*, *> -> PlainMap(value, null)
@@ -64,6 +66,10 @@ internal actual class PlainList private constructor(private val list: List<*>?, 
         }
     }
 }
+
+internal actual fun toPlatformLeaf(value: Any?): Any? = value.toJs()
+
+internal actual val functionsSdkEncodesLongs: Boolean = false
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 internal actual fun platformLeaf(value: Any): Any? {

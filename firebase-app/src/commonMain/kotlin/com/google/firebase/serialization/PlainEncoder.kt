@@ -72,9 +72,9 @@ private fun encodePlatformValue(format: FirebaseFormat, value: Any, path: ErrorP
     }
     return when {
         isArray(value) -> rules.rejectArray(value, path)
-        rules.isNativeValue(value) -> value
+        rules.isNativeValue(value) -> rules.writeNative(value)
         !rules.mapsObjects -> rules.rejectValue(value, path)
-        value is Instant && rules is Rules.Firestore -> Timestamp(value.epochSeconds, value.nanosecondsOfSecond)
+        value is Instant && rules is Rules.Firestore -> rules.writeNative(Timestamp(value.epochSeconds, value.nanosecondsOfSecond))
         else -> {
             val serializer = format.serializerOf(value::class)
             when {
@@ -175,14 +175,14 @@ internal class PlainEncoder(
         when {
             value == null -> serializer.serialize(this, value)
             descriptor.kind == SerialKind.CONTEXTUAL -> when {
-                rules.isNativeValue(value) -> this.value = value
+                rules.isNativeValue(value) -> this.value = rules.writeNative(value)
                 descriptor.capturedKClass == Any::class -> this.value = encodeRuntimeValue(format, value, path)
                 else -> serializer.serialize(this, value)
             }
             // Checked here, where the value is known, for the messages that print it
             descriptor.isArray() -> rules.rejectArray(value, path)
             descriptor.isSet() -> rules.rejectCollection(value, path)
-            value is Instant && rules is Rules.Firestore -> this.value = Timestamp(value.epochSeconds, value.nanosecondsOfSecond)
+            value is Instant && rules is Rules.Firestore -> this.value = rules.writeNative(Timestamp(value.epochSeconds, value.nanosecondsOfSecond))
             else -> serializer.serialize(this, value)
         }
     }

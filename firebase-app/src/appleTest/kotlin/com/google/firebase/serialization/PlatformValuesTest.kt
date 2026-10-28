@@ -22,5 +22,6 @@ class PlatformValuesTest {
         assertPlain(mapOf("name" to null, "tags" to listOf("a", null)), firestore.convertToPlainValue(stored))
         assertEquals(WithNulls(null, listOf("a", null)), firestore.decodeFromPlainValue<WithNulls>(stored))
         assertNull(firestore.decodeFromPlainValue<String?>(NSNull.`null`()))
+        assertNull(firestore.convertToCustomClass(NSNull.`null`(), WithNulls::class))
     }
 }

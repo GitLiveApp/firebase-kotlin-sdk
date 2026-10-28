@@ -43,9 +43,20 @@ class PlatformValuesTest {
     fun producesTheJsSdksValues() {
         val encoded = functions.encodeToPlainValue(JsReply("a", 2, listOf("x", "y"), JsNested(true)))
         assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true}}""", JSON.stringify(encoded))
-        val converted = functions.convertToPlainValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null, "__proto__" to 1))
+        val converted = firestore.convertToPlainValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null, "__proto__" to 1))
         assertEquals("""{"a":[1,2.5],"b":{"c":"d"},"e":null,"__proto__":1}""", JSON.stringify(converted))
         assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true,"missing":null,"nothing":null}}""", JSON.stringify(functions.convertToPlainValue(reply())))
+    }
+
+    @Test
+    fun writesRootValuesAndLongsAsTheJsSdkTakesThem() {
+        assertEquals("\"a\"", JSON.stringify(functions.encodeToPlainValue("a")))
+        assertEquals("5", JSON.stringify(firestore.convertToPlainValue(5L)))
+        // The JS Functions SDK sends a number, so the format writes the Int64Value wrapper the callable protocol takes
+        assertEquals(
+            """{"id":{"@type":"type.googleapis.com/google.protobuf.Int64Value","value":"9007199254740993"}}""",
+            JSON.stringify(functions.convertToPlainValue(mapOf("id" to 9007199254740993L))),
+        )
     }
 
     @Test

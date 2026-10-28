@@ -62,10 +62,10 @@ public sealed class FirebaseFormat(
      * calls such as `DocumentReference.set(Object)`: plain values are checked and copied, the product's own value types
      * are passed through and any other object is encoded with the serializer of its class, which must be `@Serializable`.
      */
-    public fun convertToPlainValue(value: Any?): Any? = encodeRuntimeValue(this, value, ErrorPath.EMPTY)
+    public fun convertToPlainValue(value: Any?): Any? = toPlatformLeaf(encodeRuntimeValue(this, value, ErrorPath.EMPTY))
 
     /** Encodes [value] to plain values with [serializer]. */
-    public fun <T> encodeToPlainValue(serializer: SerializationStrategy<T>, value: T): Any? = PlainEncoder(this, ErrorPath.EMPTY).apply { encodeSerializableValue(serializer, value) }.value
+    public fun <T> encodeToPlainValue(serializer: SerializationStrategy<T>, value: T): Any? = toPlatformLeaf(PlainEncoder(this, ErrorPath.EMPTY).apply { encodeSerializableValue(serializer, value) }.value)
 
     /**
      * Decodes plain values to a `T` with [deserializer], as the Android SDK's mapper does in calls such as
@@ -81,7 +81,7 @@ public sealed class FirebaseFormat(
      */
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> convertToCustomClass(value: Any?, type: KClass<T>, documentReference: Any? = null): T? {
-        if (value == null) return null
+        val value = value.asRead() ?: return null
         val serializer = when {
             type == Any::class || rules.isNativeType(type) -> ContextualSerializer(type)
             else -> serializerOf(type) ?: throw rules.mappingError("Class ${type.simpleName} is not @Serializable")
@@ -91,18 +91,22 @@ public sealed class FirebaseFormat(
 
     /**
      * The serializer for [type], where [Any] (as in `Map<String, Any?>`) stands for the plain value itself, as `Object`
-     * does for the Android mapper: it is decoded as is and encoded by its runtime type.
+     * does for the Android mapper: it is decoded as is and encoded by its runtime type. The product's own value types
+     * are passed through the same way, and the type arguments of a generic class are resolved by this rule too.
      */
     @Suppress("UNCHECKED_CAST")
     public fun serializerFor(type: KType): KSerializer<Any?> {
         val arguments = type.arguments.map { it.type ?: typeOf<Any?>() }
-        val serializer: KSerializer<*> = when (type.classifier) {
-            Any::class -> ContextualSerializer(Any::class)
-            Map::class, HashMap::class, LinkedHashMap::class, MutableMap::class ->
+        val classifier = type.classifier
+        val serializer: KSerializer<*> = when {
+            classifier == Any::class || classifier is KClass<*> && rules.isNativeType(classifier) -> ContextualSerializer(classifier as KClass<*>)
+            classifier == Map::class || classifier == HashMap::class || classifier == LinkedHashMap::class || classifier == MutableMap::class ->
                 MapSerializer(serializerFor(arguments[0]), serializerFor(arguments[1]))
-            List::class, ArrayList::class, MutableList::class ->
+            classifier == List::class || classifier == ArrayList::class || classifier == MutableList::class ->
                 ListSerializer(serializerFor(arguments[0]))
-            Set::class, HashSet::class, LinkedHashSet::class, MutableSet::class -> SetSerializer(serializerFor(arguments[0]))
+            classifier == Set::class || classifier == HashSet::class || classifier == LinkedHashSet::class || classifier == MutableSet::class ->
+                SetSerializer(serializerFor(arguments[0]))
+            arguments.isNotEmpty() && classifier is KClass<*> -> serializersModule.serializer(classifier, arguments.map(::serializerFor), false)
             else -> serializersModule.serializer(type)
         }
         return (if (type.isMarkedNullable) (serializer as KSerializer<Any>).nullable else serializer) as KSerializer<Any?>
@@ -160,6 +164,20 @@ public sealed class FirebaseFormat(
 
             /** `FieldValue.serverTimestamp()`, written for a `@ServerTimestamp` property that is `null`. */
             public fun serverTimestamp(): Any
+
+            /**
+             * The platform SDK's value for a value of one of the [nativeTypes], or a `com.google.firebase.Timestamp`, that
+             * the format writes: on a platform whose SDK has its own classes for them (the JS and iOS SDKs) the SDK's
+             * instance, which the SDK then takes as it is; [value] itself where the SDK takes the module's classes (the
+             * Android SDK and firebase-java-sdk, whose classes they are).
+             */
+            public fun toSdkValue(value: Any): Any = value
+
+            /**
+             * The counterpart of [toSdkValue] for a value the platform SDK returned: the module's value for an instance of
+             * one of the SDK's own classes, and any other value as it is.
+             */
+            public fun fromSdkValue(value: Any): Any = value
         }
 
         override val rules: Rules = Rules.Firestore(bindings)

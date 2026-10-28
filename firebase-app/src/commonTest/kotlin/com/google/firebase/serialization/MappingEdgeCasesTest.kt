@@ -5,6 +5,7 @@
 package com.google.firebase.serialization
 
 import com.google.firebase.Timestamp
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
@@ -35,6 +36,9 @@ data class CaseDistinct(@SerialName("X-ID") val a: Int = 0, @SerialName("x-id") 
 
 @Serializable
 data class WithDouble(val n: Double = 0.0)
+
+@Serializable
+data class WithBlob(val data: @Contextual Blob? = null, val any: @Contextual Any? = null)
 
 class MappingEdgeCasesTest {
 
@@ -75,6 +79,25 @@ class MappingEdgeCasesTest {
         assertFailsWithMessage<RuntimeException>("Found two getters or fields with conflicting case sensitivity for property: x-id") {
             firestore.encodeToPlainValue(CaseDistinct())
         }
+    }
+
+    @Test
+    fun convertsTheProductsValueTypesThroughTheBindings() {
+        assertEquals(SdkBlob("x"), (toKotlin(firestore.encodeToPlainValue(WithBlob(Blob("x")))) as Map<*, *>)["data"])
+        assertEquals(SdkBlob("y"), (toKotlin(firestore.convertToPlainValue(mapOf("b" to Blob("y")))) as Map<*, *>)["b"])
+        val stored = hashMapOf("data" to SdkBlob("x"), "any" to hashMapOf("b" to SdkBlob("z")))
+        assertEquals(WithBlob(Blob("x"), mapOf("b" to Blob("z"))), firestore.decodeFromPlainValue<WithBlob>(stored))
+        assertEquals(Blob("x"), firestore.convertToCustomClass(SdkBlob("x"), Blob::class))
+        assertEquals(mapOf("b" to Blob("z")), firestore.convertToCustomClass(hashMapOf("b" to SdkBlob("z")), Any::class))
+    }
+
+    @Test
+    fun findsSerializersForNativeTypesAndGenericArguments() {
+        val timestamp = Timestamp(1, 2)
+        assertSame(timestamp, firestore.decodeFromPlainValue<Timestamp>(timestamp))
+        assertSame(timestamp, (toKotlin(firestore.encodeToPlainValue(listOf(timestamp))) as List<*>)[0])
+        assertPlain(mapOf("value" to mapOf("a" to 1)), firestore.encodeToPlainValue(Generic<Any?>(mapOf("a" to 1))))
+        assertEquals(Generic<Any?>(mapOf("a" to 1)), firestore.decodeFromPlainValue<Generic<Any?>>(hashMapOf("value" to hashMapOf("a" to 1))))
     }
 
     @Test

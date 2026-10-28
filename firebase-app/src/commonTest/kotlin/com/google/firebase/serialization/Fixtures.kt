@@ -52,6 +52,11 @@ val testAnnotations = MappingAnnotations(
 
 data class GeoPoint(val latitude: Double, val longitude: Double)
 
+/** A value type the platform SDK has its own class for ([SdkBlob]), which the bindings convert. */
+data class Blob(val bytes: String)
+
+data class SdkBlob(val bytes: String)
+
 data class DocumentReference(val path: String)
 
 object ServerTimestampSentinel
@@ -59,11 +64,13 @@ object ServerTimestampSentinel
 val firestore = FirebaseFormat.Firestore(
     object : FirebaseFormat.Firestore.Bindings {
         override val annotations = testAnnotations
-        override val nativeTypes = listOf(GeoPoint::class, DocumentReference::class, ServerTimestampSentinel::class)
+        override val nativeTypes = listOf(GeoPoint::class, DocumentReference::class, ServerTimestampSentinel::class, Blob::class)
         override val documentReferenceType = DocumentReference::class
         override fun documentId(documentReference: Any) = (documentReference as DocumentReference).path.substringAfterLast('/')
         override fun documentPath(documentReference: Any) = (documentReference as DocumentReference).path
         override fun serverTimestamp(): Any = ServerTimestampSentinel
+        override fun toSdkValue(value: Any): Any = if (value is Blob) SdkBlob(value.bytes) else value
+        override fun fromSdkValue(value: Any): Any = if (value is SdkBlob) Blob(value.bytes) else value
     },
 )
 
