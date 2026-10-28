@@ -79,7 +79,7 @@ class MappingEdgeCasesTest {
 
     @Test
     fun keepsNaN() {
-        val plain = firestore.convertToPlainValue(mapOf("n" to Double.NaN)) as Map<*, *>
+        val plain = toKotlin(firestore.convertToPlainValue(mapOf("n" to Double.NaN))) as Map<*, *>
         assertTrue((plain["n"] as Double).isNaN())
         assertTrue(firestore.decodeFromPlainValue<WithDouble>(hashMapOf("n" to Double.NaN)).n.isNaN())
     }

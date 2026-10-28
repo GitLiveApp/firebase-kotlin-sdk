@@ -21,7 +21,6 @@ public abstract class com/google/firebase/serialization/FirebaseFormat : kotlinx
 	public final fun convertToCustomClass (Ljava/lang/Object;Lkotlin/reflect/KClass;Ljava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun convertToCustomClass$default (Lcom/google/firebase/serialization/FirebaseFormat;Ljava/lang/Object;Lkotlin/reflect/KClass;Ljava/lang/Object;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun convertToPlainValue (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun convertToPlatformValue (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun decodeFromPlainValue (Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun decodeFromPlainValue$default (Lcom/google/firebase/serialization/FirebaseFormat;Lkotlinx/serialization/DeserializationStrategy;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun encodeToPlainValue (Lkotlinx/serialization/SerializationStrategy;Ljava/lang/Object;)Ljava/lang/Object;

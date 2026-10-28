@@ -32,11 +32,12 @@ import kotlin.reflect.typeOf
  * classes through their kotlinx.serialization serializers instead, while following the Android mappers' rules so that
  * code written for the Android SDK needs as few changes as possible: usually just `@Serializable` on each model class.
  *
- * A format converts between Kotlin values and the *plain values* that the Firebase SDKs accept and return: `null`,
- * [Boolean], [String], numbers, [List]s, [Map]s with [String] keys and the product's own value types (such as a
- * Firestore `GeoPoint`), which are passed through unchanged. The Android, JVM and iOS SDKs exchange plain values as they
- * are; the JS SDK exchanges JS values, so on JS and wasmJs the reading functions also accept what it returns (JS
- * primitives, objects and arrays, read as plain values) and [convertToPlatformValue] produces what it takes.
+ * A format converts between Kotlin values and the *plain values* that the platform's Firebase SDK accepts and returns:
+ * `null`, [Boolean], [String], numbers, lists, maps with [String] keys and the product's own value types (such as a
+ * Firestore `GeoPoint`), which are passed through unchanged. The lists and maps are the platform's: Kotlin [List]s and
+ * [Map]s on Android, the JVM and Apple platforms, whose SDKs exchange them, and JS arrays and objects on JS and wasmJs,
+ * whose SDK exchanges those (a Kotlin [List] or [Map] is read there too). So what a format produces can be handed to the
+ * SDK, and what the SDK returns can be handed to a format, on every platform.
  *
  * - The property names are those the Android SDK derives from a class's getters: a Kotlin property `isActive` is stored
  *   as `active`, and a leading run of capitals is lower-cased (`URL` is stored as `url`).
@@ -60,16 +61,8 @@ public sealed class FirebaseFormat(
      * Converts [value] to plain values by its runtime type, as the Android SDK's mapper does with the `Object` given to
      * calls such as `DocumentReference.set(Object)`: plain values are checked and copied, the product's own value types
      * are passed through and any other object is encoded with the serializer of its class, which must be `@Serializable`.
-     * On JS and wasmJs [value] may also be a value the JS SDK returned, which is read as plain values.
      */
     public fun convertToPlainValue(value: Any?): Any? = encodeRuntimeValue(this, value, ErrorPath.EMPTY)
-
-    /**
-     * Converts plain values to the values the platform's Firebase SDK accepts: on JS and wasmJs a [Map] becomes a JS
-     * object, a [List] a JS array and a [Long] a JS number, recursively; on Android, the JVM and Apple platforms, whose
-     * SDKs take plain values, [value] is returned as it is.
-     */
-    public fun convertToPlatformValue(value: Any?): Any? = plainValueToPlatform(value)
 
     /** Encodes [value] to plain values with [serializer]. */
     public fun <T> encodeToPlainValue(serializer: SerializationStrategy<T>, value: T): Any? = PlainEncoder(this, ErrorPath.EMPTY).apply { encodeSerializableValue(serializer, value) }.value
@@ -77,8 +70,7 @@ public sealed class FirebaseFormat(
     /**
      * Decodes plain values to a `T` with [deserializer], as the Android SDK's mapper does in calls such as
      * `DocumentSnapshot.toObject(Class)`. For Firestore, [documentReference] is the document that `@DocumentId`
-     * properties receive (its id for a [String] property); it is ignored by the other products. On JS and wasmJs
-     * [value] may also be a value the JS SDK returned.
+     * properties receive (its id for a [String] property); it is ignored by the other products.
      */
     public fun <T> decodeFromPlainValue(deserializer: DeserializationStrategy<T>, value: Any?, documentReference: Any? = null): T = PlainDecoder(this, value, ErrorPath.EMPTY, documentReference).decodeSerializableValue(deserializer)
 

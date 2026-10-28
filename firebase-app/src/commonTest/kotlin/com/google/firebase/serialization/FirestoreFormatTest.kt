@@ -195,7 +195,7 @@ class FirestoreFormatTest {
             mapOf("city" to mapOf("name" to "LA", "state" to null, "country" to null, "capital" to null, "population" to null, "regions" to null), "at" to point, "list" to listOf(1, "a")),
             firestore.convertToPlainValue(mapOf("city" to City("LA"), "at" to point, "list" to listOf(1, "a"))),
         )
-        assertSame(point, (firestore.convertToPlainValue(mapOf("at" to point)) as Map<*, *>)["at"])
+        assertSame(point, (toKotlin(firestore.convertToPlainValue(mapOf("at" to point))) as Map<*, *>)["at"])
         assertFailsWithMessage<IllegalArgumentException>("Could not serialize object. Maps with non-string keys are not supported (found in field 'a')") {
             firestore.convertToPlainValue(mapOf("a" to mapOf(1 to 2)))
         }
@@ -236,7 +236,7 @@ class FirestoreFormatTest {
     fun passesFirestoreTypesThrough() {
         val point = GeoPoint(1.0, 2.0)
         val timestamp = Timestamp(10, 20)
-        val encoded = firestore.encodeToPlainValue(Place(point, timestamp, Instant.fromEpochSeconds(30, 40))) as Map<*, *>
+        val encoded = toKotlin(firestore.encodeToPlainValue(Place(point, timestamp, Instant.fromEpochSeconds(30, 40)))) as Map<*, *>
         assertSame(point, encoded["location"])
         assertSame(timestamp, encoded["updated"])
         val instant = encoded["instant"] as Timestamp
@@ -254,7 +254,7 @@ class FirestoreFormatTest {
     fun writesTheServerTimestampForNull() {
         assertPlain(mapOf("title" to "t", "created" to ServerTimestampSentinel), firestore.encodeToPlainValue(Post("ignored", "t")))
         val timestamp = Timestamp(1, 2)
-        assertSame(timestamp, (firestore.encodeToPlainValue(Post(title = "t", created = timestamp)) as Map<*, *>)["created"])
+        assertSame(timestamp, (toKotlin(firestore.encodeToPlainValue(Post(title = "t", created = timestamp))) as Map<*, *>)["created"])
         assertFailsWithMessage<IllegalArgumentException>(
             "Field created is annotated with @ServerTimestamp but is class java.lang.String instead of Date, Timestamp, or Instant.",
         ) { firestore.encodeToPlainValue(BadServerTimestamp()) }

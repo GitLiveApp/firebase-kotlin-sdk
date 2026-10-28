@@ -78,6 +78,7 @@ val functions = FirebaseFormat.Functions()
  * a number is not observable in common code (the JVM tests compare types with the Android SDK's own mappers).
  */
 fun assertPlain(expected: Any?, actual: Any?, path: String = "") {
+    val actual = toKotlin(actual)
     when (expected) {
         is Number -> {
             if (actual !is Number) fail("Expected the number $expected at '$path' but was $actual")

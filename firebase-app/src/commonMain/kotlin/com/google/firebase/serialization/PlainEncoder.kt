@@ -36,30 +36,41 @@ internal fun SerialDescriptor.isArray() = kind == StructureKind.LIST && baseName
 
 /**
  * Converts a value to plain values by its runtime type: the counterpart of the Android SDK's
- * `CustomClassMapper.serialize(Object)` and Cloud Functions' `Serializer.encode(Object)`. A value of the platform's SDK
- * (a JS object on JS) is read through [platformValueToPlain] first, one level at a time.
+ * `CustomClassMapper.serialize(Object)` and Cloud Functions' `Serializer.encode(Object)`. The value may be the platform
+ * SDK's own (a JS object on JS, read through [PlainMap]) as well as a Kotlin one; the result is the platform's.
  */
 internal fun encodeRuntimeValue(format: FirebaseFormat, value: Any?, path: ErrorPath): Any? {
     val rules = format.rules
     rules.checkDepth(path)
-    if (value == null) return null
-    if (value is Number) return rules.encodeNumber(value, path)
-    if (value is String || value is Boolean) return value
-    if (value is Char) rules.rejectChar(value, path)
-    // After the primitives: on JS a number is its own platform value, and a NaN is never identical to itself.
-    val plain = platformValueToPlain(value)
-    if (plain !== value) return encodeRuntimeValue(format, plain, path)
+    val value = value.asRead() ?: return null
     return when {
-        value is Map<*, *> -> HashMap<String, Any?>().also { result ->
+        value is Number -> rules.encodeNumber(value, path)
+        value is String || value is Boolean -> value
+        value is Char -> rules.rejectChar(value, path)
+        value is Map<*, *> -> PlainMap().also { result ->
             for ((key, element) in value) {
                 if (key !is String) rules.rejectMapKey(path)
                 result[key] = encodeRuntimeValue(format, element, path.child(key))
             }
-        }
-        value is List<*> -> ArrayList<Any?>(value.size).also { result ->
-            value.forEachIndexed { index, element -> result.add(encodeRuntimeValue(format, element, path.child("[$index]"))) }
-        }
+        }.value
+        value is List<*> -> PlainList().also { result ->
+            value.forEachIndexed { index, element -> result[index] = encodeRuntimeValue(format, element, path.child("[$index]")) }
+        }.value
         value is Collection<*> -> rules.rejectCollection(value, path)
+        else -> encodePlatformValue(format, value, path)
+    }
+}
+
+/** The rest of [encodeRuntimeValue]: the platform SDK's own structures, then the values without a Kotlin counterpart. */
+private fun encodePlatformValue(format: FirebaseFormat, value: Any, path: ErrorPath): Any? {
+    val rules = format.rules
+    PlainMap.of(value)?.let { map ->
+        return PlainMap().also { result -> for (key in map.keys) result[key] = encodeRuntimeValue(format, map[key], path.child(key)) }.value
+    }
+    PlainList.of(value)?.let { list ->
+        return PlainList().also { result -> for (index in 0 until list.size) result[index] = encodeRuntimeValue(format, list[index], path.child("[$index]")) }.value
+    }
+    return when {
         isArray(value) -> rules.rejectArray(value, path)
         rules.isNativeValue(value) -> value
         !rules.mapsObjects -> rules.rejectValue(value, path)
@@ -151,10 +162,10 @@ internal class PlainEncoder(
         StructureKind.LIST -> when {
             descriptor.isArray() -> rules.rejectArray(null, path)
             descriptor.isSet() -> rules.rejectCollection(null, path)
-            else -> ListEncoder(format, path).also { value = it.result }
+            else -> ListEncoder(format, path).also { value = it.result.value }
         }
-        StructureKind.MAP -> MapEncoder(format, path, descriptor.getElementDescriptor(0)).also { value = it.result }
-        StructureKind.CLASS, StructureKind.OBJECT -> ClassEncoder(format, path, ClassMapping(format, descriptor)).also { value = it.result }
+        StructureKind.MAP -> MapEncoder(format, path, descriptor.getElementDescriptor(0)).also { value = it.result.value }
+        StructureKind.CLASS, StructureKind.OBJECT -> ClassEncoder(format, path, ClassMapping(format, descriptor)).also { value = it.result.value }
         is PolymorphicKind -> PolymorphicEncoder(format, path) { value = it }
         else -> throw rules.serializeError(path, "Values of kind ${descriptor.kind} (${descriptor.serialName}) are not supported")
     }
@@ -239,7 +250,7 @@ internal abstract class ElementEncoder(protected val format: FirebaseFormat) : C
 
 /** A class, written as a map of its properties: the counterpart of the Android SDK's `BeanMapper.serialize`. */
 internal class ClassEncoder(format: FirebaseFormat, private val path: ErrorPath, private val mapping: ClassMapping) : ElementEncoder(format) {
-    val result = HashMap<String, Any?>()
+    val result = PlainMap()
 
     override fun elementEncoder(descriptor: SerialDescriptor, index: Int): PlainEncoder? {
         if (mapping.excluded[index] || mapping.documentId[index]) return null
@@ -257,17 +268,14 @@ internal class ClassEncoder(format: FirebaseFormat, private val path: ErrorPath,
 }
 
 internal class ListEncoder(format: FirebaseFormat, private val path: ErrorPath) : ElementEncoder(format) {
-    val result = ArrayList<Any?>()
+    val result = PlainList()
 
-    override fun elementEncoder(descriptor: SerialDescriptor, index: Int): PlainEncoder {
-        while (result.size <= index) result.add(null)
-        return PlainEncoder(format, path.child("[$index]")) { result[index] = it }
-    }
+    override fun elementEncoder(descriptor: SerialDescriptor, index: Int): PlainEncoder = PlainEncoder(format, path.child("[$index]")) { result[index] = it }
 }
 
 /** A map, whose keys must be strings: the elements alternate between keys and values. */
 internal class MapEncoder(format: FirebaseFormat, private val path: ErrorPath, keyDescriptor: SerialDescriptor) : ElementEncoder(format) {
-    val result = HashMap<String, Any?>()
+    val result = PlainMap()
     private var key: String? = null
 
     init {
@@ -296,14 +304,13 @@ internal class PolymorphicEncoder(format: FirebaseFormat, private val path: Erro
     }
 
     override fun endStructure(descriptor: SerialDescriptor) {
-        @Suppress("UNCHECKED_CAST")
-        val map = value as? MutableMap<String, Any?>
+        val map = value?.let(PlainMap::of)
             ?: throw rules.serializeError(path, "Polymorphic values must be classes, but ${type ?: descriptor.serialName} is not")
         if (map.containsKey(POLYMORPHIC_TYPE)) {
             throw rules.serializeError(path, "Property '$POLYMORPHIC_TYPE' of $type conflicts with the property that stores the subclass name of a polymorphic value")
         }
         map[POLYMORPHIC_TYPE] = type
-        sink(map)
+        sink(map.value)
     }
 }
 

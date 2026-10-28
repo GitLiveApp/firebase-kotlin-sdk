@@ -6,15 +6,16 @@ package com.google.firebase.serialization
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertSame
+import kotlin.test.assertIs
 
-/** The Android SDK and firebase-java-sdk exchange plain values as they are. */
+/** The Android SDK and firebase-java-sdk exchange Kotlin collections, so the plain values are the Kotlin ones. */
 class PlatformValuesTest {
 
     @Test
-    fun passesPlainValuesThroughUnchanged() {
-        val value = hashMapOf("a" to arrayListOf(1L, 2.5), "b" to hashMapOf("c" to "d"))
-        assertSame(value, functions.convertToPlatformValue(value))
-        assertEquals(value, functions.convertToPlainValue(value))
+    fun producesKotlinCollections() {
+        val encoded = functions.encodeToPlainValue(Score("a", 1.5, true))
+        assertIs<HashMap<*, *>>(encoded)
+        assertEquals(hashMapOf("player" to "a", "points" to 1.5, "isWinner" to true), encoded)
+        assertIs<ArrayList<*>>(functions.convertToPlainValue(listOf(1)))
     }
 }

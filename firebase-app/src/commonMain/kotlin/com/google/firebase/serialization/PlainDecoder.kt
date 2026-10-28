@@ -41,8 +41,8 @@ internal class PlainDecoder(
 ) : Decoder {
     private val rules = format.rules
 
-    /** The value to decode, read as a plain value when it is the platform SDK's (see [platformValueToPlain]). */
-    private val value: Any? = value.toPlainValue()
+    /** The value to decode, as the decoder reads the platform SDK's values (see [asRead]). */
+    private val value: Any? = value.asRead()
 
     override val serializersModule: SerializersModule get() = format.serializersModule
 
@@ -136,24 +136,24 @@ internal class PlainDecoder(
         return when (descriptor.kind) {
             StructureKind.CLASS, StructureKind.OBJECT -> {
                 val mapping = ClassMapping(format, descriptor)
-                val map = value as? Map<*, *> ?: fail("Can't convert object of type ${javaClassName(value)} to type ${mapping.className}")
+                val map = PlainMap.of(value) ?: fail("Can't convert object of type ${javaClassName(value)} to type ${mapping.className}")
                 ClassDecoder(format, map, path, documentReference, mapping, ignoredKey)
             }
             StructureKind.LIST -> when {
                 descriptor.isArray() -> fail(rules.arrayTarget)
                 descriptor.isSet() -> fail("Collections are not supported, please use Lists instead")
-                else -> ListDecoder(format, value as? List<*> ?: fail(rules.expectedList(value)), path, documentReference)
+                else -> ListDecoder(format, PlainList.of(value) ?: fail(rules.expectedList(value)), path, documentReference)
             }
             StructureKind.MAP -> {
                 val keyDescriptor = descriptor.getElementDescriptor(0)
                 if (keyDescriptor.kind != PrimitiveKind.STRING && keyDescriptor.kind != SerialKind.CONTEXTUAL) {
                     fail("Only Maps with string keys are supported, but found Map with key type ${typeString(keyDescriptor, boxed = true)}")
                 }
-                MapDecoder(format, value as? Map<*, *> ?: fail("Expected a Map while deserializing, but got a ${javaClassString(value)}"), path, documentReference)
+                MapDecoder(format, PlainMap.of(value) ?: fail("Expected a Map while deserializing, but got a ${javaClassString(value)}"), path, documentReference)
             }
             is PolymorphicKind -> PolymorphicDecoder(
                 format,
-                value as? Map<*, *> ?: fail("Expected a Map while deserializing, but got a ${javaClassString(value)}"),
+                PlainMap.of(value) ?: fail("Expected a Map while deserializing, but got a ${javaClassString(value)}"),
                 path,
                 documentReference,
             )
@@ -168,7 +168,7 @@ internal class PlainDecoder(
         if (descriptor.kind == SerialKind.CONTEXTUAL) {
             val type = descriptor.capturedKClass
             return when {
-                type == Any::class -> platformValueToPlainDeep(value) as T
+                type == Any::class -> toKotlin(value) as T
                 type != null && rules.isNativeType(type) -> if (type.isInstance(value)) {
                     value as T
                 } else {
@@ -223,7 +223,7 @@ internal abstract class ElementDecoder(protected val format: FirebaseFormat) : C
 /** A class, read from a map of its properties: the counterpart of the Android SDK's `BeanMapper.deserialize`. */
 internal class ClassDecoder(
     format: FirebaseFormat,
-    private val map: Map<*, *>,
+    private val map: PlainMap,
     private val path: ErrorPath,
     private val documentReference: Any?,
     private val mapping: ClassMapping,
@@ -250,7 +250,7 @@ internal class ClassDecoder(
             val name = mapping.names[element]
             if (!mapping.excluded[element] && map.containsKey(name)) {
                 // A null for a property that cannot hold it keeps the property's default; Java would store the null
-                if (map[name] == null && !elementDescriptor.isNullable && optional) continue
+                if (map[name].asRead() == null && !elementDescriptor.isNullable && optional) continue
                 return element
             }
             // A property missing from the data keeps its default, or (without one) Java's zero value: null for a
@@ -267,7 +267,7 @@ internal class ClassDecoder(
         val known = mapping.names.filterIndexed { index, _ -> !mapping.excluded[index] }.toSet()
         for (key in map.keys) {
             if (key in known || key == ignoredKey) continue
-            val message = mapping.unknownPropertyMessage(key.toString())
+            val message = mapping.unknownPropertyMessage(key)
             if (mapping.unknownProperties == UnknownProperties.THROW) throw rules.mappingError(message)
             rules.unknownPropertyLog?.invoke(message)
         }
@@ -290,7 +290,7 @@ internal class ClassDecoder(
 
 private fun SerialKind.isJavaPrimitive() = this is PrimitiveKind && this != PrimitiveKind.STRING
 
-internal class ListDecoder(format: FirebaseFormat, private val list: List<*>, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
+internal class ListDecoder(format: FirebaseFormat, private val list: PlainList, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
     private var index = 0
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int = list.size
@@ -307,32 +307,32 @@ internal class ListDecoder(format: FirebaseFormat, private val list: List<*>, pr
 }
 
 /** A map: the elements alternate between keys and values. */
-internal class MapDecoder(format: FirebaseFormat, map: Map<*, *>, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
-    private val entries = map.entries.toList()
+internal class MapDecoder(format: FirebaseFormat, private val map: PlainMap, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
+    private val keys = map.keys
     private var index = 0
 
-    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int = entries.size
+    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int = keys.size
 
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = if (index < entries.size * 2) index++ else DECODE_DONE
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = if (index < keys.size * 2) index++ else DECODE_DONE
 
     override fun elementDecoder(descriptor: SerialDescriptor, index: Int): PlainDecoder {
-        val entry = entries[index / 2]
+        val key = keys[index / 2]
         return if (index % 2 == 0) {
-            PlainDecoder(format, entry.key, path, documentReference)
+            PlainDecoder(format, key, path, documentReference)
         } else {
-            PlainDecoder(format, entry.value, path.child(entry.key.toString()), documentReference, nullable = descriptor.getElementDescriptor(1).isNullable)
+            PlainDecoder(format, map[key], path.child(key), documentReference, nullable = descriptor.getElementDescriptor(1).isNullable)
         }
     }
 }
 
 /** A polymorphic value, read from the value's map, whose `type` property is the serial name of its class. */
-internal class PolymorphicDecoder(format: FirebaseFormat, private val map: Map<*, *>, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
+internal class PolymorphicDecoder(format: FirebaseFormat, private val map: PlainMap, private val path: ErrorPath, private val documentReference: Any?) : ElementDecoder(format) {
     private var index = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int = if (index < 2) index++ else DECODE_DONE
 
     override fun elementDecoder(descriptor: SerialDescriptor, index: Int): PlainDecoder = when (index) {
         0 -> PlainDecoder(format, map[POLYMORPHIC_TYPE], path.child(POLYMORPHIC_TYPE), documentReference)
-        else -> PlainDecoder(format, map, path, documentReference, ignoredKey = POLYMORPHIC_TYPE)
+        else -> PlainDecoder(format, map.value, path, documentReference, ignoredKey = POLYMORPHIC_TYPE)
     }
 }

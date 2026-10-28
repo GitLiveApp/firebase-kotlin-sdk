@@ -13,7 +13,5 @@ internal actual fun logWarning(tag: String, message: String) {
     Log.w(tag, message)
 }
 
-// The Android SDK and firebase-java-sdk return and accept plain values.
-internal actual fun platformValueToPlain(value: Any): Any? = value
-
-internal actual fun plainValueToPlatform(value: Any?): Any? = value
+// The Android SDK and firebase-java-sdk exchange Kotlin values.
+internal actual fun platformLeaf(value: Any): Any? = value

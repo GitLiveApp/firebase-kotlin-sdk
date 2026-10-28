@@ -24,14 +24,15 @@ private fun jsArray(): JsAny = js("[1, 2]")
 
 private fun jsDate(): JsAny = js("new Date(0)")
 
-/** The values the JS SDK returns, as JSON.parse produces them, are read as plain values; plain values are written as JS values. */
+/** The JS SDK exchanges JS values: they are read as plain values, and the plain values produced are JS values. */
 class PlatformValuesTest {
 
     @Test
     fun readsTheJsSdksValuesAsPlainValues() {
         val expected = mapOf("name" to "a", "count" to 2, "tags" to listOf("x", "y"), "nested" to mapOf("flag" to true, "missing" to null, "nothing" to null))
         assertPlain(expected, functions.convertToPlainValue(reply()))
-        assertPlain(expected, functions.decodeFromPlainValue<Map<String, Any?>>(reply()))
+        assertEquals(expected, functions.decodeFromPlainValue<Map<String, Any?>>(reply()))
+        assertEquals(expected, toKotlin(reply()))
     }
 
     @Test
@@ -43,9 +44,12 @@ class PlatformValuesTest {
 
     @Test
     @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-    fun writesPlainValuesAsTheJsSdksValues() {
-        val platform = functions.convertToPlatformValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null))
-        assertEquals("""{"a":[1,2.5],"b":{"c":"d"},"e":null}""", jsonStringify(platform as JsAny?))
+    fun producesTheJsSdksValues() {
+        val encoded = functions.encodeToPlainValue(JsReply("a", 2, listOf("x", "y"), JsNested(true)))
+        assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true}}""", jsonStringify(encoded as JsAny?))
+        val converted = functions.convertToPlainValue(mapOf("a" to listOf(1L, 2.5), "b" to mapOf("c" to "d"), "e" to null, "__proto__" to 1))
+        assertEquals("""{"a":[1,2.5],"b":{"c":"d"},"e":null,"__proto__":1}""", jsonStringify(converted as JsAny?))
+        assertEquals("""{"name":"a","count":2,"tags":["x","y"],"nested":{"flag":true,"missing":null,"nothing":null}}""", jsonStringify(functions.convertToPlainValue(reply()) as JsAny?))
     }
 
     @Test

@@ -4,33 +4,71 @@
 
 package com.google.firebase.serialization
 
-import kotlin.js.json
-
 /*
- * The JS SDK returns the values JSON.parse produces: primitives, which are Kotlin's own on Kotlin/JS, plain objects and
- * arrays. A Kotlin Array is a JS array too, so on this platform convertToPlainValue reads an Array as a List instead of
- * rejecting it as the Android SDK does; the serializer of an Array property still rejects it.
+ * The JS SDK exchanges the values JSON.parse produces and JSON.stringify takes: primitives, which are Kotlin's own on
+ * Kotlin/JS, plain objects and arrays. A Kotlin Array is a JS array too, so on this platform convertToPlainValue reads an
+ * Array as a list instead of rejecting it as the Android SDK does; the serializer of an Array property still rejects it.
  */
 
-internal actual fun platformValueToPlain(value: Any): Any? = when {
-    isJsArray(value) -> value.unsafeCast<Array<Any?>>().map { it.undefinedToNull() }
-    isPlainJsObject(value) -> LinkedHashMap<String, Any?>().also { map ->
-        for (entry in objectEntries(value)) map[entry[0] as String] = entry[1].undefinedToNull()
+internal actual class PlainMap private constructor(private val map: Map<*, *>?, private val js: dynamic) {
+    actual constructor() : this(null, js("({})"))
+
+    actual val value: Any get() = map ?: js.unsafeCast<Any>()
+    actual val size: Int get() = map?.size ?: keysOf(js).size
+    actual val keys: List<String> get() = map?.keys?.map { it.toString() } ?: keysOf(js).asList()
+
+    actual fun containsKey(key: String): Boolean = map?.containsKey(key) ?: hasOwn(js, key)
+
+    actual operator fun get(key: String): Any? = if (map != null) map[key] else js[key].unsafeCast<Any?>()
+
+    actual operator fun set(key: String, element: Any?) {
+        define(js, key, element.toJsLeaf())
     }
-    else -> value
+
+    actual companion object {
+        actual fun of(value: Any): PlainMap? = when {
+            value is Map<*, *> -> PlainMap(value, null)
+            isPlainJsObject(value) -> PlainMap(null, value)
+            else -> null
+        }
+    }
 }
 
-internal actual fun plainValueToPlatform(value: Any?): Any? = when (value) {
-    is Map<*, *> -> json(*value.entries.map { (key, element) -> key.toString() to plainValueToPlatform(element) }.toTypedArray())
-    is Collection<*> -> value.map { plainValueToPlatform(it) }.toTypedArray()
-    is Long -> value.toDouble()
-    else -> value
+internal actual class PlainList private constructor(private val list: List<*>?, private val js: dynamic) {
+    actual constructor() : this(null, js("([])"))
+
+    actual val value: Any get() = list ?: js.unsafeCast<Any>()
+    actual val size: Int get() = list?.size ?: js.length.unsafeCast<Int>()
+
+    actual operator fun get(index: Int): Any? = if (list != null) list[index] else js[index].unsafeCast<Any?>()
+
+    actual operator fun set(index: Int, element: Any?) {
+        js[index] = element.toJsLeaf()
+    }
+
+    actual companion object {
+        actual fun of(value: Any): PlainList? = when {
+            value is List<*> -> PlainList(value, null)
+            isJsArray(value) -> PlainList(null, value)
+            else -> null
+        }
+    }
 }
+
+internal actual fun platformLeaf(value: Any): Any? = if (value === undefined) null else value
+
+/** A JS number for a Kotlin Long, which is a Kotlin object on Kotlin/JS; everything else is its own JS value. */
+private fun Any?.toJsLeaf(): Any? = if (this is Long) toDouble() else this
 
 private fun isJsArray(value: Any): Boolean = js("Array.isArray(value)").unsafeCast<Boolean>()
 
 private fun isPlainJsObject(value: Any): Boolean = jsTypeOf(value) == "object" && js("Object.getPrototypeOf(value) === Object.prototype").unsafeCast<Boolean>()
 
-private fun objectEntries(value: Any): Array<Array<Any?>> = js("Object.entries(value)").unsafeCast<Array<Array<Any?>>>()
+private fun keysOf(target: dynamic): Array<String> = js("Object.keys(target)").unsafeCast<Array<String>>()
 
-private fun Any?.undefinedToNull(): Any? = if (this === undefined) null else this
+private fun hasOwn(target: dynamic, key: String): Boolean = js("Object.prototype.hasOwnProperty.call(target, key)").unsafeCast<Boolean>()
+
+/** An own data property, whatever the key: `target[key] = value` would run an inherited setter for `__proto__`. */
+private fun define(target: dynamic, key: String, value: Any?) {
+    js("Object.defineProperty(target, key, { value: value, enumerable: true, writable: true, configurable: true })")
+}

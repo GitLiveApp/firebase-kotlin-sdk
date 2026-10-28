@@ -6,45 +6,83 @@ package com.google.firebase.serialization
 
 import kotlin.reflect.KClass
 
-/** The class's name as `Class.getName()` returns it on Android, for messages; elsewhere the closest name available. */
+/** The Java name of a class, as the Android SDK's messages print it (`java.util.HashMap`, `java.lang.String`). */
 internal expect fun javaClassNameOf(type: KClass<*>): String
 
 /** Logs a warning as the Android SDK's mappers do, with `android.util.Log.w` on Android. */
 internal expect fun logWarning(tag: String, message: String)
 
 /**
- * Converts [value] when it is a value of this platform's Firebase SDK rather than a plain value, and returns it as it is
- * otherwise. The Android, JVM and Apple SDKs return plain values, so there it is the identity. The JS SDK returns JS
- * values: a JS primitive becomes its Kotlin counterpart and a JS object or array becomes a [Map] or [List] whose elements
- * are still JS values, so a structure is converted one level at a time as the format reads it, in a single pass.
+ * A map-like plain value as the platform's Firebase SDK exchanges it: a Kotlin [Map] on Android, the JVM and Apple
+ * platforms, a JS object on JS and wasmJs, where a Kotlin [Map] is read too. The encoder builds one with the constructor
+ * and hands out its [value]; the decoder reads one through [of].
  */
-internal expect fun platformValueToPlain(value: Any): Any?
+internal expect class PlainMap() {
+    /** The platform's value. */
+    val value: Any
+    val size: Int
+    val keys: List<String>
+    fun containsKey(key: String): Boolean
 
-/**
- * Converts plain values to what this platform's Firebase SDK accepts: the identity on Android, the JVM and Apple, whose
- * SDKs take plain values; on JS and wasmJs a [Map] becomes a JS object, a [List] a JS array and a [Long] a JS number,
- * recursively, and any other value is passed through.
- */
-internal expect fun plainValueToPlatform(value: Any?): Any?
+    /** The element as the platform holds it; [asRead] makes it the value the decoder takes. */
+    operator fun get(key: String): Any?
+    operator fun set(key: String, element: Any?)
 
-/** [platformValueToPlain] for any value; Kotlin primitives, the usual leaves, skip the platform check. */
-internal fun Any?.toPlainValue(): Any? = when (this) {
-    null, is String, is Number, is Boolean -> this
-    else -> platformValueToPlain(this)
+    companion object {
+        /** [value] read as a map, or `null` when it is not one. */
+        fun of(value: Any): PlainMap?
+    }
 }
 
-/** [toPlainValue] applied to a whole tree, for a value read into `Any`; a tree of plain values is returned as it is. */
-internal fun platformValueToPlainDeep(value: Any?): Any? = when (val plain = value.toPlainValue()) {
-    is Map<*, *> -> {
-        var changed = plain !== value
-        val result = LinkedHashMap<Any?, Any?>(plain.size)
-        for ((key, element) in plain) result[key] = platformValueToPlainDeep(element).also { if (it !== element) changed = true }
-        if (changed) result else plain
+/** A list-like plain value, a Kotlin [List] or, on JS and wasmJs, a JS array; see [PlainMap]. */
+internal expect class PlainList() {
+    val value: Any
+    val size: Int
+    operator fun get(index: Int): Any?
+
+    /** Sets the element at [index], extending the list with `null`s up to it. */
+    operator fun set(index: Int, element: Any?)
+
+    companion object {
+        fun of(value: Any): PlainList?
     }
-    is List<*> -> {
-        var changed = plain !== value
-        val result = plain.map { element -> platformValueToPlainDeep(element).also { if (it !== element) changed = true } }
-        if (changed) result else plain
+}
+
+/**
+ * A leaf of the platform's Firebase SDK as the decoder reads it: the Kotlin counterpart of a primitive (the JS SDK's
+ * primitives on wasmJs; a JS `undefined` and Foundation's `NSNull` are `null`), and any other value as it is.
+ */
+internal expect fun platformLeaf(value: Any): Any?
+
+/** [platformLeaf] for any value; Kotlin primitives, the usual leaves, skip the platform check. */
+internal fun Any?.asRead(): Any? = when (this) {
+    null, is String, is Number, is Boolean -> this
+    else -> platformLeaf(this)
+}
+
+/**
+ * The Kotlin value of a plain value, for a value read into `Any`: a map-like value becomes a [Map] and a list-like value
+ * a [List], recursively, with the leaves [asRead]; a value that already is a Kotlin value is returned as it is.
+ */
+internal fun toKotlin(value: Any?): Any? {
+    val read = value.asRead() ?: return null
+    PlainMap.of(read)?.let { map ->
+        var changed = read !is Map<*, *>
+        val result = LinkedHashMap<String, Any?>(map.size)
+        for (key in map.keys) {
+            val element = map[key]
+            result[key] = toKotlin(element).also { if (it !== element) changed = true }
+        }
+        return if (changed) result else read
     }
-    else -> plain
+    PlainList.of(read)?.let { list ->
+        var changed = read !is List<*>
+        val result = ArrayList<Any?>(list.size)
+        for (index in 0 until list.size) {
+            val element = list[index]
+            result.add(toKotlin(element).also { if (it !== element) changed = true })
+        }
+        return if (changed) result else read
+    }
+    return read
 }
