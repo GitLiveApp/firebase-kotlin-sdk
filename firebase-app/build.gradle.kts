@@ -18,6 +18,7 @@ val supportedPlatforms = (project.property("firebase-app.supportedTargets") as S
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }
@@ -173,6 +174,7 @@ kotlin {
         getByName("commonMain") {
             dependencies {
                 implementation(project(":firebase-common"))
+                api(libs.kotlinx.serialization.core)
             }
         }
 
@@ -219,6 +221,8 @@ stripHeaderStubs(
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
     // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
     keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class", "com/google/firebase/TimestampInstantKt.class"),
+    // FirebaseFormat, the multiplatform counterpart of the Android SDK's (internal) class mappers.
+    keepPackageDirs = listOf("com/google/firebase/serialization"),
 )
 
 registerAndroidSourceCompat("firebase-common/api.txt")
