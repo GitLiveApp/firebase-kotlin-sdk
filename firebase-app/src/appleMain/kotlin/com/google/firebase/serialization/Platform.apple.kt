@@ -4,7 +4,7 @@
 
 package com.google.firebase.serialization
 
-import kotlinx.cinterop.CFBridgingRetain
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.reinterpret
 import platform.CoreFoundation.CFArraySetValueAtIndex
 import platform.CoreFoundation.CFBooleanRef
@@ -13,11 +13,14 @@ import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFTypeRef
 import platform.CoreFoundation.kCFBooleanFalse
 import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSArray
 import platform.Foundation.NSMutableArray
 import platform.Foundation.NSMutableDictionary
 import platform.Foundation.NSNull
+import platform.Foundation.NSString
 import platform.Foundation.arrayWithObject
+import platform.Foundation.create
 
 // Kotlin/Native maps a Foundation collection the iOS SDK hands over to a Kotlin Map or List viewing it, and its NSString
 // and NSNumber elements to Kotlin strings, numbers and booleans as they are read, so the plain values are those Kotlin
@@ -45,14 +48,15 @@ internal actual class PlainMap private constructor(private val map: Map<*, *>, p
 
     actual operator fun get(key: String): Any? = map[key]
 
+    @OptIn(BetaInteropApi::class)
     actual operator fun set(key: String, element: Any?) {
         val dictionary = checkNotNull(dictionary) { "A plain value read from the SDK is not written to" }
         when (element) {
-            null -> dictionary.setObject(NSNull.`null`(), key)
+            null -> dictionary.setObject(NSNull.`null`(), NSString.create(string = key))
             is Boolean -> withCFRef(dictionary) { target ->
                 withCFRef(key) { CFDictionarySetValue(target.reinterpret(), it, cfBoolean(element)) }
             }
-            else -> dictionary.setObject(element, key)
+            else -> dictionary.setObject(element, NSString.create(string = key))
         }
     }
 
@@ -87,7 +91,7 @@ internal actual class PlainList private constructor(private val list: List<*>, p
 }
 
 /** The Kotlin collection Kotlin/Native gives for a Foundation [collection] it meets as an `id`: a view of it. */
-private fun kotlinView(collection: Any): Any = NSArray.arrayWithObject(collection).objectAtIndex(0u)
+private fun kotlinView(collection: Any): Any? = NSArray.arrayWithObject(collection)[0]
 
 private fun cfBoolean(value: Boolean): CFBooleanRef? = if (value) kCFBooleanTrue else kCFBooleanFalse
 
