@@ -14,25 +14,27 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/2.7.0/pom)                   | [![16%](https://img.shields.io/badge/-16%25-orange?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/2.7.0/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-database/2.7.0/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/2.7.0/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/2.7.0/pom)         | [![63%](https://img.shields.io/badge/-63%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
-| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/2.7.0/pom)         | [![5%](https://img.shields.io/badge/-5%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
-| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/2.7.0/pom)             | [![64%](https://img.shields.io/badge/-64%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
-| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/2.7.0/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-config/2.7.0/pom)               | [![49%](https://img.shields.io/badge/-49%25-orange?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
-| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/2.7.0/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:2.7.0`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/2.7.0/pom)     | [![88%](https://img.shields.io/badge/-88%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/3.0.0-alpha02/pom)                   | [![16%](https://img.shields.io/badge/-16%25-orange?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/3.0.0-alpha02/pom)                   | [![53%](https://img.shields.io/badge/-53%25-orange?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-database/3.0.0-alpha02/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/3.0.0-alpha02/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/3.0.0-alpha02/pom)         | [![63%](https://img.shields.io/badge/-63%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/3.0.0-alpha02/pom)         | [![5%](https://img.shields.io/badge/-5%25-orange?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
+| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/3.0.0-alpha02/pom)             | [![64%](https://img.shields.io/badge/-64%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/3.0.0-alpha02/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-alpha02/pom)               | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/3.0.0-alpha02/pom)                   | [![35%](https://img.shields.io/badge/-35%25-orange?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-alpha02/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
 ## Multiplatform
 
-The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android*, *JVM* and *JS* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
+The Firebase Kotlin SDK provides a common API to access Firebase for projects targeting *iOS*, *Android*, *JVM*, *JS* and *Wasm (wasmJs)* meaning you can use Firebase directly in your common code. Under the hood, the SDK achieves this by binding to the respective official Firebase SDK for each supported platform.
 
 It uses the <a href="https://github.com/GitLiveApp/firebase-java-sdk">Firebase Java SDK</a> to support the JVM target. The library requires [additional initialization](https://github.com/GitLiveApp/firebase-java-sdk?tab=readme-ov-file#initializing-the-sdk) compared to the official Firebase SDKs.
+
+Both the *JS* and *Wasm (wasmJs)* targets bind to the official Firebase JS SDK, so they support the same set of modules and are well suited to [Compose Multiplatform for Web](https://www.jetbrains.com/lp/compose-multiplatform/).
 
 ### Initialization
 
@@ -43,13 +45,13 @@ at all, depends on how the underlying Firebase SDK is initialised:
 |----------|--------------------|-------------------|----------------|
 | Android | required, an `android.content.Context` | reads the resources generated by the Google Services Gradle plugin from `google-services.json` | uses the given options |
 | iOS | ignored | reads `GoogleService-Info.plist` (`FirebaseApp.configure()`) | uses the given options |
-| JS | ignored | not supported, throws `UnsupportedOperationException` | uses the given options (`authDomain` is JS only) |
+| JS and Wasm | ignored | not supported, throws `UnsupportedOperationException` | uses the given options (`authDomain` is JS and Wasm only) |
 | JVM | required, an `android.app.Application` from the [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) | not supported | uses the given options |
 
 On Android you usually need no call: with the Google Services Gradle plugin the official SDK initialises the default app itself
 at startup (through a `ContentProvider` merged into your manifest) and `Firebase.app` is ready to use. On iOS the default app has
 to be configured once at launch, either from Swift with `FirebaseApp.configure()` or from Kotlin as shown below, before any Firebase
-API is used. On JS and the JVM the options always have to be provided in code.
+API is used. On JS, Wasm and the JVM the options always have to be provided in code.
 
 The recommended pattern is a common function that takes the options and an optional platform context, called from each
 platform's entry point:
@@ -65,7 +67,7 @@ fun initializeFirebase(context: Any? = null): FirebaseApp = Firebase.apps(contex
         databaseUrl = "https://fir-kotlin-sdk.firebaseio.com",
         storageBucket = "fir-kotlin-sdk.appspot.com",
         gcmSenderId = "846484016111",
-        authDomain = "fir-kotlin-sdk.firebaseapp.com", // JS only, ignored elsewhere
+        authDomain = "fir-kotlin-sdk.firebaseapp.com", // JS and Wasm only, ignored elsewhere
     ),
 )
 ```
@@ -77,7 +79,7 @@ initializeFirebase(applicationContext)
 // iosMain, e.g. from the app delegate or the SwiftUI App init; or pass no options to read GoogleService-Info.plist
 initializeFirebase()
 
-// jsMain, before any other Firebase call
+// jsMain and wasmJsMain, before any other Firebase call
 initializeFirebase()
 ```
 
@@ -110,7 +112,7 @@ three overloads exist there with the context typed as `Any?`, following the rule
 Alongside the Kotlin-first `dev.gitlive.firebase` API, the SDK ships the Firebase Android SDK API itself under its original
 `com.google.firebase` packages, as `expect` declarations implemented on every platform. Code written against the Android SDK
 (including `com.google.android.gms.tasks.Task` and its listeners) therefore compiles unchanged, without even changing imports,
-in common code targeting Android, iOS, JVM and JS:
+in common code targeting Android, iOS, JVM, JS and Wasm (wasmJs):
 
 ```kotlin
 import com.google.firebase.installations.FirebaseInstallations
@@ -123,14 +125,14 @@ FirebaseInstallations.getInstance().getId()
 val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
-So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`) and
-`firebase-installations`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
+So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
+`firebase-installations`, `firebase-crashlytics` and `firebase-config`; the other modules are migrated one by one. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 
 ### Accessing the underlying Firebase SDK
 
-In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property.
+In some cases you might want to access the underlying official Firebase SDK in platform specific code, for example when the common API is missing the functionality you need. For this purpose each class in the SDK has `android`, `ios` and `js` extension properties that hold the equivalent object of the underlying official Firebase SDK. For *JVM*, as the `firebase-java-sdk` is a direct port of the Firebase Android SDK, is it also accessed via the `android` property. The *Wasm (wasmJs)* target binds to the same official Firebase JS SDK as the *JS* target and exposes it via the `js` property.
 
 These properties are only accessible from the equivalent target's source set. For example to disable persistence in Cloud Firestore on Android you can write the following in your Android specific code (e.g. `androidMain` or `androidTest`):
 
@@ -146,14 +148,61 @@ On android, some modules (`config`) require you to enable [Core library desugari
 
 ### Running on iOS
 
-On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+On iOS the SDK binds to the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk). It is **not bundled** into the published klibs — instead, each module records the `firebase-ios-sdk` Swift Package Manager dependency it needs as metadata in its Maven publication, so **your KMP app inherits it transitively**. You do not declare or link Firebase yourself.
 
-Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
+Requires a minimum deployment target of **iOS 15 / tvOS 15 / macOS 12**. iOS and tvOS come from `firebase-ios-sdk` 12; macOS 12 is the minimum Kotlin/Native builds for. The Apple targets are `iosArm64`, `iosX64`, `iosSimulatorArm64`, `macosArm64`, `tvosArm64` and `tvosSimulatorArm64`. There are no Intel `macosX64` or `tvosX64` targets, which Kotlin deprecated in 2.3.20 and removes in 2.5.20; apps that still build them need the 2.x releases.
+
+**Recommended (Swift Package Manager, automatic).** Consume the SDK via Maven as usual (e.g. `implementation("dev.gitlive:firebase-auth:<version>")`) and integrate your shared framework into Xcode using [direct integration](https://kotlinlang.org/docs/multiplatform/multiplatform-direct-integration.html) (the `embedAndSignAppleFrameworkForXcode` build phase). The Kotlin Gradle plugin resolves the inherited `firebase-ios-sdk` dependency, generates the Swift package, and links it for you (including for iOS/macOS/tvOS tests). Requires **Kotlin 2.4+** and **Xcode 26.2+**; Xcode 27 needs Kotlin 2.4.20+ in your build ([KT-87196](https://youtrack.jetbrains.com/issue/KT-87196)). Note: the [remote / SwiftPM-export](https://kotlinlang.org/docs/multiplatform/multiplatform-spm-export.html) method (packaging your shared module as its own Swift package) needs Kotlin 2.4.20+ ([KT-84420](https://youtrack.jetbrains.com/issue/KT-84420)), is experimental, and hasn't been verified end to end with this SDK; see [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md).
+
+To add Firebase products this SDK doesn't use, or to require a newer `firebase-ios-sdk`, declare your own `swiftPMDependencies` in your shared module. The Kotlin Gradle plugin merges them with the inherited ones. The first argument is the package URL, and `from(...)` accepts that version up to the next major:
+
 ```kotlin
-cocoapods {
-   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
+kotlin {
+    swiftPMDependencies {
+        swiftPackage(
+            url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+            version = from("12.17.0"),
+            products = listOf(product("FirebaseAppCheck")),
+        )
+    }
 }
 ```
+
+**CocoaPods, or linking Firebase yourself.** Because each module publishes its `firebase-ios-sdk` dependency, the Kotlin Gradle plugin fails the two integrations in which you added Firebase to Xcode yourself:
+
+- The Kotlin CocoaPods plugin: `syncFramework` fails in `checkSwiftPMDependencies` with "You are using CocoaPods integration with SwiftPM dependencies".
+- Direct integration when your Xcode project doesn't include the generated linkage package: the build fails with "SwiftPM linkage package not integrated into Xcode project".
+
+Both errors print the command that switches your Xcode project over (the `integrateEmbedAndSign` and `integrateLinkagePackage` tasks); see Kotlin's [CocoaPods to SwiftPM migration guide](https://kotl.in/cocoapods-to-swiftpm-migration). Then remove the Firebase pods from your Podfile, because linking Firebase through both CocoaPods and SwiftPM duplicates its symbols.
+
+See [documentation/ios-firebase-linking.md](documentation/ios-firebase-linking.md) for how the transitive metadata works and the product → Clang-module mapping.
+
+#### Crashlytics on iOS
+
+The Firebase iOS SDK has no API for recording a Kotlin exception, so on Apple targets `recordException` maps it onto what
+the SDK does have, and a few things look different from Android in the Crashlytics console:
+
+- **Issue title and stack trace.** The exception is recorded as a Crashlytics exception model, the way Kotlin/Native
+  crash reporters such as CrashKiOS do: its class is the issue name, its message the reason, and its stack frames are the
+  code addresses the Kotlin runtime captured. Crashlytics symbolicates those addresses from your Kotlin framework's dSYM,
+  so upload it along with your app's, for example with the Crashlytics run script pointed at the framework's dSYM or
+  with the `upload-symbols` tool from the SwiftPM checkout of `firebase-ios-sdk`
+  (`Crashlytics/upload-symbols -gsp GoogleService-Info.plist -p ios shared.framework.dSYM`). Without the dSYM the frames
+  show as addresses. Release builds of Kotlin frameworks keep enough debug information for function names; line numbers
+  need a debug build.
+- **First frame.** Kotlin/Native captures the stack trace inside the exception's constructor, so the frames through the
+  thrown class's own `<init>` are dropped and the first frame is the line that created the exception, which is also the
+  frame the console names the issue after once it is symbolicated.
+- **Causes.** Each cause follows the main stack after a `Caused by: <cause>` frame, with the frames it shares with the
+  stack above it trimmed, as a JVM stack trace prints them. The console shows one stack trace, not a chain of exceptions.
+- **Per-event keys.** The iOS SDK attaches per-event keys only to an `NSError`, which records the native stack of the
+  call that reported it rather than the Kotlin exception's frames. `recordException(exception, customKeys)` therefore
+  writes each key as a `🔑 key = value` log line immediately before recording the exception, so the keys appear in the
+  event's Logs tab instead of its Keys tab. Session-level keys set with `setCustomKey` and `setCustomKeys` work as on
+  Android.
+- **Uncaught exceptions.** This SDK does not install a Kotlin uncaught exception hook. An uncaught Kotlin exception
+  terminates the app through the Kotlin runtime, and Crashlytics reports that as a native crash with the runtime's
+  termination frames rather than the Kotlin stack trace; a crash reporter such as CrashKiOS fills that gap.
 
 ## Kotlin-first design
 
@@ -435,7 +484,7 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
+2. Make sure Xcode 26.2+ is installed with the iOS/tvOS platforms (CI uses 26.4.1, the newest Xcode Kotlin 2.4 is tested with; the Apple targets use Kotlin's Swift Package Manager integration, which requires Kotlin 2.4+; no CocoaPods installation is needed).
 3. Install the GitLive plugin into IntelliJ
 4. After a gradle sync then run `publishToMavenLocal`
 

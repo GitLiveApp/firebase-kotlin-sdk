@@ -4,8 +4,8 @@
 
 package com.google.firebase
 
-import cocoapods.FirebaseCore.FIRApp
-import cocoapods.FirebaseCore.FIROptions
+import swiftPMImport.dev.gitlive.firebase.app.FIRApp
+import swiftPMImport.dev.gitlive.firebase.app.FIROptions
 
 /** Configures the default app from `GoogleService-Info.plist`; the [context] is ignored. */
 public actual fun Firebase.initialize(context: Any?): FirebaseApp? {
