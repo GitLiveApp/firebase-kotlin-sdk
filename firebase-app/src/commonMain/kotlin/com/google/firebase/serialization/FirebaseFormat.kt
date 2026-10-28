@@ -61,6 +61,8 @@ public sealed class FirebaseFormat(
      * Converts [value] to plain values by its runtime type, as the Android SDK's mapper does with the `Object` given to
      * calls such as `DocumentReference.set(Object)`: plain values are checked and copied, the product's own value types
      * are passed through and any other object is encoded with the serializer of its class, which must be `@Serializable`.
+     * The type arguments of a generic class are erased at runtime, so such a value goes through [encodeToPlainValue],
+     * whose serializer knows them.
      */
     public fun convertToPlainValue(value: Any?): Any? = toPlatformLeaf(encodeRuntimeValue(this, value, ErrorPath.EMPTY))
 

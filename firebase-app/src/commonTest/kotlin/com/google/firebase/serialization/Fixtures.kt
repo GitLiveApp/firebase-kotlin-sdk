@@ -61,6 +61,9 @@ data class DocumentReference(val path: String)
 
 object ServerTimestampSentinel
 
+/** The platform SDK's own server timestamp sentinel, which the bindings convert [ServerTimestampSentinel] to. */
+object SdkServerTimestamp
+
 val firestore = FirebaseFormat.Firestore(
     object : FirebaseFormat.Firestore.Bindings {
         override val annotations = testAnnotations
@@ -69,8 +72,16 @@ val firestore = FirebaseFormat.Firestore(
         override fun documentId(documentReference: Any) = (documentReference as DocumentReference).path.substringAfterLast('/')
         override fun documentPath(documentReference: Any) = (documentReference as DocumentReference).path
         override fun serverTimestamp(): Any = ServerTimestampSentinel
-        override fun toSdkValue(value: Any): Any = if (value is Blob) SdkBlob(value.bytes) else value
-        override fun fromSdkValue(value: Any): Any = if (value is SdkBlob) Blob(value.bytes) else value
+        override fun toSdkValue(value: Any): Any = when (value) {
+            is Blob -> SdkBlob(value.bytes)
+            ServerTimestampSentinel -> SdkServerTimestamp
+            else -> value
+        }
+        override fun fromSdkValue(value: Any): Any = when (value) {
+            is SdkBlob -> Blob(value.bytes)
+            SdkServerTimestamp -> ServerTimestampSentinel
+            else -> value
+        }
     },
 )
 

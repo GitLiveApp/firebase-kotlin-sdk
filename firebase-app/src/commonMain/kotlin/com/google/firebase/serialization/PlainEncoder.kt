@@ -260,7 +260,7 @@ internal class ClassEncoder(format: FirebaseFormat, private val path: ErrorPath,
 
     override fun <T : Any> encodeNullableSerializableElement(descriptor: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) {
         if (value == null && mapping.serverTimestamp[index] && !mapping.excluded[index] && rules is Rules.Firestore) {
-            result[mapping.names[index]] = rules.bindings.serverTimestamp()
+            result[mapping.names[index]] = rules.writeNative(rules.bindings.serverTimestamp())
         } else {
             super.encodeNullableSerializableElement(descriptor, index, serializer, value)
         }

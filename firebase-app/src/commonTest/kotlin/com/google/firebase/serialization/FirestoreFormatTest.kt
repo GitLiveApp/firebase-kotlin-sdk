@@ -252,7 +252,9 @@ class FirestoreFormatTest {
 
     @Test
     fun writesTheServerTimestampForNull() {
-        assertPlain(mapOf("title" to "t", "created" to ServerTimestampSentinel), firestore.encodeToPlainValue(Post("ignored", "t")))
+        // The sentinel the bindings supply is converted to the SDK's like an explicitly supplied one
+        assertPlain(mapOf("title" to "t", "created" to SdkServerTimestamp), firestore.encodeToPlainValue(Post("ignored", "t")))
+        assertPlain(mapOf("created" to SdkServerTimestamp), firestore.convertToPlainValue(mapOf("created" to ServerTimestampSentinel)))
         val timestamp = Timestamp(1, 2)
         assertSame(timestamp, (toKotlin(firestore.encodeToPlainValue(Post(title = "t", created = timestamp))) as Map<*, *>)["created"])
         assertFailsWithMessage<IllegalArgumentException>(
