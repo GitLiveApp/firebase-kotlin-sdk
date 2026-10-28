@@ -112,18 +112,21 @@ class AndroidSdkSourceCompatTest {
         // Code written for the Android SDK reads the result as the collections the SDK deserializes JSON to; it must on every platform
         val sent = mapOf("text" to "a", "number" to 1.5, "flag" to true, "none" to null, "list" to listOf(1, "b", null), "nested" to mapOf("k" to listOf(mapOf("deep" to 2))))
         val data = functions.getHttpsCallable("echo").call(sent).await().data as Map<String, Any?>
-        assertEquals("a", data["text"])
-        assertEquals(1.5, (data["number"] as Number).toDouble())
-        assertEquals(true, data["flag"])
-        assertTrue(data.containsKey("none") && data["none"] == null, "none was ${data["none"]}")
+        fun found(key: String) = data[key].let { "$key was $it (${it?.let { value -> value::class.simpleName }}) in $data" }
+        assertEquals("a", data["text"], found("text"))
+        assertEquals(1.5, (data["number"] as Number).toDouble(), found("number"))
+        assertEquals(true, data["flag"], found("flag"))
+        assertTrue(data.containsKey("none") && data["none"] == null, found("none"))
         val list = data["list"] as List<Any?>
-        assertEquals(1, (list[0] as Number).toInt())
-        assertEquals("b", list[1])
-        assertEquals(null, list[2])
+        assertEquals(1, (list[0] as Number).toInt(), found("list"))
+        assertEquals("b", list[1], found("list"))
+        assertEquals(null, list[2], found("list"))
         val deep = ((data["nested"] as Map<String, Any?>)["k"] as List<Any?>)[0] as Map<String, Any?>
-        assertEquals(2, (deep["deep"] as Number).toInt())
+        assertEquals(2, (deep["deep"] as Number).toInt(), found("nested"))
         assertEquals("a", functions.getHttpsCallable("echo").call("a").await().data)
         assertEquals(null, functions.getHttpsCallable("echo").call(null).await().data)
+        // Call data the Android SDK's serializer rejects fails the Task with an IllegalArgumentException on every platform
+        assertFailsWith<IllegalArgumentException> { functions.getHttpsCallable("echo").call(mapOf(1 to 2)).await() }
     }
 
     @Test

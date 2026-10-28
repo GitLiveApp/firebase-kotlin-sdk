@@ -119,6 +119,9 @@ private inline fun task(start: () -> Promise<JsHttpsCallableResult>): Task<Https
     val source = TaskCompletionSource<HttpsCallableResult>()
     try {
         start().then({ source.setResult(HttpsCallableResult(it)) }, { source.setException(it.toFunctionsException()) })
+    } catch (e: IllegalArgumentException) {
+        // Call data the format rejects fails the Task with the format's exception, as the Android SDK's serializer does
+        source.setException(e)
     } catch (e: Throwable) {
         source.setException(e.toFunctionsException())
     }

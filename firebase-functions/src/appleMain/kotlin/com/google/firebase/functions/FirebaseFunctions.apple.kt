@@ -118,12 +118,17 @@ internal fun HttpsCallableOptions.toIos(): FIRHTTPSCallableOptions = FIRHTTPSCal
 
 private inline fun task(crossinline start: ((FIRHTTPSCallableResult?, NSError?) -> Unit) -> Unit): Task<HttpsCallableResult> {
     val source = TaskCompletionSource<HttpsCallableResult>()
-    start { result, error ->
-        if (error == null) {
-            source.setResult(HttpsCallableResult(requireNotNull(result) { "The iOS SDK completed a call with neither a result nor an error" }))
-        } else {
-            source.setException(error.toFunctionsException())
+    try {
+        start { result, error ->
+            if (error == null) {
+                source.setResult(HttpsCallableResult(requireNotNull(result) { "The iOS SDK completed a call with neither a result nor an error" }))
+            } else {
+                source.setException(error.toFunctionsException())
+            }
         }
+    } catch (e: Throwable) {
+        // Call data the format rejects fails the Task with the format's exception, as the Android SDK's serializer does
+        source.setException(e)
     }
     return source.task
 }
