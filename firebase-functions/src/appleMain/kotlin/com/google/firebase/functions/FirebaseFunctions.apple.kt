@@ -126,7 +126,7 @@ private inline fun task(crossinline start: ((FIRHTTPSCallableResult?, NSError?) 
                 source.setException(error.toFunctionsException())
             }
         }
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
         // Call data the format rejects fails the Task with the format's exception, as the Android SDK's serializer does
         source.setException(e)
     }
