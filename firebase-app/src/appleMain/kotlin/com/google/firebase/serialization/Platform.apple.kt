@@ -28,7 +28,8 @@ import platform.Foundation.arrayWithObject
 // (NSJSONSerialization writes it as the number 1). It writes through the CoreFoundation API, where a boolean is
 // Foundation's own kCFBooleanTrue/False, which Kotlin/Native would turn back into a Kotlin Boolean on any Kotlin-typed
 // reference to it; the Kotlin view of a collection keeps the Foundation object behind it, so a map the encoder re-opens
-// through [PlainMap.of] is written to the same way.
+// through [PlainMap.of] is written to the same way. A Boolean that is the whole plain value, with no collection to hold
+// it, stays a Kotlin Boolean and reaches the SDK as Kotlin/Native's number.
 
 internal actual fun platformLeaf(value: Any): Any? = if (value is NSNull) null else value
 

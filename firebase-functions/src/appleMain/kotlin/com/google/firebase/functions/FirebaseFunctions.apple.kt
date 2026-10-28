@@ -78,8 +78,17 @@ public actual class HttpsCallableReference internal constructor(private val crea
 
     public actual fun call(): Task<HttpsCallableResult> = task { completion -> ios.callWithCompletion { result, error -> completion(result, error) } }
 
-    /** The call data goes through the format, which applies the Android SDK's rules before the iOS SDK's serializer sees it. */
-    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { completion -> ios.callWithObject(functionsFormat.convertToPlainValue(data)) { result, error -> completion(result, error) } }
+    /**
+     * The call data goes through the format, which applies the Android SDK's rules before the iOS SDK's serializer sees
+     * it. A null goes through the no-data entry point: the iOS SDK's Objective-C one with data boxes a nil as a Swift
+     * Optional its serializer rejects, while both send the same JSON `null`.
+     */
+    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { completion ->
+        when (val plain = functionsFormat.convertToPlainValue(data)) {
+            null -> ios.callWithCompletion { result, error -> completion(result, error) }
+            else -> ios.callWithObject(plain) { result, error -> completion(result, error) }
+        }
+    }
 
     public actual val timeout: Long get() = (ios.timeoutInterval() * MILLIS_PER_SECOND).toLong()
 
