@@ -15,3 +15,5 @@ internal actual fun logWarning(tag: String, message: String) {
 
 // The Android SDK and firebase-java-sdk exchange Kotlin values.
 internal actual fun platformLeaf(value: Any): Any? = value
+
+internal actual fun toPlatformLeaf(value: Any?): Any? = value

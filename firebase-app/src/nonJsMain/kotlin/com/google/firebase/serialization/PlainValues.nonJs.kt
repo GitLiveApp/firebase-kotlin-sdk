@@ -5,9 +5,8 @@
 package com.google.firebase.serialization
 
 // The Android SDK, firebase-java-sdk and (through Kotlin/Native's interop with Foundation) the iOS SDK exchange Kotlin
-// collections, so the plain values are the Kotlin ones, and their Cloud Functions serializers wrap a Long themselves.
-
-internal actual fun toPlatformLeaf(value: Any?): Any? = value
+// collections, so the plain values are the Kotlin ones, with the leaves as [toPlatformLeaf] writes them, and their Cloud
+// Functions serializers wrap a Long themselves.
 
 internal actual val functionsSdkEncodesLongs: Boolean = true
 
@@ -24,7 +23,7 @@ internal actual class PlainMap private constructor(private val map: Map<*, *>) {
 
     @Suppress("UNCHECKED_CAST")
     actual operator fun set(key: String, element: Any?) {
-        (map as MutableMap<String, Any?>)[key] = element
+        (map as MutableMap<String, Any?>)[key] = toPlatformLeaf(element)
     }
 
     actual companion object {
@@ -44,7 +43,7 @@ internal actual class PlainList private constructor(private val list: List<*>) {
     actual operator fun set(index: Int, element: Any?) {
         val list = list as MutableList<Any?>
         while (list.size <= index) list.add(null)
-        list[index] = element
+        list[index] = toPlatformLeaf(element)
     }
 
     actual companion object {
