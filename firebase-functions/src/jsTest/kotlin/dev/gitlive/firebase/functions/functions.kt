@@ -7,6 +7,4 @@ package dev.gitlive.firebase.functions
 actual val emulatorHost: String = "localhost"
 actual val context: Any = Unit
 
-actual fun detailValue(details: Any?, key: String): Any? = details.asDynamic()[key]
-
 actual annotation class IgnoreForAndroidUnitTest

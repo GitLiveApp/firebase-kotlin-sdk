@@ -11,7 +11,4 @@ import androidx.test.platform.app.InstrumentationRegistry
 actual val emulatorHost: String = "10.0.2.2"
 actual val context: Any = InstrumentationRegistry.getInstrumentation().targetContext
 
-@Suppress("UNCHECKED_CAST")
-actual fun detailValue(details: Any?, key: String): Any? = (details as Map<Any?, Any?>)[key]
-
 actual annotation class IgnoreForAndroidUnitTest

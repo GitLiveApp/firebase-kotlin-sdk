@@ -10,8 +10,8 @@ package com.google.firebase.functions
  */
 public expect class HttpsCallableResult {
     /**
-     * The data returned by the function, deserialized from JSON: `null`, a `String`, a number, a `Boolean`, a `List`
-     * or a `Map` on Android, the JVM and Apple platforms; on JS the JS SDK's own value (a primitive, array or object).
+     * The data returned by the function, deserialized from JSON: `null`, a `String`, a number, a `Boolean`, a `List` or
+     * a `Map` with `String` keys, nested as the JSON was, on every platform.
      */
     public val data: Any?
 }

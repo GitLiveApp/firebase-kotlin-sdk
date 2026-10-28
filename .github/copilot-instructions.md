@@ -22,6 +22,7 @@ src/
   jsMain/       ← wraps Firebase JS SDK
   wasmJsMain/   ← wraps Firebase JS SDK for the wasmJs target (hand-mirrored from jsMain, see CLAUDE.md)
   jvmMain/      ← JVM desktop/server target (may map to src/androidMain/kotlin in some modules)
+  nonJsMain/    ← android + jvm + apple (the SDKs that exchange Kotlin collections), only in modules using utils.applyFirebaseHierarchy()
   nonJvmMain/   ← js + wasmJs + apple, only in modules using utils.applyFirebaseHierarchy()
   commonTest/   ← shared tests
   androidTest/

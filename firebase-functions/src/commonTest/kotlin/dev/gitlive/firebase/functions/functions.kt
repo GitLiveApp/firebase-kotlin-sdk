@@ -21,7 +21,9 @@ import kotlin.test.assertTrue
 
 expect val emulatorHost: String
 expect val context: Any
-expect fun detailValue(details: Any?, key: String): Any?
+
+/** [details] is a `Map` on every platform; its value for [key]. */
+fun detailValue(details: Any?, key: String): Any? = (details as Map<*, *>)[key]
 
 /** Android unit tests have no `Context` and no network, so the tests that need Firebase are skipped there. */
 expect annotation class IgnoreForAndroidUnitTest()

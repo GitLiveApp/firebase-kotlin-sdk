@@ -7,6 +7,7 @@ package com.google.firebase.functions
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
+import com.google.firebase.serialization.decodeFromPlainValue
 import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
@@ -17,6 +18,7 @@ import dev.gitlive.firebase.functions.externals.getFunctions
 import dev.gitlive.firebase.functions.externals.httpsCallable
 import dev.gitlive.firebase.functions.externals.httpsCallableFromURL
 import dev.gitlive.firebase.functions.externals.invoke
+import dev.gitlive.firebase.functions.functionsFormat
 import kotlin.js.Promise
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
@@ -79,7 +81,8 @@ public actual class HttpsCallableReference internal constructor(
 
     public actual fun call(): Task<HttpsCallableResult> = task { js() }
 
-    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { js(data.toJs()) }
+    /** The call data goes through the format, which applies the Android SDK's rules and writes the JS value the JS SDK takes. */
+    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { js(functionsFormat.convertToPlainValue(data)) }
 
     public actual val timeout: Long get() = timeoutMillis
 
@@ -100,7 +103,8 @@ public actual class HttpsCallableReference internal constructor(
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class HttpsCallableResult internal constructor(public val js: JsHttpsCallableResult) {
-    public actual val data: Any? get() = js.data
+    /** The JS SDK's value read through the format, so it holds the Kotlin collections [data] promises on every platform. */
+    public actual val data: Any? by lazy { functionsFormat.decodeFromPlainValue<Any?>(js.data) }
 
     override fun equals(other: Any?): Boolean = other is HttpsCallableResult && other.js == js
 
@@ -127,20 +131,12 @@ private inline fun <R> rethrow(function: () -> R): R = try {
     throw e.toFunctionsException()
 }
 
-/** Kotlin collections passed as call data become JS objects and arrays, as the JS SDK serializes them to JSON. */
-private fun Any?.toJs(): Any? = when (this) {
-    is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
-    is Collection<*> -> map { it.toJs() }.toTypedArray()
-    is Array<*> -> map { it.toJs() }.toTypedArray()
-    is Long -> toDouble()
-    else -> this
-}
-
 /** The JS SDK reports the canonical error code as `functions/<code-in-kebab-case>`. */
 private fun Throwable.toFunctionsException(): FirebaseFunctionsException {
     if (this is FirebaseFunctionsException) return this
     val jsCode = asDynamic().code.unsafeCast<String?>()
     val codeName = jsCode?.substringAfter('/')?.uppercase()?.replace('-', '_')
     val code = FirebaseFunctionsException.Code.entries.firstOrNull { it.name == codeName } ?: FirebaseFunctionsException.Code.UNKNOWN
-    return FirebaseFunctionsException(message ?: jsCode ?: "Unknown error", code, asDynamic().details.unsafeCast<Any?>(), this)
+    val details = functionsFormat.decodeFromPlainValue<Any?>(asDynamic().details.unsafeCast<Any?>())
+    return FirebaseFunctionsException(message ?: jsCode ?: "Unknown error", code, details, this)
 }

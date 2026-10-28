@@ -11,6 +11,7 @@ import dev.gitlive.firebase.internal.encode
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import com.google.firebase.functions.FirebaseFunctions as CompatFirebaseFunctions
@@ -34,10 +35,16 @@ public suspend inline operator fun <T> CompatHttpsCallableReference.invoke(strat
 public suspend operator fun CompatHttpsCallableReference.invoke(): CompatHttpsCallableResult = call().await()
 
 /** The [CompatHttpsCallableResult.data] deserialized as [T] with kotlinx.serialization. */
-public inline fun <reified T> CompatHttpsCallableResult.data(): T = decode<T>(value = data)
+public inline fun <reified T> CompatHttpsCallableResult.data(): T = data(serializer<T>())
 
 /** The [CompatHttpsCallableResult.data] deserialized with [strategy]. */
-public inline fun <T> CompatHttpsCallableResult.data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, data, buildSettings)
+public fun <T> CompatHttpsCallableResult.data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = decode(strategy, platformData, buildSettings)
+
+/**
+ * The result's data as the platform SDK returned it, which the `dev.gitlive` decoders take (on JS and wasmJs the JS
+ * value, which they read in place), where [CompatHttpsCallableResult.data] is the Kotlin collections the compat layer promises.
+ */
+internal expect val CompatHttpsCallableResult.platformData: Any?
 
 /**
  * FirebaseFunctions lets you call Cloud Functions for Firebase.
@@ -126,7 +133,7 @@ public class HttpsCallableResult(public val compat: CompatHttpsCallableResult) {
 
     public inline fun <reified T> data(): T = compat.data<T>()
 
-    public inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = compat.data(strategy, buildSettings)
+    public fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit = {}): T = compat.data(strategy, buildSettings)
 }
 
 /**

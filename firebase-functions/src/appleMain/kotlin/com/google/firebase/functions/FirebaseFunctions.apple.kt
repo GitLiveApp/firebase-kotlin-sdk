@@ -11,11 +11,12 @@ import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableResult
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
+import com.google.firebase.serialization.decodeFromPlainValue
 import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
+import dev.gitlive.firebase.functions.functionsFormat
 import platform.Foundation.NSError
-import platform.Foundation.NSNull
 import platform.Foundation.NSURL
 
 /** @property ios The underlying Firebase iOS SDK object. */
@@ -77,7 +78,8 @@ public actual class HttpsCallableReference internal constructor(private val crea
 
     public actual fun call(): Task<HttpsCallableResult> = task { completion -> ios.callWithCompletion { result, error -> completion(result, error) } }
 
-    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { completion -> ios.callWithObject(data) { result, error -> completion(result, error) } }
+    /** The call data goes through the format, which applies the Android SDK's rules before the iOS SDK's serializer sees it. */
+    public actual fun call(data: Any?): Task<HttpsCallableResult> = task { completion -> ios.callWithObject(functionsFormat.convertToPlainValue(data)) { result, error -> completion(result, error) } }
 
     public actual val timeout: Long get() = (ios.timeoutInterval() * MILLIS_PER_SECOND).toLong()
 
@@ -98,8 +100,8 @@ public actual class HttpsCallableReference internal constructor(private val crea
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class HttpsCallableResult internal constructor(public val ios: FIRHTTPSCallableResult) {
-    /** The iOS SDK keeps a JSON `null` result as `NSNull`; it is `null` here, as on the other platforms. */
-    public actual val data: Any? get() = ios.data().takeUnless { it is NSNull }
+    /** The iOS SDK's value read through the format: a JSON `null`, an `NSNull` at any depth there, is `null` here, as on the other platforms. */
+    public actual val data: Any? by lazy { functionsFormat.decodeFromPlainValue<Any?>(ios.data()) }
 
     override fun equals(other: Any?): Boolean = other is HttpsCallableResult && other.ios == ios
 
@@ -130,5 +132,5 @@ private inline fun task(crossinline start: ((FIRHTTPSCallableResult?, NSError?) 
 internal fun NSError.toFunctionsException(): FirebaseFunctionsException = FirebaseFunctionsException(
     localizedDescription,
     if (domain == FUNCTIONS_ERROR_DOMAIN) FirebaseFunctionsException.Code.fromValue(code.toInt()) else FirebaseFunctionsException.Code.UNKNOWN,
-    userInfo[FUNCTIONS_ERROR_DETAILS_KEY],
+    functionsFormat.decodeFromPlainValue<Any?>(userInfo[FUNCTIONS_ERROR_DETAILS_KEY]),
 )
