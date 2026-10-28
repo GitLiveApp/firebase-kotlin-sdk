@@ -7,6 +7,7 @@ package com.google.firebase.serialization
 import kotlinx.cinterop.toKString
 import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
+import platform.Foundation.numberWithBool
 
 // Kotlin/Native maps the iOS SDK's NSDictionary, NSArray, NSString and NSNumber values to Kotlin collections, strings,
 // numbers and booleans at the interop boundary, in both directions, with two exceptions the format bridges:
@@ -26,4 +27,4 @@ internal actual fun toPlatformLeaf(value: Any?): Any? = if (value is Boolean) NS
 // A Foundation boolean's objCType is "c" (a char) on arm64 and "B" (a BOOL) elsewhere; the Firestore iOS SDK reads both as
 // a boolean too, since no other value is encoded as a char in practice.
 private val NSNumber.isBoolean: Boolean
-    get() = objCType.toKString().let { it == "c" || it == "B" }
+    get() = objCType?.toKString().let { it == "c" || it == "B" }

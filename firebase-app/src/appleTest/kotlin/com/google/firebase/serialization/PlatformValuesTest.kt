@@ -11,6 +11,7 @@ import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
+import platform.Foundation.numberWithBool
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
