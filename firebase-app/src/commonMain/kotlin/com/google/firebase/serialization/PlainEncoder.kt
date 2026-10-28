@@ -43,12 +43,13 @@ internal fun encodeRuntimeValue(format: FirebaseFormat, value: Any?, path: Error
     val rules = format.rules
     rules.checkDepth(path)
     if (value == null) return null
+    if (value is Number) return rules.encodeNumber(value, path)
+    if (value is String || value is Boolean) return value
+    if (value is Char) rules.rejectChar(value, path)
+    // After the primitives: on JS a number is its own platform value, and a NaN is never identical to itself.
     val plain = platformValueToPlain(value)
     if (plain !== value) return encodeRuntimeValue(format, plain, path)
     return when {
-        value is Number -> rules.encodeNumber(value, path)
-        value is String || value is Boolean -> value
-        value is Char -> rules.rejectChar(value, path)
         value is Map<*, *> -> HashMap<String, Any?>().also { result ->
             for ((key, element) in value) {
                 if (key !is String) rules.rejectMapKey(path)
@@ -298,6 +299,9 @@ internal class PolymorphicEncoder(format: FirebaseFormat, private val path: Erro
         @Suppress("UNCHECKED_CAST")
         val map = value as? MutableMap<String, Any?>
             ?: throw rules.serializeError(path, "Polymorphic values must be classes, but ${type ?: descriptor.serialName} is not")
+        if (map.containsKey(POLYMORPHIC_TYPE)) {
+            throw rules.serializeError(path, "Property '$POLYMORPHIC_TYPE' of $type conflicts with the property that stores the subclass name of a polymorphic value")
+        }
         map[POLYMORPHIC_TYPE] = type
         sink(map)
     }

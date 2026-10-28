@@ -125,13 +125,14 @@ internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescri
             if (!seen.add(name)) {
                 throw rules.mappingError("Found conflicting getters for name ${getterName(descriptor.getElementName(index))} on class $className")
             }
+            if (!rules.beanNames) continue
             val lower = name.lowercase()
             val old = caseInsensitive.put(lower, name)
             if (old != null && old != name) {
                 throw rules.mappingError("Found two getters or fields with conflicting case sensitivity for property: $lower")
             }
         }
-        if (rules.requiresProperties && seen.isEmpty()) {
+        if (rules.requiresProperties && seen.isEmpty() && descriptor.kind != StructureKind.OBJECT) {
             throw rules.mappingError("No properties to serialize found on class $className")
         }
     }

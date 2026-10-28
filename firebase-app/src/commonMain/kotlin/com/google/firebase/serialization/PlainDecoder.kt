@@ -32,7 +32,7 @@ import kotlin.time.Instant
  */
 internal class PlainDecoder(
     private val format: FirebaseFormat,
-    private val value: Any?,
+    value: Any?,
     private val path: ErrorPath,
     private val documentReference: Any?,
     private val nullable: Boolean = false,
@@ -40,6 +40,9 @@ internal class PlainDecoder(
     private val ignoredKey: String? = null,
 ) : Decoder {
     private val rules = format.rules
+
+    /** The value to decode, read as a plain value when it is the platform SDK's (see [platformValueToPlain]). */
+    private val value: Any? = value.toPlainValue()
 
     override val serializersModule: SerializersModule get() = format.serializersModule
 
@@ -129,7 +132,7 @@ internal class PlainDecoder(
     override fun decodeInline(descriptor: SerialDescriptor): Decoder = this
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
-        val value = platformValueToPlain(value ?: fail("Failed to convert null to ${descriptor.baseName()}")) ?: fail("Failed to convert null to ${descriptor.baseName()}")
+        val value = value ?: fail("Failed to convert null to ${descriptor.baseName()}")
         return when (descriptor.kind) {
             StructureKind.CLASS, StructureKind.OBJECT -> {
                 val mapping = ClassMapping(format, descriptor)

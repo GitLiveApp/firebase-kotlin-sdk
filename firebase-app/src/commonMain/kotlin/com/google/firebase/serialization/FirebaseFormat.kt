@@ -80,16 +80,21 @@ public sealed class FirebaseFormat(
      * properties receive (its id for a [String] property); it is ignored by the other products. On JS and wasmJs
      * [value] may also be a value the JS SDK returned.
      */
-    public fun <T> decodeFromPlainValue(deserializer: DeserializationStrategy<T>, value: Any?, documentReference: Any? = null): T = PlainDecoder(this, value?.let(::platformValueToPlain), ErrorPath.EMPTY, documentReference).decodeSerializableValue(deserializer)
+    public fun <T> decodeFromPlainValue(deserializer: DeserializationStrategy<T>, value: Any?, documentReference: Any? = null): T = PlainDecoder(this, value, ErrorPath.EMPTY, documentReference).decodeSerializableValue(deserializer)
 
     /**
      * Decodes plain values to an instance of [type], found by its serializer, as the Android SDK's
-     * `CustomClassMapper.convertToCustomClass(Object, Class, DocumentReference)` does; `null` stays `null`.
+     * `CustomClassMapper.convertToCustomClass(Object, Class, DocumentReference)` does; `null` stays `null`. [Any] and
+     * the product's own value types are returned as they are, like `Object` and a `Timestamp` on Android.
      */
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> convertToCustomClass(value: Any?, type: KClass<T>, documentReference: Any? = null): T? {
         if (value == null) return null
-        return decodeFromPlainValue(serializerOf(type) as KSerializer<T>, value, documentReference)
+        val serializer = when {
+            type == Any::class || rules.isNativeType(type) -> ContextualSerializer(type)
+            else -> serializerOf(type) ?: throw rules.mappingError("Class ${type.simpleName} is not @Serializable")
+        }
+        return decodeFromPlainValue(serializer as KSerializer<T>, value, documentReference)
     }
 
     /**

@@ -27,9 +27,24 @@ internal expect fun platformValueToPlain(value: Any): Any?
  */
 internal expect fun plainValueToPlatform(value: Any?): Any?
 
-/** [platformValueToPlain] applied to a whole tree, for a value read into `Any`. */
-internal fun platformValueToPlainDeep(value: Any?): Any? = when (val plain = value?.let(::platformValueToPlain)) {
-    is Map<*, *> -> LinkedHashMap<Any?, Any?>(plain.size).also { result -> for ((key, element) in plain) result[key] = platformValueToPlainDeep(element) }
-    is List<*> -> plain.map(::platformValueToPlainDeep)
+/** [platformValueToPlain] for any value; Kotlin primitives, the usual leaves, skip the platform check. */
+internal fun Any?.toPlainValue(): Any? = when (this) {
+    null, is String, is Number, is Boolean -> this
+    else -> platformValueToPlain(this)
+}
+
+/** [toPlainValue] applied to a whole tree, for a value read into `Any`; a tree of plain values is returned as it is. */
+internal fun platformValueToPlainDeep(value: Any?): Any? = when (val plain = value.toPlainValue()) {
+    is Map<*, *> -> {
+        var changed = plain !== value
+        val result = LinkedHashMap<Any?, Any?>(plain.size)
+        for ((key, element) in plain) result[key] = platformValueToPlainDeep(element).also { if (it !== element) changed = true }
+        if (changed) result else plain
+    }
+    is List<*> -> {
+        var changed = plain !== value
+        val result = plain.map { element -> platformValueToPlainDeep(element).also { if (it !== element) changed = true } }
+        if (changed) result else plain
+    }
     else -> plain
 }
