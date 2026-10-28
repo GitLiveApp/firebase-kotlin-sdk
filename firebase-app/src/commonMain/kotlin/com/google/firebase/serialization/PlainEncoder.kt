@@ -36,13 +36,16 @@ internal fun SerialDescriptor.isArray() = kind == StructureKind.LIST && baseName
 
 /**
  * Converts a value to plain values by its runtime type: the counterpart of the Android SDK's
- * `CustomClassMapper.serialize(Object)` and Cloud Functions' `Serializer.encode(Object)`.
+ * `CustomClassMapper.serialize(Object)` and Cloud Functions' `Serializer.encode(Object)`. A value of the platform's SDK
+ * (a JS object on JS) is read through [platformValueToPlain] first, one level at a time.
  */
 internal fun encodeRuntimeValue(format: FirebaseFormat, value: Any?, path: ErrorPath): Any? {
     val rules = format.rules
     rules.checkDepth(path)
+    if (value == null) return null
+    val plain = platformValueToPlain(value)
+    if (plain !== value) return encodeRuntimeValue(format, plain, path)
     return when {
-        value == null -> null
         value is Number -> rules.encodeNumber(value, path)
         value is String || value is Boolean -> value
         value is Char -> rules.rejectChar(value, path)

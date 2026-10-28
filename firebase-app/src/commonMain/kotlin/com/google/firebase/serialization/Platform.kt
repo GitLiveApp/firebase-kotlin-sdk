@@ -11,3 +11,25 @@ internal expect fun javaClassNameOf(type: KClass<*>): String
 
 /** Logs a warning as the Android SDK's mappers do, with `android.util.Log.w` on Android. */
 internal expect fun logWarning(tag: String, message: String)
+
+/**
+ * Converts [value] when it is a value of this platform's Firebase SDK rather than a plain value, and returns it as it is
+ * otherwise. The Android, JVM and Apple SDKs return plain values, so there it is the identity. The JS SDK returns JS
+ * values: a JS primitive becomes its Kotlin counterpart and a JS object or array becomes a [Map] or [List] whose elements
+ * are still JS values, so a structure is converted one level at a time as the format reads it, in a single pass.
+ */
+internal expect fun platformValueToPlain(value: Any): Any?
+
+/**
+ * Converts plain values to what this platform's Firebase SDK accepts: the identity on Android, the JVM and Apple, whose
+ * SDKs take plain values; on JS and wasmJs a [Map] becomes a JS object, a [List] a JS array and a [Long] a JS number,
+ * recursively, and any other value is passed through.
+ */
+internal expect fun plainValueToPlatform(value: Any?): Any?
+
+/** [platformValueToPlain] applied to a whole tree, for a value read into `Any`. */
+internal fun platformValueToPlainDeep(value: Any?): Any? = when (val plain = value?.let(::platformValueToPlain)) {
+    is Map<*, *> -> LinkedHashMap<Any?, Any?>(plain.size).also { result -> for ((key, element) in plain) result[key] = platformValueToPlainDeep(element) }
+    is List<*> -> plain.map(::platformValueToPlainDeep)
+    else -> plain
+}

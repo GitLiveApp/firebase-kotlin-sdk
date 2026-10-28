@@ -12,3 +12,8 @@ internal actual fun javaClassNameOf(type: KClass<*>): String = type.java.name
 internal actual fun logWarning(tag: String, message: String) {
     Log.w(tag, message)
 }
+
+// The Android SDK and firebase-java-sdk return and accept plain values.
+internal actual fun platformValueToPlain(value: Any): Any? = value
+
+internal actual fun plainValueToPlatform(value: Any?): Any? = value

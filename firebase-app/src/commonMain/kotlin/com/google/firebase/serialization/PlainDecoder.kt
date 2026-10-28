@@ -129,7 +129,7 @@ internal class PlainDecoder(
     override fun decodeInline(descriptor: SerialDescriptor): Decoder = this
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
-        val value = value ?: fail("Failed to convert null to ${descriptor.baseName()}")
+        val value = platformValueToPlain(value ?: fail("Failed to convert null to ${descriptor.baseName()}")) ?: fail("Failed to convert null to ${descriptor.baseName()}")
         return when (descriptor.kind) {
             StructureKind.CLASS, StructureKind.OBJECT -> {
                 val mapping = ClassMapping(format, descriptor)
@@ -165,7 +165,7 @@ internal class PlainDecoder(
         if (descriptor.kind == SerialKind.CONTEXTUAL) {
             val type = descriptor.capturedKClass
             return when {
-                type == Any::class -> value as T
+                type == Any::class -> platformValueToPlainDeep(value) as T
                 type != null && rules.isNativeType(type) -> if (type.isInstance(value)) {
                     value as T
                 } else {
