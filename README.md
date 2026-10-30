@@ -102,8 +102,10 @@ initializeFirebase(Application())
 `Firebase.apps(context)` lists the initialised apps and `FirebaseApp.delete()` removes one. The default app is named
 `FirebaseApp.DEFAULT_APP_NAME` on every platform, even though the underlying SDKs use different names for it.
 
-Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)`: the same
-three overloads exist there with the context typed as `Any?`, following the rules above per platform.
+Code written against the Android SDK can keep using `com.google.firebase.Firebase.initialize(context, options)` and
+`FirebaseApp.initializeApp(context, options)` with the Android SDK's own signatures: the `context` is an `android.content.Context`,
+which the SDK provides as a placeholder class on the platforms that have none, so iOS, JS and Wasm code passes `Context()`.
+The rules above apply per platform.
 
 
 

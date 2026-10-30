@@ -20,13 +20,14 @@ SDK and the Firebase JS SDK.
 Most Firebase code moves to `commonMain` unchanged. Before you start, look for the few things that cannot cross the
 platform boundary; the compiler will find them for you in step 3, but it helps to know what to expect.
 
-1. **Android types in your own signatures.** `android.content.Context`, `java.util.Date` or `java.time.Instant` in a
-   class you are moving must become common types: the SDK takes the context as `Any?` and time as `kotlin.time.Instant`.
-2. **Members that take or return an Android type.** `FirebaseApp.initializeApp(Context)`, `getApps(Context)`,
-   `getApplicationContext()`, `FirebaseOptions.fromResource(Context)`, `Timestamp(Date)`, `Timestamp(Instant)`,
-   `toDate()` and `toInstant()` exist in common code but are deprecated with an error whose message names the
-   replacement, and where the replacement is a drop-in expression the IDE quick-fix applies it. Android code in
-   `androidMain` keeps calling them as before.
+1. **JVM time types in your own signatures.** `java.util.Date` or `java.time.Instant` in a class you are moving must
+   become `kotlin.time.Instant`. `android.content.Context` can stay: the SDK provides the class in common code (on the
+   platforms that have no context it is a placeholder that platform code creates with `Context()`), so the members that
+   take or return a context keep the Android SDK's exact signatures.
+2. **Members that take or return a JVM time type.** `Timestamp(Date)`, `Timestamp(Instant)`, `toDate()` and
+   `toInstant()` exist in common code but are deprecated with an error whose message names the replacement, and where
+   the replacement is a drop-in expression the IDE quick-fix applies it. Android code in `androidMain` keeps calling
+   them as before.
 3. **`Parcelable`.** `Timestamp` is `Parcelable` on Android only. Passing it through an `Intent` or `Bundle` stays in
    `androidMain`; a `@Parcelize` class of your own that holds a `Timestamp` field keeps working in common code, because
    the Parcelize plugin only runs in the Android compilation.
@@ -125,13 +126,13 @@ class FirebaseInstallationRepository(private val context: Context) {
 }
 ```
 
-Move the file to `shared/src/commonMain/kotlin/com/example/` and change the two Android types in its own signatures:
-the constructor takes the platform context as `Any?`, and the time conversions use `kotlin.time.Instant`. Nothing else
-is edited by hand:
+Move the file to `shared/src/commonMain/kotlin/com/example/` and change the one JVM type in its own signatures: the
+time conversions use `kotlin.time.Instant`. The `Context` stays, `android.content.Context` resolves in common code.
+Nothing else is edited by hand:
 
 ```kotlin
 // shared/src/commonMain/kotlin/com/example/FirebaseInstallationRepository.kt, after moving
-class FirebaseInstallationRepository(private val context: Any?) {
+class FirebaseInstallationRepository(private val context: Context) {
     // ...unchanged...
     fun stamp(instant: Instant): Timestamp = Timestamp(instant)
     fun toInstant(timestamp: Timestamp): Instant = timestamp.toInstant()
@@ -143,56 +144,50 @@ class FirebaseInstallationRepository(private val context: Any?) {
 > options, or annotate the file with `@OptIn(ExperimentalTime::class)`.
 
 Now compile the shared module for any target other than Android, for example `./gradlew :shared:compileKotlinIosSimulatorArm64`.
-Every remaining Android-only member is reported as an error that tells you what to use instead:
+Every remaining JVM-only member is reported as an error that tells you what to use instead:
 
 ```
-e: FirebaseInstallationRepository.kt: 'fun getApps(context: Any?): List<FirebaseApp>' is deprecated. getApps takes an android.content.Context and can only be called from Android code; use Firebase.getApps(context) from common code (the context is ignored on the other platforms).
-e: FirebaseInstallationRepository.kt: 'fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp' is deprecated. initializeApp takes an android.content.Context and can only be called from Android code; use Firebase.initialize(context) from common code (the context is ignored on the other platforms).
-e: FirebaseInstallationRepository.kt: 'fun fromResource(context: Any?): FirebaseOptions?' is deprecated. fromResource takes an android.content.Context and can only be called from Android code; use Firebase.fromResource(context) from common code, which reads the platform's default configuration (the context is ignored on the other platforms).
 e: FirebaseInstallationRepository.kt: Return type mismatch: expected 'Instant', actual 'Any'.
 e: FirebaseInstallationRepository.kt: 'fun toInstant(): Any' is deprecated. toInstant returns a java.time.Instant, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds.
 ```
 
-Note what is *not* reported. `Timestamp(instant)` compiles as it is: with a `kotlin.time.Instant` argument the call
-resolves to the SDK's top-level `Timestamp(Instant)` function rather than the deprecated `Timestamp(Date)` constructor,
-so changing the parameter type was the whole migration for that line. Everything else the compiler did not flag, the
-`Task` API, the listeners, `getInstance()`, `InstallationTokenResult` and `kotlinx.coroutines.tasks.await`, already
-works on every platform.
+Note what is *not* reported. `FirebaseApp.getApps(context)`, `FirebaseApp.initializeApp(context, options)` and
+`FirebaseOptions.fromResource(context)` compile unchanged: they take an `android.content.Context` on every platform.
+`Timestamp(instant)` compiles as it is: with a `kotlin.time.Instant` argument the call resolves to the SDK's top-level
+`Timestamp(Instant)` function rather than the deprecated `Timestamp(Date)` constructor, so changing the parameter type
+was the whole migration for that line. Everything else the compiler did not flag, the `Task` API, the listeners,
+`getInstance()`, `InstallationTokenResult` and `kotlinx.coroutines.tasks.await`, already works on every platform.
 
 ## Step 4: Apply the replacements
 
-Each deprecation above carries a `ReplaceWith`, so in IntelliJ IDEA or Android Studio put the caret on the red call,
-press `Alt+Enter` (`⌥⏎` on macOS) and choose **Replace with 'Firebase.initialize(context, options)'**, or run
-**Code | Inspect Code** and apply the "Deprecated API usage" fixes in bulk. The imports are added for you, and the
-return type mismatch disappears with the `toKotlinInstant()` fix.
+The deprecation above carries a `ReplaceWith`, so in IntelliJ IDEA or Android Studio put the caret on the red call,
+press `Alt+Enter` (`⌥⏎` on macOS) and choose **Replace with 'toKotlinInstant()'**, or run **Code | Inspect Code** and
+apply the "Deprecated API usage" fixes in bulk. The import is added for you, and the return type mismatch disappears
+with it.
 
-The rule behind the replacements is the same every time: a member of a Java class that only needs its `Context`
-widened moves onto the `Firebase` object under the same name (`Firebase.getApps`, `Firebase.fromResource`, and the
-`Firebase.initialize` extensions the Android SDK already has), and the JVM time types get a `kotlin.time.Instant`
-counterpart (`Timestamp(Instant)`, `Timestamp.toKotlinInstant()`). After the quick-fixes the class reads:
+The rule behind the replacements is the same every time: a JVM time type gets a `kotlin.time.Instant` counterpart
+(`Timestamp(Instant)`, `Timestamp.toKotlinInstant()`). After the quick-fix the class reads:
 
 ```kotlin
 // shared/src/commonMain/kotlin/com/example/FirebaseInstallationRepository.kt, after
 package com.example
 
+import android.content.Context
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
-import com.google.firebase.fromResource
-import com.google.firebase.getApps
-import com.google.firebase.initialize
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
 import com.google.firebase.toKotlinInstant
 import kotlinx.coroutines.tasks.await
 import kotlin.time.Instant
 
-class FirebaseInstallationRepository(private val context: Any?) {
+class FirebaseInstallationRepository(private val context: Context) {
 
     fun ensureInitialized(): FirebaseApp =
-        Firebase.getApps(context).firstOrNull()
-            ?: Firebase.initialize(context, Firebase.fromResource(context)!!)
+        FirebaseApp.getApps(context).firstOrNull()
+            ?: FirebaseApp.initializeApp(context, FirebaseOptions.fromResource(context)!!)
 
     fun installationId(): Task<String> = FirebaseInstallations.getInstance().getId()
 
@@ -215,34 +210,32 @@ class FirebaseInstallationRepository(private val context: Any?) {
 
 This is exactly the code compiled while writing this guide, for JS, the JVM and both Android test compilations.
 
-The replacements are real functions on every platform, not stubs: on Android `Firebase.getApps(context)` calls
-`FirebaseApp.getApps(Context)` with the context you passed, on iOS it lists the configured `FIRApp`s and ignores the
-context, and `Firebase.fromResource` reads `google-services.json` resources on Android, `GoogleService-Info.plist` on iOS,
-and returns `null` on JS and Wasm, where there is no default configuration.
+The `Context` members are implemented on every platform: on Android and the JVM they are the real SDK statics with the
+context you passed, on iOS `getApps` lists the configured `FIRApp`s and ignores the context, and `fromResource` reads
+`google-services.json` resources on Android, `GoogleService-Info.plist` on iOS, and returns `null` on JS and Wasm, where
+there is no default configuration. `getApplicationContext()` returns the application context on Android and the JVM and
+a placeholder `Context` elsewhere.
 
-Two members have no multiplatform replacement:
-
-- `FirebaseApp.getApplicationContext()` returns an Android `Context`. Code that needs it belongs in `androidMain`, where
-  the real member is available unchanged; from common code, pass the context you already have.
-- The `Parcelable` members of `Timestamp` (`writeToParcel`, `describeContents`, `CREATOR`) are not declared. See the checklist.
+One group of members has no multiplatform replacement: the `Parcelable` members of `Timestamp` (`writeToParcel`,
+`describeContents`, `CREATOR`) are not declared. See the checklist.
 
 > Code left in `androidMain` never sees the deprecations: the Android compilation binds to the Firebase Android SDK's own
-> classes, where `initializeApp(Context)` and the others are the real, undeprecated members.
+> classes, where `Timestamp(Date)` and the others are the real, undeprecated members.
 
 ## Step 5: Initialise Firebase on each platform
 
-`ensureInitialized()` above is now callable from every platform's entry point, with whatever that platform has as a
-context:
+`ensureInitialized()` above is now callable from every platform's entry point. Android passes its context; the other
+platforms have none, so they create the placeholder the SDK provides, `android.content.Context()`:
 
 ```kotlin
 // androidMain: only needed without the Google Services plugin, which initialises the default app itself
 FirebaseInstallationRepository(applicationContext).ensureInitialized()
 
-// iosMain, from the app delegate or the SwiftUI App init (Firebase.fromResource reads GoogleService-Info.plist)
-FirebaseInstallationRepository(null).ensureInitialized()
+// iosMain, from the app delegate or the SwiftUI App init (FirebaseOptions.fromResource reads GoogleService-Info.plist)
+FirebaseInstallationRepository(Context()).ensureInitialized()
 
 // jsMain and wasmJsMain: there is no default configuration, so pass options explicitly
-Firebase.initialize(null, FirebaseOptions.Builder().setApiKey("AIza...").setApplicationId("1:846484016111:web:abc123").setProjectId("fir-kotlin-sdk").build())
+FirebaseApp.initializeApp(Context(), FirebaseOptions.Builder().setApiKey("AIza...").setApplicationId("1:846484016111:web:abc123").setProjectId("fir-kotlin-sdk").build())
 ```
 
 The [Initialization](../README.md#initialization) section of the README has the full per-platform table, including the JVM.

@@ -131,19 +131,21 @@ The SDK has two public API layers per module:
    the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
    A declaration that is identical on every platform (the `Task` listener interfaces, `FidListener`) is plain common code
    rather than expect/actual: it is compiled, verified and stripped on Android/JVM like a stub and is real code elsewhere.
-   Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
-   widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
-   members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a
-   package-private Java helper (`firebase-app/src/androidMain/java`). The one exception to the signature rule is a member
-   annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be called, so an
-   Android-only member (`FirebaseApp.initializeApp(Context)`, `FirebaseOptions.fromResource`, `Timestamp(Date)`) can be mirrored
-   with the platform type widened to `Any` and a message naming the multiplatform replacement (messages live in
+   Consequences: an expect may only declare members the real class has with the same JVM signature, enum constants keep the
+   SDK's order, and this module's own code must not call a stub's companion members (they compile to `Companion` calls): use
+   the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`, whose stubs are named into the SDK's own facade
+   class, e.g. `FirebaseKt`) or a package-private Java helper (`firebase-app/src/androidMain/java`). A platform type in an SDK
+   signature gets a **stand-in class** in `commonMain` under its own package, a header stub like the rest: `android.content.Context`
+   (`firebase-app/src/commonMain/kotlin/android/content/Context.kt`) is a constructible placeholder on Apple/JS/wasmJs, since
+   an app's common code passes its context through, so `FirebaseApp.initializeApp(Context)`, `getApps(Context)`,
+   `getApplicationContext()`, `FirebaseOptions.fromResource(Context)` and `Firebase.initialize(Context)` keep the SDK's exact
+   signatures and are callable from common code (platform code without a context passes `Context()`). The one exception to the
+   signature rule is a member annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be
+   called, so a member whose type has no sensible stand-in (`Timestamp(Date)`, `toDate()`, `toInstant()`) can be mirrored with the
+   type widened to `Any` and a message naming the multiplatform replacement (messages live in
    `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`); Android code still binds to the real member.
-   When the replacement is a static member that only needs its `Context` widened, it moves onto `Firebase` under the same
-   name as a shipped top-level function (`Firebase.getApps(context)`, `Firebase.fromResource(context)`, next to
-   `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
-   get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
-   `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
+   JVM-only types get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant`
+   in `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS/wasmJs goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
