@@ -4,19 +4,40 @@
 
 package dev.gitlive.firebase.auth
 
-import com.google.firebase.auth.js as compatJs
+import com.google.firebase.auth.AdditionalUserInfoImpl
+import com.google.firebase.auth.AuthResultImpl
+import com.google.firebase.auth.FirebaseUserImpl
+import com.google.firebase.auth.FirebaseUserMetadataImpl
+import com.google.firebase.auth.MultiFactorImpl
+import com.google.firebase.auth.MultiFactorResolverImpl
+import com.google.firebase.auth.MultiFactorSessionImpl
+import com.google.firebase.auth.NativeGetTokenResult
+import com.google.firebase.auth.UserInfoImpl
 import com.google.firebase.auth.phoneCredential
 import com.google.firebase.auth.setApplicationVerifier
+import com.google.firebase.auth.toCompat
 import dev.gitlive.firebase.auth.externals.ApplicationVerifier
 import dev.gitlive.firebase.auth.externals.Auth
+import dev.gitlive.firebase.auth.externals.IdTokenResult
+import dev.gitlive.firebase.auth.externals.MultiFactorUser
 import dev.gitlive.firebase.auth.externals.User
+import dev.gitlive.firebase.auth.externals.UserMetadata
 import kotlinx.coroutines.CompletableDeferred
 import com.google.firebase.auth.FirebaseAuth as CompatFirebaseAuth
 import com.google.firebase.auth.PhoneAuthOptions as CompatPhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider as CompatPhoneAuthProvider
+import com.google.firebase.auth.js as compatJs
+import dev.gitlive.firebase.auth.externals.AdditionalUserInfo as JsAdditionalUserInfo
 import dev.gitlive.firebase.auth.externals.AuthCredential as JsAuthCredential
+import dev.gitlive.firebase.auth.externals.AuthResult as JsAuthResult
+import dev.gitlive.firebase.auth.externals.MultiFactorAssertion as JsMultiFactorAssertion
+import dev.gitlive.firebase.auth.externals.MultiFactorInfo as JsMultiFactorInfo
+import dev.gitlive.firebase.auth.externals.MultiFactorResolver as JsMultiFactorResolver
+import dev.gitlive.firebase.auth.externals.MultiFactorSession as JsMultiFactorSession
+import dev.gitlive.firebase.auth.externals.OAuthProvider as JsOAuthProvider
+import dev.gitlive.firebase.auth.externals.UserInfo as JsUserInfo
 
-/** The underlying Firebase JS SDK object. */
+/** The Firebase JS SDK object this wraps. */
 public val FirebaseAuth.js: Auth get() = compat.js
 
 /** The [FirebaseAuth] of the JS SDK's [js]. */
@@ -24,7 +45,44 @@ public fun FirebaseAuth(js: Auth): FirebaseAuth = FirebaseAuth(CompatFirebaseAut
 
 public val FirebaseUser.js: User get() = compat.js
 
+public val UserInfo.js: JsUserInfo
+    get() = when (val info = compat) {
+        is FirebaseUserImpl -> info.js
+        else -> (info as UserInfoImpl).native as JsUserInfo
+    }
+
+public val UserMetaData.js: UserMetadata get() = (compat as FirebaseUserMetadataImpl).native as UserMetadata
+
+/** The JS SDK's result; the result of `unlink`, which the SDK reports as a user, has none. */
+public val AuthResult.js: JsAuthResult get() = checkNotNull((compat as AuthResultImpl).native) { "unlink has no UserCredential" } as JsAuthResult
+
+public val AdditionalUserInfo.js: JsAdditionalUserInfo get() = (compat as AdditionalUserInfoImpl).native as JsAdditionalUserInfo
+
+public val AuthTokenResult.js: IdTokenResult get() = (compat as NativeGetTokenResult).native as IdTokenResult
+
 public val AuthCredential.js: JsAuthCredential get() = compat.compatJs
+
+/** The [AuthCredential] of the JS SDK's [js], e.g. one obtained from a provider SDK. */
+public fun AuthCredential(js: JsAuthCredential): AuthCredential = AuthCredential(js.toCompat())
+
+public val MultiFactor.js: MultiFactorUser get() = (compat as MultiFactorImpl).js
+
+public val MultiFactorInfo.js: JsMultiFactorInfo get() = compat.native as JsMultiFactorInfo
+
+public val MultiFactorAssertion.js: JsMultiFactorAssertion get() = compat.native as JsMultiFactorAssertion
+
+public val MultiFactorSession.js: JsMultiFactorSession get() = (compat as MultiFactorSessionImpl).native as JsMultiFactorSession
+
+public val MultiFactorResolver.js: JsMultiFactorResolver get() = (compat as MultiFactorResolverImpl).js
+
+/** The JS SDK's provider configured as this one. */
+public val OAuthProvider.js: JsOAuthProvider
+    get() = JsOAuthProvider(compat.providerId).apply {
+        compat.scopes.forEach { addScope(it) }
+        setCustomParameters(compat.customParameters.toJsParameters())
+    }
+
+private fun Map<String, String>.toJsParameters(): Map<String, String> = this
 
 public actual class PhoneAuthProvider(private val createOptionsBuilder: () -> CompatPhoneAuthOptions.Builder) {
 

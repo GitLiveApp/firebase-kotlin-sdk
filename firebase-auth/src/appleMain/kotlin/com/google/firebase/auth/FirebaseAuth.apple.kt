@@ -213,7 +213,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
 
     public actual fun getIdToken(forceRefresh: Boolean): Task<GetTokenResult> = task(auth) { completion ->
         ios.getIDTokenResultForcingRefresh(forceRefresh) { result, error ->
-            completion(result?.let { GetTokenResult(it.token(), it.claims().entries.associate { (key, value) -> key.toString() to value.toKotlinValue() }) }, error)
+            completion(result?.let { NativeGetTokenResult(it.token(), it.claims().entries.associate { (key, value) -> key.toString() to value.toKotlinValue() }, it) }, error)
         }
     }
 
@@ -281,7 +281,7 @@ internal class FirebaseUserImpl(override val ios: FIRUser, override val auth: Fi
     override val photoUrl: Uri? get() = ios.photoURL()?.absoluteString?.let(Uri::parse)
     override val tenantId: String? get() = ios.tenantID()
     override val isAnonymous: Boolean get() = ios.anonymous()
-    override val metadata: FirebaseUserMetadata? get() = ios.metadata().let { FirebaseUserMetadataImpl(it.creationDate().toTimestamp(), it.lastSignInDate().toTimestamp()) }
+    override val metadata: FirebaseUserMetadata? get() = ios.metadata().let { FirebaseUserMetadataImpl(it.creationDate().toTimestamp(), it.lastSignInDate().toTimestamp(), it) }
     override val multiFactor: MultiFactor get() = ios.compatMultiFactor(auth)
     override val providerData: List<UserInfo> get() = ios.providerData().mapNotNull { info -> (info as? FIRUserInfoProtocol)?.toCompat() }
 }
@@ -291,7 +291,7 @@ internal expect fun FIRUser.updatePhoneNumberCompat(credential: PhoneAuthCredent
 
 internal expect fun FIRUser.compatMultiFactor(auth: FirebaseAuth): MultiFactor
 
-private fun FIRUserInfoProtocol.toCompat(): UserInfo = UserInfoImpl(uid(), providerID(), displayName(), email(), phoneNumber(), false, photoURL()?.absoluteString?.let(Uri::parse))
+private fun FIRUserInfoProtocol.toCompat(): UserInfo = UserInfoImpl(uid(), providerID(), displayName(), email(), phoneNumber(), false, photoURL()?.absoluteString?.let(Uri::parse), this)
 
 internal fun NSDate?.toTimestamp(): Long = this?.let { (it.timeIntervalSince1970 * 1000).toLong() } ?: 0L
 
@@ -323,6 +323,7 @@ internal fun FIRAuthDataResult.toCompat(auth: FirebaseAuth): AuthResult = AuthRe
     FirebaseUserImpl(user(), auth),
     credential()?.toCompat(),
     additionalUserInfo()?.toCompat(),
+    this,
 )
 
 private fun FIRAdditionalUserInfo.toCompat(): AdditionalUserInfo = AdditionalUserInfoImpl(
@@ -330,6 +331,7 @@ private fun FIRAdditionalUserInfo.toCompat(): AdditionalUserInfo = AdditionalUse
     username(),
     profile()?.entries?.associate { (key, value) -> key.toString() to value.toKotlinValue() },
     newUser(),
+    this,
 )
 
 private fun FIRActionCodeInfo.toCompat(): ActionCodeResult {

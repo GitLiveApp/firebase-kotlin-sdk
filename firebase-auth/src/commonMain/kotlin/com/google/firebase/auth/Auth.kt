@@ -8,6 +8,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 
 /*
+ * The builders are reached through the AuthInternals bridges rather than the companion objects: this facade is shipped on the
+ * JVM, where firebase-java-sdk's OAuthProvider is a Java class without a Companion field.
+ */
+
+/*
  * The Kotlin extensions of the Android SDK's firebase-auth (AuthKt), as plain common code: on Android and the JVM the
  * facade is a header stub that is stripped, so the SDK's own binds.
  */
@@ -20,16 +25,16 @@ public val Firebase.auth: FirebaseAuth
 public fun Firebase.auth(app: FirebaseApp): FirebaseAuth = FirebaseAuth.getInstance(app)
 
 /** [ActionCodeSettings] built with [init], as the Android SDK's `actionCodeSettings`. */
-public fun actionCodeSettings(init: ActionCodeSettings.Builder.() -> Unit): ActionCodeSettings = ActionCodeSettings.newBuilder().apply(init).build()
+public fun actionCodeSettings(init: ActionCodeSettings.Builder.() -> Unit): ActionCodeSettings = actionCodeSettingsBuilder().apply(init).build()
 
 /** An [OAuthProvider] for [providerId] built with [init], as the Android SDK's `oAuthProvider`. */
-public fun oAuthProvider(providerId: String, init: OAuthProvider.Builder.() -> Unit): OAuthProvider = OAuthProvider.newBuilder(providerId).apply(init).build()
+public fun oAuthProvider(providerId: String, init: OAuthProvider.Builder.() -> Unit): OAuthProvider = oAuthProviderBuilder(providerId, FirebaseAuth.getInstance()).apply(init).build()
 
 /** An [OAuthProvider] for [providerId] and [firebaseAuth] built with [init], as the Android SDK's `oAuthProvider`. */
-public fun oAuthProvider(providerId: String, firebaseAuth: FirebaseAuth, init: OAuthProvider.Builder.() -> Unit): OAuthProvider = OAuthProvider.newBuilder(providerId, firebaseAuth).apply(init).build()
+public fun oAuthProvider(providerId: String, firebaseAuth: FirebaseAuth, init: OAuthProvider.Builder.() -> Unit): OAuthProvider = oAuthProviderBuilder(providerId, firebaseAuth).apply(init).build()
 
 /** An OAuth [AuthCredential] for [providerId] built with [init], as the Android SDK's `oAuthCredential`. */
-public fun oAuthCredential(providerId: String, init: OAuthProvider.CredentialBuilder.() -> Unit): AuthCredential = OAuthProvider.newCredentialBuilder(providerId).apply(init).build()
+public fun oAuthCredential(providerId: String, init: OAuthProvider.CredentialBuilder.() -> Unit): AuthCredential = oAuthCredentialBuilder(providerId).apply(init).build()
 
 /** A [UserProfileChangeRequest] built with [init], as the Android SDK's `userProfileChangeRequest`. */
 public fun userProfileChangeRequest(init: UserProfileChangeRequest.Builder.() -> Unit): UserProfileChangeRequest = UserProfileChangeRequest.Builder().apply(init).build()

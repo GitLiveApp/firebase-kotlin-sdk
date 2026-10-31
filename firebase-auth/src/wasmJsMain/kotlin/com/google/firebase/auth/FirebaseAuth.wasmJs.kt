@@ -250,7 +250,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     public actual fun delete(): Task<Nothing?> = write(auth) { deleteUser(js) }
 
     public actual fun getIdToken(forceRefresh: Boolean): Task<GetTokenResult> = task(auth, { getIdTokenResult(js, forceRefresh) }) { result ->
-        GetTokenResult(result.token, result.claims.toKotlinValue() as Map<String, Any?>)
+        NativeGetTokenResult(result.token, result.claims.toKotlinValue() as Map<String, Any?>, result)
     }
 
     public actual fun linkWithCredential(credential: AuthCredential): Task<AuthResult> = task(auth, { linkWithCredential(js, credential.js) }) { toAuthResult(it, auth) }
@@ -302,12 +302,12 @@ internal class FirebaseUserImpl(override val js: User, override val auth: Fireba
     override val photoUrl: Uri? get() = js.photoURL?.let(Uri::parse)
     override val tenantId: String? get() = js.tenantId
     override val isAnonymous: Boolean get() = js.isAnonymous
-    override val metadata: FirebaseUserMetadata? get() = FirebaseUserMetadataImpl(js.metadata.creationTime.toTimestamp(), js.metadata.lastSignInTime.toTimestamp())
+    override val metadata: FirebaseUserMetadata? get() = js.metadata.let { FirebaseUserMetadataImpl(it.creationTime.toTimestamp(), it.lastSignInTime.toTimestamp(), it) }
     override val multiFactor: MultiFactor get() = MultiFactorImpl(multiFactor(js), auth)
     override val providerData: List<UserInfo> get() = js.providerData.toList().map { it.toCompat() }
 }
 
-private fun JsUserInfo.toCompat(): UserInfo = UserInfoImpl(uid, providerId, displayName, email, phoneNumber, false, photoURL?.let(Uri::parse))
+private fun JsUserInfo.toCompat(): UserInfo = UserInfoImpl(uid, providerId, displayName, email, phoneNumber, false, photoURL?.let(Uri::parse), this)
 
 private fun String?.toTimestamp(): Long = this?.let { parseDateStringToMillis(it).toLong() } ?: 0L
 
@@ -367,7 +367,8 @@ private fun JsOAuthCredential.toCompat(): OAuthCredential = OAuthCredentialImpl(
 internal fun toAuthResult(result: JsAuthResult, auth: FirebaseAuth): AuthResult = AuthResultImpl(
     result.user?.let { FirebaseUserImpl(it, auth) },
     runCatching { JsOAuthProvider.credentialFromResult(result as UserCredential) }.getOrNull()?.toCompat(),
-    getAdditionalUserInfo(result as UserCredential)?.let { AdditionalUserInfoImpl(it.providerId, it.username, it.profile?.toKotlinValue() as Map<String, Any?>?, it.isNewUser) },
+    getAdditionalUserInfo(result as UserCredential)?.let { AdditionalUserInfoImpl(it.providerId, it.username, it.profile?.toKotlinValue() as Map<String, Any?>?, it.isNewUser, it) },
+    result,
 )
 
 /** A JS object of the non-null [pairs]; the JS SDK takes an absent key, not null, for an unset option. */

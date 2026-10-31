@@ -142,7 +142,10 @@ public actual class OAuthProvider internal constructor(
         private var rawNonce: String? = null
 
         public actual fun setAccessToken(accessToken: String): CredentialBuilder = apply { this.accessToken = accessToken }
-        public actual fun setIdToken(idToken: String): CredentialBuilder = apply { this.idToken = idToken }
+        public actual fun setIdToken(idToken: String): CredentialBuilder = apply {
+            this.idToken = idToken
+            rawNonce = null
+        }
         public actual fun setIdTokenWithRawNonce(idToken: String, rawNonce: String): CredentialBuilder = apply {
             this.idToken = idToken
             this.rawNonce = rawNonce

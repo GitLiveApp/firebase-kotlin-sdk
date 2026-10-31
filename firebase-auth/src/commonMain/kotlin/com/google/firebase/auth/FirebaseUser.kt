@@ -127,7 +127,7 @@ public interface SignInMethodQueryResult {
  * @property token The JWT, or null when unavailable.
  * @property claims The claims of the token, including the custom claims.
  */
-public class GetTokenResult(public val token: String?, public val claims: Map<String, Any?>) {
+public open class GetTokenResult(public val token: String?, public val claims: Map<String, Any?>) {
     /** When the token expires, in seconds since the epoch. */
     public val expirationTimestamp: Long get() = claims.long("exp")
 

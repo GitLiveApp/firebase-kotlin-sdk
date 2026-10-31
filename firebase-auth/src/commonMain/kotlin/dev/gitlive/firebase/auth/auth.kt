@@ -107,8 +107,9 @@ public class FirebaseAuth internal constructor(public val compat: CompatFirebase
             CompatActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL -> (result.info as ActionCodeEmailInfo).run {
                 ActionCodeResult.VerifyBeforeChangeEmail(email, previousEmail)
             }
-            CompatActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
-                ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
+            // the iOS SDK reports the email of a second factor revert but not the factor
+            CompatActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> result.info!!.run {
+                ActionCodeResult.RevertSecondFactorAddition(email, (this as? ActionCodeMultiFactorInfo)?.multiFactorInfo?.let { MultiFactorInfo(it) })
             }
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T

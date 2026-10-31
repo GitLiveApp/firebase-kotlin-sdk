@@ -32,6 +32,7 @@ import com.google.firebase.auth.MultiFactorAssertion as AndroidMultiFactorAssert
 import com.google.firebase.auth.MultiFactorInfo as AndroidMultiFactorInfo
 import com.google.firebase.auth.MultiFactorResolver as AndroidMultiFactorResolver
 import com.google.firebase.auth.MultiFactorSession as AndroidMultiFactorSession
+import com.google.firebase.auth.OAuthCredential as AndroidOAuthCredential
 import com.google.firebase.auth.OAuthProvider as AndroidOAuthProvider
 import com.google.firebase.auth.PhoneAuthCredential as AndroidPhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider as AndroidPhoneAuthProvider
@@ -51,6 +52,10 @@ public val AdditionalUserInfo.android: AndroidAdditionalUserInfo get() = compat
 public val AuthTokenResult.android: AndroidGetTokenResult get() = compat
 
 public val AuthCredential.android: AndroidAuthCredential get() = compat
+
+public val PhoneAuthCredential.android: AndroidPhoneAuthCredential get() = compat
+
+public val OAuthCredential.android: AndroidOAuthCredential get() = compat
 
 public val OAuthProvider.android: AndroidOAuthProvider get() = compat
 

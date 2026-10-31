@@ -24,13 +24,19 @@ internal class UserInfoImpl(
     override val phoneNumber: String?,
     override val isEmailVerified: Boolean,
     override val photoUrl: Uri?,
+    /** The platform SDK's object, for the wrapper's platform accessors. */
+    val native: Any? = null,
 ) : UserInfo
 
-internal class FirebaseUserMetadataImpl(override val creationTimestamp: Long, override val lastSignInTimestamp: Long) : FirebaseUserMetadata
+internal class FirebaseUserMetadataImpl(override val creationTimestamp: Long, override val lastSignInTimestamp: Long, val native: Any? = null) : FirebaseUserMetadata
 
-internal class AuthResultImpl(override val user: FirebaseUser?, override val credential: AuthCredential?, override val additionalUserInfo: AdditionalUserInfo?) : AuthResult
+/** @property native The platform SDK's result, null for the result of `unlink`, which the SDKs report as a user. */
+internal class AuthResultImpl(override val user: FirebaseUser?, override val credential: AuthCredential?, override val additionalUserInfo: AdditionalUserInfo?, val native: Any? = null) : AuthResult
 
-internal class AdditionalUserInfoImpl(override val providerId: String?, override val username: String?, override val profile: Map<String, Any?>?, override val isNewUser: Boolean) : AdditionalUserInfo
+internal class AdditionalUserInfoImpl(override val providerId: String?, override val username: String?, override val profile: Map<String, Any?>?, override val isNewUser: Boolean, val native: Any? = null) : AdditionalUserInfo
+
+/** A token result keeping the platform SDK's, for the wrapper's platform accessors. */
+internal class NativeGetTokenResult(token: String?, claims: Map<String, Any?>, val native: Any) : GetTokenResult(token, claims)
 
 internal class SignInMethodQueryResultImpl(override val signInMethods: List<String>?) : SignInMethodQueryResult
 

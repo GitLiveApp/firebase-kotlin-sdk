@@ -19,14 +19,14 @@ import com.google.firebase.auth.OAuthProvider as CompatOAuthProvider
 import com.google.firebase.auth.PhoneAuthCredential as CompatPhoneAuthCredential
 
 /** @property compat The Android-SDK-shaped [com.google.firebase.auth.AuthCredential] this credential wraps. */
-public open class AuthCredential internal constructor(public open val compat: CompatAuthCredential) {
+public open class AuthCredential(public open val compat: CompatAuthCredential) {
     public val providerId: String
         get() = compat.provider
 }
 
-public class PhoneAuthCredential internal constructor(override val compat: CompatPhoneAuthCredential) : AuthCredential(compat)
+public class PhoneAuthCredential(override val compat: CompatPhoneAuthCredential) : AuthCredential(compat)
 
-public class OAuthCredential internal constructor(override val compat: CompatOAuthCredential) : AuthCredential(compat)
+public class OAuthCredential(override val compat: CompatOAuthCredential) : AuthCredential(compat)
 
 public object EmailAuthProvider {
     public fun credential(email: String, password: String): AuthCredential = AuthCredential(emailCredential(email, password))
