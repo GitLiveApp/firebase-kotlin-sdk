@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import dev.gitlive.firebase.TIMESTAMP_OF_DATE_ANDROID_ONLY
+import dev.gitlive.firebase.TIMESTAMP_OF_INSTANT_ANDROID_ONLY
 import dev.gitlive.firebase.TO_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_INSTANT_ANDROID_ONLY
 
@@ -23,18 +24,27 @@ public actual class Timestamp actual constructor(
         require(seconds in MIN_SECONDS..MAX_SECONDS) { "Timestamp seconds out of range: $seconds" }
     }
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(TIMESTAMP_OF_DATE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-    public actual constructor(time: Any) : this(0, 0) {
+    public actual constructor(date: java.util.Date) : this(0, 0) {
         throw UnsupportedOperationException(TIMESTAMP_OF_DATE_ANDROID_ONLY)
+    }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_OF_INSTANT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual constructor(time: java.time.Instant) : this(0, 0) {
+        throw UnsupportedOperationException(TIMESTAMP_OF_INSTANT_ANDROID_ONLY)
     }
 
     actual override fun compareTo(other: Timestamp): Int = compareValuesBy(this, other, { it.seconds }, { it.nanoseconds })
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(TO_DATE_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
-    public actual fun toDate(): Any = throw UnsupportedOperationException(TO_DATE_ANDROID_ONLY)
+    public actual fun toDate(): java.util.Date = throw UnsupportedOperationException(TO_DATE_ANDROID_ONLY)
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(TO_INSTANT_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
-    public actual fun toInstant(): Any = throw UnsupportedOperationException(TO_INSTANT_ANDROID_ONLY)
+    public actual fun toInstant(): java.time.Instant = throw UnsupportedOperationException(TO_INSTANT_ANDROID_ONLY)
 
     override fun equals(other: Any?): Boolean = other is Timestamp && other.seconds == seconds && other.nanoseconds == nanoseconds
 

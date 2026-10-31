@@ -208,19 +208,20 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "17"
 }
 
-// The com.google.* and kotlinx.coroutines.tasks declarations are header stubs on Android and the JVM (see buildSrc
-// utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk / kotlinx-coroutines-play-services classes are
-// used at runtime.
+// The com.google.* and kotlinx.coroutines.tasks declarations and the android.* / java.* stand-ins are header stubs on
+// Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
+// kotlinx-coroutines-play-services classes and the platform's own types are used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    packageDirs = listOf("android/content", "android/net", "java/io", "java/net", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
-        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+        val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
         }?.files ?: files()
+        // android.jar, for the android.* and java.* stand-ins
+        dependencies + files(android.bootClasspath)
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
-    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class", "com/google/firebase/TimestampInstantKt.class"),
+    keepClasses = listOf("com/google/firebase/TimestampInstantKt.class"),
     // FirebaseFormat, the multiplatform counterpart of the Android SDK's (internal) class mappers.
     keepPackageDirs = listOf("com/google/firebase/serialization"),
 )

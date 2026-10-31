@@ -131,29 +131,29 @@ The SDK has two public API layers per module:
    the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
    A declaration that is identical on every platform (the `Task` listener interfaces, `FidListener`) is plain common code
    rather than expect/actual: it is compiled, verified and stripped on Android/JVM like a stub and is real code elsewhere.
-   Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
-   widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
-   members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a
-   package-private Java helper (`firebase-app/src/androidMain/java`). The one exception to the signature rule is a member
-   annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be called, so an
-   Android-only member (`FirebaseApp.initializeApp(Context)`, `FirebaseOptions.fromResource`, `Timestamp(Date)`) can be mirrored
-   with the platform type widened to `Any` and a message naming the multiplatform replacement (messages live in
-   `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`); Android code still binds to the real member.
-   When the replacement is a static member that only needs its `Context` widened, it moves onto `Firebase` under the same
-   name as a shipped top-level function (`Firebase.getApps(context)`, `Firebase.fromResource(context)`, next to
-   `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
-   get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
-   `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level). An instance member whose
-   replacement has the same arity cannot have its JVM-only parameter widened to `Any` (the member would shadow a
-   same-named extension), so the replacement is shipped as a same-named extension taking the multiplatform type
-   (`getHttpsCallableFromUrl(url: String)` in `FunctionsUrl.kt`) and the member is deprecated with its real parameter
-   type, which an error-deprecated, memberless stand-in class provides in common code (`java.net.URL` in
-   `firebase-functions/src/commonMain/kotlin/java/net`, listed in the stub `packageDirs` so it is stripped on
-   Android/JVM; the verifier skips an error-deprecated class). A stand-in only lets the member be declared: it is not a
-   compatibility layer for the JDK type, so it gets no members. On Android the shipped facades reach the SDK's JVM-only
-   members through a package-private Java helper (`FunctionsJvmApi.java`), which compiles after the stubs are stripped.
-   Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are listed in `jvmMissingMembers` and
-   verified against Android only.
+   Consequences: an expect may only declare members the real class has with the same JVM signature, enum constants keep the
+   SDK's order, and this module's own code must not call a stub's companion members (they compile to `Companion` calls): use
+   the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`, whose stubs are named into the SDK's own facade
+   class, e.g. `FirebaseKt`) or a package-private Java helper (`firebase-app/src/androidMain/java`). A platform type in an SDK
+   signature gets a **stand-in class** in firebase-app's `commonMain` under the type's own package, a header stub on Android/JVM
+   like the rest (verified against `android.jar`, firebase-java-sdk or the running JDK), in one of two shapes:
+   - **Usable**, when an app's code only carries the value to the SDK: `android.content.Context` is a constructible placeholder
+     (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
+     created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
+     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
+   - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`. The SDK members taking them (`Timestamp(Date)`,
+     `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     too, with a message naming the multiplatform counterpart (messages live in
+     `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
+     that message, Android code still binds to the real member, and the verifier skips both the class and the members since
+     they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
+     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`; `kotlin.time.ExperimentalTime` is opted in at
+     the build level).
+   A module facade that must reach an SDK member taking an error-deprecated stand-in (the `Duration` timeout forms calling
+   `setTimeout(Long, TimeUnit)`) does so through a package-private Java helper of its own (`FunctionsJvmApi.java`), which
+   compiles after the stubs are stripped. Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are
+   listed in `jvmMissingMembers` and verified against Android only.
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS/wasmJs is still declared in common; its JS and wasmJs actuals do nothing (or fail where they must return a value) and carry `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.

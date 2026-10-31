@@ -26,8 +26,10 @@ import java.util.zip.ZipFile
  * The exception is a member deprecated with `DeprecationLevel.ERROR` (or `HIDDEN`): it exists so that common code using
  * an Android-only member gets a compile error naming the replacement, cannot be called, and so need not match the real
  * class; the dump records its message so the report can count the member as provided. A whole class so deprecated is
- * likewise not verified: it stands in for a JVM-only type (`java.net.URL`) so that the SDK members taking it can be
- * declared, deprecated, in common code, and nothing in the reference jars corresponds to it.
+ * likewise not verified: it stands in for a JVM-only type (`java.util.Date`) so that the SDK members taking it can be
+ * declared, deprecated, in common code, and nothing in the reference jars corresponds to it. A stand-in that is real
+ * code elsewhere (`android.content.Context`, `java.net.URL`) is verified like any stub, against `android.jar` on Android
+ * and firebase-java-sdk or the running JDK on the JVM.
  *
  * A declaration that is identical on every platform (listener interfaces, a trivial exception subclass) does not need
  * expect/actual at all: plain common code under these packages is compiled, verified and stripped on Android/JVM the
@@ -167,6 +169,13 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     val isAnonymous get() = anonymousClass.containsMatchIn(name)
 }
 
+/**
+ * A JDK class (`java.net.URL`, `java.util.Date`), the real class behind a `java.*` stand-in on the JVM, where the JDK is not
+ * a jar on the compile classpath: read from the running JDK, which is what the JVM target compiles against.
+ */
+private fun jdkClass(name: String): ClassMembers? =
+    if (!name.startsWith("java/")) null else ClassLoader.getPlatformClassLoader().getResourceAsStream("$name.class")?.use { readMembers(it.readBytes()) }
+
 private fun readMembers(bytes: ByteArray): ClassMembers = ClassMembers().also { ClassReader(bytes).accept(it, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES) }
 
 private val kotlinOnlyMethods = setOf("getEntries")
@@ -188,6 +197,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
     val cache = mutableMapOf<String, ClassMembers?>()
     fun realClass(name: String): ClassMembers? = cache.getOrPut(name) {
         zips.firstNotNullOfOrNull { zip -> zip.getEntry("$name.class")?.let { zip.getInputStream(it).use { s -> readMembers(s.readBytes()) } } }
+            ?: jdkClass(name)
     }
 
     /** The public members of a real class including those inherited from its superclasses and interfaces (Java constants live on interfaces). */

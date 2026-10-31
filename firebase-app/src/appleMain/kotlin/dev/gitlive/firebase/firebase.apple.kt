@@ -9,19 +9,18 @@ import kotlinx.coroutines.CompletableDeferred
 import com.google.firebase.Firebase as CompatFirebase
 import com.google.firebase.FirebaseApp as CompatFirebaseApp
 import com.google.firebase.FirebaseOptions as CompatFirebaseOptions
-import com.google.firebase.getApps as compatGetApps
 import com.google.firebase.initialize as compatInitialize
 
 /** The underlying Firebase iOS SDK app. */
 public val FirebaseApp.ios: FIRApp get() = compat.ios
 
-public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFirebase.compatInitialize(context)?.let { FirebaseApp(it) }
+public actual fun Firebase.initialize(context: Any?): FirebaseApp? = CompatFirebase.compatInitialize(context.asContext())?.let { FirebaseApp(it) }
 
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat()))
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context.asContext(), options.toCompat()))
 
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context, options.toCompat(), name))
+public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = FirebaseApp(CompatFirebase.compatInitialize(context.asContext(), options.toCompat(), name))
 
-public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = CompatFirebase.compatGetApps(context).map { FirebaseApp(it) }
+public actual fun Firebase.apps(context: Any?): List<FirebaseApp> = CompatFirebaseApp.getApps(context.asContext()).map { FirebaseApp(it) }
 
 internal actual suspend fun CompatFirebaseApp.deleteAwaiting() {
     val deleted = CompletableDeferred<Unit>()
