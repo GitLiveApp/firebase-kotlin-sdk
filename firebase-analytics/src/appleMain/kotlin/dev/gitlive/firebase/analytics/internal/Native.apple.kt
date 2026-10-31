@@ -5,8 +5,8 @@
 package dev.gitlive.firebase.analytics.internal
 
 import android.os.Bundle
-import cocoapods.FirebaseAnalytics.FIRAnalytics
-import cocoapods.FirebaseAnalytics.setConsent
+import swiftPMImport.dev.gitlive.firebase.analytics.FIRAnalytics
+import swiftPMImport.dev.gitlive.firebase.analytics.setConsent
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp

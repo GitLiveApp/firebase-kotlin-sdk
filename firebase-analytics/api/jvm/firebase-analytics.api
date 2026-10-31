@@ -23,7 +23,7 @@ public final class com/google/firebase/analytics/FirebaseAnalytics {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAppInstanceId ()Lcom/google/android/gms/tasks/Task;
 	public final fun getFirebaseInstanceId ()Ljava/lang/String;
-	public static final fun getInstance (Ljava/lang/Object;)Lcom/google/firebase/analytics/FirebaseAnalytics;
+	public static final fun getInstance (Landroid/content/Context;)Lcom/google/firebase/analytics/FirebaseAnalytics;
 	public final fun getSessionId ()Lcom/google/android/gms/tasks/Task;
 	public fun hashCode ()I
 	public final fun logEvent (Ljava/lang/String;Landroid/os/Bundle;)V
@@ -38,7 +38,7 @@ public final class com/google/firebase/analytics/FirebaseAnalytics {
 }
 
 public final class com/google/firebase/analytics/FirebaseAnalytics$Companion {
-	public final fun getInstance (Ljava/lang/Object;)Lcom/google/firebase/analytics/FirebaseAnalytics;
+	public final fun getInstance (Landroid/content/Context;)Lcom/google/firebase/analytics/FirebaseAnalytics;
 }
 
 public final class com/google/firebase/analytics/FirebaseAnalytics$ConsentStatus : java/lang/Enum {

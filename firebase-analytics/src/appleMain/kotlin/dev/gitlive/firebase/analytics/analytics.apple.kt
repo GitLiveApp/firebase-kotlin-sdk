@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.analytics
 
-import cocoapods.FirebaseAnalytics.FIRAnalytics
+import swiftPMImport.dev.gitlive.firebase.analytics.FIRAnalytics
 
 /** The Firebase iOS SDK class this wraps (its API is static). */
 public val FirebaseAnalytics.ios: FIRAnalytics.Companion get() = compat.ios

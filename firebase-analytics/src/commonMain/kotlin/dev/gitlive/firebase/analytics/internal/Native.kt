@@ -52,6 +52,3 @@ internal val FirebaseAnalytics.ConsentStatus.key: String
         FirebaseAnalytics.ConsentStatus.GRANTED -> "granted"
         FirebaseAnalytics.ConsentStatus.DENIED -> "denied"
     }
-
-internal const val GET_INSTANCE_ANDROID_ONLY =
-    "getInstance takes an android.content.Context and can only be called from Android code; use Firebase.analytics from common code"

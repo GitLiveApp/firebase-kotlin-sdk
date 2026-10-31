@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.analytics
 
+import android.content.Context
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -15,7 +16,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-expect val context: Any
+/** The platform context: Android's and firebase-java-sdk's on the JVM, the placeholder `Context()` elsewhere. */
+expect val context: Context
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest

@@ -5,9 +5,8 @@
 package android.os
 
 /*
- * Header stub for firebase-java-sdk's android.os.Bundle (see buildSrc utils/HeaderStubs.kt), deleted after compilation
- * so that its class binds at runtime. It only has the members listed in api/jvm/firebase-java-sdk-missing.txt missing;
- * analytics is a no-op on the JVM, so the bundles built there are never read.
+ * Header stub for firebase-java-sdk's android.os.Bundle (see buildSrc utils/HeaderStubs.kt), verified against it and
+ * deleted after compilation so that its class binds at runtime.
  */
 public actual class Bundle {
     public actual constructor()

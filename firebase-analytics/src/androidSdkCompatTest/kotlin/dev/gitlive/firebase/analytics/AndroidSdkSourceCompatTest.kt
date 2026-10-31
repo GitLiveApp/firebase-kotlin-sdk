@@ -14,7 +14,7 @@ import com.google.firebase.analytics.ParametersBuilder
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.analytics.setConsent
-import com.google.firebase.getApps
+import com.google.firebase.FirebaseApp
 import com.google.firebase.initialize
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.runBlockingTest
@@ -36,7 +36,7 @@ class AndroidSdkSourceCompatTest {
 
     @BeforeTest
     fun initializeFirebase() {
-        if (Firebase.getApps(context).isEmpty()) {
+        if (FirebaseApp.getApps(context).isEmpty()) {
             Firebase.initialize(
                 context,
                 FirebaseOptions.Builder()

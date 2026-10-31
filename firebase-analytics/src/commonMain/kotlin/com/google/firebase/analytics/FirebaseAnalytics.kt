@@ -4,10 +4,11 @@
 
 package com.google.firebase.analytics
 
+import android.content.Context
 import android.os.Bundle
 import com.google.android.gms.tasks.Task
-import dev.gitlive.firebase.analytics.internal.GET_INSTANCE_ANDROID_ONLY
 import dev.gitlive.firebase.analytics.internal.NativeAnalytics
+import dev.gitlive.firebase.analytics.internal.compatAnalytics
 import kotlin.jvm.JvmStatic
 
 /**
@@ -198,10 +199,12 @@ public class FirebaseAnalytics private constructor(internal val native: NativeAn
     }
 
     public companion object {
-        /** Android only: use [com.google.firebase.Firebase.analytics][analytics] from common code. */
+        /**
+         * The analytics of the default app, as [com.google.firebase.Firebase.analytics][analytics]. Off Android the
+         * [context] is the firebase-app stand-in and is ignored (the platform SDKs need none).
+         */
         @JvmStatic
-        @Deprecated(GET_INSTANCE_ANDROID_ONLY, ReplaceWith("Firebase.analytics", "com.google.firebase.Firebase", "com.google.firebase.analytics.analytics"), DeprecationLevel.ERROR)
-        public fun getInstance(context: Any?): FirebaseAnalytics = throw UnsupportedOperationException(GET_INSTANCE_ANDROID_ONLY)
+        public fun getInstance(context: Context): FirebaseAnalytics = compatAnalytics(null)
 
         internal fun create(native: NativeAnalytics): FirebaseAnalytics = FirebaseAnalytics(native)
     }

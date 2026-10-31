@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-analytics
 # Android SDK api.txt ref: com.google.android.gms:play-services-measurement-api:23.2.0
-# 100% of 153 public members available (152 identical, 1 mapped, 0 missing, 0 omitted)
+# 100% of 153 public members available (153 identical, 0 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.analytics.AnalyticsKt
   HIDE  static FirebaseAnalytics getANALYTICS()
@@ -23,7 +23,7 @@ com.google.firebase.analytics.ConsentBuilder
 com.google.firebase.analytics.FirebaseAnalytics
   OK    Task getAppInstanceId()
   OK    String getFirebaseInstanceId()
-  MAP   static FirebaseAnalytics getInstance(Context)  [Context -> Object, deprecated: getInstance takes an android.content.Context and can only be called from Android code; use Firebase.analytics from common code]
+  OK    static FirebaseAnalytics getInstance(Context)
   OK    Task getSessionId()
   OK    void logEvent(String, Bundle)
   OK    void resetAnalyticsData()
