@@ -50,7 +50,7 @@ public actual class FirebaseAuth internal constructor(internal val android: com.
     public actual var languageCode: String
         get() = android.languageCode.orEmpty()
         set(value) {
-            android.setLanguageCode(value)
+            android.languageCode = value
         }
 
     public actual suspend fun applyActionCode(code: String) {
