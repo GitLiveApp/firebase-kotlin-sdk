@@ -32,10 +32,8 @@ import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
 import swiftPMImport.dev.gitlive.firebase.auth.FIRUserInfoProtocol
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
-import com.google.firebase.getApps
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
@@ -57,7 +55,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
     private val idTokenListeners = mutableMapOf<IdTokenListener, FIRIDTokenDidChangeListenerHandle>()
 
     public actual val app: FirebaseApp
-        get() = Firebase.getApps(null).firstOrNull { (it.ios as Any?) == ios.app() } ?: FirebaseApp.getInstance()
+        get() = ios.app()?.name()?.let { FirebaseApp.getInstance(it) } ?: FirebaseApp.getInstance()
 
     public actual val currentUser: FirebaseUser? get() = ios.currentUser()?.let { FirebaseUserImpl(it, this) }
 
