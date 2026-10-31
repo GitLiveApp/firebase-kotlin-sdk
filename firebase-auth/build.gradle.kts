@@ -4,7 +4,11 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
+import compat.GeneratedAndroidSdkApi
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -39,6 +43,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
             targetCompatibility = JavaVersion.VERSION_17
         }
 
+        sourceSets.getByName("main").java.srcDir("src/androidMain/java")
         testOptions.configureTestOptions(project)
         packaging {
             resources.pickFirsts.add("META-INF/kotlinx-serialization-core.kotlin_module")
@@ -53,6 +58,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -180,15 +186,44 @@ kotlin {
             }
         }
 
+        // The header stubs and the wrapper's Android code are shared by the Android and JVM targets (src/androidJvmMain), as
+        // firebase-java-sdk ports the Android auth API.
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
+                kotlin.srcDir("src/androidJvmMain/kotlin")
                 dependencies {
                     api(libs.google.firebase.auth)
                 }
             }
+        }
 
+        if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
+            getByName("jvmMain") {
+                kotlin.srcDir("src/androidJvmMain/kotlin")
+            }
+            project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/jvmMain/java")
+        }
+
+        // The test written against the com.google.firebase.auth API is shared by every test target but the JVM: tests compile
+        // against firebase-java-sdk's own classes (the header stubs are stripped), whose Kotlin shapes differ in places from the
+        // Android SDK's Java ones (listener interfaces are not `fun interface`s, `setLanguageCode` is a property setter).
+        val androidSdkCompatTest = "src/androidSdkCompatTest/kotlin"
+        if (supportedPlatforms.contains(TargetPlatform.Js) || supportedPlatforms.contains(TargetPlatform.WasmJs) || supportedPlatforms.supportsApple()) {
+            getByName("nonJvmTest") { kotlin.srcDir(androidSdkCompatTest) }
+        }
+
+        if (supportedPlatforms.contains(TargetPlatform.Android)) {
+            // The Android tests compile against the real SDK, whose listener interfaces carry checker-framework annotations
+            // that Kotlin 2.4 needs on the classpath to infer a SAM constructor (FirebaseAuth.IdTokenListener { }).
+            val checkerQual = "org.checkerframework:checker-qual:3.49.0"
+            getByName("androidUnitTest") {
+                kotlin.srcDir(androidSdkCompatTest)
+                dependencies { compileOnly(checkerQual) }
+            }
             getByName("androidInstrumentedTest") {
+                kotlin.srcDir(androidSdkCompatTest)
                 dependencies {
+                    compileOnly(checkerQual)
                     // phone auth registers an sms retriever via ContextCompat.registerReceiver(
                     // Context, BroadcastReceiver, IntentFilter, Int), which firebase-auth calls but
                     // does not pull in - without this the test apk resolves androidx.core 1.2.0 and
@@ -222,6 +257,38 @@ fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
         )
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase"),
+    androidReferenceJars = files({
+        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // Shipped: the static members this module's own code reaches through AuthStatics.java.
+    keepClasses = listOf(
+        "com/google/firebase/auth/AuthInternalsKt.class",
+        "com/google/firebase/auth/AuthStatics.class",
+    ),
+    // firebase-java-sdk has no AuthKt facade (Firebase.auth), so this module's own is shipped on the JVM.
+    jvmKeepClasses = listOf("com/google/firebase/auth/AuthKt.class"),
+)
+// firebase-auth is not open source, so its api.txt is generated from the published classes rather than downloaded.
+registerAndroidSourceCompat(
+    generated = listOf(
+        GeneratedAndroidSdkApi(
+            name = "firebase-auth",
+            artifacts = listOf("com.google.firebase:firebase-auth", "com.google.firebase:firebase-auth-interop"),
+            packages = listOf("com/google/firebase/auth/"),
+        ),
+    ),
+)
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

@@ -172,6 +172,8 @@ The SDK has two public API layers per module:
    classes by `generateAndroidSdkApi*`), a plain common class in the stripped package with real bodies for the other platforms
    (`FirebaseAnalytics` over an internal `NativeAnalytics` expect), a header stub for a platform class (`android.os.Bundle`) and a
    module the JVM SDK lacks entirely (`jvmKeepClasses` ships the module's own no-op implementation).
+   `firebase-auth` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published classes by
+   `generateAndroidSdkApi*`) and a JVM SDK without the Kotlin facade (`jvmKeepClasses` in `stripHeaderStubs` ships this module's `AuthKt`).
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.
