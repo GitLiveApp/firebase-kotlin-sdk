@@ -4,9 +4,10 @@
 
 package com.google.firebase.auth
 
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 
-/** The profile of a user from one provider, mirroring `com.google.firebase.auth.UserInfo`. The photo URL is Android-only. */
+/** The profile of a user from one provider, mirroring `com.google.firebase.auth.UserInfo`. */
 public expect interface UserInfo {
     public val uid: String
     public val providerId: String
@@ -14,13 +15,16 @@ public expect interface UserInfo {
     public val email: String?
     public val phoneNumber: String?
     public val isEmailVerified: Boolean
+
+    /** The profile photo, as the `android.net.Uri` stand-in of firebase-app off Android. */
+    public val photoUrl: Uri?
 }
 
 /**
  * A signed-in user, mirroring `com.google.firebase.auth.FirebaseUser` from the Firebase Android SDK: its profile and
  * provider data, and the account operations that need a signed-in user.
  *
- * Not mirrored: the `Activity`-bound provider flows and the photo URL, an Android `Uri` (see `api/android-sdk/exclusions.txt`).
+ * Not mirrored: the `Activity`-bound provider flows (see `api/android-sdk/exclusions.txt`).
  */
 public expect abstract class FirebaseUser() : UserInfo {
     /** The tenant the user signed in to, or null. */
@@ -146,15 +150,19 @@ public class GetTokenResult(public val token: String?, public val claims: Map<St
 
 /**
  * A profile update, mirroring `com.google.firebase.auth.UserProfileChangeRequest`; built with [Builder] or the
- * `userProfileChangeRequest` extension. The photo URI is Android-only.
+ * `userProfileChangeRequest` extension.
  */
 public expect class UserProfileChangeRequest {
     public val displayName: String?
+    public val photoUri: Uri?
 
     public class Builder {
         public constructor()
 
         public fun setDisplayName(displayName: String?): Builder
+
+        /** Sets the profile photo, or clears it when null. */
+        public fun setPhotoUri(photoUri: Uri?): Builder
         public fun build(): UserProfileChangeRequest
     }
 }

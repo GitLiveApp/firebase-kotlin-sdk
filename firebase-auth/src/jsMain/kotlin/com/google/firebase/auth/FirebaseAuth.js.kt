@@ -4,6 +4,7 @@
 
 package com.google.firebase.auth
 
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
@@ -256,7 +257,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     public actual fun updateProfile(request: UserProfileChangeRequest): Task<Nothing?> = write(auth) {
         val profile = json()
         if (request.displayNameSet) profile["displayName"] = request.displayName
-        if (request.photoUriSet) profile["photoURL"] = request.photoUri
+        if (request.photoUriSet) profile["photoURL"] = request.photoUri?.toString()
         updateProfile(js, profile)
     }
 
@@ -278,7 +279,7 @@ internal class FirebaseUserImpl(override val js: User, override val auth: Fireba
     override val email: String? get() = js.email
     override val phoneNumber: String? get() = js.phoneNumber
     override val isEmailVerified: Boolean get() = js.emailVerified
-    override val photoUrl: String? get() = js.photoURL
+    override val photoUrl: Uri? get() = js.photoURL?.let(Uri::parse)
     override val tenantId: String? get() = js.tenantId
     override val isAnonymous: Boolean get() = js.isAnonymous
     override val metadata: FirebaseUserMetadata? get() = FirebaseUserMetadataImpl(js.metadata.creationTime.toTimestamp(), js.metadata.lastSignInTime.toTimestamp())
@@ -286,7 +287,7 @@ internal class FirebaseUserImpl(override val js: User, override val auth: Fireba
     override val providerData: List<UserInfo> get() = js.providerData.map { it.toCompat() }
 }
 
-private fun JsUserInfo.toCompat(): UserInfo = UserInfoImpl(uid, providerId, displayName, email, phoneNumber, false, photoURL)
+private fun JsUserInfo.toCompat(): UserInfo = UserInfoImpl(uid, providerId, displayName, email, phoneNumber, false, photoURL?.let(Uri::parse))
 
 private fun String?.toTimestamp(): Long = this?.let { Date(it).getTime().toLong() } ?: 0L
 

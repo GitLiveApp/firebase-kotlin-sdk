@@ -14,6 +14,16 @@ public external fun confirmPasswordReset(auth: Auth, code: String, newPassword: 
 
 public external fun connectAuthEmulator(auth: Auth, url: String, options: JsAny? = definedExternally)
 
+public external fun useDeviceLanguage(auth: Auth)
+
+public external fun initializeRecaptchaConfig(auth: Auth): Promise<JsAny?>
+
+public external fun revokeAccessToken(auth: Auth, token: String): Promise<JsAny?>
+
+public external fun getAdditionalUserInfo(userCredential: UserCredential): AdditionalUserInfo?
+
+public external fun getMultiFactorResolver(auth: Auth, error: AuthError): MultiFactorResolver
+
 public external fun createUserWithEmailAndPassword(
     auth: Auth,
     email: String,
@@ -106,13 +116,39 @@ public external fun verifyBeforeUpdateEmail(
 public external fun verifyPasswordResetCode(auth: Auth, code: String): Promise<JsString>
 
 public external interface Auth : JsAny {
+    public val app: FirebaseApp
+    public val config: AuthConfig
     public val currentUser: User?
     public var languageCode: String?
+    public var tenantId: String?
+    public val settings: AuthSettings
 
     public fun onAuthStateChanged(nextOrObserver: (User?) -> Unit): Unsubscribe
     public fun onIdTokenChanged(nextOrObserver: (User?) -> Unit): Unsubscribe
     public fun signOut(): Promise<JsAny?>
     public fun updateCurrentUser(user: User?): Promise<JsAny?>
+}
+
+public external interface AuthConfig : JsAny {
+    public val apiKey: String
+    public val authDomain: String?
+}
+
+public external interface AuthSettings : JsAny {
+    public var appVerificationDisabledForTesting: Boolean
+}
+
+public external class ActionCodeURL : JsAny {
+    public val apiKey: String
+    public val code: String
+    public val continueUrl: String?
+    public val languageCode: String?
+    public val operation: String
+    public val tenantId: String?
+
+    public companion object {
+        public fun parseLink(link: String): ActionCodeURL?
+    }
 }
 
 public external interface UserInfo : JsAny {
@@ -175,7 +211,7 @@ public external interface AdditionalUserInfo : JsAny {
     public val providerId: String?
     public val username: String?
     public val profile: JsAny?
-    public val newUser: Boolean
+    public val isNewUser: Boolean
 }
 
 public external interface AuthCredential : JsAny {
@@ -193,6 +229,31 @@ public external interface UserCredential : JsAny {
     public val operationType: String
     public val providerId: String?
     public val user: User
+}
+
+public external interface PhoneMultiFactorInfo : MultiFactorInfo {
+    public val phoneNumber: String
+}
+
+public external interface TotpSecret : JsAny {
+    public val secretKey: String
+    public val hashingAlgorithm: String
+    public val codeLength: Int
+    public val codeIntervalSeconds: Int
+    public val enrollmentCompletionDeadline: String
+    public fun generateQrCodeUrl(accountName: String? = definedExternally, issuer: String? = definedExternally): String
+}
+
+public external object PhoneMultiFactorGenerator : JsAny {
+    public val FACTOR_ID: String
+    public fun assertion(phoneAuthCredential: AuthCredential): MultiFactorAssertion
+}
+
+public external object TotpMultiFactorGenerator : JsAny {
+    public val FACTOR_ID: String
+    public fun generateSecret(session: MultiFactorSession): Promise<TotpSecret>
+    public fun assertionForEnrollment(secret: TotpSecret, oneTimePassword: String): MultiFactorAssertion
+    public fun assertionForSignIn(enrollmentId: String, oneTimePassword: String): MultiFactorAssertion
 }
 
 public external interface ProfileUpdateRequest : JsAny {
@@ -232,7 +293,17 @@ public external interface MultiFactorResolver : JsAny {
 
 public external interface AuthProvider : JsAny
 
-public external interface AuthError : JsAny
+public external interface AuthError : JsAny {
+    public val code: String
+    public val message: String
+    public val customData: AuthErrorCustomData?
+}
+
+public external interface AuthErrorCustomData : JsAny {
+    public val email: String?
+    public val phoneNumber: String?
+    public val tenantId: String?
+}
 
 public external object EmailAuthProvider : AuthProvider {
     public fun credential(email: String, password: String): AuthCredential
@@ -262,6 +333,11 @@ public external class OAuthProvider(providerId: String) : AuthProvider {
 
     public fun addScope(scope: String)
     public fun setCustomParameters(customOAuthParameters: JsAny)
+
+    public companion object {
+        public fun credentialFromResult(userCredential: UserCredential): OAuthCredential?
+        public fun credentialFromError(error: AuthError): OAuthCredential?
+    }
 }
 
 public external interface OAuthCredentialOptions : JsAny {
@@ -280,7 +356,12 @@ public external class PhoneAuthProvider(auth: Auth?) : AuthProvider {
 
     public fun verifyPhoneNumber(
         phoneInfoOptions: String,
-        applicationVerifier: ApplicationVerifier,
+        applicationVerifier: ApplicationVerifier?,
+    ): Promise<JsString>
+
+    public fun verifyPhoneNumber(
+        phoneInfoOptions: JsAny,
+        applicationVerifier: ApplicationVerifier? = definedExternally,
     ): Promise<JsString>
 }
 

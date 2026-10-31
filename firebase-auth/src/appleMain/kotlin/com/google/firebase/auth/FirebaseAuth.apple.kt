@@ -4,6 +4,7 @@
 
 package com.google.firebase.auth
 
+import android.net.Uri
 import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeInfo
 import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperation
 import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationEmailLink
@@ -250,7 +251,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     public actual fun updateProfile(request: UserProfileChangeRequest): Task<Nothing?> = write(auth) {
         val change = ios.profileChangeRequest()
         if (request.displayNameSet) change.setDisplayName(request.displayName)
-        if (request.photoUriSet) change.setPhotoURL(request.photoUri?.let { url -> NSURL.URLWithString(url) })
+        if (request.photoUriSet) change.setPhotoURL(request.photoUri?.let { url -> NSURL.URLWithString(url.toString()) })
         change.commitChangesWithCompletion(it)
     }
 
@@ -277,7 +278,7 @@ internal class FirebaseUserImpl(override val ios: FIRUser, override val auth: Fi
     override val email: String? get() = ios.email()
     override val phoneNumber: String? get() = ios.phoneNumber()
     override val isEmailVerified: Boolean get() = ios.emailVerified()
-    override val photoUrl: String? get() = ios.photoURL()?.absoluteString
+    override val photoUrl: Uri? get() = ios.photoURL()?.absoluteString?.let(Uri::parse)
     override val tenantId: String? get() = ios.tenantID()
     override val isAnonymous: Boolean get() = ios.anonymous()
     override val metadata: FirebaseUserMetadata? get() = ios.metadata().let { FirebaseUserMetadataImpl(it.creationDate().toTimestamp(), it.lastSignInDate().toTimestamp()) }
@@ -290,7 +291,7 @@ internal expect fun FIRUser.updatePhoneNumberCompat(credential: PhoneAuthCredent
 
 internal expect fun FIRUser.compatMultiFactor(auth: FirebaseAuth): MultiFactor
 
-private fun FIRUserInfoProtocol.toCompat(): UserInfo = UserInfoImpl(uid(), providerID(), displayName(), email(), phoneNumber(), false, photoURL()?.absoluteString)
+private fun FIRUserInfoProtocol.toCompat(): UserInfo = UserInfoImpl(uid(), providerID(), displayName(), email(), phoneNumber(), false, photoURL()?.absoluteString?.let(Uri::parse))
 
 internal fun NSDate?.toTimestamp(): Long = this?.let { (it.timeIntervalSince1970 * 1000).toLong() } ?: 0L
 

@@ -15,12 +15,6 @@ com.google.firebase.auth.PhoneAuthOptions.Builder#setActivity  // @platform andr
 com.google.firebase.auth.PhoneAuthOptions.Builder#setTimeout  // @platform java.util.concurrent.TimeUnit
 com.google.firebase.auth.TotpSecret#openInOtpApp(String, String, Activity)  // @platform android.app.Activity
 
-# android.net.Uri accessors; the multiplatform layer exposes the photo URL as a String (dev.gitlive.firebase.auth.UserInfo.photoURL).
-com.google.firebase.auth.UserInfo#getPhotoUrl  // @platform android.net.Uri
-com.google.firebase.auth.FirebaseUser#getPhotoUrl  // @platform android.net.Uri
-com.google.firebase.auth.UserProfileChangeRequest#getPhotoUri  // @platform android.net.Uri
-com.google.firebase.auth.UserProfileChangeRequest.Builder#setPhotoUri  // @platform android.net.Uri
-
 # org.json serialization of multi-factor info.
 com.google.firebase.auth.MultiFactorInfo#toJson  // @platform org.json.JSONObject
 com.google.firebase.auth.PhoneMultiFactorInfo#toJson  // @platform org.json.JSONObject

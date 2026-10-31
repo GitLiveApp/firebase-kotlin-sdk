@@ -186,8 +186,8 @@ kotlin {
             }
         }
 
-        // The header stubs and the wrapper's Android code are shared by the Android and JVM targets (src/androidJvmMain);
-        // androidMain and jvmMain only hold the seams where firebase-java-sdk differs from the Android SDK.
+        // The header stubs and the wrapper's Android code are shared by the Android and JVM targets (src/androidJvmMain), as
+        // firebase-java-sdk ports the Android auth API.
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
             getByName("androidMain") {
                 kotlin.srcDir("src/androidJvmMain/kotlin")
@@ -204,18 +204,26 @@ kotlin {
             project.extensions.getByType<SourceSetContainer>().getByName("jvmMain").java.srcDir("src/jvmMain/java")
         }
 
-        // The test written against the com.google.firebase.auth API is shared by every test target but the JVM: firebase-java-sdk
-        // ports only part of the Android auth API (see api/jvm/firebase-java-sdk-missing.txt), so it does not compile there.
+        // The test written against the com.google.firebase.auth API is shared by every test target but the JVM: tests compile
+        // against firebase-java-sdk's own classes (the header stubs are stripped), whose Kotlin shapes differ in places from the
+        // Android SDK's Java ones (listener interfaces are not `fun interface`s, `setLanguageCode` is a property setter).
         val androidSdkCompatTest = "src/androidSdkCompatTest/kotlin"
-        if (supportedPlatforms.contains(TargetPlatform.Js) || supportedPlatforms.supportsApple()) {
+        if (supportedPlatforms.contains(TargetPlatform.Js) || supportedPlatforms.contains(TargetPlatform.WasmJs) || supportedPlatforms.supportsApple()) {
             getByName("nonJvmTest") { kotlin.srcDir(androidSdkCompatTest) }
         }
 
         if (supportedPlatforms.contains(TargetPlatform.Android)) {
-            getByName("androidUnitTest") { kotlin.srcDir(androidSdkCompatTest) }
+            // The Android tests compile against the real SDK, whose listener interfaces carry checker-framework annotations
+            // that Kotlin 2.4 needs on the classpath to infer a SAM constructor (FirebaseAuth.IdTokenListener { }).
+            val checkerQual = "org.checkerframework:checker-qual:3.49.0"
+            getByName("androidUnitTest") {
+                kotlin.srcDir(androidSdkCompatTest)
+                dependencies { compileOnly(checkerQual) }
+            }
             getByName("androidInstrumentedTest") {
                 kotlin.srcDir(androidSdkCompatTest)
                 dependencies {
+                    compileOnly(checkerQual)
                     // phone auth registers an sms retriever via ContextCompat.registerReceiver(
                     // Context, BroadcastReceiver, IntentFilter, Int), which firebase-auth calls but
                     // does not pull in - without this the test apk resolves androidx.core 1.2.0 and

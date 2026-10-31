@@ -4,8 +4,7 @@
 
 package dev.gitlive.firebase.auth
 
-import dev.gitlive.firebase.auth.internal.photoUrlString
-import dev.gitlive.firebase.auth.internal.setPhotoUrlString
+import android.net.Uri
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.auth.FirebaseUser as CompatFirebaseUser
 import com.google.firebase.auth.FirebaseUserMetadata as CompatFirebaseUserMetadata
@@ -23,7 +22,7 @@ public class FirebaseUser internal constructor(public val compat: CompatFirebase
     public val phoneNumber: String?
         get() = compat.phoneNumber
     public val photoURL: String?
-        get() = compat.photoUrlString()
+        get() = compat.photoUrl?.toString()
     public val isAnonymous: Boolean
         get() = compat.isAnonymous
     public val isEmailVerified: Boolean
@@ -68,7 +67,7 @@ public class FirebaseUser internal constructor(public val compat: CompatFirebase
     public suspend fun updateProfile(displayName: String? = this.displayName, photoUrl: String? = this.photoURL) {
         val request = CompatUserProfileChangeRequest.Builder()
             .setDisplayName(displayName)
-            .setPhotoUrlString(photoUrl)
+            .setPhotoUri(photoUrl?.let { Uri.parse(it) })
             .build()
         compat.updateProfile(request).await()
     }
@@ -92,7 +91,7 @@ public class UserInfo internal constructor(public val compat: CompatUserInfo) {
     public val phoneNumber: String?
         get() = compat.phoneNumber
     public val photoURL: String?
-        get() = compat.photoUrlString()
+        get() = compat.photoUrl?.toString()
     public val providerId: String
         get() = compat.providerId
     public val uid: String

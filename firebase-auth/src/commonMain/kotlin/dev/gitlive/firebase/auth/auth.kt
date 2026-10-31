@@ -7,9 +7,6 @@ package dev.gitlive.firebase.auth
 import com.google.firebase.auth.ActionCodeEmailInfo
 import com.google.firebase.auth.ActionCodeMultiFactorInfo
 import com.google.firebase.auth.actionCodeSettingsBuilder
-import dev.gitlive.firebase.auth.internal.emailValue
-import dev.gitlive.firebase.auth.internal.multiFactorInfoValue
-import dev.gitlive.firebase.auth.internal.previousEmailValue
 import dev.gitlive.firebase.auth.internal.signOutAwaiting
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -102,16 +99,16 @@ public class FirebaseAuth internal constructor(public val compat: CompatFirebase
         @Suppress("UNCHECKED_CAST")
         return when (result.operation) {
             CompatActionCodeResult.SIGN_IN_WITH_EMAIL_LINK -> ActionCodeResult.SignInWithEmailLink
-            CompatActionCodeResult.VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.emailValue())
-            CompatActionCodeResult.PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.emailValue())
+            CompatActionCodeResult.VERIFY_EMAIL -> ActionCodeResult.VerifyEmail(result.info!!.email)
+            CompatActionCodeResult.PASSWORD_RESET -> ActionCodeResult.PasswordReset(result.info!!.email)
             CompatActionCodeResult.RECOVER_EMAIL -> (result.info as ActionCodeEmailInfo).run {
-                ActionCodeResult.RecoverEmail(emailValue(), previousEmailValue())
+                ActionCodeResult.RecoverEmail(email, previousEmail)
             }
             CompatActionCodeResult.VERIFY_BEFORE_CHANGE_EMAIL -> (result.info as ActionCodeEmailInfo).run {
-                ActionCodeResult.VerifyBeforeChangeEmail(emailValue(), previousEmailValue())
+                ActionCodeResult.VerifyBeforeChangeEmail(email, previousEmail)
             }
             CompatActionCodeResult.REVERT_SECOND_FACTOR_ADDITION -> (result.info as ActionCodeMultiFactorInfo).run {
-                ActionCodeResult.RevertSecondFactorAddition(emailValue(), MultiFactorInfo(multiFactorInfoValue()))
+                ActionCodeResult.RevertSecondFactorAddition(email, MultiFactorInfo(multiFactorInfo))
             }
             else -> throw UnsupportedOperationException(result.operation.toString())
         } as T

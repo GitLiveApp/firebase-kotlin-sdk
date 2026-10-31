@@ -4,6 +4,8 @@
 
 package com.google.firebase.auth
 
+import android.net.Uri
+
 public actual interface UserInfo {
     public actual val uid: String
     public actual val providerId: String
@@ -11,9 +13,7 @@ public actual interface UserInfo {
     public actual val email: String?
     public actual val phoneNumber: String?
     public actual val isEmailVerified: Boolean
-
-    /** The profile photo URL. */
-    public val photoUrl: String?
+    public actual val photoUrl: Uri?
 }
 
 internal class UserInfoImpl(
@@ -23,7 +23,7 @@ internal class UserInfoImpl(
     override val email: String?,
     override val phoneNumber: String?,
     override val isEmailVerified: Boolean,
-    override val photoUrl: String?,
+    override val photoUrl: Uri?,
 ) : UserInfo
 
 internal class FirebaseUserMetadataImpl(override val creationTimestamp: Long, override val lastSignInTimestamp: Long) : FirebaseUserMetadata
@@ -47,13 +47,13 @@ public actual abstract class FirebaseAuthSettings actual constructor() {
 public actual class UserProfileChangeRequest internal constructor(
     public actual val displayName: String?,
     internal val displayNameSet: Boolean,
-    public val photoUri: String?,
+    public actual val photoUri: Uri?,
     internal val photoUriSet: Boolean,
 ) {
     public actual class Builder actual constructor() {
         private var displayName: String? = null
         private var displayNameSet = false
-        private var photoUri: String? = null
+        private var photoUri: Uri? = null
         private var photoUriSet = false
 
         public actual fun setDisplayName(displayName: String?): Builder = apply {
@@ -61,8 +61,7 @@ public actual class UserProfileChangeRequest internal constructor(
             displayNameSet = true
         }
 
-        /** Sets the photo URL, or clears it when null. */
-        public fun setPhotoUri(photoUri: String?): Builder = apply {
+        public actual fun setPhotoUri(photoUri: Uri?): Builder = apply {
             this.photoUri = photoUri
             photoUriSet = true
         }

@@ -100,9 +100,7 @@ public actual interface UserInfo {
     public actual val email: String?
     public actual val phoneNumber: String?
     public actual val isEmailVerified: Boolean
-
-    /** Android only: the profile photo as a `Uri`. */
-    public val photoUrl: Uri?
+    public actual val photoUrl: Uri?
 }
 
 public actual abstract class FirebaseUser actual constructor() : UserInfo {
@@ -138,19 +136,13 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
 
 public actual class UserProfileChangeRequest private constructor() {
     public actual val displayName: String? get() = stub()
-
-    /** Android only. */
-    public val photoUri: Uri? get() = stub()
+    public actual val photoUri: Uri? get() = stub()
 
     public actual class Builder actual constructor() {
         public val displayName: String? get() = stub()
-
-        /** Android only. */
         public val photoUri: Uri? get() = stub()
         public actual fun setDisplayName(displayName: String?): Builder = stub()
-
-        /** Android only. */
-        public fun setPhotoUri(photoUri: Uri?): Builder = stub()
+        public actual fun setPhotoUri(photoUri: Uri?): Builder = stub()
         public actual fun build(): UserProfileChangeRequest = stub()
     }
 }
