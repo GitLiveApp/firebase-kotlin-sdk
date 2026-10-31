@@ -5,6 +5,7 @@
 package com.google.firebase.perf.metrics
 
 import kotlin.jvm.JvmField
+import kotlin.jvm.Synchronized
 
 /**
  * An in-memory HTTP metric (see FirebasePerformance.jvm.kt).
@@ -31,14 +32,18 @@ public actual class HttpMetric internal constructor(public val url: String, publ
     public var responsePayloadSize: Long? = null
         private set
 
+    @Synchronized
     public actual fun getAttribute(attribute: String): String? = customAttributes[attribute]
 
-    public actual val attributes: Map<String, String> get() = customAttributes.toMap()
+    public actual val attributes: Map<String, String>
+        @Synchronized get() = customAttributes.toMap()
 
+    @Synchronized
     public actual fun putAttribute(attribute: String, value: String) {
         customAttributes[attribute] = value
     }
 
+    @Synchronized
     public actual fun removeAttribute(attribute: String) {
         customAttributes.remove(attribute)
     }

@@ -6,48 +6,48 @@ package com.google.firebase.perf.metrics
 
 import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMetric
 
-/** @property ios The underlying Firebase iOS SDK object. */
-public actual class HttpMetric internal constructor(public val ios: FIRHTTPMetric) {
-    public actual fun getAttribute(attribute: String): String? = ios.valueForAttribute(attribute)
+/** @property ios The underlying Firebase iOS SDK object; null when performance collection is disabled, which the iOS SDK reports with no metric. */
+public actual class HttpMetric internal constructor(public val ios: FIRHTTPMetric?) {
+    public actual fun getAttribute(attribute: String): String? = ios?.valueForAttribute(attribute)
 
     public actual val attributes: Map<String, String>
-        get() = ios.attributes.mapKeys { it.key.toString() }.mapValues { it.value.toString() }
+        get() = ios?.attributes?.mapKeys { it.key.toString() }?.mapValues { it.value.toString() }.orEmpty()
 
     public actual fun putAttribute(attribute: String, value: String) {
-        ios.setValue(value, attribute)
+        ios?.setValue(value, attribute)
     }
 
     public actual fun removeAttribute(attribute: String) {
-        ios.removeAttribute(attribute)
+        ios?.removeAttribute(attribute)
     }
 
     public actual fun setHttpResponseCode(responseCode: Int) {
-        ios.responseCode = responseCode.toLong()
+        ios?.responseCode = responseCode.toLong()
     }
 
     public actual fun setRequestPayloadSize(bytes: Long) {
-        ios.requestPayloadSize = bytes
+        ios?.requestPayloadSize = bytes
     }
 
     public actual fun setResponseContentType(contentType: String?) {
-        ios.responseContentType = contentType
+        ios?.responseContentType = contentType
     }
 
     public actual fun setResponsePayloadSize(bytes: Long) {
-        ios.responsePayloadSize = bytes
+        ios?.responsePayloadSize = bytes
     }
 
     public actual fun start() {
-        ios.start()
+        ios?.start()
     }
 
     public actual fun stop() {
-        ios.stop()
+        ios?.stop()
     }
 
     override fun equals(other: Any?): Boolean = other is HttpMetric && other.ios == ios
 
-    override fun hashCode(): Int = ios.hashCode()
+    override fun hashCode(): Int = ios?.hashCode() ?: 0
 
     override fun toString(): String = "HttpMetric($ios)"
 

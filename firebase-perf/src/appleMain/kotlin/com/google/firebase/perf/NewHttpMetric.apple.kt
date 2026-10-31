@@ -12,6 +12,8 @@ import java.net.URL
 
 public actual fun FirebasePerformance.newHttpMetric(url: String, httpMethod: String): HttpMetric {
     val nsUrl = requireNotNull(NSURL.URLWithString(url)) { "Invalid URL: $url" }
+    // FIRHTTPMetric's initializer returns nil while performance collection is disabled; the metric is then a no-op, as on Android.
+    if (!isPerformanceCollectionEnabled) return HttpMetric(null)
     return HttpMetric(FIRHTTPMetric(nsUrl, httpMethod.toFIRHTTPMethod()))
 }
 

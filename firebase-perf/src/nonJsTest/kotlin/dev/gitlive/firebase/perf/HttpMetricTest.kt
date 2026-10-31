@@ -78,6 +78,21 @@ class HttpMetricTest {
         metric.stop()
     }
 
+    /** With collection disabled the iOS SDK creates no metric; the layer's metric is then a no-op rather than a failure. */
+    @Test
+    fun testHttpMetricWithCollectionDisabled() = runTest {
+        Firebase.performance.isPerformanceCollectionEnabled = false
+        try {
+            val metric = Firebase.performance.newHttpMetric("https://fir-kotlin-sdk.firebaseio.com/.json", FirebasePerformance.HttpMethod.GET)
+            metric.start()
+            metric.putAttribute("disabled", "yes")
+            metric.setHttpResponseCode(200)
+            metric.stop()
+        } finally {
+            Firebase.performance.isPerformanceCollectionEnabled = true
+        }
+    }
+
     @Test
     fun testHttpMetricTraceBlock() = runTest {
         var seen: String? = null

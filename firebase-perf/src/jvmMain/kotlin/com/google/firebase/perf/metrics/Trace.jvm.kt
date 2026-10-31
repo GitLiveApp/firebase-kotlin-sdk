@@ -5,8 +5,12 @@
 package com.google.firebase.perf.metrics
 
 import kotlin.jvm.JvmField
+import kotlin.jvm.Synchronized
 
-/** An in-memory trace (see FirebasePerformance.jvm.kt). @property name The name given to [com.google.firebase.perf.FirebasePerformance.newTrace]. */
+/**
+ * An in-memory trace (see FirebasePerformance.jvm.kt); its operations are atomic, as the Android SDK's.
+ * @property name The name given to [com.google.firebase.perf.FirebasePerformance.newTrace].
+ */
 public actual class Trace internal constructor(public val name: String) {
     private val metrics = mutableMapOf<String, Long>()
     private val customAttributes = mutableMapOf<String, String>()
@@ -14,32 +18,41 @@ public actual class Trace internal constructor(public val name: String) {
     private var stopped = false
     private val isRunning get() = started && !stopped
 
+    @Synchronized
     public actual fun start() {
         started = true
     }
 
+    @Synchronized
     public actual fun stop() {
         if (started) stopped = true
     }
 
+    @Synchronized
     public actual fun getAttribute(attribute: String): String? = customAttributes[attribute]
 
-    public actual val attributes: Map<String, String> get() = customAttributes.toMap()
+    public actual val attributes: Map<String, String>
+        @Synchronized get() = customAttributes.toMap()
 
+    @Synchronized
     public actual fun getLongMetric(metricName: String): Long = metrics[metricName] ?: 0L
 
+    @Synchronized
     public actual fun incrementMetric(metricName: String, incrementBy: Long) {
         if (isRunning) metrics[metricName] = getLongMetric(metricName) + incrementBy
     }
 
+    @Synchronized
     public actual fun putAttribute(attribute: String, value: String) {
         customAttributes[attribute] = value
     }
 
+    @Synchronized
     public actual fun putMetric(metricName: String, value: Long) {
         if (isRunning) metrics[metricName] = value
     }
 
+    @Synchronized
     public actual fun removeAttribute(attribute: String) {
         customAttributes.remove(attribute)
     }
