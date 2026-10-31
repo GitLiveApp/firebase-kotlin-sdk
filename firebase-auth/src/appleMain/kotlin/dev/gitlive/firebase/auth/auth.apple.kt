@@ -4,11 +4,11 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRAuth
-import cocoapods.FirebaseAuth.FIRAuthCredential
-import cocoapods.FirebaseAuth.FIRAuthUIDelegateProtocol
-import cocoapods.FirebaseAuth.FIROAuthProvider
-import cocoapods.FirebaseAuth.FIRUser
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuth
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthCredential
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthUIDelegateProtocol
+import swiftPMImport.dev.gitlive.firebase.auth.FIROAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
 import com.google.firebase.auth.ios as compatIos
 import com.google.firebase.auth.FirebaseAuth as CompatFirebaseAuth
 

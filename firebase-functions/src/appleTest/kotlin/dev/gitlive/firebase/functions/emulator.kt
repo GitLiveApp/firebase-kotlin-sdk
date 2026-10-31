@@ -7,5 +7,4 @@ package dev.gitlive.firebase.functions
 actual val emulatorHost: String = "localhost"
 actual val context: Any = Unit
 
-@Suppress("UNCHECKED_CAST")
-actual fun detailValue(details: Any?, key: String): Any? = (details as Map<Any?, Any?>)[key]
+actual annotation class IgnoreForAndroidUnitTest

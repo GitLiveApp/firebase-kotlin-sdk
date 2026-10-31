@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore.internal
 
-import cocoapods.FirebaseFirestoreInternal.FIRFirestore
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestore
 import dev.gitlive.firebase.firestore.FirebaseFirestoreSettings
 import dev.gitlive.firebase.firestore.NativeFirebaseFirestore
 import dev.gitlive.firebase.firestore.NativeTransaction

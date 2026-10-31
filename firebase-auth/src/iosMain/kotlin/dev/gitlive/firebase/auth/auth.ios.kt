@@ -4,12 +4,12 @@
 
 package dev.gitlive.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRMultiFactor
-import cocoapods.FirebaseAuth.FIRMultiFactorAssertion
-import cocoapods.FirebaseAuth.FIRMultiFactorInfo
-import cocoapods.FirebaseAuth.FIRMultiFactorResolver
-import cocoapods.FirebaseAuth.FIRMultiFactorSession
-import cocoapods.FirebaseAuth.FIRPhoneAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactor
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorAssertion
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorInfo
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorResolver
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorSession
+import swiftPMImport.dev.gitlive.firebase.auth.FIRPhoneAuthProvider
 import com.google.firebase.auth.MultiFactorImpl
 import com.google.firebase.auth.MultiFactorResolverImpl
 import com.google.firebase.auth.MultiFactorSessionImpl

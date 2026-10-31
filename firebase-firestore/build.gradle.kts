@@ -14,7 +14,6 @@ val supportedPlatforms = (project.property("firebase-firestore.supportedTargets"
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
@@ -94,38 +93,36 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseFirestore"
-            }
-            noPodspec()
-            // As of Firebase 10.17 Firestore has moved all ObjC headers to FirebaseFirestoreInternal and the kotlin cocoapods plugin does not handle this well
-            // Adding it manually seems to resolve the issue
-            pod("FirebaseFirestoreInternal") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
-            pod("FirebaseFirestore") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-                useInteropBindingFrom("FirebaseFirestoreInternal")
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.ios.sdk.get()),
+                products = listOf(product("FirebaseFirestore")),
+                importedClangModules = listOf("FirebaseFirestoreInternal"),
+            )
+        }
+    }
+
+    if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
             }
         }
     }
@@ -164,6 +161,9 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.serialization.InternalSerializationApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")

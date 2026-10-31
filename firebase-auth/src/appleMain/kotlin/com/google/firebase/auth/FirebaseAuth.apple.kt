@@ -4,31 +4,31 @@
 
 package com.google.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRActionCodeInfo
-import cocoapods.FirebaseAuth.FIRActionCodeOperation
-import cocoapods.FirebaseAuth.FIRActionCodeOperationEmailLink
-import cocoapods.FirebaseAuth.FIRActionCodeOperationPasswordReset
-import cocoapods.FirebaseAuth.FIRActionCodeOperationRecoverEmail
-import cocoapods.FirebaseAuth.FIRActionCodeOperationRevertSecondFactorAddition
-import cocoapods.FirebaseAuth.FIRActionCodeOperationVerifyAndChangeEmail
-import cocoapods.FirebaseAuth.FIRActionCodeOperationVerifyEmail
-import cocoapods.FirebaseAuth.FIRActionCodeSettings
-import cocoapods.FirebaseAuth.FIRAdditionalUserInfo
-import cocoapods.FirebaseAuth.FIRAuth
-import cocoapods.FirebaseAuth.FIRAuthCredential
-import cocoapods.FirebaseAuth.FIRAuthDataResult
-import cocoapods.FirebaseAuth.FIRAuthErrorDomain
-import cocoapods.FirebaseAuth.FIRAuthStateDidChangeListenerHandle
-import cocoapods.FirebaseAuth.FIREmailAuthProvider
-import cocoapods.FirebaseAuth.FIRFacebookAuthProvider
-import cocoapods.FirebaseAuth.FIRGitHubAuthProvider
-import cocoapods.FirebaseAuth.FIRGoogleAuthProvider
-import cocoapods.FirebaseAuth.FIRIDTokenDidChangeListenerHandle
-import cocoapods.FirebaseAuth.FIROAuthCredential
-import cocoapods.FirebaseAuth.FIROAuthProvider
-import cocoapods.FirebaseAuth.FIRTwitterAuthProvider
-import cocoapods.FirebaseAuth.FIRUser
-import cocoapods.FirebaseAuth.FIRUserInfoProtocol
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeInfo
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperation
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationEmailLink
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationPasswordReset
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationRecoverEmail
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationRevertSecondFactorAddition
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationVerifyAndChangeEmail
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperationVerifyEmail
+import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeSettings
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAdditionalUserInfo
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuth
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthCredential
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthDataResult
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthErrorDomain
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthStateDidChangeListenerHandle
+import swiftPMImport.dev.gitlive.firebase.auth.FIREmailAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRFacebookAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRGitHubAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRGoogleAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRIDTokenDidChangeListenerHandle
+import swiftPMImport.dev.gitlive.firebase.auth.FIROAuthCredential
+import swiftPMImport.dev.gitlive.firebase.auth.FIROAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRTwitterAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUserInfoProtocol
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.Firebase
@@ -354,8 +354,8 @@ private fun FIRActionCodeOperation.toOperation(): Int = when (this) {
 internal fun ActionCodeSettings.toIos(): FIRActionCodeSettings = FIRActionCodeSettings().also {
     url?.let { url -> it.setURL(NSURL.URLWithString(url)) }
     androidPackageName?.let { name -> it.setAndroidPackageName(name, androidInstallApp, androidMinimumVersion) }
-    @Suppress("DEPRECATION")
-    dynamicLinkDomain?.let { domain -> it.setDynamicLinkDomain(domain) }
+    // dynamicLinkDomain is ignored: FIRActionCodeSettings.dynamicLinkDomain was removed in firebase-ios-sdk 12 with the
+    // Dynamic Links shutdown; linkDomain replaces it
     linkDomain?.let { domain -> it.setLinkDomain(domain) }
     it.setHandleCodeInApp(canHandleCodeInApp())
     iosBundle?.let { bundle -> it.setIOSBundleID(bundle) }

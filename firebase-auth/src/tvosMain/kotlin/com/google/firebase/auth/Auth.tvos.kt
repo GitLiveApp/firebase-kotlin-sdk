@@ -4,8 +4,8 @@
 
 package com.google.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRAuth
-import cocoapods.FirebaseAuth.FIRUser
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuth
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.auth.TvOsMultifactorNotSupportedException
 import dev.gitlive.firebase.auth.TvOsPhoneAuthNotSupportedException

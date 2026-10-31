@@ -4,20 +4,20 @@
 
 package com.google.firebase.auth
 
-import cocoapods.FirebaseAuth.FIRAuth
-import cocoapods.FirebaseAuth.FIRAuthUIDelegateProtocol
-import cocoapods.FirebaseAuth.FIRMultiFactor
-import cocoapods.FirebaseAuth.FIRMultiFactorAssertion
-import cocoapods.FirebaseAuth.FIRMultiFactorInfo
-import cocoapods.FirebaseAuth.FIRMultiFactorResolver
-import cocoapods.FirebaseAuth.FIRMultiFactorSession
-import cocoapods.FirebaseAuth.FIRPhoneAuthCredential
-import cocoapods.FirebaseAuth.FIRPhoneAuthProvider
-import cocoapods.FirebaseAuth.FIRPhoneMultiFactorGenerator
-import cocoapods.FirebaseAuth.FIRPhoneMultiFactorInfo
-import cocoapods.FirebaseAuth.FIRTOTPMultiFactorGenerator
-import cocoapods.FirebaseAuth.FIRTOTPSecret
-import cocoapods.FirebaseAuth.FIRUser
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuth
+import swiftPMImport.dev.gitlive.firebase.auth.FIRAuthUIDelegateProtocol
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactor
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorAssertion
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorInfo
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorResolver
+import swiftPMImport.dev.gitlive.firebase.auth.FIRMultiFactorSession
+import swiftPMImport.dev.gitlive.firebase.auth.FIRPhoneAuthCredential
+import swiftPMImport.dev.gitlive.firebase.auth.FIRPhoneAuthProvider
+import swiftPMImport.dev.gitlive.firebase.auth.FIRPhoneMultiFactorGenerator
+import swiftPMImport.dev.gitlive.firebase.auth.FIRPhoneMultiFactorInfo
+import swiftPMImport.dev.gitlive.firebase.auth.FIRTOTPMultiFactorGenerator
+import swiftPMImport.dev.gitlive.firebase.auth.FIRTOTPSecret
+import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
 import com.google.android.gms.tasks.Task
 import platform.Foundation.NSError
 
