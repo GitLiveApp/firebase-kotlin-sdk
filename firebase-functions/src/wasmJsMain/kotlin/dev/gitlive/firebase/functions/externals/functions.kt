@@ -13,6 +13,8 @@ public external fun getFunctions(
 
 public external fun httpsCallable(functions: Functions, name: String, options: JsAny?): HttpsCallable
 
+public external fun httpsCallableFromURL(functions: Functions, url: String, options: JsAny?): HttpsCallable
+
 public external interface Functions : JsAny
 
 public external interface HttpsCallableResult : JsAny {

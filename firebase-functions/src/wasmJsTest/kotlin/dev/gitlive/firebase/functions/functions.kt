@@ -4,11 +4,7 @@
 
 package dev.gitlive.firebase.functions
 
-import dev.gitlive.firebase.externals.asJsAny
-import dev.gitlive.firebase.externals.jsGet
-import dev.gitlive.firebase.externals.toKotlin
-
 actual val emulatorHost: String = "localhost"
 actual val context: Any = Unit
 
-actual fun detailValue(details: Any?, key: String): Any? = details?.let { jsGet(it.asJsAny(), key) }?.toKotlin()
+actual annotation class IgnoreForAndroidUnitTest
