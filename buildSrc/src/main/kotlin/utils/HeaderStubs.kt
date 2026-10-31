@@ -43,7 +43,10 @@ fun Project.stripHeaderStubs(
     packageDirs: List<String>,
     androidReferenceJars: FileCollection,
     jvmReferenceJars: FileCollection,
-    /** Class files under [packageDirs] (e.g. `com/google/firebase/FirebaseInitializeKt.class`) that are real code and are shipped. */
+    /**
+     * Class files under [packageDirs] (e.g. `com/google/firebase/FirebaseInitializeKt.class`), or whole directories
+     * (`com/google/firebase/analytics/`), that are real code and are shipped.
+     */
     keepClasses: List<String> = emptyList(),
     /** Directories under [packageDirs] (e.g. `com/google/firebase/serialization`) whose classes are all real code and are shipped. */
     keepPackageDirs: List<String> = emptyList(),
@@ -54,28 +57,40 @@ fun Project.stripHeaderStubs(
      * would without this layer.
      */
     jvmMissingMembers: List<String> = emptyList(),
+    /** A file listing further [jvmMissingMembers], one per line; `//` starts a comment. */
+    jvmMissingMembersFile: File? = null,
+    /**
+     * Classes under [packageDirs] that the Android SDK has but `firebase-java-sdk` does not, so that this module's own
+     * code needs them on the JVM: stripped from the Android compilation, and shipped (not verified) by the JVM one.
+     */
+    jvmKeepClasses: List<String> = emptyList(),
     /**
      * `false` when `firebase-java-sdk` does not provide the module at all: the JVM actuals under [packageDirs] are then
      * real implementations that are shipped, and only the Android compilations are stubs.
      */
     jvmStubs: Boolean = true,
 ) {
-    fun isKept(path: String) = path in keepClasses || keepPackageDirs.any { path.startsWith("$it/") }
+    /** Whether the class at [path] is real code to ship: on the JVM also the classes firebase-java-sdk lacks. */
+    fun isKept(path: String, jvm: Boolean) =
+        path in keepClasses || keepPackageDirs.any { path.startsWith("$it/") } || (jvm && jvmKeepClasses.covers(path))
     tasks.withType(KotlinCompile::class.java).configureEach {
         if (!name.startsWith("compile") || name.contains("Test")) return@configureEach
         val android = name.contains("Android")
         if (!android && (name != "compileKotlinJvm" || !jvmStubs)) return@configureEach
         val references = if (android) androidReferenceJars else jvmReferenceJars
+        val kept = if (android) keepClasses else keepClasses + jvmKeepClasses
         inputs.files(references).withPropertyName("headerStubReferenceJars").optional()
+        jvmMissingMembersFile?.let { inputs.file(it).withPropertyName("jvmMissingMembersFile").optional() }
         // Not declared as a task output: the Kotlin compile task pre-creates declared outputs as directories.
         val dump = project.layout.buildDirectory.file("header-stubs/$name.api")
         doLast {
             val destination = destinationDirectory.get().asFile
             val stubDirs = packageDirs.map { destination.resolve(it) }.filter { it.exists() }
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
-                .filter { !isKept(it.relativeTo(destination).invariantSeparatorsPath) }
+                .filter { !isKept(it.relativeTo(destination).invariantSeparatorsPath, jvm = !android) }
             val classes = stubs.map { readMembers(it.readBytes()) }
-            verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated = if (android) emptySet() else jvmMissingMembers.toSet())
+            val tolerated = if (android) emptySet() else (jvmMissingMembers + jvmMissingMembersFile.entries()).toSet()
+            verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated)
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
             stubs.forEach { it.delete() }
             stubDirs.forEach { dir -> dir.walkBottomUp().filter { it.isDirectory && it.listFiles().isNullOrEmpty() }.forEach { it.delete() } }
@@ -84,9 +99,14 @@ fun Project.stripHeaderStubs(
     }
     tasks.withType(Jar::class.java).configureEach {
         if (!jvmStubs && name.startsWith("jvm")) return@configureEach
-        exclude { element -> !element.isDirectory && packageDirs.any { element.path.startsWith("$it/") } && !isKept(element.path) }
+        exclude { element -> !element.isDirectory && packageDirs.any { element.path.startsWith("$it/") } && !isKept(element.path, jvm = name.startsWith("jvm")) }
     }
 }
+
+/** Whether a kept entry names [path]: a class file, or a directory (an entry ending with `/`) containing it. */
+private fun List<String>.covers(path: String): Boolean = any { if (it.endsWith("/")) path.startsWith(it) else it == path }
+
+private fun File?.entries(): List<String> = this?.takeIf { it.exists() }?.readLines().orEmpty().map { it.substringBefore("//").trim() }.filter { it.isNotEmpty() }
 
 private class Member(val name: String, val descriptor: String, val access: Int) {
     val isStatic get() = access and Opcodes.ACC_STATIC != 0
@@ -122,6 +142,8 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     val methods = mutableListOf<Member>()
     val fields = mutableListOf<Member>()
 
+    /** Public synthetic methods that are inline functions with reified type parameters (see [visitMethod]). */
+    val reifiedInlineMethods = mutableListOf<Member>()
     /** The message of a `@kotlin.Deprecated` annotation with level `ERROR` or `HIDDEN` on the class itself; such a class cannot be used. */
     var deprecation: String? = null
 
@@ -138,7 +160,13 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { deprecation = it }
 
     override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
-        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || name == "<clinit>") return null
+        if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || name == "<clinit>") return null
+        if (access and Opcodes.ACC_SYNTHETIC != 0) {
+            // An inline function with a reified type parameter is synthetic (Java cannot call it) but is real Kotlin API:
+            // it is dumped for the source-compatibility report, and not verified as it is inlined into its callers.
+            if (access and Opcodes.ACC_BRIDGE == 0 && !name.contains('$') && name != "<init>") reifiedInlineMethods += Member(name, descriptor, access)
+            return null
+        }
         val member = Member(name, descriptor, access).also { methods += it }
         return object : MethodVisitor(Opcodes.ASM9) {
             override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { member.deprecation = it }
@@ -180,6 +208,9 @@ private fun readMembers(bytes: ByteArray): ClassMembers = ClassMembers().also { 
 
 private val kotlinOnlyMethods = setOf("getEntries")
 private val anonymousClass = Regex("""\$\d+(\$|$)""")
+
+/** Kotlin-generated names (`getX$module` of an internal member, `foo$default`, `access$bar`) that never exist on a Java class. */
+private val String.isKotlinMangled: Boolean get() = contains('$')
 
 /**
  * A Kotlin `var` in a stub compiles to a `void` setter, while the SDK's builders return themselves from their setters.
@@ -224,7 +255,7 @@ private fun verifyHeaderStubs(stubs: List<ClassMembers>, referenceJars: List<Fil
                 continue
             }
             for (member in stub.methods) {
-                if (member.name in kotlinOnlyMethods || member.deprecation != null || "${stub.name}.${member.signature}" in tolerated) continue
+                if (member.name in kotlinOnlyMethods || member.name.isKotlinMangled || member.deprecation != null || "${stub.name}.${member.signature}" in tolerated) continue
                 val match = reals.firstNotNullOfOrNull { candidate -> candidate.methods.firstOrNull { it.signature == member.signature } }
                     ?: reals.firstNotNullOfOrNull { candidate -> candidate.methods.firstOrNull { it.isFluentSetterOf(member) } }
                 when {
@@ -266,7 +297,8 @@ private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
             stub.access and Opcodes.ACC_INTERFACE != 0 -> "abstract interface class"
             else -> "class"
         }
-        val superClause = stub.superName?.takeIf { it != "java/lang/Object" }?.let { " : $it" }.orEmpty()
+        val superTypes = listOfNotNull(stub.superName?.takeIf { it != "java/lang/Object" }) + stub.interfaces
+        val superClause = superTypes.takeIf { it.isNotEmpty() }?.joinToString(", ", prefix = " : ").orEmpty()
         appendLine("public $modifiers$kind ${stub.name}$superClause {")
         for (field in stub.fields.sortedBy { it.name }) {
             if (field.name == "Companion") continue
@@ -277,12 +309,13 @@ private fun dumpStubs(stubs: List<ClassMembers>): String = buildString {
             }.joinToString(" ") { "$it " }
             appendLine("\tpublic ${fieldModifiers}field ${field.name} ${field.descriptor}${field.deprecationComment()}")
         }
-        for (method in stub.methods.sortedWith(compareBy({ it.name }, { it.descriptor }))) {
+        for (method in (stub.methods + stub.reifiedInlineMethods).sortedWith(compareBy({ it.name }, { it.descriptor }))) {
             if (method.name in kotlinOnlyMethods) continue
             val methodModifiers = buildList {
                 if (method.isStatic) add("static")
                 if (method.access and Opcodes.ACC_FINAL != 0) add("final")
                 if (method.access and Opcodes.ACC_ABSTRACT != 0) add("abstract")
+                if (method.access and Opcodes.ACC_SYNTHETIC != 0) add("synthetic")
             }.joinToString(" ") { "$it " }
             appendLine("\tpublic ${methodModifiers}fun ${method.name} ${method.descriptor}${method.deprecationComment()}")
         }

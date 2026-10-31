@@ -71,6 +71,21 @@ class SourceCompatReportTest {
     """.trimIndent()
 
     @Test
+    fun dropsKotlinDefaultValuesOfParameters() {
+        val apiTxt = """
+            // Signature format: 3.0
+            package com.google.firebase.installations {
+              public final class InstallationsKt {
+                method public static kotlinx.coroutines.flow.Flow<java.lang.String> ids(com.google.firebase.installations.FirebaseInstallations, com.google.firebase.installations.Refresh refresh = com.google.firebase.installations.Refresh.NEVER);
+              }
+            }
+        """.trimIndent()
+        val member = AndroidSdkApiTxtParser.parse(apiTxt).single().members.single()
+        assertEquals("ids", member.name)
+        assertEquals(listOf("com.google.firebase.installations.FirebaseInstallations", "com.google.firebase.installations.Refresh"), member.parameters)
+    }
+
+    @Test
     fun parsesApiTxt() {
         val classes = AndroidSdkApiTxtParser.parse(apiTxt).associateBy { it.name }
         val installations = classes.getValue("com.google.firebase.installations.FirebaseInstallations")
@@ -256,6 +271,42 @@ class SourceCompatReportTest {
         assertTrue(report.contains("MAP   boolean limitedUseAppCheckTokens  [property getLimitedUseAppCheckTokens()]"), report)
         assertTrue(report.contains("MISS  boolean other  [read-only property in this SDK]"), report)
         assertTrue(report.contains("# 81% of 11 public members available (6 identical, 3 mapped, 2 missing, 0 omitted)"), report)
+    }
+
+    @Test
+    fun matchesTypeParametersByErasureAndLooksUpInheritedOverloads() {
+        val apiTxt = """
+            package com.google.firebase.test {
+              public class Base {
+                method public void foo(int value);
+              }
+              public final class Sub extends com.google.firebase.test.Base {
+                method public void foo(int value);
+                method public void foo(String value);
+                method public <T> T get(String key);
+                method public <T> void put(T value);
+                method public <T> void set(T value);
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public class com/google/firebase/test/Base {
+            	public final fun foo (I)V
+            }
+
+            public final class com/google/firebase/test/Sub : com/google/firebase/test/Base {
+            	public final fun foo (Ljava/lang/String;)V
+            	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
+            	public final fun put (I)V
+            	public final fun set (Ljava/lang/Object;)V
+            }
+        """.trimIndent()
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
+        assertTrue(report.contains("MAP   void foo(int)  [inherited]"), report) // declared by Base, which Sub extends, next to Sub's own foo(String)
+        assertTrue(report.contains("OK    void foo(String)"), report)
+        assertTrue(report.contains("OK    T get(String)"), report)
+        assertTrue(report.contains("OK    void set(T)"), report) // T erases to Object
+        assertTrue(report.contains("MISS  void put(T)"), report) // an int where the SDK takes any T
     }
 
     @Test

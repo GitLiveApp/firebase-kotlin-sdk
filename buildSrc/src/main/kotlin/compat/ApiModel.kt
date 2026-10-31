@@ -41,6 +41,8 @@ data class ApiClass(
     val name: String,
     val members: List<ApiMember>,
     val isDeprecated: Boolean = false,
+    /** The dotted names of the superclass and interfaces, when the source records them (a BCV or header-stub dump). */
+    val superTypes: List<String> = emptyList(),
 )
 
 /** Maps Java type names as written in api.txt / JVM descriptors to one canonical dotted form. */

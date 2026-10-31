@@ -12,6 +12,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * - `nonJvmMain` (js, wasmJs, apple): shared pure-Kotlin implementations of Android SDK types that Android/JVM get from
  *   the real Play Services classes (e.g. `com.google.android.gms.tasks.Task`).
  *
+ * - `nonAndroidMain` (jvm, js, wasmJs, apple): shared pure-Kotlin implementations for modules that `firebase-java-sdk` does
+ *   not provide at all, so the JVM gets real classes rather than header stubs (e.g. `FirebaseAnalytics`).
+ *
  * An API the JS SDK lacks is not split out into a source set: it is declared in common and its JS actual carries the
  * `@dev.gitlive.firebase.UnsupportedOnJs` marker.
  */
@@ -27,6 +30,14 @@ fun KotlinMultiplatformExtension.applyFirebaseHierarchy() {
                 }
             }
             group("nonJvm") {
+                withJs()
+                withWasmJs()
+                group("apple") {
+                    withApple()
+                }
+            }
+            group("nonAndroid") {
+                withJvm()
                 withJs()
                 withWasmJs()
                 group("apple") {
