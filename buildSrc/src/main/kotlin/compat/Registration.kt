@@ -60,6 +60,7 @@ fun Project.registerAndroidSourceCompat(vararg androidSdkApiFiles: String, gener
         check.set(checkMode)
         reportFile.set(layout.projectDirectory.file("api/android-sdk-compat.txt"))
         mustRunAfter(tasks.matching { it.name == "androidApiDump" || it.name == "apiDump" })
+        mustRunAfter(generateTasks)
     }
     tasks.register("androidSourceCompatDump", AndroidSourceCompatTask::class.java) {
         description = "Writes api/android-sdk-compat.txt: which Firebase Android SDK APIs this module provides"
