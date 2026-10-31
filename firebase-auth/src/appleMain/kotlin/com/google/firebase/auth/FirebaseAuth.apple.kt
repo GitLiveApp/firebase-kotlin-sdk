@@ -30,6 +30,7 @@ import swiftPMImport.dev.gitlive.firebase.auth.FIROAuthProvider
 import swiftPMImport.dev.gitlive.firebase.auth.FIRTwitterAuthProvider
 import swiftPMImport.dev.gitlive.firebase.auth.FIRUser
 import swiftPMImport.dev.gitlive.firebase.auth.FIRUserInfoProtocol
+import android.content.Context
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
@@ -54,8 +55,9 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
     private val authStateListeners = mutableMapOf<AuthStateListener, FIRAuthStateDidChangeListenerHandle>()
     private val idTokenListeners = mutableMapOf<IdTokenListener, FIRIDTokenDidChangeListenerHandle>()
 
+    /** The auth module's cinterop only forward-declares FIRApp, so the app is matched by identity against firebase-app's. */
     public actual val app: FirebaseApp
-        get() = ios.app()?.name()?.let { FirebaseApp.getInstance(it) } ?: FirebaseApp.getInstance()
+        get() = FirebaseApp.getApps(Context()).firstOrNull { (it.ios as Any?) == ios.app() } ?: FirebaseApp.getInstance()
 
     public actual val currentUser: FirebaseUser? get() = ios.currentUser()?.let { FirebaseUserImpl(it, this) }
 
