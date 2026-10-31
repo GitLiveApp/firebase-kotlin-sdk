@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS)**.
+This is a **Kotlin-first, multiplatform SDK for Firebase**. It wraps the official Firebase platform SDKs (Android, iOS, JS, JVM) behind a unified Kotlin common API, enabling Firebase to be used directly from shared Kotlin Multiplatform (KMP) source sets targeting **Android**, **iOS**, **Desktop (JVM)**, and **Web (JS and Wasm)**.
 
 All modules are published under the `dev.gitlive` group ID (e.g. `dev.gitlive:firebase-firestore`).
 
@@ -20,11 +20,15 @@ src/
   androidMain/  ← wraps Firebase Android SDK (and is also used as the physical dir for `jvmMain` in some modules, e.g. firebase-firestore)
   appleMain/    ← shared Apple targets (iOS/tvOS/macOS) wrapping Firebase iOS SDK via Kotlin/Native
   jsMain/       ← wraps Firebase JS SDK
+  wasmJsMain/   ← wraps Firebase JS SDK for the wasmJs target (hand-mirrored from jsMain, see CLAUDE.md)
   jvmMain/      ← JVM desktop/server target (may map to src/androidMain/kotlin in some modules)
+  nonJsMain/    ← android + jvm + apple (the SDKs that exchange Kotlin collections), only in modules using utils.applyFirebaseHierarchy()
+  nonJvmMain/   ← js + wasmJs + apple, only in modules using utils.applyFirebaseHierarchy()
   commonTest/   ← shared tests
   androidTest/
   appleTest/
   jsTest/
+  wasmJsTest/
   jvmTest/
 ```
 
@@ -44,7 +48,7 @@ These principles **must** be followed in all new and modified code.
 
 ### 1. Suspend functions instead of callbacks or Tasks
 
-Async operations that return a single value use `suspend fun`. Never use callbacks, `Task`, `Promise`, or listener patterns in `commonMain`.
+Async operations that return a single value use `suspend fun`. Never use callbacks, `Task`, `Promise`, or listener patterns in the `dev.gitlive.firebase` API in `commonMain` (the `com.google.firebase` source-compatibility layer described under "API Compatibility Goal" is the exception: it mirrors the Android SDK's `Task` and listeners exactly).
 
 ```kotlin
 // ✅ Correct
@@ -121,37 +125,49 @@ The SDK has two public API layers per module:
    [Firebase Android SDK API](https://firebase.google.com/docs/reference/kotlin/packages) exactly: same package, class, member and
    parameter names *and shapes*, including `com.google.android.gms.tasks.Task` return types and listener interfaces. Code written
    against the Android SDK must compile unchanged (no import changes) on every platform. On Apple the `actual`s wrap the iOS SDK,
-   on JS the modular JS SDK, and non-JVM platforms share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
+   on JS and wasmJs the modular JS SDK (hand-mirrored in `jsMain` and `wasmJsMain`, see "Mirrored source sets" in CLAUDE.md), and
+   the non-JVM platforms (Apple, JS, wasmJs) share a Kotlin `Task` implementation (`firebase-app/src/nonJvmMain`). On
    Android/JVM the `actual`s are **header stubs**: signature-identical declarations that are compiled against, verified against
    the real classes and then removed from the output (`utils.stripHeaderStubs`), so the real Firebase Android SDK binds at runtime.
    A declaration that is identical on every platform (the `Task` listener interfaces, `FidListener`) is plain common code
    rather than expect/actual: it is compiled, verified and stripped on Android/JVM like a stub and is real code elsewhere.
-   Consequences: an expect may only declare members the real class has with the same JVM signature (no `Context` parameters
-   widened to `Any`), enum constants keep the SDK's order, and this module's own code must not call a stub's companion
-   members (they compile to `Companion` calls): use the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`) or a
-   package-private Java helper (`firebase-app/src/androidMain/java`). The one exception to the signature rule is a member
-   annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be called, so an
-   Android-only member (`FirebaseApp.initializeApp(Context)`, `FirebaseOptions.fromResource`, `Timestamp(Date)`) can be mirrored
-   with the platform type widened to `Any` and a message naming the multiplatform replacement (messages live in
-   `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`); Android code still binds to the real member.
-   When the replacement is a static member that only needs its `Context` widened, it moves onto `Firebase` under the same
-   name as a shipped top-level function (`Firebase.getApps(context)`, `Firebase.fromResource(context)`, next to
-   `Firebase.initialize` in `Initialize.kt`), calling the real static through the Java helper on Android. JVM-only types
-   get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant` in
-   `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
+   Consequences: an expect may only declare members the real class has with the same JVM signature, enum constants keep the
+   SDK's order, and this module's own code must not call a stub's companion members (they compile to `Companion` calls): use
+   the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`, whose stubs are named into the SDK's own facade
+   class, e.g. `FirebaseKt`) or a package-private Java helper (`firebase-app/src/androidMain/java`). A platform type in an SDK
+   signature gets a **stand-in class** in firebase-app's `commonMain` under the type's own package, a header stub on Android/JVM
+   like the rest (verified against `android.jar`, firebase-java-sdk or the running JDK), in one of two shapes:
+   - **Usable**, when an app's code only carries the value to the SDK: `android.content.Context` is a constructible placeholder
+     (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
+     created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
+     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
+   - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`. The SDK members taking them (`Timestamp(Date)`,
+     `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     too, with a message naming the multiplatform counterpart (messages live in
+     `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
+     that message, Android code still binds to the real member, and the verifier skips both the class and the members since
+     they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
+     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`; `kotlin.time.ExperimentalTime` is opted in at
+     the build level).
+   A module facade that must reach an SDK member taking an error-deprecated stand-in (the `Duration` timeout forms calling
+   `setTimeout(Long, TimeUnit)`) does so through a package-private Java helper of its own (`FunctionsJvmApi.java`), which
+   compiles after the stubs are stripped. Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are
+   listed in `jvmMissingMembers` and verified against Android only.
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
-   - An API that maps onto Android, JVM and Apple but not JS goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
+   - An API that maps onto Android, JVM and Apple but not JS/wasmJs is still declared in common; its JS and wasmJs actuals do nothing (or fail where they must return a value) and carry `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
-     percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its
-     message and counts as provided. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
+     percentage is the module's README badge. Parameter types must match the Android SDK's exactly (the stand-ins make that
+     possible); only a different return type, a public field provided as a Kotlin property or an error deprecation is
+     reported as `MAP`, and a member deprecated with an error on our side counts as provided with its message shown. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
      unavailable unless the comment says `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an
      Android/JVM-only type with no replacement, such as `Parcel`), which drops them from the count; a single overload
      is selected with `Class#member(Type, Type)`.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app` and `firebase-installations` are the reference.
+   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config` and `firebase-functions` are the reference.
    `firebase-analytics` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published
    classes by `generateAndroidSdkApi*`), a plain common class in the stripped package with real bodies for the other platforms
    (`FirebaseAnalytics` over an internal `NativeAnalytics` expect), a header stub for a platform class (`android.os.Bundle`) and a
@@ -182,8 +198,8 @@ Migrated modules additionally expose `.compat`, the `com.google.firebase` object
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- The Firebase iOS SDK is **not** a transitive dependency — consuming projects must link it via CocoaPods or SPM.
-- Tests need the relevant Firebase pods in the `cocoapods` block of `build.gradle.kts`.
+- The Firebase iOS SDK is **not** bundled into the published klibs. Each module publishes its `firebase-ios-sdk` SwiftPM dependency as Maven metadata, so a consuming KMP app inherits it transitively and does not re-declare it. Because of that metadata, the Kotlin Gradle plugin fails consumers that use the Kotlin CocoaPods plugin, or direct integration without the generated linkage package in their Xcode project; they have to migrate to SwiftPM integration (see `documentation/ios-firebase-linking.md`).
+- The Apple targets consume Firebase via the `swiftPMDependencies` block in each module's `build.gradle.kts` (Kotlin 2.4+); this also links Firebase for iOS/macOS/tvOS tests.
 
 ### JVM / Desktop
 - Uses [`firebase-java-sdk`](https://github.com/GitLiveApp/firebase-java-sdk), which mirrors the Android SDK API.

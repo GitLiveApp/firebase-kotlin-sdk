@@ -9,8 +9,6 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.initialize
 import com.google.firebase.app
-import com.google.firebase.fromResource
-import com.google.firebase.getApps
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.installations.InstallationTokenResult
 import com.google.firebase.installations.installations
@@ -30,12 +28,10 @@ import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 /**
- * Exercises the `com.google.firebase` layer exactly as Android app code would (Task API, static accessors,
- * listeners), on every platform. Initialisation goes through the dev.gitlive API because the Android SDK's
- * `initializeApp(Context)` is deprecated with an error in common code (it points at `Firebase.initialize(context)`).
+ * Exercises the `com.google.firebase` layer exactly as Android app code would (Task API, static accessors, listeners,
+ * the `Context`-taking members with the platform's [context]), on every platform.
  */
 @IgnoreForAndroidUnitTest
-@IgnoreForJvm
 class AndroidSdkSourceCompatTest {
 
     @BeforeTest
@@ -62,10 +58,16 @@ class AndroidSdkSourceCompatTest {
         assertEquals("fir-kotlin-sdk", app.options.projectId)
         assertEquals(app, Firebase.app)
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
-        assertTrue(app in Firebase.getApps(context))
-        // Whether a default configuration exists depends on the test host; when it does its options must be usable.
-        Firebase.fromResource(context)?.let { assertTrue(it.applicationId.isNotBlank()) }
+        assertTrue(app in FirebaseApp.getApps(context))
+        assertNotNull(app.getApplicationContext())
         assertEquals("fir-kotlin-sdk", app.options.projectId)
+    }
+
+    // Whether a default configuration exists depends on the test host; when it does its options must be usable.
+    @Test
+    @IgnoreForJvm
+    fun testOptionsFromResource() {
+        FirebaseOptions.fromResource(context)?.let { assertTrue(it.applicationId.isNotBlank()) }
     }
 
     @Test
@@ -76,6 +78,10 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app, FirebaseApp.getInstance("compat"))
         assertEquals(options.projectId, app.options.projectId)
         app.delete()
+        val other = FirebaseApp.initializeApp(context, options, "compatStatic")
+        assertEquals("compatStatic", other.name)
+        assertTrue(other in FirebaseApp.getApps(context))
+        other.delete()
     }
 
     @Test

@@ -148,7 +148,7 @@ class SourceCompatReportTest {
     }
 
     @Test
-    fun mapsParametersAndOmitsExcludedClasses() {
+    fun omitsExcludedClassesAndRejectsWidenedParameters() {
         val report = SourceCompatReport.generate(
             module = "test",
             ref = "main",
@@ -160,12 +160,12 @@ class SourceCompatReportTest {
                 Exclusion(Regex("com\\.google\\.firebase\\.installations\\.Timestamp"), uncountedStatus = "PLAT"),
             ),
         )
-        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object]"), report)
+        assertTrue(report.contains("MISS  static FirebaseApp initializeApp(Context)"), report) // Object where the SDK takes a Context
         assertTrue(report.contains("InstallationsKt  (class omitted)"), report)
         assertTrue(report.contains("OMIT  FirebaseInstallations getInstallations()"), report)
         assertTrue(!report.contains("BAD_CONFIG"), report)
         assertTrue(!report.contains("getSeconds"), report)
-        assertTrue(report.contains("# 72% of 11 public members available (7 identical, 1 mapped, 1 missing, 2 omitted)"), report)
+        assertTrue(report.contains("# 63% of 11 public members available (7 identical, 0 mapped, 2 missing, 2 omitted)"), report)
     }
 
     @Test
@@ -185,30 +185,31 @@ class SourceCompatReportTest {
         """.trimIndent()
         val stubDump = """
             public final class com/google/firebase/FirebaseApp {
-            	public final fun getApplicationContext ()Ljava/lang/Object;  // deprecated: Android only
-            	public static final fun initializeApp (Ljava/lang/Object;)Lcom/google/firebase/FirebaseApp;  // deprecated: use Firebase.initialize(context), which ignores the context elsewhere
+            	public final fun getApplicationContext ()Landroid/content/Context;  // deprecated: Android only
+            	public static final fun initializeApp (Landroid/content/Context;)Lcom/google/firebase/FirebaseApp;  // deprecated: use Firebase.initialize(context), which ignores the context elsewhere
             }
 
             public final class com/google/firebase/Timestamp {
-            	public fun <init> (Ljava/lang/Object;)V  // deprecated: use Timestamp(seconds, nanoseconds)
+            	public fun <init> (Ljava/util/Date;)V  // deprecated: use Timestamp(seconds, nanoseconds)
+            	public fun <init> (Ljava/time/Instant;)V  // deprecated: use Timestamp(seconds, nanoseconds)
             	public final fun toDate ()Ljava/lang/Object;
             }
         """.trimIndent()
         val ours = BcvApiParser.parse(stubDump)
         assertEquals("Android only", ours[0].members[0].deprecation)
-        assertEquals(listOf("java.lang.Object"), ours[0].members[1].parameters)
-        assertEquals(null, ours[1].members[1].deprecation)
+        assertEquals(listOf("android.content.Context"), ours[0].members[1].parameters)
+        assertEquals(null, ours[1].members[2].deprecation)
         val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), ours, emptyList())
-        assertTrue(report.contains("MAP   Context getApplicationContext()  [returns Object, deprecated: Android only]"), report)
-        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [Context -> Object, deprecated: use Firebase.initialize(context), which ignores the context elsewhere]"), report)
-        assertTrue(report.contains("MAP   Timestamp(Date)  [Date -> Object, deprecated: use Timestamp(seconds, nanoseconds)]"), report)
-        assertTrue(report.contains("MAP   Timestamp(Instant)  [Instant -> Object, deprecated: use Timestamp(seconds, nanoseconds)]"), report)
+        assertTrue(report.contains("MAP   Context getApplicationContext()  [deprecated: Android only]"), report)
+        assertTrue(report.contains("MAP   static FirebaseApp initializeApp(Context)  [deprecated: use Firebase.initialize(context), which ignores the context elsewhere]"), report)
+        assertTrue(report.contains("MAP   Timestamp(Date)  [deprecated: use Timestamp(seconds, nanoseconds)]"), report)
+        assertTrue(report.contains("MAP   Timestamp(Instant)  [deprecated: use Timestamp(seconds, nanoseconds)]"), report)
         assertTrue(report.contains("MAP   Date toDate()  [returns Object]"), report)
         assertTrue(report.contains("# 100% of 5 public members available (0 identical, 5 mapped, 0 missing, 0 omitted)"), report)
     }
 
     @Test
-    fun mapsFieldsToPropertiesAndMethodsToExtensions() {
+    fun mapsFieldsToPropertiesAndRequiresExactParameters() {
         val apiTxt = """
             package com.google.firebase.functions {
               public final class FirebaseFunctions {
@@ -238,16 +239,17 @@ class SourceCompatReportTest {
         val dump = """
             public final class com/google/firebase/functions/FirebaseFunctions {
             	public final fun getHttpsCallable (Ljava/lang/String;)Lcom/google/firebase/functions/HttpsCallableReference;
+            	public final fun getHttpsCallableFromUrl (Ljava/net/URL;)Lcom/google/firebase/functions/HttpsCallableReference;
+            	public final fun getHttpsCallableFromUrl (Ljava/lang/String;Lcom/google/firebase/functions/HttpsCallableOptions;)Lcom/google/firebase/functions/HttpsCallableReference;
             }
 
-            public final class com/google/firebase/functions/FunctionsUrlKt {
-            	public static final fun getHttpsCallableFromUrl (Lcom/google/firebase/functions/FirebaseFunctions;Ljava/lang/String;)Lcom/google/firebase/functions/HttpsCallableReference;
-            	public static final fun getHttpsCallableFromUrl (Lcom/google/firebase/functions/FirebaseFunctions;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/functions/HttpsCallableReference;
+            public final class com/google/firebase/functions/FunctionsKt {
+            	public static final fun getHttpsCallableFromUrl (Lcom/google/firebase/functions/FirebaseFunctions;Ljava/net/URL;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/functions/HttpsCallableReference;
             }
 
             public final class com/google/firebase/functions/HttpsCallableReference {
             	public final fun getTimeout ()J
-            	public final fun setTimeout (JLjava/lang/Object;)V  // deprecated: use setTimeout(Duration)
+            	public final fun setTimeout (JLjava/util/concurrent/TimeUnit;)V  // deprecated: use setTimeout(Duration)
             }
 
             public final class com/google/firebase/functions/HttpsCallableResult {
@@ -261,14 +263,14 @@ class SourceCompatReportTest {
             }
         """.trimIndent()
         val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
-        assertTrue(report.contains("MAP   HttpsCallableReference getHttpsCallableFromUrl(URL)  [extension function, URL -> String]"), report)
-        assertTrue(report.contains("MISS  HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)"), report)
-        assertTrue(report.contains("MAP   static HttpsCallableReference getHttpsCallableFromUrl(FirebaseFunctions, URL, Function1)  [URL -> String]"), report)
-        assertTrue(report.contains("MAP   void setTimeout(long, TimeUnit)  [TimeUnit -> Object, deprecated: use setTimeout(Duration)]"), report)
+        assertTrue(report.contains("OK    HttpsCallableReference getHttpsCallableFromUrl(URL)"), report)
+        assertTrue(report.contains("MISS  HttpsCallableReference getHttpsCallableFromUrl(URL, HttpsCallableOptions)"), report) // String where the SDK takes a URL
+        assertTrue(report.contains("OK    static HttpsCallableReference getHttpsCallableFromUrl(FirebaseFunctions, URL, Function1)"), report)
+        assertTrue(report.contains("MAP   void setTimeout(long, TimeUnit)  [deprecated: use setTimeout(Duration)]"), report)
         assertTrue(report.contains("MAP   Object data  [property getData()]"), report)
         assertTrue(report.contains("MAP   boolean limitedUseAppCheckTokens  [property getLimitedUseAppCheckTokens()]"), report)
         assertTrue(report.contains("MISS  boolean other  [read-only property in this SDK]"), report)
-        assertTrue(report.contains("# 81% of 11 public members available (4 identical, 5 mapped, 2 missing, 0 omitted)"), report)
+        assertTrue(report.contains("# 81% of 11 public members available (6 identical, 3 mapped, 2 missing, 0 omitted)"), report)
     }
 
     @Test

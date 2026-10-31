@@ -4,12 +4,12 @@
 
 package com.google.firebase
 
-import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
+import android.content.Context
 
 /**
  * Configurable Firebase options, mirroring `com.google.firebase.FirebaseOptions` from the Firebase Android SDK.
- * `fromResource` takes an Android `Context` and can only be called from Android code: from common code it fails to
- * compile with a message naming the replacement, [Firebase.fromResource].
+ * `fromResource` takes the [Context] stand-in: the platform's context on Android and the JVM, a placeholder that is
+ * ignored on the other platforms.
  */
 public expect class FirebaseOptions {
     /** API key used for authenticating requests from your app. */
@@ -30,7 +30,10 @@ public expect class FirebaseOptions {
     /** The Google Cloud Storage bucket name. */
     public val storageBucket: String?
 
-    /** The tracking ID for Google Analytics. */
+    /**
+     * The tracking ID for Google Analytics. Always `null` on Apple platforms, where firebase-ios-sdk 12 removed
+     * `FIROptions.trackingID`.
+     */
     public val gaTrackingId: String?
 
     /** Builder for constructing [FirebaseOptions]. */
@@ -47,8 +50,11 @@ public expect class FirebaseOptions {
     }
 
     public companion object {
-        /** Android only: use [Firebase.fromResource] from common code. */
-        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, ReplaceWith("Firebase.fromResource(context)", "com.google.firebase.Firebase", "com.google.firebase.fromResource"), DeprecationLevel.ERROR)
-        public fun fromResource(context: Any?): FirebaseOptions?
+        /**
+         * The options of the platform's default configuration: on Android the resources the Google Services Gradle
+         * plugin generates from `google-services.json`, on Apple platforms `GoogleService-Info.plist` (the [context] is
+         * ignored); null when there is none, as on JS and wasmJs, which have no default configuration.
+         */
+        public fun fromResource(context: Context): FirebaseOptions?
     }
 }

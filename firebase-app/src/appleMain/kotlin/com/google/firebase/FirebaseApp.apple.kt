@@ -4,12 +4,9 @@
 
 package com.google.firebase
 
-import cocoapods.FirebaseCore.FIRApp
-import cocoapods.FirebaseCore.FIROptions
-import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
-import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
-import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
-import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
+import android.content.Context
+import swiftPMImport.dev.gitlive.firebase.app.FIRApp
+import swiftPMImport.dev.gitlive.firebase.app.FIROptions
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
@@ -36,8 +33,8 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
     /** No-op: automatic resource management is an Android-only behaviour. */
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
 
-    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getApplicationContext(): Any = throw UnsupportedOperationException(APPLICATION_CONTEXT_ANDROID_ONLY)
+    /** A placeholder: Apple platforms have no application context. */
+    public actual fun getApplicationContext(): Context = Context()
 
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.ios == ios
 
@@ -52,17 +49,14 @@ public actual class FirebaseApp internal constructor(public val ios: FIRApp) {
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(FIRApp.appNamed(name) ?: throw IllegalStateException("FirebaseApp with name $name does not exist."))
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?): FirebaseApp? = Firebase.initialize(context)
+        public actual fun initializeApp(context: Context): FirebaseApp? = Firebase.initialize(context)
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
+        public actual fun initializeApp(context: Context, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
+        public actual fun initializeApp(context: Context, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
-        public actual fun getApps(context: Any?): List<FirebaseApp> = Firebase.getApps(context)
+        /** All configured apps; the [context] is a placeholder and is ignored. */
+        public actual fun getApps(context: Context): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
     }
 }
 
@@ -75,7 +69,10 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
     public actual val gcmSenderId: String? get() = ios.GCMSenderID
     public actual val projectId: String? get() = ios.projectID
     public actual val storageBucket: String? get() = ios.storageBucket
-    public actual val gaTrackingId: String? get() = ios.trackingID
+
+    // FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0, where it had long been
+    // deprecated as unused, so gaTrackingId cannot be round tripped on apple targets
+    public actual val gaTrackingId: String? get() = null
 
     override fun toString(): String = "FirebaseOptions(applicationId=$applicationId, projectId=$projectId)"
 
@@ -112,13 +109,13 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
                 databaseURL = this@Builder.databaseUrl
                 projectID = this@Builder.projectId
                 storageBucket = this@Builder.storageBucket
-                trackingID = this@Builder.gaTrackingId
+                // gaTrackingId is dropped here - FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0
             },
         )
     }
 
     public actual companion object {
-        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, ReplaceWith("Firebase.fromResource(context)", "com.google.firebase.Firebase", "com.google.firebase.fromResource"), DeprecationLevel.ERROR)
-        public actual fun fromResource(context: Any?): FirebaseOptions? = Firebase.fromResource(context)
+        /** The options from `GoogleService-Info.plist`, or null when the bundle has none; the [context] is a placeholder and is ignored. */
+        public actual fun fromResource(context: Context): FirebaseOptions? = FIROptions.defaultOptions()?.let { FirebaseOptions(it) }
     }
 }
