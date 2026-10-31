@@ -8,11 +8,14 @@ import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMethod
 import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMetric
 import com.google.firebase.perf.metrics.HttpMetric
 import platform.Foundation.NSURL
+import java.net.URL
 
 public actual fun FirebasePerformance.newHttpMetric(url: String, httpMethod: String): HttpMetric {
     val nsUrl = requireNotNull(NSURL.URLWithString(url)) { "Invalid URL: $url" }
     return HttpMetric(FIRHTTPMetric(nsUrl, httpMethod.toFIRHTTPMethod()))
 }
+
+public actual fun FirebasePerformance.newHttpMetric(url: URL, httpMethod: String): HttpMetric = newHttpMetric(url.toExternalForm(), httpMethod)
 
 private fun String.toFIRHTTPMethod(): FIRHTTPMethod = when (this) {
     FirebasePerformance.HttpMethod.GET -> FIRHTTPMethod.FIRHTTPMethodGET

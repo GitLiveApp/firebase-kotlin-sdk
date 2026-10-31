@@ -7,6 +7,7 @@
 package com.google.firebase.perf
 
 import com.google.firebase.perf.metrics.HttpMetric
+import java.net.URL
 
 /*
  * Unlike the header stubs around it, this file is shipped (see keepClasses in the build file): common code reaches the
@@ -15,3 +16,5 @@ import com.google.firebase.perf.metrics.HttpMetric
  */
 
 public actual fun FirebasePerformance.newHttpMetric(url: String, httpMethod: String): HttpMetric = newHttpMetric(url, httpMethod)
+
+public actual fun FirebasePerformance.newHttpMetric(url: URL, httpMethod: String): HttpMetric = newHttpMetric(url, httpMethod)

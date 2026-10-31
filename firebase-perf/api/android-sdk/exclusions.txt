@@ -1,4 +1,7 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-perf.
+
+# HTTP metrics do not exist in the JS SDK; the Android, JVM and Apple source sets provide them as extensions (src/nonJsMain).
+com.google.firebase.perf.FirebasePerformance#newHttpMetric  // @unavailable the JS SDK has no HttpMetric; a nonJsMain extension on the other platforms
 com.google.firebase.perf.FirebasePerformance#MAX_ATTRIBUTE_KEY_LENGTH  // @hide shadowed by a private field of the SDK class, so not usable from app code; use Trace.MAX_ATTRIBUTE_KEY_LENGTH
 com.google.firebase.perf.FirebasePerformance#MAX_ATTRIBUTE_VALUE_LENGTH  // @hide shadowed by a private field of the SDK class; use Trace.MAX_ATTRIBUTE_VALUE_LENGTH
 com.google.firebase.perf.FirebasePerformance#MAX_TRACE_CUSTOM_ATTRIBUTES  // @hide shadowed by a private field of the SDK class; use Trace.MAX_TRACE_CUSTOM_ATTRIBUTES

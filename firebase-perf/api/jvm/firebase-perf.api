@@ -36,6 +36,7 @@ public final class com/google/firebase/perf/HttpMetricTraceKt {
 
 public final class com/google/firebase/perf/NewHttpMetric_jvmKt {
 	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
+	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/net/URL;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
 }
 
 public final class com/google/firebase/perf/PerformanceKt {

@@ -6,6 +6,7 @@ package com.google.firebase.perf
 
 import com.google.firebase.perf.metrics.HttpMetric
 import com.google.firebase.perf.metrics.Trace
+import java.net.URL
 import dev.gitlive.firebase.perf.stub
 import kotlin.jvm.JvmField
 
@@ -21,8 +22,10 @@ public actual class FirebasePerformance private constructor() {
 
     public actual fun newTrace(traceName: String): Trace = stub()
 
-    /** Not in the common API (JS has no [HttpMetric]); the shipped nonJsMain [newHttpMetric] extension binds to this member. */
+    /** Not in the common API (JS has no [HttpMetric]); the shipped nonJsMain [newHttpMetric] extensions bind to these members. */
     public fun newHttpMetric(url: String, httpMethod: String): HttpMetric = stub()
+
+    public fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = stub()
 
     @Retention(AnnotationRetention.SOURCE)
     public actual annotation class HttpMethod {

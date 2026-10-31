@@ -21,6 +21,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.seconds
+import java.net.URL
 
 /** The `com.google.firebase.perf.metrics.HttpMetric` part of the layer, which the JS SDK does not have. */
 @IgnoreForAndroidUnitTest
@@ -66,6 +67,15 @@ class HttpMetricTest {
         metric.setResponseContentType("application/json")
         metric.stop()
         assertEquals(100, HttpMetric.MAX_ATTRIBUTE_VALUE_LENGTH)
+    }
+
+    @Test
+    fun testHttpMetricFromUrl() = runTest {
+        val metric = Firebase.performance.newHttpMetric(URL("https://fir-kotlin-sdk.firebaseio.com/.json"), FirebasePerformance.HttpMethod.GET)
+        metric.start()
+        metric.putAttribute("source", "url")
+        assertEquals("url", metric.getAttribute("source"))
+        metric.stop()
     }
 
     @Test
