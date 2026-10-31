@@ -4,29 +4,23 @@
 
 package com.google.firebase
 
+import android.content.Context
 import swiftPMImport.dev.gitlive.firebase.app.FIRApp
-import swiftPMImport.dev.gitlive.firebase.app.FIROptions
 
-/** Configures the default app from `GoogleService-Info.plist`; the [context] is ignored. */
-public actual fun Firebase.initialize(context: Any?): FirebaseApp? {
+/** Configures the default app from `GoogleService-Info.plist`; the [context] is a placeholder and is ignored. */
+public actual fun Firebase.initialize(context: Context): FirebaseApp? {
     FIRApp.configure()
     return FIRApp.defaultApp()?.let { FirebaseApp(it) }
 }
 
-/** Configures the default app with the given [options]; the [context] is ignored. */
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp {
+/** Configures the default app with the given [options]; the [context] is a placeholder and is ignored. */
+public actual fun Firebase.initialize(context: Context, options: FirebaseOptions): FirebaseApp {
     FIRApp.configureWithOptions(options.ios)
     return FirebaseApp.getInstance()
 }
 
-/** Configures the app named [name] with the given [options]; the [context] is ignored. */
-public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions, name: String): FirebaseApp {
+/** Configures the app named [name] with the given [options]; the [context] is a placeholder and is ignored. */
+public actual fun Firebase.initialize(context: Context, options: FirebaseOptions, name: String): FirebaseApp {
     FIRApp.configureWithName(name, options.ios)
     return FirebaseApp.getInstance(name)
 }
-
-/** All initialized apps; the [context] is ignored. */
-public actual fun Firebase.getApps(context: Any?): List<FirebaseApp> = FIRApp.allApps().orEmpty().values.map { FirebaseApp(it as FIRApp) }
-
-/** The options from `GoogleService-Info.plist`, or null when the bundle has none; the [context] is ignored. */
-public actual fun Firebase.fromResource(context: Any?): FirebaseOptions? = FIROptions.defaultOptions()?.let { FirebaseOptions(it) }

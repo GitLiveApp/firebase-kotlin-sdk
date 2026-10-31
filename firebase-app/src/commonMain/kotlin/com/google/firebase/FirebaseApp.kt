@@ -4,16 +4,14 @@
 
 package com.google.firebase
 
-import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
-import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
-import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
+import android.content.Context
 
 /**
  * The entry point of Firebase SDKs, mirroring `com.google.firebase.FirebaseApp` from the Firebase Android SDK.
  *
- * The members taking or returning an Android `Context` (`initializeApp`, `getApps` and `getApplicationContext`) can
- * only be called from Android code: from common code they fail to compile with a message naming the replacement
- * (`Firebase.initialize(context)` and `Firebase.getApps(context)`).
+ * The members taking or returning an Android `Context` (`initializeApp`, `getApps` and `getApplicationContext`) keep
+ * the SDK's signatures through the [Context] stand-in: the platform's context on Android and the JVM, a placeholder
+ * that is ignored on the other platforms.
  */
 public expect class FirebaseApp {
     /** The unique name of this app. */
@@ -31,9 +29,8 @@ public expect class FirebaseApp {
      */
     public fun setAutomaticResourceManagementEnabled(enabled: Boolean)
 
-    /** Android only: the application context this app was initialized with. */
-    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-    public fun getApplicationContext(): Any
+    /** The application context on Android and the JVM; a placeholder [Context] on the other platforms, which have none. */
+    public fun getApplicationContext(): Context
 
     public companion object {
         /** The name of the default app. */
@@ -45,20 +42,16 @@ public expect class FirebaseApp {
         /** Returns the app with the given [name], which must have been initialized. */
         public fun getInstance(name: String): FirebaseApp
 
-        /** Android only: use [Firebase.initialize] from common code. */
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public fun initializeApp(context: Any?): FirebaseApp?
+        /** Initializes the default app from the platform's default configuration, as [Firebase.initialize] does. */
+        public fun initializeApp(context: Context): FirebaseApp?
 
-        /** Android only: use [Firebase.initialize] from common code. */
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp
+        /** Initializes the default app with [options], as [Firebase.initialize] does. */
+        public fun initializeApp(context: Context, options: FirebaseOptions): FirebaseApp
 
-        /** Android only: use [Firebase.initialize] from common code. */
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp
+        /** Initializes the app called [name] with [options], as [Firebase.initialize] does. */
+        public fun initializeApp(context: Context, options: FirebaseOptions, name: String): FirebaseApp
 
-        /** Android only: use [Firebase.getApps] from common code. */
-        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
-        public fun getApps(context: Any?): List<FirebaseApp>
+        /** The initialized apps; the [context] is used on Android and the JVM and ignored on the other platforms. */
+        public fun getApps(context: Context): List<FirebaseApp>
     }
 }

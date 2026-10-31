@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.installations
 
+import android.content.Context
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.app
 import dev.gitlive.firebase.FirebaseOptions
@@ -11,7 +12,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-expect val context: Any
+/** The platform context: Android's and firebase-java-sdk's on the JVM, the placeholder `Context()` elsewhere. */
+expect val context: Context
 expect annotation class IgnoreForAndroidUnitTest()
 
 /** firebase-java-sdk 0.6.3 does not support Installations (its Context stub lacks getFilesDir), so the tests are skipped on the JVM. */
