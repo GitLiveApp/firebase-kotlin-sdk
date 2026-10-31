@@ -17,8 +17,8 @@ val supportedPlatforms = (project.property("firebase-app.supportedTargets") as S
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }
@@ -98,31 +98,36 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseApp"
-            }
-            noPodspec()
-            pod("FirebaseCore") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.ios.sdk.get()),
+                products = listOf(product("FirebaseCore")),
+                importedClangModules = listOf("FirebaseCore"),
+            )
+        }
+    }
+
+    if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
             }
         }
     }
@@ -153,6 +158,9 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
@@ -166,6 +174,7 @@ kotlin {
         getByName("commonMain") {
             dependencies {
                 implementation(project(":firebase-common"))
+                api(libs.kotlinx.serialization.core)
             }
         }
 
@@ -199,19 +208,22 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "17"
 }
 
-// The com.google.* and kotlinx.coroutines.tasks declarations are header stubs on Android and the JVM (see buildSrc
-// utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk / kotlinx-coroutines-play-services classes are
-// used at runtime.
+// The com.google.* and kotlinx.coroutines.tasks declarations and the android.* / java.* stand-ins are header stubs on
+// Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
+// kotlinx-coroutines-play-services classes and the platform's own types are used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    packageDirs = listOf("android/content", "android/net", "java/io", "java/net", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
-        configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+        val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
         }?.files ?: files()
+        // android.jar, for the android.* and java.* stand-ins
+        dependencies + files(android.bootClasspath)
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Firebase.initialize(Any?, ...) is real code that overloads the SDK's Context versions from its own facade.
-    keepClasses = listOf("com/google/firebase/FirebaseInitializeKt.class", "com/google/firebase/FirebaseAppStatics.class", "com/google/firebase/TimestampInstantKt.class"),
+    keepClasses = listOf("com/google/firebase/TimestampInstantKt.class"),
+    // FirebaseFormat, the multiplatform counterpart of the Android SDK's (internal) class mappers.
+    keepPackageDirs = listOf("com/google/firebase/serialization"),
 )
 
 registerAndroidSourceCompat("firebase-common/api.txt")

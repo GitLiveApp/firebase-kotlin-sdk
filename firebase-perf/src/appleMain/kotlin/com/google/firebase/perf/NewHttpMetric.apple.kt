@@ -4,8 +4,8 @@
 
 package com.google.firebase.perf
 
-import cocoapods.FirebasePerformance.FIRHTTPMethod
-import cocoapods.FirebasePerformance.FIRHTTPMetric
+import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMethod
+import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMetric
 import com.google.firebase.perf.metrics.HttpMetric
 import platform.Foundation.NSURL
 

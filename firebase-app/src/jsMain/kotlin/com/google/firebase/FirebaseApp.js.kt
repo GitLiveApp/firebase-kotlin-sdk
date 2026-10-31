@@ -4,19 +4,17 @@
 
 package com.google.firebase
 
-import dev.gitlive.firebase.APPLICATION_CONTEXT_ANDROID_ONLY
-import dev.gitlive.firebase.FROM_RESOURCE_ANDROID_ONLY
-import dev.gitlive.firebase.GET_APPS_ANDROID_ONLY
-import dev.gitlive.firebase.INITIALIZE_APP_ANDROID_ONLY
+import android.content.Context
 import kotlin.js.json
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
 import dev.gitlive.firebase.externals.FirebaseOptions as JsFirebaseOptions
 import dev.gitlive.firebase.externals.deleteApp as jsDeleteApp
 import dev.gitlive.firebase.externals.getApp as jsGetApp
+import dev.gitlive.firebase.externals.getApps as jsGetApps
 
 public actual open class FirebaseException : Exception {
     public actual constructor(message: String) : super(message)
-    public actual constructor(message: String, cause: Throwable) : super("$message: ${cause.message}", cause)
+    public actual constructor(message: String, cause: Throwable?) : super(cause?.message?.let { "$message: $it" } ?: message, cause)
 }
 
 public actual class FirebaseNetworkException : FirebaseException {
@@ -48,8 +46,8 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
     /** No-op: automatic resource management is an Android-only behaviour. */
     public actual fun setAutomaticResourceManagementEnabled(enabled: Boolean) {}
 
-    @Deprecated(APPLICATION_CONTEXT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getApplicationContext(): Any = throw UnsupportedOperationException(APPLICATION_CONTEXT_ANDROID_ONLY)
+    /** A placeholder: JS has no application context. */
+    public actual fun getApplicationContext(): Context = Context()
 
     override fun equals(other: Any?): Boolean = other is FirebaseApp && other.js == js
 
@@ -64,17 +62,14 @@ public actual class FirebaseApp internal constructor(public val js: JsFirebaseAp
 
         public actual fun getInstance(name: String): FirebaseApp = FirebaseApp(jsGetApp(name))
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?): FirebaseApp? = Firebase.initialize(context)
+        public actual fun initializeApp(context: Context): FirebaseApp? = Firebase.initialize(context)
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
+        public actual fun initializeApp(context: Context, options: FirebaseOptions): FirebaseApp = Firebase.initialize(context, options)
 
-        @Deprecated(INITIALIZE_APP_ANDROID_ONLY, ReplaceWith("Firebase.initialize(context, options, name)", "com.google.firebase.Firebase", "com.google.firebase.initialize"), DeprecationLevel.ERROR)
-        public actual fun initializeApp(context: Any?, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
+        public actual fun initializeApp(context: Context, options: FirebaseOptions, name: String): FirebaseApp = Firebase.initialize(context, options, name)
 
-        @Deprecated(GET_APPS_ANDROID_ONLY, ReplaceWith("Firebase.getApps(context)", "com.google.firebase.Firebase", "com.google.firebase.getApps"), DeprecationLevel.ERROR)
-        public actual fun getApps(context: Any?): List<FirebaseApp> = Firebase.getApps(context)
+        /** All initialized apps; the [context] is a placeholder and is ignored. */
+        public actual fun getApps(context: Context): List<FirebaseApp> = jsGetApps().map { FirebaseApp(it) }
     }
 }
 
@@ -158,7 +153,7 @@ public actual class FirebaseOptions internal constructor(
     }
 
     public actual companion object {
-        @Deprecated(FROM_RESOURCE_ANDROID_ONLY, ReplaceWith("Firebase.fromResource(context)", "com.google.firebase.Firebase", "com.google.firebase.fromResource"), DeprecationLevel.ERROR)
-        public actual fun fromResource(context: Any?): FirebaseOptions? = Firebase.fromResource(context)
+        /** Always null: JS has no default configuration to read options from. */
+        public actual fun fromResource(context: Context): FirebaseOptions? = null
     }
 }

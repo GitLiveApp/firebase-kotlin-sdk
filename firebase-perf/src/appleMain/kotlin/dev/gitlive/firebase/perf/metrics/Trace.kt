@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.perf.metrics
 
-import cocoapods.FirebasePerformance.FIRTrace
+import swiftPMImport.dev.gitlive.firebase.perf.FIRTrace
 
 /** The underlying Firebase iOS SDK object; null when the iOS SDK refused the trace name. */
 public val Trace.ios: FIRTrace? get() = compat.ios

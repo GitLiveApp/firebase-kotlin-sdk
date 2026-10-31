@@ -2,7 +2,13 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:JvmName("FirebaseKt")
+@file:JvmMultifileClass
+
 package com.google.firebase
+
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 /**
  * Single access point to all Firebase SDKs, mirroring `com.google.firebase.Firebase` from the Firebase Android SDK.
@@ -10,7 +16,8 @@ package com.google.firebase
  * The `com.google.firebase` packages in this library mirror the Firebase Android SDK API (including `Task` return
  * types) so that Android code compiles unchanged on every platform; the `dev.gitlive.firebase` packages offer the
  * Kotlin-first (suspending) API built on top of them. On Android and the JVM these declarations are only compiled
- * against and never shipped: the real Firebase Android SDK classes are used.
+ * against and never shipped: the real Firebase Android SDK classes are used. This file and the Android
+ * `Firebase.initialize` stubs form the `FirebaseKt` facade, the SDK's own, so the module's calls to them bind at runtime.
  */
 public object Firebase
 

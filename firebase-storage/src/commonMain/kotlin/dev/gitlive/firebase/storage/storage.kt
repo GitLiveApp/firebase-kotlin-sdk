@@ -302,8 +302,19 @@ public expect class File
 
 /**
  * Represents a reference to data for all platforms. Every platform has its own constructor.
+ * Use [toData] to create one from a [ByteArray] in common code.
  */
 public expect class Data
+
+/**
+ * Creates a [Data] holding a copy of this byte array, e.g. for [StorageReference.putData].
+ */
+public expect fun ByteArray.toData(): Data
+
+/**
+ * Returns a new byte array holding a copy of this [Data], e.g. from [StorageReference.getData].
+ */
+public expect fun Data.toByteArray(): ByteArray
 
 /**
  * Represents the progress of an operation.

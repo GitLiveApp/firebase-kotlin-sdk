@@ -4,31 +4,57 @@
 
 package dev.gitlive.firebase.auth
 
-public expect class MultiFactor {
+import kotlinx.coroutines.tasks.await
+import com.google.firebase.auth.MultiFactor as CompatMultiFactor
+import com.google.firebase.auth.MultiFactorAssertion as CompatMultiFactorAssertion
+import com.google.firebase.auth.MultiFactorInfo as CompatMultiFactorInfo
+import com.google.firebase.auth.MultiFactorResolver as CompatMultiFactorResolver
+import com.google.firebase.auth.MultiFactorSession as CompatMultiFactorSession
+
+/** @property compat The Android-SDK-shaped [com.google.firebase.auth.MultiFactor] this wraps. */
+public class MultiFactor internal constructor(public val compat: CompatMultiFactor) {
     public val enrolledFactors: List<MultiFactorInfo>
-    public suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?)
-    public suspend fun getSession(): MultiFactorSession
-    public suspend fun unenroll(multiFactorInfo: MultiFactorInfo)
-    public suspend fun unenroll(factorUid: String)
+        get() = compat.enrolledFactors.map { MultiFactorInfo(it) }
+    public suspend fun enroll(multiFactorAssertion: MultiFactorAssertion, displayName: String?) {
+        compat.enroll(multiFactorAssertion.compat, displayName).await()
+    }
+    public suspend fun getSession(): MultiFactorSession = MultiFactorSession(compat.getSession().await())
+    public suspend fun unenroll(multiFactorInfo: MultiFactorInfo) {
+        compat.unenroll(multiFactorInfo.compat).await()
+    }
+    public suspend fun unenroll(factorUid: String) {
+        compat.unenroll(factorUid).await()
+    }
 }
 
-public expect class MultiFactorInfo {
+/** @property compat The Android-SDK-shaped [com.google.firebase.auth.MultiFactorInfo] this wraps. */
+public class MultiFactorInfo internal constructor(public val compat: CompatMultiFactorInfo) {
     public val displayName: String?
+        get() = compat.displayName
+
+    /** When the factor was enrolled, in milliseconds since the epoch. */
     public val enrollmentTime: Double
+        get() = compat.enrollmentTimestamp.toDouble()
     public val factorId: String
+        get() = compat.factorId
     public val uid: String
+        get() = compat.uid
 }
 
-public expect class MultiFactorAssertion {
+/** @property compat The Android-SDK-shaped [com.google.firebase.auth.MultiFactorAssertion] this wraps. */
+public class MultiFactorAssertion internal constructor(public val compat: CompatMultiFactorAssertion) {
     public val factorId: String
+        get() = compat.factorId
 }
 
-public expect class MultiFactorSession
+/** @property compat The Android-SDK-shaped [com.google.firebase.auth.MultiFactorSession] this wraps. */
+public class MultiFactorSession internal constructor(public val compat: CompatMultiFactorSession)
 
-public expect class MultiFactorResolver {
-    public val auth: FirebaseAuth
-    public val hints: List<MultiFactorInfo>
-    public val session: MultiFactorSession
+/** @property compat The Android-SDK-shaped [com.google.firebase.auth.MultiFactorResolver] this wraps. */
+public class MultiFactorResolver internal constructor(public val compat: CompatMultiFactorResolver) {
+    public val auth: FirebaseAuth get() = FirebaseAuth(compat.firebaseAuth)
+    public val hints: List<MultiFactorInfo> get() = compat.hints.map { MultiFactorInfo(it) }
+    public val session: MultiFactorSession get() = MultiFactorSession(compat.session)
 
-    public suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult
+    public suspend fun resolveSignIn(assertion: MultiFactorAssertion): AuthResult = AuthResult(compat.resolveSignIn(assertion.compat).await())
 }
