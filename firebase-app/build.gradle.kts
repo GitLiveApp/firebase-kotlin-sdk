@@ -208,16 +208,16 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "17"
 }
 
-// The com.google.*, kotlinx.coroutines.tasks and android.content.Context declarations are header stubs on Android and
-// the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
-// kotlinx-coroutines-play-services classes and the platform's Context are used at runtime.
+// The com.google.* and kotlinx.coroutines.tasks declarations and the android.* / java.* stand-ins are header stubs on
+// Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
+// kotlinx-coroutines-play-services classes and the platform's own types are used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("android/content", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    packageDirs = listOf("android/content", "android/net", "java/io", "java/net", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
         val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
         }?.files ?: files()
-        // android.jar, for the android.content.Context stand-in
+        // android.jar, for the android.* and java.* stand-ins
         dependencies + files(android.bootClasspath)
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),

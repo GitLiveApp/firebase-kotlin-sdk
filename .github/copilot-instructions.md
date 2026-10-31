@@ -135,17 +135,21 @@ The SDK has two public API layers per module:
    SDK's order, and this module's own code must not call a stub's companion members (they compile to `Companion` calls): use
    the SDK's Kotlin extensions (`Firebase.app`, `Firebase.installations`, whose stubs are named into the SDK's own facade
    class, e.g. `FirebaseKt`) or a package-private Java helper (`firebase-app/src/androidMain/java`). A platform type in an SDK
-   signature gets a **stand-in class** in `commonMain` under its own package, a header stub like the rest: `android.content.Context`
-   (`firebase-app/src/commonMain/kotlin/android/content/Context.kt`) is a constructible placeholder on Apple/JS/wasmJs, since
-   an app's common code passes its context through, so `FirebaseApp.initializeApp(Context)`, `getApps(Context)`,
-   `getApplicationContext()`, `FirebaseOptions.fromResource(Context)` and `Firebase.initialize(Context)` keep the SDK's exact
-   signatures and are callable from common code (platform code without a context passes `Context()`). The one exception to the
-   signature rule is a member annotated `@Deprecated(level = DeprecationLevel.ERROR)`: the verifier skips it because it cannot be
-   called, so a member whose type has no sensible stand-in (`Timestamp(Date)`, `toDate()`, `toInstant()`) can be mirrored with the
-   type widened to `Any` and a message naming the multiplatform replacement (messages live in
-   `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`); Android code still binds to the real member.
-   JVM-only types get a `kotlin.time` counterpart as shipped top-level functions (`Timestamp(Instant)`, `Timestamp.toKotlinInstant`
-   in `TimestampInstant.kt`; `kotlin.time.ExperimentalTime` is opted in at the build level).
+   signature gets a **stand-in class** in firebase-app's `commonMain` under the type's own package, a header stub on Android/JVM
+   like the rest (verified against `android.jar`, firebase-java-sdk or the running JDK), in one of two shapes:
+   - **Usable**, when an app's code only carries the value to the SDK: `android.content.Context` is a constructible placeholder
+     (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
+     created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
+     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
+   - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`. The SDK members taking them (`Timestamp(Date)`,
+     `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     too, with a message naming the multiplatform counterpart (messages live in
+     `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
+     that message, Android code still binds to the real member, and the verifier skips both the class and the members since
+     they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
+     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`; `kotlin.time.ExperimentalTime` is opted in at
+     the build level).
    - An Android API that cannot be mapped onto a platform and has no replacement to point at is **omitted** on purpose so
      callers get a compile error and adapt.
    - An API that maps onto Android, JVM and Apple but not JS/wasmJs goes in the `nonJsMain` source set (`utils.applyFirebaseHierarchy()`).
