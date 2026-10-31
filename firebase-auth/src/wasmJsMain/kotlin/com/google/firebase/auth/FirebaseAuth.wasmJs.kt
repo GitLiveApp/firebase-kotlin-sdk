@@ -193,9 +193,9 @@ public actual class FirebaseAuth internal constructor(public val js: Auth) {
 
     public actual fun sendPasswordResetEmail(email: String): Task<Nothing?> = sendPasswordResetEmail(email, null)
 
-    public actual fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(this) { sendPasswordResetEmail(js, email, actionCodeSettings?.toJs()) }
+    public actual fun sendPasswordResetEmail(email: String, actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(this) { sendPasswordResetEmail(js, email, actionCodeSettings?.toJsSettings()) }
 
-    public actual fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings): Task<Nothing?> = write(this) { sendSignInLinkToEmail(js, email, actionCodeSettings.toJs()) }
+    public actual fun sendSignInLinkToEmail(email: String, actionCodeSettings: ActionCodeSettings): Task<Nothing?> = write(this) { sendSignInLinkToEmail(js, email, actionCodeSettings.toJsSettings()) }
 
     public actual fun signInAnonymously(): Task<AuthResult> = task(this, { signInAnonymously(js) }) { toAuthResult(it, this) }
 
@@ -263,7 +263,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
 
     public actual fun sendEmailVerification(): Task<Nothing?> = sendEmailVerification(null)
 
-    public actual fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(auth) { sendEmailVerification(js, actionCodeSettings?.toJs()) }
+    public actual fun sendEmailVerification(actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(auth) { sendEmailVerification(js, actionCodeSettings?.toJsSettings()) }
 
     public actual fun unlink(provider: String): Task<AuthResult> = task(auth, { unlink(js, provider) }) { AuthResultImpl(FirebaseUserImpl(it, auth), null, null) }
 
@@ -283,7 +283,7 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
 
     public actual fun verifyBeforeUpdateEmail(newEmail: String): Task<Nothing?> = verifyBeforeUpdateEmail(newEmail, null)
 
-    public actual fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(auth) { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJs()) }
+    public actual fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = write(auth) { verifyBeforeUpdateEmail(js, newEmail, actionCodeSettings?.toJsSettings()) }
 
     override fun equals(other: Any?): Boolean = other is FirebaseUser && other.js == js
 
@@ -377,7 +377,8 @@ private fun jsonOf(vararg pairs: Pair<String, Any?>): JsAny {
     return obj
 }
 
-internal fun ActionCodeSettings.toJs(): JsAny = jsonOf(
+/** The JS SDK's action code settings object. Named apart from the `toJs()` of firebase-common, which the import would otherwise select. */
+internal fun ActionCodeSettings.toJsSettings(): JsAny = jsonOf(
     "url" to url,
     "android" to androidPackageName?.let { jsonOf("installApp" to androidInstallApp, "minimumVersion" to androidMinimumVersion, "packageName" to it) },
     "linkDomain" to linkDomain,
