@@ -16,11 +16,13 @@ import kotlin.test.assertTrue
 expect val context: Context
 expect annotation class IgnoreForAndroidUnitTest()
 
-/** firebase-java-sdk 0.6.3 does not support Installations (its Context stub lacks getFilesDir), so the tests are skipped on the JVM. */
+/**
+ * firebase-java-sdk ships no `com.google.android.gms.common.R` resources, so `FirebaseOptions.fromResource` fails on the
+ * JVM with a `NoClassDefFoundError` instead of returning null; the test that calls it is skipped there.
+ */
 expect annotation class IgnoreForJvm()
 
 @IgnoreForAndroidUnitTest
-@IgnoreForJvm
 class FirebaseInstallationsTest {
 
     @BeforeTest

@@ -17,10 +17,8 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-/**
- * The custom signal part of the `com.google.firebase.remoteconfig` layer. firebase-java-sdk lacks custom signals, so the
- * test cannot compile for the JVM: it is here for Apple and JS, and in androidInstrumentedTest for Android.
- */
+/** The custom signal part of the `com.google.firebase.remoteconfig` layer; real-time updates are in ConfigUpdateTest. */
+@IgnoreForAndroidUnitTest
 class CustomSignalsTest {
 
     @BeforeTest

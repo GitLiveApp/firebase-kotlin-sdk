@@ -159,8 +159,9 @@ The SDK has two public API layers per module:
    - An API that maps onto Android, JVM and Apple but not JS/wasmJs is still declared in common; its JS and wasmJs actuals do nothing (or fail where they must return a value) and carry `@dev.gitlive.firebase.UnsupportedOnJs`, an opt-in marker that warns at call sites compiled for JS only.
    - Coverage is measured, not assumed: `./gradlew :<module>:androidSourceCompatDump` compares `api/android/<module>.api` with the
      vendored Android SDK `api/android-sdk/*.api.txt` and writes `api/android-sdk-compat.txt` (committed, checked by `check`); its
-     percentage is the module's README badge. A member deprecated with an error on our side is reported as `MAP` with its
-     message and counts as provided. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
+     percentage is the module's README badge. Parameter types must match the Android SDK's exactly (the stand-ins make that
+     possible); only a different return type, a public field provided as a Kotlin property or an error deprecation is
+     reported as `MAP`, and a member deprecated with an error on our side counts as provided with its message shown. `api/android-sdk/exclusions.txt` lists members deliberately not mirrored: they count as
      unavailable unless the comment says `@hide` (hidden in the Android SDK) or `@platform` (the signature involves an
      Android/JVM-only type with no replacement, such as `Parcel`), which drops them from the count; a single overload
      is selected with `Class#member(Type, Type)`.

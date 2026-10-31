@@ -199,13 +199,6 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // firebase-java-sdk has no custom signals.
-    jvmMissingMembers = listOf(
-        "com/google/firebase/remoteconfig/CustomSignals",
-        "com/google/firebase/remoteconfig/CustomSignals\$Builder",
-        "com/google/firebase/remoteconfig/FirebaseRemoteConfig.setCustomSignals(Lcom/google/firebase/remoteconfig/CustomSignals;)Lcom/google/android/gms/tasks/Task;",
-        "com/google/firebase/remoteconfig/RemoteConfigKt.customSignals(Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/remoteconfig/CustomSignals;",
-    ),
 )
 
 registerAndroidSourceCompat("firebase-config/api.txt")
