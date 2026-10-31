@@ -5,7 +5,7 @@
 package dev.gitlive.firebase.remoteconfig
 
 /**
- * firebase-java-sdk registers no Remote Config component, so `FirebaseRemoteConfig.getInstance()` fails on the JVM
- * (the JVM is not a test target of this module); the tests that need an instance are skipped there.
+ * firebase-java-sdk does not support real-time config updates: registering a `ConfigUpdateListener` needs
+ * `androidx.concurrent.futures`, which it does not ship, so the real-time update test is skipped on the JVM.
  */
 expect annotation class IgnoreForJvm()

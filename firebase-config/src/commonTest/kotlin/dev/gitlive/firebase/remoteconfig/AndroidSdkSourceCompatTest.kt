@@ -32,7 +32,6 @@ import kotlin.test.assertTrue
  * exception classes), on every platform.
  */
 @IgnoreForAndroidUnitTest
-@IgnoreForJvm
 class AndroidSdkSourceCompatTest {
 
     private val defaults = mapOf(

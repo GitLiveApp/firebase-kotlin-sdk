@@ -32,7 +32,6 @@ import kotlin.time.Instant
  * the `Context`-taking members with the platform's [context]), on every platform.
  */
 @IgnoreForAndroidUnitTest
-@IgnoreForJvm
 class AndroidSdkSourceCompatTest {
 
     @BeforeTest
@@ -61,9 +60,14 @@ class AndroidSdkSourceCompatTest {
         assertEquals(app, FirebaseApp.getInstance(FirebaseApp.DEFAULT_APP_NAME))
         assertTrue(app in FirebaseApp.getApps(context))
         assertNotNull(app.getApplicationContext())
-        // Whether a default configuration exists depends on the test host; when it does its options must be usable.
-        FirebaseOptions.fromResource(context)?.let { assertTrue(it.applicationId.isNotBlank()) }
         assertEquals("fir-kotlin-sdk", app.options.projectId)
+    }
+
+    // Whether a default configuration exists depends on the test host; when it does its options must be usable.
+    @Test
+    @IgnoreForJvm
+    fun testOptionsFromResource() {
+        FirebaseOptions.fromResource(context)?.let { assertTrue(it.applicationId.isNotBlank()) }
     }
 
     @Test
