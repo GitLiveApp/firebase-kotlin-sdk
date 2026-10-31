@@ -13,8 +13,10 @@ import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
  * `com.google.firebase.functions.HttpsCallableReference` from the Firebase Android SDK. Obtained from
  * [FirebaseFunctions.getHttpsCallable] or [getHttpsCallableFromUrl].
  *
- * The timeout is set with the [setTimeout] and [withTimeout] extensions taking a `kotlin.time.Duration`; the Android
- * SDK's `TimeUnit` overloads are JVM-only and deprecated with an error in common code.
+ * The timeout is set with the [setTimeout] and [withTimeout] extensions taking a `kotlin.time.Duration`. The Android
+ * SDK's `TimeUnit` overloads keep their signatures through the error-deprecated `java.util.concurrent.TimeUnit` stand-in
+ * and can only be called from Android/JVM code: from common code they fail to compile with a message naming the
+ * `Duration` forms.
  *
  * Not mirrored: `stream()` (returns an `org.reactivestreams.Publisher`, which is JVM-only, and the iOS SDK's streaming
  * API is Swift-only).
@@ -36,10 +38,12 @@ public expect class HttpsCallableReference {
     public val timeout: Long
 
     /** Sets the timeout of the calls made through this reference; Android/JVM only, common code uses [setTimeout] with a `Duration`. */
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(SET_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public fun setTimeout(timeout: Long, units: Any)
+    public fun setTimeout(timeout: Long, units: java.util.concurrent.TimeUnit)
 
     /** A copy of this reference with the given timeout; Android/JVM only, common code uses [withTimeout] with a `Duration`. */
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public fun withTimeout(timeout: Long, units: Any): HttpsCallableReference
+    public fun withTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): HttpsCallableReference
 }

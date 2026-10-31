@@ -20,6 +20,7 @@ import com.google.firebase.functions.withTimeout
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest
+import java.net.URL
 import kotlinx.coroutines.tasks.await
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -32,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * Exercises the `com.google.firebase.functions` layer exactly as Android app code would (static accessors, Task API,
- * options builder, the Duration forms of the timeout members and the String forms of the URL members), on every
+ * options builder, the Duration forms of the timeout members and the URL members), on every
  * platform, against the Functions emulator.
  */
 @IgnoreForAndroidUnitTest
@@ -131,7 +132,7 @@ class AndroidSdkSourceCompatTest {
 
     @Test
     fun testCallableFromUrl() = runTest {
-        val url = "http://$emulatorHost:5001/fir-kotlin-sdk/us-central1/throwHttpsError"
+        val url = URL("http://$emulatorHost:5001/fir-kotlin-sdk/us-central1/throwHttpsError")
         val exception = assertFailsWith<FirebaseFunctionsException> {
             functions.getHttpsCallableFromUrl(url).call(mapOf("code" to "invalid-argument")).await()
         }

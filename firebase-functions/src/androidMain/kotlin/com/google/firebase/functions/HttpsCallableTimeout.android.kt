@@ -10,8 +10,8 @@ import kotlin.time.Duration
 
 /*
  * Unlike the header stubs around it, this file is shipped (see keepClasses in the build file): the SDK's members take a
- * java.util.concurrent.TimeUnit, which common code cannot name, so these extensions take a Duration and call them
- * through FunctionsJvmApi.
+ * java.util.concurrent.TimeUnit, whose stand-in common code cannot construct, so these extensions take a Duration and
+ * call them through FunctionsJvmApi.
  */
 
 public actual fun HttpsCallableReference.setTimeout(timeout: Duration) {

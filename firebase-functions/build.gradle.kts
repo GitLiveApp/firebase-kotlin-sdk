@@ -209,17 +209,15 @@ tasks.withType<JavaCompile>().configureEach {
 
 // The com.google.* declarations are header stubs on Android/JVM (see buildSrc utils/HeaderStubs.kt).
 stripHeaderStubs(
-    // java/net holds the deprecated stand-in for java.net.URL that lets the SDK's URL members be declared in common code.
-    packageDirs = listOf("com/google/firebase", "java/net"),
+    packageDirs = listOf("com/google/firebase"),
     androidReferenceJars = files({
         configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // The String / Duration counterparts of the SDK's java.net.URL and TimeUnit members are real code from their own facades.
+    // The Duration counterparts of the SDK's TimeUnit members are real code from their own facade.
     keepClasses = listOf(
-        "com/google/firebase/functions/FunctionsUrlKt.class",
         "com/google/firebase/functions/HttpsCallableTimeoutKt.class",
         "com/google/firebase/functions/FunctionsJvmApi.class",
     ),

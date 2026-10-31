@@ -11,8 +11,8 @@ import kotlin.time.Duration
 
 /*
  * Multiplatform counterparts of `HttpsCallableReference.setTimeout(long, TimeUnit)` and `withTimeout(long, TimeUnit)`
- * taking a kotlin.time.Duration, since `java.util.concurrent.TimeUnit` is JVM-only. Shipped on Android and the JVM too
- * (see keepClasses in the build file).
+ * taking a kotlin.time.Duration, since a `java.util.concurrent.TimeUnit` cannot exist in common code (its stand-in is
+ * deprecated with an error). Shipped on Android and the JVM too (see keepClasses in the build file).
  */
 
 /** Sets the timeout of the calls made through this reference. */

@@ -12,12 +12,12 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.serialization.decodeFromPlainValue
-import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.functionsFormat
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import java.net.URL
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseFunctions internal constructor(public val ios: FIRFunctions) {
@@ -26,17 +26,11 @@ public actual class FirebaseFunctions internal constructor(public val ios: FIRFu
 
     public actual fun getHttpsCallable(name: String, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference { ios.HTTPSCallableWithName(name, options.toIos()) }
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getHttpsCallableFromUrl(url: java.net.URL): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
+    public actual fun getHttpsCallableFromUrl(url: URL): HttpsCallableReference = HttpsCallableReference { ios.HTTPSCallableWithURL(url.toNSURL()) }
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getHttpsCallableFromUrl(url: java.net.URL, options: HttpsCallableOptions): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
+    public actual fun getHttpsCallableFromUrl(url: URL, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference { ios.HTTPSCallableWithURL(url.toNSURL(), options.toIos()) }
 
-    internal fun httpsCallableFromUrl(url: NSURL, options: HttpsCallableOptions?): HttpsCallableReference = HttpsCallableReference {
-        if (options == null) ios.HTTPSCallableWithURL(url) else ios.HTTPSCallableWithURL(url, options.toIos())
-    }
+    private fun URL.toNSURL(): NSURL = requireNotNull(NSURL.URLWithString(toExternalForm())) { "Not a valid URL: $this" }
 
     public actual fun useEmulator(host: String, port: Int) {
         ios.useEmulatorWithHost(host, port.toLong())
@@ -92,11 +86,13 @@ public actual class HttpsCallableReference internal constructor(private val crea
 
     public actual val timeout: Long get() = (ios.timeoutInterval() * MILLIS_PER_SECOND).toLong()
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(SET_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun setTimeout(timeout: Long, units: Any): Unit = throw UnsupportedOperationException(SET_TIMEOUT_JVM_ONLY)
+    public actual fun setTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): Unit = throw UnsupportedOperationException(SET_TIMEOUT_JVM_ONLY)
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun withTimeout(timeout: Long, units: Any): HttpsCallableReference = throw UnsupportedOperationException(WITH_TIMEOUT_JVM_ONLY)
+    public actual fun withTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): HttpsCallableReference = throw UnsupportedOperationException(WITH_TIMEOUT_JVM_ONLY)
 
     internal fun setTimeoutSeconds(seconds: Double) {
         ios.setTimeoutInterval(seconds)

@@ -8,7 +8,6 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.serialization.decodeFromPlainValue
-import dev.gitlive.firebase.functions.GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.externals.Functions
@@ -20,6 +19,7 @@ import dev.gitlive.firebase.functions.externals.httpsCallableFromURL
 import dev.gitlive.firebase.functions.externals.invoke
 import dev.gitlive.firebase.functions.functionsFormat
 import kotlin.js.Promise
+import java.net.URL
 import kotlin.js.json
 import dev.gitlive.firebase.functions.externals.HttpsCallableResult as JsHttpsCallableResult
 
@@ -30,15 +30,9 @@ public actual class FirebaseFunctions internal constructor(public val js: Functi
 
     public actual fun getHttpsCallable(name: String, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference(js, name, fromUrl = false, limitedUseAppCheckTokens = options.limitedUseAppCheckTokens)
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getHttpsCallableFromUrl(url: java.net.URL): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
+    public actual fun getHttpsCallableFromUrl(url: URL): HttpsCallableReference = HttpsCallableReference(js, url.toExternalForm(), fromUrl = true, limitedUseAppCheckTokens = false)
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getHttpsCallableFromUrl(url: java.net.URL, options: HttpsCallableOptions): HttpsCallableReference = throw UnsupportedOperationException(GET_HTTPS_CALLABLE_FROM_URL_JVM_ONLY)
-
-    internal fun httpsCallableFromUrl(url: String, options: HttpsCallableOptions?): HttpsCallableReference = HttpsCallableReference(js, url, fromUrl = true, limitedUseAppCheckTokens = options?.limitedUseAppCheckTokens ?: false)
+    public actual fun getHttpsCallableFromUrl(url: URL, options: HttpsCallableOptions): HttpsCallableReference = HttpsCallableReference(js, url.toExternalForm(), fromUrl = true, limitedUseAppCheckTokens = options.limitedUseAppCheckTokens)
 
     public actual fun useEmulator(host: String, port: Int) {
         rethrow { connectFunctionsEmulator(js, host, port) }
@@ -86,11 +80,13 @@ public actual class HttpsCallableReference internal constructor(
 
     public actual val timeout: Long get() = timeoutMillis
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(SET_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun setTimeout(timeout: Long, units: Any): Unit = throw UnsupportedOperationException(SET_TIMEOUT_JVM_ONLY)
+    public actual fun setTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): Unit = throw UnsupportedOperationException(SET_TIMEOUT_JVM_ONLY)
 
+    @Suppress("DEPRECATION_ERROR")
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun withTimeout(timeout: Long, units: Any): HttpsCallableReference = throw UnsupportedOperationException(WITH_TIMEOUT_JVM_ONLY)
+    public actual fun withTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): HttpsCallableReference = throw UnsupportedOperationException(WITH_TIMEOUT_JVM_ONLY)
 
     internal fun setTimeoutMillis(millis: Long) {
         timeoutMillis = millis

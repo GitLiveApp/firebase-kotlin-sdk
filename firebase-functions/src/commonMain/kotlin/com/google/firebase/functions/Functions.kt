@@ -6,11 +6,11 @@ package com.google.firebase.functions
 
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import java.net.URL
 
 /*
  * The Kotlin extensions of the Android SDK's firebase-functions (FunctionsKt), as plain common code: on Android and the
- * JVM the facade is a header stub that is stripped, so the SDK's own facade binds. The URL-based ones take a String here
- * and live in FunctionsUrl.kt, which is shipped.
+ * JVM the facade is a header stub that is stripped, so the SDK's own facade binds.
  */
 
 /** The [FirebaseFunctions] instance of the default [FirebaseApp]; the Android SDK's `Firebase.functions`. */
@@ -28,3 +28,6 @@ public fun Firebase.functions(app: FirebaseApp, regionOrCustomDomain: String): F
 
 /** A reference to the callable HTTPS trigger [name], with the [HttpsCallableOptions] built by [init]. */
 public fun FirebaseFunctions.getHttpsCallable(name: String, init: HttpsCallableOptions.Builder.() -> Unit): HttpsCallableReference = getHttpsCallable(name, HttpsCallableOptions.Builder().apply(init).build())
+
+/** A reference to the callable HTTPS trigger at [url], with the [HttpsCallableOptions] built by [init]. */
+public fun FirebaseFunctions.getHttpsCallableFromUrl(url: URL, init: HttpsCallableOptions.Builder.() -> Unit): HttpsCallableReference = getHttpsCallableFromUrl(url, HttpsCallableOptions.Builder().apply(init).build())
