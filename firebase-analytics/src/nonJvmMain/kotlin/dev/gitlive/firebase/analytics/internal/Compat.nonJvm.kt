@@ -15,6 +15,10 @@ private fun Any?.toParameter(): Any? = when (this) {
     else -> this
 }
 
+internal actual fun Bundle.putBundleArray(key: String?, value: Array<Bundle>) {
+    map[key.orEmpty()] = value
+}
+
 /** A bundle of these parameters (nested maps become bundles; arrays and lists of bundles are kept for `items`). */
 internal actual fun Map<String, Any?>.toBundle(): Bundle = Bundle(
     entries.associateTo(linkedMapOf()) { (key, value) ->

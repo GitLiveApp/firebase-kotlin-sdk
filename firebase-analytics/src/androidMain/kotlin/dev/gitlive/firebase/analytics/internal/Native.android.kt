@@ -42,8 +42,21 @@ internal actual fun Map<String, Any?>.toBundle(): Bundle = Bundle().also { bundl
             is Double -> bundle.putDouble(key, value)
             is Boolean -> bundle.putBoolean(key, value)
             is Bundle -> bundle.putBundle(key, value)
-            is Map<*, *> -> bundle.putBundle(key, value.entries.associate { (k, v) -> k.toString() to v }.toBundle())
+            is Map<*, *> -> bundle.putBundle(key, value.toStringKeyedBundle())
+            is Array<*> -> bundle.putBundleArray(key, value.map { it.toBundleElement(key) }.toTypedArray())
+            is List<*> -> bundle.putBundleArray(key, value.map { it.toBundleElement(key) }.toTypedArray())
             else -> throw IllegalArgumentException("Unsupported analytics parameter type ${value::class} for $key")
         }
     }
 }
+
+private fun Map<*, *>.toStringKeyedBundle(): Bundle = entries.associate { (k, v) -> k.toString() to v }.toBundle()
+
+/** An element of an `items` array: a bundle or a map of one. */
+private fun Any?.toBundleElement(key: String): Bundle = when (this) {
+    is Bundle -> this
+    is Map<*, *> -> toStringKeyedBundle()
+    else -> throw IllegalArgumentException("Unsupported analytics parameter element type ${this?.let { it::class }} in $key")
+}
+
+internal actual fun Bundle.putBundleArray(key: String?, value: Array<Bundle>): Unit = putParcelableArray(key, value)

@@ -31,3 +31,5 @@ internal actual fun nativeAnalytics(app: FirebaseApp?): NativeAnalytics = instan
 
 /** firebase-java-sdk's Bundle is built from a map; the parameters are never read on the JVM. */
 internal actual fun Map<String, Any?>.toBundle(): Bundle = Bundle(this)
+
+internal actual fun Bundle.putBundleArray(key: String?, value: Array<Bundle>): Unit = putAll(Bundle(mapOf(key.orEmpty() to value)))

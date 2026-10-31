@@ -143,7 +143,7 @@ object SourceCompatReport {
     }
 
     private fun classify(member: ApiMember, ourClass: ApiClass, oursByName: Map<String, ApiClass>): Pair<String, String?> {
-        if (member.kind == ApiMember.Kind.METHOD && !member.isStatic && ourClass.members.none { it.kind == member.kind && it.name == member.name && it.parameters.size == member.parameters.size }) {
+        if (member.kind == ApiMember.Kind.METHOD && !member.isStatic && ourClass.members.none { it.kind == member.kind && it.name == member.name && it.parameters.matches(member.parameters) }) {
             val inherited = inheritedMembers(ourClass, oursByName).firstOrNull { it.kind == member.kind && it.name == member.name && it.parameters.matches(member.parameters) }
             if (inherited != null) return "MAP" to "inherited"
         }
@@ -184,13 +184,14 @@ object SourceCompatReport {
         return "MAP" to "property ${getter.name}()"
     }
 
-    /** The Android SDK's parameters exactly, except that a type parameter (`T`, `ResultT`), which the dump shows erased, matches any type. */
+    /** The Android SDK's parameters exactly, except that a type parameter (`T`, `ResultT`) matches its erasure, `Object`, in the dump. */
     private fun List<String>.matches(theirs: List<String>): Boolean =
-        size == theirs.size && zip(theirs).all { (ours, theirs) -> ours == theirs || isTypeVariable(theirs) }
+        size == theirs.size && zip(theirs).all { (ours, theirs) -> ours == theirs || (isTypeVariable(theirs) && ours == "java.lang.Object") }
 
     private fun isAcceptedReturnType(theirs: String, ours: String): Boolean =
-        theirs == "java.lang.Void" && ours == "java.lang.Void" || (theirs == "java.util.List" && ours == "java.util.List") || isTypeVariable(theirs)
+        theirs == "java.lang.Void" && ours == "java.lang.Void" || (theirs == "java.util.List" && ours == "java.util.List") ||
+            (isTypeVariable(theirs) && ours == "java.lang.Object")
 
-    /** A type parameter such as `T` or `ResultT`, which the BCV dump shows erased (to Object or to its bound). */
+    /** A type parameter such as `T` or `ResultT`, which the BCV dump shows erased to Object. */
     private fun isTypeVariable(type: String): Boolean = type.first().isUpperCase() && !type.contains('.') && !type.endsWith("[]")
 }

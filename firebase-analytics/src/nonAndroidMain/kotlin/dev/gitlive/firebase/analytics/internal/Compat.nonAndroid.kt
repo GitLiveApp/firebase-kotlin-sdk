@@ -7,7 +7,5 @@ package dev.gitlive.firebase.analytics.internal
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 
-private val instances = mutableMapOf<String?, FirebaseAnalytics>()
-
-/** One [FirebaseAnalytics] per app (keyed by name), so repeated lookups are equal as on Android. */
-internal actual fun compatAnalytics(app: FirebaseApp?): FirebaseAnalytics = instances.getOrPut(app?.name) { FirebaseAnalytics.create(nativeAnalytics(app)) }
+/** A [FirebaseAnalytics] over the platform client of [app]; repeated lookups are equal as on Android, as it compares the client. */
+internal actual fun compatAnalytics(app: FirebaseApp?): FirebaseAnalytics = FirebaseAnalytics.create(nativeAnalytics(app))

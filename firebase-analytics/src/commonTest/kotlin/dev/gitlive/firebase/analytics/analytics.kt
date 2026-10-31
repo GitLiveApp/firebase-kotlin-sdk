@@ -57,6 +57,14 @@ class FirebaseAnalyticsTest {
         analytics.logEvent("test") {
             param("key", "value")
         }
+        analytics.logEvent(
+            "purchase",
+            mapOf(
+                "currency" to "USD",
+                "value" to 12.5,
+                "items" to listOf(mapOf("item_id" to "SKU_1", "quantity" to 2L)),
+            ),
+        )
         analytics.setUserProperty("test_property", "value")
         analytics.setDefaultEventParameters(mapOf("default_key" to "default_value"))
         analytics.setConsent {

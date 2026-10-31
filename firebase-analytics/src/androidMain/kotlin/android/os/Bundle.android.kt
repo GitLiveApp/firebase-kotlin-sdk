@@ -11,7 +11,7 @@ import dev.gitlive.firebase.analytics.stub
  * compile time and is deleted from the compilation output, so the platform class binds at runtime. Every member must
  * exist on the real class with the same JVM signature (verified by the build against the Android platform jar).
  */
-public actual class Bundle {
+public actual class Bundle : Parcelable {
     public actual constructor()
 
     public actual constructor(bundle: Bundle)
@@ -23,6 +23,9 @@ public actual class Bundle {
     public actual fun putBoolean(key: String?, value: Boolean): Unit = stub()
     public actual fun putBundle(key: String?, value: Bundle?): Unit = stub()
     public actual fun putAll(bundle: Bundle): Unit = stub()
+
+    /** The `items` of an e-commerce event; bundles are parcelable on Android. */
+    public fun putParcelableArray(key: String?, value: Array<out Parcelable>?): Unit = stub()
 
     public actual fun getString(key: String?): String? = stub()
     public actual fun getString(key: String?, defaultValue: String): String = stub()
@@ -42,4 +45,7 @@ public actual class Bundle {
     public actual fun isEmpty(): Boolean = stub()
     public actual fun remove(key: String?): Unit = stub()
     public actual fun clear(): Unit = stub()
+
+    override fun describeContents(): Int = stub()
+    override fun writeToParcel(dest: Parcel, flags: Int): Unit = stub()
 }

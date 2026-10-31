@@ -60,6 +60,7 @@ class AndroidSdkSourceCompatTest {
     fun testLogEventsAndProperties() = runBlockingTest {
         val analytics = Firebase.analytics
         assertEquals(analytics, Firebase.analytics)
+        assertEquals(analytics, FirebaseAnalytics.getInstance(context))
         assertEquals(dev.gitlive.firebase.Firebase.analytics.compat, analytics)
 
         analytics.logEvent(FirebaseAnalytics.Event.LOGIN, Bundle().apply { putString(FirebaseAnalytics.Param.METHOD, "email") })
@@ -140,8 +141,10 @@ class AndroidSdkSourceCompatTest {
             param(FirebaseAnalytics.Param.PRICE, 9.99)
             param(FirebaseAnalytics.Param.QUANTITY, 3L)
             param("nested", Bundle().apply { putBoolean("flag", true) })
+            bundle.putString("direct", "edited") // the block may edit the bundle itself, as on Android
         }.bundle
         assertEquals("SKU_1", bundle.getString(FirebaseAnalytics.Param.ITEM_ID))
+        assertEquals("edited", bundle.getString("direct"))
         assertEquals(9.99, bundle.getDouble(FirebaseAnalytics.Param.PRICE))
         assertEquals(3L, bundle.getLong(FirebaseAnalytics.Param.QUANTITY))
         assertTrue(bundle.getBundle("nested")?.getBoolean("flag") == true)

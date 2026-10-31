@@ -76,7 +76,8 @@ internal actual class NativeAnalytics(val js: JsAnalytics) {
     override fun hashCode(): Int = js.hashCode()
 }
 
-internal actual fun nativeAnalytics(app: FirebaseApp?): NativeAnalytics = NativeAnalytics(getAnalytics(app?.js))
+/** The JS SDK defaults to the default app only when the argument is omitted, not when it is null. */
+internal actual fun nativeAnalytics(app: FirebaseApp?): NativeAnalytics = NativeAnalytics(if (app == null) getAnalytics() else getAnalytics(app.js))
 
 /** The bundle as a JS object: nested bundles as objects, bundle arrays as arrays, numbers as JS numbers. */
 private fun Bundle.toJs(): JsAny? = toParameters().toJs()

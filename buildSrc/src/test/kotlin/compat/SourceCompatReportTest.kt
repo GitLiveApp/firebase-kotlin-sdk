@@ -274,6 +274,42 @@ class SourceCompatReportTest {
     }
 
     @Test
+    fun matchesTypeParametersByErasureAndLooksUpInheritedOverloads() {
+        val apiTxt = """
+            package com.google.firebase.test {
+              public class Base {
+                method public void foo(int value);
+              }
+              public final class Sub extends com.google.firebase.test.Base {
+                method public void foo(int value);
+                method public void foo(String value);
+                method public <T> T get(String key);
+                method public <T> void put(T value);
+                method public <T> void set(T value);
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public class com/google/firebase/test/Base {
+            	public final fun foo (I)V
+            }
+
+            public final class com/google/firebase/test/Sub : com/google/firebase/test/Base {
+            	public final fun foo (Ljava/lang/String;)V
+            	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
+            	public final fun put (I)V
+            	public final fun set (Ljava/lang/Object;)V
+            }
+        """.trimIndent()
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
+        assertTrue(report.contains("MAP   void foo(int)  [inherited]"), report) // declared by Base, which Sub extends, next to Sub's own foo(String)
+        assertTrue(report.contains("OK    void foo(String)"), report)
+        assertTrue(report.contains("OK    T get(String)"), report)
+        assertTrue(report.contains("OK    void set(T)"), report) // T erases to Object
+        assertTrue(report.contains("MISS  void put(T)"), report) // an int where the SDK takes any T
+    }
+
+    @Test
     fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",

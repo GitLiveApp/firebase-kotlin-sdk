@@ -5,35 +5,32 @@
 package com.google.firebase.analytics
 
 import android.os.Bundle
-import dev.gitlive.firebase.analytics.internal.toBundle
+import dev.gitlive.firebase.analytics.internal.putBundleArray
 
 /** The parameters of an event logged with [logEvent], mirroring `com.google.firebase.analytics.ParametersBuilder`. */
 public class ParametersBuilder {
-    private val parameters = linkedMapOf<String, Any?>()
-
-    /** The parameters as a [Bundle]. */
-    public val bundle: Bundle
-        get() = parameters.toBundle()
+    /** The parameters, which [param] adds to and the block may edit directly. */
+    public val bundle: Bundle = Bundle()
 
     public fun param(key: String, value: Double) {
-        parameters[key] = value
+        bundle.putDouble(key, value)
     }
 
     public fun param(key: String, value: Long) {
-        parameters[key] = value
+        bundle.putLong(key, value)
     }
 
     public fun param(key: String, value: String) {
-        parameters[key] = value
+        bundle.putString(key, value)
     }
 
     public fun param(key: String, value: Bundle) {
-        parameters[key] = value
+        bundle.putBundle(key, value)
     }
 
     /** An array of bundles, such as the [FirebaseAnalytics.Param.ITEMS] of an e-commerce event. */
     public fun param(key: String, value: Array<Bundle>) {
-        parameters[key] = value
+        bundle.putBundleArray(key, value)
     }
 }
 

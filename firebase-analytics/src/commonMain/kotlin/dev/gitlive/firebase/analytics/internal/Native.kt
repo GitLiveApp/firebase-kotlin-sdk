@@ -34,8 +34,11 @@ internal expect fun nativeAnalytics(app: FirebaseApp?): NativeAnalytics
 /** The [FirebaseAnalytics] of [app]: the single instance on Android and Apple, one per app on JS. */
 internal expect fun compatAnalytics(app: FirebaseApp?): FirebaseAnalytics
 
-/** An Android `Bundle` of these parameters (strings, numbers, booleans, nested maps and bundles, arrays of bundles). */
+/** An Android `Bundle` of these parameters (strings, numbers, booleans, nested maps and bundles, arrays and lists of bundles). */
 internal expect fun Map<String, Any?>.toBundle(): Bundle
+
+/** Puts an array of bundles (the `items` of an e-commerce event): Android's `putParcelableArray`, which common code has no type for. */
+internal expect fun Bundle.putBundleArray(key: String?, value: Array<Bundle>)
 
 /** The Google Analytics key of a consent type (`ad_storage`), as the Apple and JS SDKs take it. */
 internal val FirebaseAnalytics.ConsentType.key: String
