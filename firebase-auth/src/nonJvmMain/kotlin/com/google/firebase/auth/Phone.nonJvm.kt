@@ -48,12 +48,12 @@ public actual class PhoneAuthProvider internal constructor(internal val firebase
  * @property verificationContext On JS the `ApplicationVerifier` (reCAPTCHA) of the verification, on iOS the `FIRAuthUIDelegate` presenting it.
  */
 public actual class PhoneAuthOptions internal constructor(
-    public val firebaseAuth: FirebaseAuth,
-    public val phoneNumber: String?,
-    public val callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
-    public val multiFactorHint: PhoneMultiFactorInfo?,
-    public val multiFactorSession: MultiFactorSession?,
-    public val requireSmsValidation: Boolean,
+    internal val firebaseAuth: FirebaseAuth,
+    internal val phoneNumber: String?,
+    internal val callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks,
+    internal val multiFactorHint: PhoneMultiFactorInfo?,
+    internal val multiFactorSession: MultiFactorSession?,
+    internal val requireSmsValidation: Boolean,
     internal val verificationContext: Any?,
 ) {
     public actual class Builder actual constructor(private val firebaseAuth: FirebaseAuth) {

@@ -5,7 +5,7 @@
 package com.google.firebase.remoteconfig
 
 /** @property signals The signals as the iOS SDK takes them. */
-public actual class CustomSignals internal constructor(public val signals: Map<String, Any?>) {
+public actual class CustomSignals internal constructor(internal val signals: Map<String, Any?>) {
     override fun equals(other: Any?): Boolean = other is CustomSignals && other.signals == signals
 
     override fun hashCode(): Int = signals.hashCode()

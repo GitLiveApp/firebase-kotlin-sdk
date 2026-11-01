@@ -121,9 +121,9 @@ public actual abstract class FederatedAuthProvider actual constructor()
  */
 public actual class OAuthProvider internal constructor(
     public actual val providerId: String,
-    public val scopes: List<String>,
-    public val customParameters: Map<String, String>,
-    public val firebaseAuth: FirebaseAuth,
+    internal val scopes: List<String>,
+    internal val customParameters: Map<String, String>,
+    internal val firebaseAuth: FirebaseAuth,
 ) : FederatedAuthProvider() {
 
     public actual class Builder internal constructor(private val providerId: String, private val firebaseAuth: FirebaseAuth) {
