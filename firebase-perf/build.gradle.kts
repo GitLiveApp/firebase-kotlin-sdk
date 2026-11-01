@@ -204,9 +204,8 @@ stripHeaderStubs(
     }),
     jvmReferenceJars = files(),
     jvmStubs = false,
-    // Shipped facades: the nonJsMain extension binding to the SDK's newHttpMetric member, and the per-app instance lookup.
+    // Shipped: the per-app instance lookup and its Java bridge to the SDK's statics.
     keepClasses = listOf(
-        "com/google/firebase/perf/NewHttpMetricKt.class",
         "com/google/firebase/perf/PerformanceInstanceKt.class",
         "com/google/firebase/perf/PerformanceStatics.class",
     ),

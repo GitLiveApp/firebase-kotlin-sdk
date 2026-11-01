@@ -7,9 +7,9 @@ package dev.gitlive.firebase.perf
 import com.google.firebase.Firebase
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.HttpMetric
-import com.google.firebase.perf.newHttpMetric
 import com.google.firebase.perf.performance
 import com.google.firebase.perf.trace
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
@@ -23,7 +23,8 @@ import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.seconds
 import java.net.URL
 
-/** The `com.google.firebase.perf.metrics.HttpMetric` part of the layer, which the JS SDK does not have. */
+/** The `com.google.firebase.perf.metrics.HttpMetric` part of the layer; on JS and wasmJs the metric keeps its values and reports nothing. */
+@OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
 class HttpMetricTest {
 

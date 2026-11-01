@@ -3,6 +3,8 @@ public final class com/google/firebase/perf/FirebasePerformance {
 	public static final field MAX_TRACE_NAME_LENGTH I
 	public static final fun getInstance ()Lcom/google/firebase/perf/FirebasePerformance;
 	public final fun isPerformanceCollectionEnabled ()Z
+	public final fun newHttpMetric (Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
+	public final fun newHttpMetric (Ljava/net/URL;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
 	public final fun newTrace (Ljava/lang/String;)Lcom/google/firebase/perf/metrics/Trace;
 	public final fun setPerformanceCollectionEnabled (Z)V
 	public static final fun startTrace (Ljava/lang/String;)Lcom/google/firebase/perf/metrics/Trace;
@@ -32,11 +34,6 @@ public final class com/google/firebase/perf/FirebasePerformance$HttpMethod$Compa
 
 public final class com/google/firebase/perf/HttpMetricTraceKt {
 	public static final fun trace (Lcom/google/firebase/perf/metrics/HttpMetric;Lkotlin/jvm/functions/Function1;)V
-}
-
-public final class com/google/firebase/perf/NewHttpMetric_jvmKt {
-	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
-	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/net/URL;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
 }
 
 public final class com/google/firebase/perf/PerformanceKt {

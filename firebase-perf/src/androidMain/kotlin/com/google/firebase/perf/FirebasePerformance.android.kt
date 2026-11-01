@@ -22,10 +22,9 @@ public actual class FirebasePerformance private constructor() {
 
     public actual fun newTrace(traceName: String): Trace = stub()
 
-    /** Not in the common API (JS has no [HttpMetric]); the shipped nonJsMain [newHttpMetric] extensions bind to these members. */
-    public fun newHttpMetric(url: String, httpMethod: String): HttpMetric = stub()
+    public actual fun newHttpMetric(url: String, httpMethod: String): HttpMetric = stub()
 
-    public fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = stub()
+    public actual fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = stub()
 
     @Retention(AnnotationRetention.SOURCE)
     public actual annotation class HttpMethod {

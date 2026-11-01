@@ -4,8 +4,13 @@
 
 package com.google.firebase.perf
 
+import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMethod
+import swiftPMImport.dev.gitlive.firebase.perf.FIRHTTPMetric
 import swiftPMImport.dev.gitlive.firebase.perf.FIRPerformance
+import com.google.firebase.perf.metrics.HttpMetric
 import com.google.firebase.perf.metrics.Trace
+import platform.Foundation.NSURL
+import java.net.URL
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebasePerformance internal constructor(public val ios: FIRPerformance) {
@@ -16,6 +21,15 @@ public actual class FirebasePerformance internal constructor(public val ios: FIR
         }
 
     public actual fun newTrace(traceName: String): Trace = Trace(ios.traceWithName(traceName))
+
+    public actual fun newHttpMetric(url: String, httpMethod: String): HttpMetric {
+        val nsUrl = requireNotNull(NSURL.URLWithString(url)) { "Invalid URL: $url" }
+        // FIRHTTPMetric's initializer returns nil while performance collection is disabled; the metric is then a no-op, as on Android.
+        if (!isPerformanceCollectionEnabled) return HttpMetric(null)
+        return HttpMetric(FIRHTTPMetric(nsUrl, httpMethod.toFIRHTTPMethod()))
+    }
+
+    public actual fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = newHttpMetric(url.toExternalForm(), httpMethod)
 
     override fun equals(other: Any?): Boolean = other is FirebasePerformance && other.ios == ios
 
@@ -46,4 +60,17 @@ public actual class FirebasePerformance internal constructor(public val ios: FIR
 
         public actual fun startTrace(traceName: String): Trace = Trace(FIRPerformance.startTraceWithName(traceName))
     }
+}
+
+private fun String.toFIRHTTPMethod(): FIRHTTPMethod = when (this) {
+    FirebasePerformance.HttpMethod.GET -> FIRHTTPMethod.FIRHTTPMethodGET
+    FirebasePerformance.HttpMethod.PUT -> FIRHTTPMethod.FIRHTTPMethodPUT
+    FirebasePerformance.HttpMethod.POST -> FIRHTTPMethod.FIRHTTPMethodPOST
+    FirebasePerformance.HttpMethod.DELETE -> FIRHTTPMethod.FIRHTTPMethodDELETE
+    FirebasePerformance.HttpMethod.HEAD -> FIRHTTPMethod.FIRHTTPMethodHEAD
+    FirebasePerformance.HttpMethod.PATCH -> FIRHTTPMethod.FIRHTTPMethodPATCH
+    FirebasePerformance.HttpMethod.OPTIONS -> FIRHTTPMethod.FIRHTTPMethodOPTIONS
+    FirebasePerformance.HttpMethod.TRACE -> FIRHTTPMethod.FIRHTTPMethodTRACE
+    FirebasePerformance.HttpMethod.CONNECT -> FIRHTTPMethod.FIRHTTPMethodCONNECT
+    else -> throw IllegalArgumentException("Unsupported HTTP method: $this")
 }
