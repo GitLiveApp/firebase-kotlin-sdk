@@ -19,6 +19,10 @@ import dev.gitlive.firebase.analytics.internal.NativeAnalytics
  * managed by gtag): on JS and wasmJs [setSessionTimeoutDuration] and [resetAnalyticsData] do nothing, [getSessionId]
  * completes with null, and the three carry `@dev.gitlive.firebase.UnsupportedOnJs`, so code compiled for JS gets a
  * warning until it opts in.
+ *
+ * The [Event], [Param] and [UserProperty] names are compile-time constants in the Android SDK (static finals); here they are
+ * `val`s with the same values, as an expect declaration cannot be `const`. Compare, match and concatenate them as usual,
+ * but off Android they cannot initialize a `const val` or be an annotation argument.
  */
 public expect class FirebaseAnalytics {
     internal val native: NativeAnalytics
