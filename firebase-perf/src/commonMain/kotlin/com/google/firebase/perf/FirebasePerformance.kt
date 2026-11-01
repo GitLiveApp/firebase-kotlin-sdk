@@ -4,11 +4,17 @@
 
 package com.google.firebase.perf
 
+import com.google.firebase.perf.metrics.HttpMetric
 import com.google.firebase.perf.metrics.Trace
+import java.net.URL
 
 /**
  * Firebase Performance Monitoring, as the Android SDK's `com.google.firebase.perf.FirebasePerformance`: the entry point
- * for custom traces (and, where the platform supports it, HTTP metrics through `newHttpMetric`).
+ * for custom traces and HTTP metrics.
+ *
+ * The JS SDK has no custom HTTP metrics (it records network requests itself), so on JS and wasmJs [newHttpMetric] returns
+ * a metric that reports nothing and carries `@dev.gitlive.firebase.UnsupportedOnJs`, so code compiled for JS gets a
+ * warning until it opts in.
  */
 public expect class FirebasePerformance {
     /**
@@ -22,6 +28,12 @@ public expect class FirebasePerformance {
      * and at most [MAX_TRACE_NAME_LENGTH] characters.
      */
     public fun newTrace(traceName: String): Trace
+
+    /** Creates an [HttpMetric] for a request of [httpMethod] (one of [HttpMethod]) to [url]. */
+    public fun newHttpMetric(url: String, httpMethod: String): HttpMetric
+
+    /** Creates an [HttpMetric] for a request of [httpMethod] (one of [HttpMethod]) to [url]. */
+    public fun newHttpMetric(url: URL, httpMethod: String): HttpMetric
 
     /** The HTTP method names accepted by `newHttpMetric`; the Android SDK's `@StringDef`. */
     @Retention(AnnotationRetention.SOURCE)

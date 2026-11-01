@@ -9,7 +9,7 @@ import com.google.firebase.perf.metrics.Trace
 
 /*
  * The Kotlin extensions of the Android SDK's firebase-perf (PerformanceKt), as plain common code: on Android the facade
- * is a header stub that is stripped, so the SDK's own facade binds. The HttpMetric form of `trace` is in nonJsMain.
+ * is a header stub that is stripped, so the SDK's own facade binds. The HttpMetric form of `trace` is in HttpMetricTrace.kt.
  */
 
 /** The [FirebasePerformance] singleton; the Android SDK's `Firebase.performance`. */

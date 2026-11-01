@@ -5,8 +5,9 @@
 package com.google.firebase.perf.metrics
 
 /**
- * A metric of one HTTP request, as the Android SDK's `com.google.firebase.perf.metrics.HttpMetric`. The JS SDK has no
- * custom HTTP metrics (it records network requests itself), so this class exists on Android, the JVM and Apple platforms.
+ * A metric of one HTTP request, as the Android SDK's `com.google.firebase.perf.metrics.HttpMetric`; created with
+ * [com.google.firebase.perf.FirebasePerformance.newHttpMetric]. The JS SDK has no custom HTTP metrics (it records
+ * network requests itself), so on JS and wasmJs the metric keeps its attributes and values but reports nothing.
  */
 public expect class HttpMetric {
     /** The value of the custom attribute [attribute], or null if it is not set. */

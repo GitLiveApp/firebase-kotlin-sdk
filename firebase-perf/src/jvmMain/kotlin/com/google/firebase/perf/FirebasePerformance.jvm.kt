@@ -4,7 +4,9 @@
 
 package com.google.firebase.perf
 
+import com.google.firebase.perf.metrics.HttpMetric
 import com.google.firebase.perf.metrics.Trace
+import java.net.URL
 import kotlin.jvm.JvmField
 
 /*
@@ -16,6 +18,10 @@ public actual class FirebasePerformance private constructor() {
     public actual var isPerformanceCollectionEnabled: Boolean = true
 
     public actual fun newTrace(traceName: String): Trace = Trace(traceName)
+
+    public actual fun newHttpMetric(url: String, httpMethod: String): HttpMetric = HttpMetric(url, httpMethod)
+
+    public actual fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = HttpMetric(url.toExternalForm(), httpMethod)
 
     override fun toString(): String = "FirebasePerformance"
 

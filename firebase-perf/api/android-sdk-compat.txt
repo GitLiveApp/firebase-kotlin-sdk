@@ -1,12 +1,12 @@
 # Android SDK source compatibility of firebase-perf
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 48 public members available (48 identical, 0 mapped, 0 missing, 0 omitted)
+# 100% of 50 public members available (50 identical, 0 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.perf.FirebasePerformance
   OK    static FirebasePerformance getInstance()
   OK    boolean isPerformanceCollectionEnabled()
-  UNAV  HttpMetric newHttpMetric(String, String)
-  UNAV  HttpMetric newHttpMetric(URL, String)
+  OK    HttpMetric newHttpMetric(String, String)
+  OK    HttpMetric newHttpMetric(URL, String)
   OK    Trace newTrace(String)
   OK    void setPerformanceCollectionEnabled(boolean)
   OK    static Trace startTrace(String)

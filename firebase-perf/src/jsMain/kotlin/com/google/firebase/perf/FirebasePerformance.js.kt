@@ -4,7 +4,10 @@
 
 package com.google.firebase.perf
 
+import com.google.firebase.perf.metrics.HttpMetric
 import com.google.firebase.perf.metrics.Trace
+import dev.gitlive.firebase.UnsupportedOnJs
+import java.net.URL
 import dev.gitlive.firebase.perf.FirebasePerformanceException
 import dev.gitlive.firebase.perf.externals.getPerformance
 import dev.gitlive.firebase.perf.externals.trace
@@ -19,6 +22,14 @@ public actual class FirebasePerformance internal constructor(public val js: JsFi
         }
 
     public actual fun newTrace(traceName: String): Trace = rethrow { Trace(trace(js, traceName)) }
+
+    /** A metric that keeps its values but reports nothing: the JS SDK has no custom HTTP metrics. */
+    @UnsupportedOnJs
+    public actual fun newHttpMetric(url: String, httpMethod: String): HttpMetric = HttpMetric(url, httpMethod)
+
+    /** A metric that keeps its values but reports nothing: the JS SDK has no custom HTTP metrics. */
+    @UnsupportedOnJs
+    public actual fun newHttpMetric(url: URL, httpMethod: String): HttpMetric = HttpMetric(url.toExternalForm(), httpMethod)
 
     override fun equals(other: Any?): Boolean = other is FirebasePerformance && other.js == js
 

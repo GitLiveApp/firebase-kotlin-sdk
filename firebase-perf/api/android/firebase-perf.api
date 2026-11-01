@@ -1,8 +1,3 @@
-public final class com/google/firebase/perf/NewHttpMetricKt {
-	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/lang/String;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
-	public static final fun newHttpMetric (Lcom/google/firebase/perf/FirebasePerformance;Ljava/net/URL;Ljava/lang/String;)Lcom/google/firebase/perf/metrics/HttpMetric;
-}
-
 public final class dev/gitlive/firebase/perf/FirebasePerformance {
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCompat ()Lcom/google/firebase/perf/FirebasePerformance;
