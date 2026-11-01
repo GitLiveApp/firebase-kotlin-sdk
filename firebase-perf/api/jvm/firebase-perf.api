@@ -55,12 +55,6 @@ public final class com/google/firebase/perf/metrics/HttpMetric {
 	public static final field MAX_TRACE_NAME_LENGTH I
 	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
 	public final fun getAttributes ()Ljava/util/Map;
-	public final fun getHttpMethod ()Ljava/lang/String;
-	public final fun getHttpResponseCode ()Ljava/lang/Integer;
-	public final fun getRequestPayloadSize ()Ljava/lang/Long;
-	public final fun getResponseContentType ()Ljava/lang/String;
-	public final fun getResponsePayloadSize ()Ljava/lang/Long;
-	public final fun getUrl ()Ljava/lang/String;
 	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun removeAttribute (Ljava/lang/String;)V
 	public final fun setHttpResponseCode (I)V
@@ -84,7 +78,6 @@ public final class com/google/firebase/perf/metrics/Trace {
 	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
 	public final fun getAttributes ()Ljava/util/Map;
 	public final fun getLongMetric (Ljava/lang/String;)J
-	public final fun getName ()Ljava/lang/String;
 	public final fun incrementMetric (Ljava/lang/String;J)V
 	public final fun putAttribute (Ljava/lang/String;Ljava/lang/String;)V
 	public final fun putMetric (Ljava/lang/String;J)V

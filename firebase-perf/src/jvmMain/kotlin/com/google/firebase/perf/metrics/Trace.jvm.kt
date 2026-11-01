@@ -11,7 +11,7 @@ import kotlin.jvm.Synchronized
  * An in-memory trace (see FirebasePerformance.jvm.kt); its operations are atomic, as the Android SDK's.
  * @property name The name given to [com.google.firebase.perf.FirebasePerformance.newTrace].
  */
-public actual class Trace internal constructor(public val name: String) {
+public actual class Trace internal constructor(internal val name: String) {
     private val metrics = mutableMapOf<String, Long>()
     private val customAttributes = mutableMapOf<String, String>()
     private var started = false
