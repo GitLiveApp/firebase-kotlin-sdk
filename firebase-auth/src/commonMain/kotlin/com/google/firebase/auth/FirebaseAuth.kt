@@ -37,7 +37,10 @@ public expect class FirebaseAuth {
     /** Sets [tenantId]. */
     public fun setTenantId(tenantId: String)
 
-    /** Sets [customAuthDomain]. */
+    /**
+     * Sets [customAuthDomain]. The JS SDK takes the auth domain from the app's options when the app is initialized, so on
+     * JS and wasmJs this does nothing and carries `@dev.gitlive.firebase.UnsupportedOnJs`.
+     */
     public fun setCustomAuthDomain(customAuthDomain: String)
 
     /** The settings of this instance, for tests. */
