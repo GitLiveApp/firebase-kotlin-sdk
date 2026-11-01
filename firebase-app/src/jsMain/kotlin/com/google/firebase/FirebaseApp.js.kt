@@ -19,17 +19,14 @@ public actual open class FirebaseException : Exception {
 
 public actual class FirebaseNetworkException : FirebaseException {
     public actual constructor(message: String) : super(message)
-    public constructor(code: String?, cause: Throwable) : super(code.toString(), cause)
 }
 
 public actual open class FirebaseTooManyRequestsException : FirebaseException {
     public actual constructor(message: String) : super(message)
-    public constructor(code: String?, cause: Throwable) : super(code.toString(), cause)
 }
 
 public actual open class FirebaseApiNotAvailableException : FirebaseException {
     public actual constructor(message: String) : super(message)
-    public constructor(code: String?, cause: Throwable) : super(code.toString(), cause)
 }
 
 /** @property js The underlying Firebase JS SDK object. */
