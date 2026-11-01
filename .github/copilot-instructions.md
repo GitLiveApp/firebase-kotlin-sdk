@@ -169,8 +169,8 @@ The SDK has two public API layers per module:
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
    builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions` and `firebase-perf` are the reference.
    `firebase-analytics` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published
-   classes by `generateAndroidSdkApi*`), a plain common class in the stripped package with real bodies for the other platforms
-   (`FirebaseAnalytics` over an internal `NativeAnalytics` expect), a header stub for a platform class (`android.os.Bundle`) and a
+   classes by `generateAndroidSdkApi*`), an `expect` class whose platform actuals share an internal `NativeAnalytics` expect
+   (so the JS and wasmJs actuals can carry `@UnsupportedOnJs` on the session members the JS SDK lacks), a header stub for a platform class (`android.os.Bundle`) and a
    module the JVM SDK lacks entirely (`jvmKeepClasses` ships the module's own no-op implementation).
    `firebase-auth` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published classes by
    `generateAndroidSdkApi*`) and a JVM SDK without the Kotlin facade (`jvmKeepClasses` in `stripHeaderStubs` ships this module's `AuthKt`).

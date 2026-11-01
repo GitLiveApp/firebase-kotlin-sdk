@@ -6,6 +6,7 @@ package dev.gitlive.firebase.analytics
 
 import kotlinx.coroutines.tasks.await
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.analytics.internal.toBundle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,12 +33,18 @@ public class FirebaseAnalytics internal constructor(public val compat: CompatFir
         compat.setAnalyticsCollectionEnabled(enabled)
     }
 
+    /** Does nothing on JS and wasmJs, where the JS SDK manages sessions itself. */
+    @OptIn(UnsupportedOnJs::class)
     public fun setSessionTimeoutInterval(sessionTimeoutInterval: Duration) {
         compat.setSessionTimeoutDuration(sessionTimeoutInterval.inWholeMilliseconds)
     }
 
+    /** Null on JS and wasmJs, where the JS SDK manages sessions itself. */
+    @OptIn(UnsupportedOnJs::class)
     public suspend fun getSessionId(): Long? = compat.getSessionId().await()
 
+    /** Does nothing on JS and wasmJs, where the JS SDK manages sessions itself. */
+    @OptIn(UnsupportedOnJs::class)
     public fun resetAnalyticsData() {
         compat.resetAnalyticsData()
     }

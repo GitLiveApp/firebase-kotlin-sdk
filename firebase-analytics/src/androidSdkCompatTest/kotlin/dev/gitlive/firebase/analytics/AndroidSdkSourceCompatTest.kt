@@ -16,6 +16,7 @@ import com.google.firebase.analytics.logEvent
 import com.google.firebase.analytics.setConsent
 import com.google.firebase.FirebaseApp
 import com.google.firebase.initialize
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.runBlockingTest
 import kotlin.test.AfterTest
@@ -31,6 +32,7 @@ import kotlin.test.assertTrue
  * Android app would be; running on every platform is what the source-compatibility layer promises. Not compiled for the
  * JVM, where analytics is a no-op and firebase-java-sdk's Bundle has no setters.
  */
+@OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
 class AndroidSdkSourceCompatTest {
 
