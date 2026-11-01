@@ -236,7 +236,7 @@ public actual class FirebaseAuth internal constructor(public val js: Auth) {
         public actual fun getInstance(app: FirebaseApp): FirebaseAuth = rethrow { wrap(getAuth(app.js)) }
 
         /** The instance of the JS SDK's [auth]; one per JS object, so listeners added through one lookup can be removed through another. */
-        public fun wrap(auth: Auth): FirebaseAuth = instances.firstOrNull { it.js == auth } ?: FirebaseAuth(auth).also { instances += it }
+        internal fun wrap(auth: Auth): FirebaseAuth = instances.firstOrNull { it.js == auth } ?: FirebaseAuth(auth).also { instances += it }
     }
 }
 

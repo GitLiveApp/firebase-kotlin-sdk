@@ -192,7 +192,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
         public actual fun getInstance(app: FirebaseApp): FirebaseAuth = wrap(FIRAuth.authWithApp(app.ios as objcnames.classes.FIRApp))
 
         /** The instance of the iOS SDK's [auth]. */
-        public fun wrap(auth: FIRAuth): FirebaseAuth = instances.getOrPut(auth) { FirebaseAuth(auth) }
+        internal fun wrap(auth: FIRAuth): FirebaseAuth = instances.getOrPut(auth) { FirebaseAuth(auth) }
     }
 }
 
