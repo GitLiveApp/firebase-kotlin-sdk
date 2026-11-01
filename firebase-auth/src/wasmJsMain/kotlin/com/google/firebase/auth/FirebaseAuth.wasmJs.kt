@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.Unsubscribe
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.auth.externals.ActionCodeURL
 import dev.gitlive.firebase.auth.externals.ApplicationVerifier
 import dev.gitlive.firebase.auth.externals.Auth
@@ -120,7 +121,9 @@ public actual class FirebaseAuth internal constructor(public val js: Auth) {
         js.tenantId = tenantId
     }
 
-    public actual fun setCustomAuthDomain(customAuthDomain: String): Unit = throw UnsupportedOperationException("The JS SDK's auth domain is set in the app's options")
+    /** Does nothing: the JS SDK takes the auth domain from the app's options when the app is initialized. */
+    @UnsupportedOnJs
+    public actual fun setCustomAuthDomain(customAuthDomain: String) {}
 
     public actual val firebaseAuthSettings: FirebaseAuthSettings = object : FirebaseAuthSettings() {
         override fun setAppVerificationDisabledForTesting(disabled: Boolean) {
