@@ -10,23 +10,23 @@ package com.google.firebase.perf.metrics
  * @property url The request URL.
  * @property httpMethod The HTTP method, one of [com.google.firebase.perf.FirebasePerformance.HttpMethod].
  */
-public actual class HttpMetric internal constructor(public val url: String, public val httpMethod: String) {
+public actual class HttpMetric internal constructor(internal val url: String, internal val httpMethod: String) {
     private val customAttributes = mutableMapOf<String, String>()
 
     /** The value last given to [setHttpResponseCode], or null. */
-    public var httpResponseCode: Int? = null
+    internal var httpResponseCode: Int? = null
         private set
 
     /** The value last given to [setRequestPayloadSize], or null. */
-    public var requestPayloadSize: Long? = null
+    internal var requestPayloadSize: Long? = null
         private set
 
     /** The value last given to [setResponseContentType], or null. */
-    public var responseContentType: String? = null
+    internal var responseContentType: String? = null
         private set
 
     /** The value last given to [setResponsePayloadSize], or null. */
-    public var responsePayloadSize: Long? = null
+    internal var responsePayloadSize: Long? = null
         private set
 
     public actual fun getAttribute(attribute: String): String? = customAttributes[attribute]
