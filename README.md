@@ -135,7 +135,7 @@ from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array)
 `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
 `logEvent(name, Bundle().apply { putString(...) })` work in common code. On the JVM analytics is a no-op, as the
 [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) has no analytics; on JS and wasmJs the session timeout,
-session ID and analytics data reset do nothing, as the JS SDK has no equivalent. For a step-by-step walkthrough of moving Android SDK code
+session ID and analytics data reset do nothing, as the JS SDK has no equivalent, and carry `@UnsupportedOnJs`. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
 

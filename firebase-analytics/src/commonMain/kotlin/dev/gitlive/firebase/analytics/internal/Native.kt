@@ -42,16 +42,8 @@ internal expect fun Bundle.putBundleArray(key: String?, value: Array<Bundle>)
 
 /** The Google Analytics key of a consent type (`ad_storage`), as the Apple and JS SDKs take it. */
 internal val FirebaseAnalytics.ConsentType.key: String
-    get() = when (this) {
-        FirebaseAnalytics.ConsentType.AD_STORAGE -> "ad_storage"
-        FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE -> "analytics_storage"
-        FirebaseAnalytics.ConsentType.AD_USER_DATA -> "ad_user_data"
-        FirebaseAnalytics.ConsentType.AD_PERSONALIZATION -> "ad_personalization"
-    }
+    get() = name.lowercase()
 
 /** The Google Analytics value of a consent status (`granted`), as the Apple and JS SDKs take it. */
 internal val FirebaseAnalytics.ConsentStatus.key: String
-    get() = when (this) {
-        FirebaseAnalytics.ConsentStatus.GRANTED -> "granted"
-        FirebaseAnalytics.ConsentStatus.DENIED -> "denied"
-    }
+    get() = name.lowercase()
