@@ -8,7 +8,6 @@ import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
 import com.google.firebase.storage.UploadTask
-import com.google.firebase.storage.putFileUrl
 import com.google.firebase.storage.toByteArray
 import com.google.firebase.storage.toNSData
 import platform.Foundation.NSData
