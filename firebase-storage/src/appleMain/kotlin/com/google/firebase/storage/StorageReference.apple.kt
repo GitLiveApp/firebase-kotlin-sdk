@@ -202,8 +202,8 @@ internal fun StorageMetadata.toIos(): FIRStorageMetadata {
     return ios
 }
 
-@Suppress("UNCHECKED_CAST")
 /** [reference] is the object's reference: the iOS SDK's metadata does not carry one. */
+@Suppress("UNCHECKED_CAST")
 internal fun FIRStorageMetadata.toCompat(
     reference: StorageReference,
 ): StorageMetadata = StorageMetadata().also { compat ->
