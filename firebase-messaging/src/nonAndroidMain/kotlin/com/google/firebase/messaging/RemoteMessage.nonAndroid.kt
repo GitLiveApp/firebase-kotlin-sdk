@@ -14,12 +14,15 @@ public actual class RemoteMessage internal constructor(
     @Suppress("DEPRECATION")
     @Deprecated("Upstream messaging through Firebase Cloud Messaging has been decommissioned")
     public actual val to: String?,
-    public actual val data: Map<String, String>,
+    data: Map<String, String>,
     public actual val messageId: String?,
     public actual val messageType: String?,
     public actual val collapseKey: String?,
     public actual val ttl: Int,
 ) {
+    /** The application's data: the Android SDK's `getData()` leaves out the `google.`/`gcm.` keys and `from`, `message_type` and `collapse_key`. */
+    public actual val data: Map<String, String> = data.filterKeys { it.isApplicationDataKey() }
+
     public actual val from: String? get() = null
     public actual val notification: Notification? get() = null
     public actual val originalPriority: Int get() = PRIORITY_UNKNOWN
@@ -119,3 +122,6 @@ public actual class SendException internal constructor(message: String, public a
         public actual val ERROR_UNKNOWN: Int = 0
     }
 }
+
+/** Whether [this] key is the application's, not one of the keys the Android SDK reserves (`google.*`, `gcm.*`, `from`, `message_type`, `collapse_key`). */
+private fun String.isApplicationDataKey(): Boolean = !startsWith("google.") && !startsWith("gcm.") && this != "from" && this != "message_type" && this != "collapse_key"

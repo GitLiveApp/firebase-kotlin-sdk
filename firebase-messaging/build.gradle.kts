@@ -97,7 +97,7 @@ kotlin {
         tvosSimulatorArm64().enableKeychainForTests()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-        macosArm64()
+        macosArm64().embedInfoPlistForTests()
     }
     if (supportedPlatforms.supportsApple()) {
         swiftPMDependencies {
@@ -212,12 +212,22 @@ registerAndroidSourceCompat("firebase-messaging/api.txt")
 // inserting nil into its keychain query), so an Info.plist with a bundle identifier is embedded as well; it also turns the
 // notification-delegate swizzling off, which needs an app bundle (UNUserNotificationCenter has no bundle proxy for a bare executable).
 fun KotlinNativeTargetWithSimulatorTests.enableKeychainForTests() {
+    embedInfoPlistForTests()
     testRuns.configureEach {
         executionSource.binary.linkerOpts(
             "-sectcreate",
             "__TEXT",
             "__entitlements",
             file("$projectDir/src/commonTest/resources/entitlements.plist").absolutePath,
+        )
+    }
+}
+
+// The macOS test executable needs the bundle identifier too (FIRMessaging keys its token cache by it), but no keychain
+// access group: a macOS process can use the keychain without one.
+fun org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithTests<*>.embedInfoPlistForTests() {
+    testRuns.configureEach {
+        executionSource.binary.linkerOpts(
             "-sectcreate",
             "__TEXT",
             "__info_plist",

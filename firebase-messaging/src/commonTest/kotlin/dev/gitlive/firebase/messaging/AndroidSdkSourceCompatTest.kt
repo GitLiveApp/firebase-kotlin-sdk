@@ -44,6 +44,17 @@ class AndroidSdkSourceCompatTest {
 
         val replaced = RemoteMessage.Builder("846484016111@fcm.googleapis.com").setData(mapOf("a" to "b")).clearData().addData("c", "d").build()
         assertEquals(mapOf("c" to "d"), replaced.data)
+
+        // getData() leaves out the keys the SDK reserves.
+        val reserved = RemoteMessage.Builder("846484016111@fcm.googleapis.com")
+            .addData("google.c.a.e", "1")
+            .addData("gcm.n.e", "1")
+            .addData("from", "sender")
+            .addData("message_type", "gcm")
+            .addData("collapse_key", "key")
+            .addData("application", "value")
+            .build()
+        assertEquals(mapOf("application" to "value"), reserved.data)
     }
 
     @Test

@@ -28,12 +28,12 @@ public val Firebase.messaging: FirebaseMessaging
  * @property compat The Android-SDK-shaped [com.google.firebase.messaging.FirebaseMessaging] this wraps.
  */
 public class FirebaseMessaging internal constructor(public val compat: CompatFirebaseMessaging) {
-    /** Subscribes to [topic]; throws [NotImplementedError] on JS, whose SDK has no topics. */
+    /** Subscribes to [topic]; throws on JS ([NotImplementedError]) and the JVM ([UnsupportedOperationException]), whose SDKs have no topics. */
     public fun subscribeToTopic(topic: String) {
         compat.subscribeToTopicOrThrow(topic)
     }
 
-    /** Unsubscribes from [topic]; throws [NotImplementedError] on JS, whose SDK has no topics. */
+    /** Unsubscribes from [topic]; throws on JS ([NotImplementedError]) and the JVM ([UnsupportedOperationException]), whose SDKs have no topics. */
     public fun unsubscribeFromTopic(topic: String) {
         compat.unsubscribeFromTopicOrThrow(topic)
     }
