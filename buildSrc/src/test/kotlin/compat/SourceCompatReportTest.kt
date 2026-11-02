@@ -129,7 +129,8 @@ class SourceCompatReportTest {
             exclusions = listOf(
                 Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#clearFidCache"), uncountedStatus = "HIDE"),
                 Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseInstallations#getInstance\\(FirebaseApp\\)"), uncountedStatus = "PLAT"),
-                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseOptions\\${'$'}Builder#initializeApp"), uncountedStatus = null),
+                // Written as in exclusions.txt, with the nested class in source form (the parser names it FirebaseOptions${'$'}Builder).
+                Exclusion(Regex("com\\.google\\.firebase\\.installations\\.FirebaseOptions\\.Builder#initializeApp"), uncountedStatus = null),
             ),
         )
         assertTrue(report.contains("HIDE  void clearFidCache()"), report)
