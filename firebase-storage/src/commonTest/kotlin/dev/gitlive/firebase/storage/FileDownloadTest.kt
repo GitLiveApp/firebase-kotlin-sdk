@@ -47,12 +47,16 @@ class FileDownloadTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
-        )
-        storage = FirebaseStorage.getInstance(app.compat).apply {
-            useEmulator(emulatorHost, 9199)
-            maxOperationRetryTimeMillis = 30_000
-            maxUploadRetryTimeMillis = 30_000
+        ).also {
+            // useEmulator is only valid before the storage instance is used and the iOS SDK caches the instance per app and
+            // bucket, so it is applied once, when the app is created (as the FirebaseStorageTest fixture does), not per test.
+            FirebaseStorage.getInstance(it.compat).apply {
+                useEmulator(emulatorHost, 9199)
+                maxOperationRetryTimeMillis = 30_000
+                maxUploadRetryTimeMillis = 30_000
+            }
         }
+        storage = FirebaseStorage.getInstance(app.compat)
     }
 
     @Test
