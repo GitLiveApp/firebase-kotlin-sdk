@@ -1,0 +1,114 @@
+// Source: https://raw.githubusercontent.com/firebase/firebase-android-sdk/fc5a2bee3a2f81f2f35652867628a3f4913e915d/firebase-messaging/api.txt
+// Signature format: 3.0
+package com.google.firebase.messaging {
+
+  public class FirebaseMessaging {
+    method @Deprecated public com.google.android.gms.tasks.Task<java.lang.Void!> deleteToken();
+    method public boolean deliveryMetricsExportToBigQueryEnabled();
+    method public static com.google.firebase.messaging.FirebaseMessaging getInstance();
+    method @Deprecated public com.google.android.gms.tasks.Task<java.lang.String!> getToken();
+    method public boolean isAutoInitEnabled();
+    method public boolean isNotificationDelegationEnabled();
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> register();
+    method @Deprecated public void send(com.google.firebase.messaging.RemoteMessage);
+    method public void setAutoInitEnabled(boolean);
+    method public void setDeliveryMetricsExportToBigQuery(boolean);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> setNotificationDelegationEnabled(boolean);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> subscribeToTopic(String);
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> unregister();
+    method public com.google.android.gms.tasks.Task<java.lang.Void!> unsubscribeFromTopic(String);
+    field @Deprecated public static final String INSTANCE_ID_SCOPE = "FCM";
+  }
+
+  public class FirebaseMessagingService extends android.app.Service {
+    ctor public FirebaseMessagingService();
+    method public final android.os.IBinder! onBind(android.content.Intent!);
+    method @WorkerThread public void onDeletedMessages();
+    method @WorkerThread public void onMessageReceived(com.google.firebase.messaging.RemoteMessage);
+    method @Deprecated @WorkerThread public void onMessageSent(String);
+    method @Deprecated @WorkerThread public void onNewToken(String);
+    method @WorkerThread public void onRegistered(String);
+    method @Deprecated @WorkerThread public void onSendError(String, Exception);
+    method public final int onStartCommand(android.content.Intent!, int, int);
+    method @WorkerThread public void onUnregistered(String);
+  }
+
+  public final class MessagingKt {
+    method public static com.google.firebase.messaging.FirebaseMessaging getMessaging(com.google.firebase.Firebase);
+    method public static inline com.google.firebase.messaging.RemoteMessage remoteMessage(String to, kotlin.jvm.functions.Function1<? super com.google.firebase.messaging.RemoteMessage.Builder,kotlin.Unit> init);
+  }
+
+  @com.google.android.gms.common.internal.safeparcel.SafeParcelable.Class(creator="RemoteMessageCreator") @com.google.android.gms.common.internal.safeparcel.SafeParcelable.Reserved({1}) public final class RemoteMessage extends com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable {
+    method public String? getCollapseKey();
+    method public java.util.Map<java.lang.String!,java.lang.String!> getData();
+    method public String? getFrom();
+    method public String? getMessageId();
+    method public String? getMessageType();
+    method public com.google.firebase.messaging.RemoteMessage.Notification? getNotification();
+    method @com.google.firebase.messaging.RemoteMessage.MessagePriority public int getOriginalPriority();
+    method @com.google.firebase.messaging.RemoteMessage.MessagePriority public int getPriority();
+    method @Deprecated public String? getSenderId();
+    method public long getSentTime();
+    method @Deprecated public String? getTo();
+    method public int getTtl();
+    method public void writeToParcel(android.os.Parcel, int);
+    field public static final int PRIORITY_HIGH = 1; // 0x1
+    field public static final int PRIORITY_NORMAL = 2; // 0x2
+    field public static final int PRIORITY_UNKNOWN = 0; // 0x0
+  }
+
+  public static class RemoteMessage.Builder {
+    ctor public RemoteMessage.Builder(String);
+    method public com.google.firebase.messaging.RemoteMessage.Builder addData(String, String?);
+    method public com.google.firebase.messaging.RemoteMessage build();
+    method public com.google.firebase.messaging.RemoteMessage.Builder clearData();
+    method public com.google.firebase.messaging.RemoteMessage.Builder setCollapseKey(String?);
+    method public com.google.firebase.messaging.RemoteMessage.Builder setData(java.util.Map<java.lang.String!,java.lang.String!>);
+    method public com.google.firebase.messaging.RemoteMessage.Builder setMessageId(String);
+    method public com.google.firebase.messaging.RemoteMessage.Builder setMessageType(String?);
+    method public com.google.firebase.messaging.RemoteMessage.Builder setTtl(@IntRange(from=0, to=86400) int);
+  }
+
+  @IntDef({com.google.firebase.messaging.RemoteMessage.PRIORITY_UNKNOWN, com.google.firebase.messaging.RemoteMessage.PRIORITY_HIGH, com.google.firebase.messaging.RemoteMessage.PRIORITY_NORMAL}) @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.SOURCE) public static @interface RemoteMessage.MessagePriority {
+  }
+
+  public static class RemoteMessage.Notification {
+    method public String? getBody();
+    method public String![]? getBodyLocalizationArgs();
+    method public String? getBodyLocalizationKey();
+    method public String? getChannelId();
+    method public String? getClickAction();
+    method public String? getColor();
+    method public boolean getDefaultLightSettings();
+    method public boolean getDefaultSound();
+    method public boolean getDefaultVibrateSettings();
+    method public Long? getEventTime();
+    method public String? getIcon();
+    method public android.net.Uri? getImageUrl();
+    method public int[]? getLightSettings();
+    method public android.net.Uri? getLink();
+    method public boolean getLocalOnly();
+    method public Integer? getNotificationCount();
+    method public Integer? getNotificationPriority();
+    method public String? getSound();
+    method public boolean getSticky();
+    method public String? getTag();
+    method public String? getTicker();
+    method public String? getTitle();
+    method public String![]? getTitleLocalizationArgs();
+    method public String? getTitleLocalizationKey();
+    method public long[]? getVibrateTimings();
+    method public Integer? getVisibility();
+  }
+
+  public final class SendException extends java.lang.Exception {
+    method public int getErrorCode();
+    field public static final int ERROR_INVALID_PARAMETERS = 1; // 0x1
+    field public static final int ERROR_SIZE = 2; // 0x2
+    field public static final int ERROR_TOO_MANY_MESSAGES = 4; // 0x4
+    field public static final int ERROR_TTL_EXCEEDED = 3; // 0x3
+    field public static final int ERROR_UNKNOWN = 0; // 0x0
+  }
+
+}
+
