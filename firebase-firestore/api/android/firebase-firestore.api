@@ -24,7 +24,7 @@ public final class dev/gitlive/firebase/firestore/CollectionReference : dev/gitl
 	public final fun document (Ljava/lang/String;)Ldev/gitlive/firebase/firestore/DocumentReference;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDocument ()Ldev/gitlive/firebase/firestore/DocumentReference;
-	public synthetic fun getNative$firebase_firestore_release ()Lcom/google/firebase/firestore/Query;
+	public synthetic fun getNative$dev_gitlive_firebase_firestore_release ()Lcom/google/firebase/firestore/Query;
 	public final fun getParent ()Ldev/gitlive/firebase/firestore/DocumentReference;
 	public final fun getPath ()Ljava/lang/String;
 	public fun hashCode ()I

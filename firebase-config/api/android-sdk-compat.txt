@@ -1,0 +1,112 @@
+# Android SDK source compatibility of firebase-config
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 92 public members available (91 identical, 1 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.remoteconfig.ConfigUpdate
+  OK    ConfigUpdate()
+  OK    static ConfigUpdate create(Set)
+  OK    Set getUpdatedKeys()
+com.google.firebase.remoteconfig.ConfigUpdateListener
+  OK    void onError(FirebaseRemoteConfigException)
+  OK    void onUpdate(ConfigUpdate)
+com.google.firebase.remoteconfig.ConfigUpdateListenerRegistration
+  OK    void remove()
+com.google.firebase.remoteconfig.CustomSignals
+com.google.firebase.remoteconfig.CustomSignals.Builder
+  OK    Builder()
+  OK    CustomSignals build()
+  OK    Builder put(String, double)
+  OK    Builder put(String, String)
+  OK    Builder put(String, long)
+com.google.firebase.remoteconfig.FirebaseRemoteConfig
+  OK    Task activate()
+  OK    ConfigUpdateListenerRegistration addOnConfigUpdateListener(ConfigUpdateListener)
+  OK    Task ensureInitialized()
+  OK    Task fetch()
+  OK    Task fetch(long)
+  OK    Task fetchAndActivate()
+  OK    Map getAll()
+  OK    boolean getBoolean(String)
+  OK    double getDouble(String)
+  OK    FirebaseRemoteConfigInfo getInfo()
+  OK    static FirebaseRemoteConfig getInstance()
+  OK    static FirebaseRemoteConfig getInstance(FirebaseApp)
+  OK    Set getKeysByPrefix(String)
+  OK    long getLong(String)
+  OK    String getString(String)
+  OK    FirebaseRemoteConfigValue getValue(String)
+  OK    Task reset()
+  OK    Task setConfigSettingsAsync(FirebaseRemoteConfigSettings)
+  OK    Task setCustomSignals(CustomSignals)
+  MAP   Task setDefaultsAsync(int)  [deprecated: setDefaultsAsync(Int) reads an Android XML resource and can only be called from Android code; use setDefaultsAsync(Map) from common code]
+  OK    Task setDefaultsAsync(Map)
+  OK    static boolean DEFAULT_VALUE_FOR_BOOLEAN
+  OK    static byte[] DEFAULT_VALUE_FOR_BYTE_ARRAY
+  OK    static double DEFAULT_VALUE_FOR_DOUBLE
+  OK    static long DEFAULT_VALUE_FOR_LONG
+  OK    static String DEFAULT_VALUE_FOR_STRING
+  OK    static int LAST_FETCH_STATUS_FAILURE
+  OK    static int LAST_FETCH_STATUS_NO_FETCH_YET
+  OK    static int LAST_FETCH_STATUS_SUCCESS
+  OK    static int LAST_FETCH_STATUS_THROTTLED
+  OK    static int VALUE_SOURCE_DEFAULT
+  OK    static int VALUE_SOURCE_REMOTE
+  OK    static int VALUE_SOURCE_STATIC
+com.google.firebase.remoteconfig.FirebaseRemoteConfigClientException
+  OK    FirebaseRemoteConfigClientException(String)
+  OK    FirebaseRemoteConfigClientException(String, Code)
+  OK    FirebaseRemoteConfigClientException(String, Throwable)
+  OK    FirebaseRemoteConfigClientException(String, Throwable, Code)
+com.google.firebase.remoteconfig.FirebaseRemoteConfigException
+  OK    FirebaseRemoteConfigException(String)
+  OK    FirebaseRemoteConfigException(String, Code)
+  OK    FirebaseRemoteConfigException(String, Throwable)
+  OK    FirebaseRemoteConfigException(String, Throwable, Code)
+  OK    Code getCode()
+com.google.firebase.remoteconfig.FirebaseRemoteConfigException.Code
+  OK    int value()
+  OK    static Code CONFIG_UPDATE_MESSAGE_INVALID
+  OK    static Code CONFIG_UPDATE_NOT_FETCHED
+  OK    static Code CONFIG_UPDATE_STREAM_ERROR
+  OK    static Code CONFIG_UPDATE_UNAVAILABLE
+  OK    static Code UNKNOWN
+com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException
+  OK    FirebaseRemoteConfigFetchThrottledException(long)
+  OK    long getThrottleEndTimeMillis()
+com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo
+  OK    FirebaseRemoteConfigSettings getConfigSettings()
+  OK    long getFetchTimeMillis()
+  OK    int getLastFetchStatus()
+com.google.firebase.remoteconfig.FirebaseRemoteConfigServerException
+  OK    FirebaseRemoteConfigServerException(int, String)
+  OK    FirebaseRemoteConfigServerException(String, Code)
+  OK    FirebaseRemoteConfigServerException(int, String, Code)
+  OK    FirebaseRemoteConfigServerException(int, String, Throwable)
+  OK    FirebaseRemoteConfigServerException(String, Throwable, Code)
+  OK    FirebaseRemoteConfigServerException(int, String, Throwable, Code)
+  OK    int getHttpStatusCode()
+com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+  OK    long getFetchTimeoutInSeconds()
+  OK    long getMinimumFetchIntervalInSeconds()
+  OK    Builder toBuilder()
+com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings.Builder
+  OK    Builder()
+  OK    FirebaseRemoteConfigSettings build()
+  OK    long getFetchTimeoutInSeconds()
+  OK    long getMinimumFetchIntervalInSeconds()
+  OK    Builder setFetchTimeoutInSeconds(long)
+  OK    Builder setMinimumFetchIntervalInSeconds(long)
+com.google.firebase.remoteconfig.FirebaseRemoteConfigValue
+  OK    boolean asBoolean()
+  OK    byte[] asByteArray()
+  OK    double asDouble()
+  OK    long asLong()
+  OK    String asString()
+  OK    int getSource()
+com.google.firebase.remoteconfig.RemoteConfigKt
+  OK    static CustomSignals customSignals(Function1)
+  OK    static FirebaseRemoteConfigValue get(FirebaseRemoteConfig, String)
+  OK    static Flow getConfigUpdates(FirebaseRemoteConfig)
+  OK    static FirebaseRemoteConfig getRemoteConfig(Firebase)
+  OK    static FirebaseRemoteConfig remoteConfig(Firebase, FirebaseApp)
+  OK    static FirebaseRemoteConfigSettings remoteConfigSettings(Function1)

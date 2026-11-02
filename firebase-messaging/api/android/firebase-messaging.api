@@ -1,8 +1,3 @@
-public final class com/google/firebase/messaging/RemoteMessageUriKt {
-	public static final fun getImageUrl (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
-	public static final fun getLink (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
-}
-
 public final class dev/gitlive/firebase/messaging/FirebaseMessaging {
 	public final fun deleteToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z

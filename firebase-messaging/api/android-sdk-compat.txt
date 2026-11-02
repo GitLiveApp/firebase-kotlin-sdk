@@ -1,19 +1,19 @@
 # Android SDK source compatibility of firebase-messaging
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 91% of 67 public members available (61 identical, 0 mapped, 0 missing, 6 omitted)
+# 96% of 63 public members available (61 identical, 0 mapped, 0 missing, 2 omitted)
 #
 com.google.firebase.messaging.FirebaseMessaging
   SKIP  Task deleteToken()
-  OMIT  boolean deliveryMetricsExportToBigQueryEnabled()
+  UNAV  boolean deliveryMetricsExportToBigQueryEnabled()
   OK    static FirebaseMessaging getInstance()
   SKIP  Task getToken()
   OK    boolean isAutoInitEnabled()
-  OMIT  boolean isNotificationDelegationEnabled()
+  UNAV  boolean isNotificationDelegationEnabled()
   OMIT  Task register()
   SKIP  void send(RemoteMessage)
   OK    void setAutoInitEnabled(boolean)
-  OMIT  void setDeliveryMetricsExportToBigQuery(boolean)
-  OMIT  Task setNotificationDelegationEnabled(boolean)
+  UNAV  void setDeliveryMetricsExportToBigQuery(boolean)
+  UNAV  Task setNotificationDelegationEnabled(boolean)
   OK    Task subscribeToTopic(String)
   OMIT  Task unregister()
   OK    Task unsubscribeFromTopic(String)

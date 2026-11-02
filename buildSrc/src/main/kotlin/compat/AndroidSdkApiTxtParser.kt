@@ -122,8 +122,8 @@ object AndroidSdkApiTxtParser {
         }
         params += current.toString()
         return params.map { param ->
-            // "Type name" or "Type" (metalava may include parameter names)
-            val cleaned = annotation.replace(param.trim(), "").trim()
+            // "Type name", "Type" or "Type name = default" (metalava includes the names, and the defaults, of Kotlin parameters)
+            val cleaned = annotation.replace(param.trim(), "").substringBefore(" = ").trim()
             val type = cleaned.split(Regex("\\s+")).let { if (it.size > 1 && !cleaned.endsWith("...") && !cleaned.endsWith("]")) it.dropLast(1).joinToString(" ") else if (it.size > 1 && it.last().none { ch -> ch == '[' || ch == '.' }) it.dropLast(1).joinToString(" ") else cleaned }
             TypeNames.fromApiTxt(type)
         }

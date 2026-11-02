@@ -6,17 +6,32 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 /**
  * The default KMP hierarchy plus two intermediate source sets used by the `com.google.firebase` compatibility layer:
  *
- * - `nonJvmMain` (js, apple): shared pure-Kotlin implementations of Android SDK types that Android/JVM get from the
- *   real Play Services classes (e.g. `com.google.android.gms.tasks.Task`).
- * - `nonAndroidMain` (jvm, js, apple): shared pure-Kotlin implementations for modules that `firebase-java-sdk` does not
- *   provide at all, so the JVM gets real classes rather than header stubs (e.g. `RemoteMessage`).
+ * - `nonJsMain` (android, jvm, apple): the targets whose Firebase SDKs exchange Kotlin collections, where
+ *   `FirebaseFormat`'s plain values are the Kotlin ones (`PlainValues.nonJs.kt`); wasmJs binds to the JS SDK like js,
+ *   so it is outside.
+ * - `nonJvmMain` (js, wasmJs, apple): shared pure-Kotlin implementations of Android SDK types that Android/JVM get from
+ *   the real Play Services classes (e.g. `com.google.android.gms.tasks.Task`).
+ *
+ * - `nonAndroidMain` (jvm, js, wasmJs, apple): shared pure-Kotlin implementations for modules that `firebase-java-sdk` does
+ *   not provide at all, so the JVM gets real classes rather than header stubs (e.g. `FirebaseAnalytics`).
+ *
+ * An API the JS SDK lacks is not split out into a source set: it is declared in common and its JS actual carries the
+ * `@dev.gitlive.firebase.UnsupportedOnJs` marker.
  */
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun KotlinMultiplatformExtension.applyFirebaseHierarchy() {
     applyDefaultHierarchyTemplate {
         common {
+            group("nonJs") {
+                withAndroidTarget()
+                withJvm()
+                group("apple") {
+                    withApple()
+                }
+            }
             group("nonJvm") {
                 withJs()
+                withWasmJs()
                 group("apple") {
                     withApple()
                 }
@@ -24,6 +39,7 @@ fun KotlinMultiplatformExtension.applyFirebaseHierarchy() {
             group("nonAndroid") {
                 withJvm()
                 withJs()
+                withWasmJs()
                 group("apple") {
                     withApple()
                 }

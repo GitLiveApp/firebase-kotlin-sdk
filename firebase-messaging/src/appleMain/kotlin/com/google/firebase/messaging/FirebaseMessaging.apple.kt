@@ -4,7 +4,7 @@
 
 package com.google.firebase.messaging
 
-import cocoapods.FirebaseMessaging.FIRMessaging
+import swiftPMImport.dev.gitlive.firebase.messaging.FIRMessaging
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseException

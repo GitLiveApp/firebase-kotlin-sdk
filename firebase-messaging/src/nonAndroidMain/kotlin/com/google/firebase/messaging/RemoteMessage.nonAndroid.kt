@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import android.net.Uri
 /*
  * firebase-java-sdk has no Cloud Messaging and the Apple and JS SDKs deliver messages through their own APIs, so off
  * Android a RemoteMessage is a plain value built with RemoteMessage.Builder.
@@ -96,8 +97,8 @@ public actual class RemoteMessage internal constructor(
         public actual val titleLocalizationKey: String? = null,
         public actual val vibrateTimings: LongArray? = null,
         public actual val visibility: Int? = null,
-        internal val imageUrlValue: String? = null,
-        internal val linkValue: String? = null,
+        public actual val imageUrl: Uri? = null,
+        public actual val link: Uri? = null,
     )
 
     public actual companion object {
@@ -108,10 +109,6 @@ public actual class RemoteMessage internal constructor(
 }
 
 private const val MAX_TTL_SECONDS = 86_400
-
-public actual val RemoteMessage.Notification.imageUrl: String? get() = imageUrlValue
-
-public actual val RemoteMessage.Notification.link: String? get() = linkValue
 
 public actual class SendException internal constructor(message: String, public actual val errorCode: Int) : Exception(message) {
     public actual companion object {

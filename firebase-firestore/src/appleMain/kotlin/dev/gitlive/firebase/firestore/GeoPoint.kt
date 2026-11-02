@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestoreInternal.FIRGeoPoint
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRGeoPoint
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase GeoPoint. */

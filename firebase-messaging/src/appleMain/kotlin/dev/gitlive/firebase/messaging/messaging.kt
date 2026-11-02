@@ -4,7 +4,7 @@
 
 package dev.gitlive.firebase.messaging
 
-import cocoapods.FirebaseMessaging.FIRMessaging
+import swiftPMImport.dev.gitlive.firebase.messaging.FIRMessaging
 
 /** The underlying Firebase iOS SDK object. */
 public val FirebaseMessaging.ios: FIRMessaging get() = compat.ios

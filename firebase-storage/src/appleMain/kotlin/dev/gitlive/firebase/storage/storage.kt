@@ -4,19 +4,24 @@
 
 package dev.gitlive.firebase.storage
 
-import cocoapods.FirebaseStorage.FIRStorage
-import cocoapods.FirebaseStorage.FIRStorageListResult
-import cocoapods.FirebaseStorage.FIRStorageMetadata
-import cocoapods.FirebaseStorage.FIRStorageReference
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusProgress
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusResume
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusFailure
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusPause
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusProgress
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusResume
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusSuccess
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.ios
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -27,11 +32,12 @@ import kotlinx.coroutines.flow.emitAll
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import platform.Foundation.create
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-public val FirebaseStorage.ios: FIRStorage get() = FIRStorage.storage()
+public val FirebaseStorage.ios: FIRStorage get() = ios
 
 public actual val Firebase.storage: FirebaseStorage get() =
     FirebaseStorage(FIRStorage.storage())
@@ -223,6 +229,17 @@ public actual class ListResult(internal val ios: FIRStorageListResult) {
 public actual class File(public val url: NSURL)
 
 public actual class Data(public val data: NSData)
+
+@OptIn(BetaInteropApi::class)
+public actual fun ByteArray.toData(): Data = Data(
+    // addressOf(0) throws on an empty array
+    if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.convert()) },
+)
+
+public actual fun Data.toByteArray(): ByteArray {
+    require(data.length <= Int.MAX_VALUE.toULong()) { "Data of ${data.length} bytes is too large for a ByteArray" }
+    return data.bytes?.readBytes(data.length.toInt()) ?: ByteArray(0)
+}
 
 public actual class FirebaseStorageException(message: String) : FirebaseException(message)
 

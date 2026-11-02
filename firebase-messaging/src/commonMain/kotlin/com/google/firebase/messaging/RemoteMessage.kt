@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import android.net.Uri
 /**
  * A message received from, or (with [Builder]) sent to, Firebase Cloud Messaging, as the Android SDK's `RemoteMessage`.
  * On Android the SDK delivers received messages to a `FirebaseMessagingService`; the other platforms receive messages
@@ -77,7 +78,7 @@ public expect class RemoteMessage {
     @Retention(AnnotationRetention.SOURCE)
     public annotation class MessagePriority
 
-    /** The notification payload of a message, as the Android SDK's `RemoteMessage.Notification`; the image and link URLs are `imageUrl` and `link` extensions. */
+    /** The notification payload of a message, as the Android SDK's `RemoteMessage.Notification`; [imageUrl] and [link] are [Uri]s (the firebase-app stand-in off Android). */
     public class Notification {
         /** The body text. */
         public val body: String?
@@ -150,6 +151,12 @@ public expect class RemoteMessage {
 
         /** The Android notification visibility. */
         public val visibility: Int?
+
+        /** The URL of the notification image, if any. */
+        public val imageUrl: Uri?
+
+        /** The link opened when the notification is tapped, if any. */
+        public val link: Uri?
     }
 
     public companion object {

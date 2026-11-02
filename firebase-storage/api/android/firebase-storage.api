@@ -121,5 +121,7 @@ public final class dev/gitlive/firebase/storage/android {
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ldev/gitlive/firebase/FirebaseApp;Ljava/lang/String;)Ldev/gitlive/firebase/storage/FirebaseStorage;
 	public static final fun storage (Ldev/gitlive/firebase/Firebase;Ljava/lang/String;)Ldev/gitlive/firebase/storage/FirebaseStorage;
+	public static final fun toByteArray (Ldev/gitlive/firebase/storage/Data;)[B
+	public static final fun toData ([B)Ldev/gitlive/firebase/storage/Data;
 }
 

@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestoreInternal.FIRFieldValue
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRFieldValue
 
 @PublishedApi
 internal actual fun isSpecialValue(value: Any): Boolean = when (value) {

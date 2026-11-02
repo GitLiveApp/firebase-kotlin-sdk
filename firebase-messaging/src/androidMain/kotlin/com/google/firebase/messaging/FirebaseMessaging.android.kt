@@ -91,9 +91,8 @@ public actual class RemoteMessage private constructor() {
         public actual val vibrateTimings: LongArray? get() = stub()
         public actual val visibility: Int? get() = stub()
 
-        /** The SDK's Uri members; common code uses the String extensions of RemoteMessageUri.kt, which bind to these. */
-        public val imageUrl: Uri? get() = stub()
-        public val link: Uri? get() = stub()
+        public actual val imageUrl: Uri? get() = stub()
+        public actual val link: Uri? get() = stub()
     }
 
     public actual companion object {

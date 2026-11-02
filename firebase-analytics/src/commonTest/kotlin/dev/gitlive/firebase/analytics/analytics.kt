@@ -4,6 +4,7 @@
 
 package dev.gitlive.firebase.analytics
 
+import android.content.Context
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -15,7 +16,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-expect val context: Any
+/** The platform context: Android's and firebase-java-sdk's on the JVM, the placeholder `Context()` elsewhere. */
+expect val context: Context
 expect annotation class IgnoreForAndroidUnitTest()
 
 @IgnoreForAndroidUnitTest
@@ -54,6 +56,19 @@ class FirebaseAnalyticsTest {
         // This should not crash, otherwise the test will fail
         analytics.logEvent("test") {
             param("key", "value")
+        }
+        analytics.logEvent(
+            "purchase",
+            mapOf(
+                "currency" to "USD",
+                "value" to 12.5,
+                "items" to listOf(mapOf("item_id" to "SKU_1", "quantity" to 2L)),
+            ),
+        )
+        analytics.setUserProperty("test_property", "value")
+        analytics.setDefaultEventParameters(mapOf("default_key" to "default_value"))
+        analytics.setConsent {
+            analyticsStorage = FirebaseAnalytics.ConsentStatus.GRANTED
         }
     }
 }

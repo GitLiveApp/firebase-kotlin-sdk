@@ -6,8 +6,6 @@ package dev.gitlive.firebase.messaging
 
 import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.messaging.SendException
-import com.google.firebase.messaging.imageUrl
-import com.google.firebase.messaging.link
 import com.google.firebase.messaging.remoteMessage
 import kotlin.test.Test
 import kotlin.test.assertEquals

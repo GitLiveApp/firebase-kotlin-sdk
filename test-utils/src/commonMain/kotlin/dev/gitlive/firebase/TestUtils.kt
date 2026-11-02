@@ -10,6 +10,13 @@ import kotlinx.coroutines.test.TestResult
 expect fun runTest(test: suspend CoroutineScope.() -> Unit): TestResult
 expect fun runBlockingTest(action: suspend CoroutineScope.() -> Unit)
 
+/**
+ * Whether [runBlockingTest] blocks until its action has completed. It cannot on JS and wasmJs, where it
+ * returns straight away and the action runs later, so teardown done through it may still be pending
+ * when the next test starts.
+ */
+expect val runBlockingTestBlocks: Boolean
+
 expect fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any
 expect fun nativeListOf(vararg elements: Any?): Any
 expect fun nativeAssertEquals(expected: Any?, actual: Any?)

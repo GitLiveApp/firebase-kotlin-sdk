@@ -8,7 +8,7 @@ package com.google.android.gms.tasks
  * Represents an asynchronous operation, mirroring the Play Services Tasks API so that code written against the
  * Firebase Android SDK compiles unchanged on every platform.
  *
- * On Android and the JVM this is the real Play Services class; on Apple and JS platforms a Kotlin implementation
+ * On Android and the JVM this is the real Play Services class; on Apple, JS and wasmJs platforms a Kotlin implementation
  * is provided. Listeners on the Kotlin implementation are invoked on the thread that completes the task.
  *
  * The static-only `Tasks` helper class is intentionally not mirrored; use `kotlinx.coroutines.tasks.await`

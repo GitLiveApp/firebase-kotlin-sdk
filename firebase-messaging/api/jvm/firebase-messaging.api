@@ -73,7 +73,9 @@ public final class com/google/firebase/messaging/RemoteMessage$Notification {
 	public final fun getDefaultVibrateSettings ()Z
 	public final fun getEventTime ()Ljava/lang/Long;
 	public final fun getIcon ()Ljava/lang/String;
+	public final fun getImageUrl ()Landroid/net/Uri;
 	public final fun getLightSettings ()[I
+	public final fun getLink ()Landroid/net/Uri;
 	public final fun getLocalOnly ()Z
 	public final fun getNotificationCount ()Ljava/lang/Integer;
 	public final fun getNotificationPriority ()Ljava/lang/Integer;
@@ -86,11 +88,6 @@ public final class com/google/firebase/messaging/RemoteMessage$Notification {
 	public final fun getTitleLocalizationKey ()Ljava/lang/String;
 	public final fun getVibrateTimings ()[J
 	public final fun getVisibility ()Ljava/lang/Integer;
-}
-
-public final class com/google/firebase/messaging/RemoteMessage_nonAndroidKt {
-	public static final fun getImageUrl (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
-	public static final fun getLink (Lcom/google/firebase/messaging/RemoteMessage$Notification;)Ljava/lang/String;
 }
 
 public final class com/google/firebase/messaging/SendException : java/lang/Exception {

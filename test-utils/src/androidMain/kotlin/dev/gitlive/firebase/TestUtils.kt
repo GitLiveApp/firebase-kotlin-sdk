@@ -11,6 +11,7 @@ import kotlin.time.Duration.Companion.minutes
 
 actual fun runTest(test: suspend CoroutineScope.() -> Unit) = kotlinx.coroutines.test.runTest(timeout = 5.minutes) { test() }
 actual fun runBlockingTest(action: suspend CoroutineScope.() -> Unit) = runBlocking(block = action)
+actual val runBlockingTestBlocks: Boolean = true
 
 actual fun nativeMapOf(vararg pairs: Pair<Any, Any?>): Any = mapOf(*pairs)
 actual fun nativeListOf(vararg elements: Any?): Any = listOf(*elements)
