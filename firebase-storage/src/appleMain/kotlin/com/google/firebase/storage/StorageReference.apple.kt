@@ -103,10 +103,8 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     override fun toString(): String = "gs://$bucket$path"
 }
 
-/** An [UploadController] over a [FIRStorageUploadTask]. */
-
 /**
- * [payloadSize] is the size of the uploaded bytes or file when known: the iOS SDK's progress counts the bytes of the request
+ * An [UploadController] over a [FIRStorageUploadTask]. [payloadSize] is the size of the uploaded bytes or file when known: the iOS SDK's progress counts the bytes of the request
  * body, which for a small (single-request, multipart) upload includes the metadata part, whereas the Android SDK's snapshot
  * counts the payload, so the progress is scaled to the payload.
  */
