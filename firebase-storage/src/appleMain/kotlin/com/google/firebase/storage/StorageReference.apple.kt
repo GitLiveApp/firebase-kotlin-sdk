@@ -30,7 +30,7 @@ private const val MILLIS_PER_SECOND = 1000.0
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class StorageReference internal constructor(public val ios: FIRStorageReference) : Comparable<StorageReference> {
-    public actual val activeUploadTasks: List<UploadTask> get() = ActiveTasks.uploads.filter { it.reference == this }
+    public actual val activeUploadTasks: List<UploadTask> get() = ActiveTasks.uploads.filter { it.reference.isUnder(this) }
     public actual val bucket: String get() = ios.bucket()
     public actual val name: String get() = ios.name()
     public actual val parent: StorageReference? get() = ios.parent()?.let { StorageReference(it) }
@@ -87,7 +87,7 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
 
-    public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference == this }
+    public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference.isUnder(this) }
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task { completion ->
         ios.updateMetadata(metadata.toIos()) { updated, error -> completion(updated?.toCompat() ?: StorageMetadata(), error) }
@@ -97,7 +97,7 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 
     override fun hashCode(): Int = toString().hashCode()
 
-    override fun toString(): String = "gs://$bucket/$path"
+    override fun toString(): String = "gs://$bucket$path"
 }
 
 /** An [UploadController] over a [FIRStorageUploadTask]. */
@@ -170,27 +170,35 @@ internal fun NSError.toStorageException(): StorageException = StorageException.o
 
 internal fun ByteArray.toNSData(): NSData = if (isEmpty()) NSData() else usePinned { NSData.create(bytes = it.addressOf(0), length = size.toULong()) }
 
-internal fun NSData.toByteArray(): ByteArray = ByteArray(length.toInt()).apply {
-    if (isNotEmpty()) usePinned { memcpy(it.addressOf(0), bytes, length) }
+internal fun NSData.toByteArray(): ByteArray {
+    require(length <= Int.MAX_VALUE.toULong()) { "Data of $length bytes is too large for a ByteArray" }
+    return ByteArray(length.toInt()).apply {
+        if (isNotEmpty()) usePinned { memcpy(it.addressOf(0), bytes, length) }
+    }
 }
 
 internal fun swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult.toCompat(): ListResult = ListResult(
     items = items().map { StorageReference(it as FIRStorageReference) },
     prefixes = prefixes().map { StorageReference(it as FIRStorageReference) },
     pageToken = pageToken(),
+    native = this,
 )
 
 internal fun StorageMetadata.toIos(): FIRStorageMetadata {
-    // The Apple SDK only sends deletions for custom keys present in the metadata it was created from,
-    // so removed keys are seeded as the initial state and left out of the customMetadata set below.
-    val removed = customMetadata.filterValues { it == null }.keys
-    val ios = if (removed.isEmpty()) FIRStorageMetadata() else FIRStorageMetadata(dictionary = mapOf("metadata" to removed.associateWith { "" }))
-    ios.setCacheControl(cacheControl)
-    ios.setContentDisposition(contentDisposition)
-    ios.setContentEncoding(contentEncoding)
-    ios.setContentLanguage(contentLanguage)
-    ios.setContentType(contentType)
-    ios.setCustomMetadata(customMetadata.filterValues { it != null }.toMap<Any?, String?>())
+    // The Apple SDK sends an update as the difference from the metadata it was created from, and a deletion only for a
+    // key present in that initial state, so the headers and custom keys to delete are seeded there and set to nil below.
+    val headers = providedHeaders()
+    val removedCustom = customMetadata.filterValues { it == null }.keys
+    val seed = mutableMapOf<Any?, Any?>()
+    headers.filterValues { it == null }.keys.forEach { seed[it] = "" }
+    if (removedCustom.isNotEmpty()) seed["metadata"] = removedCustom.associateWith { "" }
+    val ios = if (seed.isEmpty()) FIRStorageMetadata() else FIRStorageMetadata(dictionary = seed)
+    if ("cacheControl" in headers) ios.setCacheControl(headers["cacheControl"])
+    if ("contentDisposition" in headers) ios.setContentDisposition(headers["contentDisposition"])
+    if ("contentEncoding" in headers) ios.setContentEncoding(headers["contentEncoding"])
+    if ("contentLanguage" in headers) ios.setContentLanguage(headers["contentLanguage"])
+    if ("contentType" in headers) ios.setContentType(headers["contentType"])
+    if (customMetadata.isNotEmpty()) ios.setCustomMetadata(customMetadata.filterValues { it != null }.toMap<Any?, String?>())
     return ios
 }
 

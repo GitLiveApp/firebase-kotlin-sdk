@@ -16,6 +16,12 @@ public actual class StorageMetadata actual constructor() {
     /** A `null` value marks a key removed by [Builder.setCustomMetadata], which an update sends as an explicit delete. */
     internal val customMetadata = mutableMapOf<String, String?>()
 
+    /**
+     * The header fields set through the [Builder] (by their JSON names), as the Android SDK tracks user-provided values: an
+     * update sends only these, a `null` value as an explicit delete, and leaves the object's other fields untouched.
+     */
+    internal val providedFields = mutableSetOf<String>()
+
     internal var generationValue: String? = null
     internal var md5HashValue: String? = null
     internal var metadataGenerationValue: String? = null
@@ -52,43 +58,60 @@ public actual class StorageMetadata actual constructor() {
 
         public actual constructor()
 
+        /** Copies every field of [original], the identifying ones included, as the Android SDK's copying constructor does. */
         public actual constructor(original: StorageMetadata) {
+            metadata.bucketValue = original.bucketValue
             metadata.cacheControlValue = original.cacheControlValue
             metadata.contentDispositionValue = original.contentDispositionValue
             metadata.contentEncodingValue = original.contentEncodingValue
             metadata.contentLanguageValue = original.contentLanguageValue
             metadata.contentTypeValue = original.contentTypeValue
+            metadata.creationTimeMillisValue = original.creationTimeMillisValue
             metadata.customMetadata.putAll(original.customMetadata)
+            metadata.providedFields.addAll(original.providedFields)
+            metadata.generationValue = original.generationValue
+            metadata.md5HashValue = original.md5HashValue
+            metadata.metadataGenerationValue = original.metadataGenerationValue
+            metadata.nameValue = original.nameValue
+            metadata.pathValue = original.pathValue
+            metadata.referenceValue = original.referenceValue
+            metadata.sizeBytesValue = original.sizeBytesValue
+            metadata.updatedTimeMillisValue = original.updatedTimeMillisValue
         }
 
         public actual var cacheControl: String?
             get() = metadata.cacheControlValue
             set(value) {
                 metadata.cacheControlValue = value
+                metadata.providedFields += "cacheControl"
             }
 
         public actual var contentDisposition: String?
             get() = metadata.contentDispositionValue
             set(value) {
                 metadata.contentDispositionValue = value
+                metadata.providedFields += "contentDisposition"
             }
 
         public actual var contentEncoding: String?
             get() = metadata.contentEncodingValue
             set(value) {
                 metadata.contentEncodingValue = value
+                metadata.providedFields += "contentEncoding"
             }
 
         public actual var contentLanguage: String?
             get() = metadata.contentLanguageValue
             set(value) {
                 metadata.contentLanguageValue = value
+                metadata.providedFields += "contentLanguage"
             }
 
         public actual var contentType: String?
             get() = metadata.contentTypeValue
             set(value) {
                 metadata.contentTypeValue = value
+                metadata.providedFields += "contentType"
             }
 
         public actual fun build(): StorageMetadata = Builder(metadata).metadata
@@ -107,4 +130,13 @@ public actual class StorageMetadata actual constructor() {
             metadata.customMetadata[key] = value
         }
     }
+}
+
+/** The header fields an update sends: the ones set through the [StorageMetadata.Builder], a `null` value meaning delete. */
+internal fun StorageMetadata.providedHeaders(): Map<String, String?> = buildMap {
+    if ("cacheControl" in providedFields) put("cacheControl", cacheControl)
+    if ("contentDisposition" in providedFields) put("contentDisposition", contentDisposition)
+    if ("contentEncoding" in providedFields) put("contentEncoding", contentEncoding)
+    if ("contentLanguage" in providedFields) put("contentLanguage", contentLanguage)
+    if ("contentType" in providedFields) put("contentType", contentType)
 }

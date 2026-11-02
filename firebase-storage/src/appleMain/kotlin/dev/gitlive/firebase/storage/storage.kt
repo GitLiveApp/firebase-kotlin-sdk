@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.storage
 
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.putFileUrl
@@ -20,6 +21,9 @@ public val FirebaseStorage.ios: FIRStorage get() = compat.ios
 
 /** The underlying Firebase iOS SDK object. */
 public val StorageReference.ios: FIRStorageReference get() = compat.ios
+
+/** The underlying Firebase iOS SDK object. */
+public val ListResult.ios: FIRStorageListResult get() = compat.native as FIRStorageListResult
 
 public actual class File(public val url: NSURL)
 

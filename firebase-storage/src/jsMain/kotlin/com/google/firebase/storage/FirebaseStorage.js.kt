@@ -50,7 +50,7 @@ public actual class FirebaseStorage internal constructor(public val js: JsFireba
     public actual companion object {
         public actual fun getInstance(): FirebaseStorage = rethrow { FirebaseStorage(getStorage()) }
 
-        public actual fun getInstance(url: String): FirebaseStorage = rethrow { FirebaseStorage(getStorage(null, url)) }
+        public actual fun getInstance(url: String): FirebaseStorage = rethrow { FirebaseStorage(getStorage(bucketUrl = url)) }
 
         public actual fun getInstance(app: FirebaseApp): FirebaseStorage = rethrow { FirebaseStorage(getStorage(app.js)) }
 

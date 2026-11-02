@@ -135,34 +135,46 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
         return true
     }
 
+    // A listener added after completion is replayed at once and not queued: the terminal dispatch is over (or, when the
+    // listener is added from inside that dispatch, still iterating its own snapshot), so queueing it would run it twice.
     actual override fun addOnCanceledListener(listener: OnCanceledListener): StorageTask<ResultT> = apply {
-        canceledListeners += listener
-        if (isCanceled) listener.onCanceled()
+        if (completeState) {
+            if (canceledState) listener.onCanceled()
+        } else {
+            canceledListeners += listener
+        }
     }
 
     actual override fun addOnCompleteListener(listener: OnCompleteListener<ResultT>): StorageTask<ResultT> = apply {
-        completeListeners += listener
-        if (isComplete) listener.onComplete(this)
+        if (completeState) listener.onComplete(this) else completeListeners += listener
     }
 
     actual override fun addOnFailureListener(listener: OnFailureListener): StorageTask<ResultT> = apply {
-        failureListeners += listener
-        if (status == TaskStatus.FAILURE) listener.onFailure(error!!)
+        if (completeState) {
+            if (status == TaskStatus.FAILURE) listener.onFailure(error!!)
+        } else {
+            failureListeners += listener
+        }
     }
 
     actual override fun addOnPausedListener(listener: OnPausedListener<ResultT>): StorageTask<ResultT> = apply {
+        if (completeState) return@apply
         pausedListeners += listener
         if (isPaused) listener.onPaused(snapshot)
     }
 
     actual override fun addOnProgressListener(listener: OnProgressListener<ResultT>): StorageTask<ResultT> = apply {
+        if (completeState) return@apply
         progressListeners += listener
         if (status == TaskStatus.IN_PROGRESS) listener.onProgress(snapshot)
     }
 
     actual override fun addOnSuccessListener(listener: OnSuccessListener<in ResultT>): StorageTask<ResultT> = apply {
-        successListeners += listener
-        if (isSuccessful) listener.onSuccess(finalSnapshot!!)
+        if (completeState) {
+            if (successState) listener.onSuccess(finalSnapshot!!)
+        } else {
+            successListeners += listener
+        }
     }
 
     public actual fun removeOnCanceledListener(listener: OnCanceledListener): StorageTask<ResultT> = apply { canceledListeners -= listener }
@@ -314,6 +326,9 @@ internal class UploadTaskImpl(reference: StorageReference, controller: UploadCon
         controller.start(this)
     }
 }
+
+/** Whether this reference is [parent] or under it, as the Android SDK's registry matches active tasks by URL prefix. */
+internal fun StorageReference.isUnder(parent: StorageReference): Boolean = bucket == parent.bucket && (path == parent.path || path.startsWith(parent.path.trimEnd('/') + "/"))
 
 /** The tasks that have not completed, per reference; the Android SDK keeps the same registry. */
 internal object ActiveTasks {

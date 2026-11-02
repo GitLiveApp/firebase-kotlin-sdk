@@ -34,7 +34,7 @@ import dev.gitlive.firebase.storage.externals.UploadTask as JsUploadTask
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class StorageReference internal constructor(public val js: JsStorageReference) : Comparable<StorageReference> {
-    public actual val activeUploadTasks: List<UploadTask> get() = ActiveTasks.uploads.filter { it.reference == this }
+    public actual val activeUploadTasks: List<UploadTask> get() = ActiveTasks.uploads.filter { it.reference.isUnder(this) }
     public actual val bucket: String get() = js.bucket
     public actual val name: String get() = js.name
     public actual val parent: StorageReference? get() = js.parent?.let { StorageReference(it) }
@@ -97,7 +97,7 @@ public actual class StorageReference internal constructor(public val js: JsStora
 
     override fun hashCode(): Int = toString().hashCode()
 
-    override fun toString(): String = "gs://$bucket/$path"
+    override fun toString(): String = "gs://$bucket$path"
 }
 
 /** An [UploadController] over the JS SDK's `UploadTask`. */
@@ -184,16 +184,14 @@ internal fun JsListResult.toCompat(): ListResult = ListResult(
 )
 
 internal fun StorageMetadata.toJs(): Json {
-    val custom = json()
-    customMetadata.forEach { (key, value) -> custom[key] = value }
-    return json(
-        "cacheControl" to cacheControl,
-        "contentDisposition" to contentDisposition,
-        "contentEncoding" to contentEncoding,
-        "contentLanguage" to contentLanguage,
-        "contentType" to contentType,
-        "customMetadata" to custom,
-    )
+    val result = json()
+    providedHeaders().forEach { (key, value) -> result[key] = value }
+    if (customMetadata.isNotEmpty()) {
+        val custom = json()
+        customMetadata.forEach { (key, value) -> custom[key] = value }
+        result["customMetadata"] = custom
+    }
+    return result
 }
 
 internal fun FullMetadata.toCompat(): StorageMetadata = StorageMetadata().also { compat ->

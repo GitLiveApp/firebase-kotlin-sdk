@@ -7,6 +7,7 @@ package dev.gitlive.firebase.storage
 import com.google.firebase.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
+import android.net.Uri
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.TaskState
 import com.google.firebase.storage.UploadTask
@@ -88,9 +89,9 @@ class AndroidSdkSourceCompatTest {
         assertEquals("text/plain", uploaded?.contentType)
         assertEquals(ref, snapshot.storage)
         assertNull(snapshot.error)
-        // The Android SDK's member (a Uri) wins over the String extension there, so only its string form is used.
-        val uploadSession: String? = snapshot.uploadSessionUri?.toString()
-        assertTrue(uploadSession == null || uploadSession.isNotEmpty())
+        // The resumable upload session URL is Android-only; the other SDKs do not expose it.
+        val uploadSession: Uri? = snapshot.uploadSessionUri
+        assertTrue(uploadSession == null || uploadSession.toString().isNotEmpty())
 
         assertEquals("hello", ref.getBytes(1024).await().decodeToString())
         assertTrue(ref.getDownloadUrl().await().toString().contains("compatBytes.txt"))
@@ -104,6 +105,12 @@ class AndroidSdkSourceCompatTest {
         assertEquals(5, fetched.sizeBytes)
         assertTrue(fetched.creationTimeMillis > 0)
         assertNotNull(fetched.generation)
+
+        // An update sends only the fields set on its builder and leaves the rest untouched.
+        val partial = ref.updateMetadata(StorageMetadata.Builder().setCacheControl("public, max-age=60").build()).await()
+        assertEquals("public, max-age=60", partial.cacheControl)
+        assertEquals("text/plain", partial.contentType)
+        assertEquals("value", partial.getCustomMetadata("key"))
 
         val updated = ref.updateMetadata(StorageMetadata.Builder(fetched).setContentType("text/markdown").setCustomMetadata("key", null).build()).await()
         assertEquals("text/markdown", updated.contentType)

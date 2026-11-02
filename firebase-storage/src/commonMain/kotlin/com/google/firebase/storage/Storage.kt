@@ -5,6 +5,7 @@
 package com.google.firebase.storage
 
 import android.net.Uri
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.channels.awaitClose
@@ -59,11 +60,13 @@ public val <T : StorageTask.ProvideError> StorageTask<T>.taskState: Flow<TaskSta
     get() = callbackFlow {
         val progressListener = OnProgressListener<T> { trySend(TaskState.InProgress(it)) }
         val pausedListener = OnPausedListener<T> { trySend(TaskState.Paused(it)) }
+        val completeListener = OnCompleteListener<T> { close(it.exception) }
         addOnProgressListener(progressListener)
         addOnPausedListener(pausedListener)
-        addOnCompleteListener { close(it.exception) }
+        addOnCompleteListener(completeListener)
         awaitClose {
             removeOnProgressListener(progressListener)
             removeOnPausedListener(pausedListener)
+            removeOnCompleteListener(completeListener)
         }
     }
