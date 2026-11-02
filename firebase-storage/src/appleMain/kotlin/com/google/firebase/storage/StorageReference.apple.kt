@@ -21,6 +21,9 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSData
 import platform.Foundation.NSError
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSFileSize
+import platform.Foundation.NSNumber
 import platform.Foundation.NSURL
 import platform.Foundation.create
 import platform.Foundation.timeIntervalSince1970
@@ -71,11 +74,11 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
         ios.listAllWithCompletion { result, error -> completion(result?.toCompat() ?: ListResult(emptyList(), emptyList(), null), error) }
     }
 
-    public actual fun putBytes(bytes: ByteArray): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), null)))
+    public actual fun putBytes(bytes: ByteArray): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), null), bytes.size.toLong()))
 
-    public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), metadata.toIos())))
+    public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), metadata.toIos()), bytes.size.toLong()))
 
-    internal fun putFileUrl(url: NSURL, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putFile(url, metadata?.toIos())))
+    internal fun putFileUrl(url: NSURL, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putFile(url, metadata?.toIos()), url.fileSize()))
 
     public actual fun putFile(uri: Uri): UploadTask = putFileUrl(uri.toNSURL(), null)
 
@@ -101,7 +104,12 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 }
 
 /** An [UploadController] over a [FIRStorageUploadTask]. */
-internal class IosUploadController(private val reference: StorageReference, private val ios: FIRStorageUploadTask) : UploadController {
+/**
+ * [payloadSize] is the size of the uploaded bytes or file when known: the iOS SDK's progress counts the bytes of the request
+ * body, which for a small (single-request, multipart) upload includes the metadata part, whereas the Android SDK's snapshot
+ * counts the payload, so the progress is scaled to the payload.
+ */
+internal class IosUploadController(private val reference: StorageReference, private val ios: FIRStorageUploadTask, private val payloadSize: Long?) : UploadController {
     override var bytesTransferred: Long = 0
     override var totalByteCount: Long = 0
     override var metadata: StorageMetadata? = null
@@ -122,6 +130,9 @@ internal class IosUploadController(private val reference: StorageReference, priv
         ios.observeStatus(FIRStorageTaskStatusSuccess) { snapshot ->
             update(snapshot)
             metadata = snapshot?.metadata()?.toCompat(reference)
+            // Everything is uploaded: the object's size is the authoritative byte count.
+            (metadata?.sizeBytes?.takeIf { it > 0 } ?: payloadSize)?.let { totalByteCount = it }
+            bytesTransferred = totalByteCount
             ios.removeAllObservers()
             task.reportSuccess()
         }
@@ -134,9 +145,14 @@ internal class IosUploadController(private val reference: StorageReference, priv
     }
 
     private fun update(snapshot: FIRStorageTaskSnapshot?) {
-        snapshot?.progress()?.let {
-            bytesTransferred = it.completedUnitCount
-            totalByteCount = it.totalUnitCount
+        val progress = snapshot?.progress() ?: return
+        val size = payloadSize
+        if (size == null || progress.totalUnitCount <= 0) {
+            bytesTransferred = progress.completedUnitCount
+            totalByteCount = progress.totalUnitCount
+        } else {
+            totalByteCount = size
+            bytesTransferred = (progress.completedUnitCount.toDouble() * size / progress.totalUnitCount).toLong().coerceIn(0, size)
         }
     }
 
@@ -230,3 +246,6 @@ internal fun Uri.toNSURL(): NSURL {
     val value = toString()
     return if ("://" in value) requireNotNull(NSURL.URLWithString(value)) { "Not a URL: $value" } else NSURL.fileURLWithPath(value)
 }
+
+/** The size of the file at this URL, or null when it cannot be read. */
+internal fun NSURL.fileSize(): Long? = path?.let { NSFileManager.defaultManager.attributesOfItemAtPath(it, null)?.get(NSFileSize) as? NSNumber }?.longValue
