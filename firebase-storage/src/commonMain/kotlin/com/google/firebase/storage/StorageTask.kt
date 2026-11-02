@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener
@@ -116,7 +117,7 @@ public expect abstract class UploadTask : StorageTask<UploadTask.TaskSnapshot> {
     /** Schedules the upload to run. */
     protected open fun schedule()
 
-    /** The state of an upload; the upload session URL is the `uploadSessionUri` extension. */
+    /** The state of an upload. */
     public inner class TaskSnapshot : StorageTask<TaskSnapshot>.SnapshotBase {
         /** The bytes uploaded so far. */
         public val bytesTransferred: Long
@@ -126,6 +127,9 @@ public expect abstract class UploadTask : StorageTask<UploadTask.TaskSnapshot> {
 
         /** The total size of the upload. */
         public val totalByteCount: Long
+
+        /** The resumable upload session URL on Android; null elsewhere, as the Apple and JS SDKs do not expose it. */
+        public val uploadSessionUri: Uri?
     }
 }
 
@@ -133,7 +137,6 @@ public expect abstract class UploadTask : StorageTask<UploadTask.TaskSnapshot> {
  * The URL of the resumable upload session, if the SDK exposes it (the Android SDK returns an `android.net.Uri`, which
  * common code cannot name; on Android the SDK's member binds for Android code and this String form is shipped).
  */
-public expect val UploadTask.TaskSnapshot.uploadSessionUri: String?
 
 /** Receives the snapshots of a paused task; the Android SDK's `OnPausedListener`. */
 public fun interface OnPausedListener<in ProgressT> {

@@ -6,9 +6,10 @@
 
 package dev.gitlive.firebase.analytics
 
+import android.content.Context
 import dev.gitlive.firebase.testContext
 
-actual val context: Any = testContext
+actual val context: Context = testContext
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

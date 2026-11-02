@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.UnsupportedOnJs
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.storage.externals.connectStorageEmulator
 import dev.gitlive.firebase.storage.externals.getStorage
@@ -20,8 +21,9 @@ public actual class FirebaseStorage internal constructor(public val js: JsFireba
             js.maxOperationRetryTime = value.toDouble()
         }
 
-    /** The JS SDK has no file downloads: kept for the maxDownloadRetryTimeMillis extension. */
-    internal var maxDownloadRetryTimeMillisValue: Long = DEFAULT_RETRY_TIME_MILLIS
+    /** Kept in memory with no effect: the JS SDK has no file downloads. */
+    @UnsupportedOnJs
+    public actual var maxDownloadRetryTimeMillis: Long = DEFAULT_RETRY_TIME_MILLIS
 
     public actual var maxUploadRetryTimeMillis: Long
         get() = js.maxUploadRetryTime.toLong()

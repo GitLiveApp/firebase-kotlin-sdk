@@ -21,6 +21,9 @@ public expect class FirebaseStorage {
     /** The maximum time to retry uploads, in milliseconds. */
     public var maxUploadRetryTimeMillis: Long
 
+    /** The maximum time to retry downloads, in milliseconds; kept but without effect on JS, whose SDK has no file downloads. */
+    public var maxDownloadRetryTimeMillis: Long
+
     /** A reference to the root of the default bucket. */
     public val reference: StorageReference
 

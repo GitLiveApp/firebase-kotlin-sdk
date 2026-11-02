@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.messaging
 
-import cocoapods.FirebaseMessaging.FIRMessaging
+import swiftPMImport.dev.gitlive.firebase.messaging.FIRMessaging
 import dev.gitlive.firebase.Firebase
 import kotlinx.coroutines.CompletableDeferred
 import platform.Foundation.NSError

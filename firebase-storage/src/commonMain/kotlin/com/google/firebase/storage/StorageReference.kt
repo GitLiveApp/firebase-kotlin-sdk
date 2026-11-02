@@ -4,11 +4,13 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 
 /**
- * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Uploads from a file and
- * downloads to a file are the `putFile` / `getFile` extensions, which take the platform's file type.
+ * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
+ * [android.net.Uri] (the firebase-app stand-in off Android): a `file:` URL, or a path on Apple platforms.
  */
 public expect class StorageReference : Comparable<StorageReference> {
     /** The uploads to this reference that have not completed. */
@@ -69,4 +71,21 @@ public expect class StorageReference : Comparable<StorageReference> {
 
     /** Updates the object's mutable metadata (the settable fields of [metadata]). */
     public fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata>
+
+    /** Uploads the file at [uri] to this reference. Fails on JS, whose SDK cannot read a file by its URL. */
+    public fun putFile(uri: Uri): UploadTask
+
+    /** Uploads the file at [uri] to this reference with [metadata]. Fails on JS, whose SDK cannot read a file by its URL. */
+    public fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask
+
+    /** Downloads the object to the file at [destinationUri]. Fails on JS, whose SDK has no file downloads. */
+    public fun getFile(destinationUri: Uri): FileDownloadTask
+
+    /** Downloads the object to [destinationFile]; Android and JVM only, common code uses [getFile] with a [Uri]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public fun getFile(destinationFile: java.io.File): FileDownloadTask
+
+    /** The downloads from this reference that have not completed; always empty on JS. */
+    public val activeDownloadTasks: List<FileDownloadTask>
 }

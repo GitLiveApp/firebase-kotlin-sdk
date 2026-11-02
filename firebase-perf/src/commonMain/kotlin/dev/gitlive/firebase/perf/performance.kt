@@ -1,25 +1,39 @@
+/*
+ * Copyright (c) 2020 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
+// The facade name of the former androidMain file, kept for binary compatibility.
+@file:JvmName("PerformanceKt")
+@file:JvmMultifileClass
+
 package dev.gitlive.firebase.perf
 
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.perf.metrics.Trace
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+import com.google.firebase.perf.FirebasePerformance as CompatFirebasePerformance
+import com.google.firebase.perf.performance as compatPerformance
+import com.google.firebase.perf.performanceOf as compatPerformanceOf
+
+// The Android-SDK-shaped singleton is reached through the `Firebase.performance` extension (PerformanceKt), a real
+// static method on every platform, rather than the companion object of the header stub.
 
 /** Returns the [FirebasePerformance] instance of the default [FirebaseApp]. */
-public expect val Firebase.performance: FirebasePerformance
+public val Firebase.performance: FirebasePerformance
+    get() = FirebasePerformance(com.google.firebase.Firebase.compatPerformance)
 
-/** Returns the [FirebasePerformance] instance of a given [FirebaseApp]. */
-public expect fun Firebase.performance(app: FirebaseApp): FirebasePerformance
+/** Returns the [FirebasePerformance] instance of the given [FirebaseApp] (the Android SDK keeps one per app). */
+public fun Firebase.performance(app: FirebaseApp): FirebasePerformance = FirebasePerformance(compatPerformanceOf(app.compat))
 
 /**
- * The Firebase Performance Monitoring API.
+ * Firebase Performance Monitoring.
  *
- * It is automatically initialized by FirebaseApp.
- *
- * This SDK uses FirebaseInstallations to identify the app instance and periodically sends data
- * to the Firebase backend. To stop sending performance events, call [setPerformanceCollectionEnabled] with value [false].
+ * @property compat The Android-SDK-shaped [com.google.firebase.perf.FirebasePerformance] this wraps.
  */
-public expect class FirebasePerformance {
+public class FirebasePerformance internal constructor(public val compat: CompatFirebasePerformance) {
     /**
      * Creates a Trace object with given name.
      *
@@ -27,7 +41,7 @@ public expect class FirebasePerformance {
      *     underscore '_' character.
      * @return the new Trace object.
      */
-    public fun newTrace(traceName: String): Trace
+    public fun newTrace(traceName: String): Trace = Trace(compat.newTrace(traceName))
 
     /**
      * Determines whether performance monitoring is enabled or disabled. This respects the Firebase
@@ -38,7 +52,7 @@ public expect class FirebasePerformance {
      *     disabled. This is for dynamic enable/disable state. This does not reflect whether
      *     instrumentation is enabled/disabled in Gradle properties.
      */
-    public fun isPerformanceCollectionEnabled(): Boolean
+    public fun isPerformanceCollectionEnabled(): Boolean = compat.isPerformanceCollectionEnabled
 
     /**
      * Enables or disables performance monitoring. This setting is persisted and applied on future
@@ -62,10 +76,19 @@ public expect class FirebasePerformance {
      *
      * @param enable Should performance monitoring be enabled
      */
-    public fun setPerformanceCollectionEnabled(enable: Boolean)
+    public fun setPerformanceCollectionEnabled(enable: Boolean) {
+        compat.isPerformanceCollectionEnabled = enable
+    }
+
+    override fun equals(other: Any?): Boolean = other is FirebasePerformance && other.compat == compat
+
+    override fun hashCode(): Int = compat.hashCode()
+
+    override fun toString(): String = "FirebasePerformance($compat)"
 }
 
-/**
- * Exception that gets thrown when an operation on Firebase Performance fails.
- */
-public expect open class FirebasePerformanceException : FirebaseException
+/** An error reported by the underlying Performance Monitoring SDK (on JS, where the SDK throws). */
+public open class FirebasePerformanceException : FirebaseException {
+    public constructor(message: String) : super(message)
+    public constructor(message: String, cause: Throwable) : super(message, cause)
+}

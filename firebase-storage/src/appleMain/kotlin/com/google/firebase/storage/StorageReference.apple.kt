@@ -4,15 +4,17 @@
 
 package com.google.firebase.storage
 
-import cocoapods.FirebaseStorage.FIRStorageMetadata
-import cocoapods.FirebaseStorage.FIRStorageReference
-import cocoapods.FirebaseStorage.FIRStorageTaskSnapshot
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusProgress
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusResume
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
-import cocoapods.FirebaseStorage.FIRStorageUploadTask
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import android.net.Uri
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskSnapshot
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusFailure
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusPause
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusProgress
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusResume
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusSuccess
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageUploadTask
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import kotlinx.cinterop.addressOf
@@ -74,6 +76,18 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = UploadTaskImpl(this, IosUploadController(ios.putData(bytes.toNSData(), metadata.toIos())))
 
     internal fun putFileUrl(url: NSURL, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, IosUploadController(ios.putFile(url, metadata?.toIos())))
+
+    public actual fun putFile(uri: Uri): UploadTask = putFileUrl(uri.toNSURL(), null)
+
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = putFileUrl(uri.toNSURL(), metadata)
+
+    public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destinationUri.toNSURL()))
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+
+    public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference == this }
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task { completion ->
         ios.updateMetadata(metadata.toIos()) { updated, error -> completion(updated?.toCompat() ?: StorageMetadata(), error) }
@@ -160,7 +174,7 @@ internal fun NSData.toByteArray(): ByteArray = ByteArray(length.toInt()).apply {
     if (isNotEmpty()) usePinned { memcpy(it.addressOf(0), bytes, length) }
 }
 
-internal fun cocoapods.FirebaseStorage.FIRStorageListResult.toCompat(): ListResult = ListResult(
+internal fun swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult.toCompat(): ListResult = ListResult(
     items = items().map { StorageReference(it as FIRStorageReference) },
     prefixes = prefixes().map { StorageReference(it as FIRStorageReference) },
     pageToken = pageToken(),
@@ -198,4 +212,10 @@ internal fun FIRStorageMetadata.toCompat(): StorageMetadata = StorageMetadata().
     compat.referenceValue = storageReference()?.let { StorageReference(it) }
     compat.sizeBytesValue = size()
     compat.updatedTimeMillisValue = updated()?.timeIntervalSince1970?.let { (it * MILLIS_PER_SECOND).toLong() } ?: 0
+}
+
+/** The `NSURL` of a [Uri]: a URL when it has a scheme, else a file path. */
+internal fun Uri.toNSURL(): NSURL {
+    val value = toString()
+    return if ("://" in value) requireNotNull(NSURL.URLWithString(value)) { "Not a URL: $value" } else NSURL.fileURLWithPath(value)
 }

@@ -5,6 +5,7 @@ import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
+import dev.gitlive.firebase.runBlockingTestBlocks
 import dev.gitlive.firebase.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -39,6 +40,8 @@ class FirebaseDatabaseTest {
     @Serializable
     data class DatabaseTest(val title: String, val likes: Int = 0)
 
+    // useEmulator is only valid before the database instance has been used, so it is applied when
+    // the app is created rather than every time a test reuses one.
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
@@ -51,17 +54,31 @@ class FirebaseDatabaseTest {
                 projectId = "fir-kotlin-sdk-default-rtdb",
                 gcmSenderId = "846484016111",
             ),
-        )
-
-        database = Firebase.database(app).apply {
-            useEmulator(emulatorHost, 9000)
+        ).also {
+            Firebase.database(it).useEmulator(emulatorHost, 9000)
         }
+
+        database = Firebase.database(app)
+        // On JS and wasmJs the app outlives each test and is left offline in between (see deinitializeFirebase).
+        if (!runBlockingTestBlocks) database.goOnline()
     }
 
+    // Each test gets a fresh app where the deletion can complete before the next test starts. On JS
+    // and wasmJs runBlockingTest cannot block, so the next test would reuse the app while its
+    // deletion was still pending and call useEmulator on an already initialized database ("Cannot
+    // call useEmulator() after instance has already been initialized"). There the app is kept for
+    // the whole class instead and only taken offline, which closes its connection so the node test
+    // process can exit after the last test.
     @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
+    fun deinitializeFirebase() {
+        if (runBlockingTestBlocks) {
+            runBlockingTest {
+                Firebase.apps(context).forEach {
+                    it.delete()
+                }
+            }
+        } else {
+            database.goOffline()
         }
     }
 

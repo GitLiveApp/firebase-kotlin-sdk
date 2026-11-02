@@ -2,7 +2,11 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import compat.GeneratedAndroidSdkApi
+import compat.registerAndroidSourceCompat
 import utils.TargetPlatform
+import utils.applyFirebaseHierarchy
+import utils.stripHeaderStubs
 import utils.supportsApple
 import utils.toTargetPlatforms
 
@@ -14,7 +18,6 @@ val supportedPlatforms = (project.property("firebase-analytics.supportedTargets"
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
     kotlin("multiplatform")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
@@ -52,6 +55,7 @@ if (supportedPlatforms.contains(TargetPlatform.Android)) {
 
 kotlin {
     explicitApi()
+    applyFirebaseHierarchy()
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -90,31 +94,36 @@ kotlin {
     }
     if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
         tvosArm64()
-        tvosX64()
         tvosSimulatorArm64()
     }
     if (supportedPlatforms.contains(TargetPlatform.Macos)) {
         macosArm64()
-        macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseAnalytics"
-            }
-            noPodspec()
-            pod("FirebaseAnalytics") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
+        swiftPMDependencies {
+            discoverClangModulesImplicitly = false
+            iosMinimumDeploymentTarget.set(libs.versions.ios.deploymentTarget.get())
+            tvosMinimumDeploymentTarget.set(libs.versions.tvos.deploymentTarget.get())
+            macosMinimumDeploymentTarget.set(libs.versions.macos.deploymentTarget.get())
+            swiftPackage(
+                url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+                version = from(libs.versions.firebase.ios.sdk.get()),
+                products = listOf(product("FirebaseAnalytics")),
+                importedClangModules = listOf("FirebaseAnalytics"),
+            )
+        }
+    }
+
+    if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+        wasmJs {
+            nodejs()
+            browser {
+                testTask {
+                    useKarma {
+                        useChromeHeadless()
+                    }
+                }
             }
         }
     }
@@ -145,6 +154,9 @@ kotlin {
                 this.apiVersion = libs.versions.settings.api.get()
                 this.languageVersion = libs.versions.settings.language.get()
                 progressiveMode = true
+                if (name.lowercase().contains("wasm")) {
+                    optIn("kotlin.js.ExperimentalWasmJsInterop")
+                }
                 if (name.lowercase().contains("ios")
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
@@ -175,8 +187,45 @@ kotlin {
                 }
             }
         }
+
+        // The test written against the com.google.firebase.analytics API is shared by every test target but the JVM, where
+        // analytics is a no-op (it asserts on what the platform SDK receives).
+        val androidSdkCompatTest = "src/androidSdkCompatTest/kotlin"
+        if (supportedPlatforms.contains(TargetPlatform.Js) || supportedPlatforms.contains(TargetPlatform.WasmJs) || supportedPlatforms.supportsApple()) {
+            getByName("nonJvmTest") { kotlin.srcDir(androidSdkCompatTest) }
+        }
+        if (supportedPlatforms.contains(TargetPlatform.Android)) {
+            getByName("androidUnitTest") { kotlin.srcDir(androidSdkCompatTest) }
+            getByName("androidInstrumentedTest") { kotlin.srcDir(androidSdkCompatTest) }
+        }
     }
 }
+
+// android.os.Bundle and the com.google.firebase.analytics classes are header stubs on Android (verified against the platform and
+// the Analytics SDK). firebase-java-sdk has no analytics, so the JVM ships the module's own no-op implementation of the
+// com.google.firebase.analytics classes and only stubs android.os.Bundle (verified against firebase-java-sdk's).
+stripHeaderStubs(
+    packageDirs = listOf("com/google/firebase", "android/os"),
+    androidReferenceJars = files({
+        val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
+            attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
+        }?.files ?: files()
+        // android.jar, for android.os.Bundle
+        dependencies + files(android.bootClasspath)
+    }),
+    jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    jvmKeepClasses = listOf("com/google/firebase/analytics/"),
+)
+// firebase-analytics is not open source, so its api.txt is generated from the published classes rather than downloaded.
+registerAndroidSourceCompat(
+    generated = listOf(
+        GeneratedAndroidSdkApi(
+            name = "firebase-analytics",
+            artifacts = listOf("com.google.android.gms:play-services-measurement-api"),
+            packages = listOf("com/google/firebase/analytics/"),
+        ),
+    ),
+)
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)

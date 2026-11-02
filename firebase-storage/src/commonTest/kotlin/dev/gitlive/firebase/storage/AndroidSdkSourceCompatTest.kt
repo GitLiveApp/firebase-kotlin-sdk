@@ -16,7 +16,6 @@ import com.google.firebase.storage.component3
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
 import com.google.firebase.storage.taskState
-import com.google.firebase.storage.uploadSessionUri
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runTest

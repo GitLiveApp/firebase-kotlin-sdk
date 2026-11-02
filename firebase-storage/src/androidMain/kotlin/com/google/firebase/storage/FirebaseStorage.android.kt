@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
@@ -20,9 +21,7 @@ import java.io.File
 /*
  * Header stubs for com.google.firebase:firebase-storage (see buildSrc utils/HeaderStubs.kt): compiled against,
  * verified to match the real classes, and deleted from the output so the real SDK binds at runtime. The task stubs
- * extend the real Play Services Task (firebase-app strips its stubs), so they leave its members inherited. The members with
- * android.net.Uri / java.io.File signatures that are not in the common API are declared here so that the shipped
- * String / Any extensions (StorageFiles.android.kt, StorageDownloads.android.kt, StorageTaskUri.android.kt) bind to them.
+ * extend the real Play Services Task (firebase-app strips its stubs), so they leave its members inherited.
  */
 
 public actual class FirebaseStorage private constructor() {
@@ -34,8 +33,7 @@ public actual class FirebaseStorage private constructor() {
         get() = stub()
         set(_) = stub()
 
-    /** Not in the common API (JS has no download retry time); the shipped nonJsMain extension binds to this member. */
-    public var maxDownloadRetryTimeMillis: Long
+    public actual var maxDownloadRetryTimeMillis: Long
         get() = stub()
         set(_) = stub()
     public actual val reference: StorageReference get() = stub()
@@ -79,12 +77,14 @@ public actual class StorageReference private constructor() : Comparable<StorageR
     public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = stub()
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = stub()
 
-    /** The SDK's file members; the shipped extensions of common code bind to these. */
-    public fun putFile(uri: Uri): UploadTask = stub()
-    public fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = stub()
-    public fun getFile(destinationUri: Uri): FileDownloadTask = stub()
-    public fun getFile(destinationFile: File): FileDownloadTask = stub()
-    public val activeDownloadTasks: List<FileDownloadTask> get() = stub()
+    public actual fun putFile(uri: Uri): UploadTask = stub()
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = stub()
+    public actual fun getFile(destinationUri: Uri): FileDownloadTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getFile(destinationFile: File): FileDownloadTask = stub()
+    public actual val activeDownloadTasks: List<FileDownloadTask> get() = stub()
 }
 
 public actual abstract class CancellableTask<StateT> actual constructor() : Task<StateT>() {
@@ -149,8 +149,7 @@ public actual abstract class UploadTask private constructor() : StorageTask<Uplo
         public actual val metadata: StorageMetadata? get() = stub()
         public actual val totalByteCount: Long get() = stub()
 
-        /** The SDK's Uri member; the shipped String extension of common code binds to it. */
-        public val uploadSessionUri: Uri? get() = stub()
+        public actual val uploadSessionUri: Uri? get() = stub()
     }
 }
 

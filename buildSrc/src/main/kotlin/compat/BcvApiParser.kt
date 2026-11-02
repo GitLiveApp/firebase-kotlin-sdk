@@ -38,9 +38,10 @@ object BcvApiParser {
             if (current == null) continue
             method.find(line)?.let { match ->
                 val modifiers = match.groupValues[1]
-                if ("synthetic" in modifiers) return@let
                 val name = match.groupValues[2]
-                if (name.endsWith("\$default")) return@let
+                // Compiler-generated members are skipped, except an inline function with a reified type parameter,
+                // which is synthetic (Java cannot call it) but is a real Kotlin API.
+                if (name.contains('$') || "synthetic" in modifiers && (name == "<init>" || "bridge" in modifiers)) return@let
                 val (params, returnType) = TypeNames.fromDescriptor(match.groupValues[3])
                 members += if (name == "<init>") {
                     ApiMember(ApiMember.Kind.CONSTRUCTOR, "<init>", params, null, false, deprecation = deprecation)

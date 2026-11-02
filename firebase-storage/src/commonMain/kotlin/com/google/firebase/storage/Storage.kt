@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.channels.awaitClose
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.callbackFlow
 /*
  * The Kotlin extensions of the Android SDK's firebase-storage (StorageKt), as plain common code: on Android and the
  * JVM the facade is a header stub that is stripped, so the SDK's own facade binds. The FileDownloadTask forms are in
- * nonJsMain (StorageDownloads.kt).
+ * StorageDownloadComponents.kt.
  */
 
 /** The [FirebaseStorage] of the default [FirebaseApp]; the Android SDK's `Firebase.storage`. */
@@ -40,6 +41,9 @@ public operator fun UploadTask.TaskSnapshot.component2(): Long = totalByteCount
 
 /** The metadata of the uploaded object, once complete. */
 public operator fun UploadTask.TaskSnapshot.component3(): StorageMetadata? = metadata
+
+/** The resumable upload session URL, Android only. */
+public operator fun UploadTask.TaskSnapshot.component4(): Uri? = uploadSessionUri
 
 /** The items of the page. */
 public operator fun ListResult.component1(): List<StorageReference> = items

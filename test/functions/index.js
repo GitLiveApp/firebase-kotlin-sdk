@@ -30,3 +30,8 @@ exports.throwHttpsError = functions.https.onCall((dataOrRequest) => {
     httpResponseCode: error.httpResponseCode,
   });
 });
+
+exports.echo = functions.https.onCall((dataOrRequest) => {
+  // v2 passes a request whose data is the call data; v1 passes the data itself
+  return dataOrRequest && typeof dataOrRequest === "object" && "rawRequest" in dataOrRequest ? dataOrRequest.data : dataOrRequest;
+});

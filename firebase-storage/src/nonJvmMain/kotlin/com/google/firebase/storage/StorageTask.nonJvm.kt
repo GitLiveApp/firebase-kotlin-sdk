@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener
@@ -293,7 +294,10 @@ public actual abstract class UploadTask internal constructor(
         public actual val bytesTransferred: Long,
         public actual val totalByteCount: Long,
         public actual val metadata: StorageMetadata?,
-    ) : SnapshotBase(error)
+    ) : SnapshotBase(error) {
+        /** Null: the Apple and JS SDKs do not expose the resumable upload session. */
+        public actual val uploadSessionUri: Uri? get() = null
+    }
 }
 
 /** The [UploadTask] of the Apple and JS SDKs; [UploadTask] itself is abstract, as the expect class leaves the `Task` members inherited. */
@@ -310,9 +314,6 @@ internal class UploadTaskImpl(reference: StorageReference, controller: UploadCon
         controller.start(this)
     }
 }
-
-/** The Apple and JS SDKs do not expose the resumable upload session. */
-public actual val UploadTask.TaskSnapshot.uploadSessionUri: String? get() = null
 
 /** The tasks that have not completed, per reference; the Android SDK keeps the same registry. */
 internal object ActiveTasks {

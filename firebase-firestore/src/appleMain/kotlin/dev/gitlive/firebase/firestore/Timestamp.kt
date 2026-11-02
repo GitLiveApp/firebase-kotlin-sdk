@@ -1,6 +1,6 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseCore.FIRTimestamp
+import swiftPMImport.dev.gitlive.firebase.app.FIRTimestamp
 import kotlinx.serialization.Serializable
 
 /** A class representing a platform specific Firebase Timestamp. */

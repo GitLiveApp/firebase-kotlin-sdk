@@ -15,6 +15,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -72,6 +73,19 @@ class FirebaseRemoteConfigTest {
         assertEquals("Hello World", value.asString())
         assertEquals(ValueSource.Default, value.getSource())
         assertEquals("Hello World", value.asByteArray().decodeToString())
+    }
+
+    @Test
+    fun testNamedApp() = runTest {
+        // Android keys Remote Config's local storage by app ID, so the named app needs its own
+        val options = Firebase.apps(context).first().options.copy(applicationId = "1:846484016111:ios:dd1f6688bad7af768c841b")
+        val namedApp = Firebase.initialize(context, options, "named")
+        val namedRemoteConfig = Firebase.remoteConfig(namedApp)
+        namedRemoteConfig.setDefaults("named_app_only" to "named")
+
+        assertEquals("named", namedRemoteConfig.getValue("named_app_only").asString())
+        assertFalse(remoteConfig.all.containsKey("named_app_only"))
+        namedRemoteConfig.reset()
     }
 
     @Test
@@ -148,11 +162,16 @@ class FirebaseRemoteConfigTest {
         remoteConfig.settings {
             minimumFetchInterval = 1.minutes
         }
+        // A default under the same key as the remote value: the fetched value has to win over it (#427).
+        remoteConfig.setDefaults("test_remote_string" to "Local default")
 
         remoteConfig.fetchAndActivate()
 
         val value: FirebaseRemoteConfigValue = remoteConfig["test_remote_string"]
         assertEquals("Hello from remote!", value.asString())
         assertEquals(ValueSource.Remote, value.getSource())
+
+        // `all` has to apply the same precedence as `getValue`.
+        assertEquals("Hello from remote!", remoteConfig.all["test_remote_string"]?.asString())
     }
 }

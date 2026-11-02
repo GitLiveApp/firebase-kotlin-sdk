@@ -4,7 +4,7 @@
 
 package com.google.firebase.storage
 
-import cocoapods.FirebaseStorage.FIRStorage
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.getApps
@@ -28,8 +28,7 @@ public actual class FirebaseStorage internal constructor(public val ios: FIRStor
             ios.setMaxUploadRetryTime(value / MILLIS_PER_SECOND)
         }
 
-    /** The maximum time to retry downloads, in milliseconds. */
-    internal var maxDownloadRetryTimeMillisValue: Long
+    public actual var maxDownloadRetryTimeMillis: Long
         get() = (ios.maxDownloadRetryTime() * MILLIS_PER_SECOND).toLong()
         set(value) {
             ios.setMaxDownloadRetryTime(value / MILLIS_PER_SECOND)

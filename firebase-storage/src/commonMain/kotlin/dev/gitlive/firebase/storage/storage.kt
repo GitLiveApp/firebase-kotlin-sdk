@@ -9,7 +9,6 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.storage.OnPausedListener
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.UploadTask
-import com.google.firebase.storage.putFile
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -141,7 +140,7 @@ public class StorageReference internal constructor(public val compat: CompatStor
 
     private fun uploadData(data: Data, metadata: FirebaseStorageMetadata?): UploadTask = if (metadata != null) compat.putBytes(data.toByteArray(), metadata.toCompat()) else compat.putBytes(data.toByteArray())
 
-    private fun uploadFile(file: File, metadata: FirebaseStorageMetadata?): UploadTask = if (metadata != null) compat.putFile(file.platformFile, metadata.toCompat()) else compat.putFile(file.platformFile)
+    private fun uploadFile(file: File, metadata: FirebaseStorageMetadata?): UploadTask = compat.uploadFile(file, metadata?.toCompat())
 
     override fun equals(other: Any?): Boolean = other is StorageReference && other.compat == compat
 
@@ -196,18 +195,23 @@ public class ListResult internal constructor(public val compat: CompatListResult
     public val pageToken: String? get() = compat.pageToken
 }
 
-/** A file on the platform: an `android.net.Uri` on Android and the JVM, an `NSURL` on Apple platforms, a `File` on JS. */
+/** A file on the platform: an `android.net.Uri` on Android and the JVM, an `NSURL` on Apple platforms, a browser `File` on JS and wasmJs. */
 public expect class File
 
-/** Bytes on the platform: a `ByteArray` on Android and the JVM, an `NSData` on Apple platforms, a `Uint8Array` on JS. */
+/**
+ * Bytes on the platform: a `ByteArray` on Android and the JVM, an `NSData` on Apple platforms, a `Uint8Array` on JS and
+ * wasmJs. Use [toData] to create one from a [ByteArray] in common code.
+ */
 public expect class Data
 
-internal expect fun Data.toByteArray(): ByteArray
+/** Creates a [Data] holding a copy of this byte array, e.g. for [StorageReference.putData]. */
+public expect fun ByteArray.toData(): Data
 
-internal expect fun ByteArray.toData(): Data
+/** Returns a new byte array holding a copy of this [Data], e.g. from [StorageReference.getData]. */
+public expect fun Data.toByteArray(): ByteArray
 
-/** The platform file object the `com.google.firebase.storage` layer's `putFile` takes. */
-internal expect val File.platformFile: Any
+/** Uploads the platform [file] through the `com.google.firebase.storage` layer: by URL where the SDK reads files, as a browser `File` on JS. */
+internal expect fun CompatStorageReference.uploadFile(file: File, metadata: CompatStorageMetadata?): UploadTask
 
 public sealed class Progress(public val bytesTransferred: Number, public val totalByteCount: Number) {
     public class Running internal constructor(bytesTransferred: Number, totalByteCount: Number) : Progress(bytesTransferred, totalByteCount)

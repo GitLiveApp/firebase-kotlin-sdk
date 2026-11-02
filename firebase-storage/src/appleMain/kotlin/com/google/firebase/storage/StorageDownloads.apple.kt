@@ -4,13 +4,13 @@
 
 package com.google.firebase.storage
 
-import cocoapods.FirebaseStorage.FIRStorageDownloadTask
-import cocoapods.FirebaseStorage.FIRStorageTaskSnapshot
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusFailure
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusPause
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusProgress
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusResume
-import cocoapods.FirebaseStorage.FIRStorageTaskStatusSuccess
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageDownloadTask
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskSnapshot
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusFailure
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusPause
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusProgress
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusResume
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusSuccess
 
 public actual abstract class FileDownloadTask internal constructor(
     override val reference: StorageReference,
@@ -90,14 +90,3 @@ internal class FileDownloadTaskImpl(reference: StorageReference, ios: FIRStorage
         start()
     }
 }
-
-/** [destination] is an `NSURL` or a `String` path. */
-public actual fun StorageReference.getFile(destination: Any): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destination.toFileUrl()))
-
-public actual val StorageReference.activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference == this }
-
-public actual var FirebaseStorage.maxDownloadRetryTimeMillis: Long
-    get() = maxDownloadRetryTimeMillisValue
-    set(value) {
-        maxDownloadRetryTimeMillisValue = value
-    }

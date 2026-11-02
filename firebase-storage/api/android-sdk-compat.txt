@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-storage
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 98% of 166 public members available (159 identical, 5 mapped, 0 missing, 2 omitted)
+# 100% of 165 public members available (158 identical, 7 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.storage.CancellableTask
   OK    CancellableTask()
@@ -27,14 +27,14 @@ com.google.firebase.storage.FirebaseStorage
   OK    static FirebaseStorage getInstance(FirebaseApp)
   OK    static FirebaseStorage getInstance(String)
   OK    static FirebaseStorage getInstance(FirebaseApp, String)
-  OMIT  long getMaxChunkUploadRetry()
+  UNAV  long getMaxChunkUploadRetry()
   OK    long getMaxDownloadRetryTimeMillis()
   OK    long getMaxOperationRetryTimeMillis()
   OK    long getMaxUploadRetryTimeMillis()
   OK    StorageReference getReference()
   OK    StorageReference getReference(String)
   OK    StorageReference getReferenceFromUrl(String)
-  OMIT  void setMaxChunkUploadRetry(long)
+  UNAV  void setMaxChunkUploadRetry(long)
   OK    void setMaxDownloadRetryTimeMillis(long)
   OK    void setMaxOperationRetryTimeMillis(long)
   OK    void setMaxUploadRetryTimeMillis(long)
@@ -77,7 +77,7 @@ com.google.firebase.storage.StorageKt
   OK    static String component3(ListResult)
   PLAT  static InputStream component3(TaskSnapshot)
   OK    static StorageMetadata component3(TaskSnapshot)
-  PLAT  static Uri component4(TaskSnapshot)
+  OK    static Uri component4(TaskSnapshot)
   OK    static FirebaseStorage getStorage(Firebase)
   OK    static Flow getTaskState(StorageTask)
   OK    static FirebaseStorage storage(Firebase, FirebaseApp)
@@ -128,7 +128,7 @@ com.google.firebase.storage.StorageReference
   OK    Task getBytes(long)
   OK    Task getDownloadUrl()
   OK    FileDownloadTask getFile(Uri)
-  OK    FileDownloadTask getFile(File)
+  MAP   FileDownloadTask getFile(File)  [deprecated: getFile(java.io.File) is Android/JVM-only; use getFile(Uri) with a file URL (Uri.parse, or Uri.fromFile on Android)]
   OK    Task getMetadata()
   OK    String getName()
   OK    StorageReference getParent()
@@ -144,7 +144,7 @@ com.google.firebase.storage.StorageReference
   OK    UploadTask putBytes(byte[], StorageMetadata)
   OK    UploadTask putFile(Uri)
   OK    UploadTask putFile(Uri, StorageMetadata)
-  PLAT  UploadTask putFile(Uri, StorageMetadata, Uri)
+  UNAV  UploadTask putFile(Uri, StorageMetadata, Uri)
   PLAT  UploadTask putStream(InputStream)
   PLAT  UploadTask putStream(InputStream, StorageMetadata)
   OK    Task updateMetadata(StorageMetadata)
@@ -176,7 +176,7 @@ com.google.firebase.storage.StorageTask
   MAP   Exception getException()  [inherited]
   MAP   ResultT getResult()  [inherited]
   PLAT  ResultT getResult(Class)
-  OK    ResultT getSnapshot()
+  MAP   ResultT getSnapshot()  [returns ProvideError]
   MAP   boolean isCanceled()  [inherited]
   MAP   boolean isComplete()  [inherited]
   OK    boolean isInProgress()

@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.analytics
 
+import android.content.Context
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -9,7 +10,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-actual val context: Any = Unit
+actual val context: Context = Context()
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

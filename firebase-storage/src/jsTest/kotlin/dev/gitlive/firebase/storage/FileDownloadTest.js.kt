@@ -4,7 +4,9 @@
 
 package dev.gitlive.firebase.storage
 
-/** A path only: the JS SDK cannot download to it. */
-actual fun temporaryFile(name: String): Any = name
+import android.net.Uri
+
+/** A name only: the JS SDK cannot download to it. */
+actual fun temporaryFile(name: String): Uri = Uri.parse(name)
 
 actual val supportsFileDownloads: Boolean = false

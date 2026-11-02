@@ -4,14 +4,11 @@
 
 package dev.gitlive.firebase.storage
 
+import android.net.Uri
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.activeDownloadTasks
 import com.google.firebase.storage.component1
 import com.google.firebase.storage.component2
-import com.google.firebase.storage.getFile
-import com.google.firebase.storage.maxDownloadRetryTimeMillis
-import com.google.firebase.storage.putFile
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.initialize
@@ -24,8 +21,8 @@ import kotlin.test.assertFails
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-/** A file the platform test can write and read: a java.io.File on Android and the JVM, an NSURL on Apple platforms. */
-expect fun temporaryFile(name: String): Any
+/** The URL of a file the platform test can write and read; on JS a bare name, as its SDK cannot use files. */
+expect fun temporaryFile(name: String): Uri
 
 /** Whether the platform SDK downloads to files; the JS SDK does not. */
 expect val supportsFileDownloads: Boolean

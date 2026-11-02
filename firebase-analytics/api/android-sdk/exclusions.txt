@@ -1,0 +1,12 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-analytics (see README, "Using the Firebase Android SDK API from common code").
+# The api.txt is generated from the published classes, so it also lists members the SDK hides from its reference documentation.
+
+# Android-only entry points; the instance is obtained with Firebase.analytics from common code.
+com.google.firebase.analytics.GoogleAnalyticsServerPreviewActivity  // @platform android.app.Activity
+
+# Internals leaked by the Kotlin extensions: the cached instance and its lock, the connector for other Firebase SDKs and the test hook.
+com.google.firebase.analytics.AnalyticsKt#getANALYTICS  // @hide the cached default instance
+com.google.firebase.analytics.AnalyticsKt#setANALYTICS  // @hide the cached default instance
+com.google.firebase.analytics.AnalyticsKt#getLOCK  // @hide the cached default instance
+com.google.firebase.analytics.connector.*  // @hide for other Firebase SDKs
+com.google.firebase.analytics.ktxtesting.*  // @hide test hook

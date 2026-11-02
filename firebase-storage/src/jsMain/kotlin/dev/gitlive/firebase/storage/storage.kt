@@ -4,9 +4,12 @@
 
 package dev.gitlive.firebase.storage
 
+import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.toUint8Array
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
+import com.google.firebase.storage.StorageMetadata as CompatStorageMetadata
+import com.google.firebase.storage.StorageReference as CompatStorageReference
 import dev.gitlive.firebase.storage.externals.FirebaseStorage as JsFirebaseStorage
 import dev.gitlive.firebase.storage.externals.StorageReference as JsStorageReference
 
@@ -20,8 +23,8 @@ public actual typealias File = org.w3c.files.File
 
 public actual class Data(public val data: Uint8Array)
 
-internal actual fun Data.toByteArray(): ByteArray = Int8Array(data.buffer, data.byteOffset, data.length).unsafeCast<ByteArray>()
+public actual fun ByteArray.toData(): Data = Data(copyOf().toUint8Array())
 
-internal actual fun ByteArray.toData(): Data = Data(toUint8Array())
+public actual fun Data.toByteArray(): ByteArray = Int8Array(data.buffer, data.byteOffset, data.length).unsafeCast<ByteArray>().copyOf()
 
-internal actual val File.platformFile: Any get() = this
+internal actual fun CompatStorageReference.uploadFile(file: File, metadata: CompatStorageMetadata?): UploadTask = upload(file, metadata)

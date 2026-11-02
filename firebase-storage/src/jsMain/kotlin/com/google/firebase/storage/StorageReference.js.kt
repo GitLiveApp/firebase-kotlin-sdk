@@ -4,6 +4,9 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import dev.gitlive.firebase.UnsupportedOnJs
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import dev.gitlive.firebase.storage.externals.FullMetadata
@@ -69,6 +72,26 @@ public actual class StorageReference internal constructor(public val js: JsStora
     }
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task { updateMetadata(js, metadata.toJs().unsafeCast<SettableMetadata>()).then { it.toCompat() } }
+
+    /** Fails: the JS SDK cannot read a file by its URL; use [putBytes], or the dev.gitlive wrapper's `putFile` with a browser `File`. */
+    @UnsupportedOnJs
+    public actual fun putFile(uri: Uri): UploadTask = failedFileUpload()
+
+    /** Fails: the JS SDK cannot read a file by its URL; use [putBytes], or the dev.gitlive wrapper's `putFile` with a browser `File`. */
+    @UnsupportedOnJs
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = failedFileUpload()
+
+    /** Fails: the JS SDK downloads through URLs, not to files; use [getBytes] or [getDownloadUrl]. */
+    @UnsupportedOnJs
+    public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+
+    /** Always empty: the JS SDK has no file downloads. */
+    @UnsupportedOnJs
+    public actual val activeDownloadTasks: List<FileDownloadTask> get() = emptyList()
 
     override fun equals(other: Any?): Boolean = other is StorageReference && other.bucket == bucket && other.path == path
 
