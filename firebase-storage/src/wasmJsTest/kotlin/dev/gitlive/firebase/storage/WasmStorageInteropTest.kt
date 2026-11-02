@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.storage
 
+import com.google.firebase.storage.toCompat
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
@@ -32,7 +33,7 @@ class WasmStorageInteropTest {
 
     @Test
     fun absentNextPageTokenIsNull() {
-        val result = ListResult(listResultWithoutPageToken())
+        val result = listResultWithoutPageToken().toCompat()
         assertNull(result.pageToken)
     }
 }

@@ -35,6 +35,7 @@ public external fun connectStorageEmulator(
 )
 
 public external interface FirebaseStorage : JsAny {
+    public val app: FirebaseApp
     public var maxOperationRetryTime: Double
     public var maxUploadRetryTime: Double
 }
@@ -103,6 +104,7 @@ public external interface UploadTask : JsAny {
 
 public external interface UploadTaskSnapshot : JsAny {
     public val bytesTransferred: Double
+    public val metadata: FullMetadata?
     public val ref: StorageReference
     public val state: String
     public val task: UploadTask
