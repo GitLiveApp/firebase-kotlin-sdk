@@ -200,20 +200,22 @@ internal fun swiftPMImport.dev.gitlive.firebase.storage.FIRStorageListResult.toC
 )
 
 internal fun StorageMetadata.toIos(): FIRStorageMetadata {
-    // The Apple SDK sends an update as the difference from the metadata it was created from, and a deletion only for a
-    // key present in that initial state, so the headers and custom keys to delete are seeded there and set to nil below.
+    // The Apple SDK sends an update as the difference from the metadata it was created from: a header or custom key to
+    // delete must be present in that initial state (seeded with a placeholder here) and set to nil. Its dictionary always
+    // carries a "metadata" entry for the custom metadata, serialised as null when none was set, which would wipe the
+    // object's custom metadata; the diff drops the entry only when the initial and current custom maps are both maps and
+    // equal, so both are always maps, empty when nothing custom changes.
     val headers = providedHeaders()
     val removedCustom = customMetadata.filterValues { it == null }.keys
-    val seed = mutableMapOf<Any?, Any?>()
+    val seed = mutableMapOf<Any?, Any?>("metadata" to removedCustom.associateWith { "" })
     headers.filterValues { it == null }.keys.forEach { seed[it] = "" }
-    if (removedCustom.isNotEmpty()) seed["metadata"] = removedCustom.associateWith { "" }
-    val ios = if (seed.isEmpty()) FIRStorageMetadata() else FIRStorageMetadata(dictionary = seed)
+    val ios = FIRStorageMetadata(dictionary = seed)
     if ("cacheControl" in headers) ios.setCacheControl(headers["cacheControl"])
     if ("contentDisposition" in headers) ios.setContentDisposition(headers["contentDisposition"])
     if ("contentEncoding" in headers) ios.setContentEncoding(headers["contentEncoding"])
     if ("contentLanguage" in headers) ios.setContentLanguage(headers["contentLanguage"])
     if ("contentType" in headers) ios.setContentType(headers["contentType"])
-    if (customMetadata.isNotEmpty()) ios.setCustomMetadata(customMetadata.filterValues { it != null }.toMap<Any?, String?>())
+    ios.setCustomMetadata(customMetadata.filterValues { it != null }.toMap<Any?, String?>())
     return ios
 }
 
