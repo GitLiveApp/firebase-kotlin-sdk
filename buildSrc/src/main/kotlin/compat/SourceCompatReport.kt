@@ -12,10 +12,13 @@ package compat
 data class Exclusion(val pattern: Regex, val uncountedStatus: String?) {
     fun matchesClass(name: String): Boolean = pattern.matches(name)
 
+    /** [className] is the binary name (`Outer$Nested`); patterns are written in source form (`Outer.Nested#member`), so both are tried. */
     fun matchesMember(className: String, member: ApiMember): Boolean =
-        pattern.matches("$className#${member.name}") ||
-            pattern.matches("$className#${member.name}(${member.parameters.joinToString(",") { it.simpleName() }})") ||
-            pattern.matches("$className#${member.name}(${member.parameters.joinToString(",") { it.nestedName() }})")
+        listOf(className, className.replace('$', '.')).distinct().any { name ->
+            pattern.matches("$name#${member.name}") ||
+                pattern.matches("$name#${member.name}(${member.parameters.joinToString(",") { it.simpleName() }})") ||
+                pattern.matches("$name#${member.name}(${member.parameters.joinToString(",") { it.nestedName() }})")
+        }
 
     /** `TaskSnapshot` for `com.google.firebase.storage.UploadTask$TaskSnapshot`. */
     private fun String.simpleName(): String = substringAfterLast('.').substringAfterLast('$')

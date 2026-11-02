@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-auth
 # Android SDK api.txt ref: com.google.firebase:firebase-auth-interop:20.0.0, com.google.firebase:firebase-auth:24.2.0
-# 100% of 273 public members available (266 identical, 7 mapped, 0 missing, 0 omitted)
+# 100% of 271 public members available (264 identical, 7 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.auth.ActionCodeEmailInfo
   OK    ActionCodeEmailInfo()
@@ -287,13 +287,13 @@ com.google.firebase.auth.PhoneAuthOptions.Builder
   OK    Builder(FirebaseAuth)
   OK    PhoneAuthOptions build()
   OK    Builder requireSmsValidation(boolean)
-  OK    Builder setActivity(Activity)
+  PLAT  Builder setActivity(Activity)
   OK    Builder setCallbacks(OnVerificationStateChangedCallbacks)
   OK    Builder setForceResendingToken(ForceResendingToken)
   OK    Builder setMultiFactorHint(PhoneMultiFactorInfo)
   OK    Builder setMultiFactorSession(MultiFactorSession)
   OK    Builder setPhoneNumber(String)
-  OK    Builder setTimeout(Long, TimeUnit)
+  PLAT  Builder setTimeout(Long, TimeUnit)
 com.google.firebase.auth.PhoneAuthProvider
   OK    static PhoneAuthCredential getCredential(String, String)
   SKIP  static PhoneAuthProvider getInstance()
