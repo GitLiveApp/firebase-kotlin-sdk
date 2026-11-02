@@ -4,17 +4,16 @@
 
 package com.google.firebase.storage
 
-import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
-import com.google.firebase.Firebase
+import android.content.Context
 import com.google.firebase.FirebaseApp
-import com.google.firebase.getApps
+import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
 
 private const val MILLIS_PER_SECOND = 1000.0
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseStorage internal constructor(public val ios: FIRStorage) {
     public actual val app: FirebaseApp
-        get() = Firebase.getApps(null).firstOrNull { it.ios == ios.app() } ?: FirebaseApp.getInstance()
+        get() = FirebaseApp.getApps(Context()).firstOrNull { (it.ios as Any?) == ios.app() } ?: FirebaseApp.getInstance()
 
     public actual var maxOperationRetryTimeMillis: Long
         get() = (ios.maxOperationRetryTime() * MILLIS_PER_SECOND).toLong()

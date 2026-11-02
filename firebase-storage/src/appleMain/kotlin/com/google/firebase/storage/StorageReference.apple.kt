@@ -56,7 +56,7 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     }
 
     public actual fun getMetadata(): Task<StorageMetadata> = task { completion ->
-        ios.metadataWithCompletion { metadata, error -> completion(metadata?.toCompat() ?: StorageMetadata(), error) }
+        ios.metadataWithCompletion { metadata, error -> completion(metadata?.toCompat(this) ?: StorageMetadata(), error) }
     }
 
     public actual fun list(maxResults: Int): Task<ListResult> = task { completion ->
@@ -71,11 +71,11 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
         ios.listAllWithCompletion { result, error -> completion(result?.toCompat() ?: ListResult(emptyList(), emptyList(), null), error) }
     }
 
-    public actual fun putBytes(bytes: ByteArray): UploadTask = UploadTaskImpl(this, IosUploadController(ios.putData(bytes.toNSData(), null)))
+    public actual fun putBytes(bytes: ByteArray): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), null)))
 
-    public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = UploadTaskImpl(this, IosUploadController(ios.putData(bytes.toNSData(), metadata.toIos())))
+    public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putData(bytes.toNSData(), metadata.toIos())))
 
-    internal fun putFileUrl(url: NSURL, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, IosUploadController(ios.putFile(url, metadata?.toIos())))
+    internal fun putFileUrl(url: NSURL, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, IosUploadController(this, ios.putFile(url, metadata?.toIos())))
 
     public actual fun putFile(uri: Uri): UploadTask = putFileUrl(uri.toNSURL(), null)
 
@@ -90,7 +90,7 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference.isUnder(this) }
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task { completion ->
-        ios.updateMetadata(metadata.toIos()) { updated, error -> completion(updated?.toCompat() ?: StorageMetadata(), error) }
+        ios.updateMetadata(metadata.toIos()) { updated, error -> completion(updated?.toCompat(this) ?: StorageMetadata(), error) }
     }
 
     override fun equals(other: Any?): Boolean = other is StorageReference && other.bucket == bucket && other.path == path
@@ -101,7 +101,7 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 }
 
 /** An [UploadController] over a [FIRStorageUploadTask]. */
-internal class IosUploadController(private val ios: FIRStorageUploadTask) : UploadController {
+internal class IosUploadController(private val reference: StorageReference, private val ios: FIRStorageUploadTask) : UploadController {
     override var bytesTransferred: Long = 0
     override var totalByteCount: Long = 0
     override var metadata: StorageMetadata? = null
@@ -121,7 +121,7 @@ internal class IosUploadController(private val ios: FIRStorageUploadTask) : Uplo
         }
         ios.observeStatus(FIRStorageTaskStatusSuccess) { snapshot ->
             update(snapshot)
-            metadata = snapshot?.metadata()?.toCompat()
+            metadata = snapshot?.metadata()?.toCompat(reference)
             ios.removeAllObservers()
             task.reportSuccess()
         }
@@ -203,7 +203,8 @@ internal fun StorageMetadata.toIos(): FIRStorageMetadata {
 }
 
 @Suppress("UNCHECKED_CAST")
-internal fun FIRStorageMetadata.toCompat(): StorageMetadata = StorageMetadata().also { compat ->
+/** [reference] is the object's reference: the iOS SDK's metadata does not carry one. */
+internal fun FIRStorageMetadata.toCompat(reference: StorageReference): StorageMetadata = StorageMetadata().also { compat ->
     compat.bucketValue = bucket()
     compat.cacheControlValue = cacheControl()
     compat.contentDispositionValue = contentDisposition()
@@ -217,7 +218,7 @@ internal fun FIRStorageMetadata.toCompat(): StorageMetadata = StorageMetadata().
     compat.metadataGenerationValue = metageneration().toString()
     compat.nameValue = name()
     compat.pathValue = path() ?: ""
-    compat.referenceValue = storageReference()?.let { StorageReference(it) }
+    compat.referenceValue = reference
     compat.sizeBytesValue = size()
     compat.updatedTimeMillisValue = updated()?.timeIntervalSince1970?.let { (it * MILLIS_PER_SECOND).toLong() } ?: 0
 }
