@@ -8,7 +8,7 @@ package com.google.firebase.database
  * An immutable copy of the data at a location, as the Android SDK's `DataSnapshot`. `value` is the natural type of the
  * data: a `Map`, a `List`, a `String`, a `Boolean`, a `Long`, a `Double` or null. A custom class is read with the
  * reified `getValue<T>()` extension, which maps a `@Serializable` class with the Android SDK's rules on every platform;
- * `getValue(Class)` is Android-only, and the [GenericTypeIndicator] form casts the value on the other platforms.
+ * the SDK's reflective `getValue(Class)` and `getValue(GenericTypeIndicator)` are deprecated with an error on Android.
  */
 public expect class DataSnapshot {
     /** Whether there is data at the location. */
@@ -25,9 +25,6 @@ public expect class DataSnapshot {
 
     /** The data with priorities included (`.value` / `.priority` objects) when [useExportFormat] is true. */
     public fun getValue(useExportFormat: Boolean): Any?
-
-    /** The data as [T]; on Apple platforms, JS and wasmJs a cast of [value], which maps and lists satisfy (a class needs the reified `getValue<T>()`). */
-    public fun <T> getValue(t: GenericTypeIndicator<T>): T?
 
     /** The priority of the location: a String, a Double or null. */
     public val priority: Any?
@@ -49,7 +46,7 @@ public expect class DataSnapshot {
 }
 
 /**
- * Names the type [T] a value is mapped to, as the Android SDK's `GenericTypeIndicator`, for `getValue` calls such as
- * `snapshot.getValue(object : GenericTypeIndicator<Map<String, Long>>() {})`.
+ * The Android SDK's `GenericTypeIndicator`, kept so that its `getValue(GenericTypeIndicator)` members compile (they are
+ * deprecated with an error towards the reified `getValue<T>()`, which maps through the format on every platform).
  */
 public abstract class GenericTypeIndicator<T>

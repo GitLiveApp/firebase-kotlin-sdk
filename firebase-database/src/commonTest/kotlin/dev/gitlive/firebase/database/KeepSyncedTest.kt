@@ -5,6 +5,7 @@
 package dev.gitlive.firebase.database
 
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.serialization.setData
 import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
@@ -47,7 +48,7 @@ class KeepSyncedTest {
     @Test
     fun testKeepSynced() = runTest {
         val reference = database.getReference("test/compatKeepSynced")
-        reference.setValue("synced").await()
+        reference.setData("synced").await()
         reference.keepSynced(true)
         assertEquals("synced", reference.get().await().value)
         reference.keepSynced(false)

@@ -56,6 +56,8 @@ internal actual fun EncodedObject.toCompatMap(): Map<String, Any?> = ios as Map<
 
 internal actual val CompatDataSnapshot.nativeValue: Any? get() = value
 
+// The wrapper's data is already encoded, so it goes to the SDK's setter directly.
+@Suppress("DEPRECATION_ERROR")
 internal actual var CompatMutableData.nativeValue: Any?
     get() = value
     set(value) {

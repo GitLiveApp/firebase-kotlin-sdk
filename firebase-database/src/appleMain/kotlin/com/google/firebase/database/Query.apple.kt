@@ -5,6 +5,8 @@
 package com.google.firebase.database
 
 import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+import dev.gitlive.firebase.database.REFLECTIVE_UPDATE
 import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildAdded
 import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildChanged
 import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildMoved
@@ -67,11 +69,11 @@ public actual open class Query internal constructor(public open val ios: FIRData
     }
 
     public actual fun removeEventListener(listener: ValueEventListener) {
-        Observers.remove(listener)
+        Observers.remove(listener, ios)
     }
 
     public actual fun removeEventListener(listener: ChildEventListener) {
-        Observers.remove(listener)
+        Observers.remove(listener, ios)
     }
 
     public actual fun get(): Task<DataSnapshot> = task { completion ->
@@ -131,16 +133,21 @@ public actual open class Query internal constructor(public open val ios: FIRData
     override fun toString(): String = ios.description.orEmpty()
 }
 
-/** The iOS observer handles of each listener, so that a listener can be removed the Android way. */
+/** The iOS observer handles of each listener and the query it observes, so that a listener can be removed the Android way: from that query only. */
 private object Observers {
-    private val handles = mutableMapOf<Any, MutableList<Pair<FIRDatabaseQuery, FIRDatabaseHandle>>>()
+    private class Observer(val listener: Any, val query: FIRDatabaseQuery, val handle: FIRDatabaseHandle)
+
+    private val observers = mutableListOf<Observer>()
 
     fun add(listener: Any, query: FIRDatabaseQuery, handle: FIRDatabaseHandle) {
-        handles.getOrPut(listener) { mutableListOf() } += query to handle
+        observers += Observer(listener, query, handle)
     }
 
-    fun remove(listener: Any) {
-        handles.remove(listener)?.forEach { (query, handle) -> query.removeObserverWithHandle(handle) }
+    // The iOS SDK creates a new query object per call, so queries match by description (see Query.equals).
+    fun remove(listener: Any, query: FIRDatabaseQuery) {
+        val removed = observers.filter { it.listener == listener && (it.query == query || it.query.description == query.description) }
+        observers -= removed
+        removed.forEach { it.query.removeObserverWithHandle(it.handle) }
     }
 }
 
@@ -157,14 +164,18 @@ public actual open class DatabaseReference internal constructor(override val ios
 
     public actual fun onDisconnect(): OnDisconnect = OnDisconnect(ios)
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: CompletionListener?) {
         ios.setValue(value.toIos(), withCompletionBlock = listener.completion())
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?, listener: CompletionListener?) {
         ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
     }
@@ -175,8 +186,10 @@ public actual open class DatabaseReference internal constructor(override val ios
         ios.setPriority(priority, withCompletionBlock = listener.completion())
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { ios.updateChildValues(update.toIosMap(), withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: CompletionListener?) {
         ios.updateChildValues(update.toIosMap(), withCompletionBlock = listener.completion())
     }
@@ -194,7 +207,9 @@ public actual open class DatabaseReference internal constructor(override val ios
     public actual fun runTransaction(handler: Transaction.Handler, fireLocalEvents: Boolean) {
         ios.runTransactionBlock(
             block = { data ->
-                if (handler.doTransaction(MutableData(data!!)).isSuccess) FIRTransactionResult.successWithValue(data) else FIRTransactionResult.abort()
+                // The result's MutableData is the node to commit (a child's data replaces the location's, as on Android).
+                val result = handler.doTransaction(MutableData(data!!))
+                if (result.isSuccess) FIRTransactionResult.successWithValue(result.resultData!!.ios) else FIRTransactionResult.abort()
             },
             andCompletionBlock = { error, committed, snapshot ->
                 handler.onComplete(error?.toDatabaseError(), committed, snapshot?.let { DataSnapshot(it) })
@@ -224,24 +239,31 @@ public actual open class DatabaseReference internal constructor(override val ios
 
 /** @property ios The underlying Firebase iOS SDK reference the operations are registered on. */
 public actual class OnDisconnect internal constructor(public val ios: FIRDatabaseReference) {
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: DatabaseReference.CompletionListener?) {
         ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = listener.completion())
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?): Task<Nothing?> = write { setWithPriority(value, priority, it) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?, listener: DatabaseReference.CompletionListener?) {
         setWithPriority(value, priority, listener.completion())
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double, listener: DatabaseReference.CompletionListener?) {
         ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Map<*, *>?, listener: DatabaseReference.CompletionListener?) {
         setWithPriority(value, priority, listener.completion())
     }
@@ -251,8 +273,10 @@ public actual class OnDisconnect internal constructor(public val ios: FIRDatabas
         if (priority == null) ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = completion) else ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = completion)
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { ios.onDisconnectUpdateChildValues(update.toIosMap(), withCompletionBlock = it) }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: DatabaseReference.CompletionListener?) {
         ios.onDisconnectUpdateChildValues(update.toIosMap(), withCompletionBlock = listener.completion())
     }

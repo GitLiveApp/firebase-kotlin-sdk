@@ -5,6 +5,7 @@
 package com.google.firebase.database
 
 import swiftPMImport.dev.gitlive.firebase.database.FIRDataSnapshot
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
 import swiftPMImport.dev.gitlive.firebase.database.FIRMutableData
 import kotlinx.cinterop.toKString
 import platform.Foundation.NSNull
@@ -19,9 +20,6 @@ public actual class DataSnapshot internal constructor(public val ios: FIRDataSna
     public actual val value: Any? get() = ios.value.fromIos()
 
     public actual fun getValue(useExportFormat: Boolean): Any? = if (useExportFormat) ios.valueInExportFormat().fromIos() else value
-
-    @Suppress("UNCHECKED_CAST")
-    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = value as T?
 
     public actual val priority: Any? get() = ios.priority.fromIos()
 
@@ -44,12 +42,11 @@ public actual class MutableData internal constructor(public val ios: FIRMutableD
 
     public actual var value: Any?
         get() = ios.value.fromIos()
+
+        @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
         set(value) {
             ios.setValue(value?.toIos())
         }
-
-    @Suppress("UNCHECKED_CAST")
-    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = value as T?
 
     public actual var priority: Any?
         get() = ios.priority.fromIos()

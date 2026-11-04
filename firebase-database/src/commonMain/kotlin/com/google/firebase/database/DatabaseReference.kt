@@ -5,11 +5,15 @@
 package com.google.firebase.database
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+import dev.gitlive.firebase.database.REFLECTIVE_UPDATE
 
 /**
  * A location in the database that can be read and written, as the Android SDK's `DatabaseReference`. Values are the
  * platform's natural types: `Map`, `List`, `String`, `Boolean`, `Long` and `Double` (and the platform SDK's own types on
- * Apple platforms and JS); custom classes are not mapped outside Android.
+ * Apple platforms and JS). A `@Serializable` class is written with the [setData] and [updateData] extensions, which map it
+ * through `FirebaseFormat.Database` on every platform; the SDK's `setValue` and `updateChildren`, which map a class by
+ * reflection on Android, are deprecated with an error towards them.
  */
 public expect open class DatabaseReference : Query {
     /** The [FirebaseDatabase] this reference belongs to. */
@@ -34,15 +38,19 @@ public expect open class DatabaseReference : Query {
     public fun onDisconnect(): OnDisconnect
 
     /** Writes [value] at this location, replacing the current data; null deletes it. */
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun setValue(value: Any?): Task<Nothing?>
 
     /** Writes [value] at this location and calls [listener] once the server has acknowledged it. */
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun setValue(value: Any?, listener: CompletionListener?)
 
     /** Writes [value] with [priority] at this location. */
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun setValue(value: Any?, priority: Any?): Task<Nothing?>
 
     /** Writes [value] with [priority] at this location and calls [listener] once the server has acknowledged it. */
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun setValue(value: Any?, priority: Any?, listener: CompletionListener?)
 
     /** Sets the priority of this location, a String, a Double or null. */
@@ -52,9 +60,11 @@ public expect open class DatabaseReference : Query {
     public fun setPriority(priority: Any?, listener: CompletionListener?)
 
     /** Writes the children in [update] (paths to values; a null value deletes) without replacing the other children. */
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public fun updateChildren(update: Map<String, Any?>): Task<Nothing?>
 
     /** Writes the children in [update] and calls [listener] once the server has acknowledged it. */
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public fun updateChildren(update: Map<String, Any?>, listener: CompletionListener?)
 
     /** Deletes the data at this location. */

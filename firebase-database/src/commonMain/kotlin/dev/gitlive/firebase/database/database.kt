@@ -396,7 +396,7 @@ public class DatabaseReference internal constructor(override val compat: CompatD
      *
      * @return An object for managing disconnect operations at this location
      */
-    public fun onDisconnect(): OnDisconnect = OnDisconnect(compat.onDisconnect())
+    public fun onDisconnect(): OnDisconnect = OnDisconnect(compat.onDisconnect(), this)
 
     @Deprecated("Deprecated. Use builder instead", replaceWith = ReplaceWith("setValue(value) { this.encodeDefaults = encodeDefaults }"))
     public suspend inline fun <reified T> setValue(value: T?, encodeDefaults: Boolean) {
@@ -428,6 +428,7 @@ public class DatabaseReference internal constructor(override val compat: CompatD
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR") // the data is already encoded; on Android the SDK member is deprecated towards the format
     internal suspend fun setValueEncoded(encodedValue: Any?) {
         compat.setValue(encodedValue).await()
     }
@@ -453,6 +454,7 @@ public class DatabaseReference internal constructor(override val compat: CompatD
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR") // the data is already encoded; on Android the SDK member is deprecated towards the format
     internal suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         compat.updateChildren(encodedUpdate.toCompatMap()).await()
     }
@@ -602,7 +604,7 @@ public typealias DatabaseException = com.google.firebase.database.DatabaseExcept
  *
  * @property compat The Android-SDK-shaped [com.google.firebase.database.OnDisconnect] this wraps.
  */
-public class OnDisconnect internal constructor(public val compat: CompatOnDisconnect) {
+public class OnDisconnect internal constructor(public val compat: CompatOnDisconnect, internal val reference: DatabaseReference) {
     /**
      * Remove the value at this location when the client disconnects
      *
@@ -674,6 +676,7 @@ public class OnDisconnect internal constructor(public val compat: CompatOnDiscon
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR") // the data is already encoded; on Android the SDK member is deprecated towards the format
     internal suspend fun setEncodedValue(encodedValue: Any?) {
         compat.setValue(encodedValue).await()
     }
@@ -702,6 +705,7 @@ public class OnDisconnect internal constructor(public val compat: CompatOnDiscon
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR") // the data is already encoded; on Android the SDK member is deprecated towards the format
     internal suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) {
         compat.updateChildren(encodedUpdate.toCompatMap()).await()
     }

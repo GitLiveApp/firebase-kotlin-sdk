@@ -5,6 +5,9 @@
 package com.google.firebase.database
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.database.REFLECTIVE_READ
+import dev.gitlive.firebase.database.REFLECTIVE_UPDATE
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.database.stub
 
@@ -109,13 +112,25 @@ public actual open class DatabaseReference private constructor() : Query() {
     public actual fun child(pathString: String): DatabaseReference = stub()
     public actual fun push(): DatabaseReference = stub()
     public actual fun onDisconnect(): OnDisconnect = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?, listener: CompletionListener?): Unit = stub()
     public actual fun setPriority(priority: Any?): Task<Nothing?> = stub()
     public actual fun setPriority(priority: Any?, listener: CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: CompletionListener?): Unit = stub()
     public actual fun removeValue(): Task<Nothing?> = stub()
     public actual fun removeValue(listener: CompletionListener?): Unit = stub()
@@ -141,7 +156,12 @@ public actual class DataSnapshot private constructor() {
     public actual val ref: DatabaseReference get() = stub()
     public actual val value: Any? get() = stub()
     public actual fun getValue(useExportFormat: Boolean): Any? = stub()
-    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(valueType: Class<T>): T? = stub()
     public actual val priority: Any? get() = stub()
     public actual fun child(path: String): DataSnapshot = stub()
     public actual fun hasChild(path: String): Boolean = stub()
@@ -154,8 +174,15 @@ public actual class MutableData private constructor() {
     public actual val key: String? get() = stub()
     public actual var value: Any?
         get() = stub()
+
+        @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
         set(_) = stub()
-    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(valueType: Class<T>): T? = stub()
     public actual var priority: Any?
         get() = stub()
         set(_) = stub()
@@ -186,14 +213,31 @@ public actual class Transaction actual constructor() {
 }
 
 public actual class OnDisconnect private constructor() {
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: DatabaseReference.CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?, listener: DatabaseReference.CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double, listener: DatabaseReference.CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Map<*, *>?, listener: DatabaseReference.CompletionListener?): Unit = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: DatabaseReference.CompletionListener?): Unit = stub()
     public actual fun removeValue(): Task<Nothing?> = stub()
     public actual fun removeValue(listener: DatabaseReference.CompletionListener?): Unit = stub()

@@ -5,6 +5,8 @@
 package com.google.firebase.database
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+import dev.gitlive.firebase.database.REFLECTIVE_UPDATE
 import com.google.android.gms.tasks.TaskCompletionSource
 import dev.gitlive.firebase.Unsubscribe
 import dev.gitlive.firebase.UnsupportedOnJs
@@ -61,17 +63,17 @@ public actual open class Query internal constructor(public open val js: JsQuery,
         val unsubscribe = rethrow {
             onValue(js, { listener.onDataChange(DataSnapshot(it, jsDatabase)) }, { listener.onCancelled(it.toDatabaseError()) })
         }
-        Subscriptions.add(listener, unsubscribe)
+        Subscriptions.add(listener, js, unsubscribe)
         return listener
     }
 
     public actual fun addChildEventListener(listener: ChildEventListener): ChildEventListener {
         val cancel: (JsAny) -> Unit = { listener.onCancelled(it.toDatabaseError()) }
         rethrow {
-            Subscriptions.add(listener, onChildAdded(js, { snapshot, previous -> listener.onChildAdded(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
-            Subscriptions.add(listener, onChildChanged(js, { snapshot, previous -> listener.onChildChanged(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
-            Subscriptions.add(listener, onChildMoved(js, { snapshot, previous -> listener.onChildMoved(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
-            Subscriptions.add(listener, onChildRemoved(js, { snapshot, _ -> listener.onChildRemoved(DataSnapshot(snapshot, jsDatabase)) }, cancel))
+            Subscriptions.add(listener, js, onChildAdded(js, { snapshot, previous -> listener.onChildAdded(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
+            Subscriptions.add(listener, js, onChildChanged(js, { snapshot, previous -> listener.onChildChanged(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
+            Subscriptions.add(listener, js, onChildMoved(js, { snapshot, previous -> listener.onChildMoved(DataSnapshot(snapshot, jsDatabase), previous) }, cancel))
+            Subscriptions.add(listener, js, onChildRemoved(js, { snapshot, _ -> listener.onChildRemoved(DataSnapshot(snapshot, jsDatabase)) }, cancel))
         }
         return listener
     }
@@ -83,11 +85,11 @@ public actual open class Query internal constructor(public open val js: JsQuery,
     }
 
     public actual fun removeEventListener(listener: ValueEventListener) {
-        Subscriptions.remove(listener)
+        Subscriptions.remove(listener, js)
     }
 
     public actual fun removeEventListener(listener: ChildEventListener) {
-        Subscriptions.remove(listener)
+        Subscriptions.remove(listener, js)
     }
 
     public actual fun get(): Task<DataSnapshot> = task({ jsGetSnapshot(js) }) { DataSnapshot(it, jsDatabase) }
@@ -145,16 +147,20 @@ public actual open class Query internal constructor(public open val js: JsQuery,
     override fun toString(): String = jsToString(js)
 }
 
-/** The JS SDK unsubscribe functions of each listener, so that a listener can be removed the Android way. */
+/** The JS SDK unsubscribe functions of each listener and the query it listens to, so that a listener can be removed the Android way: from that query only. */
 private object Subscriptions {
-    private val unsubscribes = mutableMapOf<Any, MutableList<Unsubscribe>>()
+    private class Subscription(val listener: Any, val query: JsQuery, val unsubscribe: Unsubscribe)
 
-    fun add(listener: Any, unsubscribe: Unsubscribe) {
-        unsubscribes.getOrPut(listener) { mutableListOf() } += unsubscribe
+    private val subscriptions = mutableListOf<Subscription>()
+
+    fun add(listener: Any, query: JsQuery, unsubscribe: Unsubscribe) {
+        subscriptions += Subscription(listener, query, unsubscribe)
     }
 
-    fun remove(listener: Any) {
-        unsubscribes.remove(listener)?.forEach { rethrow { it() } }
+    fun remove(listener: Any, query: JsQuery) {
+        val removed = subscriptions.filter { it.listener == listener && (it.query == query || it.query.isEqual(query)) }
+        subscriptions -= removed
+        removed.forEach { rethrow { it.unsubscribe() } }
     }
 }
 
@@ -171,14 +177,18 @@ public actual open class DatabaseReference internal constructor(override val js:
 
     public actual fun onDisconnect(): OnDisconnect = rethrow { OnDisconnect(jsOnDisconnect(js), this) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = write { jsSet(js, value.toJs()) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: CompletionListener?) {
         write { jsSet(js, value.toJs()) }.notify(listener, this)
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = write { jsSetWithPriority(js, value.toJs(), priority.toJs()) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Any?, listener: CompletionListener?) {
         write { jsSetWithPriority(js, value.toJs(), priority.toJs()) }.notify(listener, this)
     }
@@ -189,8 +199,10 @@ public actual open class DatabaseReference internal constructor(override val js:
         write { jsSetPriority(js, priority.toJs()) }.notify(listener, this)
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { jsUpdate(js, update.toJs()!!) }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: CompletionListener?) {
         write { jsUpdate(js, update.toJs()!!) }.notify(listener, this)
     }
@@ -213,8 +225,9 @@ public actual open class DatabaseReference internal constructor(override val js:
             jsRunTransaction(
                 js,
                 transactionUpdate = aborting({ current ->
-                    val data = MutableData(current, key)
-                    if (handler.doTransaction(data).isSuccess) data.root.js else abort
+                    // The result's MutableData is the node to commit, priority included (a child's data replaces the location's, as on Android).
+                    val result = handler.doTransaction(MutableData(current, key))
+                    if (result.isSuccess) result.resultData!!.jsNode else abort
                 }, abort),
                 options = json("applyLocally" to fireLocalEvents),
             )
@@ -259,30 +272,39 @@ private fun aborting(update: (JsAny?) -> JsAny?, abort: JsAny): JsAny = js("(cur
  * @property ref The reference the operations are registered on.
  */
 public actual class OnDisconnect internal constructor(public val js: JsOnDisconnect, public val ref: DatabaseReference) {
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = write { js.set(value.toJs()) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, listener: DatabaseReference.CompletionListener?) {
         write { js.set(value.toJs()) }.notify(listener, ref)
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?): Task<Nothing?> = write { js.setWithPriority(value.toJs(), priority?.toJsString()) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: String?, listener: DatabaseReference.CompletionListener?) {
         write { js.setWithPriority(value.toJs(), priority?.toJsString()) }.notify(listener, ref)
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = write { js.setWithPriority(value.toJs(), priority.toJsNumber()) }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Double, listener: DatabaseReference.CompletionListener?) {
         write { js.setWithPriority(value.toJs(), priority.toJsNumber()) }.notify(listener, ref)
     }
 
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?, priority: Map<*, *>?, listener: DatabaseReference.CompletionListener?) {
         write { js.setWithPriority(value.toJs(), priority.toJs()) }.notify(listener, ref)
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { js.update(update.toJs()!!) }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun updateChildren(update: Map<String, Any?>, listener: DatabaseReference.CompletionListener?) {
         write { js.update(update.toJs()!!) }.notify(listener, ref)
     }

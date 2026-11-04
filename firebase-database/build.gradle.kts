@@ -223,11 +223,14 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Shipped: the static members this module's own code reaches through DatabaseStatics.java.
+    // Shipped: the static members this module's own code reaches through DatabaseStatics.java and the format the mapping
+    // entry points in com.google.firebase.serialization (kept below) inline against.
     keepClasses = listOf(
         "com/google/firebase/database/DatabaseInternalsKt.class",
         "com/google/firebase/database/DatabaseStatics.class",
+        "com/google/firebase/database/FormatKt.class",
     ),
+    keepPackageDirs = listOf("com/google/firebase/serialization"),
 )
 
 registerAndroidSourceCompat("firebase-database/api.txt")

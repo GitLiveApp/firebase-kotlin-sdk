@@ -2,24 +2,22 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-// The SDK's facade, which the reified getValue actuals (Database.android.kt) join.
-@file:JvmName("DatabaseKt")
-@file:JvmMultifileClass
-
 package com.google.firebase.database
 
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.serialization.getValue as formatGetValue
+import com.google.firebase.serialization.values as formatValues
+import dev.gitlive.firebase.database.REFLECTIVE_READ
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.map
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
 
 /*
  * The Kotlin extensions of the Android SDK's firebase-database (DatabaseKt, ChildEvent), as plain common code: on
- * Android and the JVM the facade and the classes are header stubs that are stripped, so the SDK's own bind.
+ * Android and the JVM the facade and the classes are header stubs that are stripped, so the SDK's own bind. The reified
+ * reads are the SDK's reflective ones there, so they are deprecated with an error towards the format's in
+ * com.google.firebase.serialization (DatabaseMapping.kt).
  */
 
 /** The [FirebaseDatabase] of the default [FirebaseApp]; the Android SDK's `Firebase.database`. */
@@ -36,14 +34,16 @@ public fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatab
 public fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase.getInstance(app, url)
 
 /**
- * The data as [T], as the Android SDK's reified `getValue`: the SDK's reflective mapping on Android and the JVM, and on
- * the other platforms the same rules applied through the serializer of [T] (`FirebaseFormat.Database`), so a
- * `@Serializable` class, a `Map`, a `List` or a primitive reads the same everywhere.
+ * The SDK's reified `getValue`, which maps a class by reflection on Android: deprecated with an error towards
+ * [com.google.firebase.serialization.getValue], which maps through `FirebaseFormat.Database` on every platform (see
+ * DatabaseMapping.kt for why it lives in that package).
  */
-public expect inline fun <reified T> DataSnapshot.getValue(): T?
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+public inline fun <reified T> DataSnapshot.getValue(): T? = formatGetValue<T>()
 
-/** The data as [T], as the Android SDK's reified `getValue` (see [DataSnapshot.getValue]). */
-public expect inline fun <reified T> MutableData.getValue(): T?
+/** The SDK's reified `getValue` (see [DataSnapshot.getValue]); deprecated towards [com.google.firebase.serialization.getValue]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+public inline fun <reified T> MutableData.getValue(): T? = formatGetValue<T>()
 
 /** A change to a child of a location, emitted by [Query.childEvents]. */
 public sealed class ChildEvent {
@@ -106,5 +106,6 @@ public val Query.childEvents: Flow<ChildEvent>
         awaitClose { removeEventListener(listener) }
     }
 
-/** The data at this location and every change to it as [T] (see [getValue]). */
-public inline fun <reified T> Query.values(): Flow<T?> = snapshots.map { it.getValue<T>() }
+/** The SDK's `values` flow (see [DataSnapshot.getValue]); deprecated towards [com.google.firebase.serialization.values]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("values<T>()", "com.google.firebase.serialization.values"), DeprecationLevel.ERROR)
+public inline fun <reified T> Query.values(): Flow<T?> = formatValues<T>()

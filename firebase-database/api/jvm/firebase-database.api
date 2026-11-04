@@ -1,3 +1,14 @@
+public final class com/google/firebase/database/FormatKt {
+	public static final fun getDatabaseFormat ()Lcom/google/firebase/serialization/FirebaseFormat$Database;
+}
+
+public final class com/google/firebase/serialization/DatabaseMappingKt {
+	public static final fun updateData (Lcom/google/firebase/database/DatabaseReference;Ljava/util/Map;)Lcom/google/android/gms/tasks/Task;
+	public static final fun updateData (Lcom/google/firebase/database/DatabaseReference;Ljava/util/Map;Lcom/google/firebase/database/DatabaseReference$CompletionListener;)V
+	public static final fun updateData (Lcom/google/firebase/database/OnDisconnect;Ljava/util/Map;)Lcom/google/android/gms/tasks/Task;
+	public static final fun updateData (Lcom/google/firebase/database/OnDisconnect;Ljava/util/Map;Lcom/google/firebase/database/DatabaseReference$CompletionListener;)V
+}
+
 public final class dev/gitlive/firebase/database/ChildEvent {
 	public final fun component1 ()Ldev/gitlive/firebase/database/DataSnapshot;
 	public final fun component2 ()Ldev/gitlive/firebase/database/ChildEvent$Type;

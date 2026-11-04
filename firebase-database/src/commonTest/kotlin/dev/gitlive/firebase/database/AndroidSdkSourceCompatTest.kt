@@ -10,21 +10,20 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.Logger
 import com.google.firebase.database.MutableData
-import com.google.firebase.database.PropertyName
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.childEvents
 import com.google.firebase.database.database
-import com.google.firebase.database.getValue
+import com.google.firebase.serialization.getValue
+import com.google.firebase.serialization.setData
+import com.google.firebase.serialization.updateData
 import com.google.firebase.database.snapshots
-import com.google.firebase.database.values
+import com.google.firebase.serialization.values
+import com.google.firebase.serialization.IgnoreExtraProperties
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
@@ -37,7 +36,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -107,7 +108,7 @@ class AndroidSdkSourceCompatTest {
     fun testWritesReadsAndSnapshots() = runTest {
         ensureConnected()
         val reference = database.getReference("test/compatWrites")
-        reference.setValue(mapOf("name" to "compat", "count" to 5, "nested" to mapOf("flag" to true))).await()
+        reference.setData(mapOf("name" to "compat", "count" to 5, "nested" to mapOf("flag" to true))).await()
 
         val snapshot: DataSnapshot = reference.get().await()
         assertTrue(snapshot.exists(), "snapshot.exists()")
@@ -120,19 +121,18 @@ class AndroidSdkSourceCompatTest {
         assertEquals("compat", snapshot.child("name").value)
         assertEquals(5L, (snapshot.child("count").value as Number).toLong())
         assertEquals(true, snapshot.child("nested/flag").getValue<Boolean>())
-        assertEquals("compat", snapshot.child("name").getValue(object : GenericTypeIndicator<String>() {}))
         assertEquals(setOf("count", "name", "nested"), snapshot.children.map { it.key }.toSet())
         val value = snapshot.getValue<Map<String, Any?>>()
         assertEquals("compat", value?.get("name"))
         assertNull(snapshot.priority)
 
-        reference.updateChildren(mapOf("count" to 6, "name" to null)).await()
+        reference.updateData(mapOf("count" to 6, "name" to null)).await()
         val updated = reference.snapshots.first()
         assertFalse(updated.hasChild("name"), "updated.hasChild('name')")
         assertEquals(6L, (updated.child("count").value as Number).toLong())
 
         val completed = CompletableDeferred<DatabaseError?>()
-        reference.child("count").setValue(7, DatabaseReference.CompletionListener { error, ref -> completed.complete(error.also { assertEquals(reference.child("count"), ref) }) })
+        reference.child("count").setData(7, DatabaseReference.CompletionListener { error, ref -> completed.complete(error.also { assertEquals(reference.child("count"), ref) }) })
         assertNull(completed.await())
         assertEquals(7L, reference.child("count").values<Long>().first()?.let { (it as Number).toLong() })
 
@@ -163,7 +163,7 @@ class AndroidSdkSourceCompatTest {
         reference.removeEventListener(listener)
 
         val single = CompletableDeferred<DataSnapshot>()
-        reference.child("a").setValue(1).await()
+        reference.child("a").setData(1).await()
         reference.addListenerForSingleValueEvent(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -188,7 +188,7 @@ class AndroidSdkSourceCompatTest {
     fun testQueries() = runTest {
         ensureConnected()
         val reference = database.getReference("test/compatQueries")
-        reference.setValue(
+        reference.setData(
             mapOf(
                 "a" to mapOf("score" to 1),
                 "b" to mapOf("score" to 2),
@@ -214,7 +214,7 @@ class AndroidSdkSourceCompatTest {
     fun testTransaction() = runTest {
         ensureConnected()
         val reference = database.getReference("test/compatTransaction")
-        reference.setValue(mapOf("likes" to 2)).await()
+        reference.setData(mapOf("likes" to 2)).await()
         reference.get().await()
 
         val completed = CompletableDeferred<DataSnapshot?>()
@@ -227,7 +227,7 @@ class AndroidSdkSourceCompatTest {
                     assertTrue(currentData.hasChild("likes"))
                     assertEquals(1, currentData.childrenCount)
                     assertEquals(listOf("likes"), currentData.children.map { it.key })
-                    likes.value = current + 1
+                    likes.setData(current + 1)
                     return Transaction.success(currentData)
                 }
 
@@ -259,7 +259,7 @@ class AndroidSdkSourceCompatTest {
         ensureConnected()
         val reference = database.getReference("test/compatClasses")
         val post = CompatPost("Hello", starCount = 3, draft = true, tags = listOf("a", "b"))
-        reference.setValue(post).await()
+        reference.setData(post).await()
 
         val snapshot = reference.get().await()
         val stored = snapshot.getValue<Map<String, Any?>>()
@@ -268,10 +268,10 @@ class AndroidSdkSourceCompatTest {
         assertEquals(post.copy(draft = false), snapshot.getValue<CompatPost>())
         assertEquals(listOf("a", "b"), snapshot.child("tags").getValue<List<String>>())
 
-        reference.child("extra").setValue("ignored").await()
+        reference.child("extra").setData("ignored").await()
         assertEquals(post.copy(draft = false), reference.get().await().getValue<CompatPost>())
 
-        reference.updateChildren(mapOf("nested" to CompatPost("Nested"), "extra" to null)).await()
+        reference.updateData(mapOf("nested" to CompatPost("Nested"), "extra" to null)).await()
         assertEquals("Nested", reference.child("nested/title").get().await().getValue<String>())
         assertEquals(CompatPost("Nested"), reference.child("nested").values<CompatPost>().first())
 
@@ -281,7 +281,7 @@ class AndroidSdkSourceCompatTest {
                 override fun doTransaction(currentData: MutableData): Transaction.Result {
                     // The SDKs may run the handler with no local data first; returning it unchanged lets them retry with the server's.
                     val current = currentData.getValue<CompatPost>() ?: return Transaction.success(currentData)
-                    currentData.value = current.copy(starCount = current.starCount + 1)
+                    currentData.setData(current.copy(starCount = current.starCount + 1))
                     return Transaction.success(currentData)
                 }
 
@@ -302,17 +302,17 @@ class AndroidSdkSourceCompatTest {
     fun testServerValuesAndDisconnect() = runTest {
         ensureConnected()
         val reference = database.getReference("test/compatServerValues")
-        reference.child("stamp").setValue(ServerValue.TIMESTAMP).await()
+        reference.child("stamp").setData(ServerValue.TIMESTAMP).await()
         assertTrue((reference.child("stamp").get().await().value as Number).toLong() > 0)
-        reference.child("counter").setValue(2).await()
-        reference.child("counter").setValue(ServerValue.increment(5)).await()
+        reference.child("counter").setData(2).await()
+        reference.child("counter").setData(ServerValue.increment(5)).await()
         assertEquals(7L, (reference.child("counter").get().await().value as Number).toLong())
-        reference.child("counter").setValue(ServerValue.increment(0.5)).await()
+        reference.child("counter").setData(ServerValue.increment(0.5)).await()
         assertEquals(7.5, (reference.child("counter").get().await().value as Number).toDouble())
 
         val onDisconnect = reference.child("presence").onDisconnect()
-        onDisconnect.setValue("offline").await()
-        onDisconnect.updateChildren(mapOf("last" to 1)).await()
+        onDisconnect.setData("offline").await()
+        onDisconnect.updateData(mapOf("last" to 1)).await()
         onDisconnect.removeValue().await()
         onDisconnect.cancel().await()
         val cancelled = CompletableDeferred<DatabaseError?>()
@@ -332,10 +332,10 @@ class AndroidSdkSourceCompatTest {
         assertTrue(error.toException().message!!.contains(error.message))
 
         val invalid = database.getReference("FirebaseRealtimeDatabaseTest/lastActivity")
-        val exception = assertFailsWith<DatabaseException> { invalid.setValue("stringNotAllowed").await() }
+        val exception = assertFailsWith<DatabaseException> { invalid.setData("stringNotAllowed").await() }
         assertNotNull(exception.message)
         val failed = CompletableDeferred<DatabaseError?>()
-        invalid.setValue("stringNotAllowed") { failedError, _ -> failed.complete(failedError) }
+        invalid.setData("stringNotAllowed", DatabaseReference.CompletionListener { failedError, _ -> failed.complete(failedError) })
         assertEquals(DatabaseError.PERMISSION_DENIED, failed.await()?.code)
     }
 
@@ -347,15 +347,15 @@ class AndroidSdkSourceCompatTest {
 }
 
 /**
- * A model class as written for the Android SDK, plus `@Serializable`: the SDK maps it by reflection on Android and the
- * JVM, the layer's format maps it through its serializer elsewhere. The getter and property forms of an annotation are
- * both given, as the SDK reads the getter and kotlinx.serialization the property.
+ * A model class mapped by `FirebaseFormat.Database` on every platform, Android included: `@Serializable`, with
+ * kotlinx.serialization's own `@SerialName` and `@Transient` for the stored names and exclusion, and the format's
+ * `@IgnoreExtraProperties` (`com.google.firebase.serialization`).
  */
 @Serializable
 @IgnoreExtraProperties
 data class CompatPost(
     val title: String = "",
-    @get:PropertyName("stars") @PropertyName("stars") val starCount: Long = 0,
-    @get:Exclude @Exclude val draft: Boolean = false,
+    @SerialName("stars") val starCount: Long = 0,
+    @Transient val draft: Boolean = false,
     val tags: List<String> = emptyList(),
 )

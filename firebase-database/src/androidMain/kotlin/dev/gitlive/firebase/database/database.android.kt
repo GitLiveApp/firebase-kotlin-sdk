@@ -35,12 +35,14 @@ public val Query.persistenceEnabled: Boolean get() = PersistenceSettings.enabled
 public val OnDisconnect.persistenceEnabled: Boolean get() = true
 
 @Deprecated("Unused; it will be removed in the next major version.")
-public val OnDisconnect.database: FirebaseDatabase get() = dev.gitlive.firebase.Firebase.database
+public val OnDisconnect.database: FirebaseDatabase get() = FirebaseDatabase(reference.compat.database)
 
 internal actual fun EncodedObject.toCompatMap(): Map<String, Any?> = android
 
 internal actual val CompatDataSnapshot.nativeValue: Any? get() = value
 
+// The wrapper's data is already encoded, so it goes to the SDK's setter directly.
+@Suppress("DEPRECATION_ERROR")
 internal actual var CompatMutableData.nativeValue: Any?
     get() = value
     set(value) {

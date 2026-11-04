@@ -4,6 +4,8 @@
 
 package com.google.firebase.database
 
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+
 /**
  * The data of a location inside a transaction, as the Android SDK's `MutableData`: [value] is read and then set to the
  * new data before the [Transaction.Handler] returns [Transaction.success].
@@ -12,11 +14,13 @@ public expect class MutableData {
     /** The last segment of the path, or null at the root. */
     public val key: String?
 
-    /** The current data as its natural type (see [DataSnapshot]); setting it, to a plain value or a `@Serializable` class, replaces the data of the transaction. */
+    /**
+     * The current data as its natural type (see [DataSnapshot]); setting it replaces the data of the transaction. The
+     * setter, which maps a class by reflection on Android, is deprecated with an error towards [setData], which maps a
+     * `@Serializable` class through `FirebaseFormat.Database` on every platform.
+     */
+    @set:Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public var value: Any?
-
-    /** The data as [T]; on Apple platforms, JS and wasmJs a cast of [value], which maps and lists satisfy (a class needs the reified `getValue<T>()`). */
-    public fun <T> getValue(t: GenericTypeIndicator<T>): T?
 
     /** The priority of the location; setting it changes the priority written by the transaction. */
     public var priority: Any?

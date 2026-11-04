@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-database
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 191 public members available (191 identical, 0 mapped, 0 missing, 0 omitted)
+# 100% of 193 public members available (173 identical, 20 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.database.ChildEvent
 com.google.firebase.database.ChildEvent.Added
@@ -45,8 +45,8 @@ com.google.firebase.database.DataSnapshot
   OK    DatabaseReference getRef()
   OK    Object getValue()
   OK    Object getValue(boolean)
-  OK    T getValue(GenericTypeIndicator)
-  PLAT  T getValue(Class)
+  MAP   T getValue(GenericTypeIndicator)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; com.google.firebase.serialization.getValue<T>() maps it through FirebaseFormat on every platform]
+  MAP   T getValue(Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; com.google.firebase.serialization.getValue<T>() maps it through FirebaseFormat on every platform]
   OK    boolean hasChild(String)
   OK    boolean hasChildren()
 com.google.firebase.database.DatabaseError
@@ -95,12 +95,12 @@ com.google.firebase.database.DatabaseReference
   OK    void runTransaction(Handler, boolean)
   OK    Task setPriority(Object)
   OK    void setPriority(Object, CompletionListener)
-  OK    Task setValue(Object)
-  OK    void setValue(Object, CompletionListener)
-  OK    Task setValue(Object, Object)
-  OK    void setValue(Object, Object, CompletionListener)
-  OK    Task updateChildren(Map)
-  OK    void updateChildren(Map, CompletionListener)
+  MAP   Task setValue(Object)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   Task setValue(Object, Object)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, Object, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   Task updateChildren(Map)  [deprecated: updateChildren maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   void updateChildren(Map, CompletionListener)  [deprecated: updateChildren maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
 com.google.firebase.database.DatabaseReference.CompletionListener
   OK    void onComplete(DatabaseError, DatabaseReference)
 com.google.firebase.database.Exclude
@@ -138,26 +138,26 @@ com.google.firebase.database.MutableData
   OK    String getKey()
   OK    Object getPriority()
   OK    Object getValue()
-  OK    T getValue(GenericTypeIndicator)
-  PLAT  T getValue(Class)
+  MAP   T getValue(GenericTypeIndicator)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; com.google.firebase.serialization.getValue<T>() maps it through FirebaseFormat on every platform]
+  MAP   T getValue(Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; com.google.firebase.serialization.getValue<T>() maps it through FirebaseFormat on every platform]
   OK    boolean hasChild(String)
   OK    boolean hasChildren()
   OK    void setPriority(Object)
-  OK    void setValue(Object)
+  MAP   void setValue(Object)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
 com.google.firebase.database.OnDisconnect
   OK    Task cancel()
   OK    void cancel(CompletionListener)
   OK    Task removeValue()
   OK    void removeValue(CompletionListener)
-  OK    Task setValue(Object)
-  OK    void setValue(Object, CompletionListener)
-  OK    Task setValue(Object, double)
-  OK    Task setValue(Object, String)
-  OK    void setValue(Object, double, CompletionListener)
-  OK    void setValue(Object, String, CompletionListener)
-  OK    void setValue(Object, Map, CompletionListener)
-  OK    Task updateChildren(Map)
-  OK    void updateChildren(Map, CompletionListener)
+  MAP   Task setValue(Object)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   Task setValue(Object, double)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   Task setValue(Object, String)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, double, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, String, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   void setValue(Object, Map, CompletionListener)  [deprecated: setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too]
+  MAP   Task updateChildren(Map)  [deprecated: updateChildren maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   void updateChildren(Map, CompletionListener)  [deprecated: updateChildren maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
 com.google.firebase.database.PropertyName
   OK    String value()
 com.google.firebase.database.Query
