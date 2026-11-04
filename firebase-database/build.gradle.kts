@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import dev.gitlive.firebase.iossdk.gradle.FirebaseIosFramework
+import dev.gitlive.firebase.iossdk.gradle.firebaseIosSdk
 import utils.TargetPlatform
 import utils.supportsApple
 import utils.toTargetPlatforms
@@ -14,7 +16,7 @@ val supportedPlatforms = (project.property("firebase-database.supportedTargets")
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
+    id("dev.gitlive.firebase-ios-sdk")
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("testOptionsConvention")
@@ -100,24 +102,8 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseDatabase"
-            }
-            noPodspec()
-            pod("FirebaseDatabase") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        firebaseIosSdk {
+            framework(FirebaseIosFramework.Database, packageName = "cocoapods.FirebaseDatabase")
         }
     }
 

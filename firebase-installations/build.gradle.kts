@@ -5,6 +5,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import compat.registerAndroidSourceCompat
+import dev.gitlive.firebase.iossdk.gradle.FirebaseIosFramework
+import dev.gitlive.firebase.iossdk.gradle.firebaseIosSdk
 import utils.TargetPlatform
 import utils.applyFirebaseHierarchy
 import utils.stripHeaderStubs
@@ -19,7 +21,7 @@ val supportedPlatforms = (project.property("firebase-installations.supportedTarg
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
+    id("dev.gitlive.firebase-ios-sdk")
     kotlin("multiplatform")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
@@ -106,24 +108,8 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseInstallations"
-            }
-            noPodspec()
-            pod("FirebaseInstallations") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        firebaseIosSdk {
+            framework(FirebaseIosFramework.Installations, packageName = "cocoapods.FirebaseInstallations")
         }
     }
 

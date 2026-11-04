@@ -178,8 +178,12 @@ Migrated modules additionally expose `.compat`, the `com.google.firebase` object
 - Access the underlying Android object via the `.android` extension property in `androidMain`.
 
 ### iOS
-- The Firebase iOS SDK is **not** a transitive dependency — consuming projects must link it via CocoaPods or SPM.
-- Tests need the relevant Firebase pods in the `cocoapods` block of `build.gradle.kts`.
+- The Firebase iOS SDK is **not** a transitive dependency — consuming native iOS apps should link it via Swift
+  Package Manager (Firebase stopped publishing to CocoaPods after version 12).
+- This repo's own modules (and KMP consumers needing to run their own Kotlin/Native iOS tests) get the Firebase
+  frameworks via the `dev.gitlive.firebase-ios-sdk` Gradle plugin (`firebase-ios-sdk-plugin/`), which vendors
+  Google's official release zip instead of CocoaPods. Tests need the relevant framework declared in the
+  `firebaseIosSdk { }` block of `build.gradle.kts`.
 
 ### JVM / Desktop
 - Uses [`firebase-java-sdk`](https://github.com/GitLiveApp/firebase-java-sdk), which mirrors the Android SDK API.

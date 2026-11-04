@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import dev.gitlive.firebase.iossdk.gradle.FirebaseIosFramework
+import dev.gitlive.firebase.iossdk.gradle.firebaseIosSdk
 import utils.TargetPlatform
 import utils.supportsApple
 import utils.toTargetPlatforms
@@ -15,7 +17,7 @@ val supportedPlatforms = (project.property("firebase-crashlytics.supportedTarget
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
+    id("dev.gitlive.firebase-ios-sdk")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
 }
@@ -97,24 +99,8 @@ kotlin {
         macosX64()
     }
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseCrashlytics"
-            }
-            noPodspec()
-            pod("FirebaseCrashlytics") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        firebaseIosSdk {
+            framework(FirebaseIosFramework.Crashlytics, packageName = "cocoapods.FirebaseCrashlytics")
         }
     }
 

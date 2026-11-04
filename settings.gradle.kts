@@ -18,6 +18,7 @@ include(
 
 pluginManagement {
     includeBuild("convention-plugin-test-option")
+    includeBuild("firebase-ios-sdk-plugin")
     repositories {
         google()
         mavenCentral()

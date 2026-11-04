@@ -141,12 +141,22 @@ On android, some modules (`config`) require you to enable [Core library desugari
 
 ### Running on iOS
 
-On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
+On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firebase SDK as well.
 
-Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
+Firebase stopped publishing new releases to CocoaPods after version 12 — for a final native iOS app, add Firebase via [Swift Package Manager](https://firebase.google.com/docs/ios/setup) in Xcode instead.
+
+For a Kotlin Multiplatform project that needs to run its *own* `iosSimulatorArm64Test` (or similar) against this SDK's types — the same problem this repo itself has, since CocoaPods can no longer supply those frameworks to Gradle either — apply the `dev.gitlive.firebase-ios-sdk` Gradle plugin this repo uses internally, in the module's `build.gradle.kts`. It always resolves to exactly the Firebase iOS SDK version this Kotlin SDK release was built and tested against — there's no version or checksum to configure:
 ```kotlin
-cocoapods {
-   pod("FirebaseCore") // Repeat for Firebase pods required by your project, e.g FirebaseFirestore for the `firebase-firestore` module.
+plugins {
+    id("dev.gitlive.firebase-ios-sdk")
+}
+
+kotlin {
+    iosSimulatorArm64()
+
+    firebaseIosSdk {
+        framework(FirebaseIosFramework.Core) // repeat for any other Firebase framework your project needs, e.g. Firestore
+    }
 }
 ```
 
@@ -430,9 +440,8 @@ In cases where it makes sense, such as Firebase Functions HTTPS Callable, operat
 If you'd like to contribute to this project then you can fork this repository. 
 You can build and test the project locally.
 1. Open the project in IntelliJ IDEA.
-2. Install cocoapods via `sudo gem install -n /usr/local/bin cocoapods`
-3. Install the GitLive plugin into IntelliJ
-4. After a gradle sync then run `publishToMavenLocal`
+2. Install the GitLive plugin into IntelliJ
+3. After a gradle sync then run `publishToMavenLocal`
 
 ### Testing
 To run the tests you can use the following gradle tasks:

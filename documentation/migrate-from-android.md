@@ -74,8 +74,10 @@ What this changes per platform:
 - **Android**: the module depends on the official `com.google.firebase:firebase-installations` and `firebase-common`, so
   they are still on your app's classpath, and nothing else from `com.google.*` is added. Keep the Google Services Gradle
   plugin and `google-services.json` on the Android app as before; the BoM in the app module stays optional.
-- **iOS**: the Firebase iOS SDK is not linked transitively. Add the pods your app uses (`FirebaseCore`,
-  `FirebaseInstallations`) through CocoaPods or Swift Package Manager, and `GoogleService-Info.plist` to the app.
+- **iOS**: the Firebase iOS SDK is not linked transitively. Add the frameworks your app uses (`FirebaseCore`,
+  `FirebaseInstallations`) through Swift Package Manager (CocoaPods no longer carries Firebase past version 12),
+  and `GoogleService-Info.plist` to the app. See [Running on iOS](../README.md#running-on-ios) for the Gradle
+  plugin this repo's own Kotlin/Native tests use instead of CocoaPods.
 - **JS**: the Firebase JS SDK is an npm dependency of the module; nothing to add.
 - **JVM**: the [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) is used, see [Initialization](../README.md#initialization).
 

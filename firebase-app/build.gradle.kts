@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import compat.registerAndroidSourceCompat
+import dev.gitlive.firebase.iossdk.gradle.FirebaseIosFramework
+import dev.gitlive.firebase.iossdk.gradle.firebaseIosSdk
 import utils.TargetPlatform
 import utils.applyFirebaseHierarchy
 import utils.stripHeaderStubs
@@ -17,7 +19,7 @@ val supportedPlatforms = (project.property("firebase-app.supportedTargets") as S
 
 plugins {
     id("com.android.library")
-    kotlin("native.cocoapods")
+    id("dev.gitlive.firebase-ios-sdk")
     kotlin("multiplatform")
     id("testOptionsConvention")
     alias(libs.plugins.publish)
@@ -105,25 +107,13 @@ kotlin {
         macosArm64()
         macosX64()
     }
+    // Kotlin/Native's own per-target minimum OS version already matches what Firebase requires (iOS 15 /
+    // tvOS 15 / macOS 12 - see the comment by firebase-ios-sdk in gradle/libs.versions.toml), so unlike the
+    // old cocoapods { ios.deploymentTarget = ... } block - which only existed to populate the synthetic
+    // Podfile's `platform :ios, 'X'` line - there is nothing to configure here.
     if (supportedPlatforms.supportsApple()) {
-        cocoapods {
-            if (supportedPlatforms.contains(TargetPlatform.Ios)) {
-                ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Tvos)) {
-                tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
-            }
-            if (supportedPlatforms.contains(TargetPlatform.Macos)) {
-                osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
-            }
-            framework {
-                baseName = "FirebaseApp"
-            }
-            noPodspec()
-            pod("FirebaseCore") {
-                version = libs.versions.firebase.cocoapods.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
+        firebaseIosSdk {
+            framework(FirebaseIosFramework.Core, packageName = "cocoapods.FirebaseCore")
         }
     }
 
