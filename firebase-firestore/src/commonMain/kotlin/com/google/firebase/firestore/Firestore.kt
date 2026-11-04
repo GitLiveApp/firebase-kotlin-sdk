@@ -2,26 +2,24 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-// The SDK's facade, which the reified actuals (Firestore.android.kt) join.
-@file:JvmName("FirestoreKt")
-@file:JvmMultifileClass
-
 package com.google.firebase.firestore
 
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.serialization.dataObjects as formatDataObjects
+import com.google.firebase.serialization.getField as formatGetField
+import com.google.firebase.serialization.toObject as formatToObject
+import com.google.firebase.serialization.toObjects as formatToObjects
+import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
 
 /*
  * The Kotlin extensions of the Android SDK's firebase-firestore (FirestoreKt), as plain common code: on Android and the
- * JVM the facade is a header stub that is stripped, so the SDK's own binds. The reified functions map documents to
- * custom classes by reflection on Android and the JVM, and on the other platforms through the serializer of the class
- * with the same rules (`FirebaseFirestore.Firestore`, see firestoreFormat), so a `@Serializable` class reads the same everywhere.
+ * JVM the facade is a header stub that is stripped, so the SDK's own binds. The reified reads are the SDK's reflective ones
+ * there, so they are deprecated with an error towards the format's in com.google.firebase.serialization (FirestoreMapping.kt).
  */
 
 /** The [FirebaseFirestore] of the default [FirebaseApp]; the Android SDK's `Firebase.firestore`. */
@@ -76,45 +74,55 @@ public fun Query.snapshots(metadataChanges: MetadataChanges = MetadataChanges.EX
     awaitClose { registration.remove() }
 }
 
-/** The document data as [T] (see [toObject]) and every change to it as a [Flow]. */
-public inline fun <reified T> DocumentReference.dataObjects(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE): Flow<T?> = snapshots(metadataChanges).map { it.toObject<T>() }
-
-/** The query results as [T] (see [toObject]) and every change to them as a [Flow]. */
-public inline fun <reified T> Query.dataObjects(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE): Flow<List<T>> = snapshots(metadataChanges).map { it.toObjects<T>() }
-
-/**
- * The value of [field] as [T], as the Android SDK's reified `getField`: the SDK's reflective mapping on Android and the JVM,
- * the same rules through the serializer of [T] elsewhere (`FirebaseFormat.Firestore`).
+/*
+ * The SDK's reified reads, which map a class by reflection on Android: deprecated with an error towards the same names in
+ * com.google.firebase.serialization (FirestoreMapping.kt), which map through FirebaseFormat.Firestore on every platform.
  */
-public expect inline fun <reified T> DocumentSnapshot.getField(field: String): T?
 
-/** The value of [field] as [T] (see [getField]). */
-public expect inline fun <reified T> DocumentSnapshot.getField(field: String, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T?
+/** The SDK's `dataObjects` flow; deprecated towards [com.google.firebase.serialization.dataObjects]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("dataObjects<T>(metadataChanges)", "com.google.firebase.serialization.dataObjects"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentReference.dataObjects(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE): Flow<T?> = formatDataObjects<T>(metadataChanges)
 
-/** The value of [fieldPath] as [T] (see [getField]). */
-public expect inline fun <reified T> DocumentSnapshot.getField(fieldPath: FieldPath): T?
+/** The SDK's `dataObjects` flow; deprecated towards [com.google.firebase.serialization.dataObjects]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("dataObjects<T>(metadataChanges)", "com.google.firebase.serialization.dataObjects"), DeprecationLevel.ERROR)
+public inline fun <reified T> Query.dataObjects(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE): Flow<List<T>> = formatDataObjects<T>(metadataChanges)
 
-/** The value of [fieldPath] as [T] (see [getField]). */
-public expect inline fun <reified T> DocumentSnapshot.getField(fieldPath: FieldPath, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T?
+/** The SDK's reified `getField`; deprecated towards [com.google.firebase.serialization.getField]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.getField(field: String): T? = formatGetField<T>(field)
 
-/**
- * The document as [T], as the Android SDK's reified `toObject`: the SDK's reflective mapping on Android and the JVM, the
- * same rules through the serializer of [T] elsewhere (`FirebaseFormat.Firestore`), `@DocumentId` and `@ServerTimestamp`
- * included; null when the document does not exist.
- */
-public expect inline fun <reified T> DocumentSnapshot.toObject(): T?
+/** The SDK's reified `getField`; deprecated towards [com.google.firebase.serialization.getField]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.getField(field: String, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T? = formatGetField<T>(field, serverTimestampBehavior)
 
-/** The document as [T] (see [toObject]), with the server timestamps resolved as [serverTimestampBehavior] says. */
-public expect inline fun <reified T> DocumentSnapshot.toObject(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T?
+/** The SDK's reified `getField`; deprecated towards [com.google.firebase.serialization.getField]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.getField(fieldPath: FieldPath): T? = formatGetField<T>(fieldPath)
 
-/** The document as [T] (see [DocumentSnapshot.toObject]); a query document always exists. */
-public expect inline fun <reified T> QueryDocumentSnapshot.toObject(): T
+/** The SDK's reified `getField`; deprecated towards [com.google.firebase.serialization.getField]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.getField(fieldPath: FieldPath, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T? = formatGetField<T>(fieldPath, serverTimestampBehavior)
 
-/** The document as [T] (see [DocumentSnapshot.toObject]), with the server timestamps resolved as [serverTimestampBehavior] says. */
-public expect inline fun <reified T> QueryDocumentSnapshot.toObject(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T
+/** The SDK's reified `toObject`; deprecated towards [com.google.firebase.serialization.toObject]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.toObject(): T? = formatToObject<T>()
 
-/** The documents as [T] (see [DocumentSnapshot.toObject]). */
-public expect inline fun <reified T> QuerySnapshot.toObjects(): List<T>
+/** The SDK's reified `toObject`; deprecated towards [com.google.firebase.serialization.toObject]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+public inline fun <reified T> DocumentSnapshot.toObject(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T? = formatToObject<T>(serverTimestampBehavior)
 
-/** The documents as [T] (see [DocumentSnapshot.toObject]), with the server timestamps resolved as [serverTimestampBehavior] says. */
-public expect inline fun <reified T> QuerySnapshot.toObjects(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T>
+/** The SDK's reified `toObject`; deprecated towards [com.google.firebase.serialization.toObject]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+public inline fun <reified T> QueryDocumentSnapshot.toObject(): T = formatToObject<T>()
+
+/** The SDK's reified `toObject`; deprecated towards [com.google.firebase.serialization.toObject]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+public inline fun <reified T> QueryDocumentSnapshot.toObject(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T = formatToObject<T>(serverTimestampBehavior)
+
+/** The SDK's reified `toObjects`; deprecated towards [com.google.firebase.serialization.toObjects]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+public inline fun <reified T> QuerySnapshot.toObjects(): List<T> = formatToObjects<T>()
+
+/** The SDK's reified `toObjects`; deprecated towards [com.google.firebase.serialization.toObjects]. */
+@Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+public inline fun <reified T> QuerySnapshot.toObjects(serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = formatToObjects<T>(serverTimestampBehavior)

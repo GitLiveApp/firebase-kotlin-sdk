@@ -90,3 +90,9 @@ internal actual fun filterInArray(fieldPath: FieldPath, values: List<Any>): Filt
 internal actual fun filterNotInArray(field: String, values: List<Any>): Filter = FirestoreStatics.notInArray(field, values)
 
 internal actual fun filterNotInArray(fieldPath: FieldPath, values: List<Any>): Filter = FirestoreStatics.notInArray(fieldPath, values)
+
+// The format's value types are the SDK's own classes here, so they go to and come from the SDK as they are.
+
+internal actual fun Any.toSdkValue(): Any = this
+
+internal actual fun Any.fromSdkValue(): Any = this

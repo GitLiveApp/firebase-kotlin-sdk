@@ -2,6 +2,8 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Continuation
@@ -12,6 +14,8 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.SuccessContinuation
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /** @property results The result of every aggregation by its alias. */
 public actual class AggregateQuerySnapshot internal constructor(public actual val query: AggregateQuery, private val results: Map<String, Any?>) {
@@ -70,31 +74,47 @@ public actual abstract class LoadBundleTask internal constructor() : Task<LoadBu
     internal abstract fun registerProgressListener(listener: OnProgressListener<LoadBundleTaskProgress>)
 }
 
-/** Completed by the platform SDK's progress updates through [update]; the final progress completes the task. */
+/**
+ * Completed by the platform SDK's progress updates through [update]; the final progress completes the task. The progress
+ * and the listeners change together, so a listener registered during an update is told of that progress exactly once.
+ */
 internal class LoadBundleTaskImpl : LoadBundleTask() {
+    private class State(val progress: LoadBundleTaskProgress?, val listeners: List<OnProgressListener<LoadBundleTaskProgress>>)
+
     private val source = TaskCompletionSource<LoadBundleTaskProgress>()
     private val task get() = source.task
-    private val progressListeners = mutableListOf<OnProgressListener<LoadBundleTaskProgress>>()
-    private var progress: LoadBundleTaskProgress? = null
+    private val state = AtomicReference(State(null, emptyList()))
 
-    /** Reports [progress]; a `SUCCESS` or `ERROR` state completes the task. */
+    /** Replaces the state with the one [transform] makes of the current one, and returns the state it replaced. */
+    private inline fun swap(transform: (State) -> State): State {
+        while (true) {
+            val current = state.load()
+            if (state.compareAndSet(current, transform(current))) return current
+        }
+    }
+
+    /** Reports [progress]; a `SUCCESS` or `ERROR` state completes the task, whether or not a listener throws. */
     fun update(progress: LoadBundleTaskProgress) {
-        this.progress = progress
-        progressListeners.toList().forEach { it.onProgress(progress) }
-        when (progress.taskState) {
-            LoadBundleTaskProgress.TaskState.SUCCESS -> source.trySetResult(progress)
-            LoadBundleTaskProgress.TaskState.ERROR -> source.trySetException(progress.exception ?: FirebaseFirestoreException("Bundle loading failed", FirebaseFirestoreException.Code.UNKNOWN))
-            LoadBundleTaskProgress.TaskState.RUNNING -> Unit
+        val listeners = swap { State(progress, it.listeners) }.listeners
+        try {
+            listeners.forEach { it.onProgress(progress) }
+        } finally {
+            when (progress.taskState) {
+                LoadBundleTaskProgress.TaskState.SUCCESS -> source.trySetResult(progress)
+                LoadBundleTaskProgress.TaskState.ERROR -> source.trySetException(progress.exception ?: FirebaseFirestoreException("Bundle loading failed", FirebaseFirestoreException.Code.UNKNOWN))
+                LoadBundleTaskProgress.TaskState.RUNNING -> Unit
+            }
         }
     }
 
     /** Fails the task with [exception], keeping the last progress counts. */
     fun fail(exception: Exception) {
+        val progress = state.load().progress
         update(LoadBundleTaskProgress(progress?.documentsLoaded ?: 0, progress?.totalDocuments ?: 0, progress?.bytesLoaded ?: 0, progress?.totalBytes ?: 0, LoadBundleTaskProgress.TaskState.ERROR, exception))
     }
 
     override fun registerProgressListener(listener: OnProgressListener<LoadBundleTaskProgress>) {
-        progressListeners += listener
+        val progress = swap { State(it.progress, it.listeners + listener) }.progress
         progress?.takeIf { it.taskState != LoadBundleTaskProgress.TaskState.RUNNING }?.let(listener::onProgress)
     }
 

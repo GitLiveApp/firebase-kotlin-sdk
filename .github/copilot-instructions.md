@@ -191,17 +191,28 @@ The SDK has two public API layers per module:
    `@Transient` and its own `@SerialInfo` annotations in `com.google.firebase.serialization` (firebase-app); the SDK's
    `@PropertyName`, `@Exclude`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` are header stubs deprecated towards
    them, as kotlinx.serialization cannot record the SDK's annotation classes, which app code compiles against on Android.
-   `firebase-firestore` shows custom-class mapping through `com.google.firebase.serialization.FirebaseFormat` (in firebase-app): where
-   the Android SDK maps a class by reflection (`set`, `update`, `add` and the reified `toObject`, `toObjects` and `getField`), the
-   Apple, JS and wasmJs actuals go through `FirebaseFormat.Firestore` with the module's `Bindings` (its `MappingAnnotations`, the value
-   types passed through, `@DocumentId` and `@ServerTimestamp` support, and `toSdkValue`/`fromSdkValue` converting the layer's
-   `Timestamp`, `GeoPoint`, `Blob`, `DocumentReference`, `FieldValue` and `FieldPath` to the platform SDK's own classes); Android and
-   the JVM keep the SDK's own mapping. The mapping annotations are `expect` classes: the Android/JVM actuals are header stubs with
-   the SDK's targets (the reflective mapper reads getters and fields), the other actuals add the `PROPERTY` target and `@SerialInfo`
-   so kotlinx.serialization records them. The reified extensions are `expect inline fun`s whose Android actuals join the SDK's
-   facade through `@JvmMultifileClass` and pass `T::class.java` to the SDK's `Class`-taking members, which the Android stubs declare
-   for that purpose (they stay `@platform` exclusions in the report). On wasmJs the `dev.gitlive` wrapper's special-value serializers
-   convert the JS SDK's classes themselves (`toCompatSpecialValue`), as a Kotlin value cannot be stored in the JS tree the decoders read.
+   `firebase-firestore` shows custom-class mapping through `com.google.firebase.serialization.FirebaseFormat` (in firebase-app) as
+   the single mapper on every platform, Android included: the shipped `setData`/`updateData`/`addData` extensions call the
+   SDK members with the data mapped by the format (the reified `setData`/`addData` with its static type, so generic classes map;
+   on Android and the JVM the member receives the mapped data itself, where it would map by reflection, and the other actuals,
+   which map every value they write through the format, receive it as a `PlainValue` the format passes through) and the reified `toObject`,
+   `toObjects`, `getField` and `dataObjects` read through `format.decodeFromPlainValue`, with the module's `FirestoreBindings` (the value types passed
+   through, `@DocumentId` and `@ServerTimestamp` support, and `toSdkValue`/`fromSdkValue` converting the layer's `Timestamp`,
+   `GeoPoint`, `Blob`, `DocumentReference`, `FieldValue` and `FieldPath` to the platform SDK's own classes; the identity on Android
+   and the JVM). They live in `com.google.firebase.serialization` (`FirestoreMapping.kt`, shipped through `keepPackageDirs`): the
+   reads keep the SDK's names, and in the SDK's own package a call would resolve to the SDK's `FirestoreKt` facade on Android and
+   the JVM (this module's is a stripped stub), whose inline bodies map by reflection. The SDK's reflective members are deprecated
+   with an error towards them on the common declarations and every actual (`set(Any)`, `update(Map)`, `add(Any)`, the facade's
+   reified reads; the `Class`-taking reads only exist in the Android stubs), with the messages in
+   `dev.gitlive.firebase.firestore.AndroidOnlyApi.kt`; a deprecation only on an Android stub never reaches app code, which
+   compiles against the SDK's own classes once the stubs are stripped. The report counts them as `MAP`; the format and its
+   bindings (`FormatKt`, `FirestoreBindings`) are listed in `keepClasses`, and the wrapper's already-encoded writes call the
+   deprecated members under `@Suppress("DEPRECATION_ERROR")`. The format reads kotlinx.serialization's `@SerialName` and
+   `@Transient` and its own `@SerialInfo` annotations in `com.google.firebase.serialization` (firebase-app); the SDK's
+   `@PropertyName`, `@Exclude`, `@DocumentId`, `@ServerTimestamp`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` are
+   header stubs deprecated towards them, as kotlinx.serialization cannot record the SDK's annotation classes, which app code
+   compiles against on Android. On wasmJs the `dev.gitlive` wrapper's special-value serializers convert the JS SDK's classes
+   themselves (`toCompatSpecialValue`), as a Kotlin value cannot be stored in the JS tree the decoders read.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

@@ -5,6 +5,8 @@
 package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
+import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 import dev.gitlive.firebase.firestore.internal.DEFAULT_MAX_ATTEMPTS
 
 /**
@@ -21,12 +23,15 @@ public expect class Transaction {
     public fun get(documentRef: DocumentReference): DocumentSnapshot
 
     /** Writes [data] (a map of field values) to [documentRef], replacing the document. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(documentRef: DocumentReference, data: Any): Transaction
 
     /** Writes [data] (a map of field values) to [documentRef] according to [options]. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction
 
     /** Updates the fields in [data] of [documentRef]; fails if the document does not exist. */
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public fun update(documentRef: DocumentReference, data: Map<String, Any?>): Transaction
 
     /** Updates [field] of [documentRef] to [value] and the further field/value pairs in [moreFieldsAndValues]. */
@@ -77,12 +82,15 @@ public class TransactionOptions private constructor(
  */
 public expect class WriteBatch {
     /** Writes [data] (a map of field values) to [documentRef], replacing the document. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(documentRef: DocumentReference, data: Any): WriteBatch
 
     /** Writes [data] (a map of field values) to [documentRef] according to [options]. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(documentRef: DocumentReference, data: Any, options: SetOptions): WriteBatch
 
     /** Updates the fields in [data] of [documentRef]; fails if the document does not exist. */
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public fun update(documentRef: DocumentReference, data: Map<String, Any?>): WriteBatch
 
     /** Updates [field] of [documentRef] to [value] and the further field/value pairs in [moreFieldsAndValues]. */

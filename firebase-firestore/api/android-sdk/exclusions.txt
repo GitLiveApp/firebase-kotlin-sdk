@@ -12,13 +12,7 @@ com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/ma
 com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the pinned JS SDK
 com.google.firebase.firestore.DocumentSnapshot#getVectorValue  // @unavailable vector values are not in the pinned JS SDK
 
-# Reflective mapping of documents to custom classes is Android-only.
-com.google.firebase.firestore.DocumentSnapshot#get(FieldPath, Class)  // @platform java.lang.Class
-com.google.firebase.firestore.DocumentSnapshot#get(FieldPath, Class, ServerTimestampBehavior)  // @platform java.lang.Class
-com.google.firebase.firestore.DocumentSnapshot#get(String, Class)  // @platform java.lang.Class
-com.google.firebase.firestore.DocumentSnapshot#get(String, Class, ServerTimestampBehavior)  // @platform java.lang.Class
-com.google.firebase.firestore.DocumentSnapshot#toObject  // @platform java.lang.Class
-com.google.firebase.firestore.QuerySnapshot#toObjects  // @platform java.lang.Class
+# The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
 
 # java.util.Date accessors; use getTimestamp and com.google.firebase.toKotlinInstant.

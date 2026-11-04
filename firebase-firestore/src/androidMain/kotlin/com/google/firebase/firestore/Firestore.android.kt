@@ -8,6 +8,10 @@ import android.app.Activity
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
+import dev.gitlive.firebase.firestore.REFLECTIVE_READ
+import dev.gitlive.firebase.firestore.REFLECTIVE_SET
+import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
 import dev.gitlive.firebase.firestore.stub
 import java.util.concurrent.Executor
 
@@ -153,6 +157,8 @@ public actual class CollectionReference private constructor() : Query() {
     public actual val parent: DocumentReference? get() = stub()
     public actual fun document(): DocumentReference = stub()
     public actual fun document(documentPath: String): DocumentReference = stub()
+
+    @Deprecated(REFLECTIVE_ADD, ReplaceWith("addData(data)", "com.google.firebase.serialization.addData"), DeprecationLevel.ERROR)
     public actual fun add(data: Any): Task<DocumentReference> = stub()
 }
 
@@ -211,8 +217,14 @@ public actual class DocumentReference private constructor() {
     public actual fun collection(collectionPath: String): CollectionReference = stub()
     public actual fun get(): Task<DocumentSnapshot> = stub()
     public actual fun get(source: Source): Task<DocumentSnapshot> = stub()
+
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any, options: SetOptions): Task<Nothing?> = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(data: Map<String, Any?>): Task<Nothing?> = stub()
     public actual fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Task<Nothing?> = stub()
     public actual fun update(fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Task<Nothing?> = stub()
@@ -252,12 +264,23 @@ public actual open class DocumentSnapshot {
     public actual fun getGeoPoint(field: String): GeoPoint? = stub()
     public actual fun getDocumentReference(field: String): DocumentReference? = stub()
 
-    // The SDK's reflective mapping, which the reified extensions (FirestoreKt.android.kt) inline into their callers.
+    // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
     public open fun <T> toObject(valueType: Class<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
     public open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
     public fun <T> get(field: String, valueType: Class<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
     public fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
     public fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
     public fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     public actual enum class ServerTimestampBehavior {
@@ -270,7 +293,10 @@ public actual open class DocumentSnapshot {
 @Suppress("DEPRECATION_ERROR")
 public actual class QueryDocumentSnapshot private constructor() : DocumentSnapshot() {
     // A query document exists, so the SDK's overrides return a value.
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
     override fun <T> toObject(valueType: Class<T>): T = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
     override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
 }
 
@@ -283,9 +309,13 @@ public actual class QuerySnapshot private constructor() : Iterable<QueryDocument
     public actual val isEmpty: Boolean get() = stub()
     public actual fun size(): Int = stub()
 
-    // The SDK's reflective mapping, which the reified extensions (FirestoreKt.android.kt) inline into their callers.
+    // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
     public fun <T> toObjects(clazz: Class<T>): List<T> = stub()
+
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
     public fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
+
     actual override fun iterator(): Iterator<QueryDocumentSnapshot> = stub()
 }
 
@@ -309,8 +339,14 @@ public actual class SnapshotMetadata private constructor() {
 
 public actual class Transaction private constructor() {
     public actual fun get(documentRef: DocumentReference): DocumentSnapshot = stub()
+
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): Transaction = stub()
+
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): Transaction = stub()
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): Transaction = stub()
     public actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): Transaction = stub()
@@ -322,8 +358,13 @@ public actual class Transaction private constructor() {
 }
 
 public actual class WriteBatch private constructor() {
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): WriteBatch = stub()
+
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): WriteBatch = stub()
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): WriteBatch = stub()
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch = stub()
     public actual fun update(documentRef: DocumentReference, fieldPath: FieldPath, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch = stub()

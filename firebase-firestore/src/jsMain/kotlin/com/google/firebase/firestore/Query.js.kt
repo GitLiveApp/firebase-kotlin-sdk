@@ -5,6 +5,9 @@
 package com.google.firebase.firestore
 
 import dev.gitlive.firebase.UnsupportedOnJs
+import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
+import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
+import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
 import dev.gitlive.firebase.firestore.externals.addDoc
@@ -145,6 +148,7 @@ public actual class CollectionReference internal constructor(override val js: Js
 
     public actual fun document(documentPath: String): DocumentReference = rethrow { DocumentReference(doc(js, documentPath)) }
 
+    @Deprecated(REFLECTIVE_ADD, ReplaceWith("addData(data)", "com.google.firebase.serialization.addData"), DeprecationLevel.ERROR)
     public actual fun add(data: Any): Task<DocumentReference> = task { addDoc(js, data.toJs()!!).then { DocumentReference(it) } }
 
     override fun toString(): String = "CollectionReference($path)"
@@ -191,10 +195,13 @@ public actual class DocumentReference internal constructor(public val js: JsDocu
         }.then { DocumentSnapshot(it) }
     }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any): Task<Nothing?> = write { setDoc(js, data.toJs()!!) }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any, options: SetOptions): Task<Nothing?> = write { setDoc(js, data.toJs()!!, options.toJs()) }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(data: Map<String, Any?>): Task<Nothing?> = write { updateDoc(js, data.toJs()!!) }
 
     public actual fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Task<Nothing?> = write { updateDoc(js, field, value.toJs(), *moreFieldsAndValues.toJs()) }
@@ -227,10 +234,13 @@ public actual class Transaction internal constructor(public val js: JsTransactio
     @UnsupportedOnJs
     public actual fun get(documentRef: DocumentReference): DocumentSnapshot = throw UnsupportedOperationException(TRANSACTION_GET_ASYNC_ON_JS)
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): Transaction = rethrow { js.set(documentRef.js, data.toJs()!!) }.let { this }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction = rethrow { js.set(documentRef.js, data.toJs()!!, options.toJs()) }.let { this }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): Transaction = rethrow { js.update(documentRef.js, data.toJs()!!) }.let { this }
 
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): Transaction = rethrow { js.update(documentRef.js, field, value.toJs(), *moreFieldsAndValues.toJs()) }.let { this }
@@ -246,10 +256,13 @@ public actual class Transaction internal constructor(public val js: JsTransactio
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class WriteBatch internal constructor(public val js: JsWriteBatch) {
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): WriteBatch = rethrow { js.set(documentRef.js, data.toJs()!!) }.let { this }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): WriteBatch = rethrow { js.set(documentRef.js, data.toJs()!!, options.toJs()) }.let { this }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): WriteBatch = rethrow { js.update(documentRef.js, data.toJs()!!) }.let { this }
 
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch = rethrow { js.update(documentRef.js, field, value.toJs(), *moreFieldsAndValues.toJs()) }.let { this }

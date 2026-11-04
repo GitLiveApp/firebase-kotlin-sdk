@@ -11,9 +11,10 @@ import com.google.firebase.Timestamp
  * Firebase Android SDK. Field values are the Firestore types: `Boolean`, `Long`, `Double`, `String`, [Timestamp],
  * [GeoPoint], [Blob], [DocumentReference], `List` and `Map`, as on Android; a document that does not exist has no data.
  *
- * Not mirrored: the reflective mapping to custom classes (`toObject`, `get(field, Class)`) and the `Date` accessors
- * (see `api/android-sdk/exclusions.txt`); use the reified `toObject` and `getField` of the Kotlin extensions and
- * [getTimestamp] instead.
+ * A custom class is read with the reified `toObject<T>()` and `getField<T>()` extensions, which map a `@Serializable`
+ * class with the Android SDK's rules on every platform; the SDK's reflective `toObject(Class)` and `get(field, Class)`
+ * are deprecated with an error on Android. Not mirrored: the `Date` accessors (see `api/android-sdk/exclusions.txt`);
+ * use [getTimestamp] instead.
  */
 public expect open class DocumentSnapshot {
     /** The document id. */

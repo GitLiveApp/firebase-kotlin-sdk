@@ -57,7 +57,8 @@ public class GeoPoint(public val latitude: Double, public val longitude: Double)
 
     override fun compareTo(other: GeoPoint): Int = compareValuesBy(this, other, { it.latitude }, { it.longitude })
 
-    override fun equals(other: Any?): Boolean = other is GeoPoint && other.latitude == latitude && other.longitude == longitude
+    // Compared as compareTo and hashCode do, so that -0.0 and 0.0 are distinct in every one of them.
+    override fun equals(other: Any?): Boolean = other is GeoPoint && other.latitude.compareTo(latitude) == 0 && other.longitude.compareTo(longitude) == 0
 
     override fun hashCode(): Int = 31 * latitude.hashCode() + longitude.hashCode()
 

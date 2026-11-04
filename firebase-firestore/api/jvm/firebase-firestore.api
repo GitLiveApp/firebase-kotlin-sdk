@@ -1,3 +1,13 @@
+public final class com/google/firebase/firestore/FormatKt {
+	public static final fun getFirestoreFormat ()Lcom/google/firebase/serialization/FirebaseFormat$Firestore;
+}
+
+public final class com/google/firebase/serialization/FirestoreMappingKt {
+	public static final fun updateData (Lcom/google/firebase/firestore/DocumentReference;Ljava/util/Map;)Lcom/google/android/gms/tasks/Task;
+	public static final fun updateData (Lcom/google/firebase/firestore/Transaction;Lcom/google/firebase/firestore/DocumentReference;Ljava/util/Map;)Lcom/google/firebase/firestore/Transaction;
+	public static final fun updateData (Lcom/google/firebase/firestore/WriteBatch;Lcom/google/firebase/firestore/DocumentReference;Ljava/util/Map;)Lcom/google/firebase/firestore/WriteBatch;
+}
+
 public abstract class dev/gitlive/firebase/firestore/BaseTimestamp {
 	public static final field Companion Ldev/gitlive/firebase/firestore/BaseTimestamp$Companion;
 }

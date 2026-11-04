@@ -5,6 +5,7 @@
 package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
 
 /**
  * A query over the documents of a collection or collection group, mirroring `com.google.firebase.firestore.Query`
@@ -105,6 +106,7 @@ public expect class CollectionReference : Query {
     public fun document(documentPath: String): DocumentReference
 
     /** Adds a new document with an automatically generated id and [data] (a map of field values). */
+    @Deprecated(REFLECTIVE_ADD, ReplaceWith("addData(data)", "com.google.firebase.serialization.addData"), DeprecationLevel.ERROR)
     public fun add(data: Any): Task<DocumentReference>
 }
 

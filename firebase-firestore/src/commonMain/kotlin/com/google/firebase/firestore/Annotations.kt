@@ -2,54 +2,49 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package com.google.firebase.firestore
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialInfo
-
 /*
- * The mapping annotations of the Android SDK's firebase-firestore. On Android and the JVM they are header stubs of the
- * SDK's own, which its reflective mapper reads from a class's getters and fields; on the other platforms
- * `FirebaseFormat.Firestore` reads them from a `@Serializable` class's properties, where kotlinx.serialization records
- * them, so they also target the property and carry `@SerialInfo`. A class shared across the platforms therefore
- * annotates both the getter and the property: `@get:PropertyName("stars") @PropertyName("stars") val starCount: Long`;
- * a class annotation needs no such doubling.
+ * The mapping annotations of the Android SDK's firebase-firestore, deprecated: `FirebaseFormat.Firestore` (see
+ * firestoreFormat), which maps a `@Serializable` class on every platform, Android included, reads kotlinx.serialization's
+ * own `@SerialName` and `@Transient` and the format's `com.google.firebase.serialization` annotations, which
+ * kotlinx.serialization records on every platform. These classes cannot be: on Android and the JVM they are header stubs
+ * of the SDK's own annotations (see buildSrc utils/HeaderStubs.kt), and app code compiles against the SDK's classes,
+ * which carry no `@SerialInfo`.
  */
 
-/** Marks a property that receives the document id when a document is mapped to a custom class. */
-@SerialInfo
+/** The SDK's annotation; [com.google.firebase.serialization.DocumentId] is read on every platform. */
+@Deprecated("FirebaseFormat reads com.google.firebase.serialization.DocumentId on every platform", ReplaceWith("DocumentId", "com.google.firebase.serialization.DocumentId"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
-public expect annotation class DocumentId()
+public annotation class DocumentId
 
-/** Excludes a property from the mapping. */
-@SerialInfo
+/** The SDK's exclusion annotation; [kotlinx.serialization.Transient] excludes a property on every platform. */
+@Deprecated("FirebaseFormat reads @Transient on every platform", ReplaceWith("Transient", "kotlinx.serialization.Transient"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
-public expect annotation class Exclude()
+public annotation class Exclude
 
-/** Ignores document fields without a matching property (they are logged otherwise). */
-@SerialInfo
+/** The SDK's annotation; [com.google.firebase.serialization.IgnoreExtraProperties] is read on every platform. */
+@Deprecated("FirebaseFormat reads com.google.firebase.serialization.IgnoreExtraProperties on every platform", ReplaceWith("IgnoreExtraProperties", "com.google.firebase.serialization.IgnoreExtraProperties"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-public expect annotation class IgnoreExtraProperties()
+public annotation class IgnoreExtraProperties
 
-/** The document field name of a property. */
-@SerialInfo
+/** The SDK's property name annotation; [kotlinx.serialization.SerialName] names a property on every platform. */
+@Deprecated("FirebaseFormat reads @SerialName on every platform", ReplaceWith("SerialName(value)", "kotlinx.serialization.SerialName"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
-public expect annotation class PropertyName(val value: String)
+public annotation class PropertyName(val value: String)
 
-/** Marks a `Timestamp` or `Instant` property written as the server timestamp when it is null. */
-@SerialInfo
+/** The SDK's annotation; [com.google.firebase.serialization.ServerTimestamp] is read on every platform. */
+@Deprecated("FirebaseFormat reads com.google.firebase.serialization.ServerTimestamp on every platform", ReplaceWith("ServerTimestamp", "com.google.firebase.serialization.ServerTimestamp"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
-public expect annotation class ServerTimestamp()
+public annotation class ServerTimestamp
 
-/** Fails the mapping for document fields without a matching property. */
-@SerialInfo
+/** The SDK's annotation; [com.google.firebase.serialization.ThrowOnExtraProperties] is read on every platform. */
+@Deprecated("FirebaseFormat reads com.google.firebase.serialization.ThrowOnExtraProperties on every platform", ReplaceWith("ThrowOnExtraProperties", "com.google.firebase.serialization.ThrowOnExtraProperties"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-public expect annotation class ThrowOnExtraProperties()
+public annotation class ThrowOnExtraProperties

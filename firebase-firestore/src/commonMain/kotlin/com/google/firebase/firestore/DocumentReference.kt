@@ -5,11 +5,15 @@
 package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
+import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 
 /**
  * A document location, mirroring `com.google.firebase.firestore.DocumentReference` from the Firebase Android SDK: the
- * document may or may not exist; reads, writes and listeners are performed through it. Data is written as maps of
- * field values (a custom class is only mapped by reflection on Android).
+ * document may or may not exist; reads, writes and listeners are performed through it. A `@Serializable` class is
+ * written with the [setData] and [updateData] extensions, which map it through `FirebaseFormat.Firestore` on every
+ * platform; the SDK's `set` and `update(Map)`, which map a class by reflection on Android, are deprecated with an error
+ * towards them.
  *
  * Not mirrored: the `Activity` and `Executor` overloads of `addSnapshotListener` (see `api/android-sdk/exclusions.txt`).
  */
@@ -36,12 +40,15 @@ public expect class DocumentReference {
     public fun get(source: Source): Task<DocumentSnapshot>
 
     /** Writes [data] (a map of field values), replacing the document. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(data: Any): Task<Nothing?>
 
     /** Writes [data] (a map of field values) according to [options]. */
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public fun set(data: Any, options: SetOptions): Task<Nothing?>
 
     /** Updates the fields in [data]; fails if the document does not exist. */
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public fun update(data: Map<String, Any?>): Task<Nothing?>
 
     /** Updates [field] to [value] and the further field/value pairs in [moreFieldsAndValues]. */

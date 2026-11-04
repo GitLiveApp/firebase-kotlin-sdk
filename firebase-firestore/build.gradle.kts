@@ -235,11 +235,15 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
-    // Shipped: the static members this module's own code reaches through FirestoreStatics.java.
+    // Shipped: the static members this module's own code reaches through FirestoreStatics.java, and the format and its
+    // bindings the mapping entry points in com.google.firebase.serialization (kept below) inline against.
     keepClasses = listOf(
         "com/google/firebase/firestore/FirestoreInternalsKt.class",
         "com/google/firebase/firestore/FirestoreStatics.class",
+        "com/google/firebase/firestore/FormatKt.class",
+        "com/google/firebase/firestore/FirestoreBindings.class",
     ),
+    keepPackageDirs = listOf("com/google/firebase/serialization"),
     // firebase-java-sdk ports an older Android SDK without the cache-only listen source, the gRPC flow control window
     // setting and the restricted FieldPath.fromDotSeparatedPath.
     jvmMissingMembers = listOf(

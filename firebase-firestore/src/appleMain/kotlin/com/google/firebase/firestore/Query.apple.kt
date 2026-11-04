@@ -5,6 +5,9 @@
 package com.google.firebase.firestore
 
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateField
+import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
+import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
+import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateQuerySnapshot
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateSource
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRCollectionReference
@@ -142,6 +145,7 @@ public actual class CollectionReference internal constructor(override val ios: F
     public actual fun document(documentPath: String): DocumentReference = DocumentReference(ios.documentWithPath(documentPath))
 
     /** Completes once the write is acknowledged, as on Android (addDocumentWithData returns the reference before that). */
+    @Deprecated(REFLECTIVE_ADD, ReplaceWith("addData(data)", "com.google.firebase.serialization.addData"), DeprecationLevel.ERROR)
     public actual fun add(data: Any): Task<DocumentReference> = task { completion ->
         val reference = ios.documentWithAutoID()
         reference.setData(data.toIosData()) { error -> completion(if (error == null) DocumentReference(reference) else null, error) }
@@ -192,12 +196,15 @@ public actual class DocumentReference internal constructor(public val ios: FIRDo
         ios.getDocumentWithSource(source.toIos()) { snapshot, error -> completion(snapshot?.let { DocumentSnapshot(it) }, error) }
     }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any): Task<Nothing?> = write { ios.setData(data.toIosData(), it) }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(data: Any, options: SetOptions): Task<Nothing?> = write {
         if (options.merge) ios.setData(data.toIosData(), true, it) else ios.setData(data.toIosData(), options.iosMergeFields(), it)
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(data: Map<String, Any?>): Task<Nothing?> = write { ios.updateData(data.toIosData(), it) }
 
     public actual fun update(field: String, value: Any?, vararg moreFieldsAndValues: Any?): Task<Nothing?> = write { ios.updateData(updateData(field, value, moreFieldsAndValues), it) }
@@ -239,12 +246,15 @@ public actual class Transaction internal constructor(public val ios: FIRTransact
         DocumentSnapshot(snapshot!!)
     }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): Transaction = apply { ios.setData(data.toIosData(), documentRef.ios) }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): Transaction = apply {
         if (options.merge) ios.setData(data.toIosData(), documentRef.ios, true) else ios.setData(data.toIosData(), documentRef.ios, options.iosMergeFields())
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): Transaction = apply { ios.updateData(data.toIosData(), documentRef.ios) }
 
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): Transaction = apply {
@@ -264,12 +274,15 @@ public actual class Transaction internal constructor(public val ios: FIRTransact
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class WriteBatch internal constructor(public val ios: FIRWriteBatch) {
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any): WriteBatch = apply { ios.setData(data.toIosData(), documentRef.ios) }
 
+    @Deprecated(REFLECTIVE_SET, ReplaceWith("setData(documentRef, data, options)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun set(documentRef: DocumentReference, data: Any, options: SetOptions): WriteBatch = apply {
         if (options.merge) ios.setData(data.toIosData(), documentRef.ios, true) else ios.setData(data.toIosData(), documentRef.ios, options.iosMergeFields())
     }
 
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(documentRef, data)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
     public actual fun update(documentRef: DocumentReference, data: Map<String, Any?>): WriteBatch = apply { ios.updateData(data.toIosData(), documentRef.ios) }
 
     public actual fun update(documentRef: DocumentReference, field: String, value: Any?, vararg moreFieldsAndValues: Any?): WriteBatch = apply {

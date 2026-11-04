@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.serialization.setData
 import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
@@ -57,7 +58,7 @@ class TransactionGetTest {
     @Test
     fun testTransactionGet() = runTest {
         val document = firestore.collection("compat").document("test").collection("nonJs").document("counter")
-        document.set(mapOf("count" to 1L)).await()
+        document.setData(mapOf("count" to 1L)).await()
         val increment = { transaction: com.google.firebase.firestore.Transaction ->
             val snapshot = transaction.get(document)
             val count = snapshot.getLong("count") ?: 0L

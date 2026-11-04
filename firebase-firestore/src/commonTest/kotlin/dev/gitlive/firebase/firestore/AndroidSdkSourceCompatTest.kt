@@ -10,35 +10,36 @@ import com.google.firebase.firestore.AggregateField
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.ServerTimestamp
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.TransactionOptions
-import com.google.firebase.firestore.dataObjects
+import com.google.firebase.serialization.addData
+import com.google.firebase.serialization.dataObjects
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.getField
+import com.google.firebase.serialization.setData
+import com.google.firebase.serialization.getField
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.memoryEagerGcSettings
 import com.google.firebase.firestore.snapshots
-import com.google.firebase.firestore.toObject
-import com.google.firebase.firestore.toObjects
+import com.google.firebase.serialization.toObject
+import com.google.firebase.serialization.toObjects
+import com.google.firebase.serialization.updateData
+import com.google.firebase.serialization.DocumentId
+import com.google.firebase.serialization.IgnoreExtraProperties
+import com.google.firebase.serialization.ServerTimestamp
 import dev.gitlive.firebase.initialize
 import dev.gitlive.firebase.runBlockingTest
 import dev.gitlive.firebase.runTest
@@ -49,7 +50,9 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -132,7 +135,7 @@ class AndroidSdkSourceCompatTest {
         val documents = collection("documents")
         val other = documents.document("other")
         val document = documents.document("doc")
-        document.set(
+        document.setData(
             mapOf(
                 "name" to "first",
                 "count" to 1L,
@@ -178,7 +181,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals("first", (snapshot.toObject<Any>() as Map<*, *>)["name"])
 
         document.update("count", 2L, "nested.key", "updated").await()
-        document.update(mapOf("flag" to false)).await()
+        document.updateData(mapOf("flag" to false)).await()
         document.update(FieldPath.of("name"), "second", FieldPath.of("ratio"), 2.5).await()
         val updated = document.get(Source.SERVER).await()
         assertEquals(2L, updated.getLong("count"))
@@ -187,9 +190,9 @@ class AndroidSdkSourceCompatTest {
         assertEquals("second", updated.getString("name"))
         assertEquals(2.5, updated.getDouble("ratio"))
 
-        document.set(mapOf("extra" to "merged"), SetOptions.merge()).await()
-        document.set(mapOf("written" to 1L, "skipped" to 2L), SetOptions.mergeFields("written")).await()
-        document.set(mapOf("path" to mapOf("written" to 3L)), SetOptions.mergeFieldPaths(listOf(FieldPath.of("path", "written")))).await()
+        document.setData(mapOf("extra" to "merged"), SetOptions.merge()).await()
+        document.setData(mapOf("written" to 1L, "skipped" to 2L), SetOptions.mergeFields("written")).await()
+        document.setData(mapOf("path" to mapOf("written" to 3L)), SetOptions.mergeFieldPaths(listOf(FieldPath.of("path", "written")))).await()
         val merged = document.get().await()
         assertEquals("second", merged.getString("name"))
         assertEquals("merged", merged.getString("extra"))
@@ -197,7 +200,7 @@ class AndroidSdkSourceCompatTest {
         assertFalse(merged.contains("skipped"))
         assertEquals(3L, merged.get("path.written"))
 
-        document.set(mapOf("only" to "this")).await()
+        document.setData(mapOf("only" to "this")).await()
         val replaced = document.get().await()
         assertFalse(replaced.contains("name"))
         assertEquals("this", replaced.getString("only"))
@@ -206,7 +209,7 @@ class AndroidSdkSourceCompatTest {
         assertFalse(document.get().await().exists())
         assertNull(document.get().await().data)
 
-        val added = documents.add(mapOf("added" to true)).await()
+        val added = documents.addData(mapOf("added" to true)).await()
         assertEquals(true, added.get().await().getBoolean("added"))
         added.delete().await()
     }
@@ -217,7 +220,7 @@ class AndroidSdkSourceCompatTest {
         val author = firestore.document("compat/test/authors/jane")
         val document = posts.document("post")
         val post = CompatPost(title = "Hello", starCount = 3, draft = true, location = GeoPoint(1.0, 2.0), author = author, tags = listOf("a", "b"))
-        document.set(post).await()
+        document.setData(post).await()
 
         val snapshot = document.get().await()
         val stored = assertNotNull(snapshot.data)
@@ -233,11 +236,11 @@ class AndroidSdkSourceCompatTest {
         // Not getField<List<String>>: the Android SDK's reflective mapping rejects a generic type there, on every platform alike.
         assertEquals(listOf("a", "b"), snapshot.get("tags"))
 
-        document.update(mapOf("extra" to 1L)).await()
+        document.updateData(mapOf("extra" to 1L)).await()
         assertEquals("Hello", document.get().await().toObject<CompatPost>()?.title)
 
-        posts.add(CompatPost(title = "Second")).await()
-        firestore.runBatch { batch -> batch.set(posts.document("batched"), CompatPost(title = "Batched")) }.await()
+        posts.addData(CompatPost(title = "Second")).await()
+        firestore.runBatch { batch -> batch.setData(posts.document("batched"), CompatPost(title = "Batched")) }.await()
         val objects = posts.orderBy("title").get().await().toObjects<CompatPost>()
         assertEquals(listOf("Batched", "Hello", "Second"), objects.map { it.title })
         assertTrue(objects.all { it.id != null }, "ids: ${objects.map { it.id }}")
@@ -250,8 +253,8 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testFieldValues() = runTest {
         val document = collection("fieldValues").document("doc")
-        document.set(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon")).await()
-        document.update(
+        document.setData(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon")).await()
+        document.updateData(
             mapOf(
                 "count" to FieldValue.increment(5L),
                 "ratio" to FieldValue.increment(0.5),
@@ -275,9 +278,9 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testQueriesAndAggregations() = runTest {
         val scores = collection("queries")
-        scores.document("a").set(mapOf("name" to "a", "score" to 1L, "tags" to listOf("x"))).await()
-        scores.document("b").set(mapOf("name" to "b", "score" to 2L, "tags" to listOf("x", "y"))).await()
-        scores.document("c").set(mapOf("name" to "c", "score" to 3L, "tags" to listOf("y"))).await()
+        scores.document("a").setData(mapOf("name" to "a", "score" to 1L, "tags" to listOf("x"))).await()
+        scores.document("b").setData(mapOf("name" to "b", "score" to 2L, "tags" to listOf("x", "y"))).await()
+        scores.document("c").setData(mapOf("name" to "c", "score" to 3L, "tags" to listOf("y"))).await()
 
         assertEquals(listOf("c", "b"), scores.whereGreaterThan("score", 1L).orderBy("score", Query.Direction.DESCENDING).get().await().map { it.id })
         assertEquals(listOf("a", "b"), scores.orderBy(FieldPath.of("score")).limit(2).get().await().documents.map { it.id })
@@ -342,7 +345,7 @@ class AndroidSdkSourceCompatTest {
         }
         val inSync = CompletableDeferred<Unit>()
         val syncRegistration = firestore.addSnapshotsInSyncListener { inSync.complete(Unit) }
-        document.set(mapOf("name" to "listened")).await()
+        document.setData(mapOf("name" to "listened")).await()
         assertEquals("listened", awaitEvent { events.await() }.getString("name"))
         awaitEvent { inSync.await() }
         registration.remove()
@@ -376,13 +379,13 @@ class AndroidSdkSourceCompatTest {
         val documents = collection("transactions")
         val first = documents.document("first")
         val second = documents.document("second")
-        first.set(mapOf("count" to 1L)).await()
+        first.setData(mapOf("count" to 1L)).await()
 
         val result = firestore.runTransaction { transaction ->
             transaction.update(first, "count", 2L)
-            transaction.set(second, mapOf("count" to 10L))
-            transaction.set(second, mapOf("merged" to true), SetOptions.merge())
-            transaction.update(second, mapOf("count" to 11L))
+            transaction.setData(second, mapOf("count" to 10L))
+            transaction.setData(second, mapOf("merged" to true), SetOptions.merge())
+            transaction.updateData(second, mapOf("count" to 11L))
             transaction.update(second, FieldPath.of("nested", "value"), "x")
             "done"
         }.await()
@@ -413,16 +416,16 @@ class AndroidSdkSourceCompatTest {
         assertEquals(FirebaseFirestoreException.Code.ABORTED, failure.code)
 
         firestore.runBatch { batch ->
-            batch.set(second, mapOf("count" to 1L))
+            batch.setData(second, mapOf("count" to 1L))
             batch.update(first, "count", 3L)
         }.await()
         assertEquals(1L, second.get().await().getLong("count"))
         assertEquals(3L, first.get().await().getLong("count"))
 
         firestore.batch()
-            .set(second, mapOf("count" to 5L, "extra" to "value"), SetOptions.mergeFields("count"))
+            .setData(second, mapOf("count" to 5L, "extra" to "value"), SetOptions.mergeFields("count"))
             .update(second, FieldPath.of("count"), 6L)
-            .update(first, mapOf("count" to 4L))
+            .updateData(first, mapOf("count" to 4L))
             .delete(first)
             .commit()
             .await()
@@ -436,7 +439,7 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testErrors() = runTest {
         val missing = collection("errors").document("missing")
-        val exception = assertFailsWith<FirebaseFirestoreException> { missing.update(mapOf("count" to 1L)).await() }
+        val exception = assertFailsWith<FirebaseFirestoreException> { missing.updateData(mapOf("count" to 1L)).await() }
         assertEquals(FirebaseFirestoreException.Code.NOT_FOUND, exception.code)
         assertEquals(5, FirebaseFirestoreException.Code.NOT_FOUND.value())
         assertEquals(FirebaseFirestoreException.Code.NOT_FOUND, FirebaseFirestoreException.Code.fromValue(5))
@@ -449,7 +452,7 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testNetwork() = runTest {
         val document = collection("network").document("doc")
-        document.set(mapOf("name" to "online")).await()
+        document.setData(mapOf("name" to "online")).await()
         // A listener keeps the document in the (eagerly collected) memory cache while the network is off.
         val listened = CompletableDeferred<Unit>()
         val registration = document.addSnapshotListener { snapshot, _ -> if (snapshot?.exists() == true) listened.complete(Unit) }
@@ -469,19 +472,19 @@ class AndroidSdkSourceCompatTest {
 }
 
 /**
- * A model class as written for the Android SDK, plus `@Serializable` (and `@Contextual` on the Firestore value types):
- * the SDK maps it by reflection on Android and the JVM, the layer's format maps it through its serializer elsewhere. The
- * getter and property forms of an annotation are both given, as the SDK reads the getter and kotlinx.serialization the
- * property.
+ * A model class mapped by `FirebaseFormat.Firestore` on every platform, Android included: `@Serializable` (with
+ * `@Contextual` on the Firestore value types), kotlinx.serialization's own `@SerialName` and `@Transient` for the stored
+ * names and exclusion, and the format's `@DocumentId`, `@ServerTimestamp` and `@IgnoreExtraProperties`
+ * (`com.google.firebase.serialization`).
  */
 @Serializable
 @IgnoreExtraProperties
 data class CompatPost(
-    @get:DocumentId @DocumentId val id: String? = null,
+    @DocumentId val id: String? = null,
     val title: String = "",
-    @get:PropertyName("stars") @PropertyName("stars") val starCount: Long = 0,
-    @get:Exclude @Exclude val draft: Boolean = false,
-    @get:ServerTimestamp @ServerTimestamp @Contextual val created: Timestamp? = null,
+    @SerialName("stars") val starCount: Long = 0,
+    @Transient val draft: Boolean = false,
+    @ServerTimestamp @Contextual val created: Timestamp? = null,
     @Contextual val location: GeoPoint? = null,
     @Contextual val author: DocumentReference? = null,
     val tags: List<String> = emptyList(),

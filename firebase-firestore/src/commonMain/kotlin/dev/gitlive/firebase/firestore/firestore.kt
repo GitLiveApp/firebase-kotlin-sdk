@@ -190,6 +190,7 @@ public data class Transaction internal constructor(public val compat: CompatTran
     public inline fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}): Transaction = setEncoded(documentRef, encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): Transaction = apply {
         setOptions.toCompat()?.let { compat.set(documentRef.compat, encodedData.toCompatMap(), it) } ?: compat.set(documentRef.compat, encodedData.toCompatMap())
     }
@@ -252,6 +253,7 @@ public data class Transaction internal constructor(public val compat: CompatTran
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): Transaction = apply { compat.update(documentRef.compat, encodedData.toCompatMap()) }
 
     public fun delete(documentRef: DocumentReference): Transaction = apply { compat.delete(documentRef.compat) }
@@ -469,6 +471,7 @@ public data class WriteBatch internal constructor(public val compat: CompatWrite
     public inline fun <T : Any> set(documentRef: DocumentReference, strategy: SerializationStrategy<T>, data: T, vararg mergeFieldPaths: FieldPath, buildSettings: EncodeSettings.Builder.() -> Unit = {}): WriteBatch = setEncoded(documentRef, encodeAsObject(strategy, data, buildSettings), SetOptions.MergeFieldPaths(mergeFieldPaths.asList()))
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal fun setEncoded(documentRef: DocumentReference, encodedData: EncodedObject, setOptions: SetOptions): WriteBatch = apply {
         setOptions.toCompat()?.let { compat.set(documentRef.compat, encodedData.toCompatMap(), it) } ?: compat.set(documentRef.compat, encodedData.toCompatMap())
     }
@@ -531,6 +534,7 @@ public data class WriteBatch internal constructor(public val compat: CompatWrite
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal fun updateEncoded(documentRef: DocumentReference, encodedData: EncodedObject): WriteBatch = apply { compat.update(documentRef.compat, encodedData.toCompatMap()) }
 
     public fun delete(documentRef: DocumentReference): WriteBatch = apply { compat.delete(documentRef.compat) }
@@ -641,6 +645,7 @@ public data class DocumentReference internal constructor(public val compat: Comp
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal suspend fun setEncoded(encodedData: EncodedObject, setOptions: SetOptions) {
         (setOptions.toCompat()?.let { compat.set(encodedData.toCompatMap(), it) } ?: compat.set(encodedData.toCompatMap())).await()
     }
@@ -668,6 +673,7 @@ public data class DocumentReference internal constructor(public val compat: Comp
     }
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal suspend fun updateEncoded(encodedData: EncodedObject) {
         compat.update(encodedData.toCompatMap()).await()
     }
@@ -742,6 +748,7 @@ public data class CollectionReference internal constructor(override val compat: 
     )
 
     @PublishedApi
+    @Suppress("DEPRECATION_ERROR")
     internal suspend fun addEncoded(data: EncodedObject): DocumentReference = DocumentReference(compat.add(data.toCompatMap()).await())
 }
 
