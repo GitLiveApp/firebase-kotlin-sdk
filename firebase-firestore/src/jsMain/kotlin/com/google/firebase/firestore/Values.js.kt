@@ -38,23 +38,12 @@ import dev.gitlive.firebase.firestore.externals.where as jsWhere
 
 private const val MAX_EXACT_INTEGER = 9007199254740992.0
 
-/** [this] as the JS SDK writes it: Kotlin maps become objects, collections arrays, longs numbers and the layer's value types the SDK's. */
-internal fun Any?.toJs(): Any? = when (this) {
-    null -> null
-    is String, is Boolean -> this
-    is Long -> toDouble()
-    is Number -> this
-    is Timestamp -> JsTimestamp(seconds.toDouble(), nanoseconds.toDouble())
-    is GeoPoint -> JsGeoPoint(latitude, longitude)
-    is DocumentReference -> js
-    is FieldValue -> toJsFieldValue()
-    is Blob -> Bytes.fromUint8Array(toBytes().toUint8Array())
-    is FieldPath -> toJs()
-    is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
-    is Collection<*> -> map { it.toJs() }.toTypedArray()
-    is Array<*> -> map { it.toJs() }.toTypedArray()
-    else -> if (isPlainObject(this)) json(*objectKeys(this).map { key -> key to asDynamic()[key].unsafeCast<Any?>().toJs() }.toTypedArray()) else this
-}
+/**
+ * [this] as the JS SDK writes it, through the format: Kotlin maps become objects, collections arrays and longs numbers,
+ * the layer's value types become the SDK's (see [toSdkValue]) and a `@Serializable` class is mapped with the Android
+ * SDK's rules (see [firestoreFormat]).
+ */
+internal fun Any?.toJs(): Any? = firestoreFormat.convertToPlainValue(this)
 
 /** A value read by the JS SDK as the Android SDK's types (see [toJs]). */
 internal fun Any?.toCompat(): Any? {
@@ -97,7 +86,7 @@ internal fun Any.toCompatNumber(): Number {
     return if (number == floor(number) && abs(number) < MAX_EXACT_INTEGER) number.toLong() else number
 }
 
-private fun FieldValue.toJsFieldValue(): Any = when (operation) {
+internal fun FieldValue.toJsFieldValue(): Any = when (operation) {
     FieldValue.Operation.SERVER_TIMESTAMP -> jsServerTimestamp()
     FieldValue.Operation.DELETE -> deleteField()
     FieldValue.Operation.ARRAY_UNION -> jsArrayUnion(*arguments.map { it.toJs()!! }.toTypedArray())

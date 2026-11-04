@@ -205,6 +205,14 @@ kotlin {
             }
         }
 
+        if (supportedPlatforms.contains(TargetPlatform.WasmJs)) {
+            getByName("wasmJsMain") {
+                dependencies {
+                    implementation(libs.kotlinx.browser)
+                }
+            }
+        }
+
         if (supportedPlatforms.contains(TargetPlatform.Jvm)) {
             getByName("jvmMain") {
                 kotlin.srcDir("src/androidMain/kotlin")

@@ -10,18 +10,23 @@ import com.google.firebase.firestore.AggregateField
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.ServerTimestamp
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.TransactionOptions
@@ -43,6 +48,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -202,6 +209,42 @@ class AndroidSdkSourceCompatTest {
         val added = documents.add(mapOf("added" to true)).await()
         assertEquals(true, added.get().await().getBoolean("added"))
         added.delete().await()
+    }
+
+    @Test
+    fun testCustomClasses() = runTest {
+        val posts = collection("posts")
+        val author = firestore.document("compat/test/authors/jane")
+        val document = posts.document("post")
+        val post = CompatPost(title = "Hello", starCount = 3, draft = true, location = GeoPoint(1.0, 2.0), author = author, tags = listOf("a", "b"))
+        document.set(post).await()
+
+        val snapshot = document.get().await()
+        val stored = assertNotNull(snapshot.data)
+        assertEquals(setOf("title", "stars", "created", "location", "author", "tags"), stored.keys)
+        assertEquals(3L, (stored["stars"] as Number).toLong())
+        assertIs<Timestamp>(stored["created"])
+        val read = assertNotNull(snapshot.toObject<CompatPost>())
+        assertEquals("post", read.id)
+        assertEquals(post.copy(id = "post", draft = false, created = read.created), read)
+        assertEquals(3L, snapshot.getField<Long>("stars"))
+        assertEquals(GeoPoint(1.0, 2.0), snapshot.getField<GeoPoint>("location"))
+        assertEquals(author, snapshot.getField<DocumentReference>("author"))
+        // Not getField<List<String>>: the Android SDK's reflective mapping rejects a generic type there, on every platform alike.
+        assertEquals(listOf("a", "b"), snapshot.get("tags"))
+
+        document.update(mapOf("extra" to 1L)).await()
+        assertEquals("Hello", document.get().await().toObject<CompatPost>()?.title)
+
+        posts.add(CompatPost(title = "Second")).await()
+        firestore.runBatch { batch -> batch.set(posts.document("batched"), CompatPost(title = "Batched")) }.await()
+        val objects = posts.orderBy("title").get().await().toObjects<CompatPost>()
+        assertEquals(listOf("Batched", "Hello", "Second"), objects.map { it.title })
+        assertTrue(objects.all { it.id != null }, "ids: ${objects.map { it.id }}")
+        assertEquals(listOf("Hello"), posts.whereEqualTo("title", "Hello").dataObjects<CompatPost>().first().map { it.title })
+        assertEquals("Hello", document.dataObjects<CompatPost>().first()?.title)
+
+        posts.get().await().documents.forEach { it.reference.delete().await() }
     }
 
     @Test
@@ -424,3 +467,22 @@ class AndroidSdkSourceCompatTest {
         firestore.terminate().await()
     }
 }
+
+/**
+ * A model class as written for the Android SDK, plus `@Serializable` (and `@Contextual` on the Firestore value types):
+ * the SDK maps it by reflection on Android and the JVM, the layer's format maps it through its serializer elsewhere. The
+ * getter and property forms of an annotation are both given, as the SDK reads the getter and kotlinx.serialization the
+ * property.
+ */
+@Serializable
+@IgnoreExtraProperties
+data class CompatPost(
+    @get:DocumentId @DocumentId val id: String? = null,
+    val title: String = "",
+    @get:PropertyName("stars") @PropertyName("stars") val starCount: Long = 0,
+    @get:Exclude @Exclude val draft: Boolean = false,
+    @get:ServerTimestamp @ServerTimestamp @Contextual val created: Timestamp? = null,
+    @Contextual val location: GeoPoint? = null,
+    @Contextual val author: DocumentReference? = null,
+    val tags: List<String> = emptyList(),
+)

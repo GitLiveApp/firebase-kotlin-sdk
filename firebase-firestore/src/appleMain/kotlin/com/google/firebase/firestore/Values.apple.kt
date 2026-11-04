@@ -29,21 +29,12 @@ import platform.posix.memcpy
  * com.google.firebase.Timestamp, GeoPoint, DocumentReference and Blob.
  */
 
-/** [this] as the iOS SDK writes it: the layer's value types become the SDK's. */
-internal fun Any?.toIos(): Any? = when (this) {
-    null -> null
-    is String, is Boolean, is Number -> this
-    is Timestamp -> FIRTimestamp(seconds, nanoseconds)
-    is GeoPoint -> FIRGeoPoint(latitude, longitude)
-    is DocumentReference -> ios
-    is FieldValue -> toIosFieldValue()
-    is Blob -> toBytes().toNSData()
-    is FieldPath -> toIos()
-    is Map<*, *> -> entries.associate { (key, value) -> key.toIos() to value.toIos() }
-    is Collection<*> -> map { it.toIos() }
-    is Array<*> -> map { it.toIos() }
-    else -> this
-}
+/**
+ * [this] as the iOS SDK writes it, through the format: collections become Foundation ones (with Foundation booleans,
+ * which Kotlin/Native's boxing of a `Boolean` is not), the layer's value types become the SDK's (see [toSdkValue]) and
+ * a `@Serializable` class is mapped with the Android SDK's rules (see [firestoreFormat]).
+ */
+internal fun Any?.toIos(): Any? = firestoreFormat.convertToPlainValue(this)
 
 /** [this] as the iOS SDK writes a document: a map of field values. */
 @Suppress("UNCHECKED_CAST")
@@ -64,7 +55,7 @@ internal fun Any?.toCompat(): Any? = when (this) {
 @Suppress("UNCHECKED_CAST")
 internal fun Map<Any?, *>?.toCompatData(): Map<String, Any?>? = this?.toCompat() as Map<String, Any?>?
 
-private fun FieldValue.toIosFieldValue(): FIRFieldValue = when (operation) {
+internal fun FieldValue.toIosFieldValue(): FIRFieldValue = when (operation) {
     FieldValue.Operation.SERVER_TIMESTAMP -> FIRFieldValue.fieldValueForServerTimestamp()
     FieldValue.Operation.DELETE -> FIRFieldValue.fieldValueForDelete()
     FieldValue.Operation.ARRAY_UNION -> FIRFieldValue.fieldValueForArrayUnion(arguments.map { it.toIos() })

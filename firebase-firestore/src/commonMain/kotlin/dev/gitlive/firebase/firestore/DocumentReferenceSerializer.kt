@@ -11,8 +11,8 @@ import kotlinx.serialization.SerializationException
 public object DocumentReferenceSerializer : KSerializer<DocumentReference> by SpecialValueSerializer(
     serialName = "DocumentReference",
     toNativeValue = { it.nativeValue },
-    fromNativeValue = { value ->
-        when (value) {
+    fromNativeValue = { raw ->
+        when (val value = raw?.toCompatSpecialValue()) {
             is NativeDocumentReferenceType -> DocumentReference(value)
             else -> throw SerializationException("Cannot deserialize $value")
         }

@@ -150,6 +150,13 @@ resolves to the SDK's reflective extension on Android). The SDK's mapping annota
 reads (`@PropertyName` and `@Exclude` towards `@SerialName` and `@Transient`), as kotlinx.serialization cannot record the SDK's
 own annotation classes on Android. The stored name is the property's serial name: a property the Android SDK stored under its
 getter name (`isActive` as `active`) names it with `@SerialName("active")`.
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md). A model class written for the Android SDK's
+Cloud Firestore mapper needs only `@Serializable` (and `@Contextual` on `Timestamp`, `GeoPoint`, `DocumentReference` and `Blob`
+properties) to be read and written the same way on the other platforms, where `com.google.firebase.serialization.FirebaseFormat`
+applies the Android SDK's mapping rules (the property names, number handling, `@PropertyName`, `@Exclude`, `@ServerTimestamp`,
+`@DocumentId`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties`) through the class's serializer; the annotations go on the
+property as well as the getter (`@get:PropertyName("stars") @PropertyName("stars")`), as the Android SDK reads the getter and
+kotlinx.serialization the property.
 
 ### Accessing the underlying Firebase SDK
 

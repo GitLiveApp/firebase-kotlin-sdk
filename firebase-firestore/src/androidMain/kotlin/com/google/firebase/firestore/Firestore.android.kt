@@ -252,6 +252,14 @@ public actual open class DocumentSnapshot {
     public actual fun getGeoPoint(field: String): GeoPoint? = stub()
     public actual fun getDocumentReference(field: String): DocumentReference? = stub()
 
+    // The SDK's reflective mapping, which the reified extensions (FirestoreKt.android.kt) inline into their callers.
+    public open fun <T> toObject(valueType: Class<T>): T? = stub()
+    public open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public fun <T> get(field: String, valueType: Class<T>): T? = stub()
+    public fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
+    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+
     public actual enum class ServerTimestampBehavior {
         NONE,
         ESTIMATE,
@@ -260,7 +268,11 @@ public actual open class DocumentSnapshot {
 }
 
 @Suppress("DEPRECATION_ERROR")
-public actual class QueryDocumentSnapshot private constructor() : DocumentSnapshot()
+public actual class QueryDocumentSnapshot private constructor() : DocumentSnapshot() {
+    // A query document exists, so the SDK's overrides return a value.
+    override fun <T> toObject(valueType: Class<T>): T = stub()
+    override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
+}
 
 public actual class QuerySnapshot private constructor() : Iterable<QueryDocumentSnapshot> {
     public actual val query: Query get() = stub()
@@ -270,6 +282,10 @@ public actual class QuerySnapshot private constructor() : Iterable<QueryDocument
     public actual fun getDocumentChanges(metadataChanges: MetadataChanges): List<DocumentChange> = stub()
     public actual val isEmpty: Boolean get() = stub()
     public actual fun size(): Int = stub()
+
+    // The SDK's reflective mapping, which the reified extensions (FirestoreKt.android.kt) inline into their callers.
+    public fun <T> toObjects(clazz: Class<T>): List<T> = stub()
+    public fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
     actual override fun iterator(): Iterator<QueryDocumentSnapshot> = stub()
 }
 
