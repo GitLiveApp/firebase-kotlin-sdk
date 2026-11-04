@@ -17,10 +17,13 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.SerializersModuleCollector
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
+import kotlin.reflect.KClassifier
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -39,13 +42,15 @@ import kotlin.reflect.typeOf
  * whose SDK exchanges those (a Kotlin [List] or [Map] is read there too). So what a format produces can be handed to the
  * SDK, and what the SDK returns can be handed to a format, on every platform.
  *
- * - The property names are those the Android SDK derives from a class's getters: a Kotlin property `isActive` is stored
- *   as `active`, and a leading run of capitals is lower-cased (`URL` is stored as `url`).
+ * - The property names are the serial names: the Kotlin property name unless `@SerialName` says otherwise, and a
+ *   `@Transient` property is left out. (The Android SDK's reflective mappers derive names from getters instead, storing
+ *   `isActive` as `active`; a class migrated from them names such properties with `@SerialName`.)
  * - The value rules, and the exception types and messages when a value is rejected, are those of the Android mapper of
  *   each product: see [Firestore], [Database] and [Functions].
- * - The product's mapping annotations (`@PropertyName`, `@Exclude`, `@IgnoreExtraProperties`, `@ThrowOnExtraProperties`
- *   and, for Firestore, `@ServerTimestamp` and `@DocumentId`) take effect when kotlinx.serialization records them: see
- *   [MappingAnnotations].
+ * - The mapping annotations are this package's [IgnoreExtraProperties], [ThrowOnExtraProperties] and, for Firestore,
+ *   [ServerTimestamp] and [DocumentId], which kotlinx.serialization records on every platform when they are applied to
+ *   the class or the property itself. (The Android SDK's annotations of the same names are the SDK's own classes on
+ *   Android, which kotlinx.serialization cannot record, so the product modules deprecate them towards these.)
  *
  * Where kotlinx.serialization can do more than the Android mapper, the format keeps the extra support rather than
  * reproducing an Android failure that no working Android code depends on: generic classes, `object`s, value classes and
@@ -94,7 +99,9 @@ public sealed class FirebaseFormat(
     /**
      * The serializer for [type], where [Any] (as in `Map<String, Any?>`) stands for the plain value itself, as `Object`
      * does for the Android mapper: it is decoded as is and encoded by its runtime type. The product's own value types
-     * are passed through the same way, and the type arguments of a generic class are resolved by this rule too.
+     * are passed through the same way, and the type arguments of a generic class are resolved by this rule too. So is a
+     * type without a serializer of its own, such as the `Comparable` a map of mixed values infers, unless it is the base
+     * of a polymorphic hierarchy registered in the [serializersModule].
      */
     @Suppress("UNCHECKED_CAST")
     public fun serializerFor(type: KType): KSerializer<Any?> {
@@ -108,10 +115,47 @@ public sealed class FirebaseFormat(
                 ListSerializer(serializerFor(arguments[0]))
             classifier == Set::class || classifier == HashSet::class || classifier == LinkedHashSet::class || classifier == MutableSet::class ->
                 SetSerializer(serializerFor(arguments[0]))
-            arguments.isNotEmpty() && classifier is KClass<*> -> serializersModule.serializer(classifier, arguments.map(::serializerFor), false)
-            else -> serializersModule.serializer(type)
+            arguments.isNotEmpty() && classifier is KClass<*> -> serializerOrRuntime(classifier) { serializersModule.serializer(classifier, arguments.map(::serializerFor), false) }
+            else -> serializerOrRuntime(classifier) { serializersModule.serializer(type) }
         }
         return (if (type.isMarkedNullable) (serializer as KSerializer<Any>).nullable else serializer) as KSerializer<Any?>
+    }
+
+    /**
+     * The serializer [find] finds, or the runtime-typed one ([Any]'s) when it finds none or an open polymorphic one for a
+     * [classifier] that is not a registered base class: an interface (JS and Wasm have no serializer for it, the JVM an
+     * open polymorphic one) stands for whatever value it holds, as it does for the Android mapper.
+     */
+    private fun serializerOrRuntime(classifier: KClassifier?, find: () -> KSerializer<*>): KSerializer<*> {
+        val found = try {
+            find()
+        } catch (_: SerializationException) {
+            return ContextualSerializer(Any::class)
+        }
+        return if (found.descriptor.kind == PolymorphicKind.OPEN && classifier !in polymorphicBases) ContextualSerializer(Any::class) else found
+    }
+
+    /** The base classes of the polymorphic hierarchies registered in the [serializersModule]. */
+    private val polymorphicBases: Set<KClass<*>> by lazy {
+        buildSet {
+            serializersModule.dumpTo(
+                object : SerializersModuleCollector {
+                    override fun <T : Any> contextual(kClass: KClass<T>, provider: (typeArgumentsSerializers: List<KSerializer<*>>) -> KSerializer<*>) = Unit
+
+                    override fun <Base : Any, Sub : Base> polymorphic(baseClass: KClass<Base>, actualClass: KClass<Sub>, actualSerializer: KSerializer<Sub>) {
+                        add(baseClass)
+                    }
+
+                    override fun <Base : Any> polymorphicDefaultSerializer(baseClass: KClass<Base>, defaultSerializerProvider: (value: Base) -> SerializationStrategy<Base>?) {
+                        add(baseClass)
+                    }
+
+                    override fun <Base : Any> polymorphicDefaultDeserializer(baseClass: KClass<Base>, defaultDeserializerProvider: (className: String?) -> DeserializationStrategy<Base>?) {
+                        add(baseClass)
+                    }
+                },
+            )
+        }
     }
 
     internal fun serializerOf(type: KClass<*>): KSerializer<Any?>? = try {
@@ -127,7 +171,7 @@ public sealed class FirebaseFormat(
      *
      * - Numbers: [Int], [Long], [Float] and [Double]; other numbers and [Char]s are rejected.
      * - Collections: [List]s, and [Map]s with [String] keys; sets, other collections and arrays are rejected.
-     * - Enums: the entry's name, or the entry's `@PropertyName`.
+     * - Enums: the entry's serial name.
      * - `com.google.firebase.Timestamp` and the [Bindings.nativeTypes] (such as `GeoPoint`, `Blob`, `DocumentReference`
      *   and `FieldValue`) are passed through unchanged, and a `kotlin.time.Instant` is stored as a `Timestamp`. In a
      *   `@Serializable` class such properties need kotlinx.serialization's `@Contextual`, or a file-level
@@ -146,9 +190,6 @@ public sealed class FirebaseFormat(
 
         /** The Firestore types this format passes through; provided by the Firestore module. */
         public interface Bindings {
-            /** The annotations the format honours. */
-            public val annotations: MappingAnnotations
-
             /**
              * The value types passed through unchanged (`Blob`, `DocumentReference`, `FieldValue`, `GeoPoint`, `VectorValue`
              * and the BSON types, and `java.util.Date` on Android); `com.google.firebase.Timestamp` always is.
@@ -191,17 +232,16 @@ public sealed class FirebaseFormat(
      * - Numbers: [Int], [Long], [Float] and [Double], where a [Float] or [Double] with an integral value is stored as a
      *   [Long] (`1.0` is stored as `1`); other numbers and [Char]s are rejected.
      * - Collections: [List]s, and [Map]s with [String] keys; sets, other collections and arrays are rejected.
-     * - Enums: the entry's name.
+     * - Enums: the entry's serial name.
      * - Rejected values throw the exception made by [exception] (the module's `DatabaseException`), without a path.
      * - A database property without a class property is logged unless the class has `@IgnoreExtraProperties`, and fails
      *   the read if it has `@ThrowOnExtraProperties`.
      */
     public class Database(
-        public val annotations: MappingAnnotations,
         public val exception: (message: String) -> RuntimeException,
         serializersModule: SerializersModule = EmptySerializersModule(),
     ) : FirebaseFormat(serializersModule) {
-        override val rules: Rules = Rules.Database(annotations, exception)
+        override val rules: Rules = Rules.Database(exception)
     }
 
     /**
@@ -219,28 +259,6 @@ public sealed class FirebaseFormat(
         override val rules: Rules = Rules.Functions
     }
 }
-
-/**
- * The mapping annotations of a Firebase product, as declared by its module (for example
- * `com.google.firebase.firestore.PropertyName`).
- *
- * kotlinx.serialization only records annotations that are meta-annotated with `@SerialInfo` and applied to the property
- * itself (not with a `@get:`/`@field:` use-site target), or to the class; an annotation it does not record has no effect.
- */
-public class MappingAnnotations(
-    /** The name given by a `@PropertyName` annotation, or `null` for any other annotation. */
-    public val propertyName: (Annotation) -> String? = { null },
-    /** `@Exclude`: the property is neither written nor read. */
-    public val exclude: KClass<out Annotation>? = null,
-    /** `@IgnoreExtraProperties`: properties without a class property are ignored silently. */
-    public val ignoreExtraProperties: KClass<out Annotation>? = null,
-    /** `@ThrowOnExtraProperties`: properties without a class property fail the read. */
-    public val throwOnExtraProperties: KClass<out Annotation>? = null,
-    /** Firestore's `@ServerTimestamp`. */
-    public val serverTimestamp: KClass<out Annotation>? = null,
-    /** Firestore's `@DocumentId`. */
-    public val documentId: KClass<out Annotation>? = null,
-)
 
 /** Encodes [value] to plain values with the serializer of its type, where [Any] stands for any plain value. */
 public inline fun <reified T> FirebaseFormat.encodeToPlainValue(value: T): Any? = encodeToPlainValue(serializerFor(typeOf<T>()), value)

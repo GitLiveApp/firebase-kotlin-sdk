@@ -33,14 +33,21 @@ data class NativeValues(
     @Contextual val bytes: Blob? = null,
 )
 
+/** An enum without `@SerialName`, which the Android SDK's mappers do not know. */
+@Serializable
+enum class Heading {
+    NORTH,
+    SOUTH,
+}
+
 @Serializable
 data class Readable(
     val name: String? = null,
     val population: Long? = null,
     val int: Int = 0,
     val double: Double = 0.0,
-    val float: Float = 0f,
-    val direction: Direction = Direction.NORTH,
+    val float: Float = 4.5f,
+    val direction: Heading = Heading.NORTH,
     val regions: List<String>? = null,
     val counts: Map<String, Long>? = null,
     val nested: Readable? = null,
@@ -51,13 +58,13 @@ data class Readable(
  * same Kotlin value, the same plain values or the same exception, of the same type and with the same message.
  *
  * The Android SDK's annotations are Java annotations, which kotlinx.serialization does not record, so these tests do not
- * use annotations; the common tests cover them.
+ * use annotations; the common tests cover them. Nor do they use classes whose names the Android mappers derive from
+ * getters (`isCapital` stored as `capital`): the format stores the serial name, which the common tests cover too.
  */
 class AndroidMapperParityTest {
 
     private val firestoreFormat = FirebaseFormat.Firestore(
         object : FirebaseFormat.Firestore.Bindings {
-            override val annotations = MappingAnnotations()
             override val nativeTypes = listOf(GeoPoint::class, Blob::class, DocumentReference::class, FieldValue::class, Date::class)
             override val documentReferenceType = DocumentReference::class
             override fun documentId(documentReference: Any) = (documentReference as DocumentReference).id
@@ -66,7 +73,7 @@ class AndroidMapperParityTest {
         },
     )
 
-    private val databaseFormat = FirebaseFormat.Database(MappingAnnotations(), ::AndroidDatabaseException)
+    private val databaseFormat = FirebaseFormat.Database(::AndroidDatabaseException)
 
     private var values = 0
     private var exceptions = 0
@@ -83,17 +90,11 @@ class AndroidMapperParityTest {
     }
 
     private val encoded = listOf(
-        City("Los Angeles", "CA", "USA", false, 3_900_000, arrayListOf("west_coast", "socal")),
-        City(),
-        Names(true, "1", "u", "s", "i"),
         Numbers(1, 2, 3.0, 4.5f),
         Numbers(1, 2, 3.5, 4f),
-        WithEnum(Direction.NORTH),
-        WithEnum(Direction.SOUTH),
-        Nested(listOf(City("a"), City("b", population = 2))),
         NativeValues(GeoPoint(1.0, 2.0), Timestamp(3, 4), Date(5), Blob.fromBytes(byteArrayOf(6))),
-        Readable("n", 1, 2, 3.5, 4.5f, Direction.SOUTH, listOf("r"), mapOf("c" to 5L), Readable("m")),
-        Score("a", 1.0, true),
+        Readable("n", 1, 2, 3.5, 4.5f, Heading.SOUTH, listOf("r"), mapOf("c" to 5L), Readable("m")),
+        Readable(),
         WithShort(1),
         WithChar(),
         WithSet(setOf("a")),
@@ -104,13 +105,13 @@ class AndroidMapperParityTest {
 
     private val runtimeValues = listOf(
         mapOf("a" to listOf(1, 2L, 3.5, 4.5f, "s", true, null), "b" to mapOf("c" to mapOf("d" to 1))),
-        mapOf("city" to City("LA"), "place" to GeoPoint(1.0, 2.0), "server" to FieldValue.serverTimestamp()),
+        mapOf("readable" to Readable("LA"), "place" to GeoPoint(1.0, 2.0), "server" to FieldValue.serverTimestamp()),
         mapOf("a" to mapOf(1 to 2)),
         mapOf("a" to listOf(setOf(1))),
         mapOf("a" to arrayOf(1)),
         mapOf("a" to 1.toShort()),
         mapOf("a" to 'c'),
-        mapOf("direction" to Direction.SOUTH),
+        mapOf("direction" to Heading.SOUTH),
         1.0,
         2.5f,
     )
@@ -136,7 +137,7 @@ class AndroidMapperParityTest {
         hashMapOf<String, Any?>("tags" to arrayListOf("a")) to WithSet::class.java,
         hashMapOf<String, Any?>("tags" to arrayListOf("a")) to WithArray::class.java,
         hashMapOf<String, Any?>("counts" to hashMapOf("1" to "a")) to WithIntKeys::class.java,
-        hashMapOf<String, Any?>("cities" to arrayListOf("LA")) to Nested::class.java,
+        hashMapOf<String, Any?>("nested" to arrayListOf("LA")) to Readable::class.java,
         hashMapOf<String, Any?>("location" to GeoPoint(1.0, 2.0), "updated" to Timestamp(3, 4), "bytes" to Blob.fromBytes(byteArrayOf(1))) to NativeValues::class.java,
         hashMapOf<String, Any?>("location" to "here") to NativeValues::class.java,
         hashMapOf<String, Any?>() to Empty::class.java,

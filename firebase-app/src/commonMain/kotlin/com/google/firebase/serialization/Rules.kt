@@ -14,11 +14,6 @@ import kotlin.reflect.KClass
  */
 internal sealed class Rules {
 
-    abstract val annotations: MappingAnnotations
-
-    /** Whether class properties are named as the Android SDK names them from getters (see [beanPropertyName]). */
-    abstract val beanNames: Boolean
-
     /** Whether a class needs at least one property ("No properties to serialize found on class …"). */
     abstract val requiresProperties: Boolean
 
@@ -56,9 +51,6 @@ internal sealed class Rules {
     /** Whether [convertToPlainValue][FirebaseFormat.convertToPlainValue] maps enums and classes by runtime type. */
     abstract val mapsObjects: Boolean
 
-    /** The name given to an enum entry by an annotation, as Firestore's `@PropertyName`; the entry's name otherwise. */
-    open val enumPropertyName: (Annotation) -> String? = { null }
-
     /** Types passed through unchanged. */
     open fun isNativeType(type: KClass<*>): Boolean = false
 
@@ -81,13 +73,10 @@ internal sealed class Rules {
 
     /** Firestore */
     class Firestore(val bindings: FirebaseFormat.Firestore.Bindings) : Rules() {
-        override val annotations get() = bindings.annotations
-        override val beanNames = true
         override val requiresProperties = true
         override val unknownPropertyLog: (String) -> Unit = { logWarning("Firestore", "[CustomClassMapper]: $it") }
         override val mapsObjects = true
         override val maxDepth = 500
-        override val enumPropertyName get() = bindings.annotations.propertyName
 
         override fun serializeError(path: ErrorPath, reason: String) = IllegalArgumentException("Could not serialize object. $reason${path.suffix()}")
         override fun deserializeError(path: ErrorPath, reason: String) = RuntimeException("Could not deserialize object. $reason${path.suffix()}")
@@ -114,8 +103,7 @@ internal sealed class Rules {
     }
 
     /** Realtime Database */
-    class Database(override val annotations: MappingAnnotations, val exception: (String) -> RuntimeException) : Rules() {
-        override val beanNames = true
+    class Database(val exception: (String) -> RuntimeException) : Rules() {
         override val requiresProperties = true
         override val unknownPropertyLog: (String) -> Unit = { logWarning("ClassMapper", it) }
         override val mapsObjects = true
@@ -148,8 +136,6 @@ internal sealed class Rules {
 
     /** Cloud Functions */
     object Functions : Rules() {
-        override val annotations = MappingAnnotations()
-        override val beanNames = false
         override val requiresProperties = false
         override val unknownPropertyLog: ((String) -> Unit)? = null
         override val mapsObjects = false

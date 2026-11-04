@@ -124,9 +124,6 @@ internal class PlainDecoder(
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         val name = enumDescriptor.baseName()
         val string = value as? String ?: fail("Expected a String while deserializing to enum class $name but got a ${value?.let(::javaClassString) ?: "null"}")
-        for (index in 0 until enumDescriptor.elementsCount) {
-            if (enumDescriptor.getElementAnnotations(index).firstNotNullOfOrNull(rules.enumPropertyName) == string) return index
-        }
         val index = enumDescriptor.getElementIndex(string)
         if (index == UNKNOWN_NAME) fail("Could not find enum value of $name for value \"$string\"")
         return index
@@ -251,7 +248,7 @@ internal class ClassDecoder(
                 return element
             }
             val name = mapping.names[element]
-            if (!mapping.excluded[element] && map.containsKey(name)) {
+            if (map.containsKey(name)) {
                 // A null for a property that cannot hold it keeps the property's default; Java would store the null
                 if (map[name].asRead() == null && !elementDescriptor.isNullable && optional) continue
                 return element
@@ -267,7 +264,7 @@ internal class ClassDecoder(
 
     private fun checkUnknownProperties() {
         if (mapping.unknownProperties == UnknownProperties.IGNORE) return
-        val known = mapping.names.filterIndexed { index, _ -> !mapping.excluded[index] }.toSet()
+        val known = mapping.names.toSet()
         for (key in map.keys) {
             if (key in known || key == ignoredKey) continue
             val message = mapping.unknownPropertyMessage(key)
@@ -283,7 +280,7 @@ internal class ClassDecoder(
             val id = if (elementDescriptor.kind == PrimitiveKind.STRING) rules.bindings.documentId(documentReference) else documentReference
             return PlainDecoder(format, id, path.child(name), documentReference)
         }
-        return if (!mapping.excluded[index] && map.containsKey(name)) {
+        return if (map.containsKey(name)) {
             PlainDecoder(format, map[name], path.child(name), documentReference, nullable = elementDescriptor.isNullable)
         } else {
             PlainDecoder(format, null, path.child(name), documentReference, nullable = elementDescriptor.isNullable, absent = true)

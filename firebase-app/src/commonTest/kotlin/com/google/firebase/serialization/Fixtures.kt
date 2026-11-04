@@ -2,51 +2,11 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package com.google.firebase.serialization
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.fail
-
-// Stand-ins for the product modules' mapping annotations (com.google.firebase.firestore.PropertyName and so on), declared
-// as the modules' will be: recorded by kotlinx.serialization, which needs @SerialInfo and the PROPERTY target.
-
-@SerialInfo
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
-annotation class PropertyName(val value: String)
-
-@SerialInfo
-@Target(AnnotationTarget.PROPERTY)
-annotation class Exclude
-
-@SerialInfo
-@Target(AnnotationTarget.CLASS)
-annotation class IgnoreExtraProperties
-
-@SerialInfo
-@Target(AnnotationTarget.CLASS)
-annotation class ThrowOnExtraProperties
-
-@SerialInfo
-@Target(AnnotationTarget.PROPERTY)
-annotation class ServerTimestamp
-
-@SerialInfo
-@Target(AnnotationTarget.PROPERTY)
-annotation class DocumentId
-
-val testAnnotations = MappingAnnotations(
-    propertyName = { (it as? PropertyName)?.value },
-    exclude = Exclude::class,
-    ignoreExtraProperties = IgnoreExtraProperties::class,
-    throwOnExtraProperties = ThrowOnExtraProperties::class,
-    serverTimestamp = ServerTimestamp::class,
-    documentId = DocumentId::class,
-)
 
 // Stand-ins for Firestore's value types
 
@@ -66,7 +26,6 @@ object SdkServerTimestamp
 
 val firestore = FirebaseFormat.Firestore(
     object : FirebaseFormat.Firestore.Bindings {
-        override val annotations = testAnnotations
         override val nativeTypes = listOf(GeoPoint::class, DocumentReference::class, ServerTimestampSentinel::class, Blob::class)
         override val documentReferenceType = DocumentReference::class
         override fun documentId(documentReference: Any) = (documentReference as DocumentReference).path.substringAfterLast('/')
@@ -87,7 +46,7 @@ val firestore = FirebaseFormat.Firestore(
 
 class DatabaseException(message: String) : RuntimeException(message)
 
-val database = FirebaseFormat.Database(testAnnotations, ::DatabaseException)
+val database = FirebaseFormat.Database(::DatabaseException)
 
 val functions = FirebaseFormat.Functions()
 

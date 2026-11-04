@@ -6,7 +6,9 @@ package com.google.firebase.serialization
 
 import com.google.firebase.Timestamp
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.serializer
 import dev.gitlive.firebase.IgnoreForAndroidUnitTest
 import dev.gitlive.firebase.context
@@ -55,7 +57,7 @@ data class WithIntKeys(val counts: Map<Int, String> = emptyMap())
 enum class Direction {
     NORTH,
 
-    @PropertyName("south")
+    @SerialName("south")
     SOUTH,
 }
 
@@ -83,7 +85,7 @@ data class Linked(@DocumentId @Contextual val reference: DocumentReference? = nu
 data class BadServerTimestamp(@ServerTimestamp val created: String? = null)
 
 @Serializable
-data class Renamed(@PropertyName("full_name") val name: String = "", @Exclude val cached: String = "")
+data class Renamed(@SerialName("full_name") val name: String = "", @Transient val cached: String = "")
 
 @Serializable
 @ThrowOnExtraProperties
@@ -132,14 +134,14 @@ class FirestoreFormatTest {
                 "name" to "Los Angeles",
                 "state" to "CA",
                 "country" to "USA",
-                "capital" to false,
+                "isCapital" to false,
                 "population" to 3_900_000L,
                 "regions" to listOf("west_coast", "socal"),
             ),
             firestore.encodeToPlainValue(city),
         )
         assertPlain(
-            mapOf("active" to true, "isbn" to "1", "url" to "u", "urlstring" to "s", "_id" to "i"),
+            mapOf("isActive" to true, "isbn" to "1", "URL" to "u", "uRLString" to "s", "_id" to "i"),
             firestore.encodeToPlainValue(Names(true, "1", "u", "s", "i")),
         )
     }
@@ -147,18 +149,18 @@ class FirestoreFormatTest {
     @Test
     fun writesNullsAndDefaults() {
         assertPlain(
-            mapOf("name" to null, "state" to null, "country" to null, "capital" to null, "population" to null, "regions" to null),
+            mapOf("name" to null, "state" to null, "country" to null, "isCapital" to null, "population" to null, "regions" to null),
             firestore.encodeToPlainValue(City()),
         )
     }
 
     @Test
-    fun readsPropertiesByTheirGetterNames() {
+    fun readsPropertiesByTheirSerialNames() {
         assertEquals(
             City("Los Angeles", isCapital = true, population = 3_900_000),
-            firestore.decodeFromPlainValue(hashMapOf("name" to "Los Angeles", "capital" to true, "population" to 3_900_000L)),
+            firestore.decodeFromPlainValue(hashMapOf("name" to "Los Angeles", "isCapital" to true, "population" to 3_900_000L)),
         )
-        assertEquals(Names(isActive = true, URL = "u"), firestore.decodeFromPlainValue(hashMapOf("active" to true, "url" to "u")))
+        assertEquals(Names(isActive = true, URL = "u"), firestore.decodeFromPlainValue(hashMapOf("isActive" to true, "URL" to "u")))
     }
 
     @Test
@@ -192,7 +194,7 @@ class FirestoreFormatTest {
     fun convertsValuesByTheirRuntimeType() {
         val point = GeoPoint(1.0, 2.0)
         assertPlain(
-            mapOf("city" to mapOf("name" to "LA", "state" to null, "country" to null, "capital" to null, "population" to null, "regions" to null), "at" to point, "list" to listOf(1, "a")),
+            mapOf("city" to mapOf("name" to "LA", "state" to null, "country" to null, "isCapital" to null, "population" to null, "regions" to null), "at" to point, "list" to listOf(1, "a")),
             firestore.convertToPlainValue(mapOf("city" to City("LA"), "at" to point, "list" to listOf(1, "a"))),
         )
         assertSame(point, (toKotlin(firestore.convertToPlainValue(mapOf("at" to point))) as Map<*, *>)["at"])
@@ -219,11 +221,13 @@ class FirestoreFormatTest {
     }
 
     @Test
-    fun mapsEnumsByNameOrPropertyName() {
+    fun mapsEnumsByTheirSerialName() {
         assertPlain(mapOf("direction" to "NORTH"), firestore.encodeToPlainValue(WithEnum(Direction.NORTH)))
         assertPlain(mapOf("direction" to "south"), firestore.encodeToPlainValue(WithEnum(Direction.SOUTH)))
         assertEquals(WithEnum(Direction.SOUTH), firestore.decodeFromPlainValue(hashMapOf("direction" to "south")))
-        assertEquals(WithEnum(Direction.SOUTH), firestore.decodeFromPlainValue(hashMapOf("direction" to "SOUTH")))
+        assertFailsWithMessage<RuntimeException>(
+            "Could not deserialize object. Could not find enum value of com.google.firebase.serialization.Direction for value \"SOUTH\" (found in field 'direction')",
+        ) { firestore.decodeFromPlainValue<WithEnum>(hashMapOf("direction" to "SOUTH")) }
         assertFailsWithMessage<RuntimeException>(
             "Could not deserialize object. Could not find enum value of com.google.firebase.serialization.Direction for value \"EAST\" (found in field 'direction')",
         ) { firestore.decodeFromPlainValue<WithEnum>(hashMapOf("direction" to "EAST")) }
@@ -276,7 +280,7 @@ class FirestoreFormatTest {
     // Logs the unknown property with android.util.Log, which Android unit tests do not provide
     @Test
     @IgnoreForAndroidUnitTest
-    fun honoursPropertyNameAndExclude() {
+    fun honoursSerialNameAndTransient() {
         assertPlain(mapOf("full_name" to "n"), firestore.encodeToPlainValue(Renamed("n", "c")))
         assertEquals(Renamed("n"), firestore.decodeFromPlainValue(hashMapOf("full_name" to "n", "cached" to "c")))
     }
@@ -310,8 +314,8 @@ class FirestoreFormatTest {
             "Could not deserialize object. Failed to convert a value of type java.lang.String to int (found in field 'int')",
         ) { firestore.decodeFromPlainValue<Numbers>(hashMapOf("int" to "1")) }
         assertFailsWithMessage<RuntimeException>(
-            "Could not deserialize object. Failed to convert value of type java.lang.Long to boolean (found in field 'capital')",
-        ) { firestore.decodeFromPlainValue<City>(hashMapOf("capital" to 1L)) }
+            "Could not deserialize object. Failed to convert value of type java.lang.Long to boolean (found in field 'isCapital')",
+        ) { firestore.decodeFromPlainValue<City>(hashMapOf("isCapital" to 1L)) }
         assertFailsWithMessage<RuntimeException>(
             "Could not deserialize object. Failed to convert value of type java.lang.Long to String (found in field 'name')",
         ) { firestore.decodeFromPlainValue<City>(hashMapOf("name" to 1L)) }
@@ -359,7 +363,7 @@ class FirestoreFormatTest {
         val data = hashMapOf("a" to 1L, "b" to arrayListOf("x"), "c" to hashMapOf("d" to null))
         assertEquals(data, firestore.decodeFromPlainValue<Map<String, Any?>>(data))
         assertEquals(WithAny(data), firestore.decodeFromPlainValue(hashMapOf("data" to data)))
-        assertPlain(mapOf("data" to mapOf("city" to mapOf("name" to "LA", "state" to null, "country" to null, "capital" to null, "population" to null, "regions" to null))), firestore.encodeToPlainValue(WithAny(mapOf("city" to City("LA")))))
+        assertPlain(mapOf("data" to mapOf("city" to mapOf("name" to "LA", "state" to null, "country" to null, "isCapital" to null, "population" to null, "regions" to null))), firestore.encodeToPlainValue(WithAny(mapOf("city" to City("LA")))))
         assertNull(firestore.convertToCustomClass(null, City::class))
         assertEquals(City("LA"), firestore.convertToCustomClass(hashMapOf("name" to "LA"), City::class))
     }
