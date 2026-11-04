@@ -1,0 +1,61 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
+
+# The pipeline API (Firestore Pipelines) does not exist in the pinned iOS and JS SDKs.
+com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
+com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
+com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
+
+# Vector values and the minimum/maximum field transforms do not exist in the pinned JS SDK.
+com.google.firebase.firestore.VectorValue  // @unavailable vector values are not in the pinned JS SDK
+com.google.firebase.firestore.FieldValue#vector  // @unavailable vector values are not in the pinned JS SDK
+com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/maximum transforms are not in the pinned JS SDK
+com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the pinned JS SDK
+com.google.firebase.firestore.DocumentSnapshot#getVectorValue  // @unavailable vector values are not in the pinned JS SDK
+
+# Reflective mapping of documents to custom classes is Android-only.
+com.google.firebase.firestore.DocumentSnapshot#get(FieldPath, Class)  // @platform java.lang.Class
+com.google.firebase.firestore.DocumentSnapshot#get(FieldPath, Class, ServerTimestampBehavior)  // @platform java.lang.Class
+com.google.firebase.firestore.DocumentSnapshot#get(String, Class)  // @platform java.lang.Class
+com.google.firebase.firestore.DocumentSnapshot#get(String, Class, ServerTimestampBehavior)  // @platform java.lang.Class
+com.google.firebase.firestore.DocumentSnapshot#toObject  // @platform java.lang.Class
+com.google.firebase.firestore.QuerySnapshot#toObjects  // @platform java.lang.Class
+com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
+
+# java.util.Date accessors; use getTimestamp and com.google.firebase.toKotlinInstant.
+com.google.firebase.firestore.DocumentSnapshot#getDate  // @platform java.util.Date
+
+# Activity-scoped and Executor overloads of the listeners.
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Activity, Runnable)  // @platform android.app.Activity
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Executor, Runnable)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Activity, OnCanceledListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Executor, OnCanceledListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Activity, OnCompleteListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Executor, OnCompleteListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Activity, OnFailureListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Executor, OnFailureListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Activity, OnProgressListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Executor, OnProgressListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Activity, OnSuccessListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Executor, OnSuccessListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWith(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWithTask(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#onSuccessTask(Executor, SuccessContinuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions#getActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions#getExecutor  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setExecutor  // @platform java.util.concurrent.Executor
+
+# Bundles from JVM streams; use loadBundle(ByteArray).
+com.google.firebase.firestore.FirebaseFirestore#loadBundle(InputStream)  // @platform java.io.InputStream
+com.google.firebase.firestore.FirebaseFirestore#loadBundle(ByteBuffer)  // @platform java.nio.ByteBuffer
+
+# Library-internal (@RestrictTo) member with no equivalent in the iOS and JS SDKs.
+com.google.firebase.firestore.DocumentReference#getFullPath  // @hide restricted to the Android SDK's own libraries
