@@ -4,15 +4,14 @@
 
 package com.google.firebase.database
 
-import cocoapods.FirebaseDatabase.FIRDatabase
-import com.google.firebase.Firebase
+import android.content.Context
 import com.google.firebase.FirebaseApp
-import com.google.firebase.getApps
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabase
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseDatabase internal constructor(public val ios: FIRDatabase) {
     public actual val app: FirebaseApp
-        get() = Firebase.getApps(null).firstOrNull { (it.ios as Any?) == ios.app } ?: FirebaseApp.getInstance()
+        get() = FirebaseApp.getApps(Context()).firstOrNull { (it.ios as Any?) == ios.app } ?: FirebaseApp.getInstance()
 
     public actual val reference: DatabaseReference get() = DatabaseReference(ios.reference())
 
