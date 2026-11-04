@@ -12,10 +12,10 @@ public expect class MutableData {
     /** The last segment of the path, or null at the root. */
     public val key: String?
 
-    /** The current data as its natural type (see [DataSnapshot]); setting it replaces the data of the transaction. */
+    /** The current data as its natural type (see [DataSnapshot]); setting it, to a plain value or a `@Serializable` class, replaces the data of the transaction. */
     public var value: Any?
 
-    /** The data as [T]; on Apple platforms and JS a cast of [value]. */
+    /** The data as [T]; on Apple platforms, JS and wasmJs a cast of [value], which maps and lists satisfy (a class needs the reified `getValue<T>()`). */
     public fun <T> getValue(t: GenericTypeIndicator<T>): T?
 
     /** The priority of the location; setting it changes the priority written by the transaction. */

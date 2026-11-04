@@ -4,7 +4,6 @@
 
 package com.google.firebase.database
 
-import kotlin.js.json
 import kotlin.math.abs
 import kotlin.math.floor
 
@@ -15,17 +14,11 @@ private const val MAX_EXACT_INTEGER = 9007199254740992.0
  * uses (Map, List, String, Boolean, Long, Double), integral numbers reading as Long like the Android SDK's.
  */
 
-/** [this] as a plain JS value: Kotlin maps become objects, collections arrays, longs numbers. */
-internal fun Any?.toJs(): Any? = when (this) {
-    null -> null
-    is String, is Boolean -> this
-    is Long -> toDouble()
-    is Number -> this
-    is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
-    is Collection<*> -> map { it.toJs() }.toTypedArray()
-    is Array<*> -> map { it.toJs() }.toTypedArray()
-    else -> this
-}
+/**
+ * [this] as the plain JS value the JS SDK takes, through the format: Kotlin maps become objects, collections arrays and
+ * longs numbers, and a `@Serializable` class is mapped with the Android SDK's rules (see [databaseFormat]).
+ */
+internal fun Any?.toJs(): Any? = databaseFormat.convertToPlainValue(this)
 
 /** A plain JS value as its natural Kotlin type. */
 internal fun Any?.fromJs(): Any? {

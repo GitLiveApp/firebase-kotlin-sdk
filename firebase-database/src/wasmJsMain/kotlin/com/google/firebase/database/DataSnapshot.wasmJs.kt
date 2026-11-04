@@ -11,7 +11,6 @@ import dev.gitlive.firebase.externals.jsObject
 import dev.gitlive.firebase.externals.jsSet
 import dev.gitlive.firebase.externals.jsTypeOf
 import dev.gitlive.firebase.externals.json
-import dev.gitlive.firebase.externals.toJs
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
 
 /**

@@ -12,6 +12,7 @@ import com.google.firebase.database.transactionSuccess
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeDecodeSettingsBuilder
 import dev.gitlive.firebase.EncodeSettings
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.database.ChildEvent.Type.ADDED
 import dev.gitlive.firebase.database.ChildEvent.Type.CHANGED
@@ -78,6 +79,7 @@ public class FirebaseDatabase internal constructor(public val compat: CompatFire
      *
      * @param enabled Set to true to enable disk persistence, set to false to disable it.
      */
+    @OptIn(UnsupportedOnJs::class)
     public fun setPersistenceEnabled(enabled: Boolean) {
         compat.setPersistenceEnabled(enabled)
         PersistenceSettings.enabled[compat] = enabled
@@ -96,6 +98,7 @@ public class FirebaseDatabase internal constructor(public val compat: CompatFire
      *
      * @param cacheSizeInBytes The new size of the cache in bytes.
      */
+    @OptIn(UnsupportedOnJs::class)
     public fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {
         compat.setPersistenceCacheSizeBytes(cacheSizeInBytes)
     }
@@ -133,6 +136,7 @@ public class FirebaseDatabase internal constructor(public val compat: CompatFire
      * The writes will be rolled back locally and the affected events will be raised again with the
      * reverted data.
      */
+    @OptIn(UnsupportedOnJs::class)
     public fun purgeOutstandingWrites() {
         compat.purgeOutstandingWrites()
     }

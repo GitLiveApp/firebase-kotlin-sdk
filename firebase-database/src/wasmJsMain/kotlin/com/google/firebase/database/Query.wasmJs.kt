@@ -19,7 +19,6 @@ import dev.gitlive.firebase.database.externals.query
 import dev.gitlive.firebase.externals.jsGet
 import dev.gitlive.firebase.externals.jsObject
 import dev.gitlive.firebase.externals.json
-import dev.gitlive.firebase.externals.toJs
 import dev.gitlive.firebase.externals.toKotlin
 import kotlin.js.JsException
 import kotlin.js.Promise
@@ -207,7 +206,8 @@ public actual open class DatabaseReference internal constructor(override val js:
     }
 
     public actual fun runTransaction(handler: Transaction.Handler, fireLocalEvents: Boolean) {
-        // The JS SDK aborts when the update returns `undefined`, which Kotlin/Wasm cannot produce: a marker object stands for it.
+        // The JS SDK aborts when the update returns `undefined`, which Kotlin/Wasm cannot produce: a marker object stands for it
+        // and a JS function (see aborting) turns it into `undefined` without the result passing through Kotlin again.
         val abort = jsObject()
         val transaction = try {
             jsRunTransaction(
@@ -251,9 +251,8 @@ public actual open class DatabaseReference internal constructor(override val js:
     }
 }
 
-/** [update] as a JS function that returns `undefined` where [update] returned [abort]. */
-private fun aborting(update: (JsAny?) -> JsAny?, abort: JsAny): (JsAny?) -> JsAny? =
-    js("(current) => { const result = update(current); return result === abort ? undefined : result; }")
+/** [update] as the JS function the SDK calls, which returns `undefined` (an abort) where [update] returned [abort]. */
+private fun aborting(update: (JsAny?) -> JsAny?, abort: JsAny): JsAny = js("(current) => { const result = update(current); return result === abort ? undefined : result; }")
 
 /**
  * @property js The underlying Firebase JS SDK object.

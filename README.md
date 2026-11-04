@@ -137,7 +137,12 @@ from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array)
 [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) has no analytics; on JS and wasmJs the session timeout,
 session ID and analytics data reset do nothing, as the JS SDK has no equivalent, and carry `@UnsupportedOnJs`. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
-[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md). A model class written for the Android SDK's
+Realtime Database mapper needs only `@Serializable` to be read and written the same way on the other platforms, where
+`com.google.firebase.serialization.FirebaseFormat` applies the Android SDK's mapping rules (the property names, number handling,
+`@PropertyName`, `@Exclude`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties`) through the class's serializer; the
+annotations go on the property as well as the getter (`@get:PropertyName("stars") @PropertyName("stars")`), as the Android SDK
+reads the getter and kotlinx.serialization the property.
 
 ### Accessing the underlying Firebase SDK
 

@@ -10,10 +10,13 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.Logger
 import com.google.firebase.database.MutableData
+import com.google.firebase.database.PropertyName
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
@@ -34,6 +37,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.Serializable
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -245,8 +249,53 @@ class AndroidSdkSourceCompatTest {
             },
             false,
         )
-        assertFalse(aborted.await())
+        assertFalse(aborted.await(), "aborted transaction committed; data is now ${reference.get().await().value}")
         assertEquals(3L, (reference.get().await().child("likes").value as Number).toLong())
+        assertEquals(3L, (reference.get().await().child("likes").value as Number).toLong())
+    }
+
+    @Test
+    fun testCustomClasses() = runTest {
+        ensureConnected()
+        val reference = database.getReference("test/compatClasses")
+        val post = CompatPost("Hello", starCount = 3, draft = true, tags = listOf("a", "b"))
+        reference.setValue(post).await()
+
+        val snapshot = reference.get().await()
+        val stored = snapshot.getValue<Map<String, Any?>>()
+        assertEquals(setOf("title", "stars", "tags"), stored?.keys)
+        assertEquals(3L, (stored?.get("stars") as Number).toLong())
+        assertEquals(post.copy(draft = false), snapshot.getValue<CompatPost>())
+        assertEquals(listOf("a", "b"), snapshot.child("tags").getValue<List<String>>())
+
+        reference.child("extra").setValue("ignored").await()
+        assertEquals(post.copy(draft = false), reference.get().await().getValue<CompatPost>())
+
+        reference.updateChildren(mapOf("nested" to CompatPost("Nested"), "extra" to null)).await()
+        assertEquals("Nested", reference.child("nested/title").get().await().getValue<String>())
+        assertEquals(CompatPost("Nested"), reference.child("nested").values<CompatPost>().first())
+
+        val completed = CompletableDeferred<Triple<DatabaseError?, Boolean, DataSnapshot?>>()
+        reference.runTransaction(
+            object : Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    // The SDKs may run the handler with no local data first; returning it unchanged lets them retry with the server's.
+                    val current = currentData.getValue<CompatPost>() ?: return Transaction.success(currentData)
+                    currentData.value = current.copy(starCount = current.starCount + 1)
+                    return Transaction.success(currentData)
+                }
+
+                override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                    completed.complete(Triple(error, committed, currentData))
+                }
+            },
+        )
+        val (error, committed, currentData) = completed.await()
+        assertNull(error)
+        assertTrue(committed, "committed")
+        assertEquals(4L, currentData?.getValue<CompatPost>()?.starCount)
+
+        reference.removeValue().await()
     }
 
     @Test
@@ -296,3 +345,17 @@ class AndroidSdkSourceCompatTest {
         }
     }
 }
+
+/**
+ * A model class as written for the Android SDK, plus `@Serializable`: the SDK maps it by reflection on Android and the
+ * JVM, the layer's format maps it through its serializer elsewhere. The getter and property forms of an annotation are
+ * both given, as the SDK reads the getter and kotlinx.serialization the property.
+ */
+@Serializable
+@IgnoreExtraProperties
+data class CompatPost(
+    val title: String = "",
+    @get:PropertyName("stars") @PropertyName("stars") val starCount: Long = 0,
+    @get:Exclude @Exclude val draft: Boolean = false,
+    val tags: List<String> = emptyList(),
+)

@@ -5,6 +5,7 @@
 package com.google.firebase.database
 
 import com.google.firebase.FirebaseApp
+import dev.gitlive.firebase.UnsupportedOnJs
 import dev.gitlive.firebase.database.externals.Database
 import dev.gitlive.firebase.database.externals.SDK_VERSION
 import dev.gitlive.firebase.database.externals.connectDatabaseEmulator
@@ -34,6 +35,7 @@ public actual class FirebaseDatabase internal constructor(public val js: Databas
     }
 
     /** No-op: the JS SDK has no write queue to purge. */
+    @UnsupportedOnJs
     public actual fun purgeOutstandingWrites() {}
 
     /** The JS SDK only has a switch: [Logger.Level.DEBUG] enables its logging, every other level disables it. */
@@ -42,9 +44,11 @@ public actual class FirebaseDatabase internal constructor(public val js: Databas
     }
 
     /** No-op: the JS SDK has no disk persistence. */
+    @UnsupportedOnJs
     public actual fun setPersistenceCacheSizeBytes(cacheSizeInBytes: Long) {}
 
     /** No-op: the JS SDK has no disk persistence. */
+    @UnsupportedOnJs
     public actual fun setPersistenceEnabled(isEnabled: Boolean) {}
 
     public actual fun useEmulator(host: String, port: Int) {

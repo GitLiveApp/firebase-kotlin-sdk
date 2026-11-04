@@ -6,8 +6,9 @@ package com.google.firebase.database
 
 /**
  * An immutable copy of the data at a location, as the Android SDK's `DataSnapshot`. `value` is the natural type of the
- * data: a `Map`, a `List`, a `String`, a `Boolean`, a `Long`, a `Double` or null. Mapping to custom classes through
- * `getValue(Class)` is Android-only; the [GenericTypeIndicator] form casts the value on the other platforms.
+ * data: a `Map`, a `List`, a `String`, a `Boolean`, a `Long`, a `Double` or null. A custom class is read with the
+ * reified `getValue<T>()` extension, which maps a `@Serializable` class with the Android SDK's rules on every platform;
+ * `getValue(Class)` is Android-only, and the [GenericTypeIndicator] form casts the value on the other platforms.
  */
 public expect class DataSnapshot {
     /** Whether there is data at the location. */
@@ -25,7 +26,7 @@ public expect class DataSnapshot {
     /** The data with priorities included (`.value` / `.priority` objects) when [useExportFormat] is true. */
     public fun getValue(useExportFormat: Boolean): Any?
 
-    /** The data as [T]; on Apple platforms and JS a cast of [value], which maps and lists satisfy. */
+    /** The data as [T]; on Apple platforms, JS and wasmJs a cast of [value], which maps and lists satisfy (a class needs the reified `getValue<T>()`). */
     public fun <T> getValue(t: GenericTypeIndicator<T>): T?
 
     /** The priority of the location: a String, a Double or null. */

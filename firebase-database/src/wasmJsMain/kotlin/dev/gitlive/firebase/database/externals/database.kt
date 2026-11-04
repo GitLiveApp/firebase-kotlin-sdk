@@ -107,9 +107,13 @@ public external fun startAt(value: JsAny?, key: String? = definedExternally): Qu
 
 public external fun update(ref: DatabaseReference, values: JsAny): Promise<JsAny?>
 
+/**
+ * [transactionUpdate] is the JS function itself rather than a Kotlin function type: a value returned through a Kotlin
+ * function wrapper loses `undefined` (it becomes `null`, which the SDK writes as a deletion), and the SDK aborts on it.
+ */
 public external fun runTransaction(
     ref: DatabaseReference,
-    transactionUpdate: (currentData: JsAny?) -> JsAny?,
+    transactionUpdate: JsAny,
     options: JsAny? = definedExternally,
 ): Promise<TransactionResult>
 

@@ -21,6 +21,13 @@ private const val MAX_EXACT_INTEGER = 9007199254740992.0
  * uses (Map, List, String, Boolean, Long, Double), integral numbers reading as Long like the Android SDK's.
  */
 
+/**
+ * [this] as the plain JS value the JS SDK takes, through the format: Kotlin maps become objects, collections arrays and
+ * longs numbers, and a `@Serializable` class is mapped with the Android SDK's rules (see [databaseFormat]).
+ */
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+internal fun Any?.toJs(): JsAny? = databaseFormat.convertToPlainValue(this) as JsAny?
+
 /** A plain JS value as its natural Kotlin type. */
 @Suppress("UNCHECKED_CAST", "UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 internal fun JsAny?.fromJs(): Any? {

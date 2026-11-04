@@ -2,6 +2,10 @@
  * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
  */
 
+// The SDK's facade, which the reified getValue actuals (Database.android.kt) join.
+@file:JvmName("DatabaseKt")
+@file:JvmMultifileClass
+
 package com.google.firebase.database
 
 import com.google.firebase.Firebase
@@ -10,6 +14,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 /*
  * The Kotlin extensions of the Android SDK's firebase-database (DatabaseKt, ChildEvent), as plain common code: on
@@ -29,11 +35,15 @@ public fun Firebase.database(app: FirebaseApp): FirebaseDatabase = FirebaseDatab
 /** The [FirebaseDatabase] of [app] at [url]. */
 public fun Firebase.database(app: FirebaseApp, url: String): FirebaseDatabase = FirebaseDatabase.getInstance(app, url)
 
-/** The data as [T], as the Android SDK's reified `getValue`; on Apple platforms and JS a cast of [DataSnapshot.value]. */
-public inline fun <reified T> DataSnapshot.getValue(): T? = getValue(object : GenericTypeIndicator<T>() {})
+/**
+ * The data as [T], as the Android SDK's reified `getValue`: the SDK's reflective mapping on Android and the JVM, and on
+ * the other platforms the same rules applied through the serializer of [T] (`FirebaseFormat.Database`), so a
+ * `@Serializable` class, a `Map`, a `List` or a primitive reads the same everywhere.
+ */
+public expect inline fun <reified T> DataSnapshot.getValue(): T?
 
-/** The data as [T], as the Android SDK's reified `getValue`; on Apple platforms and JS a cast of [MutableData.value]. */
-public inline fun <reified T> MutableData.getValue(): T? = getValue(object : GenericTypeIndicator<T>() {})
+/** The data as [T], as the Android SDK's reified `getValue` (see [DataSnapshot.getValue]). */
+public expect inline fun <reified T> MutableData.getValue(): T?
 
 /** A change to a child of a location, emitted by [Query.childEvents]. */
 public sealed class ChildEvent {

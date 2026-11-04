@@ -174,6 +174,14 @@ The SDK has two public API layers per module:
    module the JVM SDK lacks entirely (`jvmKeepClasses` ships the module's own no-op implementation).
    `firebase-auth` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published classes by
    `generateAndroidSdkApi*`) and a JVM SDK without the Kotlin facade (`jvmKeepClasses` in `stripHeaderStubs` ships this module's `AuthKt`).
+   `firebase-database` shows custom-class mapping through `com.google.firebase.serialization.FirebaseFormat` (in firebase-app): where
+   the Android SDK maps a class by reflection (`setValue(Any?)`, `updateChildren`, `MutableData.value`, the reified `getValue<T>()`),
+   the Apple, JS and wasmJs actuals go through `FirebaseFormat.Database` with the module's `MappingAnnotations`, so a `@Serializable`
+   class written for Android maps the same everywhere; Android and the JVM keep the SDK's own mapping. The mapping annotations are
+   `expect` classes: the Android/JVM actuals are header stubs with the SDK's targets (the reflective mapper reads getters and fields),
+   the other actuals add the `PROPERTY` target and `@SerialInfo` so kotlinx.serialization records them. The reified `getValue<T>()`
+   is an `expect inline fun` whose Android actual joins the SDK's facade through `@JvmMultifileClass` and reads through the SDK's
+   `GenericTypeIndicator`.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.
