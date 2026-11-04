@@ -1,0 +1,225 @@
+# Android SDK source compatibility of firebase-database
+# Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
+# 100% of 191 public members available (191 identical, 0 mapped, 0 missing, 0 omitted)
+#
+com.google.firebase.database.ChildEvent
+com.google.firebase.database.ChildEvent.Added
+  OK    Added(DataSnapshot, String)
+  OK    DataSnapshot component1()
+  OK    String component2()
+  OK    Added copy(DataSnapshot, String)
+  OK    String getPreviousChildName()
+  OK    DataSnapshot getSnapshot()
+com.google.firebase.database.ChildEvent.Changed
+  OK    Changed(DataSnapshot, String)
+  OK    DataSnapshot component1()
+  OK    String component2()
+  OK    Changed copy(DataSnapshot, String)
+  OK    String getPreviousChildName()
+  OK    DataSnapshot getSnapshot()
+com.google.firebase.database.ChildEvent.Moved
+  OK    Moved(DataSnapshot, String)
+  OK    DataSnapshot component1()
+  OK    String component2()
+  OK    Moved copy(DataSnapshot, String)
+  OK    String getPreviousChildName()
+  OK    DataSnapshot getSnapshot()
+com.google.firebase.database.ChildEvent.Removed
+  OK    Removed(DataSnapshot)
+  OK    DataSnapshot component1()
+  OK    Removed copy(DataSnapshot)
+  OK    DataSnapshot getSnapshot()
+com.google.firebase.database.ChildEventListener
+  OK    void onCancelled(DatabaseError)
+  OK    void onChildAdded(DataSnapshot, String)
+  OK    void onChildChanged(DataSnapshot, String)
+  OK    void onChildMoved(DataSnapshot, String)
+  OK    void onChildRemoved(DataSnapshot)
+com.google.firebase.database.DataSnapshot
+  OK    DataSnapshot child(String)
+  OK    boolean exists()
+  OK    Iterable getChildren()
+  OK    long getChildrenCount()
+  OK    String getKey()
+  OK    Object getPriority()
+  OK    DatabaseReference getRef()
+  OK    Object getValue()
+  OK    Object getValue(boolean)
+  OK    T getValue(GenericTypeIndicator)
+  PLAT  T getValue(Class)
+  OK    boolean hasChild(String)
+  OK    boolean hasChildren()
+com.google.firebase.database.DatabaseError
+  OK    static DatabaseError fromException(Throwable)
+  OK    int getCode()
+  OK    String getDetails()
+  OK    String getMessage()
+  OK    DatabaseException toException()
+  OK    static int DATA_STALE
+  OK    static int DISCONNECTED
+  OK    static int EXPIRED_TOKEN
+  OK    static int INVALID_TOKEN
+  OK    static int MAX_RETRIES
+  OK    static int NETWORK_ERROR
+  OK    static int OPERATION_FAILED
+  OK    static int OVERRIDDEN_BY_SET
+  OK    static int PERMISSION_DENIED
+  OK    static int UNAVAILABLE
+  OK    static int UNKNOWN_ERROR
+  OK    static int USER_CODE_EXCEPTION
+  OK    static int WRITE_CANCELED
+com.google.firebase.database.DatabaseException
+com.google.firebase.database.DatabaseKt
+  OK    static FirebaseDatabase database(Firebase, FirebaseApp)
+  OK    static FirebaseDatabase database(Firebase, String)
+  OK    static FirebaseDatabase database(Firebase, FirebaseApp, String)
+  OK    static Flow getChildEvents(Query)
+  OK    static FirebaseDatabase getDatabase(Firebase)
+  OK    static Flow getSnapshots(Query)
+  OK    static T getValue(DataSnapshot)
+  OK    static T getValue(MutableData)
+  OK    static Flow values(Query)
+com.google.firebase.database.DatabaseReference
+  OK    DatabaseReference child(String)
+  OK    FirebaseDatabase getDatabase()
+  OK    String getKey()
+  OK    DatabaseReference getParent()
+  OK    DatabaseReference getRoot()
+  OK    static void goOffline()
+  OK    static void goOnline()
+  OK    OnDisconnect onDisconnect()
+  OK    DatabaseReference push()
+  OK    Task removeValue()
+  OK    void removeValue(CompletionListener)
+  OK    void runTransaction(Handler)
+  OK    void runTransaction(Handler, boolean)
+  OK    Task setPriority(Object)
+  OK    void setPriority(Object, CompletionListener)
+  OK    Task setValue(Object)
+  OK    void setValue(Object, CompletionListener)
+  OK    Task setValue(Object, Object)
+  OK    void setValue(Object, Object, CompletionListener)
+  OK    Task updateChildren(Map)
+  OK    void updateChildren(Map, CompletionListener)
+com.google.firebase.database.DatabaseReference.CompletionListener
+  OK    void onComplete(DatabaseError, DatabaseReference)
+com.google.firebase.database.Exclude
+com.google.firebase.database.FirebaseDatabase
+  OK    FirebaseApp getApp()
+  OK    static FirebaseDatabase getInstance()
+  OK    static FirebaseDatabase getInstance(FirebaseApp)
+  OK    static FirebaseDatabase getInstance(String)
+  OK    static FirebaseDatabase getInstance(FirebaseApp, String)
+  OK    DatabaseReference getReference()
+  OK    DatabaseReference getReference(String)
+  OK    DatabaseReference getReferenceFromUrl(String)
+  OK    static String getSdkVersion()
+  OK    void goOffline()
+  OK    void goOnline()
+  OK    void purgeOutstandingWrites()
+  OK    void setLogLevel(Level)
+  OK    void setPersistenceCacheSizeBytes(long)
+  OK    void setPersistenceEnabled(boolean)
+  OK    void useEmulator(String, int)
+com.google.firebase.database.GenericTypeIndicator
+  OK    GenericTypeIndicator()
+com.google.firebase.database.IgnoreExtraProperties
+com.google.firebase.database.Logger
+com.google.firebase.database.Logger.Level
+  OK    static Level DEBUG
+  OK    static Level ERROR
+  OK    static Level INFO
+  OK    static Level NONE
+  OK    static Level WARN
+com.google.firebase.database.MutableData
+  OK    MutableData child(String)
+  OK    Iterable getChildren()
+  OK    long getChildrenCount()
+  OK    String getKey()
+  OK    Object getPriority()
+  OK    Object getValue()
+  OK    T getValue(GenericTypeIndicator)
+  PLAT  T getValue(Class)
+  OK    boolean hasChild(String)
+  OK    boolean hasChildren()
+  OK    void setPriority(Object)
+  OK    void setValue(Object)
+com.google.firebase.database.OnDisconnect
+  OK    Task cancel()
+  OK    void cancel(CompletionListener)
+  OK    Task removeValue()
+  OK    void removeValue(CompletionListener)
+  OK    Task setValue(Object)
+  OK    void setValue(Object, CompletionListener)
+  OK    Task setValue(Object, double)
+  OK    Task setValue(Object, String)
+  OK    void setValue(Object, double, CompletionListener)
+  OK    void setValue(Object, String, CompletionListener)
+  OK    void setValue(Object, Map, CompletionListener)
+  OK    Task updateChildren(Map)
+  OK    void updateChildren(Map, CompletionListener)
+com.google.firebase.database.PropertyName
+  OK    String value()
+com.google.firebase.database.Query
+  OK    ChildEventListener addChildEventListener(ChildEventListener)
+  OK    void addListenerForSingleValueEvent(ValueEventListener)
+  OK    ValueEventListener addValueEventListener(ValueEventListener)
+  OK    Query endAt(boolean)
+  OK    Query endAt(double)
+  OK    Query endAt(String)
+  OK    Query endAt(boolean, String)
+  OK    Query endAt(double, String)
+  OK    Query endAt(String, String)
+  OK    Query endBefore(boolean)
+  OK    Query endBefore(double)
+  OK    Query endBefore(String)
+  OK    Query endBefore(boolean, String)
+  OK    Query endBefore(double, String)
+  OK    Query endBefore(String, String)
+  OK    Query equalTo(boolean)
+  OK    Query equalTo(double)
+  OK    Query equalTo(String)
+  OK    Query equalTo(boolean, String)
+  OK    Query equalTo(double, String)
+  OK    Query equalTo(String, String)
+  OK    Task get()
+  OK    DatabaseReference getRef()
+  OK    void keepSynced(boolean)
+  OK    Query limitToFirst(int)
+  OK    Query limitToLast(int)
+  OK    Query orderByChild(String)
+  OK    Query orderByKey()
+  OK    Query orderByPriority()
+  OK    Query orderByValue()
+  OK    void removeEventListener(ChildEventListener)
+  OK    void removeEventListener(ValueEventListener)
+  OK    Query startAfter(boolean)
+  OK    Query startAfter(double)
+  OK    Query startAfter(String)
+  OK    Query startAfter(boolean, String)
+  OK    Query startAfter(double, String)
+  OK    Query startAfter(String, String)
+  OK    Query startAt(boolean)
+  OK    Query startAt(double)
+  OK    Query startAt(String)
+  OK    Query startAt(boolean, String)
+  OK    Query startAt(double, String)
+  OK    Query startAt(String, String)
+com.google.firebase.database.ServerValue
+  OK    ServerValue()
+  OK    static Object increment(double)
+  OK    static Object increment(long)
+  OK    static Map TIMESTAMP
+com.google.firebase.database.ThrowOnExtraProperties
+com.google.firebase.database.Transaction
+  OK    Transaction()
+  OK    static Result abort()
+  OK    static Result success(MutableData)
+com.google.firebase.database.Transaction.Handler
+  OK    Result doTransaction(MutableData)
+  OK    void onComplete(DatabaseError, boolean, DataSnapshot)
+com.google.firebase.database.Transaction.Result
+  OK    boolean isSuccess()
+com.google.firebase.database.ValueEventListener
+  OK    void onCancelled(DatabaseError)
+  OK    void onDataChange(DataSnapshot)
