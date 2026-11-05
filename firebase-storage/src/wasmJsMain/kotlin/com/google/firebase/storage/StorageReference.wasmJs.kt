@@ -35,6 +35,8 @@ import kotlin.js.Promise
 import dev.gitlive.firebase.storage.externals.ListResult as JsListResult
 import dev.gitlive.firebase.storage.externals.StorageReference as JsStorageReference
 import dev.gitlive.firebase.storage.externals.UploadTask as JsUploadTask
+import kotlinx.io.Source
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class StorageReference internal constructor(public val js: JsStorageReference) : Comparable<StorageReference> {
@@ -74,12 +76,16 @@ public actual class StorageReference internal constructor(public val js: JsStora
 
     private fun uploadController(data: JsAny?, metadata: StorageMetadata?): UploadController = WasmUploadController(uploadBytesResumable(js, data, metadata?.toJs()))
 
-    /** The stream is read to its end at once (JS has no other thread to read it on), then uploaded as bytes. */
-    public actual fun putStream(stream: java.io.InputStream): UploadTask = putStream(stream, null)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
 
-    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = putStream(stream, metadata as StorageMetadata?)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
 
-    private fun putStream(stream: java.io.InputStream, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, StreamUploadController(stream) { bytes -> rethrow { uploadController(bytes.toUint8Array(), metadata) } })
+    /** The source is read to its end at once (JS has no other thread to read it on), then uploaded as bytes. */
+    internal fun putSourceBytes(source: Source, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, SourceUploadController(source) { bytes -> rethrow { uploadController(bytes.toUint8Array(), metadata) } })
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task({ updateMetadata(js, metadata.toJs()) }) { it.toCompat() }
 
@@ -98,10 +104,6 @@ public actual class StorageReference internal constructor(public val js: JsStora
     /** Fails: the JS SDK downloads through URLs, not to files; use [getBytes] or [getDownloadUrl]. */
     @UnsupportedOnJs
     public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this)
-
-    public actual fun getStream(): StreamDownloadTask = StreamDownloadTaskImpl(this, null)
-
-    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = StreamDownloadTaskImpl(this, processor)
 
     /** Always empty: the JS SDK has no file downloads. */
     @UnsupportedOnJs
@@ -245,3 +247,5 @@ internal fun FullMetadata.toCompat(): StorageMetadata = StorageMetadata().also {
 }
 
 private fun String?.toEpochMillis(): Long = this?.let { parseDateStringToMillis(it) }?.takeIf { !it.isNaN() && it >= 0 }?.toLong() ?: 0
+
+internal actual fun StorageReference.putSource(source: Source, metadata: StorageMetadata?): UploadTask = putSourceBytes(source, metadata)

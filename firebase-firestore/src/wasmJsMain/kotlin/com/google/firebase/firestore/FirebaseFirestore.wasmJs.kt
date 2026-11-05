@@ -41,6 +41,8 @@ import dev.gitlive.firebase.firestore.externals.loadBundle as jsLoadBundle
 import dev.gitlive.firebase.firestore.externals.runTransaction as jsRunTransaction
 import dev.gitlive.firebase.firestore.externals.LoadBundleTask as JsLoadBundleTask
 import org.khronos.webgl.Uint8Array
+import kotlinx.io.Source
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 
 private const val DEFAULT_DATABASE = "(default)"
 
@@ -143,7 +145,11 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
 
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = loadBundle { jsLoadBundle(js, bundleData.toUint8Array().buffer) }
 
-    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = loadBundle { jsLoadBundle(js, bundleData.toReadableStream()) }
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
+
+    internal fun loadBundleFromSource(source: Source): LoadBundleTask = loadBundle { jsLoadBundle(js, source.toReadableStream()) }
 
     /** The task of the JS SDK's bundle load [start] returns, as a [LoadBundleTask]; a load that fails to start fails the task. */
     private fun loadBundle(start: () -> JsLoadBundleTask): LoadBundleTask {
@@ -263,14 +269,16 @@ public actual class PersistentCacheIndexManager internal constructor(public val 
     }
 }
 
+internal actual fun FirebaseFirestore.loadBundleSource(source: Source): LoadBundleTask = loadBundleFromSource(source)
+
 /**
- * A `ReadableStream` the JS SDK pulls the stream's bytes through, chunk by chunk, as it parses the bundle; the stream is
+ * A `ReadableStream` the JS SDK pulls the source's bytes through, chunk by chunk, as it parses the bundle; the source is
  * closed at its end, and a failing read errors the `ReadableStream`, which fails the load.
  */
-private fun java.io.InputStream.toReadableStream(): JsAny = readableStream { controller ->
+private fun Source.toReadableStream(): JsAny = readableStream { controller ->
     try {
         val buffer = ByteArray(BUNDLE_CHUNK_SIZE)
-        val count = read(buffer)
+        val count = readAtMostTo(buffer)
         if (count < 0) {
             close()
             closeStream(controller)

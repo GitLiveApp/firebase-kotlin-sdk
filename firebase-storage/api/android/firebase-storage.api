@@ -1,3 +1,8 @@
+public final class com/google/firebase/storage/StorageSourcesKt {
+	public static final fun putStream (Lcom/google/firebase/storage/StorageReference;Lkotlinx/io/RawSource;)Lcom/google/firebase/storage/UploadTask;
+	public static final fun putStream (Lcom/google/firebase/storage/StorageReference;Lkotlinx/io/RawSource;Lcom/google/firebase/storage/StorageMetadata;)Lcom/google/firebase/storage/UploadTask;
+}
+
 public final class dev/gitlive/firebase/storage/Data {
 	public fun <init> ([B)V
 	public final fun getData ()[B

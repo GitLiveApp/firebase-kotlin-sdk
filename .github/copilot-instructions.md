@@ -141,22 +141,18 @@ The SDK has two public API layers per module:
      (platform code without a context passes `Context()`), `java.net.URL`, `android.net.Uri` and `java.io.File` hold the string
      or path they are created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
      `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`, `getFile(File)`), and Android code creating these inline compiles unchanged.
-   - **Mirrored**, when the type's own API is small and useful everywhere: `java.io.InputStream` (`read` ×3, `skip`, `available`,
-     `close`) and `java.io.ByteArrayInputStream` are `expect` classes whose Android/JVM actuals are header stubs of the JDK's and
-     whose other actuals implement the JDK's contracts, so common code subclasses `InputStream` or passes a `ByteArrayInputStream`
-     to `loadBundle(InputStream)`, which every platform implements (JS and wasmJs pull it through a `ReadableStream`, Apple adapts it
-     to an `NSInputStream` for `loadBundleStream:`), or to storage's `putStream`, and reads `getStream()`'s `StreamDownloadTask`
-     (off Android and the JVM the whole object is downloaded, or the stream read to its end, since the Apple and JS SDKs work in
-     whole byte buffers).
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.nio.ByteBuffer`. The SDK
-     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getDate(String)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getDate(String)`, `loadBundle(InputStream)`, `putStream(InputStream)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since
      they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
-     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`; `kotlin.time.ExperimentalTime` is opted in at
-     the build level).
+     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`, and for the JDK streams the kotlinx-io forms
+     `FirebaseFirestore.loadBundle(RawSource)` in `Bundles.kt` and `StorageReference.putStream(RawSource)` in `StorageSources.kt`, whose
+     Android/JVM actuals hand the SDK `source.asInputStream()` while the other platforms stream through kotlinx-io's `asNSInputStream()`
+     or a `ReadableStream`, or read the source to its end where the SDK uploads whole buffers; `kotlin.time.ExperimentalTime` is opted in at
+     the build level). Such counterparts and their platform actuals are shipped through `keepClasses`.
    A module facade that must reach an SDK member taking an error-deprecated stand-in (the `Duration` timeout forms calling
    `setTimeout(Long, TimeUnit)`) does so through a package-private Java helper of its own (`FunctionsJvmApi.java`), which
    compiles after the stubs are stripped. Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are

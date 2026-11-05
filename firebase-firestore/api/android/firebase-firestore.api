@@ -1,3 +1,7 @@
+public final class com/google/firebase/firestore/BundlesKt {
+	public static final fun loadBundle (Lcom/google/firebase/firestore/FirebaseFirestore;Lkotlinx/io/RawSource;)Lcom/google/firebase/firestore/LoadBundleTask;
+}
+
 public final class com/google/firebase/firestore/FormatKt {
 	public static final fun getFirestoreFormat ()Lcom/google/firebase/serialization/FirebaseFormat$Firestore;
 }

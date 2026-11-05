@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-storage
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 176 public members available (170 identical, 6 mapped, 0 missing, 0 omitted)
+# 100% of 167 public members available (159 identical, 8 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.storage.CancellableTask
   OK    CancellableTask()
@@ -68,14 +68,14 @@ com.google.firebase.storage.StorageException.ErrorCode
 com.google.firebase.storage.StorageKt
   OK    static long component1(TaskSnapshot)
   OK    static List component1(ListResult)
-  OK    static long component1(TaskSnapshot)
+  PLAT  static long component1(TaskSnapshot)
   OK    static long component1(TaskSnapshot)
   OK    static long component2(TaskSnapshot)
   OK    static List component2(ListResult)
-  OK    static long component2(TaskSnapshot)
+  PLAT  static long component2(TaskSnapshot)
   OK    static long component2(TaskSnapshot)
   OK    static String component3(ListResult)
-  OK    static InputStream component3(TaskSnapshot)
+  PLAT  static InputStream component3(TaskSnapshot)
   OK    static StorageMetadata component3(TaskSnapshot)
   OK    static Uri component4(TaskSnapshot)
   OK    static FirebaseStorage getStorage(Firebase)
@@ -135,8 +135,8 @@ com.google.firebase.storage.StorageReference
   OK    String getPath()
   OK    StorageReference getRoot()
   OK    FirebaseStorage getStorage()
-  OK    StreamDownloadTask getStream()
-  OK    StreamDownloadTask getStream(StreamProcessor)
+  PLAT  StreamDownloadTask getStream()
+  PLAT  StreamDownloadTask getStream(StreamProcessor)
   OK    Task list(int)
   OK    Task list(int, String)
   OK    Task listAll()
@@ -145,8 +145,8 @@ com.google.firebase.storage.StorageReference
   OK    UploadTask putFile(Uri)
   OK    UploadTask putFile(Uri, StorageMetadata)
   UNAV  UploadTask putFile(Uri, StorageMetadata, Uri)
-  OK    UploadTask putStream(InputStream)
-  OK    UploadTask putStream(InputStream, StorageMetadata)
+  MAP   UploadTask putStream(InputStream)  [deprecated: putStream(java.io.InputStream) is Android/JVM-only; use putStream(RawSource) (kotlinx-io), on the JVM with stream.asSource()]
+  MAP   UploadTask putStream(InputStream, StorageMetadata)  [deprecated: putStream(java.io.InputStream) is Android/JVM-only; use putStream(RawSource) (kotlinx-io), on the JVM with stream.asSource()]
   OK    Task updateMetadata(StorageMetadata)
 com.google.firebase.storage.StorageTask
   OK    StorageTask()
@@ -206,13 +206,6 @@ com.google.firebase.storage.StorageTask.SnapshotBase
   OK    Exception getError()
   OK    StorageReference getStorage()
   OK    StorageTask getTask()
-com.google.firebase.storage.StreamDownloadTask
-com.google.firebase.storage.StreamDownloadTask.StreamProcessor
-  OK    void doInBackground(TaskSnapshot, InputStream)
-com.google.firebase.storage.StreamDownloadTask.TaskSnapshot
-  OK    long getBytesTransferred()
-  OK    InputStream getStream()
-  OK    long getTotalByteCount()
 com.google.firebase.storage.TaskState
 com.google.firebase.storage.TaskState.InProgress
   OK    InProgress(T)

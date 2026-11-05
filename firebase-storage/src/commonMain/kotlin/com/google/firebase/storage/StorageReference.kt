@@ -6,11 +6,13 @@ package com.google.firebase.storage
 
 import android.net.Uri
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 
 /**
  * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
  * [android.net.Uri] or [java.io.File] (the firebase-app stand-ins off Android): a `file:` URL, or a path on Apple
- * platforms. Streams are [java.io.InputStream]s (firebase-app's mirror off Android and the JVM).
+ * platforms. The `putStream` overloads taking a JVM stream are declared through the error-deprecated `java.io.InputStream`
+ * stand-in, pointing common code at the kotlinx-io `putStream(RawSource)` extensions (see `StorageSources.kt`).
  */
 public expect class StorageReference : Comparable<StorageReference> {
     /** The uploads to this reference that have not completed. */
@@ -69,13 +71,14 @@ public expect class StorageReference : Comparable<StorageReference> {
     /** Uploads [bytes] to this reference with [metadata]. */
     public fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask
 
-    /**
-     * Uploads the bytes of [stream] to this reference, reading it to the end first (off the caller's thread where the
-     * platform has one) and closing it.
-     */
+    /** Android/JVM only: uploads a `java.io.InputStream`; common code uploads a kotlinx-io source through `putStream(RawSource)`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public fun putStream(stream: java.io.InputStream): UploadTask
 
-    /** Uploads the bytes of [stream] to this reference with [metadata]; see [putStream]. */
+    /** Android/JVM only: uploads a `java.io.InputStream` with [metadata]; common code uses `putStream(RawSource, StorageMetadata)`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask
 
     /** Updates the object's mutable metadata (the settable fields of [metadata]). */
@@ -92,12 +95,6 @@ public expect class StorageReference : Comparable<StorageReference> {
 
     /** Downloads the object to [destinationFile]. Fails on JS, whose SDK has no file downloads. */
     public fun getFile(destinationFile: java.io.File): FileDownloadTask
-
-    /** Downloads the object into memory, its snapshot's stream reading the bytes once the task succeeds. */
-    public fun getStream(): StreamDownloadTask
-
-    /** Downloads the object and hands its stream to [processor] off the caller's thread; the task succeeds once it returns. */
-    public fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask
 
     /** The downloads from this reference that have not completed; always empty on JS. */
     public val activeDownloadTasks: List<FileDownloadTask>

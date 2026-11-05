@@ -187,6 +187,8 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 api(project(":firebase-common"))
+                // The multiplatform form of loadBundle(InputStream) takes a kotlinx-io RawSource.
+                api(libs.kotlinx.io.core)
                 implementation(project(":firebase-common-internal"))
             }
         }
@@ -242,6 +244,9 @@ stripHeaderStubs(
         "com/google/firebase/firestore/FirestoreStatics.class",
         "com/google/firebase/firestore/FormatKt.class",
         "com/google/firebase/firestore/FirestoreBindings.class",
+        // loadBundle(RawSource), the kotlinx-io counterpart of loadBundle(InputStream), and its Android/JVM actual.
+        "com/google/firebase/firestore/BundlesKt.class",
+        "com/google/firebase/firestore/Bundles_androidKt.class",
     ),
     keepPackageDirs = listOf("com/google/firebase/serialization"),
     // firebase-java-sdk ports an older Android SDK without the cache-only listen source, the gRPC flow control window

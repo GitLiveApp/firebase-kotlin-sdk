@@ -27,6 +27,8 @@ import platform.Foundation.NSURL
 import platform.Foundation.create
 import platform.Foundation.timeIntervalSince1970
 import platform.posix.memcpy
+import kotlinx.io.Source
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 
 private const val MILLIS_PER_SECOND = 1000.0
 
@@ -87,15 +89,15 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 
     public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destinationFile.path)))
 
-    public actual fun getStream(): StreamDownloadTask = StreamDownloadTaskImpl(this, null)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
 
-    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = StreamDownloadTaskImpl(this, processor)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
 
-    public actual fun putStream(stream: java.io.InputStream): UploadTask = putStream(stream, null)
-
-    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = putStream(stream, metadata as StorageMetadata?)
-
-    private fun putStream(stream: java.io.InputStream, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, StreamUploadController(stream) { bytes -> IosUploadController(this, ios.putData(bytes.toNSData(), metadata?.toIos()), bytes.size.toLong()) })
+    internal fun putSourceBytes(source: Source, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, SourceUploadController(source) { bytes -> IosUploadController(this, ios.putData(bytes.toNSData(), metadata?.toIos()), bytes.size.toLong()) })
 
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference.isUnder(this) }
 
@@ -257,3 +259,5 @@ internal fun Uri.toNSURL(): NSURL {
 
 /** The size of the file at this URL, or null when it cannot be read. */
 internal fun NSURL.fileSize(): Long? = path?.let { NSFileManager.defaultManager.attributesOfItemAtPath(it, null)?.get(NSFileSize) as? NSNumber }?.longValue
+
+internal actual fun StorageReference.putSource(source: Source, metadata: StorageMetadata?): UploadTask = putSourceBytes(source, metadata)

@@ -30,9 +30,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import com.google.firebase.storage.StreamDownloadTask
-import java.io.ByteArrayInputStream
-import java.io.InputStream
+import com.google.firebase.storage.putStream
+import kotlinx.io.Buffer
 
 /**
  * Exercises the `com.google.firebase.storage` layer exactly as Android app code would (the static accessors, the
@@ -129,28 +128,17 @@ class AndroidSdkSourceCompatTest {
     }
 
     @Test
-    fun testStreams() = runTest {
+    fun testPutStream() = runTest {
         val ref = storage.getReference("test").child("compatStream.txt")
-        val uploaded: UploadTask.TaskSnapshot = ref.putStream(ByteArrayInputStream("streamed".encodeToByteArray()), storageMetadata { contentType = "text/plain" }).await()
+        val source = Buffer().apply { write("streamed".encodeToByteArray()) }
+        val uploaded: UploadTask.TaskSnapshot = ref.putStream(source, storageMetadata { contentType = "text/plain" }).await()
         assertEquals(8, uploaded.bytesTransferred)
         assertEquals("text/plain", uploaded.metadata?.contentType)
+        assertEquals("streamed", ref.getBytes(1024).await().decodeToString())
 
-        // The snapshot counts the bytes read from the stream so far, which the caller reads after the task completes.
-        val download: StreamDownloadTask = ref.getStream()
-        val downloaded: StreamDownloadTask.TaskSnapshot = download.await()
-        val (bytesTransferred, totalByteCount, stream) = downloaded
-        assertEquals(0, bytesTransferred)
-        assertEquals(8, totalByteCount)
-        assertEquals("streamed", stream.readText())
-        assertEquals(8, download.snapshot.bytesTransferred)
-
-        val processed = CompletableDeferred<String>()
-        ref.getStream { state, processorStream -> processed.complete("${state.totalByteCount}:${processorStream.readText()}") }.await()
-        assertEquals("8:streamed", processed.await())
-
-        val failed = ref.getStream { _, _ -> throw IllegalStateException("processor failed") }
-        assertFailsWith<StorageException> { failed.await() }
-        assertEquals("processor failed", failed.exception?.cause?.message)
+        val plain: UploadTask.TaskSnapshot = ref.putStream(Buffer().apply { write("again".encodeToByteArray()) }).await()
+        assertEquals(5, plain.bytesTransferred)
+        assertEquals("again", ref.getBytes(1024).await().decodeToString())
     }
 
     @Test
@@ -209,16 +197,5 @@ class AndroidSdkSourceCompatTest {
         assertNull(StorageException.fromExceptionAndHttpCode(null, 200))
         assertEquals(StorageException.ERROR_NOT_AUTHORIZED, StorageException.fromExceptionAndHttpCode(null, 403)?.errorCode)
         assertEquals(403, StorageException.fromExceptionAndHttpCode(null, 403)?.httpResultCode)
-    }
-}
-
-/** The stream's remaining bytes as UTF-8, read as JDK code would. */
-private fun InputStream.readText(): String {
-    var result = ByteArray(0)
-    val buffer = ByteArray(64)
-    while (true) {
-        val count = read(buffer)
-        if (count < 0) return result.decodeToString()
-        result += buffer.copyOf(count)
     }
 }

@@ -37,5 +37,8 @@ internal const val JAVA_INSTANT_JVM_ONLY =
 internal const val TIME_UNIT_JVM_ONLY =
     "java.util.concurrent.TimeUnit is JVM-only and only stands in for the Firebase Android SDK members taking one; use kotlin.time.Duration in common code"
 
+internal const val INPUT_STREAM_JVM_ONLY =
+    "java.io.InputStream is JVM-only and only stands in for the Firebase Android SDK members taking one; common code passes a kotlinx-io RawSource to the counterpart"
+
 internal const val BYTE_BUFFER_JVM_ONLY =
     "java.nio.ByteBuffer is JVM-only and only stands in for the Firebase Android SDK members taking one; pass a ByteArray in common code"

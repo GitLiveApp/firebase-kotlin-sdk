@@ -4,7 +4,7 @@
 
 package com.google.firebase.storage
 
-// The FileDownloadTask and StreamDownloadTask forms of the Android SDK's StorageKt destructuring operators, as plain code that is a header
+// The FileDownloadTask forms of the Android SDK's StorageKt destructuring operators, as plain code that is a header
 // stub on Android and the JVM (verified against the SDK's StorageKt facade).
 
 /** The bytes downloaded so far. */
@@ -12,12 +12,3 @@ public operator fun FileDownloadTask.TaskSnapshot.component1(): Long = bytesTran
 
 /** The total size of the download. */
 public operator fun FileDownloadTask.TaskSnapshot.component2(): Long = totalByteCount
-
-/** The bytes downloaded so far. */
-public operator fun StreamDownloadTask.TaskSnapshot.component1(): Long = bytesTransferred
-
-/** The total size of the download. */
-public operator fun StreamDownloadTask.TaskSnapshot.component2(): Long = totalByteCount
-
-/** The downloaded bytes. */
-public operator fun StreamDownloadTask.TaskSnapshot.component3(): java.io.InputStream = stream

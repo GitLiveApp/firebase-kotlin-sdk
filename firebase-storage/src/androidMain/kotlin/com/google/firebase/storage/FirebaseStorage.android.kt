@@ -17,6 +17,7 @@ import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.storage.stub
 import java.io.File
 import java.io.InputStream
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 
 /*
  * Header stubs for com.google.firebase:firebase-storage (see buildSrc utils/HeaderStubs.kt): compiled against,
@@ -82,9 +83,11 @@ public actual class StorageReference private constructor() : Comparable<StorageR
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = stub()
 
     public actual fun getFile(destinationFile: File): FileDownloadTask = stub()
-    public actual fun getStream(): StreamDownloadTask = stub()
-    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = stub()
+
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public actual fun putStream(stream: InputStream): UploadTask = stub()
+
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public actual fun putStream(stream: InputStream, metadata: StorageMetadata): UploadTask = stub()
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = stub()
 }
@@ -159,18 +162,6 @@ public actual abstract class FileDownloadTask private constructor() : StorageTas
     public actual inner class TaskSnapshot private constructor() : SnapshotBase(null) {
         public actual val bytesTransferred: Long get() = stub()
         public actual val totalByteCount: Long get() = stub()
-    }
-}
-
-public actual abstract class StreamDownloadTask private constructor() : StorageTask<StreamDownloadTask.TaskSnapshot>() {
-    public actual fun interface StreamProcessor {
-        public actual fun doInBackground(state: TaskSnapshot, stream: InputStream)
-    }
-
-    public actual inner class TaskSnapshot private constructor() : SnapshotBase(null) {
-        public actual val bytesTransferred: Long get() = stub()
-        public actual val totalByteCount: Long get() = stub()
-        public actual val stream: InputStream get() = stub()
     }
 }
 

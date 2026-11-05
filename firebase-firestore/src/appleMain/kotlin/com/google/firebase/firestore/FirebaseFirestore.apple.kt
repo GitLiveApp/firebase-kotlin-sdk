@@ -30,26 +30,9 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNumber
 import platform.Foundation.numberWithLong
 import platform.darwin.dispatch_queue_t
-import platform.posix.uint8_tVar
-import platform.posix.memcpy
-import platform.darwin.NSUIntegerVar
-import platform.darwin.NSUInteger
-import platform.darwin.NSInteger
-import platform.Foundation.NSStreamStatusOpen
-import platform.Foundation.NSStreamStatusNotOpen
-import platform.Foundation.NSStreamStatusError
-import platform.Foundation.NSStreamStatusClosed
-import platform.Foundation.NSStreamStatusAtEnd
-import platform.Foundation.NSStreamPropertyKey
-import platform.Foundation.NSRunLoopMode
-import platform.Foundation.NSRunLoop
-import platform.Foundation.NSInputStream
-import platform.Foundation.NSData
-import kotlinx.cinterop.usePinned
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.UnsafeNumber
-import kotlinx.cinterop.CPointerVar
+import kotlinx.io.asNSInputStream
+import kotlinx.io.Source
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseFirestore internal constructor(public val ios: FIRFirestore) {
@@ -132,10 +115,14 @@ public actual class FirebaseFirestore internal constructor(public val ios: FIRFi
         return task
     }
 
-    /** The stream is read by the iOS SDK's `loadBundleStream:` through an `NSInputStream` over it (see [InputStreamAdapter]). */
-    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
+
+    /** The iOS SDK's `loadBundleStream:` reads the source through kotlinx-io's `NSInputStream` over it, on its own worker queue. */
+    internal fun loadBundleFromSource(source: Source): LoadBundleTask {
         val task = LoadBundleTaskImpl()
-        ios.loadBundleStream(InputStreamAdapter(bundleData)).addObserver { progress -> task.update(progress!!.toCompat()) }
+        ios.loadBundleStream(source.asNSInputStream()).addObserver { progress -> task.update(progress!!.toCompat()) }
         return task
     }
 
@@ -234,64 +221,4 @@ public actual class PersistentCacheIndexManager internal constructor(public val 
     }
 }
 
-/**
- * An `NSInputStream` reading a Kotlin [java.io.InputStream], for the iOS SDK's `loadBundleStream:`, which opens it, reads
- * it to the end on its own worker queue and closes it; the Kotlin stream is closed with it. A failing read puts the
- * stream in the error state with the exception as its `streamError`, which the SDK reports as the load's failure. The
- * stream is polled, so the run-loop scheduling and delegate of `NSStream` are no-ops.
- */
-@OptIn(UnsafeNumber::class)
-private class InputStreamAdapter(private val stream: java.io.InputStream) : NSInputStream(NSData()) {
-    private var status = NSStreamStatusNotOpen
-    private var error: NSError? = null
-
-    override fun streamStatus() = status
-
-    override fun streamError() = error
-
-    override fun open() {
-        if (status == NSStreamStatusNotOpen) status = NSStreamStatusOpen
-    }
-
-    override fun close() {
-        if (status == NSStreamStatusClosed) return
-        status = NSStreamStatusClosed
-        try {
-            stream.close()
-        } catch (_: Exception) {
-            // The reader is done with the stream either way.
-        }
-    }
-
-    override fun read(buffer: CPointer<uint8_tVar>?, maxLength: NSUInteger): NSInteger {
-        if (status != NSStreamStatusOpen && status != NSStreamStatusAtEnd || buffer == null) return -1
-        val chunk = ByteArray(minOf(maxLength.toLong(), BUNDLE_CHUNK_SIZE.toLong()).toInt())
-        val count = try {
-            stream.read(chunk)
-        } catch (e: Exception) {
-            error = e.toNSError()
-            status = NSStreamStatusError
-            return -1
-        }
-        if (count < 0) {
-            status = NSStreamStatusAtEnd
-            return 0
-        }
-        if (count > 0) chunk.usePinned { memcpy(buffer, it.addressOf(0), count.convert()) }
-        return count.convert()
-    }
-
-    override fun getBuffer(buffer: CPointer<CPointerVar<uint8_tVar>>?, length: CPointer<NSUIntegerVar>?): Boolean = false
-
-    override fun hasBytesAvailable(): Boolean = status == NSStreamStatusOpen
-
-    override fun propertyForKey(key: NSStreamPropertyKey): Any? = null
-
-    override fun setProperty(property: Any?, forKey: NSStreamPropertyKey): Boolean = false
-
-    override fun scheduleInRunLoop(aRunLoop: NSRunLoop, forMode: NSRunLoopMode) {}
-
-    override fun removeFromRunLoop(aRunLoop: NSRunLoop, forMode: NSRunLoopMode) {}
-}
-
-private const val BUNDLE_CHUNK_SIZE = 16 * 1024
+internal actual fun FirebaseFirestore.loadBundleSource(source: Source): LoadBundleTask = loadBundleFromSource(source)

@@ -60,8 +60,7 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
 
     internal abstract fun controlCancel(): Boolean
 
-    /** Always current, as the Android SDK's `getSnapshot()`: a stream download's snapshot counts the bytes read after completion too; [result] is the final one. */
-    public actual val snapshot: ResultT get() = snapshotWith(error)
+    public actual val snapshot: ResultT get() = finalSnapshot ?: snapshotWith(error)
 
     // The Task members are implemented by the concrete subclasses (the expect classes leave them inherited): the state.
     internal val completeState: Boolean get() = status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE || status == TaskStatus.CANCELED

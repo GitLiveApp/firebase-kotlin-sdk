@@ -16,6 +16,7 @@ import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
 import dev.gitlive.firebase.firestore.stub
 import java.util.concurrent.Executor
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 
 /*
  * Header stubs for com.google.firebase:firebase-firestore (see buildSrc utils/HeaderStubs.kt): compiled against,
@@ -43,6 +44,7 @@ public actual class FirebaseFirestore private constructor() {
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = stub()
 
     @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = stub()
 
     @Suppress("DEPRECATION_ERROR")

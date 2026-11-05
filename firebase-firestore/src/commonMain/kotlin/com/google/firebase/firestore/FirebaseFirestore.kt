@@ -9,16 +9,16 @@ import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.Runnable
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 
 /**
  * The entry point of Cloud Firestore, mirroring `com.google.firebase.firestore.FirebaseFirestore` from the Firebase
  * Android SDK: obtained per [FirebaseApp] and database with the static accessors (or the `Firebase.firestore`
  * extensions), it creates references, batches and transactions and manages the network and the local cache.
  *
- * `loadBundle(InputStream)` takes firebase-app's `java.io.InputStream` (the JDK's on Android and the JVM, a working mirror
- * of it elsewhere), so a bundle can be streamed from any source in common code; `loadBundle(ByteBuffer)` is declared
- * through the error-deprecated `java.nio.ByteBuffer` stand-in, pointing common code at `loadBundle(ByteArray)`. Not
- * mirrored: the pipeline API (see `api/android-sdk/exclusions.txt`).
+ * The `loadBundle` overloads taking JVM streams are declared through the error-deprecated `java.io.InputStream` and
+ * `java.nio.ByteBuffer` stand-ins, pointing common code at the kotlinx-io `loadBundle(RawSource)` extension (see
+ * `Bundles.kt`) and at `loadBundle(ByteArray)`. Not mirrored: the pipeline API (see `api/android-sdk/exclusions.txt`).
  */
 public expect class FirebaseFirestore {
     /** The [FirebaseApp] this instance belongs to. */
@@ -57,7 +57,9 @@ public expect class FirebaseFirestore {
     /** Loads a Firestore bundle into the local cache. */
     public fun loadBundle(bundleData: ByteArray): LoadBundleTask
 
-    /** Loads a Firestore bundle into the local cache as the stream is read; the stream is closed when it ends. */
+    /** Android/JVM only: loads a bundle from a `java.io.InputStream`; common code streams one through the kotlinx-io `loadBundle(RawSource)`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask
 
     /** Android/JVM only: loads a bundle from a `java.nio.ByteBuffer`; common code passes its bytes to [loadBundle]. */
