@@ -143,6 +143,8 @@ On android, some modules (`config`) require you to enable [Core library desugari
 
 On iOS the official [Firebase iOS SDK](https://github.com/firebase/firebase-ios-sdk) is not linked as a transitive dependency. Therefore, any project using this SDK needs to link the actual Firestore SDK as well. This can be done through your preferred installation method (Cocoapods/SPM).
 
+This SDK is built against Firebase iOS SDK **12.19.3** and requires a minimum deployment target of **iOS 15 / tvOS 15 / macOS 10.15**. Link `firebase-ios-sdk` **12.19.3** (CocoaPods) or **13.1.1+** (SPM) or later: older versions are affected by the [compromised eMudhra intermediate CA](https://firebase.google.com/support/guides/compromised-emudhra-intermediate-ca) issue in the Firestore SDK. On Apple targets `FirebaseOptions.gaTrackingId` is always `null` and `ActionCodeSettings.dynamicLinkDomain` is ignored (use `linkDomain`), as both were removed in firebase-ios-sdk 12.
+
 Similarly, tests require linking as well. Make sure to add the required frameworks to the search path of your test targets. This can be done by specifying a `cocoapods` block in your `build.gradle`:
 ```kotlin
 cocoapods {

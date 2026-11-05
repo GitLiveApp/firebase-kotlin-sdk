@@ -154,7 +154,8 @@ public actual class AuthTokenResult(internal val ios: FIRAuthTokenResult) {
 internal fun ActionCodeSettings.toIos() = FIRActionCodeSettings().also {
     it.setURL(NSURL.URLWithString(url))
     androidPackageName?.run { it.setAndroidPackageName(packageName, installIfNotAvailable, minimumVersion) }
-    dynamicLinkDomain?.run { it.setDynamicLinkDomain(this) }
+    // dynamicLinkDomain is ignored here - FIRActionCodeSettings.dynamicLinkDomain was removed in
+    // firebase-ios-sdk 12.0.0 with the dynamic links shutdown, linkDomain replaces it
     linkDomain?.run { it.setLinkDomain(this) }
     it.setHandleCodeInApp(canHandleCodeInApp)
     iOSBundleId?.run { it.setIOSBundleID(this) }
