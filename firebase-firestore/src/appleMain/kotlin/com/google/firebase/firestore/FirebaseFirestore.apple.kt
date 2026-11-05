@@ -5,6 +5,8 @@
 package com.google.firebase.firestore
 
 import android.content.Context
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestore
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestoreSettings
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRLoadBundleTaskProgress
@@ -110,6 +112,14 @@ public actual class FirebaseFirestore internal constructor(public val ios: FIRFi
         ios.loadBundle(bundleData.toNSData()).addObserver { progress -> task.update(progress!!.toCompat()) }
         return task
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_BUFFER_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.array())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.nio.ByteBuffer): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_BUFFER_ANDROID_ONLY)
 
     public actual fun getNamedQuery(name: String): Task<Query?> = task { completion -> ios.getQueryNamed(name) { query -> completion(query?.let { Query(it) }, null) } }
 

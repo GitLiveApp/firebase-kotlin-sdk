@@ -8,6 +8,9 @@ import android.app.Activity
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
 import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 import dev.gitlive.firebase.firestore.REFLECTIVE_SET
@@ -39,6 +42,15 @@ public actual class FirebaseFirestore private constructor() {
     public actual fun <TResult> runTransaction(options: TransactionOptions, updateFunction: Transaction.Function<TResult>): Task<TResult> = stub()
     public actual fun addSnapshotsInSyncListener(runnable: Runnable): ListenerRegistration = stub()
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_BUFFER_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.array())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.nio.ByteBuffer): LoadBundleTask = stub()
+
     public actual fun getNamedQuery(name: String): Task<Query?> = stub()
     public actual fun useEmulator(host: String, port: Int): Unit = stub()
     public actual fun clearPersistence(): Task<Nothing?> = stub()
@@ -260,6 +272,15 @@ public actual open class DocumentSnapshot {
     public actual fun getString(field: String): String? = stub()
     public actual fun getTimestamp(field: String): Timestamp? = stub()
     public actual fun getTimestamp(field: String, serverTimestampBehavior: ServerTimestampBehavior): Timestamp? = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field)"), DeprecationLevel.ERROR)
+    public actual fun getDate(field: String): java.util.Date? = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field, serverTimestampBehavior)"), DeprecationLevel.ERROR)
+    public actual fun getDate(field: String, serverTimestampBehavior: ServerTimestampBehavior): java.util.Date? = stub()
+
     public actual fun getBlob(field: String): Blob? = stub()
     public actual fun getGeoPoint(field: String): GeoPoint? = stub()
     public actual fun getDocumentReference(field: String): DocumentReference? = stub()

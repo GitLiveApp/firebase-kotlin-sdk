@@ -5,6 +5,8 @@
 package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.firestore.externals.clearIndexedDbPersistence
 import dev.gitlive.firebase.firestore.externals.connectFirestoreEmulator
@@ -121,6 +123,14 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
         }
         return task
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LOAD_BUNDLE_BUFFER_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.array())"), DeprecationLevel.ERROR)
+    public actual fun loadBundle(bundleData: java.nio.ByteBuffer): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_BUFFER_ANDROID_ONLY)
 
     public actual fun getNamedQuery(name: String): Task<Query?> = task { namedQuery(js, name).then { query -> query?.let { Query(it) } } }
 

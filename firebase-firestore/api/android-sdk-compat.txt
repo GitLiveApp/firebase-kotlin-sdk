@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 341 public members available (311 identical, 30 mapped, 0 missing, 0 omitted)
+# 100% of 345 public members available (311 identical, 34 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -87,8 +87,8 @@ com.google.firebase.firestore.DocumentSnapshot
   OK    Boolean getBoolean(String)
   OK    Map getData()
   OK    Map getData(ServerTimestampBehavior)
-  PLAT  Date getDate(String)
-  PLAT  Date getDate(String, ServerTimestampBehavior)
+  MAP   Date getDate(String)  [deprecated: getDate returns a java.util.Date, which is JVM-only; use getTimestamp, and toKotlinInstant() on the Timestamp]
+  MAP   Date getDate(String, ServerTimestampBehavior)  [deprecated: getDate returns a java.util.Date, which is JVM-only; use getTimestamp, and toKotlinInstant() on the Timestamp]
   OK    DocumentReference getDocumentReference(String)
   OK    Double getDouble(String)
   OK    GeoPoint getGeoPoint(String)
@@ -169,8 +169,8 @@ com.google.firebase.firestore.FirebaseFirestore
   OK    Task getNamedQuery(String)
   OK    PersistentCacheIndexManager getPersistentCacheIndexManager()
   OK    LoadBundleTask loadBundle(byte[])
-  PLAT  LoadBundleTask loadBundle(InputStream)
-  PLAT  LoadBundleTask loadBundle(ByteBuffer)
+  MAP   LoadBundleTask loadBundle(InputStream)  [deprecated: loadBundle(InputStream) is JVM-only; read the stream into a ByteArray and use loadBundle(ByteArray)]
+  MAP   LoadBundleTask loadBundle(ByteBuffer)  [deprecated: loadBundle(ByteBuffer) is JVM-only; use loadBundle(ByteArray) with the buffer's bytes]
   UNAV  PipelineSource pipeline()
   OK    Task runBatch(Function)
   OK    Task runTransaction(Function)

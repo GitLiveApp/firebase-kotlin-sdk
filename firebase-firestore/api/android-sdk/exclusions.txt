@@ -1,22 +1,23 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
 
-# The pipeline API (Firestore Pipelines) does not exist in the pinned iOS and JS SDKs.
-com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
-com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
-com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines are not in the pinned iOS/JS SDKs
+# Firestore Pipelines are Swift-only in the pinned iOS SDK (not in FirebaseFirestoreInternal, which the Apple targets bind)
+# and a separate preview entry point (firebase/firestore/pipelines) in the pinned JS SDK.
+com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
+com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
+com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
 
-# Vector values and the minimum/maximum field transforms do not exist in the pinned JS SDK.
-com.google.firebase.firestore.VectorValue  // @unavailable vector values are not in the pinned JS SDK
-com.google.firebase.firestore.FieldValue#vector  // @unavailable vector values are not in the pinned JS SDK
-com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/maximum transforms are not in the pinned JS SDK
-com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the pinned JS SDK
-com.google.firebase.firestore.DocumentSnapshot#getVectorValue  // @unavailable vector values are not in the pinned JS SDK
+# The minimum/maximum field transforms are not in the pinned iOS SDK's Objective-C API (the JS SDK has minimum()/maximum()).
+com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
+com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
+
+# Vector values exist in the pinned iOS (FIRVectorValue, FIRFieldValue.vectorWithArray:) and JS (VectorValue, vector()) SDKs
+# and are not mirrored yet.
+com.google.firebase.firestore.VectorValue  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
+com.google.firebase.firestore.FieldValue#vector  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
+com.google.firebase.firestore.DocumentSnapshot#getVectorValue  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
 
 # The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
-
-# java.util.Date accessors; use getTimestamp and com.google.firebase.toKotlinInstant.
-com.google.firebase.firestore.DocumentSnapshot#getDate  // @platform java.util.Date
 
 # Activity-scoped and Executor overloads of the listeners.
 com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
@@ -46,10 +47,6 @@ com.google.firebase.firestore.SnapshotListenOptions#getActivity  // @platform an
 com.google.firebase.firestore.SnapshotListenOptions#getExecutor  // @platform java.util.concurrent.Executor
 com.google.firebase.firestore.SnapshotListenOptions$Builder#setActivity  // @platform android.app.Activity
 com.google.firebase.firestore.SnapshotListenOptions$Builder#setExecutor  // @platform java.util.concurrent.Executor
-
-# Bundles from JVM streams; use loadBundle(ByteArray).
-com.google.firebase.firestore.FirebaseFirestore#loadBundle(InputStream)  // @platform java.io.InputStream
-com.google.firebase.firestore.FirebaseFirestore#loadBundle(ByteBuffer)  // @platform java.nio.ByteBuffer
 
 # Library-internal (@RestrictTo) member with no equivalent in the iOS and JS SDKs.
 com.google.firebase.firestore.DocumentReference#getFullPath  // @hide restricted to the Android SDK's own libraries

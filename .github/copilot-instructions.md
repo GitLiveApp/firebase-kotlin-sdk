@@ -142,8 +142,8 @@ The SDK has two public API layers per module:
      created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
      `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`. The SDK members taking them (`Timestamp(Date)`,
-     `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(InputStream)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since

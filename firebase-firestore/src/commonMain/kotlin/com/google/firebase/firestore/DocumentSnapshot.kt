@@ -5,6 +5,7 @@
 package com.google.firebase.firestore
 
 import com.google.firebase.Timestamp
+import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
 
 /**
  * The data of a document read from Firestore, mirroring `com.google.firebase.firestore.DocumentSnapshot` from the
@@ -13,8 +14,8 @@ import com.google.firebase.Timestamp
  *
  * A custom class is read with the reified `toObject<T>()` and `getField<T>()` extensions, which map a `@Serializable`
  * class with the Android SDK's rules on every platform; the SDK's reflective `toObject(Class)` and `get(field, Class)`
- * are deprecated with an error on Android. Not mirrored: the `Date` accessors (see `api/android-sdk/exclusions.txt`);
- * use [getTimestamp] instead.
+ * are deprecated with an error on Android. The `java.util.Date` accessors are declared through the error-deprecated
+ * stand-in, as `Timestamp.toDate()` is, so common code is pointed at [getTimestamp].
  */
 public expect open class DocumentSnapshot {
     /** The document id. */
@@ -59,6 +60,16 @@ public expect open class DocumentSnapshot {
     public fun getString(field: String): String?
     public fun getTimestamp(field: String): Timestamp?
     public fun getTimestamp(field: String, serverTimestampBehavior: ServerTimestampBehavior): Timestamp?
+
+    /** Android/JVM only: the value of [field] as a `java.util.Date`; common code uses [getTimestamp] and `toKotlinInstant()`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field)"), DeprecationLevel.ERROR)
+    public fun getDate(field: String): java.util.Date?
+
+    /** Android/JVM only (see [getDate]). */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field, serverTimestampBehavior)"), DeprecationLevel.ERROR)
+    public fun getDate(field: String, serverTimestampBehavior: ServerTimestampBehavior): java.util.Date?
     public fun getBlob(field: String): Blob?
     public fun getGeoPoint(field: String): GeoPoint?
     public fun getDocumentReference(field: String): DocumentReference?

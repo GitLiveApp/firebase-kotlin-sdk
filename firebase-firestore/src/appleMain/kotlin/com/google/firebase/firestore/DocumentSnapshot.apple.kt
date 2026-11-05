@@ -5,6 +5,7 @@
 package com.google.firebase.firestore
 
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRDocumentChange
+import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRDocumentChangeType
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRDocumentSnapshot
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRQueryDocumentSnapshot
@@ -86,6 +87,14 @@ public actual open class DocumentSnapshot internal constructor(public open val i
     public actual fun getString(field: String): String? = typed(field, get(field))
     public actual fun getTimestamp(field: String): Timestamp? = typed(field, get(field))
     public actual fun getTimestamp(field: String, serverTimestampBehavior: ServerTimestampBehavior): Timestamp? = typed(field, get(field, serverTimestampBehavior))
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field)"), DeprecationLevel.ERROR)
+    public actual fun getDate(field: String): java.util.Date? = throw UnsupportedOperationException(GET_DATE_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_DATE_ANDROID_ONLY, ReplaceWith("getTimestamp(field, serverTimestampBehavior)"), DeprecationLevel.ERROR)
+    public actual fun getDate(field: String, serverTimestampBehavior: ServerTimestampBehavior): java.util.Date? = throw UnsupportedOperationException(GET_DATE_ANDROID_ONLY)
     public actual fun getBlob(field: String): Blob? = typed(field, get(field))
     public actual fun getGeoPoint(field: String): GeoPoint? = typed(field, get(field))
     public actual fun getDocumentReference(field: String): DocumentReference? = typed(field, get(field))
