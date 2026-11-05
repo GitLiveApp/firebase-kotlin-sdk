@@ -38,6 +38,7 @@ import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 import dev.gitlive.firebase.firestore.externals.or as jsOr
 import dev.gitlive.firebase.firestore.externals.serverTimestamp as jsServerTimestamp
 import dev.gitlive.firebase.firestore.externals.where as jsWhere
+import dev.gitlive.firebase.firestore.externals.VectorValue as JsVectorValue
 
 /*
  * The JS SDK reads and writes plain JS values with its own Timestamp, GeoPoint, DocumentReference and Bytes classes;
@@ -66,6 +67,7 @@ internal fun JsAny?.toCompat(): Any? {
         "object" -> when {
             this is JsTimestamp -> Timestamp(seconds.toLong(), nanoseconds.toInt())
             this is JsGeoPoint -> GeoPoint(latitude, longitude)
+            this is JsVectorValue -> VectorValue.of(toArray().toDoubleArray())
             this is JsDocumentReference -> DocumentReference(this)
             this is Bytes -> Blob.fromBytes(toUint8Array().toByteArray())
             jsIsArray(this) -> (this as JsArray<JsAny?>).toList().map { it.toCompat() }
@@ -89,6 +91,12 @@ internal fun FieldValue.toJsFieldValue(): JsAny = when (operation) {
     FieldValue.Operation.ARRAY_REMOVE -> jsArrayRemove(*arguments.map { it.toJs() }.toTypedArray())
     FieldValue.Operation.INCREMENT -> jsIncrement((arguments.single() as Number).toDouble())
 }
+
+/** The numbers of a JS SDK vector. */
+internal fun JsArray<JsNumber>.toDoubleArray(): DoubleArray = DoubleArray(length) { this[it]!!.toDouble() }
+
+/** A JS array of numbers, as the JS SDK's `vector` takes. */
+internal fun DoubleArray.toJsNumberArray(): JsArray<JsNumber> = JsArray<JsNumber>().also { array -> forEachIndexed { index, value -> array[index] = value.toJsNumber() } }
 
 internal fun FieldPath.toJs(): JsFieldPath = if (isDocumentId) documentId() else JsFieldPath(*segments.toTypedArray())
 

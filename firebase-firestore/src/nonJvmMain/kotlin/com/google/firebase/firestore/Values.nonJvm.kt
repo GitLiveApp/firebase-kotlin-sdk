@@ -55,6 +55,7 @@ public actual abstract class FieldValue internal constructor(internal val operat
         public actual fun arrayRemove(vararg elements: Any): FieldValue = Impl(Operation.ARRAY_REMOVE, elements.asList())
         public actual fun increment(l: Long): FieldValue = Impl(Operation.INCREMENT, listOf(l))
         public actual fun increment(d: Double): FieldValue = Impl(Operation.INCREMENT, listOf(d))
+        public actual fun vector(values: DoubleArray): VectorValue = VectorValue.of(values)
     }
 }
 

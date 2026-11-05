@@ -283,6 +283,7 @@ public actual open class DocumentSnapshot {
 
     public actual fun getBlob(field: String): Blob? = stub()
     public actual fun getGeoPoint(field: String): GeoPoint? = stub()
+    public actual fun getVectorValue(field: String): VectorValue? = stub()
     public actual fun getDocumentReference(field: String): DocumentReference? = stub()
 
     // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
@@ -426,6 +427,9 @@ public actual abstract class FieldValue private constructor() {
 
         @JvmStatic
         public actual fun increment(l: Long): FieldValue = stub()
+
+        @JvmStatic
+        public actual fun vector(values: DoubleArray): VectorValue = stub()
 
         @JvmStatic
         public actual fun increment(d: Double): FieldValue = stub()

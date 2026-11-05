@@ -20,7 +20,7 @@ internal val firestoreFormat: FirebaseFormat.Firestore = FirebaseFormat.Firestor
 
 /** The module's side of [FirebaseFormat.Firestore]: its value types, and the platform SDK's classes for them. */
 internal object FirestoreBindings : FirebaseFormat.Firestore.Bindings {
-    override val nativeTypes: List<KClass<*>> = listOf(GeoPoint::class, Blob::class, DocumentReference::class, FieldValue::class, FieldPath::class)
+    override val nativeTypes: List<KClass<*>> = listOf(GeoPoint::class, Blob::class, VectorValue::class, DocumentReference::class, FieldValue::class, FieldPath::class)
 
     override val documentReferenceType: KClass<*> = DocumentReference::class
 

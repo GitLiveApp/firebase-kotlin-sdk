@@ -24,7 +24,7 @@ public expect class FieldPath {
  * A sentinel written in place of a field value, mirroring `com.google.firebase.firestore.FieldValue` from the Firebase
  * Android SDK: a server timestamp, a deletion or a transform of the current value.
  *
- * Not mirrored: `vector`, `minimum` and `maximum` (see `api/android-sdk/exclusions.txt`).
+ * Not mirrored: `minimum` and `maximum` (see `api/android-sdk/exclusions.txt`).
  */
 public expect abstract class FieldValue {
     public companion object {
@@ -45,6 +45,24 @@ public expect abstract class FieldValue {
 
         /** Adds [d] to the numeric field. */
         public fun increment(d: Double): FieldValue
+
+        /** A [VectorValue] of [values], stored as Firestore's vector type. */
+        public fun vector(values: DoubleArray): VectorValue
+    }
+}
+
+/** A vector of doubles, mirroring `com.google.firebase.firestore.VectorValue` from the Firebase Android SDK; created with [FieldValue.vector]. */
+public class VectorValue private constructor(private val values: DoubleArray) {
+    /** A copy of the vector's values. */
+    public fun toArray(): DoubleArray = values.copyOf()
+
+    override fun equals(other: Any?): Boolean = other is VectorValue && other.values.contentEquals(values)
+
+    override fun hashCode(): Int = values.contentHashCode()
+
+    internal companion object {
+        /** A vector of a copy of [values]. */
+        internal fun of(values: DoubleArray): VectorValue = VectorValue(values.copyOf())
     }
 }
 

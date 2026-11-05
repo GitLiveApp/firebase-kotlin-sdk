@@ -29,6 +29,7 @@ import dev.gitlive.firebase.firestore.externals.increment as jsIncrement
 import dev.gitlive.firebase.firestore.externals.or as jsOr
 import dev.gitlive.firebase.firestore.externals.serverTimestamp as jsServerTimestamp
 import dev.gitlive.firebase.firestore.externals.where as jsWhere
+import dev.gitlive.firebase.firestore.externals.VectorValue as JsVectorValue
 
 /*
  * The JS SDK reads and writes plain JS values with its own Timestamp, GeoPoint, DocumentReference and Bytes classes;
@@ -54,6 +55,8 @@ internal fun Any?.toCompat(): Any? {
         "object" -> when {
             this is JsTimestamp -> Timestamp(seconds.toLong(), nanoseconds.toInt())
             this is JsGeoPoint -> GeoPoint(latitude, longitude)
+            this is JsVectorValue -> VectorValue.of(toArray().toDoubleArray())
+            this is JsVectorValue -> VectorValue.of(toArray().toDoubleArray())
             this is JsDocumentReference -> DocumentReference(this)
             this is Bytes -> Blob.fromBytes(toUint8Array().toByteArray())
             isArray(this) -> unsafeCast<Array<Any?>>().map { it.toCompat() }
@@ -72,6 +75,7 @@ internal fun Any?.toCompatLeaves(): Any? {
     return when {
         this is JsTimestamp -> Timestamp(seconds.toLong(), nanoseconds.toInt())
         this is JsGeoPoint -> GeoPoint(latitude, longitude)
+        this is JsVectorValue -> VectorValue.of(toArray().toDoubleArray())
         this is JsDocumentReference -> DocumentReference(this)
         this is Bytes -> Blob.fromBytes(toUint8Array().toByteArray())
         isArray(this) -> unsafeCast<Array<Any?>>().map { it.toCompatLeaves() }.toTypedArray()

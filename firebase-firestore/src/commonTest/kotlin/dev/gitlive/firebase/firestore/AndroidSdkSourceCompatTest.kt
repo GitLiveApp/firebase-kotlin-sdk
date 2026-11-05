@@ -65,6 +65,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
+import com.google.firebase.firestore.VectorValue
 
 /**
  * Exercises the `com.google.firebase.firestore` layer exactly as Android app code would (the static accessors, the
@@ -219,12 +220,12 @@ class AndroidSdkSourceCompatTest {
         val posts = collection("posts")
         val author = firestore.document("compat/test/authors/jane")
         val document = posts.document("post")
-        val post = CompatPost(title = "Hello", starCount = 3, draft = true, location = GeoPoint(1.0, 2.0), author = author, tags = listOf("a", "b"))
+        val post = CompatPost(title = "Hello", starCount = 3, draft = true, location = GeoPoint(1.0, 2.0), embedding = FieldValue.vector(doubleArrayOf(0.5, 1.5)), author = author, tags = listOf("a", "b"))
         document.setData(post).await()
 
         val snapshot = document.get().await()
         val stored = assertNotNull(snapshot.data)
-        assertEquals(setOf("title", "stars", "created", "location", "author", "tags"), stored.keys)
+        assertEquals(setOf("title", "stars", "created", "location", "embedding", "author", "tags"), stored.keys)
         assertEquals(3L, (stored["stars"] as Number).toLong())
         assertIs<Timestamp>(stored["created"])
         val read = assertNotNull(snapshot.toObject<CompatPost>())
@@ -232,6 +233,7 @@ class AndroidSdkSourceCompatTest {
         assertEquals(post.copy(id = "post", draft = false, created = read.created), read)
         assertEquals(3L, snapshot.getField<Long>("stars"))
         assertEquals(GeoPoint(1.0, 2.0), snapshot.getField<GeoPoint>("location"))
+        assertEquals(FieldValue.vector(doubleArrayOf(0.5, 1.5)), snapshot.getField<VectorValue>("embedding"))
         assertEquals(author, snapshot.getField<DocumentReference>("author"))
         // Not getField<List<String>>: the Android SDK's reflective mapping rejects a generic type there, on every platform alike.
         assertEquals(listOf("a", "b"), snapshot.get("tags"))
@@ -253,7 +255,7 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testFieldValues() = runTest {
         val document = collection("fieldValues").document("doc")
-        document.setData(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon")).await()
+        document.setData(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon", "embedding" to FieldValue.vector(doubleArrayOf(1.0, 2.5, -3.0)))).await()
         document.updateData(
             mapOf(
                 "count" to FieldValue.increment(5L),
@@ -271,7 +273,11 @@ class AndroidSdkSourceCompatTest {
         assertEquals(listOf("b", "c"), snapshot.get("tags"))
         assertFalse(snapshot.contains("gone"))
         assertNotNull(snapshot.getTimestamp("time"))
+        assertEquals(FieldValue.vector(doubleArrayOf(1.0, 2.5, -3.0)), snapshot.getVectorValue("embedding"))
+        assertContentEquals(doubleArrayOf(1.0, 2.5, -3.0), snapshot.getVectorValue("embedding")?.toArray())
+        assertIs<VectorValue>(snapshot.get("embedding"))
         assertEquals(FieldValue.serverTimestamp(), FieldValue.serverTimestamp())
+        assertEquals(FieldValue.vector(doubleArrayOf(1.0)), FieldValue.vector(doubleArrayOf(1.0)))
         document.delete().await()
     }
 
@@ -486,6 +492,7 @@ data class CompatPost(
     @Transient val draft: Boolean = false,
     @ServerTimestamp @Contextual val created: Timestamp? = null,
     @Contextual val location: GeoPoint? = null,
+    @Contextual val embedding: VectorValue? = null,
     @Contextual val author: DocumentReference? = null,
     val tags: List<String> = emptyList(),
 )

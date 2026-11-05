@@ -198,7 +198,7 @@ The SDK has two public API layers per module:
    which map every value they write through the format, receive it as a `PlainValue` the format passes through) and the reified `toObject`,
    `toObjects`, `getField` and `dataObjects` read through `format.decodeFromPlainValue`, with the module's `FirestoreBindings` (the value types passed
    through, `@DocumentId` and `@ServerTimestamp` support, and `toSdkValue`/`fromSdkValue` converting the layer's `Timestamp`,
-   `GeoPoint`, `Blob`, `DocumentReference`, `FieldValue` and `FieldPath` to the platform SDK's own classes; the identity on Android
+   `GeoPoint`, `Blob`, `VectorValue`, `DocumentReference`, `FieldValue` and `FieldPath` to the platform SDK's own classes; the identity on Android
    and the JVM). They live in `com.google.firebase.serialization` (`FirestoreMapping.kt`, shipped through `keepPackageDirs`): the
    reads keep the SDK's names, and in the SDK's own package a call would resolve to the SDK's `FirestoreKt` facade on Android and
    the JVM (this module's is a stripped stub), whose inline bodies map by reflection. The SDK's reflective members are deprecated

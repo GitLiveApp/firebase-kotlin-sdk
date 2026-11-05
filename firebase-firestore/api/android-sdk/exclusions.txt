@@ -10,12 +10,6 @@ com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firest
 com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
 com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
 
-# Vector values exist in the pinned iOS (FIRVectorValue, FIRFieldValue.vectorWithArray:) and JS (VectorValue, vector()) SDKs
-# and are not mirrored yet.
-com.google.firebase.firestore.VectorValue  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
-com.google.firebase.firestore.FieldValue#vector  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
-com.google.firebase.firestore.DocumentSnapshot#getVectorValue  // @unavailable vector values are not mirrored yet, though the pinned iOS and JS SDKs have them
-
 # The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
 

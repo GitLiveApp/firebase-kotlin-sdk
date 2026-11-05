@@ -90,6 +90,7 @@ public actual open class DocumentSnapshot internal constructor(public open val j
     public actual fun getDate(field: String, serverTimestampBehavior: ServerTimestampBehavior): java.util.Date? = throw UnsupportedOperationException(GET_DATE_ANDROID_ONLY)
     public actual fun getBlob(field: String): Blob? = typed(field, get(field))
     public actual fun getGeoPoint(field: String): GeoPoint? = typed(field, get(field))
+    public actual fun getVectorValue(field: String): VectorValue? = typed(field, get(field))
     public actual fun getDocumentReference(field: String): DocumentReference? = typed(field, get(field))
 
     /** The data as the JS SDK reads it with the leaves as the layer's value types, which the dev.gitlive layer's decoders take. */

@@ -22,11 +22,12 @@ import platform.Foundation.NSLocalizedDescriptionKey
 import platform.Foundation.NSNull
 import platform.Foundation.create
 import platform.posix.memcpy
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRVectorValue
 
 /*
- * The iOS SDK reads and writes Foundation values with its own FIRTimestamp, FIRGeoPoint, FIRDocumentReference and NSData;
+ * The iOS SDK reads and writes Foundation values with its own FIRTimestamp, FIRGeoPoint, FIRVectorValue, FIRDocumentReference and NSData;
  * the layer presents them as the Android SDK's types: Map, List, String, Boolean, Long, Double,
- * com.google.firebase.Timestamp, GeoPoint, DocumentReference and Blob.
+ * com.google.firebase.Timestamp, GeoPoint, VectorValue, DocumentReference and Blob.
  */
 
 /**
@@ -45,6 +46,7 @@ internal fun Any?.toCompat(): Any? = when (this) {
     null, is NSNull -> null
     is FIRTimestamp -> Timestamp(seconds, nanoseconds)
     is FIRGeoPoint -> GeoPoint(latitude, longitude)
+    is FIRVectorValue -> toVectorValue()
     is FIRDocumentReference -> DocumentReference(this)
     is NSData -> Blob.fromBytes(toByteArray())
     is Map<*, *> -> entries.associate { (key, value) -> key.toString() to value.toCompat() }
@@ -65,6 +67,9 @@ internal fun FieldValue.toIosFieldValue(): FIRFieldValue = when (operation) {
         else -> FIRFieldValue.fieldValueForDoubleIncrement((amount as Number).toDouble())
     }
 }
+
+/** The iOS SDK's vector as the layer's; the SDK hands its numbers over as NSNumbers, which Kotlin/Native sees as [Number]s. */
+internal fun FIRVectorValue.toVectorValue(): VectorValue = VectorValue.of(array.map { (it as Number).toDouble() }.toDoubleArray())
 
 internal fun FieldPath.toIos(): FIRFieldPath = if (isDocumentId) FIRFieldPath.documentID() else FIRFieldPath(segments)
 

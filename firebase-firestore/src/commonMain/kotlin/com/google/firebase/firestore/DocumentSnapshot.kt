@@ -72,6 +72,9 @@ public expect open class DocumentSnapshot {
     public fun getDate(field: String, serverTimestampBehavior: ServerTimestampBehavior): java.util.Date?
     public fun getBlob(field: String): Blob?
     public fun getGeoPoint(field: String): GeoPoint?
+
+    /** The value of [field] as a [VectorValue], or null when absent. */
+    public fun getVectorValue(field: String): VectorValue?
     public fun getDocumentReference(field: String): DocumentReference?
 
     /** How a server timestamp that has not been written to the backend yet is read. */

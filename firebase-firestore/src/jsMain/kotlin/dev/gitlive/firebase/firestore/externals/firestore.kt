@@ -193,6 +193,13 @@ public external class GeoPoint(latitude: Double, longitude: Double) {
     public fun isEqual(other: GeoPoint): Boolean
 }
 
+public external fun vector(values: Array<Double>): VectorValue
+
+public external class VectorValue {
+    public fun toArray(): Array<Double>
+    public fun isEqual(other: VectorValue): Boolean
+}
+
 public external interface CollectionReference : Query {
     public val id: String
     public val path: String

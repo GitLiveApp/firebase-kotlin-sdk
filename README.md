@@ -139,7 +139,7 @@ session ID and analytics data reset do nothing, as the JS SDK has no equivalent,
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md). Custom classes are mapped by
 `com.google.firebase.serialization.FirebaseFormat` on every platform, Android included: a model class needs `@Serializable`
-(and, for Cloud Firestore, `@Contextual` on `Timestamp`, `GeoPoint`, `DocumentReference` and `Blob` properties), and the format
+(and, for Cloud Firestore, `@Contextual` on `Timestamp`, `GeoPoint`, `VectorValue`, `DocumentReference` and `Blob` properties), and the format
 applies the Android SDK's Realtime Database or Cloud Firestore rules (the number handling, and the format's own `@ServerTimestamp`,
 `@DocumentId`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` in `com.google.firebase.serialization`) through the class's
 serializer, with kotlinx.serialization's `@SerialName` and `@Transient` naming and excluding properties. The Android SDK's

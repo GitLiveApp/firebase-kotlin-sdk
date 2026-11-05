@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 345 public members available (311 identical, 34 mapped, 0 missing, 0 omitted)
+# 100% of 348 public members available (314 identical, 34 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -99,7 +99,7 @@ com.google.firebase.firestore.DocumentSnapshot
   OK    String getString(String)
   OK    Timestamp getTimestamp(String)
   OK    Timestamp getTimestamp(String, ServerTimestampBehavior)
-  UNAV  VectorValue getVectorValue(String)
+  OK    VectorValue getVectorValue(String)
   MAP   T toObject(Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
   MAP   T toObject(Class, ServerTimestampBehavior)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
 com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior
@@ -124,7 +124,7 @@ com.google.firebase.firestore.FieldValue
   UNAV  static FieldValue minimum(double)
   UNAV  static FieldValue minimum(long)
   OK    static FieldValue serverTimestamp()
-  UNAV  static VectorValue vector(double[])
+  OK    static VectorValue vector(double[])
 com.google.firebase.firestore.Filter
   OK    Filter()
   OK    static Filter and(Filter[])
@@ -444,6 +444,8 @@ com.google.firebase.firestore.TransactionOptions.Builder
   OK    Builder(TransactionOptions)
   OK    TransactionOptions build()
   OK    Builder setMaxAttempts(int)
+com.google.firebase.firestore.VectorValue
+  OK    double[] toArray()
 com.google.firebase.firestore.WriteBatch
   OK    Task commit()
   OK    WriteBatch delete(DocumentReference)
