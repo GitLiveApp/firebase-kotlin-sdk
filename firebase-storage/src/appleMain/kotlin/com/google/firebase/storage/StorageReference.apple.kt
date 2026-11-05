@@ -4,7 +4,6 @@
 
 package com.google.firebase.storage
 
-import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import android.net.Uri
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
@@ -86,9 +85,17 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destinationUri.toNSURL()))
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destinationFile.path)))
+
+    public actual fun getStream(): StreamDownloadTask = StreamDownloadTaskImpl(this, null)
+
+    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = StreamDownloadTaskImpl(this, processor)
+
+    public actual fun putStream(stream: java.io.InputStream): UploadTask = putStream(stream, null)
+
+    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = putStream(stream, metadata as StorageMetadata?)
+
+    private fun putStream(stream: java.io.InputStream, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, StreamUploadController(stream) { bytes -> IosUploadController(this, ios.putData(bytes.toNSData(), metadata?.toIos()), bytes.size.toLong()) })
 
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference.isUnder(this) }
 

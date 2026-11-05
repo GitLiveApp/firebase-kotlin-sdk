@@ -4,7 +4,6 @@
 
 package com.google.firebase.storage
 
-import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
@@ -17,6 +16,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.storage.stub
 import java.io.File
+import java.io.InputStream
 
 /*
  * Header stubs for com.google.firebase:firebase-storage (see buildSrc utils/HeaderStubs.kt): compiled against,
@@ -81,9 +81,11 @@ public actual class StorageReference private constructor() : Comparable<StorageR
     public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = stub()
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = stub()
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: File): FileDownloadTask = stub()
+    public actual fun getStream(): StreamDownloadTask = stub()
+    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = stub()
+    public actual fun putStream(stream: InputStream): UploadTask = stub()
+    public actual fun putStream(stream: InputStream, metadata: StorageMetadata): UploadTask = stub()
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = stub()
 }
 
@@ -157,6 +159,18 @@ public actual abstract class FileDownloadTask private constructor() : StorageTas
     public actual inner class TaskSnapshot private constructor() : SnapshotBase(null) {
         public actual val bytesTransferred: Long get() = stub()
         public actual val totalByteCount: Long get() = stub()
+    }
+}
+
+public actual abstract class StreamDownloadTask private constructor() : StorageTask<StreamDownloadTask.TaskSnapshot>() {
+    public actual fun interface StreamProcessor {
+        public actual fun doInBackground(state: TaskSnapshot, stream: InputStream)
+    }
+
+    public actual inner class TaskSnapshot private constructor() : SnapshotBase(null) {
+        public actual val bytesTransferred: Long get() = stub()
+        public actual val totalByteCount: Long get() = stub()
+        public actual val stream: InputStream get() = stub()
     }
 }
 

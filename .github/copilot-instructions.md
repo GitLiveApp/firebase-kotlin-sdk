@@ -138,17 +138,19 @@ The SDK has two public API layers per module:
    signature gets a **stand-in class** in firebase-app's `commonMain` under the type's own package, a header stub on Android/JVM
    like the rest (verified against `android.jar`, firebase-java-sdk or the running JDK), in one of two shapes:
    - **Usable**, when an app's code only carries the value to the SDK: `android.content.Context` is a constructible placeholder
-     (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
-     created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
-     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
+     (platform code without a context passes `Context()`), `java.net.URL`, `android.net.Uri` and `java.io.File` hold the string
+     or path they are created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
+     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`, `getFile(File)`), and Android code creating these inline compiles unchanged.
    - **Mirrored**, when the type's own API is small and useful everywhere: `java.io.InputStream` (`read` ×3, `skip`, `available`,
      `close`) and `java.io.ByteArrayInputStream` are `expect` classes whose Android/JVM actuals are header stubs of the JDK's and
      whose other actuals implement the JDK's contracts, so common code subclasses `InputStream` or passes a `ByteArrayInputStream`
-     to `loadBundle(InputStream)`, which every platform implements (JS and wasmJs pull it through a `ReadableStream`, Apple drains it
-     on a background queue into `NSData`).
+     to `loadBundle(InputStream)`, which every platform implements (JS and wasmJs pull it through a `ReadableStream`, Apple adapts it
+     to an `NSInputStream` for `loadBundleStream:`), or to storage's `putStream`, and reads `getStream()`'s `StreamDownloadTask`
+     (off Android and the JVM the whole object is downloaded, or the stream read to its end, since the Apple and JS SDKs work in
+     whole byte buffers).
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.nio.ByteBuffer`. The SDK
-     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getDate(String)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since

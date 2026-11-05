@@ -4,7 +4,6 @@
 
 package com.google.firebase.storage
 
-import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import dev.gitlive.firebase.UnsupportedOnJs
 import android.net.Uri
 import com.google.android.gms.tasks.Task
@@ -67,9 +66,16 @@ public actual class StorageReference internal constructor(public val js: JsStora
 
     public actual fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask = upload(bytes.toUint8Array(), metadata)
 
-    internal fun upload(data: dynamic, metadata: StorageMetadata?): UploadTask = rethrow {
-        UploadTaskImpl(this, JsUploadController(uploadBytesResumable(js, data, metadata?.toJs())))
-    }
+    internal fun upload(data: dynamic, metadata: StorageMetadata?): UploadTask = rethrow { UploadTaskImpl(this, uploadController(data, metadata)) }
+
+    private fun uploadController(data: dynamic, metadata: StorageMetadata?): UploadController = JsUploadController(uploadBytesResumable(js, data, metadata?.toJs()))
+
+    /** The stream is read to its end at once (JS has no other thread to read it on), then uploaded as bytes. */
+    public actual fun putStream(stream: java.io.InputStream): UploadTask = putStream(stream, null)
+
+    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = putStream(stream, metadata as StorageMetadata?)
+
+    private fun putStream(stream: java.io.InputStream, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, StreamUploadController(stream) { bytes -> rethrow { uploadController(bytes.toUint8Array(), metadata) } })
 
     public actual fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata> = task { updateMetadata(js, metadata.toJs().unsafeCast<SettableMetadata>()).then { it.toCompat() } }
 
@@ -85,9 +91,13 @@ public actual class StorageReference internal constructor(public val js: JsStora
     @UnsupportedOnJs
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this)
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
-    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+    /** Fails: the JS SDK downloads through URLs, not to files; use [getBytes] or [getDownloadUrl]. */
+    @UnsupportedOnJs
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this)
+
+    public actual fun getStream(): StreamDownloadTask = StreamDownloadTaskImpl(this, null)
+
+    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = StreamDownloadTaskImpl(this, processor)
 
     /** Always empty: the JS SDK has no file downloads. */
     @UnsupportedOnJs
