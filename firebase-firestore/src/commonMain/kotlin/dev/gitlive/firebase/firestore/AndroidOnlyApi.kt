@@ -16,5 +16,4 @@ internal const val REFLECTIVE_READ = "Maps a custom class with the Android SDK's
 internal const val GET_DATE_ANDROID_ONLY = "getDate returns a java.util.Date, which is JVM-only; use getTimestamp, and toKotlinInstant() on the Timestamp"
 
 // The bundle loaders from JVM streams, which only Android and the JVM can call (java.io.InputStream and java.nio.ByteBuffer are error-deprecated stand-ins in common code).
-internal const val LOAD_BUNDLE_STREAM_ANDROID_ONLY = "loadBundle(InputStream) is JVM-only; read the stream into a ByteArray and use loadBundle(ByteArray)"
 internal const val LOAD_BUNDLE_BUFFER_ANDROID_ONLY = "loadBundle(ByteBuffer) is JVM-only; use loadBundle(ByteArray) with the buffer's bytes"

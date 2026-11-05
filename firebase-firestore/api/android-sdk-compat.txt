@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 352 public members available (318 identical, 34 mapped, 0 missing, 0 omitted)
+# 100% of 352 public members available (319 identical, 33 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -169,7 +169,7 @@ com.google.firebase.firestore.FirebaseFirestore
   OK    Task getNamedQuery(String)
   OK    PersistentCacheIndexManager getPersistentCacheIndexManager()
   OK    LoadBundleTask loadBundle(byte[])
-  MAP   LoadBundleTask loadBundle(InputStream)  [deprecated: loadBundle(InputStream) is JVM-only; read the stream into a ByteArray and use loadBundle(ByteArray)]
+  OK    LoadBundleTask loadBundle(InputStream)
   MAP   LoadBundleTask loadBundle(ByteBuffer)  [deprecated: loadBundle(ByteBuffer) is JVM-only; use loadBundle(ByteArray) with the buffer's bytes]
   UNAV  PipelineSource pipeline()
   OK    Task runBatch(Function)

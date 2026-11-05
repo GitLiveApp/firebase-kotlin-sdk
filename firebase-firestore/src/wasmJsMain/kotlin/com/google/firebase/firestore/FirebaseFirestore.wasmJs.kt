@@ -6,7 +6,6 @@ package com.google.firebase.firestore
 
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
-import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.externals.json
@@ -40,6 +39,8 @@ import dev.gitlive.firebase.firestore.externals.collection as jsCollection
 import dev.gitlive.firebase.firestore.externals.collectionGroup as jsCollectionGroup
 import dev.gitlive.firebase.firestore.externals.loadBundle as jsLoadBundle
 import dev.gitlive.firebase.firestore.externals.runTransaction as jsRunTransaction
+import dev.gitlive.firebase.firestore.externals.LoadBundleTask as JsLoadBundleTask
+import org.khronos.webgl.Uint8Array
 
 private const val DEFAULT_DATABASE = "(default)"
 
@@ -140,10 +141,15 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
         return ListenerRegistration { rethrow { unsubscribe() } }
     }
 
-    public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask {
+    public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = loadBundle { jsLoadBundle(js, bundleData.toUint8Array().buffer) }
+
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = loadBundle { jsLoadBundle(js, bundleData.toReadableStream()) }
+
+    /** The task of the JS SDK's bundle load [start] returns, as a [LoadBundleTask]; a load that fails to start fails the task. */
+    private fun loadBundle(start: () -> JsLoadBundleTask): LoadBundleTask {
         val task = LoadBundleTaskImpl()
         try {
-            val jsTask = jsLoadBundle(js, bundleData.toUint8Array().buffer)
+            val jsTask = start()
             jsTask.onProgress({ task.update(it.toProgress()) }, {}, {})
             jsTask.then({ task.update(it.toProgress()) }, { task.fail(it.toFirestoreException()) })
         } catch (e: Throwable) {
@@ -151,10 +157,6 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
         }
         return task
     }
-
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
-    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
 
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(LOAD_BUNDLE_BUFFER_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.array())"), DeprecationLevel.ERROR)
@@ -260,3 +262,32 @@ public actual class PersistentCacheIndexManager internal constructor(public val 
         rethrow { deleteAllPersistentCacheIndexes(js) }
     }
 }
+
+/**
+ * A `ReadableStream` the JS SDK pulls the stream's bytes through, chunk by chunk, as it parses the bundle; the stream is
+ * closed at its end, and a failing read errors the `ReadableStream`, which fails the load.
+ */
+private fun java.io.InputStream.toReadableStream(): JsAny = readableStream { controller ->
+    try {
+        val buffer = ByteArray(BUNDLE_CHUNK_SIZE)
+        val count = read(buffer)
+        if (count < 0) {
+            close()
+            closeStream(controller)
+        } else {
+            enqueue(controller, buffer.copyOf(count).toUint8Array())
+        }
+    } catch (e: Throwable) {
+        errorStream(controller, jsError(e.message ?: e.toString()))
+    }
+}
+
+private const val BUNDLE_CHUNK_SIZE = 16 * 1024
+
+private fun readableStream(pull: (JsAny) -> Unit): JsAny = js("new ReadableStream({ pull: (controller) => pull(controller) })")
+
+private fun enqueue(controller: JsAny, chunk: Uint8Array): Unit = js("controller.enqueue(chunk)")
+
+private fun closeStream(controller: JsAny): Unit = js("controller.close()")
+
+private fun errorStream(controller: JsAny, error: JsAny): Unit = js("controller.error(error)")

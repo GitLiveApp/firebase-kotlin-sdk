@@ -141,9 +141,14 @@ The SDK has two public API layers per module:
      (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
      created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
      `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
+   - **Mirrored**, when the type's own API is small and useful everywhere: `java.io.InputStream` (`read` ×3, `skip`, `available`,
+     `close`) and `java.io.ByteArrayInputStream` are `expect` classes whose Android/JVM actuals are header stubs of the JDK's and
+     whose other actuals implement the JDK's contracts, so common code subclasses `InputStream` or passes a `ByteArrayInputStream`
+     to `loadBundle(InputStream)`, which every platform implements (JS and wasmJs pull it through a `ReadableStream`, Apple drains it
+     on a background queue into `NSData`).
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
-     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(InputStream)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since

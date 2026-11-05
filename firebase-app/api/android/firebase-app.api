@@ -142,6 +142,3 @@ public final class dev/gitlive/firebase/FirebaseOptions {
 public abstract interface annotation class dev/gitlive/firebase/UnsupportedOnJs : java/lang/annotation/Annotation {
 }
 
-public final class java/nio/ByteBuffer {
-}
-

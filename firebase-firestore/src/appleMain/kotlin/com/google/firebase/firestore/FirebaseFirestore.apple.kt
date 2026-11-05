@@ -6,7 +6,6 @@ package com.google.firebase.firestore
 
 import android.content.Context
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
-import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestore
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRFirestoreSettings
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRLoadBundleTaskProgress
@@ -31,6 +30,8 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNumber
 import platform.Foundation.numberWithLong
 import platform.darwin.dispatch_queue_t
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_global_queue
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseFirestore internal constructor(public val ios: FIRFirestore) {
@@ -113,9 +114,24 @@ public actual class FirebaseFirestore internal constructor(public val ios: FIRFi
         return task
     }
 
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
-    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = throw UnsupportedOperationException(LOAD_BUNDLE_STREAM_ANDROID_ONLY)
+    /**
+     * The stream is drained on a background queue (never the caller's thread) and handed to the iOS SDK as `NSData`
+     * once complete; the SDK's `loadBundleStream:` is not used, as it needs an `NSInputStream` subclass over the Kotlin
+     * stream. A failing read fails the task.
+     */
+    public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask {
+        val task = LoadBundleTaskImpl()
+        dispatch_async(dispatch_get_global_queue(0, 0u)) {
+            val bytes = try {
+                bundleData.use { it.drain() }
+            } catch (e: Exception) {
+                task.fail(e)
+                return@dispatch_async
+            }
+            ios.loadBundle(bytes.toNSData()).addObserver { progress -> task.update(progress!!.toCompat()) }
+        }
+        return task
+    }
 
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(LOAD_BUNDLE_BUFFER_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.array())"), DeprecationLevel.ERROR)
@@ -209,5 +225,16 @@ public actual class PersistentCacheIndexManager internal constructor(public val 
 
     public actual fun deleteAllIndexes() {
         ios.deleteAllIndexes()
+    }
+}
+
+/** Every remaining byte of the stream. */
+private fun java.io.InputStream.drain(): ByteArray {
+    var result = ByteArray(0)
+    val buffer = ByteArray(16 * 1024)
+    while (true) {
+        val count = read(buffer)
+        if (count < 0) return result
+        result += buffer.copyOf(count)
     }
 }

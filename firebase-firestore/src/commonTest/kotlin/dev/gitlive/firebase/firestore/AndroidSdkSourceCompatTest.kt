@@ -66,6 +66,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import com.google.firebase.firestore.VectorValue
+import com.google.firebase.firestore.LoadBundleTaskProgress
+import java.io.ByteArrayInputStream
 
 /**
  * Exercises the `com.google.firebase.firestore` layer exactly as Android app code would (the static accessors, the
@@ -250,6 +252,25 @@ class AndroidSdkSourceCompatTest {
         assertEquals("Hello", document.dataObjects<CompatPost>().first()?.title)
 
         posts.get().await().documents.forEach { it.reference.delete().await() }
+    }
+
+    @Test
+    fun testLoadBundle() = runTest {
+        // A bundle is length-prefixed JSON elements; one with only its metadata loads no documents.
+        fun bundle(id: String): ByteArray {
+            val metadata = """{"metadata":{"id":"$id","createTime":{"seconds":1,"nanos":0},"version":1,"totalDocuments":0,"totalBytes":0}}"""
+            return "${metadata.encodeToByteArray().size}$metadata".encodeToByteArray()
+        }
+        val fromBytes = firestore.loadBundle(bundle("compat-bytes")).await()
+        assertEquals(LoadBundleTaskProgress.TaskState.SUCCESS, fromBytes.taskState)
+        assertEquals(0, fromBytes.totalDocuments)
+
+        val fromStream = firestore.loadBundle(ByteArrayInputStream(bundle("compat-stream"))).await()
+        assertEquals(LoadBundleTaskProgress.TaskState.SUCCESS, fromStream.taskState)
+        assertEquals(0, fromStream.totalDocuments)
+
+        val failed = runCatching { firestore.loadBundle(ByteArrayInputStream("not a bundle".encodeToByteArray())).await() }
+        assertTrue(failed.isFailure, "loading an invalid bundle from a stream fails the task")
     }
 
     @Test

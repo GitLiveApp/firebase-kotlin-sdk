@@ -10,7 +10,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
-import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
 import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 import dev.gitlive.firebase.firestore.REFLECTIVE_SET
@@ -44,7 +43,6 @@ public actual class FirebaseFirestore private constructor() {
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = stub()
 
     @Suppress("DEPRECATION_ERROR")
-    @Deprecated(LOAD_BUNDLE_STREAM_ANDROID_ONLY, ReplaceWith("loadBundle(bundleData.readBytes())"), DeprecationLevel.ERROR)
     public actual fun loadBundle(bundleData: java.io.InputStream): LoadBundleTask = stub()
 
     @Suppress("DEPRECATION_ERROR")
