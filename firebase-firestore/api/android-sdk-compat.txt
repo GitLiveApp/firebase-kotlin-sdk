@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 348 public members available (314 identical, 34 mapped, 0 missing, 0 omitted)
+# 100% of 352 public members available (318 identical, 34 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -119,10 +119,10 @@ com.google.firebase.firestore.FieldValue
   OK    static FieldValue delete()
   OK    static FieldValue increment(double)
   OK    static FieldValue increment(long)
-  UNAV  static FieldValue maximum(double)
-  UNAV  static FieldValue maximum(long)
-  UNAV  static FieldValue minimum(double)
-  UNAV  static FieldValue minimum(long)
+  OK    static FieldValue maximum(double)
+  OK    static FieldValue maximum(long)
+  OK    static FieldValue minimum(double)
+  OK    static FieldValue minimum(long)
   OK    static FieldValue serverTimestamp()
   OK    static VectorValue vector(double[])
 com.google.firebase.firestore.Filter

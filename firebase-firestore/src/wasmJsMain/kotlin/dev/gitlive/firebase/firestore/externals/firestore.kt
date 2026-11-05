@@ -93,6 +93,10 @@ public external fun increment(n: Int): FieldValue
 
 public external fun increment(n: Double): FieldValue
 
+public external fun maximum(n: Double): FieldValue
+
+public external fun minimum(n: Double): FieldValue
+
 public external fun initializeFirestore(app: FirebaseApp, settings: JsAny? = definedExternally, databaseId: String? = definedExternally): Firestore
 
 public external fun limit(limit: Double): QueryConstraint

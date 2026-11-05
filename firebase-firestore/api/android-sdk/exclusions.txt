@@ -1,14 +1,11 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
 
-# Firestore Pipelines are Swift-only in the pinned iOS SDK (not in FirebaseFirestoreInternal, which the Apple targets bind)
-# and a separate preview entry point (firebase/firestore/pipelines) in the pinned JS SDK.
+# Firestore Pipelines are Swift-only in the iOS SDK, at any version: its Objective-C side is the hidden `__FIRPipelineBridge`
+# classes, so FirebaseFirestoreInternal, which the Apple targets bind, has no pipeline API. In the pinned JS SDK they are a
+# separate preview entry point (firebase/firestore/pipelines).
 com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
 com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
 com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
-
-# The minimum/maximum field transforms are not in the pinned iOS SDK's Objective-C API (the JS SDK has minimum()/maximum()).
-com.google.firebase.firestore.FieldValue#maximum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
-com.google.firebase.firestore.FieldValue#minimum  // @unavailable the minimum/maximum transforms are not in the iOS SDK's Objective-C API
 
 # The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class

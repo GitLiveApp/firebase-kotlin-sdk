@@ -429,10 +429,22 @@ public actual abstract class FieldValue private constructor() {
         public actual fun increment(l: Long): FieldValue = stub()
 
         @JvmStatic
-        public actual fun vector(values: DoubleArray): VectorValue = stub()
+        public actual fun increment(d: Double): FieldValue = stub()
 
         @JvmStatic
-        public actual fun increment(d: Double): FieldValue = stub()
+        public actual fun minimum(l: Long): FieldValue = stub()
+
+        @JvmStatic
+        public actual fun minimum(d: Double): FieldValue = stub()
+
+        @JvmStatic
+        public actual fun maximum(l: Long): FieldValue = stub()
+
+        @JvmStatic
+        public actual fun maximum(d: Double): FieldValue = stub()
+
+        @JvmStatic
+        public actual fun vector(values: DoubleArray): VectorValue = stub()
     }
 }
 

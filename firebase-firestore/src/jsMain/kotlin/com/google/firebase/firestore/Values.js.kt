@@ -30,6 +30,8 @@ import dev.gitlive.firebase.firestore.externals.or as jsOr
 import dev.gitlive.firebase.firestore.externals.serverTimestamp as jsServerTimestamp
 import dev.gitlive.firebase.firestore.externals.where as jsWhere
 import dev.gitlive.firebase.firestore.externals.VectorValue as JsVectorValue
+import dev.gitlive.firebase.firestore.externals.maximum as jsMaximum
+import dev.gitlive.firebase.firestore.externals.minimum as jsMinimum
 
 /*
  * The JS SDK reads and writes plain JS values with its own Timestamp, GeoPoint, DocumentReference and Bytes classes;
@@ -96,6 +98,8 @@ internal fun FieldValue.toJsFieldValue(): Any = when (operation) {
     FieldValue.Operation.ARRAY_UNION -> jsArrayUnion(*arguments.map { it.toJs()!! }.toTypedArray())
     FieldValue.Operation.ARRAY_REMOVE -> jsArrayRemove(*arguments.map { it.toJs()!! }.toTypedArray())
     FieldValue.Operation.INCREMENT -> jsIncrement((arguments.single() as Number).toDouble())
+    FieldValue.Operation.MINIMUM -> jsMinimum((arguments.single() as Number).toDouble())
+    FieldValue.Operation.MAXIMUM -> jsMaximum((arguments.single() as Number).toDouble())
 }
 
 internal fun FieldPath.toJs(): JsFieldPath = if (isDocumentId) documentId() else JsFieldPath(*segments.toTypedArray())

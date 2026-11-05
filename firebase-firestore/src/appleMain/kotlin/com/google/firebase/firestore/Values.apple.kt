@@ -66,6 +66,14 @@ internal fun FieldValue.toIosFieldValue(): FIRFieldValue = when (operation) {
         is Long -> FIRFieldValue.fieldValueForIntegerIncrement(amount)
         else -> FIRFieldValue.fieldValueForDoubleIncrement((amount as Number).toDouble())
     }
+    FieldValue.Operation.MINIMUM -> when (val bound = arguments.single()) {
+        is Long -> FIRFieldValue.fieldValueForIntegerMinimum(bound)
+        else -> FIRFieldValue.fieldValueForDoubleMinimum((bound as Number).toDouble())
+    }
+    FieldValue.Operation.MAXIMUM -> when (val bound = arguments.single()) {
+        is Long -> FIRFieldValue.fieldValueForIntegerMaximum(bound)
+        else -> FIRFieldValue.fieldValueForDoubleMaximum((bound as Number).toDouble())
+    }
 }
 
 /** The iOS SDK's vector as the layer's; the SDK hands its numbers over as NSNumbers, which Kotlin/Native sees as [Number]s. */

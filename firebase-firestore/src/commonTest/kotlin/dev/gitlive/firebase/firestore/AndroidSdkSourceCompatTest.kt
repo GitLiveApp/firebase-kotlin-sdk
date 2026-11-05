@@ -255,11 +255,15 @@ class AndroidSdkSourceCompatTest {
     @Test
     fun testFieldValues() = runTest {
         val document = collection("fieldValues").document("doc")
-        document.setData(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon", "embedding" to FieldValue.vector(doubleArrayOf(1.0, 2.5, -3.0)))).await()
+        document.setData(mapOf("count" to 1L, "tags" to listOf("a"), "gone" to "soon", "embedding" to FieldValue.vector(doubleArrayOf(1.0, 2.5, -3.0)), "low" to 10L, "high" to 10L, "lowest" to 1.5, "highest" to 1.5)).await()
         document.updateData(
             mapOf(
                 "count" to FieldValue.increment(5L),
                 "ratio" to FieldValue.increment(0.5),
+                "low" to FieldValue.minimum(3L),
+                "high" to FieldValue.maximum(3L),
+                "lowest" to FieldValue.minimum(0.5),
+                "highest" to FieldValue.maximum(0.5),
                 "tags" to FieldValue.arrayUnion("b", "c"),
                 "gone" to FieldValue.delete(),
                 "time" to FieldValue.serverTimestamp(),
@@ -273,6 +277,10 @@ class AndroidSdkSourceCompatTest {
         assertEquals(listOf("b", "c"), snapshot.get("tags"))
         assertFalse(snapshot.contains("gone"))
         assertNotNull(snapshot.getTimestamp("time"))
+        assertEquals(3L, snapshot.getLong("low"))
+        assertEquals(10L, snapshot.getLong("high"))
+        assertEquals(0.5, snapshot.getDouble("lowest"))
+        assertEquals(1.5, snapshot.getDouble("highest"))
         assertEquals(FieldValue.vector(doubleArrayOf(1.0, 2.5, -3.0)), snapshot.getVectorValue("embedding"))
         assertContentEquals(doubleArrayOf(1.0, 2.5, -3.0), snapshot.getVectorValue("embedding")?.toArray())
         assertIs<VectorValue>(snapshot.get("embedding"))

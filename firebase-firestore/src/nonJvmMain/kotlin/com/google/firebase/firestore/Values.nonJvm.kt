@@ -38,7 +38,7 @@ public actual class FieldPath internal constructor(internal val segments: List<S
 
 /** A sentinel value; [operation] and [arguments] are converted to the platform SDK's field value when written. */
 public actual abstract class FieldValue internal constructor(internal val operation: Operation, internal val arguments: List<Any?>) {
-    internal enum class Operation { SERVER_TIMESTAMP, DELETE, ARRAY_UNION, ARRAY_REMOVE, INCREMENT }
+    internal enum class Operation { SERVER_TIMESTAMP, DELETE, ARRAY_UNION, ARRAY_REMOVE, INCREMENT, MINIMUM, MAXIMUM }
 
     override fun equals(other: Any?): Boolean = other is FieldValue && other.operation == operation && other.arguments == arguments
 
@@ -55,6 +55,10 @@ public actual abstract class FieldValue internal constructor(internal val operat
         public actual fun arrayRemove(vararg elements: Any): FieldValue = Impl(Operation.ARRAY_REMOVE, elements.asList())
         public actual fun increment(l: Long): FieldValue = Impl(Operation.INCREMENT, listOf(l))
         public actual fun increment(d: Double): FieldValue = Impl(Operation.INCREMENT, listOf(d))
+        public actual fun minimum(l: Long): FieldValue = Impl(Operation.MINIMUM, listOf(l))
+        public actual fun minimum(d: Double): FieldValue = Impl(Operation.MINIMUM, listOf(d))
+        public actual fun maximum(l: Long): FieldValue = Impl(Operation.MAXIMUM, listOf(l))
+        public actual fun maximum(d: Double): FieldValue = Impl(Operation.MAXIMUM, listOf(d))
         public actual fun vector(values: DoubleArray): VectorValue = VectorValue.of(values)
     }
 }

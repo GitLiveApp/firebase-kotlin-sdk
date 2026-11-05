@@ -23,8 +23,6 @@ public expect class FieldPath {
 /**
  * A sentinel written in place of a field value, mirroring `com.google.firebase.firestore.FieldValue` from the Firebase
  * Android SDK: a server timestamp, a deletion or a transform of the current value.
- *
- * Not mirrored: `minimum` and `maximum` (see `api/android-sdk/exclusions.txt`).
  */
 public expect abstract class FieldValue {
     public companion object {
@@ -45,6 +43,18 @@ public expect abstract class FieldValue {
 
         /** Adds [d] to the numeric field. */
         public fun increment(d: Double): FieldValue
+
+        /** Sets the numeric field to the lesser of its value and [l]. */
+        public fun minimum(l: Long): FieldValue
+
+        /** Sets the numeric field to the lesser of its value and [d]. */
+        public fun minimum(d: Double): FieldValue
+
+        /** Sets the numeric field to the greater of its value and [l]. */
+        public fun maximum(l: Long): FieldValue
+
+        /** Sets the numeric field to the greater of its value and [d]. */
+        public fun maximum(d: Double): FieldValue
 
         /** A [VectorValue] of [values], stored as Firestore's vector type. */
         public fun vector(values: DoubleArray): VectorValue
