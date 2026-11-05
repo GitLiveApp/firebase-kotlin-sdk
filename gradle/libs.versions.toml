@@ -14,11 +14,12 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
 kotlinx-binarycompatibilityvalidator = "0.18.1"
 kotlinx-datetime = "0.7.1"
+kotlinx-io = "0.9.2"
 kotlinx-browser = "0.5.0"
 kotlinter = "5.2.0"
 settings-api = "2.2"
 settings-language = "2.2"
-firebase-ios-sdk = "12.17.0"
+firebase-ios-sdk = "12.19.3"
 # firebase-ios-sdk 12 declares platforms: [.iOS(.v15), .macCatalyst(.v15), .macOS(.v10_15), .tvOS(.v15), .watchOS(.v7)]
 # Kotlin/Native builds for iOS 15 / macOS 12 / tvOS 15 (minVersion in konan.properties), so macOS uses its 12.0 floor
 # rather than Firebase's 10.15.
@@ -59,6 +60,7 @@ kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-cor
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }

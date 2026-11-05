@@ -14,7 +14,7 @@ publication:
 
 - The root Gradle module metadata exposes a **`swiftPMDependenciesMetadataElements`** variant
   (usage `swiftPMDependenciesMetadata`) referencing a **`<module>-<version>-swiftpm-metadata.json`**
-  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `12.17.0`, product
+  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `12.19.3`, product
   `FirebaseCore`, deployment targets, and `isModulesDiscoveryEnabled = false`. The declared version
   is a `from(...)` lower bound, so SwiftPM may resolve any newer 12.x minor or patch release, up to
   but not including 13.0.0.
@@ -23,7 +23,7 @@ publication:
   dependency graph — **without declaring any `swiftPMDependencies` of its own**. (Verified: a
   consumer depending only on `dev.gitlive:firebase-app` produced an aggregated
   `build/kotlin/swiftPMDependenciesMetadataForLockFiles` listing `firebase-ios-sdk` / `FirebaseCore`
-  / `12.17.0`.)
+  / `12.19.3`.)
 - The Kotlin Gradle plugin then generates a synthetic Swift package containing all transitive
   SwiftPM dependencies and provides the machine code when linking the app's framework / running
   Kotlin/Native tests (`generateSyntheticLinkageSwiftPMImportProject…`, `integrateEmbedAndSign`,

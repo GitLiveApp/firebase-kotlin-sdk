@@ -142,14 +142,17 @@ The SDK has two public API layers per module:
      created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
      `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`. The SDK members taking them (`Timestamp(Date)`,
-     `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(InputStream)`, `putStream(InputStream)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since
      they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
-     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`; `kotlin.time.ExperimentalTime` is opted in at
-     the build level).
+     `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`, and for the JDK streams the kotlinx-io forms
+     `FirebaseFirestore.loadBundle(RawSource)` in `Bundles.kt` and `StorageReference.putStream(RawSource)` and `getFile(kotlinx.io.files.Path)` in `StorageSources.kt`, whose
+     Android/JVM actuals hand the SDK `source.asInputStream()` while the other platforms stream through kotlinx-io's `asNSInputStream()`
+     or a `ReadableStream`, or read the source to its end where the SDK uploads whole buffers; `kotlin.time.ExperimentalTime` is opted in at
+     the build level). Such counterparts and their platform actuals are shipped through `keepClasses`.
    A module facade that must reach an SDK member taking an error-deprecated stand-in (the `Duration` timeout forms calling
    `setTimeout(Long, TimeUnit)`) does so through a package-private Java helper of its own (`FunctionsJvmApi.java`), which
    compiles after the stubs are stripped. Members the Android SDK has but `firebase-java-sdk` lacks or keeps non-public are
@@ -167,7 +170,7 @@ The SDK has two public API layers per module:
      is selected with `Class#member(Type, Type)`.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-perf`, `firebase-messaging`, `firebase-storage` and `firebase-database` are the reference.
+   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-perf`, `firebase-messaging`, `firebase-storage`, `firebase-database` and `firebase-firestore` are the reference.
    `firebase-analytics` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published
    classes by `generateAndroidSdkApi*`), an `expect` class whose platform actuals share an internal `NativeAnalytics` expect
    (so the JS and wasmJs actuals can carry `@UnsupportedOnJs` on the session members the JS SDK lacks), a header stub for a platform class (`android.os.Bundle`) and a
@@ -191,6 +194,28 @@ The SDK has two public API layers per module:
    `@Transient` and its own `@SerialInfo` annotations in `com.google.firebase.serialization` (firebase-app); the SDK's
    `@PropertyName`, `@Exclude`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` are header stubs deprecated towards
    them, as kotlinx.serialization cannot record the SDK's annotation classes, which app code compiles against on Android.
+   `firebase-firestore` shows custom-class mapping through `com.google.firebase.serialization.FirebaseFormat` (in firebase-app) as
+   the single mapper on every platform, Android included: the shipped `setData`/`updateData`/`addData` extensions call the
+   SDK members with the data mapped by the format (the reified `setData`/`addData` with its static type, so generic classes map;
+   on Android and the JVM the member receives the mapped data itself, where it would map by reflection, and the other actuals,
+   which map every value they write through the format, receive it as a `PlainValue` the format passes through) and the reified `toObject`,
+   `toObjects`, `getField` and `dataObjects` read through `format.decodeFromPlainValue`, with the module's `FirestoreBindings` (the value types passed
+   through, `@DocumentId` and `@ServerTimestamp` support, and `toSdkValue`/`fromSdkValue` converting the layer's `Timestamp`,
+   `GeoPoint`, `Blob`, `VectorValue`, `DocumentReference`, `FieldValue` and `FieldPath` to the platform SDK's own classes; the identity on Android
+   and the JVM). They live in `com.google.firebase.serialization` (`FirestoreMapping.kt`, shipped through `keepPackageDirs`): the
+   reads keep the SDK's names, and in the SDK's own package a call would resolve to the SDK's `FirestoreKt` facade on Android and
+   the JVM (this module's is a stripped stub), whose inline bodies map by reflection. The SDK's reflective members are deprecated
+   with an error towards them on the common declarations and every actual (`set(Any)`, `update(Map)`, `add(Any)`, the facade's
+   reified reads; the `Class`-taking reads only exist in the Android stubs), with the messages in
+   `dev.gitlive.firebase.firestore.AndroidOnlyApi.kt`; a deprecation only on an Android stub never reaches app code, which
+   compiles against the SDK's own classes once the stubs are stripped. The report counts them as `MAP`; the format and its
+   bindings (`FormatKt`, `FirestoreBindings`) are listed in `keepClasses`, and the wrapper's already-encoded writes call the
+   deprecated members under `@Suppress("DEPRECATION_ERROR")`. The format reads kotlinx.serialization's `@SerialName` and
+   `@Transient` and its own `@SerialInfo` annotations in `com.google.firebase.serialization` (firebase-app); the SDK's
+   `@PropertyName`, `@Exclude`, `@DocumentId`, `@ServerTimestamp`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` are
+   header stubs deprecated towards them, as kotlinx.serialization cannot record the SDK's annotation classes, which app code
+   compiles against on Android. On wasmJs the `dev.gitlive` wrapper's special-value serializers convert the JS SDK's classes
+   themselves (`toCompatSpecialValue`), as a Kotlin value cannot be stored in the JS tree the decoders read.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

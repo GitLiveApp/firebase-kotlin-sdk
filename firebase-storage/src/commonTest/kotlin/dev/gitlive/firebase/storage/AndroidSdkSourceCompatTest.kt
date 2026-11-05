@@ -30,6 +30,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.google.firebase.storage.putStream
+import kotlinx.io.Buffer
 
 /**
  * Exercises the `com.google.firebase.storage` layer exactly as Android app code would (the static accessors, the
@@ -123,6 +125,20 @@ class AndroidSdkSourceCompatTest {
         ref.delete().await()
         val exception = assertFailsWith<StorageException> { ref.getBytes(1024).await() }
         assertEquals(StorageException.ERROR_OBJECT_NOT_FOUND, exception.errorCode)
+    }
+
+    @Test
+    fun testPutStream() = runTest {
+        val ref = storage.getReference("test").child("compatStream.txt")
+        val source = Buffer().apply { write("streamed".encodeToByteArray()) }
+        val uploaded: UploadTask.TaskSnapshot = ref.putStream(source, storageMetadata { contentType = "text/plain" }).await()
+        assertEquals(8, uploaded.bytesTransferred)
+        assertEquals("text/plain", uploaded.metadata?.contentType)
+        assertEquals("streamed", ref.getBytes(1024).await().decodeToString())
+
+        val plain: UploadTask.TaskSnapshot = ref.putStream(Buffer().apply { write("again".encodeToByteArray()) }).await()
+        assertEquals(5, plain.bytesTransferred)
+        assertEquals("again", ref.getBytes(1024).await().decodeToString())
     }
 
     @Test

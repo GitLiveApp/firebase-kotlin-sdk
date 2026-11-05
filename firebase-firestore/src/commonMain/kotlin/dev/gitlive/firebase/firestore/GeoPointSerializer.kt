@@ -9,8 +9,8 @@ import kotlinx.serialization.SerializationException
 public object GeoPointSerializer : KSerializer<GeoPoint> by SpecialValueSerializer(
     serialName = "GeoPoint",
     toNativeValue = GeoPoint::nativeValue,
-    fromNativeValue = { value ->
-        when (value) {
+    fromNativeValue = { raw ->
+        when (val value = raw?.toCompatSpecialValue()) {
             is NativeGeoPoint -> GeoPoint(value)
             else -> throw SerializationException("Cannot deserialize $value")
         }

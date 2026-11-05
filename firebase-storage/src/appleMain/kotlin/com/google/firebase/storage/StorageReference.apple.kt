@@ -4,7 +4,6 @@
 
 package com.google.firebase.storage
 
-import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import android.net.Uri
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
@@ -28,6 +27,10 @@ import platform.Foundation.NSURL
 import platform.Foundation.create
 import platform.Foundation.timeIntervalSince1970
 import platform.posix.memcpy
+import kotlinx.io.Source
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import kotlinx.io.files.Path
 
 private const val MILLIS_PER_SECOND = 1000.0
 
@@ -87,8 +90,20 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destinationUri.toNSURL()))
 
     @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+
+    internal fun getFileAt(destination: Path): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destination.toString())))
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public actual fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask = throw UnsupportedOperationException(PUT_STREAM_JVM_ONLY)
+
+    internal fun putSourceBytes(source: Source, metadata: StorageMetadata?): UploadTask = UploadTaskImpl(this, SourceUploadController(source) { bytes -> IosUploadController(this, ios.putData(bytes.toNSData(), metadata?.toIos()), bytes.size.toLong()) })
 
     public actual val activeDownloadTasks: List<FileDownloadTask> get() = ActiveTasks.downloads.filterIsInstance<FileDownloadTask>().filter { it.reference.isUnder(this) }
 
@@ -250,3 +265,7 @@ internal fun Uri.toNSURL(): NSURL {
 
 /** The size of the file at this URL, or null when it cannot be read. */
 internal fun NSURL.fileSize(): Long? = path?.let { NSFileManager.defaultManager.attributesOfItemAtPath(it, null)?.get(NSFileSize) as? NSNumber }?.longValue
+
+internal actual fun StorageReference.putSource(source: Source, metadata: StorageMetadata?): UploadTask = putSourceBytes(source, metadata)
+
+public actual fun StorageReference.getFile(destination: Path): FileDownloadTask = getFileAt(destination)

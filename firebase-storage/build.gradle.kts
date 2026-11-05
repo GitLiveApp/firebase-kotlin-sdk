@@ -172,6 +172,8 @@ kotlin {
             dependencies {
                 api(project(":firebase-app"))
                 api(project(":firebase-common"))
+                // The multiplatform form of putStream(InputStream) takes a kotlinx-io RawSource.
+                api(libs.kotlinx.io.core)
             }
         }
 
@@ -213,6 +215,11 @@ stripHeaderStubs(
         }?.files ?: files()
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
+    // putStream(RawSource), the kotlinx-io counterpart of putStream(InputStream), and its Android/JVM actual.
+    keepClasses = listOf(
+        "com/google/firebase/storage/StorageSourcesKt.class",
+        "com/google/firebase/storage/StorageSources_androidKt.class",
+    ),
 )
 
 registerAndroidSourceCompat("firebase-storage/api.txt")
