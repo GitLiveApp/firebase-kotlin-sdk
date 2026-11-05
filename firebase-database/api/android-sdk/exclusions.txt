@@ -1,0 +1,1 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-database.

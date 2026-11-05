@@ -70,6 +70,7 @@ public external fun onValue(
     query: Query,
     callback: ValueSnapshotCallback,
     cancelCallback: CancelCallback? = definedExternally,
+    options: JsAny? = definedExternally,
 ): Unsubscribe
 
 public external fun onDisconnect(ref: DatabaseReference): OnDisconnect
@@ -77,6 +78,8 @@ public external fun onDisconnect(ref: DatabaseReference): OnDisconnect
 public external fun orderByChild(path: String): QueryConstraint
 
 public external fun orderByKey(): QueryConstraint
+
+public external fun orderByPriority(): QueryConstraint
 
 public external fun orderByValue(): QueryConstraint
 
@@ -86,11 +89,17 @@ public external fun query(query: Query, vararg queryConstraints: QueryConstraint
 
 public external fun ref(db: Database, path: String? = definedExternally): DatabaseReference
 
+public external fun refFromURL(db: Database, url: String): DatabaseReference
+
 public external fun remove(ref: DatabaseReference): Promise<JsAny?>
 
 public external fun serverTimestamp(): JsAny
 
 public external fun set(ref: DatabaseReference, value: JsAny?): Promise<JsAny?>
+
+public external fun setPriority(ref: DatabaseReference, priority: JsAny?): Promise<JsAny?>
+
+public external fun setWithPriority(ref: DatabaseReference, value: JsAny?, priority: JsAny?): Promise<JsAny?>
 
 public external fun startAfter(value: JsAny?, key: String? = definedExternally): QueryConstraint
 
@@ -98,9 +107,13 @@ public external fun startAt(value: JsAny?, key: String? = definedExternally): Qu
 
 public external fun update(ref: DatabaseReference, values: JsAny): Promise<JsAny?>
 
+/**
+ * [transactionUpdate] is the JS function itself rather than a Kotlin function type: a value returned through a Kotlin
+ * function wrapper loses `undefined` (it becomes `null`, which the SDK writes as a deletion), and the SDK aborts on it.
+ */
 public external fun runTransaction(
     ref: DatabaseReference,
-    transactionUpdate: (currentData: JsAny?) -> JsAny?,
+    transactionUpdate: JsAny,
     options: JsAny? = definedExternally,
 ): Promise<TransactionResult>
 
@@ -110,6 +123,7 @@ public external interface Database : JsAny {
 
 public external interface Query : JsAny {
     public val ref: DatabaseReference
+    public fun isEqual(other: Query?): Boolean
 }
 
 public external interface QueryConstraint : JsAny
@@ -124,12 +138,15 @@ public external interface ThenableReference : DatabaseReference
 
 public external interface DataSnapshot : JsAny {
     public val key: String?
+    public val priority: JsAny?
     public val size: Int
     public val ref: DatabaseReference
     public fun `val`(): JsAny?
+    public fun exportVal(): JsAny?
     public fun exists(): Boolean
     public fun forEach(action: (a: DataSnapshot) -> Boolean): Boolean
     public fun child(path: String): DataSnapshot
+    public fun hasChild(path: String): Boolean
     public fun hasChildren(): Boolean
 }
 
@@ -137,6 +154,7 @@ public external interface OnDisconnect : JsAny {
     public fun cancel(): Promise<JsAny?>
     public fun remove(): Promise<JsAny?>
     public fun set(value: JsAny?): Promise<JsAny?>
+    public fun setWithPriority(value: JsAny?, priority: JsAny?): Promise<JsAny?>
     public fun update(value: JsAny): Promise<JsAny?>
 }
 

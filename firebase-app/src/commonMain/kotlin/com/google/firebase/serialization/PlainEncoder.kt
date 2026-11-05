@@ -40,6 +40,7 @@ internal fun SerialDescriptor.isArray() = kind == StructureKind.LIST && baseName
  * SDK's own (a JS object on JS, read through [PlainMap]) as well as a Kotlin one; the result is the platform's.
  */
 internal fun encodeRuntimeValue(format: FirebaseFormat, value: Any?, path: ErrorPath): Any? {
+    if (value is PlainValue) return value.value
     val rules = format.rules
     rules.checkDepth(path)
     val value = value.asRead() ?: return null
@@ -152,8 +153,7 @@ internal class PlainEncoder(
     }
 
     override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
-        value = enumDescriptor.getElementAnnotations(index).firstNotNullOfOrNull(rules.enumPropertyName)
-            ?: enumDescriptor.getElementName(index)
+        value = enumDescriptor.getElementName(index)
     }
 
     override fun encodeInline(descriptor: SerialDescriptor): Encoder = this
@@ -253,13 +253,13 @@ internal class ClassEncoder(format: FirebaseFormat, private val path: ErrorPath,
     val result = PlainMap()
 
     override fun elementEncoder(descriptor: SerialDescriptor, index: Int): PlainEncoder? {
-        if (mapping.excluded[index] || mapping.documentId[index]) return null
+        if (mapping.documentId[index]) return null
         val name = mapping.names[index]
         return PlainEncoder(format, path.child(name)) { result[name] = it }
     }
 
     override fun <T : Any> encodeNullableSerializableElement(descriptor: SerialDescriptor, index: Int, serializer: SerializationStrategy<T>, value: T?) {
-        if (value == null && mapping.serverTimestamp[index] && !mapping.excluded[index] && rules is Rules.Firestore) {
+        if (value == null && mapping.serverTimestamp[index] && rules is Rules.Firestore) {
             result[mapping.names[index]] = rules.writeNative(rules.bindings.serverTimestamp())
         } else {
             super.encodeNullableSerializableElement(descriptor, index, serializer, value)

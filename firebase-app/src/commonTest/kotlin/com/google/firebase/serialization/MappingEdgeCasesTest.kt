@@ -73,12 +73,11 @@ class MappingEdgeCasesTest {
     }
 
     @Test
-    fun functionsKeepsCaseDistinctSerialNames() {
+    fun keepsCaseDistinctSerialNames() {
         assertPlain(mapOf("X-ID" to 1, "x-id" to 2), functions.encodeToPlainValue(CaseDistinct(1, 2)))
         assertEquals(CaseDistinct(1, 2), functions.decodeFromPlainValue(hashMapOf("X-ID" to 1, "x-id" to 2)))
-        assertFailsWithMessage<RuntimeException>("Found two getters or fields with conflicting case sensitivity for property: x-id") {
-            firestore.encodeToPlainValue(CaseDistinct())
-        }
+        assertPlain(mapOf("X-ID" to 1, "x-id" to 2), firestore.encodeToPlainValue(CaseDistinct(1, 2)))
+        assertEquals(CaseDistinct(1, 2), firestore.decodeFromPlainValue(hashMapOf("X-ID" to 1, "x-id" to 2)))
     }
 
     @Test
@@ -89,6 +88,20 @@ class MappingEdgeCasesTest {
         assertEquals(WithBlob(Blob("x"), mapOf("b" to Blob("z"))), firestore.decodeFromPlainValue<WithBlob>(stored))
         assertEquals(Blob("x"), firestore.convertToCustomClass(SdkBlob("x"), Blob::class))
         assertEquals(mapOf("b" to Blob("z")), firestore.convertToCustomClass(hashMapOf("b" to SdkBlob("z")), Any::class))
+    }
+
+    @Test
+    fun mapsAnInterfaceTypeByTheRuntimeType() {
+        // A map of mixed values infers Map<String, Comparable<*>>, which has no serializer of its own
+        assertPlain(mapOf("a" to 1, "b" to "x"), firestore.encodeToPlainValue<Map<String, Comparable<*>>>(mapOf("a" to 1L, "b" to "x")))
+        assertEquals(mapOf("a" to 1L, "b" to "x"), firestore.decodeFromPlainValue<Map<String, Comparable<*>>>(hashMapOf("a" to 1L, "b" to "x")))
+    }
+
+    @Test
+    fun passesAnAlreadyConvertedValueThrough() {
+        val converted = firestore.convertToPlainValue(mapOf("city" to "LA", "when" to ServerTimestampSentinel))
+        assertSame(converted, firestore.convertToPlainValue(PlainValue(converted)))
+        assertPlain(mapOf("inner" to mapOf("city" to "LA", "when" to SdkServerTimestamp)), firestore.convertToPlainValue(mapOf("inner" to PlainValue(converted))))
     }
 
     @Test

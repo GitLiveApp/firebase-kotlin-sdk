@@ -26,17 +26,18 @@ class DatabaseFormatTest {
     }
 
     @Test
-    fun writesPropertiesByTheirGetterNames() {
-        assertPlain(mapOf("player" to "a", "points" to 1.5, "winner" to true), database.encodeToPlainValue(Score("a", 1.5, true)))
-        assertEquals(Score("a", 2.0, true), database.decodeFromPlainValue(hashMapOf("player" to "a", "points" to 2L, "winner" to true)))
+    fun writesPropertiesByTheirSerialNames() {
+        assertPlain(mapOf("player" to "a", "points" to 1.5, "isWinner" to true), database.encodeToPlainValue(Score("a", 1.5, true)))
+        assertEquals(Score("a", 2.0, true), database.decodeFromPlainValue(hashMapOf("player" to "a", "points" to 2L, "isWinner" to true)))
     }
 
     @Test
-    fun mapsEnumsByName() {
-        assertPlain(mapOf("direction" to "SOUTH"), database.encodeToPlainValue(WithEnum(Direction.SOUTH)))
-        assertFailsWithMessage<DatabaseException>("Could not find enum value of com.google.firebase.serialization.Direction for value \"south\"") {
-            database.decodeFromPlainValue<WithEnum>(hashMapOf("direction" to "south"))
+    fun mapsEnumsByTheirSerialName() {
+        assertPlain(mapOf("direction" to "south"), database.encodeToPlainValue(WithEnum(Direction.SOUTH)))
+        assertFailsWithMessage<DatabaseException>("Could not find enum value of com.google.firebase.serialization.Direction for value \"SOUTH\"") {
+            database.decodeFromPlainValue<WithEnum>(hashMapOf("direction" to "SOUTH"))
         }
+        assertEquals(WithEnum(Direction.SOUTH), database.decodeFromPlainValue(hashMapOf("direction" to "south")))
     }
 
     @Test
@@ -91,7 +92,7 @@ class FunctionsFormatTest {
     fun mapsClassesThroughTheirSerializerWithTheirSerialNames() {
         assertPlain(mapOf("player" to "a", "points" to 1.5, "isWinner" to true), functions.encodeToPlainValue(Score("a", 1.5, true)))
         assertEquals(Score("a", 1.0), functions.decodeFromPlainValue(hashMapOf("player" to "a", "points" to 1, "unknown" to 2)))
-        assertPlain(mapOf("direction" to "SOUTH"), functions.encodeToPlainValue(WithEnum(Direction.SOUTH)))
+        assertPlain(mapOf("direction" to "south"), functions.encodeToPlainValue(WithEnum(Direction.SOUTH)))
         assertPlain(mapOf("count" to 1), functions.encodeToPlainValue(WithShort(1)))
     }
 }

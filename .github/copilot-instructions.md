@@ -167,13 +167,30 @@ The SDK has two public API layers per module:
      is selected with `Class#member(Type, Type)`.
 2. **`dev.gitlive.firebase.*` (Kotlin-first layer)** — the existing API, implemented in `commonMain` *on top of* the
    `com.google.firebase` layer (suspend functions instead of `Task`, `Flow` instead of listeners, default arguments instead of
-   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-perf`, `firebase-messaging` and `firebase-storage` are the reference.
+   builders). New modules are migrated to this structure one at a time; `firebase-app`, `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-perf`, `firebase-messaging`, `firebase-storage` and `firebase-database` are the reference.
    `firebase-analytics` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published
    classes by `generateAndroidSdkApi*`), an `expect` class whose platform actuals share an internal `NativeAnalytics` expect
    (so the JS and wasmJs actuals can carry `@UnsupportedOnJs` on the session members the JS SDK lacks), a header stub for a platform class (`android.os.Bundle`) and a
    module the JVM SDK lacks entirely (`jvmKeepClasses` ships the module's own no-op implementation).
    `firebase-auth` shows a closed-source Android module (its `api/android-sdk/*.api.txt` is generated from the published classes by
    `generateAndroidSdkApi*`) and a JVM SDK without the Kotlin facade (`jvmKeepClasses` in `stripHeaderStubs` ships this module's `AuthKt`).
+   `firebase-database` shows custom-class mapping through `com.google.firebase.serialization.FirebaseFormat` (in firebase-app) as
+   the single mapper on every platform, Android included: the shipped `setData`/`updateData` extensions call the SDK members
+   with the data mapped by the format (`convertToPlainValue` on Android and the JVM, where the member would map by reflection;
+   the other actuals map every value they write through the format themselves) and the reified `getValue<T>()`/`values<T>()`
+   read through `format.decodeFromPlainValue`, so a `@Serializable` class maps the same everywhere. They live in
+   `com.google.firebase.serialization` (`DatabaseMapping.kt`, shipped through `keepPackageDirs`): the reads keep the SDK's names,
+   and in the SDK's own package a call would resolve to the SDK's `DatabaseKt` facade on Android and the JVM (this module's is a
+   stripped stub), whose inline bodies map by reflection. The SDK's reflective members are deprecated with an error towards them
+   on the common declarations and every actual (`setValue(Any?)`, `updateChildren(Map)`, `MutableData.value`'s setter, the
+   facade's `getValue<T>()` and `values<T>()`; the `Class`/`GenericTypeIndicator` reads only exist in the Android stubs), with the
+   messages in `dev.gitlive.firebase.database.AndroidOnlyApi.kt`; a deprecation only on an Android stub never reaches app code,
+   which compiles against the SDK's own classes once the stubs are stripped. The report counts them as `MAP`; the format
+   (`FormatKt`) is listed in `keepClasses`, and the wrapper's already-encoded writes call the deprecated members under
+   `@Suppress("DEPRECATION_ERROR")`. The format reads kotlinx.serialization's `@SerialName` and
+   `@Transient` and its own `@SerialInfo` annotations in `com.google.firebase.serialization` (firebase-app); the SDK's
+   `@PropertyName`, `@Exclude`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` are header stubs deprecated towards
+   them, as kotlinx.serialization cannot record the SDK's annotation classes, which app code compiles against on Android.
 
 When adding to the `dev.gitlive` layer, keep matching class, function and parameter names from the Android SDK; the
 `com.google.firebase` layer takes the exact Android shape, the `dev.gitlive` layer the Kotlin-idiomatic one.

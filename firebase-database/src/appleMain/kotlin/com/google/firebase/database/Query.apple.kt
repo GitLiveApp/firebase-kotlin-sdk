@@ -1,0 +1,337 @@
+/*
+ * Copyright (c) 2026 GitLive Ltd.  Use of this source code is governed by the Apache 2.0 license.
+ */
+
+package com.google.firebase.database
+
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType
+import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+import dev.gitlive.firebase.database.REFLECTIVE_UPDATE
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildAdded
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildChanged
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildMoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeChildRemoved
+import swiftPMImport.dev.gitlive.firebase.database.FIRDataEventType.FIRDataEventTypeValue
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseHandle
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseQuery
+import swiftPMImport.dev.gitlive.firebase.database.FIRDatabaseReference
+import swiftPMImport.dev.gitlive.firebase.database.FIRTransactionResult
+import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingAtBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEndingBeforeBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryEqualToBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAfterBoolean
+import dev.gitlive.firebase.database.cinterop.GitLiveQueryStartingAtBoolean
+import com.google.android.gms.tasks.TaskCompletionSource
+import platform.Foundation.NSError
+import platform.Foundation.NSNull
+
+private const val IOS_PERMISSION_DENIED = 1L
+private const val IOS_UNAVAILABLE = 2L
+private const val IOS_WRITE_CANCELED = 3L
+
+/** @property ios The underlying Firebase iOS SDK object. */
+public actual open class Query internal constructor(public open val ios: FIRDatabaseQuery) {
+    public actual val ref: DatabaseReference get() = DatabaseReference(ios.ref)
+
+    public actual fun addValueEventListener(listener: ValueEventListener): ValueEventListener {
+        val handle = ios.observeEventType(
+            FIRDataEventTypeValue,
+            withBlock = { snapshot -> listener.onDataChange(DataSnapshot(snapshot!!)) },
+            withCancelBlock = { error -> listener.onCancelled(error!!.toDatabaseError()) },
+        )
+        Observers.add(listener, ios, handle)
+        return listener
+    }
+
+    public actual fun addChildEventListener(listener: ChildEventListener): ChildEventListener {
+        fun observe(type: FIRDataEventType, onEvent: (DataSnapshot, String?) -> Unit) {
+            val handle = ios.observeEventType(
+                type,
+                andPreviousSiblingKeyWithBlock = { snapshot, previousKey -> onEvent(DataSnapshot(snapshot!!), previousKey) },
+                withCancelBlock = { error -> listener.onCancelled(error!!.toDatabaseError()) },
+            )
+            Observers.add(listener, ios, handle)
+        }
+        observe(FIRDataEventTypeChildAdded, listener::onChildAdded)
+        observe(FIRDataEventTypeChildChanged, listener::onChildChanged)
+        observe(FIRDataEventTypeChildMoved, listener::onChildMoved)
+        observe(FIRDataEventTypeChildRemoved) { snapshot, _ -> listener.onChildRemoved(snapshot) }
+        return listener
+    }
+
+    public actual fun addListenerForSingleValueEvent(listener: ValueEventListener) {
+        ios.observeSingleEventOfType(
+            FIRDataEventTypeValue,
+            withBlock = { snapshot -> listener.onDataChange(DataSnapshot(snapshot!!)) },
+            withCancelBlock = { error -> listener.onCancelled(error!!.toDatabaseError()) },
+        )
+    }
+
+    public actual fun removeEventListener(listener: ValueEventListener) {
+        Observers.remove(listener, ios)
+    }
+
+    public actual fun removeEventListener(listener: ChildEventListener) {
+        Observers.remove(listener, ios)
+    }
+
+    public actual fun get(): Task<DataSnapshot> = task { completion ->
+        ios.getDataWithCompletionBlock { error, snapshot -> completion(snapshot?.let { DataSnapshot(it) }, error) }
+    }
+
+    public actual fun keepSynced(keepSynced: Boolean) {
+        ios.keepSynced(keepSynced)
+    }
+
+    public actual fun orderByChild(path: String): Query = Query(ios.queryOrderedByChild(path))
+    public actual fun orderByKey(): Query = Query(ios.queryOrderedByKey())
+    public actual fun orderByPriority(): Query = Query(ios.queryOrderedByPriority())
+    public actual fun orderByValue(): Query = Query(ios.queryOrderedByValue())
+    public actual fun limitToFirst(limit: Int): Query = Query(ios.queryLimitedToFirst(limit.toULong()))
+    public actual fun limitToLast(limit: Int): Query = Query(ios.queryLimitedToLast(limit.toULong()))
+
+    // With a null key the single-argument iOS methods are used: the childKey variants reject a nil key under orderByKey.
+    // Boolean bounds go through the booleanQuery cinterop shim so the SDK receives a CFBoolean rather than the number
+    // Kotlin/Native boxes a Boolean as, which would not match the booleans toIos() stores.
+    public actual fun startAt(value: String?): Query = Query(ios.queryStartingAtValue(value))
+    public actual fun startAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: Double): Query = Query(ios.queryStartingAtValue(value))
+    public actual fun startAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAtValue(value) else ios.queryStartingAtValue(value, key))
+    public actual fun startAt(value: Boolean): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun startAt(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAtBoolean(ios, value, key) as FIRDatabaseQuery)
+    public actual fun startAfter(value: String?): Query = Query(ios.queryStartingAfterValue(value))
+    public actual fun startAfter(value: String?, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: Double): Query = Query(ios.queryStartingAfterValue(value))
+    public actual fun startAfter(value: Double, key: String?): Query = Query(if (key == null) ios.queryStartingAfterValue(value) else ios.queryStartingAfterValue(value, key))
+    public actual fun startAfter(value: Boolean): Query = Query(GitLiveQueryStartingAfterBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun startAfter(value: Boolean, key: String?): Query = Query(GitLiveQueryStartingAfterBoolean(ios, value, key) as FIRDatabaseQuery)
+    public actual fun endAt(value: String?): Query = Query(ios.queryEndingAtValue(value))
+    public actual fun endAt(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: Double): Query = Query(ios.queryEndingAtValue(value))
+    public actual fun endAt(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingAtValue(value) else ios.queryEndingAtValue(value, key))
+    public actual fun endAt(value: Boolean): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun endAt(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingAtBoolean(ios, value, key) as FIRDatabaseQuery)
+    public actual fun endBefore(value: String?): Query = Query(ios.queryEndingBeforeValue(value))
+    public actual fun endBefore(value: String?, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: Double): Query = Query(ios.queryEndingBeforeValue(value))
+    public actual fun endBefore(value: Double, key: String?): Query = Query(if (key == null) ios.queryEndingBeforeValue(value) else ios.queryEndingBeforeValue(value, key))
+    public actual fun endBefore(value: Boolean): Query = Query(GitLiveQueryEndingBeforeBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun endBefore(value: Boolean, key: String?): Query = Query(GitLiveQueryEndingBeforeBoolean(ios, value, key) as FIRDatabaseQuery)
+    public actual fun equalTo(value: String?): Query = Query(ios.queryEqualToValue(value))
+    public actual fun equalTo(value: String?, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: Double): Query = Query(ios.queryEqualToValue(value))
+    public actual fun equalTo(value: Double, key: String?): Query = Query(if (key == null) ios.queryEqualToValue(value) else ios.queryEqualToValue(value, key))
+    public actual fun equalTo(value: Boolean): Query = Query(GitLiveQueryEqualToBoolean(ios, value, null) as FIRDatabaseQuery)
+    public actual fun equalTo(value: Boolean, key: String?): Query = Query(GitLiveQueryEqualToBoolean(ios, value, key) as FIRDatabaseQuery)
+
+    /** The iOS SDK creates a new object per call, so queries are equal when they describe the same location and constraints. */
+    override fun equals(other: Any?): Boolean = other is Query && (other.ios == ios || other.ios.description == ios.description)
+
+    override fun hashCode(): Int = ios.description.hashCode()
+
+    override fun toString(): String = ios.description.orEmpty()
+}
+
+/** The iOS observer handles of each listener and the query it observes, so that a listener can be removed the Android way: from that query only. */
+private object Observers {
+    private class Observer(val listener: Any, val query: FIRDatabaseQuery, val handle: FIRDatabaseHandle)
+
+    private val observers = mutableListOf<Observer>()
+
+    fun add(listener: Any, query: FIRDatabaseQuery, handle: FIRDatabaseHandle) {
+        observers += Observer(listener, query, handle)
+    }
+
+    // The iOS SDK creates a new query object per call, so queries match by description (see Query.equals).
+    fun remove(listener: Any, query: FIRDatabaseQuery) {
+        val removed = observers.filter { it.listener == listener && (it.query == query || it.query.description == query.description) }
+        observers -= removed
+        removed.forEach { it.query.removeObserverWithHandle(it.handle) }
+    }
+}
+
+/** @property ios The underlying Firebase iOS SDK object. */
+public actual open class DatabaseReference internal constructor(override val ios: FIRDatabaseReference) : Query(ios) {
+    public actual val database: FirebaseDatabase get() = FirebaseDatabase(ios.database)
+    public actual val key: String? get() = ios.key
+    public actual val parent: DatabaseReference? get() = ios.parent?.let { DatabaseReference(it) }
+    public actual val root: DatabaseReference get() = DatabaseReference(ios.root)
+
+    public actual fun child(pathString: String): DatabaseReference = DatabaseReference(ios.child(pathString))
+
+    public actual fun push(): DatabaseReference = DatabaseReference(ios.childByAutoId())
+
+    public actual fun onDisconnect(): OnDisconnect = OnDisconnect(ios)
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, listener: CompletionListener?) {
+        ios.setValue(value.toIos(), withCompletionBlock = listener.completion())
+    }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: Any?): Task<Nothing?> = write { ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: Any?, listener: CompletionListener?) {
+        ios.setValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
+    }
+
+    public actual fun setPriority(priority: Any?): Task<Nothing?> = write { ios.setPriority(priority, withCompletionBlock = it) }
+
+    public actual fun setPriority(priority: Any?, listener: CompletionListener?) {
+        ios.setPriority(priority, withCompletionBlock = listener.completion())
+    }
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
+    public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { ios.updateChildValues(update.toIosMap(), withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
+    public actual fun updateChildren(update: Map<String, Any?>, listener: CompletionListener?) {
+        ios.updateChildValues(update.toIosMap(), withCompletionBlock = listener.completion())
+    }
+
+    public actual fun removeValue(): Task<Nothing?> = write { ios.removeValueWithCompletionBlock(it) }
+
+    public actual fun removeValue(listener: CompletionListener?) {
+        ios.removeValueWithCompletionBlock(listener.completion())
+    }
+
+    public actual fun runTransaction(handler: Transaction.Handler) {
+        runTransaction(handler, true)
+    }
+
+    public actual fun runTransaction(handler: Transaction.Handler, fireLocalEvents: Boolean) {
+        ios.runTransactionBlock(
+            block = { data ->
+                // The result's MutableData is the node to commit (a child's data replaces the location's, as on Android).
+                val result = handler.doTransaction(MutableData(data!!))
+                if (result.isSuccess) FIRTransactionResult.successWithValue(result.resultData!!.ios) else FIRTransactionResult.abort()
+            },
+            andCompletionBlock = { error, committed, snapshot ->
+                handler.onComplete(error?.toDatabaseError(), committed, snapshot?.let { DataSnapshot(it) })
+            },
+            withLocalEvents = fireLocalEvents,
+        )
+    }
+
+    public actual fun interface CompletionListener {
+        public actual fun onComplete(error: DatabaseError?, ref: DatabaseReference)
+    }
+
+    private fun CompletionListener?.completion(): (NSError?, FIRDatabaseReference?) -> Unit = { error, ref ->
+        this?.onComplete(error?.toDatabaseError(), DatabaseReference(ref ?: ios))
+    }
+
+    public actual companion object {
+        public actual fun goOffline() {
+            FIRDatabaseReference.goOffline()
+        }
+
+        public actual fun goOnline() {
+            FIRDatabaseReference.goOnline()
+        }
+    }
+}
+
+/** @property ios The underlying Firebase iOS SDK reference the operations are registered on. */
+public actual class OnDisconnect internal constructor(public val ios: FIRDatabaseReference) {
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, listener: DatabaseReference.CompletionListener?) {
+        ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = listener.completion())
+    }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: String?): Task<Nothing?> = write { setWithPriority(value, priority, it) }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: String?, listener: DatabaseReference.CompletionListener?) {
+        setWithPriority(value, priority, listener.completion())
+    }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: Double): Task<Nothing?> = write { ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: Double, listener: DatabaseReference.CompletionListener?) {
+        ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = listener.completion())
+    }
+
+    @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value, priority, listener)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
+    public actual fun setValue(value: Any?, priority: Map<*, *>?, listener: DatabaseReference.CompletionListener?) {
+        setWithPriority(value, priority, listener.completion())
+    }
+
+    /** The iOS SDK's priority form takes a non-null priority. */
+    private fun setWithPriority(value: Any?, priority: Any?, completion: (NSError?, FIRDatabaseReference?) -> Unit) {
+        if (priority == null) ios.onDisconnectSetValue(value.toIos(), withCompletionBlock = completion) else ios.onDisconnectSetValue(value.toIos(), andPriority = priority, withCompletionBlock = completion)
+    }
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
+    public actual fun updateChildren(update: Map<String, Any?>): Task<Nothing?> = write { ios.onDisconnectUpdateChildValues(update.toIosMap(), withCompletionBlock = it) }
+
+    @Deprecated(REFLECTIVE_UPDATE, ReplaceWith("updateData(update, listener)", "com.google.firebase.serialization.updateData"), DeprecationLevel.ERROR)
+    public actual fun updateChildren(update: Map<String, Any?>, listener: DatabaseReference.CompletionListener?) {
+        ios.onDisconnectUpdateChildValues(update.toIosMap(), withCompletionBlock = listener.completion())
+    }
+
+    public actual fun removeValue(): Task<Nothing?> = write { ios.onDisconnectRemoveValueWithCompletionBlock(it) }
+
+    public actual fun removeValue(listener: DatabaseReference.CompletionListener?) {
+        ios.onDisconnectRemoveValueWithCompletionBlock(listener.completion())
+    }
+
+    public actual fun cancel(): Task<Nothing?> = write { ios.cancelDisconnectOperationsWithCompletionBlock(it) }
+
+    public actual fun cancel(listener: DatabaseReference.CompletionListener) {
+        ios.cancelDisconnectOperationsWithCompletionBlock(listener.completion())
+    }
+
+    private fun DatabaseReference.CompletionListener?.completion(): (NSError?, FIRDatabaseReference?) -> Unit = { error, ref ->
+        this?.onComplete(error?.toDatabaseError(), DatabaseReference(ref ?: ios))
+    }
+}
+
+/** The children of an update as the iOS SDK expects them (see [toIos]); a `null` child is an `NSNull`, which the SDK reads as a deletion. */
+@Suppress("UNCHECKED_CAST")
+internal fun Map<String, Any?>.toIosMap(): Map<Any?, *> = toIos() as Map<Any?, *>
+
+/**
+ * A Kotlin value as the iOS SDK expects it, through the format: `null` as `NSNull` (a deletion in an update), and
+ * collections as Foundation ones whose booleans are Foundation's, which Kotlin/Native's boxing of a `Boolean` is not
+ * (the SDK would write the number `1`). A bare boolean has no collection to hold it, so it is written in the SDK's
+ * `{".value": x}` leaf form, which resolves to a plain scalar write.
+ */
+internal fun Any?.toIos(): Any = when (this) {
+    null -> NSNull.`null`()
+    is Boolean -> databaseFormat.convertToPlainValue(mapOf(".value" to this))!!
+    else -> databaseFormat.convertToPlainValue(this) ?: NSNull.`null`()
+}
+
+/** A write as a [Task] of the SDK's completion block. */
+private inline fun write(crossinline start: ((NSError?, FIRDatabaseReference?) -> Unit) -> Unit): Task<Nothing?> = task { completion ->
+    start { error, _ -> completion(null, error) }
+}
+
+internal inline fun <T> task(crossinline start: ((T?, NSError?) -> Unit) -> Unit): Task<T> {
+    val source = TaskCompletionSource<T>()
+    start { result, error -> if (error == null) source.setResult(result) else source.setException(error.toDatabaseError().toException()) }
+    return source.task
+}
+
+/** The iOS SDK reports permission denied, unavailable and write cancelled by code; everything else is unknown. */
+internal fun NSError.toDatabaseError(): DatabaseError = DatabaseError(
+    when (code) {
+        IOS_PERMISSION_DENIED -> DatabaseError.PERMISSION_DENIED
+        IOS_UNAVAILABLE -> DatabaseError.UNAVAILABLE
+        IOS_WRITE_CANCELED -> DatabaseError.WRITE_CANCELED
+        else -> DatabaseError.UNKNOWN_ERROR
+    },
+    localizedDescription,
+)

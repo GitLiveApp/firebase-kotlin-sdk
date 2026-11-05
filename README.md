@@ -16,7 +16,7 @@ The following libraries are available for the various Firebase products.
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/3.0.0-alpha02/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
 | [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/3.0.0-alpha02/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-database/3.0.0-alpha02/pom)           | [![48%](https://img.shields.io/badge/-48%25-orange?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-database/3.0.0-alpha02/pom)           | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
 | [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/3.0.0-alpha02/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
 | [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/3.0.0-alpha02/pom)         | [![93%](https://img.shields.io/badge/-93%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
 | [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/3.0.0-alpha02/pom)         | [![96%](https://img.shields.io/badge/-96%25-green?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
@@ -128,7 +128,7 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging` and `firebase-storage`;
+`firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging`, `firebase-storage` and `firebase-database`;
 the other modules are migrated one by one. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
 Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
 from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array), so
@@ -137,7 +137,19 @@ from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array)
 [Firebase Java SDK](https://github.com/GitLiveApp/firebase-java-sdk) has no analytics; on JS and wasmJs the session timeout,
 session ID and analytics data reset do nothing, as the JS SDK has no equivalent, and carry `@UnsupportedOnJs`. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
-[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md).
+[Migrating from the Firebase Android SDK](documentation/migrate-from-android.md). Custom classes are mapped by
+`com.google.firebase.serialization.FirebaseFormat` on every platform, Android included: a model class needs `@Serializable`,
+and the format applies the Android SDK's Realtime Database rules (the number handling, and the format's own
+`@IgnoreExtraProperties` and `@ThrowOnExtraProperties` in `com.google.firebase.serialization`) through the class's serializer,
+with kotlinx.serialization's `@SerialName` and `@Transient` naming and excluding properties. The Android SDK's reflective
+members (`setValue(Any?)`, `updateChildren(Map)`, `MutableData.value`'s setter and the reified `getValue<T>()` and `values<T>()`
+in common code, `getValue(Class)` and `getValue(GenericTypeIndicator)` on Android) are deprecated with an error towards the
+`setData`/`updateData` extensions and the reified `getValue<T>()` and `values<T>()` of `com.google.firebase.serialization`, which
+plain values and maps work through too (`setData` maps the value with its static type, so a generic class maps as well) (the reads keep the SDK's names but need that import: in the SDK's own package a call
+resolves to the SDK's reflective extension on Android). The SDK's mapping annotations are deprecated towards the ones the format
+reads (`@PropertyName` and `@Exclude` towards `@SerialName` and `@Transient`), as kotlinx.serialization cannot record the SDK's
+own annotation classes on Android. The stored name is the property's serial name: a property the Android SDK stored under its
+getter name (`isActive` as `active`) names it with `@SerialName("active")`.
 
 ### Accessing the underlying Firebase SDK
 

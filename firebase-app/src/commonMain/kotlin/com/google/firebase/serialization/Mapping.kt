@@ -31,49 +31,16 @@ internal class ErrorPath private constructor(private val parent: ErrorPath?, pri
     }
 }
 
-/**
- * The name the Android SDK gives the property of a Kotlin class, which it reads from the property's getter: `getName()`
- * gives `name`, `isActive()` (Kotlin's getter for a property named `isActive`) gives `active`, and the leading run of
- * capitals is lower-cased, so `getURL()` gives `url`.
- */
-internal fun beanPropertyName(kotlinName: String): String {
-    // Kotlin names the getter of a property `isX` (where X is not a lower-case ASCII letter) `isX`, and any other
-    // property `x` `getX`, capitalizing an ASCII first letter; the Android SDK then strips the `is`/`get` prefix.
-    val stripped = if (kotlinName.length > 2 && kotlinName.startsWith("is") && kotlinName[2] !in 'a'..'z') {
-        kotlinName.substring(2)
-    } else {
-        kotlinName.replaceFirstChar { if (it in 'a'..'z') it.uppercaseChar() else it }
-    }
-    val chars = stripped.toCharArray()
-    var index = 0
-    while (index < chars.size && chars[index].isUpperCase()) {
-        chars[index] = chars[index].lowercaseChar()
-        index++
-    }
-    return chars.concatToString()
-}
-
-/** The getter the Kotlin compiler generates for a property, for messages. */
-private fun getterName(kotlinName: String) = if (kotlinName.length > 2 && kotlinName.startsWith("is") && kotlinName[2] !in 'a'..'z') {
-    kotlinName
-} else {
-    "get" + kotlinName.replaceFirstChar { if (it in 'a'..'z') it.uppercaseChar() else it }
-}
-
 internal enum class UnknownProperties { IGNORE, LOG, THROW }
 
 /** How a class is mapped, the counterpart of the Android SDK's `BeanMapper`. */
 internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescriptor) {
     private val rules = format.rules
-    private val annotations = rules.annotations
 
     val className: String get() = descriptor.serialName.removeSuffix("?")
 
-    /** The stored name of each element. */
-    val names: Array<String>
-
-    /** Elements that are not mapped (`@Exclude`). */
-    val excluded: BooleanArray
+    /** The stored name of each element: its serial name, so the Kotlin property name unless `@SerialName` says otherwise. */
+    val names: Array<String> = Array(descriptor.elementsCount, descriptor::getElementName)
 
     /** Elements written as the server timestamp when `null` (`@ServerTimestamp`). */
     val serverTimestamp: BooleanArray
@@ -85,15 +52,10 @@ internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescri
 
     init {
         val count = descriptor.elementsCount
-        excluded = BooleanArray(count) { index -> descriptor.getElementAnnotations(index).any { annotations.exclude?.isInstance(it) == true } }
-        names = Array(count) { index ->
-            descriptor.getElementAnnotations(index).firstNotNullOfOrNull(annotations.propertyName)
-                ?: descriptor.getElementName(index).let { if (rules.beanNames) beanPropertyName(it) else it }
-        }
         // @ServerTimestamp and @DocumentId are Firestore's
         val firestore = rules is Rules.Firestore
         serverTimestamp = BooleanArray(count) { index ->
-            (firestore && descriptor.getElementAnnotations(index).any { annotations.serverTimestamp?.isInstance(it) == true }).also { annotated ->
+            (firestore && descriptor.getElementAnnotations(index).any { it is ServerTimestamp }).also { annotated ->
                 if (annotated && !isTimestampType(descriptor.getElementDescriptor(index))) {
                     throw IllegalArgumentException(
                         "Field ${descriptor.getElementName(index)} is annotated with @ServerTimestamp but is ${typeString(descriptor.getElementDescriptor(index))} instead of Date, Timestamp, or Instant.",
@@ -102,7 +64,7 @@ internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescri
             }
         }
         documentId = BooleanArray(count) { index ->
-            (firestore && descriptor.getElementAnnotations(index).any { annotations.documentId?.isInstance(it) == true }).also { annotated ->
+            (firestore && descriptor.getElementAnnotations(index).any { it is DocumentId }).also { annotated ->
                 if (annotated && !isDocumentIdType(rules, descriptor.getElementDescriptor(index))) {
                     throw IllegalArgumentException(
                         "Field is annotated with @DocumentId but is ${typeString(descriptor.getElementDescriptor(index))} instead of String or DocumentReference.",
@@ -112,27 +74,12 @@ internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescri
         }
         val classAnnotations = descriptor.annotations
         unknownProperties = when {
-            classAnnotations.any { annotations.throwOnExtraProperties?.isInstance(it) == true } -> UnknownProperties.THROW
-            rules.unknownPropertyLog == null || classAnnotations.any { annotations.ignoreExtraProperties?.isInstance(it) == true } -> UnknownProperties.IGNORE
+            classAnnotations.any { it is ThrowOnExtraProperties } -> UnknownProperties.THROW
+            rules.unknownPropertyLog == null || classAnnotations.any { it is IgnoreExtraProperties } -> UnknownProperties.IGNORE
             else -> UnknownProperties.LOG
         }
-
-        val caseInsensitive = HashMap<String, String>()
-        val seen = HashSet<String>()
-        for (index in 0 until count) {
-            if (excluded[index]) continue
-            val name = names[index]
-            if (!seen.add(name)) {
-                throw rules.mappingError("Found conflicting getters for name ${getterName(descriptor.getElementName(index))} on class $className")
-            }
-            if (!rules.beanNames) continue
-            val lower = name.lowercase()
-            val old = caseInsensitive.put(lower, name)
-            if (old != null && old != name) {
-                throw rules.mappingError("Found two getters or fields with conflicting case sensitivity for property: $lower")
-            }
-        }
-        if (rules.requiresProperties && seen.isEmpty() && descriptor.kind != StructureKind.OBJECT) {
+        // Duplicate serial names are rejected by kotlinx.serialization itself, so only an empty class is checked here.
+        if (rules.requiresProperties && count == 0 && descriptor.kind != StructureKind.OBJECT) {
             throw rules.mappingError("No properties to serialize found on class $className")
         }
     }
@@ -140,7 +87,7 @@ internal class ClassMapping(format: FirebaseFormat, val descriptor: SerialDescri
     /** The message for a property without a class property. */
     fun unknownPropertyMessage(name: String): String {
         val lower = name.lowercase()
-        val caseMismatch = names.indices.any { !excluded[it] && names[it].lowercase() == lower }
+        val caseMismatch = names.any { it.lowercase() == lower }
         return "No setter/field for $name found on class $className" + if (caseMismatch) " (fields/setters are case sensitive!)" else ""
     }
 }
