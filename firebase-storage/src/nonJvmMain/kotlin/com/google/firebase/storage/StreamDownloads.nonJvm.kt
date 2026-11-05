@@ -74,7 +74,8 @@ public actual abstract class StreamDownloadTask internal constructor(
     override val reference: StorageReference,
     private val processor: StreamProcessor?,
 ) : StorageTask<StreamDownloadTask.TaskSnapshot>() {
-    private var bytes: ByteArray? = null
+    private var stream: CountingStream? = null
+    private var totalByteCount = 0L
     private var canceled = false
 
     internal fun start() {
@@ -83,14 +84,15 @@ public actual abstract class StreamDownloadTask internal constructor(
         reference.getBytes(Long.MAX_VALUE)
             .addOnSuccessListener { downloaded ->
                 if (canceled) return@addOnSuccessListener
-                bytes = downloaded
+                totalByteCount = downloaded.size.toLong()
+                val stream = CountingStream(downloaded).also { stream = it }
                 val processor = processor
                 if (processor == null) {
                     reportSuccess()
                 } else {
                     inBackground {
                         val failure = try {
-                            processor.doInBackground(snapshotWith(null), stream())
+                            processor.doInBackground(snapshotWith(null), stream)
                             null
                         } catch (e: Exception) {
                             e
@@ -102,12 +104,8 @@ public actual abstract class StreamDownloadTask internal constructor(
             .addOnFailureListener { if (!canceled) reportFailure(StorageException.fromException(it)) }
     }
 
-    private fun stream(): InputStream = ByteArrayInputStream(bytes ?: ByteArray(0))
-
-    override fun snapshotWith(error: Exception?): TaskSnapshot {
-        val size = bytes?.size?.toLong() ?: 0L
-        return TaskSnapshot(error, size, size, stream())
-    }
+    /** As the Android SDK's, the snapshot counts the bytes read from the stream so far, and the total once the download is known. */
+    override fun snapshotWith(error: Exception?): TaskSnapshot = TaskSnapshot(error, stream?.bytesRead ?: 0L, totalByteCount, stream ?: ByteArrayInputStream(ByteArray(0)))
 
     /** False: the Apple and JS SDKs' byte downloads cannot be paused. */
     override fun controlPause(): Boolean = false
@@ -131,6 +129,23 @@ public actual abstract class StreamDownloadTask internal constructor(
         public actual val totalByteCount: Long,
         public actual val stream: InputStream,
     ) : SnapshotBase(error)
+}
+
+/** The downloaded bytes as the task's one stream, counting what has been read of them. */
+private class CountingStream(bytes: ByteArray) : InputStream() {
+    private val source = ByteArrayInputStream(bytes)
+    var bytesRead = 0L
+        private set
+
+    override fun read(): Int = source.read().also { if (it >= 0) bytesRead++ }
+
+    override fun read(b: ByteArray, off: Int, len: Int): Int = source.read(b, off, len).also { if (it > 0) bytesRead += it }
+
+    override fun skip(n: Long): Long = source.skip(n).also { bytesRead += it }
+
+    override fun available(): Int = source.available()
+
+    override fun close() = source.close()
 }
 
 internal class StreamDownloadTaskImpl(reference: StorageReference, processor: StreamDownloadTask.StreamProcessor?) : StreamDownloadTask(reference, processor) {

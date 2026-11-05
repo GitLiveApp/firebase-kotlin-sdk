@@ -135,11 +135,14 @@ class AndroidSdkSourceCompatTest {
         assertEquals(8, uploaded.bytesTransferred)
         assertEquals("text/plain", uploaded.metadata?.contentType)
 
-        val downloaded: StreamDownloadTask.TaskSnapshot = ref.getStream().await()
+        // The snapshot counts the bytes read from the stream so far, which the caller reads after the task completes.
+        val download: StreamDownloadTask = ref.getStream()
+        val downloaded: StreamDownloadTask.TaskSnapshot = download.await()
         val (bytesTransferred, totalByteCount, stream) = downloaded
-        assertEquals(8, bytesTransferred)
+        assertEquals(0, bytesTransferred)
         assertEquals(8, totalByteCount)
         assertEquals("streamed", stream.readText())
+        assertEquals(8, download.snapshot.bytesTransferred)
 
         val processed = CompletableDeferred<String>()
         ref.getStream { state, processorStream -> processed.complete("${state.totalByteCount}:${processorStream.readText()}") }.await()
