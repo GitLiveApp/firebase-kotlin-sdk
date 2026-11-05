@@ -75,6 +75,7 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
     public actual val gcmSenderId: String? get() = ios.GCMSenderID
     public actual val projectId: String? get() = ios.projectID
     public actual val storageBucket: String? get() = ios.storageBucket
+
     // FIROptions.trackingID was removed in firebase-ios-sdk 12.0.0, where it had long been
     // deprecated as unused, so gaTrackingId cannot be round tripped on apple targets
     public actual val gaTrackingId: String? get() = null
