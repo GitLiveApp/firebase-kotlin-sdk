@@ -18,6 +18,7 @@ import dev.gitlive.firebase.storage.stub
 import java.io.File
 import java.io.InputStream
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 
 /*
  * Header stubs for com.google.firebase:firebase-storage (see buildSrc utils/HeaderStubs.kt): compiled against,
@@ -82,6 +83,7 @@ public actual class StorageReference private constructor() : Comparable<StorageR
     public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = stub()
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = stub()
 
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: File): FileDownloadTask = stub()
 
     @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)

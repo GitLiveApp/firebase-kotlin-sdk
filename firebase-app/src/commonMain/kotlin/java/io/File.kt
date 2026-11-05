@@ -4,31 +4,14 @@
 
 package java.io
 
+import dev.gitlive.firebase.FILE_JVM_ONLY
+
 /**
- * Stands in for `java.io.File` as the carrier of a file path, so that the Firebase Android SDK members taking one
- * (`StorageReference.getFile(File)`) keep their signatures in common code and Android code creating one, `File(path)`,
- * compiles unchanged.
- *
- * On Android and the JVM the class is a header stub stripped from the output (see buildSrc utils/HeaderStubs.kt), so
- * code there uses the JDK's. Elsewhere this class is shipped: it holds the path as given, with none of the JDK's
- * file-system access, and the platform SDK receives [path]. Only the members the SDK needs are declared.
+ * Stands in for `java.io.File` so that the Firebase Android SDK members taking one (`StorageReference.getFile(File)`)
+ * can be declared in common code and deprecated with an error naming their multiplatform counterparts, which take a
+ * kotlinx-io `Path` (`getFile(Path)`). A value of this type cannot exist in common code: the class has no members and cannot be
+ * constructed. On Android and the JVM the class is a header stub that is stripped from the output (see buildSrc
+ * utils/HeaderStubs.kt), so code there uses the JDK's.
  */
-public class File(pathname: String) {
-    /** The file [child] of the directory at [parent]. */
-    public constructor(parent: String, child: String) : this(if (parent.isEmpty()) child else parent.trimEnd('/') + "/" + child)
-
-    /** The file [child] of the directory [parent]. */
-    public constructor(parent: File, child: String) : this(parent.path, child)
-
-    /** The path as given. */
-    public val path: String = pathname
-
-    /** The last segment of [path]. */
-    public val name: String get() = path.substringAfterLast('/')
-
-    override fun toString(): String = path
-
-    override fun equals(other: Any?): Boolean = other is File && other.path == path
-
-    override fun hashCode(): Int = path.hashCode()
-}
+@Deprecated(FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+public class File private constructor()

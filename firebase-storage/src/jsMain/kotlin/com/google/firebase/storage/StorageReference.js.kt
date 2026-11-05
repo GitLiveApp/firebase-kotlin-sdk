@@ -32,6 +32,8 @@ import dev.gitlive.firebase.storage.externals.StorageReference as JsStorageRefer
 import dev.gitlive.firebase.storage.externals.UploadTask as JsUploadTask
 import kotlinx.io.Source
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import kotlinx.io.files.Path
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class StorageReference internal constructor(public val js: JsStorageReference) : Comparable<StorageReference> {
@@ -97,9 +99,9 @@ public actual class StorageReference internal constructor(public val js: JsStora
     @UnsupportedOnJs
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this)
 
-    /** Fails: the JS SDK downloads through URLs, not to files; use [getBytes] or [getDownloadUrl]. */
-    @UnsupportedOnJs
-    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
 
     /** Always empty: the JS SDK has no file downloads. */
     @UnsupportedOnJs
@@ -231,3 +233,7 @@ internal fun FullMetadata.toCompat(): StorageMetadata = StorageMetadata().also {
 private fun String?.toEpochMillis(): Long = this?.let { Date.parse(it).toLong() }?.takeIf { it >= 0 } ?: 0
 
 internal actual fun StorageReference.putSource(source: Source, metadata: StorageMetadata?): UploadTask = putSourceBytes(source, metadata)
+
+/** Fails: the JS SDK downloads through URLs, not to files; use [StorageReference.getBytes] or [StorageReference.getDownloadUrl]. */
+@UnsupportedOnJs
+public actual fun StorageReference.getFile(destination: Path): FileDownloadTask = FileDownloadTaskImpl(this)

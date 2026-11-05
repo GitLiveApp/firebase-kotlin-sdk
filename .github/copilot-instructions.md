@@ -138,18 +138,18 @@ The SDK has two public API layers per module:
    signature gets a **stand-in class** in firebase-app's `commonMain` under the type's own package, a header stub on Android/JVM
    like the rest (verified against `android.jar`, firebase-java-sdk or the running JDK), in one of two shapes:
    - **Usable**, when an app's code only carries the value to the SDK: `android.content.Context` is a constructible placeholder
-     (platform code without a context passes `Context()`), `java.net.URL`, `android.net.Uri` and `java.io.File` hold the string
-     or path they are created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
-     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`, `getFile(File)`), and Android code creating these inline compiles unchanged.
+     (platform code without a context passes `Context()`), `java.net.URL` and `android.net.Uri` hold the string they are
+     created from. The SDK members keep their exact signatures and are callable from common code (`FirebaseApp.initializeApp(Context)`,
+     `getHttpsCallableFromUrl(URL)`, `putFile(Uri)`), and Android code creating these inline compiles unchanged.
    - **Error-deprecated and memberless**, when the type is used for its own API or has no meaning on a platform: `java.util.Date`,
-     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
-     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getDate(String)`, `loadBundle(InputStream)`, `putStream(InputStream)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
+     `java.time.Instant`, `java.util.concurrent.TimeUnit`, `java.io.File`, `java.io.InputStream`, `java.nio.ByteBuffer`. The SDK
+     members taking them (`Timestamp(Date)`, `toDate()`, `setTimeout(Long, TimeUnit)`, `getFile(File)`, `getDate(String)`, `loadBundle(InputStream)`, `putStream(InputStream)`, `loadBundle(ByteBuffer)`) keep their exact signatures but are `@Deprecated(level = ERROR)`
      too, with a message naming the multiplatform counterpart (messages live in
      `firebase-app/src/commonMain/kotlin/dev/gitlive/firebase/AndroidOnlyApi.kt`): common code using them fails to compile with
      that message, Android code still binds to the real member, and the verifier skips both the class and the members since
      they cannot be called. The counterparts are shipped top-level functions with the Kotlin type (`Timestamp(kotlin.time.Instant)`,
      `Timestamp.toKotlinInstant` in `TimestampInstant.kt`, `setTimeout(Duration)`, and for the JDK streams the kotlinx-io forms
-     `FirebaseFirestore.loadBundle(RawSource)` in `Bundles.kt` and `StorageReference.putStream(RawSource)` in `StorageSources.kt`, whose
+     `FirebaseFirestore.loadBundle(RawSource)` in `Bundles.kt` and `StorageReference.putStream(RawSource)` and `getFile(kotlinx.io.files.Path)` in `StorageSources.kt`, whose
      Android/JVM actuals hand the SDK `source.asInputStream()` while the other platforms stream through kotlinx-io's `asNSInputStream()`
      or a `ReadableStream`, or read the source to its end where the SDK uploads whole buffers; `kotlin.time.ExperimentalTime` is opted in at
      the build level). Such counterparts and their platform actuals are shipped through `keepClasses`.

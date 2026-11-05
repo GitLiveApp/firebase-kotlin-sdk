@@ -7,12 +7,13 @@ package com.google.firebase.storage
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 
 /**
  * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
- * [android.net.Uri] or [java.io.File] (the firebase-app stand-ins off Android): a `file:` URL, or a path on Apple
- * platforms. The `putStream` overloads taking a JVM stream are declared through the error-deprecated `java.io.InputStream`
- * stand-in, pointing common code at the kotlinx-io `putStream(RawSource)` extensions (see `StorageSources.kt`).
+ * [android.net.Uri] (the firebase-app stand-in off Android): a `file:` URL, or a path on Apple platforms. The members
+ * taking JDK types are declared through the error-deprecated `java.io.File` and `java.io.InputStream` stand-ins, pointing
+ * common code at the kotlinx-io `getFile(Path)` and `putStream(RawSource)` extensions (see `StorageSources.kt`).
  */
 public expect class StorageReference : Comparable<StorageReference> {
     /** The uploads to this reference that have not completed. */
@@ -93,7 +94,9 @@ public expect class StorageReference : Comparable<StorageReference> {
     /** Downloads the object to the file at [destinationUri]. Fails on JS, whose SDK has no file downloads. */
     public fun getFile(destinationUri: Uri): FileDownloadTask
 
-    /** Downloads the object to [destinationFile]. Fails on JS, whose SDK has no file downloads. */
+    /** Android/JVM only: downloads to a `java.io.File`; common code downloads to a kotlinx-io `Path` through `getFile(Path)`, or to a [Uri]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public fun getFile(destinationFile: java.io.File): FileDownloadTask
 
     /** The downloads from this reference that have not completed; always empty on JS. */

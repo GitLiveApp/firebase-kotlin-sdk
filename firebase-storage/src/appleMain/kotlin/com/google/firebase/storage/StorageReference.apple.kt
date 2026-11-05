@@ -29,6 +29,8 @@ import platform.Foundation.timeIntervalSince1970
 import platform.posix.memcpy
 import kotlinx.io.Source
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import kotlinx.io.files.Path
 
 private const val MILLIS_PER_SECOND = 1000.0
 
@@ -87,7 +89,11 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
 
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destinationUri.toNSURL()))
 
-    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destinationFile.path)))
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
+    public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+
+    internal fun getFileAt(destination: Path): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destination.toString())))
 
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
@@ -261,3 +267,5 @@ internal fun Uri.toNSURL(): NSURL {
 internal fun NSURL.fileSize(): Long? = path?.let { NSFileManager.defaultManager.attributesOfItemAtPath(it, null)?.get(NSFileSize) as? NSNumber }?.longValue
 
 internal actual fun StorageReference.putSource(source: Source, metadata: StorageMetadata?): UploadTask = putSourceBytes(source, metadata)
+
+public actual fun StorageReference.getFile(destination: Path): FileDownloadTask = getFileAt(destination)
