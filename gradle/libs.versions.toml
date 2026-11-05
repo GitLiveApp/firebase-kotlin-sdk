@@ -17,9 +17,13 @@ kotlinx-datetime = "0.7.1"
 kotlinter = "5.2.0"
 settings-api = "2.2"
 settings-language = "2.2"
-firebase-cocoapods = "11.8.0"
-ios-deploymentTarget = "13.0"
-tvos-deploymentTarget = "13.0"
+firebase-cocoapods = "12.19.0"
+# 12.19.3 is a patch release of only FirebaseCore, FirebaseFirestore and FirebaseFirestoreInternal (eMudhra CA fix);
+# every other pod's latest 12.x is 12.19.0, which accepts FirebaseCore ~> 12.19.0
+firebase-core-firestore-cocoapods = "12.19.3"
+# firebase-ios-sdk 12 requires iOS 15 / tvOS 15 (macOS 10.15 is unchanged)
+ios-deploymentTarget = "15.0"
+tvos-deploymentTarget = "15.0"
 macos-deploymentTarget = "10.15"
 test-logger-plugin = "4.0.0"
 dokka = "2.0.0"

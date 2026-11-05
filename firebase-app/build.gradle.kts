@@ -121,7 +121,7 @@ kotlin {
             }
             noPodspec()
             pod("FirebaseCore") {
-                version = libs.versions.firebase.cocoapods.get()
+                version = libs.versions.firebase.core.firestore.cocoapods.get()
                 extraOpts += listOf("-compiler-option", "-fmodules")
             }
         }
