@@ -11,7 +11,6 @@ import utils.toTargetPlatforms
  * Copyright (c) 2023 GitLive Ltd. Use of this source code is governed by the Apache 2.0 license.
  */
 
-version = project.property("firebase-storage.version") as String
 val supportedPlatforms = (project.property("firebase-storage.supportedTargets") as String).toTargetPlatforms()
 
 plugins {
@@ -194,7 +193,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.gitlive",
         artifactId = "firebase-storage",
-        version = project.property("firebase-storage.version") as String
+        version = project.version.toString()
     )
 
     pom {

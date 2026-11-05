@@ -37,6 +37,12 @@ expect fun Map<String, Any?>.asEncoded(): Any
 @IgnoreForAndroidUnitTest
 abstract class BaseFirebaseFirestoreTest {
 
+    companion object {
+        // A fresh instance of the test class is created per test, so the counter has to
+        // live here for the generated app names to stay unique across the whole run.
+        private var nextAppId = 0
+    }
+
     @Serializable
     data class FirestoreTest(
         val prop1: String,
@@ -70,9 +76,13 @@ abstract class BaseFirebaseFirestoreTest {
     lateinit var firebaseApp: FirebaseApp
     lateinit var firestore: FirebaseFirestore
 
+    // These tests need a genuinely fresh client per test, so each one gets its own
+    // uniquely named app which is deleted again in teardown. Reusing whatever
+    // Firebase.apps() returned would hand back the deleted app from the previous test
+    // and fail with "FirebaseApp was deleted".
     @BeforeTest
     fun initializeFirebase() {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        firebaseApp = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:${Random.nextInt()}:ios:dd1f6688bad7af768c841a",
@@ -82,10 +92,10 @@ abstract class BaseFirebaseFirestoreTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "firestoreTest${nextAppId++}",
         )
-        firebaseApp = app
 
-        firestore = Firebase.firestore(app).apply {
+        firestore = Firebase.firestore(firebaseApp).apply {
             settings = firestoreSettings {
                 cacheSettings = memoryCacheSettings {
                     gcSettings = memoryEagerGcSettings { }
@@ -97,9 +107,7 @@ abstract class BaseFirebaseFirestoreTest {
 
     @AfterTest
     fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
+        firebaseApp.delete()
     }
 }
 
@@ -110,5 +118,20 @@ class FirebaseFirestoreTest : BaseFirebaseFirestoreTest() {
     fun testMultiple() = runTest {
         Firebase.firestore(firebaseApp).disableNetwork()
         Firebase.firestore(firebaseApp).enableNetwork()
+    }
+
+    @Test
+    fun testWaitForPendingWrites() = runTest {
+        val doc = firestore.collection("testFirestoreWaitForPendingWrites").document("test1")
+        doc.set(FirestoreTest.serializer(), FirestoreTest("waitForPendingWrites"))
+        // Completes once the pending write above is acknowledged by the backend.
+        firestore.waitForPendingWrites()
+        doc.delete()
+    }
+
+    @Test
+    fun testTerminate() = runTest {
+        // terminate must be the last operation on this instance; further use is expected to fail.
+        firestore.terminate()
     }
 }

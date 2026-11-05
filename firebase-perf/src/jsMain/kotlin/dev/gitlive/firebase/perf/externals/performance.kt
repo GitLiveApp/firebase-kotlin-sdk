@@ -4,6 +4,7 @@
 package dev.gitlive.firebase.perf.externals
 
 import dev.gitlive.firebase.externals.FirebaseApp
+import kotlin.js.Json
 
 public external fun getPerformance(app: FirebaseApp? = definedExternally): FirebasePerformance
 
@@ -16,7 +17,7 @@ public external interface FirebasePerformance {
 
 public external interface PerformanceTrace {
     public fun getAttribute(attr: String): String?
-    public fun getAttributes(): Map<String, String>
+    public fun getAttributes(): Json
     public fun getMetric(metricName: String): Int
     public fun incrementMetric(metricName: String, num: Int? = definedExternally)
     public fun putAttribute(attr: String, value: String)

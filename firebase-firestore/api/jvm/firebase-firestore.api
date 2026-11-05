@@ -234,6 +234,7 @@ public final class dev/gitlive/firebase/firestore/FieldValue$Companion {
 	public final fun arrayUnion ([Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getDelete ()Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun getServerTimestamp ()Ldev/gitlive/firebase/firestore/FieldValue;
+	public final fun increment (D)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun increment (I)Ldev/gitlive/firebase/firestore/FieldValue;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
@@ -366,7 +367,9 @@ public final class dev/gitlive/firebase/firestore/FirebaseFirestore {
 	public final fun setSettings (Ldev/gitlive/firebase/firestore/FirebaseFirestoreSettings;)V
 	public final fun setSettings (Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;)V
 	public static synthetic fun setSettings$default (Ldev/gitlive/firebase/firestore/FirebaseFirestore;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Long;ILjava/lang/Object;)V
+	public final fun terminate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun useEmulator (Ljava/lang/String;I)V
+	public final fun waitForPendingWrites (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class dev/gitlive/firebase/firestore/FirebaseFirestore$Companion {

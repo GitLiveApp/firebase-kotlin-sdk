@@ -10,8 +10,12 @@ import com.google.firebase.auth.OAuthProvider as AndroidOAuthProvider
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.TimeUnit
 
 public actual open class AuthCredential(public open val android: com.google.firebase.auth.AuthCredential) {
@@ -86,12 +90,17 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
 
     public actual fun credential(verificationId: String, smsCode: String): PhoneAuthCredential = PhoneAuthCredential(PhoneAuthProvider.getCredential(verificationId, smsCode))
 
-    public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = coroutineScope {
-        val response = CompletableDeferred<Result<AuthCredential>>()
+    // unlike the other platforms android can complete the verification without any user input, via
+    // sms auto retrieval, so the credential is whichever of the two arrives first
+    public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = supervisorScope {
+        // resending replaces the verification id and invalidates the previous one
+        val latestVerificationId = MutableStateFlow<String?>(null)
+        val autoRetrieved = CompletableDeferred<AuthCredential>()
         val callback = object :
             PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onCodeSent(verificationId: String, forceResending: PhoneAuthProvider.ForceResendingToken) {
+                latestVerificationId.value = verificationId
                 verificationProvider.codeSent {
                     val options = createOptionsBuilder()
                         .setPhoneNumber(phoneNumber)
@@ -104,23 +113,12 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
                 }
             }
 
-            override fun onCodeAutoRetrievalTimeOut(verificationId: String) {
-                launch {
-                    val code = verificationProvider.getVerificationCode()
-                    try {
-                        response.complete(Result.success(credential(verificationId, code)))
-                    } catch (e: Exception) {
-                        response.complete(Result.failure(e))
-                    }
-                }
-            }
-
             override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
-                response.complete(Result.success(AuthCredential(credential)))
+                autoRetrieved.complete(AuthCredential(credential))
             }
 
             override fun onVerificationFailed(error: FirebaseException) {
-                response.complete(Result.failure(error))
+                autoRetrieved.completeExceptionally(error)
             }
         }
         val options = createOptionsBuilder()
@@ -131,7 +129,25 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
             .build()
         PhoneAuthProvider.verifyPhoneNumber(options)
 
-        response.await().getOrThrow()
+        val userEntered = async {
+            // prompt as soon as a code has been sent rather than waiting for auto retrieval to time
+            // out, as recommended by
+            // https://firebase.google.com/docs/auth/android/phone-auth#oncodeautoretrievaltimeoutstring-verificationid
+            latestVerificationId.filterNotNull().first()
+            val code = verificationProvider.getVerificationCode()
+            credential(checkNotNull(latestVerificationId.value), code)
+        }
+
+        try {
+            select {
+                autoRetrieved.onAwait { it }
+                userEntered.onAwait { it }
+            }
+        } finally {
+            // select does not cancel the losing clause, and a code entry still waiting on the user
+            // would otherwise keep this scope alive after auto retrieval has already completed
+            userEntered.cancel()
+        }
     }
 }
 

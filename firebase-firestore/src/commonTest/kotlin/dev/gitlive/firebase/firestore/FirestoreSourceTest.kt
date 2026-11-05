@@ -12,8 +12,13 @@ import kotlin.test.*
 @IgnoreForAndroidUnitTest
 class FirestoreSourceTest {
     lateinit var firestore: FirebaseFirestore
+    private lateinit var app: FirebaseApp
 
     companion object {
+        // A fresh instance of this class is created per test, so the counter has to
+        // live here for the generated app names to stay unique across the whole run.
+        private var nextAppId = 0
+
         val testDoc = BaseFirebaseFirestoreTest.FirestoreTest(
             "aaa",
             0.0,
@@ -23,8 +28,12 @@ class FirestoreSourceTest {
         )
     }
 
+    // Each call gets its own uniquely named app. Cache settings can only be applied
+    // before the instance is used, so these tests deliberately discard the app and
+    // build a new one mid-test; reusing whatever Firebase.apps() returned would hand
+    // back the discarded instance and fail with "FirebaseApp was deleted".
     private fun initializeFirebase(persistenceEnabled: Boolean = false) {
-        val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
+        app = Firebase.initialize(
             context,
             FirebaseOptions(
                 applicationId = "1:${Random.nextInt()}:ios:dd1f6688bad7af768c841a",
@@ -34,6 +43,7 @@ class FirestoreSourceTest {
                 projectId = "fir-kotlin-sdk",
                 gcmSenderId = "846484016111",
             ),
+            "firestoreSourceTest${nextAppId++}",
         )
 
         firestore = Firebase.firestore(app).apply {
@@ -48,10 +58,12 @@ class FirestoreSourceTest {
         }
     }
 
+    // The app built by the second initializeFirebase() of each test would otherwise
+    // outlive it and collide with a later test's app.
     @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
+    fun deleteApp() = runBlockingTest {
+        if (::app.isInitialized) {
+            app.delete()
         }
     }
 
@@ -116,7 +128,7 @@ class FirestoreSourceTest {
         val doc = firestore.collection("testFirestoreQuerying").document("one")
         doc.set(testDoc)
 
-        Firebase.apps(context).forEach { it.delete() }
+        app.delete()
 
         initializeFirebase(persistenceEnabled = persistenceEnabled)
 

@@ -1,5 +1,6 @@
 import com.google.gson.GsonBuilder
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import java.io.File
 import java.util.Properties
 
@@ -32,8 +33,44 @@ class EmulatorJobsMatrix {
             }
     }
 
+    private fun getAffectedProjectNames(rootProject: Project): Set<String>? {
+        val changedFilesPath = rootProject.findProperty("changedFilesPath") as? String ?: return null
+        val changedFiles = File(rootProject.rootDir, changedFilesPath)
+            .takeIf { it.exists() }
+            ?.readLines()?.map { it.trim() }?.filter { it.isNotEmpty() }
+            ?.takeIf { it.isNotEmpty() }
+            ?: return null
+        val moduleNames = rootProject.subprojects.map { it.name }.toSet()
+        val changedModules = mutableSetOf<String>()
+        changedFiles.forEach { changedFile ->
+            val moduleName = changedFile.substringBefore("/")
+            if (moduleNames.contains(moduleName)) {
+                changedModules.add(moduleName)
+            } else {
+                return null
+            }
+        }
+        val dependencies = rootProject.subprojects.associate { subProject ->
+            subProject.name to subProject.configurations.flatMap { configuration ->
+                configuration.dependencies.filterIsInstance<ProjectDependency>().map { it.name }
+            }.toSet()
+        }
+        val affected = mutableSetOf<String>()
+        var newlyAffected: Set<String> = changedModules
+        while (newlyAffected.isNotEmpty()) {
+            affected.addAll(newlyAffected)
+            newlyAffected = dependencies.filterValues { it.any(affected::contains) }.keys - affected
+        }
+        return affected
+    }
+
+    private fun affectedSubprojects(rootProject: Project): List<Project> {
+        val affected = getAffectedProjectNames(rootProject)
+        return rootProject.subprojects.filter { affected == null || affected.contains(it.name) }
+    }
+
     fun getIosTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Ios) || subProject.name == "test-utils"
         }.map { subProject ->
@@ -44,7 +81,7 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getMacosTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Macos) || subProject.name == "test-utils"
         }.map { subProject ->
@@ -55,7 +92,7 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getTvosTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Tvos) || subProject.name == "test-utils"
         }.map { subProject ->
@@ -66,7 +103,7 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getJsTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Js) || subProject.name == "test-utils"
         }.map { subProject ->
@@ -74,7 +111,7 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getJvmTestTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             (subProject.property("${subProject.name}.supportedTestTargets") as String).toTargetPlatforms().contains(
                 TargetPlatform.Jvm) || subProject.name == "test-utils"
         }.map { subProject ->
@@ -82,7 +119,7 @@ class EmulatorJobsMatrix {
         }.map { listOf("cleanTest", it) }
 
     fun getEmulatorTaskList(rootProject: Project): List<List<String>> =
-        rootProject.subprojects.filter { subProject ->
+        affectedSubprojects(rootProject).filter { subProject ->
             File(subProject.projectDir, "src${File.separator}commonTest").exists() ||
                     File(
                         subProject.projectDir,

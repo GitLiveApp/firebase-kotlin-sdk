@@ -10,10 +10,10 @@ import java.net.URL
 import java.io.InputStream
 
 plugins {
-    alias(libs.plugins.android.application) apply false
+    id("com.android.application") apply false // provided by buildSrc
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.multiplatform) apply false
-    alias(libs.plugins.native.cocoapods) apply false
+    id("org.jetbrains.kotlin.multiplatform") apply false // provided by buildSrc
+    id("org.jetbrains.kotlin.native.cocoapods") apply false // provided by buildSrc
     alias(libs.plugins.test.logger.plugin) apply false
     alias(libs.plugins.ben.manes.versions) apply false
     alias(libs.plugins.kotlinter) apply false
@@ -34,31 +34,11 @@ val compileSdkVersion by extra(34)
 val targetSdkVersion by extra(34)
 val minSdkVersion by extra(23)
 
-tasks {
-    register("updateVersions") {
-        dependsOn(
-            "firebase-analytics:updateVersion", "firebase-analytics:updateDependencyVersion",
-            "firebase-app:updateVersion", "firebase-app:updateDependencyVersion",
-            "firebase-auth:updateVersion", "firebase-auth:updateDependencyVersion",
-            "firebase-common:updateVersion", "firebase-common:updateDependencyVersion",
-            "firebase-config:updateVersion", "firebase-config:updateDependencyVersion",
-            "firebase-database:updateVersion", "firebase-database:updateDependencyVersion",
-            "firebase-firestore:updateVersion", "firebase-firestore:updateDependencyVersion",
-            "firebase-functions:updateVersion", "firebase-functions:updateDependencyVersion",
-            "firebase-installations:updateVersion", "firebase-installations:updateDependencyVersion",
-            "firebase-messaging:updateVersion", "firebase-messaging:updateDependencyVersion",
-            "firebase-perf:updateVersion", "firebase-perf:updateDependencyVersion",
-            "firebase-storage:updateVersion", "firebase-storage:updateDependencyVersion"
-        )
-    }
-}
-
 private val dokkaCopyrightMessage = "© 2024 GitLive Ltd."
 private val dokkaHomepageUrl = "https://github.com/GitLiveApp/firebase-kotlin-sdk"
 
 tasks.withType<AbstractDokkaTask>().configureEach {
-    val version = project.property("firebase-app.version") as String
-    moduleVersion.set(version)
+    moduleVersion.set(project.version.toString())
     moduleName.set("Firebase Kotlin SDK")
 
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
@@ -140,30 +120,16 @@ subprojects {
                 )
             }
         }
-
-        if (skipPublishing) return@tasks
-
-        register<Exec>("updateVersion") {
-            commandLine("npm", "--allow-same-version", "--prefix", projectDir, "version", "${project.property("${project.name}.version")}")
-        }
-
-        register<Copy>("updateDependencyVersion") {
-            mustRunAfter("updateVersion")
-            val from = file("package.json")
-            from.writeText(
-                from.readText()
-                    .replace("version\": \"([^\"]+)".toRegex(), "version\": \"${project.property("${project.name}.version")}")
-                    .replace("firebase-common\": \"([^\"]+)".toRegex(), "firebase-common\": \"${project.property("firebase-common.version")}")
-                    .replace("firebase-app\": \"([^\"]+)".toRegex(), "firebase-app\": \"${project.property("firebase-app.version")}")
-            )
-        }
     }
 
     afterEvaluate  {
         dependencies {
             "commonMainImplementation"(libs.kotlinx.coroutines.core)
             "androidMainImplementation"(libs.kotlinx.coroutines.play.services)
-            "androidMainImplementation"(platform(libs.firebase.bom))
+            // api, not implementation: the Firebase artifacts are declared with `api` and without a
+            // version, so the BoM has to reach the api variant as well or a consumer resolving the
+            // compile classpath has nothing to supply the version from.
+            "androidMainApi"(platform(libs.firebase.bom))
             "commonTestImplementation"(kotlin("test-common"))
             "commonTestImplementation"(kotlin("test-annotations-common"))
             if (this@afterEvaluate.name != "firebase-crashlytics") {

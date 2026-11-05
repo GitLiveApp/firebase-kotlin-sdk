@@ -189,7 +189,8 @@ internal fun ActionCodeSettings.toJson() = json(
     "ios" to (iOSBundleId?.run { json("bundleId" to iOSBundleId) } ?: undefined),
 )
 
-public actual open class FirebaseAuthException(code: String?, cause: Throwable) : FirebaseException(code, cause)
+public actual open class FirebaseAuthException(internal val authCode: String?, cause: Throwable) : FirebaseException(authCode.toString(), cause)
+public actual val FirebaseAuthException.code: String? get() = authCode
 public actual open class FirebaseAuthActionCodeException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthEmailException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
 public actual open class FirebaseAuthInvalidCredentialsException(code: String?, cause: Throwable) : FirebaseAuthException(code, cause)
@@ -234,6 +235,7 @@ private fun errorToException(cause: dynamic) = when (val code = cause.code?.toSt
     "auth/missing-verification-code",
     "auth/invalid-verification-id",
     "auth/missing-verification-id",
+    "auth/wrong-password",
     -> FirebaseAuthInvalidCredentialsException(code, cause.unsafeCast<Throwable>())
 
     "auth/maximum-second-factor-count-exceeded",

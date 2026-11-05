@@ -240,6 +240,21 @@ class DocumentReferenceTest : BaseFirebaseFirestoreTest() {
     }
 
     @Test
+    fun testIncrementDoubleFieldValue() = testDocument(
+        firestore
+            .collection("testFirestoreIncrementDoubleFieldValue")
+            .document("test1"),
+    ) { doc ->
+        doc.set(FirestoreTest.serializer(), FirestoreTest("increment1", time = 1.5))
+        val dataBefore = doc.get().data(FirestoreTest.serializer())
+        assertEquals(1.5, dataBefore.time)
+
+        doc.update("time" to FieldValue.increment(0.75))
+        val dataAfter = doc.get().data(FirestoreTest.serializer())
+        assertEquals(2.25, dataAfter.time)
+    }
+
+    @Test
     fun testArrayUnion() = testDocument(
         firestore
             .collection("testFirestoreArrayUnion")

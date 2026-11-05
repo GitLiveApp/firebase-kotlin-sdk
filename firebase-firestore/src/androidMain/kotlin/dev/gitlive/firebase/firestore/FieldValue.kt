@@ -19,6 +19,7 @@ public actual class FieldValue internal actual constructor(internal actual val n
         public actual val serverTimestamp: FieldValue get() = FieldValue(NativeFieldValue.serverTimestamp())
         public actual val delete: FieldValue get() = FieldValue(NativeFieldValue.delete())
         public actual fun increment(value: Int): FieldValue = FieldValue(NativeFieldValue.increment(value.toDouble()))
+        public actual fun increment(value: Double): FieldValue = FieldValue(NativeFieldValue.increment(value))
         public actual fun arrayUnion(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayUnion(*elements))
         public actual fun arrayRemove(vararg elements: Any): FieldValue = FieldValue(NativeFieldValue.arrayRemove(*elements))
     }

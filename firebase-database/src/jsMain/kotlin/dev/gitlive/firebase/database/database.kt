@@ -14,6 +14,7 @@ import dev.gitlive.firebase.database.externals.Database
 import dev.gitlive.firebase.database.externals.child
 import dev.gitlive.firebase.database.externals.connectDatabaseEmulator
 import dev.gitlive.firebase.database.externals.enableLogging
+import dev.gitlive.firebase.database.externals.get
 import dev.gitlive.firebase.database.externals.getDatabase
 import dev.gitlive.firebase.database.externals.onChildAdded
 import dev.gitlive.firebase.database.externals.onChildChanged
@@ -32,17 +33,12 @@ import dev.gitlive.firebase.internal.decode
 import dev.gitlive.firebase.internal.js
 import dev.gitlive.firebase.internal.reencodeTransformation
 import dev.gitlive.firebase.js
-import kotlinx.coroutines.asDeferred
+import kotlinx.coroutines.await
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
-import kotlin.js.Promise
 import kotlin.js.json
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
 import dev.gitlive.firebase.database.externals.DatabaseReference as JsDatabaseReference
@@ -84,6 +80,8 @@ public actual class FirebaseDatabase internal constructor(internal val js: Datab
     public actual fun goOffline(): Unit = rethrow { jsGoOffline(js) }
 
     public actual fun goOnline(): Unit = rethrow { jsGoOnline(js) }
+
+    public actual fun purgeOutstandingWrites() {}
 }
 
 internal actual open class NativeQuery(
@@ -145,6 +143,10 @@ public actual open class Query internal actual constructor(
         awaitClose { rethrow { unsubscribes.forEach { it.invoke() } } }
     }
 
+    public actual suspend fun get(): DataSnapshot = rethrow {
+        DataSnapshot(get(publicJs).await(), database)
+    }
+
     public actual fun startAt(value: String, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
 
     public actual fun startAt(value: Double, key: String?): Query = Query(query(publicJs, jsStartAt(value, key ?: undefined)), database)
@@ -181,20 +183,33 @@ internal actual class NativeDatabaseReference internal constructor(
 
     actual fun onDisconnect() = rethrow { NativeOnDisconnect(onDisconnect(js), database) }
 
-    actual suspend fun removeValue() = rethrow { remove(js).awaitWhileOnline(database) }
+    actual suspend fun removeValue() = rethrow { remove(js).await() }
 
     actual suspend fun setValueEncoded(encodedValue: Any?) = rethrow {
-        set(js, encodedValue).awaitWhileOnline(database)
+        set(js, encodedValue).await()
     }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { update(js, encodedUpdate.js).await() }
 
-    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = DataSnapshot(
-        jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
-            reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
-        }).awaitWhileOnline(database).snapshot,
-        database,
-    )
+    actual suspend fun <T> runTransaction(strategy: KSerializer<T>, buildSettings: EncodeDecodeSettingsBuilder.() -> Unit, transactionUpdate: (currentData: T) -> T): DataSnapshot = rethrow {
+        DataSnapshot(
+            jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+                reencodeTransformation(strategy, currentData ?: json(), buildSettings, transactionUpdate)
+            }).await().snapshot,
+            database,
+        )
+    }
+
+    actual suspend fun runTransaction(update: Transaction.(MutableData) -> Transaction.Result): DataSnapshot? = rethrow {
+        val result = jsRunTransaction<Any?>(js, transactionUpdate = { currentData ->
+            val mutableData = MutableData(js.key, currentData)
+            when (val txResult = Transaction().update(mutableData)) {
+                is Transaction.Result.Success -> txResult.data.jsValue
+                Transaction.Result.Abort -> undefined
+            }
+        }).await()
+        if (result.committed) DataSnapshot(result.snapshot, database) else null
+    }
 }
 
 public val DataSnapshot.js: JsDataSnapshot get() = js
@@ -228,17 +243,80 @@ public actual class DataSnapshot internal constructor(
         get() = DatabaseReference(NativeDatabaseReference(js.ref, database))
 }
 
+public actual class MutableData private constructor(
+    private val root: Root,
+    private val path: List<String>,
+    public actual val key: String?,
+) {
+    internal constructor(key: String?, value: Any?) : this(Root(value), emptyList(), key)
+
+    /** The transaction's JS value, shared by this instance and every child obtained from it. */
+    private class Root(var value: Any?)
+
+    /** The JS value at [path] under the root. */
+    internal var jsValue: Any?
+        get() = path.fold(root.value) { parent, segment -> if (isObject(parent)) parent.asDynamic()[segment].unsafeCast<Any?>() else null }
+        set(value) {
+            if (path.isEmpty()) {
+                root.value = value
+                return
+            }
+            if (!isObject(root.value)) root.value = json()
+            var parent: dynamic = root.value
+            for (segment in path.dropLast(1)) {
+                if (!isObject(parent[segment].unsafeCast<Any?>())) parent[segment] = json()
+                parent = parent[segment]
+            }
+            parent[path.last()] = value
+        }
+
+    public actual val value: Any? get() = jsValue
+
+    @PublishedApi
+    internal actual fun setEncodedValue(encodedValue: Any?) {
+        jsValue = encodedValue.toJs()
+    }
+
+    public actual fun child(path: String): MutableData {
+        val segments = path.split("/").filter { it.isNotEmpty() }
+        return MutableData(root, this.path + segments, segments.lastOrNull() ?: key)
+    }
+
+    public actual val hasChildren: Boolean
+        get() = childKeys().isNotEmpty()
+
+    public actual val children: Iterable<MutableData>
+        get() = childKeys().map { MutableData(root, path + it, it) }
+
+    private fun childKeys(): List<String> {
+        val current = jsValue
+        if (!isObject(current)) return emptyList()
+        return (js("Object.keys")(current).unsafeCast<Array<String>>()).filter { current.asDynamic()[it] != null }
+    }
+
+    private fun isObject(value: Any?): Boolean = value != null && jsTypeOf(value) == "object"
+
+    /** [this] as a plain JS value: Kotlin maps become objects, collections arrays, longs numbers. */
+    private fun Any?.toJs(): Any? = when (this) {
+        is Long -> toDouble()
+        is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJs() }.toTypedArray())
+        is Collection<*> -> map { it.toJs() }.toTypedArray()
+        is Array<*> -> map { it.toJs() }.toTypedArray()
+        else -> this
+    }
+}
+
 internal actual class NativeOnDisconnect internal constructor(
     val js: JsOnDisconnect,
     val database: Database,
 ) {
 
-    actual suspend fun removeValue() = rethrow { js.remove().awaitWhileOnline(database) }
-    actual suspend fun cancel() = rethrow { js.cancel().awaitWhileOnline(database) }
+    actual suspend fun removeValue() = rethrow { js.remove().await() }
+    actual suspend fun cancel() = rethrow { js.cancel().await() }
 
-    actual suspend fun setEncodedValue(encodedValue: Any?) = rethrow { js.set(encodedValue).awaitWhileOnline(database) }
+    actual suspend fun setEncodedValue(encodedValue: Any?) = rethrow { js.set(encodedValue).await() }
 
-    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { js.update(encodedUpdate.js).awaitWhileOnline(database) }
+    actual suspend fun updateEncodedChildren(encodedUpdate: EncodedObject) = rethrow { js.update(encodedUpdate.js).await() }
 }
 
 public val OnDisconnect.js: dev.gitlive.firebase.database.externals.OnDisconnect get() = native.js
@@ -259,19 +337,5 @@ internal inline fun <R> rethrow(function: () -> R): R {
         throw e
     } catch (e: dynamic) {
         throw DatabaseException(e)
-    }
-}
-
-@PublishedApi
-internal suspend fun <T> Promise<T>.awaitWhileOnline(database: Database): T = coroutineScope {
-    val notConnected = FirebaseDatabase(database)
-        .reference(".info/connected")
-        .valueEvents
-        .filter { !it.value<Boolean>() }
-        .produceIn(this)
-
-    select {
-        this@awaitWhileOnline.asDeferred().onAwait { it.also { notConnected.cancel() } }
-        notConnected.onReceive { throw DatabaseException("Database not connected", null) }
     }
 }

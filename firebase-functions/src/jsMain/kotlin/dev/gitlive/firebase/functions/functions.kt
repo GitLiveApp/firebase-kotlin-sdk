@@ -67,7 +67,7 @@ public actual class HttpsCallableResult(internal val js: JsHttpsCallableResult) 
     public actual inline fun <T> data(strategy: DeserializationStrategy<T>, buildSettings: DecodeSettings.Builder.() -> Unit): T = rethrow { decode(strategy, publicJs.data, buildSettings) }
 }
 
-public actual class FirebaseFunctionsException(cause: Throwable, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(cause.message, cause)
+public actual class FirebaseFunctionsException(cause: Throwable, public val code: FunctionsExceptionCode, public val details: Any?) : FirebaseException(cause.message.toString(), cause)
 
 public actual val FirebaseFunctionsException.code: FunctionsExceptionCode get() = code
 

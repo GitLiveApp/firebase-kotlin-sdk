@@ -87,6 +87,9 @@ public data class AndroidPackageName(
 )
 
 public expect open class FirebaseAuthException : FirebaseException
+
+/** Platform Firebase Auth error code, when the underlying SDK provides one. */
+public expect val FirebaseAuthException.code: String?
 public expect class FirebaseAuthActionCodeException : FirebaseAuthException
 public expect class FirebaseAuthEmailException : FirebaseAuthException
 public expect open class FirebaseAuthInvalidCredentialsException : FirebaseAuthException
