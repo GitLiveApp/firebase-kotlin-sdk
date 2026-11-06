@@ -229,20 +229,22 @@ public external interface Query : JsAny
 public external interface QueryConstraint : JsAny
 
 public external interface AggregateQuerySnapshot : JsAny {
+    public val query: Query
+
     public fun data(): JsAny
 }
 
 public external interface AggregateField : JsAny
 
-public external fun sum(field: String): AggregateField
+public external fun count(): AggregateField
 
-public external fun sum(field: FieldPath): AggregateField
+public external fun sum(field: String): AggregateField
 
 public external fun average(field: String): AggregateField
 
-public external fun average(field: FieldPath): AggregateField
-
 public external fun getAggregateFromServer(query: Query, aggregateSpec: JsAny): Promise<AggregateQuerySnapshot>
+
+public external fun getCount(query: Query): Promise<AggregateQuerySnapshot>
 
 public external interface QuerySnapshot : JsAny {
     public val docs: JsArray<DocumentSnapshot>

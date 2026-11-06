@@ -59,6 +59,15 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         exception?.let { close(exception) }
     }
 
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val registration =
+            android.addSnapshotListener(listenOptions.android) { snapshots, exception ->
+                snapshots?.let { trySend(snapshots) }
+                exception?.let { close(exception) }
+            }
+        awaitClose { registration.remove() }
+    }
+
     override fun equals(other: Any?): Boolean = this === other || other is NativeDocumentReference && nativeValue == other.nativeValue
     override fun hashCode(): Int = nativeValue.hashCode()
     override fun toString(): String = nativeValue.toString()

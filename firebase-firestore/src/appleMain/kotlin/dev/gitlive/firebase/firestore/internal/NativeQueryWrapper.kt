@@ -1,12 +1,11 @@
 package dev.gitlive.firebase.firestore.internal
 
-import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateField
-import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateQuerySnapshot
-import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateSource
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRFilter
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
@@ -17,28 +16,16 @@ import dev.gitlive.firebase.firestore.toException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import platform.Foundation.NSNull
-import platform.Foundation.NSNumber
 
 internal actual open class NativeQueryWrapper internal actual constructor(actual open val native: NativeQuery) {
 
     actual fun limit(limit: Number) = native.queryLimitedTo(limit.toLong())
     actual fun limitToLast(limit: Number) = native.queryLimitedToLast(limit.toLong())
 
-    actual suspend fun count(): Long = awaitResult<FIRAggregateQuerySnapshot> {
-        native.count.aggregationWithSource(FIRAggregateSource.FIRAggregateSourceServer, it)
-    }.count.longLongValue
+    actual fun count(): NativeAggregateQuery = native.count
 
-    actual suspend fun sum(field: String): Double = aggregateDouble(FIRAggregateField.aggregateFieldForSumOfField(field)) ?: 0.0
-    actual suspend fun sum(field: EncodedFieldPath): Double = aggregateDouble(FIRAggregateField.aggregateFieldForSumOfFieldPath(field)) ?: 0.0
-    actual suspend fun average(field: String): Double? = aggregateDouble(FIRAggregateField.aggregateFieldForAverageOfField(field))
-    actual suspend fun average(field: EncodedFieldPath): Double? = aggregateDouble(FIRAggregateField.aggregateFieldForAverageOfFieldPath(field))
-
-    private suspend fun aggregateDouble(aggregateField: FIRAggregateField): Double? {
-        val snapshot = awaitResult<FIRAggregateQuerySnapshot> {
-            native.aggregate(listOf(aggregateField)).aggregationWithSource(FIRAggregateSource.FIRAggregateSourceServer, it)
-        }
-        return (snapshot.valueForAggregateField(aggregateField) as? NSNumber)?.doubleValue
-    }
+    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): NativeAggregateQuery =
+        native.aggregate(listOf(aggregateField.ios) + aggregateFields.map { it.ios })
 
     actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
 
@@ -53,6 +40,15 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val listener =
             native.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+                snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+                error?.let { close(error.toException()) }
+            }
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val listener =
+            native.addSnapshotListenerWithOptions(listenOptions.ios) { snapshot, error ->
                 snapshot?.let { trySend(QuerySnapshot(snapshot)) }
                 error?.let { close(error.toException()) }
             }

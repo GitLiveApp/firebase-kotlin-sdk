@@ -22,6 +22,15 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
         awaitClose { listener.remove() }
     }
 
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val listener =
+            ios.addSnapshotListenerWithOptions(listenOptions.ios) { snapshot, error ->
+                snapshot?.let { trySend(snapshot) }
+                error?.let { close(error.toException()) }
+            }
+        awaitClose { listener.remove() }
+    }
+
     val ios: NativeDocumentReferenceType by ::nativeValue
 
     actual val id: String

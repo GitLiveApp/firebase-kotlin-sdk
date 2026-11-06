@@ -1,26 +1,24 @@
 package dev.gitlive.firebase.firestore.internal
 
 import dev.gitlive.firebase.externals.jsArrayOf
-import dev.gitlive.firebase.externals.jsGet
 import dev.gitlive.firebase.externals.json
 import dev.gitlive.firebase.externals.toJs
-import dev.gitlive.firebase.externals.toKotlin
 import dev.gitlive.firebase.externals.awaitValue
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import dev.gitlive.firebase.firestore.errorToException
 import dev.gitlive.firebase.firestore.externals.Query
 import dev.gitlive.firebase.firestore.externals.QueryConstraint
-import dev.gitlive.firebase.firestore.externals.AggregateField
 import dev.gitlive.firebase.firestore.externals.and
-import dev.gitlive.firebase.firestore.externals.getAggregateFromServer
-import dev.gitlive.firebase.firestore.externals.getCountFromServer
 import dev.gitlive.firebase.firestore.externals.getDocs
 import dev.gitlive.firebase.firestore.externals.getDocsFromCache
 import dev.gitlive.firebase.firestore.externals.getDocsFromServer
@@ -50,20 +48,11 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         dev.gitlive.firebase.firestore.externals.limitToLast(limit.toDouble()),
     ).wrapped
 
-    actual suspend fun count(): Long = rethrow {
-        val data = getCountFromServer(js).awaitValue().data()
-        (jsGet(data, "count").toKotlin() as Number).toLong()
-    }
-
-    actual suspend fun sum(field: String): Double = aggregateDouble(dev.gitlive.firebase.firestore.externals.sum(field)) ?: 0.0
-    actual suspend fun sum(field: EncodedFieldPath): Double = aggregateDouble(dev.gitlive.firebase.firestore.externals.sum(field)) ?: 0.0
-    actual suspend fun average(field: String): Double? = aggregateDouble(dev.gitlive.firebase.firestore.externals.average(field))
-    actual suspend fun average(field: EncodedFieldPath): Double? = aggregateDouble(dev.gitlive.firebase.firestore.externals.average(field))
-
-    private suspend fun aggregateDouble(aggregateField: AggregateField): Double? = rethrow {
-        val snapshot = getAggregateFromServer(js, json("result" to aggregateField)).awaitValue()
-        (jsGet(snapshot.data(), "result").toKotlin() as? Number)?.toDouble()
-    }
+    actual fun count(): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(AggregateField.Count))
+    actual fun aggregate(
+        aggregateField: AggregateField,
+        vararg aggregateFields: AggregateField,
+    ): NativeAggregateQuery = NativeAggregateQuery(native.js, listOf(aggregateField, *aggregateFields))
 
     actual fun where(filter: Filter) = query(js, filter.toQueryConstraint()).wrapped
 
@@ -179,6 +168,18 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             onSnapshot(
                 js,
                 json("includeMetadataChanges" to includeMetadataChanges),
+                { trySend(QuerySnapshot(it)) },
+                { close(errorToException(it)) },
+            )
+        }
+        awaitClose { rethrow { unsubscribe() } }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val unsubscribe = rethrow {
+            onSnapshot(
+                js,
+                listenOptions.js,
                 { trySend(QuerySnapshot(it)) },
                 { close(errorToException(it)) },
             )
