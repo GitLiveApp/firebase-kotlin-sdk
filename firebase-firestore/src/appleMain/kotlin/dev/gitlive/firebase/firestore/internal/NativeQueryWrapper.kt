@@ -25,8 +25,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual fun count(): NativeAggregateQuery = native.count
 
-    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): NativeAggregateQuery =
-        native.aggregate(listOf(aggregateField.ios) + aggregateFields.map { it.ios })
+    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): NativeAggregateQuery = native.aggregate(listOf(aggregateField.ios) + aggregateFields.map { it.ios })
 
     actual suspend fun get(source: Source) = QuerySnapshot(awaitResult { native.getDocumentsWithSource(source.toIosSource(), it) })
 
