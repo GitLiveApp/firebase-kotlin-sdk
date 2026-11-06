@@ -412,6 +412,11 @@ public final class dev/gitlive/firebase/firestore/FirebaseFirestoreSettings$Comp
 }
 
 public final class dev/gitlive/firebase/firestore/FirestoreKt {
+	public static final fun average (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun average (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getCount (Ldev/gitlive/firebase/firestore/Query;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sum (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun sum (Ldev/gitlive/firebase/firestore/Query;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ldev/gitlive/firebase/firestore/Query;
 	public static final fun where (Ldev/gitlive/firebase/firestore/Query;Ldev/gitlive/firebase/firestore/FieldPath;Ljava/util/List;Ljava/util/List;)Ldev/gitlive/firebase/firestore/Query;

@@ -116,6 +116,7 @@ internal fun NSError.toException() = when (domain) {
         16L -> FunctionsExceptionCode.UNAUTHENTICATED
         else -> FunctionsExceptionCode.UNKNOWN
     }
+
     else -> FunctionsExceptionCode.UNKNOWN
 }.let {
     FirebaseFunctionsException(
