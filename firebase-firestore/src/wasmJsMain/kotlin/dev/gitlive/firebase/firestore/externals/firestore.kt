@@ -244,8 +244,6 @@ public external fun average(field: String): AggregateField
 
 public external fun getAggregateFromServer(query: Query, aggregateSpec: JsAny): Promise<AggregateQuerySnapshot>
 
-public external fun getCount(query: Query): Promise<AggregateQuerySnapshot>
-
 public external interface QuerySnapshot : JsAny {
     public val docs: JsArray<DocumentSnapshot>
     public val empty: Boolean

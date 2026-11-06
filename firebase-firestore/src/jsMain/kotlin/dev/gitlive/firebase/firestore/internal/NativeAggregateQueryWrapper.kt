@@ -7,7 +7,6 @@ import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeAggregateQuerySnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.externals.getAggregateFromServer
-import dev.gitlive.firebase.firestore.externals.getCount
 import dev.gitlive.firebase.firestore.wrapped
 import kotlinx.coroutines.await
 import kotlin.js.json
@@ -16,18 +15,14 @@ internal actual class NativeAggregateQueryWrapper actual constructor(actual val 
 
     actual val query: NativeQuery get() = native.query.wrapped
 
-    actual suspend fun get(source: AggregateSource): NativeAggregateQuerySnapshot = if (native.aggregateFields.size == 1 && native.aggregateFields.first() == AggregateField.Count) {
-        getCount(query.js)
-    } else {
-        getAggregateFromServer(
-            query.js,
-            json(
-                *native.aggregateFields.map { field ->
-                    field.alias to field.js
-                }.toTypedArray(),
-            ),
-        )
-    }.await().let(::NativeAggregateQuerySnapshot)
+    actual suspend fun get(source: AggregateSource): NativeAggregateQuerySnapshot = getAggregateFromServer(
+        query.js,
+        json(
+            *native.aggregateFields.map { field ->
+                field.alias to field.js
+            }.toTypedArray(),
+        ),
+    ).await().let(::NativeAggregateQuerySnapshot)
 }
 
 internal actual class NativeAggregateQuerySnapshotWrapper actual constructor(actual val native: NativeAggregateQuerySnapshot) {
