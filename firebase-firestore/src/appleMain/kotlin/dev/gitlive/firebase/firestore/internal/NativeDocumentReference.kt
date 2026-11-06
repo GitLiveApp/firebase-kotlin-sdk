@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore.internal
 
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult
@@ -16,6 +17,15 @@ internal actual class NativeDocumentReference actual constructor(actual val nati
     actual fun snapshots(includeMetadataChanges: Boolean) = callbackFlow {
         val listener =
             ios.addSnapshotListenerWithIncludeMetadataChanges(includeMetadataChanges) { snapshot, error ->
+                snapshot?.let { trySend(snapshot) }
+                error?.let { close(error.toException()) }
+            }
+        awaitClose { listener.remove() }
+    }
+
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val listener =
+            ios.addSnapshotListenerWithOptions(listenOptions.ios) { snapshot, error ->
                 snapshot?.let { trySend(snapshot) }
                 error?.let { close(error.toException()) }
             }

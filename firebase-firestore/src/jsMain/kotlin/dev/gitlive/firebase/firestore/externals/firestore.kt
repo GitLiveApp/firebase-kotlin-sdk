@@ -231,18 +231,18 @@ public external interface Query
 public external interface QueryConstraint
 
 public external interface AggregateQuerySnapshot {
-    public fun data(): dynamic
+    public val query: Query
+
+    public fun data(): Json
 }
 
-public external interface AggregateField
+public external interface AggregateField<T>
 
-public external fun sum(field: String): AggregateField
+public external fun count(): AggregateField<Int>
 
-public external fun sum(field: FieldPath): AggregateField
+public external fun sum(field: String): AggregateField<Double?>
 
-public external fun average(field: String): AggregateField
-
-public external fun average(field: FieldPath): AggregateField
+public external fun average(field: String): AggregateField<Double?>
 
 public external fun getAggregateFromServer(query: Query, aggregateSpec: Json): Promise<AggregateQuerySnapshot>
 
