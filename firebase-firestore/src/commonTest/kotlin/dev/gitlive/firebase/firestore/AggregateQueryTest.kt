@@ -94,6 +94,25 @@ open class AggregateQueryTest : BaseFirebaseFirestoreTest() {
         assertEquals(0, aggregate[sumProp]?.toInt())
     }
 
+    @Test
+    fun testCountShortcut() = runTestWithFirestoreData {
+        assertEquals(3L, collection.getCount())
+    }
+
+    @Test
+    fun testSumShortcut() = runTestWithFirestoreData {
+        assertEquals(6, collection.sum(FirestoreTest::count.name).toInt())
+        assertEquals(1, collection.sum(FirestoreTest::time.name).toInt())
+        assertEquals(0, collection.sum(FirestoreTest::prop1.name).toInt())
+    }
+
+    @Test
+    fun testAverageShortcut() = runTestWithFirestoreData {
+        assertEquals(2.0, collection.average(FirestoreTest::count.name))
+        assertEquals(1.0 / 3.0, collection.average(FirestoreTest::time.name))
+        assertNull(collection.average(FirestoreTest::prop1.name))
+    }
+
     private fun runTestWithFirestoreData(
         documentOne: FirestoreTest = testOne,
         documentTwo: FirestoreTest = testTwo,

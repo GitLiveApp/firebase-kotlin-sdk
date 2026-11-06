@@ -361,6 +361,32 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
     )
 }
 
+/**
+ * Fetches the number of documents matching this [Query] in a single round-trip. A convenience shortcut for
+ * `count().get().count`; use [Query.count] directly if you need the [AggregateQuerySnapshot] itself.
+ */
+public suspend fun Query.getCount(): Long = count().get().count
+
+/**
+ * Fetches the sum of [field] across documents matching this [Query] in a single round-trip, or `0.0` if the
+ * query matches no documents. To combine a sum with other aggregates in one round-trip, use [Query.aggregate]
+ * with [AggregateField.sum] instead.
+ */
+public suspend fun Query.sum(field: String): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
+
+public suspend fun Query.sum(field: FieldPath): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
+
+/**
+ * Fetches the average of [field] across documents matching this [Query] in a single round-trip, or `null` if
+ * the query matches no documents. To combine an average with other aggregates in one round-trip, use
+ * [Query.aggregate] with [AggregateField.average] instead.
+ */
+public suspend fun Query.average(field: String): Double? = aggregateDouble(AggregateField.average(field))
+
+public suspend fun Query.average(field: FieldPath): Double? = aggregateDouble(AggregateField.average(field))
+
+private suspend fun Query.aggregateDouble(aggregateField: AggregateField): Double? = aggregate(aggregateField).get().getDouble(aggregateField)
+
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
 public fun Query.where(field: String, equalTo: Any?): Query = where {
     field equalTo equalTo
