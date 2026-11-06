@@ -4,7 +4,6 @@ import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
@@ -12,6 +11,7 @@ import dev.gitlive.firebase.firestore.Filter
 import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import kotlinx.coroutines.channels.ProducerScope

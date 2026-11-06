@@ -1,6 +1,7 @@
 package dev.gitlive.firebase.firestore.internal
 
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.await
 import dev.gitlive.firebase.firestore.awaitResult

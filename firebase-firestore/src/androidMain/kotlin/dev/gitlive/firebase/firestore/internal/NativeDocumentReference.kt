@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.TaskExecutors
 import com.google.firebase.firestore.MetadataChanges
 import dev.gitlive.firebase.firestore.NativeDocumentReferenceType
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.performUpdate
 import dev.gitlive.firebase.internal.EncodedObject

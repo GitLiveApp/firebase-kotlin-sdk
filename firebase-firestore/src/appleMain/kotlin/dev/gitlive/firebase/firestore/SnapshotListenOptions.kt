@@ -1,7 +1,7 @@
 package dev.gitlive.firebase.firestore
 
-import cocoapods.FirebaseFirestoreInternal.FIRListenSource
-import cocoapods.FirebaseFirestoreInternal.FIRSnapshotListenOptions
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRListenSource
+import swiftPMImport.dev.gitlive.firebase.firestore.FIRSnapshotListenOptions
 
 public actual data class SnapshotListenOptions(
     public actual val listenSource: ListenSource,

@@ -9,6 +9,7 @@ import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.NativeQuery
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import dev.gitlive.firebase.firestore.awaitResult
