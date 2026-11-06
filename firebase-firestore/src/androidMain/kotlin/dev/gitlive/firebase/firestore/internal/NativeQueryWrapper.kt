@@ -1,16 +1,17 @@
 package dev.gitlive.firebase.firestore.internal
 
 import com.google.android.gms.tasks.TaskExecutors
-import com.google.firebase.firestore.AggregateField
-import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
+import dev.gitlive.firebase.firestore.AggregateField
 import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.EncodedFieldPath
 import dev.gitlive.firebase.firestore.Filter
+import dev.gitlive.firebase.firestore.NativeAggregateQuery
 import dev.gitlive.firebase.firestore.NativeDocumentSnapshot
 import dev.gitlive.firebase.firestore.QuerySnapshot
+import dev.gitlive.firebase.firestore.SnapshotListenOptions
 import dev.gitlive.firebase.firestore.Source
 import dev.gitlive.firebase.firestore.WhereConstraint
 import kotlinx.coroutines.channels.ProducerScope
@@ -22,15 +23,6 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
 
     actual fun limit(limit: Number) = native.limit(limit.toLong())
     actual fun limitToLast(limit: Number) = native.limitToLast(limit.toLong())
-
-    actual suspend fun count(): Long = native.count().get(AggregateSource.SERVER).await().count
-
-    actual suspend fun sum(field: String): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
-    actual suspend fun sum(field: EncodedFieldPath): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
-    actual suspend fun average(field: String): Double? = aggregateDouble(AggregateField.average(field))
-    actual suspend fun average(field: EncodedFieldPath): Double? = aggregateDouble(AggregateField.average(field))
-
-    private suspend fun aggregateDouble(aggregateField: AggregateField): Double? = native.aggregate(aggregateField).get(AggregateSource.SERVER).await().getDouble(aggregateField)
 
     actual val snapshots get() = callbackFlow {
         val listener = native.addSnapshotListener { snapshot, exception ->
@@ -49,6 +41,13 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
         }
         awaitClose { listener.remove() }
     }
+    actual fun snapshots(listenOptions: SnapshotListenOptions) = callbackFlow {
+        val listener = native.addSnapshotListener(listenOptions.android) { snapshot, exception ->
+            snapshot?.let { trySend(QuerySnapshot(snapshot)) }
+            exception?.let { close(exception) }
+        }
+        awaitClose { listener.remove() }
+    }
 
     actual suspend fun get(source: Source): QuerySnapshot = QuerySnapshot(native.get(source.toAndroidSource()).await())
 
@@ -59,10 +58,12 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
+
         is Filter.Or -> com.google.firebase.firestore.Filter.or(
             *filters.map { it.toAndroidFilter() }
                 .toTypedArray(),
         )
+
         is Filter.Field -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
@@ -72,6 +73,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(field, constraint.value)
                 }
+
                 is WhereConstraint.ForObject -> {
                     val modifier: (String, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
@@ -82,6 +84,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(field, constraint.value)
                 }
+
                 is WhereConstraint.ForArray -> {
                     val modifier: (String, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray
@@ -92,6 +95,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                 }
             }
         }
+
         is Filter.Path -> {
             when (constraint) {
                 is WhereConstraint.ForNullableObject -> {
@@ -101,6 +105,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
+
                 is WhereConstraint.ForObject -> {
                     val modifier: (FieldPath, Any) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.LessThan -> com.google.firebase.firestore.Filter::lessThan
@@ -111,6 +116,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
                     }
                     modifier.invoke(path.android, constraint.value)
                 }
+
                 is WhereConstraint.ForArray -> {
                     val modifier: (FieldPath, List<Any>) -> com.google.firebase.firestore.Filter = when (constraint) {
                         is WhereConstraint.InArray -> com.google.firebase.firestore.Filter::inArray
@@ -149,4 +155,7 @@ internal actual open class NativeQueryWrapper internal actual constructor(actual
             }
         awaitClose { registration.remove() }
     }
+
+    actual fun count(): NativeAggregateQuery = native.count()
+    actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField) = native.aggregate(aggregateField.android, *aggregateFields.map { it.android }.toTypedArray())
 }

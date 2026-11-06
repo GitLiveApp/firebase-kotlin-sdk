@@ -635,16 +635,16 @@ open class QueryTest : BaseFirebaseFirestoreTest() {
 
     @Test
     fun testCount() = runTestWithFirestoreData {
-        assertEquals(3L, collection.count())
+        assertEquals(3L, collection.getCount())
 
         val filteredCount = collection
             .where { FirestoreTest::count.name greaterThan 1 }
-            .count()
+            .getCount()
         assertEquals(2L, filteredCount)
 
         val emptyCount = collection
             .where { FirestoreTest::prop1.name equalTo "doesNotExist" }
-            .count()
+            .getCount()
         assertEquals(0L, emptyCount)
     }
 

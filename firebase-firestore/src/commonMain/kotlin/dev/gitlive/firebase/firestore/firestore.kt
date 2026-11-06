@@ -10,6 +10,8 @@ import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseException
+import dev.gitlive.firebase.firestore.internal.NativeAggregateQuerySnapshotWrapper
+import dev.gitlive.firebase.firestore.internal.NativeAggregateQueryWrapper
 import dev.gitlive.firebase.firestore.internal.NativeCollectionReferenceWrapper
 import dev.gitlive.firebase.firestore.internal.NativeDocumentReference
 import dev.gitlive.firebase.firestore.internal.NativeDocumentSnapshotWrapper
@@ -256,14 +258,10 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
 
     public fun limit(limit: Number): Query = Query(nativeQuery.limit(limit))
     public fun limitToLast(limit: Number): Query = Query(nativeQuery.limitToLast(limit))
-
-    public suspend fun count(): Long = nativeQuery.count()
-    public suspend fun sum(field: String): Double = nativeQuery.sum(field)
-    public suspend fun sum(field: FieldPath): Double = nativeQuery.sum(field.encoded)
-    public suspend fun average(field: String): Double? = nativeQuery.average(field)
-    public suspend fun average(field: FieldPath): Double? = nativeQuery.average(field.encoded)
     public val snapshots: Flow<QuerySnapshot> = nativeQuery.snapshots
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot> = nativeQuery.snapshots(includeMetadataChanges)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = nativeQuery.snapshots(listenOptions)
+
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = nativeQuery.get(source)
 
     public fun where(builder: FilterBuilder.() -> Filter?): Query = builder(FilterBuilder())?.let { Query(nativeQuery.where(it)) } ?: this
@@ -355,7 +353,39 @@ public open class Query internal constructor(internal val nativeQuery: NativeQue
      * @param builder closure for configuring the [FieldValuesDSL]
      */
     public fun endAtFieldValues(builder: FieldValuesDSL.() -> Unit): Query = Query(nativeQuery.endAt(*FieldValuesDSL().apply(builder).fieldValues.toTypedArray()))
+
+    public fun count(): AggregateQuery = AggregateQuery(nativeQuery.count())
+
+    public fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): AggregateQuery = AggregateQuery(
+        nativeQuery.aggregate(aggregateField, *aggregateFields),
+    )
 }
+
+/**
+ * Fetches the number of documents matching this [Query] in a single round-trip. A convenience shortcut for
+ * `count().get().count`; use [Query.count] directly if you need the [AggregateQuerySnapshot] itself.
+ */
+public suspend fun Query.getCount(): Long = count().get().count
+
+/**
+ * Fetches the sum of [field] across documents matching this [Query] in a single round-trip, or `0.0` if the
+ * query matches no documents. To combine a sum with other aggregates in one round-trip, use [Query.aggregate]
+ * with [AggregateField.sum] instead.
+ */
+public suspend fun Query.sum(field: String): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
+
+public suspend fun Query.sum(field: FieldPath): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
+
+/**
+ * Fetches the average of [field] across documents matching this [Query] in a single round-trip, or `null` if
+ * the query matches no documents. To combine an average with other aggregates in one round-trip, use
+ * [Query.aggregate] with [AggregateField.average] instead.
+ */
+public suspend fun Query.average(field: String): Double? = aggregateDouble(AggregateField.average(field))
+
+public suspend fun Query.average(field: FieldPath): Double? = aggregateDouble(AggregateField.average(field))
+
+private suspend fun Query.aggregateDouble(aggregateField: AggregateField): Double? = aggregate(aggregateField).get().getDouble(aggregateField)
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
 public fun Query.where(field: String, equalTo: Any?): Query = where {
@@ -407,6 +437,38 @@ public fun Query.where(path: FieldPath, inArray: List<Any>? = null, arrayContain
             arrayContainsAny?.let { path containsAny it },
         ).toTypedArray(),
     )
+}
+
+internal expect class NativeAggregateQuery
+internal expect class NativeAggregateQuerySnapshot
+
+public class AggregateQuery internal constructor(internal val nativeQuery: NativeAggregateQueryWrapper) {
+
+    public companion object {}
+
+    public val query: Query get() = Query(nativeQuery.query)
+    internal val native = nativeQuery.native
+
+    internal constructor(native: NativeAggregateQuery) : this(NativeAggregateQueryWrapper(native))
+
+    public suspend fun get(source: AggregateSource = AggregateSource.SERVER): AggregateQuerySnapshot = AggregateQuerySnapshot(nativeQuery.get(source))
+}
+
+public class AggregateQuerySnapshot internal constructor(internal val nativeSnapshot: NativeAggregateQuerySnapshotWrapper) {
+
+    public companion object {}
+
+    public val query: AggregateQuery get() = AggregateQuery(nativeSnapshot.query)
+    internal val native = nativeSnapshot.native
+    public val count: Long get() = nativeSnapshot.count
+
+    internal constructor(native: NativeAggregateQuerySnapshot) : this(NativeAggregateQuerySnapshotWrapper(native))
+
+    public operator fun get(aggregateField: AggregateField): Number? = nativeSnapshot[aggregateField]
+    public operator fun get(averageAggregateField: AggregateField.Average): Double? = nativeSnapshot[averageAggregateField]
+    public operator fun get(countAggregateField: AggregateField.Count): Long = nativeSnapshot[countAggregateField]
+    public fun getDouble(aggregateField: AggregateField): Double? = nativeSnapshot.getDouble(aggregateField)
+    public fun getLong(aggregateField: AggregateField): Long? = nativeSnapshot.getLong(aggregateField)
 }
 
 internal expect class NativeWriteBatch
@@ -539,7 +601,8 @@ public data class DocumentReference internal constructor(internal val native: Na
     val path: String get() = native.path
     val snapshots: Flow<DocumentSnapshot> get() = native.snapshots.map(::DocumentSnapshot)
     val parent: CollectionReference get() = CollectionReference(native.parent)
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<DocumentSnapshot> = native.snapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = native.snapshots(listenOptions).map(::DocumentSnapshot)
 
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(native.collection(collectionPath))
     public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(native.get(source))
@@ -841,4 +904,23 @@ public enum class Source {
     CACHE,
     SERVER,
     DEFAULT,
+}
+
+public enum class AggregateSource {
+    SERVER,
+}
+
+public expect sealed class AggregateField {
+
+    public companion object {
+        public fun average(field: String): Average
+        public fun average(fieldPath: FieldPath): Average
+        public fun count(): Count
+        public fun sum(field: String): Sum
+        public fun sum(fieldPath: FieldPath): Sum
+    }
+
+    public object Count : AggregateField
+    public class Average : AggregateField
+    public class Sum : AggregateField
 }
