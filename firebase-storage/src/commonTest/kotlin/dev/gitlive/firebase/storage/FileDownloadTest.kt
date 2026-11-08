@@ -33,6 +33,9 @@ expect fun temporaryFile(name: String): Uri
 /** Whether the platform SDK downloads to files; the JS SDK does not. */
 expect val supportsFileDownloads: Boolean
 
+/** Whether the platform SDK uploads from file URLs; the JS SDK does not, and on the JVM firebase-java-sdk's `ContentResolver` cannot open them yet. */
+expect val supportsFileUploads: Boolean
+
 /** The file download part of the `com.google.firebase.storage` layer; on JS, whose SDK has no file downloads, the download fails. */
 @OptIn(UnsupportedOnJs::class)
 @IgnoreForAndroidUnitTest
@@ -86,6 +89,7 @@ class FileDownloadTest {
         assertEquals(13, totalByteCount)
         assertEquals(13, bytesTransferred)
         assertTrue(ref.activeDownloadTasks.isEmpty())
+        if (!supportsFileUploads) return@runTest
         val reUploaded = ref.child("../compatReupload.txt").putFile(destination).await()
         assertEquals(13, reUploaded.totalByteCount)
     }

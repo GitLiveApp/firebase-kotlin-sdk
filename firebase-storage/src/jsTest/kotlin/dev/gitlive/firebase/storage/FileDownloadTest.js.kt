@@ -10,3 +10,5 @@ import android.net.Uri
 actual fun temporaryFile(name: String): Uri = Uri.parse(name)
 
 actual val supportsFileDownloads: Boolean = false
+
+actual val supportsFileUploads: Boolean = false
