@@ -132,7 +132,7 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
         ios.fetchSignInMethodsForEmail(email) { methods, error -> completion(SignInMethodQueryResultImpl(methods?.map { it.toString() }), error) }
     }
 
-    public actual fun initializeRecaptchaConfig(): Task<Nothing?> = write(this) { ios.initializeRecaptchaConfigWithCompletion(it) }
+    public actual fun initializeRecaptchaConfig(): Task<Nothing?> = write(this) { ios.initializeRecaptchaConfigCompat(it) }
 
     public actual fun revokeAccessToken(token: String): Task<Nothing?> = write(this) { ios.revokeTokenWithAuthorizationCode(token, it) }
 
@@ -198,6 +198,9 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
 
 /** The test settings of [this]; phone number verification, which they configure, is only available on iOS. */
 internal expect fun FIRAuth.compatSettings(): FirebaseAuthSettings
+
+/** Loads the reCAPTCHA configuration of [this]; the Firebase iOS SDK only provides reCAPTCHA on iOS. */
+internal expect fun FIRAuth.initializeRecaptchaConfigCompat(completion: (NSError?) -> Unit)
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual abstract class FirebaseUser actual constructor() : UserInfo {

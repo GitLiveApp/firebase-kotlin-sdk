@@ -19,6 +19,9 @@ internal actual fun FIRAuth.compatSettings(): FirebaseAuthSettings = object : Fi
     override fun setAppVerificationDisabledForTesting(disabled: Boolean) {}
 }
 
+// The Firebase iOS SDK has no reCAPTCHA on tvOS, so there is no configuration to load
+internal actual fun FIRAuth.initializeRecaptchaConfigCompat(completion: (NSError?) -> Unit): Unit = completion(null)
+
 internal actual fun FIRUser.updatePhoneNumberCompat(credential: PhoneAuthCredential, completion: (NSError?) -> Unit): Unit = throw TvOsPhoneAuthNotSupportedException()
 
 internal actual fun FIRUser.compatMultiFactor(auth: FirebaseAuth): MultiFactor = object : MultiFactor() {

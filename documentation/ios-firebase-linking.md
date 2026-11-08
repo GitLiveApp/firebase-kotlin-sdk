@@ -14,16 +14,16 @@ publication:
 
 - The root Gradle module metadata exposes a **`swiftPMDependenciesMetadataElements`** variant
   (usage `swiftPMDependenciesMetadata`) referencing a **`<module>-<version>-swiftpm-metadata.json`**
-  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `12.19.3`, product
+  artifact. For example `firebase-app`'s artifact declares `firebase-ios-sdk` @ `13.1.1`, product
   `FirebaseCore`, deployment targets, and `isModulesDiscoveryEnabled = false`. The declared version
-  is a `from(...)` lower bound, so SwiftPM may resolve any newer 12.x minor or patch release, up to
-  but not including 13.0.0.
+  is a `from(...)` lower bound, so SwiftPM may resolve any newer 13.x minor or patch release, up to
+  but not including 14.0.0.
 - A downstream KMP module that depends on `dev.gitlive:firebase-*` from Maven resolves this via its
   `swiftPMDependenciesMetadataClasspath`, aggregating the SwiftPM dependencies across the whole
   dependency graph — **without declaring any `swiftPMDependencies` of its own**. (Verified: a
   consumer depending only on `dev.gitlive:firebase-app` produced an aggregated
   `build/kotlin/swiftPMDependenciesMetadataForLockFiles` listing `firebase-ios-sdk` / `FirebaseCore`
-  / `12.19.3`.)
+  / `13.1.1`.)
 - The Kotlin Gradle plugin then generates a synthetic Swift package containing all transitive
   SwiftPM dependencies and provides the machine code when linking the app's framework / running
   Kotlin/Native tests (`generateSyntheticLinkageSwiftPMImportProject…`, `integrateEmbedAndSign`,
@@ -86,8 +86,8 @@ officially tested up to Xcode 26.4; full Xcode 27 support is planned for Kotlin 
   [CocoaPods to SwiftPM migration guide](https://kotl.in/cocoapods-to-swiftpm-migration). Afterwards
   remove the Firebase pods from your Podfile (see "Don't mix package managers for Firebase" below).
 - **Deployment target.** This SDK targets **iOS 15 / tvOS 15 / macOS 12**. iOS and tvOS match
-  firebase-ios-sdk 12's own declared minimums (iOS 15 / macCatalyst 15 / macOS 10.15 / tvOS 15 /
-  watchOS 7). macOS is 12 rather than Firebase's 10.15 because Kotlin/Native builds macOS code for
+  firebase-ios-sdk 13's own declared minimums (iOS 15 / macCatalyst 15 / macOS 11 / tvOS 15 /
+  watchOS 8). macOS is 12 rather than Firebase's 11 because Kotlin/Native builds macOS code for
   macOS 12 and later. Your app's deployment target must be **≥** these. The iOS and tvOS floors rose
   from 13 in firebase-ios-sdk 12.0.0 — if your app still targets iOS 13 or 14, stay on a release of
   this SDK that pins `firebase-ios-sdk` 11.x.
@@ -96,6 +96,9 @@ officially tested up to Xcode 26.4; full Xcode 27 support is planned for Kotlin 
   `dev.gitlive:firebase-*`, Kotlin 2.4.20 can reuse stale Xcode build state and fail with this error
   ([KT-88106](https://youtrack.jetbrains.com/issue/KT-88106), fix planned for Kotlin 2.5.0). Delete
   `build/kotlin/swiftPMXcodeDumps` in your root project, or run `./gradlew clean`.
+- **Firestore package trait.** From firebase-ios-sdk 13, Firestore and its gRPC/Abseil
+  dependencies are behind the package's `Firestore` trait, which is on by default. Keep the default
+  traits enabled if you use `dev.gitlive:firebase-firestore`.
 - **Don't mix package managers for Firebase.** All Firebase products share transitive C/C++
   dependencies (gRPC/abseil/leveldb/BoringSSL/nanopb). Linking some via SwiftPM and others via
   CocoaPods duplicates those symbols and causes `dyld` crashes — use one mechanism for the whole

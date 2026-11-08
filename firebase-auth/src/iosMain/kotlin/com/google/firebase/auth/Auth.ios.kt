@@ -31,6 +31,8 @@ internal actual fun FIRAuth.compatSettings(): FirebaseAuthSettings = object : Fi
     }
 }
 
+internal actual fun FIRAuth.initializeRecaptchaConfigCompat(completion: (NSError?) -> Unit): Unit = initializeRecaptchaConfigWithCompletion(completion)
+
 internal actual fun FIRUser.updatePhoneNumberCompat(credential: PhoneAuthCredential, completion: (NSError?) -> Unit) {
     updatePhoneNumberCredential(credential.ios as FIRPhoneAuthCredential, completion)
 }

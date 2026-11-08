@@ -84,7 +84,7 @@ public expect class FirebaseAuth {
     @Deprecated("Migrating off of this method is recommended as a security best-practice. Learn more in the Identity Platform documentation for [Email Enumeration Protection](https://cloud.google.com/identity-platform/docs/admin/email-enumeration-protection).")
     public fun fetchSignInMethodsForEmail(email: String): Task<SignInMethodQueryResult>
 
-    /** Initializes the reCAPTCHA configuration, so that the first sign-in does not have to. */
+    /** Initializes the reCAPTCHA configuration, so that the first sign-in does not have to. Completes without doing anything on tvOS, which has no reCAPTCHA. */
     public fun initializeRecaptchaConfig(): Task<Nothing?>
 
     /** Revokes the Sign in with Apple [token] of the current user. */
