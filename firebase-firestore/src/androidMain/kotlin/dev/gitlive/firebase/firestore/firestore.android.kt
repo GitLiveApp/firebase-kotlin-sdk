@@ -85,7 +85,8 @@ public actual fun firestoreSettings(
 internal actual fun FirebaseFirestoreSettings.applyTo(firestore: AndroidFirebaseFirestore) {
     firestore.firestoreSettings = androidFirestoreSettings {
         setSslEnabled(sslEnabled)
-        setHost(host)
+        // Qualified: inside the builder, host is the builder's own property.
+        setHost(this@applyTo.host)
         setLocalCacheSettings(cacheSettings.toCompat())
     }
     callbackExecutors[firestore] = callbackExecutor

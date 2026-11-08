@@ -111,7 +111,8 @@ public actual fun firestoreSettings(
 internal actual fun FirebaseFirestoreSettings.applyTo(firestore: CompatFirebaseFirestore) {
     firestore.firestoreSettings = compatFirestoreSettings {
         setSslEnabled(sslEnabled)
-        setHost(host)
+        // Qualified: inside the builder, host is the builder's own property.
+        setHost(this@applyTo.host)
         setLocalCacheSettings(cacheSettings.toCompat())
     }.also { it.callbackContext = dispatchQueue }
 }

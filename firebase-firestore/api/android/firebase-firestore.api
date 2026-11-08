@@ -154,10 +154,6 @@ public final class dev/gitlive/firebase/firestore/DoubleAsTimestampSerializer : 
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
-public final class dev/gitlive/firebase/firestore/EncodersKt {
-	public static final fun isSpecialValue (Ljava/lang/Object;)Z
-}
-
 public final class dev/gitlive/firebase/firestore/FieldPath {
 	public static final field Companion Ldev/gitlive/firebase/firestore/FieldPath$Companion;
 	public fun <init> ([Ljava/lang/String;)V
@@ -792,6 +788,10 @@ public final class dev/gitlive/firebase/firestore/WriteBatch {
 }
 
 public final class dev/gitlive/firebase/firestore/WriteBatch$Companion {
+}
+
+public final class dev/gitlive/firebase/firestore/_encodersKt {
+	public static final fun isSpecialValue (Ljava/lang/Object;)Z
 }
 
 public final class dev/gitlive/firebase/firestore/android {

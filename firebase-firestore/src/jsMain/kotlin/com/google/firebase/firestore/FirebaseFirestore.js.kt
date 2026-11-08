@@ -243,8 +243,9 @@ public actual class PersistentCacheIndexManager internal constructor(public val 
 internal actual fun FirebaseFirestore.loadBundleSource(source: Source): LoadBundleTask = loadBundleFromSource(source)
 
 /**
- * A `ReadableStream` the JS SDK pulls the source's bytes through, chunk by chunk, as it parses the bundle; the source is
- * closed at its end, and a failing read errors the `ReadableStream`, which fails the load.
+ * A `ReadableStream` the JS SDK pulls the source's bytes through, chunk by chunk, as it parses the bundle. The source is
+ * closed at its end, when a read fails (which errors the `ReadableStream` and fails the load) and when the SDK cancels
+ * the stream, as it does on a failed parse.
  */
 private fun Source.toReadableStream(): ReadableStream = ReadableStream(
     json(
@@ -259,12 +260,26 @@ private fun Source.toReadableStream(): ReadableStream = ReadableStream(
                     controller.enqueue(buffer.copyOf(count).toUint8Array())
                 }
             } catch (e: Throwable) {
+                closeQuietly()
                 controller.error(e)
             }
             Unit
         },
+        "cancel" to { _: dynamic ->
+            closeQuietly()
+            Unit
+        },
     ),
 )
+
+/** Closes the source; a failing close has nothing left to report to. */
+private fun Source.closeQuietly() {
+    try {
+        close()
+    } catch (_: Throwable) {
+        // Already failed or closed.
+    }
+}
 
 private const val BUNDLE_CHUNK_SIZE = 16 * 1024
 
