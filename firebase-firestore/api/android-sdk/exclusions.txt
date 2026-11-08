@@ -1,11 +1,12 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
 
-# Firestore Pipelines are Swift-only in the iOS SDK, at any version: its Objective-C side is the hidden `__FIRPipelineBridge`
-# classes, so FirebaseFirestoreInternal, which the Apple targets bind, has no pipeline API. In the pinned JS SDK they are a
-# separate preview entry point (firebase/firestore/pipelines).
-com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
-com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
-com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines are Swift-only in the iOS SDK and a preview entry point in the JS SDK
+# Firestore Pipelines have no supported Objective-C API in the iOS SDK: the supported API is Swift, and the Objective-C side is
+# the `__`-prefixed FIRPipelineBridge classes, hidden as internal since 13.0.0 (FlutterFire and React Native Firebase build on
+# them anyway; firebase/firebase-ios-sdk#17013 asks for them to be formalised). In the pinned JS SDK they are a separate
+# preview entry point (firebase/firestore/pipelines).
+com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
+com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
+com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
 
 # The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
