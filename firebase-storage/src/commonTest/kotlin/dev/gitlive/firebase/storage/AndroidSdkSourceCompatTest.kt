@@ -152,6 +152,34 @@ class AndroidSdkSourceCompatTest {
     }
 
     @Test
+    fun testListenersRegisteredDuringCompletion() = runTest {
+        val ref = storage.getReference("test/compatTaskNested.bin")
+        val task: UploadTask = ref.putBytes(ByteArray(1024))
+        // A listener registered from inside another's terminal callback is told exactly once.
+        val nestedCalls = CompletableDeferred<Int>()
+        var calls = 0
+        task.addOnSuccessListener {
+            task.addOnCompleteListener {
+                calls++
+                nestedCalls.complete(calls)
+            }
+        }
+        task.await()
+        assertEquals(1, nestedCalls.await())
+        assertEquals(1, calls)
+        // Registration after completion replays the terminal event once and never the others.
+        var successes = 0
+        var failures = 0
+        var cancellations = 0
+        task.addOnSuccessListener { successes++ }
+        task.addOnFailureListener { failures++ }
+        task.addOnCanceledListener { cancellations++ }
+        assertEquals(1, successes)
+        assertEquals(0, failures)
+        assertEquals(0, cancellations)
+    }
+
+    @Test
     fun testList() = runTest {
         val folder = storage.getReference("test/compatList")
         folder.child("one.txt").putBytes("1".encodeToByteArray()).await()

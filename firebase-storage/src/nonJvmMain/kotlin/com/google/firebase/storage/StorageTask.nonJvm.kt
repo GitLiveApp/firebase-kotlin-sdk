@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.RuntimeExecutionException
 import com.google.android.gms.tasks.SuccessContinuation
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.cancellation.CancellationException
 
 /*
@@ -37,16 +39,55 @@ public actual abstract class ControllableTask<StateT> actual constructor() : Can
 
 private enum class TaskStatus { QUEUED, IN_PROGRESS, PAUSED, SUCCESS, FAILURE, CANCELED }
 
+/**
+ * The status of a [StorageTask] together with its listeners, replaced as a whole on every change: a listener registered
+ * while the task completes is either in the list that completion dispatches to or replayed once by its registration,
+ * never both, and a platform callback (the main queue on Apple) and a registration from another thread see one
+ * consistent state.
+ */
+private data class State<ResultT>(
+    val status: TaskStatus,
+    val error: Exception? = null,
+    val finalSnapshot: ResultT? = null,
+    val canceledListeners: List<OnCanceledListener> = emptyList(),
+    val completeListeners: List<OnCompleteListener<ResultT>> = emptyList(),
+    val failureListeners: List<OnFailureListener> = emptyList(),
+    val pausedListeners: List<OnPausedListener<ResultT>> = emptyList(),
+    val progressListeners: List<OnProgressListener<ResultT>> = emptyList(),
+    val successListeners: List<OnSuccessListener<in ResultT>> = emptyList(),
+) {
+    val isComplete: Boolean get() = status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE || status == TaskStatus.CANCELED
+}
+
+/**
+ * Calls [block] for every listener. One that throws does not stop the others, as on Android, where each listener runs on
+ * its own executor; the first exception is rethrown once all have run, with the others suppressed.
+ */
+private inline fun <L> List<L>.dispatch(block: (L) -> Unit) {
+    var thrown: Throwable? = null
+    for (listener in this) {
+        try {
+            block(listener)
+        } catch (e: Throwable) {
+            val first = thrown
+            if (first == null) thrown = e else first.addSuppressed(e)
+        }
+    }
+    thrown?.let { throw it }
+}
+
+@OptIn(ExperimentalAtomicApi::class)
 public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> protected actual constructor() : ControllableTask<ResultT>() {
-    private var status = TaskStatus.QUEUED
-    private var error: Exception? = null
-    private var finalSnapshot: ResultT? = null
-    private val canceledListeners = mutableListOf<OnCanceledListener>()
-    private val completeListeners = mutableListOf<OnCompleteListener<ResultT>>()
-    private val failureListeners = mutableListOf<OnFailureListener>()
-    private val pausedListeners = mutableListOf<OnPausedListener<ResultT>>()
-    private val progressListeners = mutableListOf<OnProgressListener<ResultT>>()
-    private val successListeners = mutableListOf<OnSuccessListener<in ResultT>>()
+    private val state = AtomicReference(State<ResultT>(TaskStatus.QUEUED))
+
+    /** Replaces the state with what [transform] makes of the current one; returns the state replaced and its replacement. */
+    private inline fun swap(transform: (State<ResultT>) -> State<ResultT>): Pair<State<ResultT>, State<ResultT>> {
+        while (true) {
+            val current = state.load()
+            val next = transform(current)
+            if (state.compareAndSet(current, next)) return current to next
+        }
+    }
 
     /** The reference the task operates on. */
     internal abstract val reference: StorageReference
@@ -60,19 +101,23 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
 
     internal abstract fun controlCancel(): Boolean
 
-    public actual val snapshot: ResultT get() = finalSnapshot ?: snapshotWith(error)
+    public actual val snapshot: ResultT get() = state.load().let { it.finalSnapshot ?: snapshotWith(it.error) }
+
+    private val status: TaskStatus get() = state.load().status
 
     // The Task members are implemented by the concrete subclasses (the expect classes leave them inherited): the state.
-    internal val completeState: Boolean get() = status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE || status == TaskStatus.CANCELED
+    internal val completeState: Boolean get() = state.load().isComplete
     internal val successState: Boolean get() = status == TaskStatus.SUCCESS
     internal val canceledState: Boolean get() = status == TaskStatus.CANCELED
-    internal val exceptionState: Exception? get() = error
+    internal val exceptionState: Exception? get() = state.load().error
 
-    internal fun resultState(): ResultT = when (status) {
-        TaskStatus.SUCCESS -> finalSnapshot!!
-        TaskStatus.FAILURE -> throw RuntimeExecutionException(error!!)
-        TaskStatus.CANCELED -> throw CancellationException("Task is already canceled")
-        else -> throw IllegalStateException("Task is not yet complete")
+    internal fun resultState(): ResultT = state.load().let {
+        when (it.status) {
+            TaskStatus.SUCCESS -> it.finalSnapshot!!
+            TaskStatus.FAILURE -> throw RuntimeExecutionException(it.error!!)
+            TaskStatus.CANCELED -> throw CancellationException("Task is already canceled")
+            else -> throw IllegalStateException("Task is not yet complete")
+        }
     }
 
     actual override val isInProgress: Boolean get() = status == TaskStatus.QUEUED || status == TaskStatus.IN_PROGRESS
@@ -86,108 +131,108 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
 
     /** The platform task made progress (or resumed). */
     internal fun reportProgress() {
-        if (isComplete) return
-        status = TaskStatus.IN_PROGRESS
+        val (previous, current) = swap { if (it.isComplete) it else it.copy(status = TaskStatus.IN_PROGRESS) }
+        if (previous.isComplete) return
         onProgress()
-        val current = snapshot
-        progressListeners.toList().forEach { it.onProgress(current) }
+        val snapshot = snapshot
+        current.progressListeners.dispatch { it.onProgress(snapshot) }
     }
 
     /** The platform task was paused. */
     internal fun reportPaused() {
-        if (isComplete) return
-        status = TaskStatus.PAUSED
+        val (previous, current) = swap { if (it.isComplete) it else it.copy(status = TaskStatus.PAUSED) }
+        if (previous.isComplete) return
         onPaused()
-        val current = snapshot
-        pausedListeners.toList().forEach { it.onPaused(current) }
+        val snapshot = snapshot
+        current.pausedListeners.dispatch { it.onPaused(snapshot) }
     }
 
     /** The platform task completed successfully. */
     internal fun reportSuccess() {
-        if (!complete(TaskStatus.SUCCESS, null)) return
+        val current = complete(TaskStatus.SUCCESS, null) ?: return
         onSuccess()
-        val final = finalSnapshot!!
-        successListeners.toList().forEach { it.onSuccess(final) }
-        completeListeners.toList().forEach { it.onComplete(this) }
+        val final = current.finalSnapshot!!
+        try {
+            current.successListeners.dispatch { it.onSuccess(final) }
+        } finally {
+            current.completeListeners.dispatch { it.onComplete(this) }
+        }
     }
 
     /** The platform task failed with [e]. */
     internal fun reportFailure(e: Exception) {
-        if (!complete(TaskStatus.FAILURE, e)) return
+        val current = complete(TaskStatus.FAILURE, e) ?: return
         onFailure()
-        failureListeners.toList().forEach { it.onFailure(e) }
-        completeListeners.toList().forEach { it.onComplete(this) }
+        try {
+            current.failureListeners.dispatch { it.onFailure(e) }
+        } finally {
+            current.completeListeners.dispatch { it.onComplete(this) }
+        }
     }
 
     /** The platform task was cancelled. */
     internal fun reportCanceled() {
-        if (!complete(TaskStatus.CANCELED, StorageException.canceled())) return
+        val current = complete(TaskStatus.CANCELED, StorageException.canceled()) ?: return
         onCanceled()
-        canceledListeners.toList().forEach { it.onCanceled() }
-        completeListeners.toList().forEach { it.onComplete(this) }
+        try {
+            current.canceledListeners.dispatch { it.onCanceled() }
+        } finally {
+            current.completeListeners.dispatch { it.onComplete(this) }
+        }
     }
 
-    private fun complete(newStatus: TaskStatus, e: Exception?): Boolean {
-        if (isComplete) return false
-        error = e
-        status = newStatus
-        finalSnapshot = snapshotWith(e)
-        return true
+    /**
+     * Moves to the terminal [newStatus] and returns the state to dispatch to, or null when the task had already completed.
+     * The status is final before any listener runs, so a listener that throws cannot leave the task incomplete.
+     */
+    private fun complete(newStatus: TaskStatus, e: Exception?): State<ResultT>? {
+        val (previous, current) = swap { if (it.isComplete) it else it.copy(status = newStatus, error = e, finalSnapshot = snapshotWith(e)) }
+        return current.takeUnless { previous.isComplete }
     }
 
     // A listener added after completion is replayed at once and not queued: the terminal dispatch is over (or, when the
     // listener is added from inside that dispatch, still iterating its own snapshot), so queueing it would run it twice.
     actual override fun addOnCanceledListener(listener: OnCanceledListener): StorageTask<ResultT> = apply {
-        if (completeState) {
-            if (canceledState) listener.onCanceled()
-        } else {
-            canceledListeners += listener
-        }
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(canceledListeners = it.canceledListeners + listener) }
+        if (previous.status == TaskStatus.CANCELED) listener.onCanceled()
     }
 
     actual override fun addOnCompleteListener(listener: OnCompleteListener<ResultT>): StorageTask<ResultT> = apply {
-        if (completeState) listener.onComplete(this) else completeListeners += listener
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(completeListeners = it.completeListeners + listener) }
+        if (previous.isComplete) listener.onComplete(this)
     }
 
     actual override fun addOnFailureListener(listener: OnFailureListener): StorageTask<ResultT> = apply {
-        if (completeState) {
-            if (status == TaskStatus.FAILURE) listener.onFailure(error!!)
-        } else {
-            failureListeners += listener
-        }
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(failureListeners = it.failureListeners + listener) }
+        if (previous.status == TaskStatus.FAILURE) listener.onFailure(previous.error!!)
     }
 
     actual override fun addOnPausedListener(listener: OnPausedListener<ResultT>): StorageTask<ResultT> = apply {
-        if (completeState) return@apply
-        pausedListeners += listener
-        if (isPaused) listener.onPaused(snapshot)
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(pausedListeners = it.pausedListeners + listener) }
+        if (previous.status == TaskStatus.PAUSED) listener.onPaused(snapshot)
     }
 
     actual override fun addOnProgressListener(listener: OnProgressListener<ResultT>): StorageTask<ResultT> = apply {
-        if (completeState) return@apply
-        progressListeners += listener
-        if (status == TaskStatus.IN_PROGRESS) listener.onProgress(snapshot)
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(progressListeners = it.progressListeners + listener) }
+        if (previous.status == TaskStatus.IN_PROGRESS) listener.onProgress(snapshot)
     }
 
     actual override fun addOnSuccessListener(listener: OnSuccessListener<in ResultT>): StorageTask<ResultT> = apply {
-        if (completeState) {
-            if (successState) listener.onSuccess(finalSnapshot!!)
-        } else {
-            successListeners += listener
-        }
+        val (previous, _) = swap { if (it.isComplete) it else it.copy(successListeners = it.successListeners + listener) }
+        if (previous.status == TaskStatus.SUCCESS) listener.onSuccess(previous.finalSnapshot!!)
     }
 
-    public actual fun removeOnCanceledListener(listener: OnCanceledListener): StorageTask<ResultT> = apply { canceledListeners -= listener }
+    public actual fun removeOnCanceledListener(listener: OnCanceledListener): StorageTask<ResultT> = apply { swap { it.copy(canceledListeners = it.canceledListeners - listener) } }
 
-    public actual fun removeOnCompleteListener(listener: OnCompleteListener<ResultT>): StorageTask<ResultT> = apply { completeListeners -= listener }
+    public actual fun removeOnCompleteListener(listener: OnCompleteListener<ResultT>): StorageTask<ResultT> = apply { swap { it.copy(completeListeners = it.completeListeners - listener) } }
 
-    public actual fun removeOnFailureListener(listener: OnFailureListener): StorageTask<ResultT> = apply { failureListeners -= listener }
+    public actual fun removeOnFailureListener(listener: OnFailureListener): StorageTask<ResultT> = apply { swap { it.copy(failureListeners = it.failureListeners - listener) } }
 
-    public actual fun removeOnPausedListener(listener: OnPausedListener<ResultT>): StorageTask<ResultT> = apply { pausedListeners -= listener }
+    public actual fun removeOnPausedListener(listener: OnPausedListener<ResultT>): StorageTask<ResultT> = apply { swap { it.copy(pausedListeners = it.pausedListeners - listener) } }
 
-    public actual fun removeOnProgressListener(listener: OnProgressListener<ResultT>): StorageTask<ResultT> = apply { progressListeners -= listener }
+    public actual fun removeOnProgressListener(listener: OnProgressListener<ResultT>): StorageTask<ResultT> = apply { swap { it.copy(progressListeners = it.progressListeners - listener) } }
 
-    public actual fun removeOnSuccessListener(listener: OnSuccessListener<in ResultT>): StorageTask<ResultT> = apply { successListeners -= listener }
+    public actual fun removeOnSuccessListener(listener: OnSuccessListener<in ResultT>): StorageTask<ResultT> = apply { swap { it.copy(successListeners = it.successListeners - listener) } }
 
     actual override fun <ContinuationResultT> continueWith(continuation: Continuation<ResultT, ContinuationResultT>): Task<ContinuationResultT> {
         val source = TaskCompletionSource<ContinuationResultT>()
