@@ -61,19 +61,19 @@ private data class State<ResultT>(
 
 /**
  * Calls [block] for every listener. One that throws does not stop the others, as on Android, where each listener runs on
- * its own executor; the first exception is rethrown once all have run, with the others suppressed.
+ * its own executor: what they throw is collected into [thrown] (the first kept, the others suppressed) and returned,
+ * for the caller to rethrow once every group of listeners has run.
  */
-private inline fun <L> List<L>.dispatch(block: (L) -> Unit) {
-    var thrown: Throwable? = null
+private inline fun <L> List<L>.dispatch(thrown: Throwable? = null, block: (L) -> Unit): Throwable? {
+    var first = thrown
     for (listener in this) {
         try {
             block(listener)
         } catch (e: Throwable) {
-            val first = thrown
-            if (first == null) thrown = e else first.addSuppressed(e)
+            if (first == null) first = e else first.addSuppressed(e)
         }
     }
-    thrown?.let { throw it }
+    return first
 }
 
 @OptIn(ExperimentalAtomicApi::class)
@@ -135,7 +135,7 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
         if (previous.isComplete) return
         onProgress()
         val snapshot = snapshot
-        current.progressListeners.dispatch { it.onProgress(snapshot) }
+        current.progressListeners.dispatch { it.onProgress(snapshot) }?.let { throw it }
     }
 
     /** The platform task was paused. */
@@ -144,7 +144,7 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
         if (previous.isComplete) return
         onPaused()
         val snapshot = snapshot
-        current.pausedListeners.dispatch { it.onPaused(snapshot) }
+        current.pausedListeners.dispatch { it.onPaused(snapshot) }?.let { throw it }
     }
 
     /** The platform task completed successfully. */
@@ -152,33 +152,24 @@ public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> pro
         val current = complete(TaskStatus.SUCCESS, null) ?: return
         onSuccess()
         val final = current.finalSnapshot!!
-        try {
-            current.successListeners.dispatch { it.onSuccess(final) }
-        } finally {
-            current.completeListeners.dispatch { it.onComplete(this) }
-        }
+        val thrown = current.successListeners.dispatch { it.onSuccess(final) }
+        current.completeListeners.dispatch(thrown) { it.onComplete(this) }?.let { throw it }
     }
 
     /** The platform task failed with [e]. */
     internal fun reportFailure(e: Exception) {
         val current = complete(TaskStatus.FAILURE, e) ?: return
         onFailure()
-        try {
-            current.failureListeners.dispatch { it.onFailure(e) }
-        } finally {
-            current.completeListeners.dispatch { it.onComplete(this) }
-        }
+        val thrown = current.failureListeners.dispatch { it.onFailure(e) }
+        current.completeListeners.dispatch(thrown) { it.onComplete(this) }?.let { throw it }
     }
 
     /** The platform task was cancelled. */
     internal fun reportCanceled() {
         val current = complete(TaskStatus.CANCELED, StorageException.canceled()) ?: return
         onCanceled()
-        try {
-            current.canceledListeners.dispatch { it.onCanceled() }
-        } finally {
-            current.completeListeners.dispatch { it.onComplete(this) }
-        }
+        val thrown = current.canceledListeners.dispatch { it.onCanceled() }
+        current.completeListeners.dispatch(thrown) { it.onComplete(this) }?.let { throw it }
     }
 
     /**

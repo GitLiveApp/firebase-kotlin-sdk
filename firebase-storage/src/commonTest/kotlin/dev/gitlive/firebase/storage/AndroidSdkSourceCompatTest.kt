@@ -167,14 +167,16 @@ class AndroidSdkSourceCompatTest {
         task.await()
         assertEquals(1, nestedCalls.await())
         assertEquals(1, calls)
-        // Registration after completion replays the terminal event once and never the others.
-        var successes = 0
+        // Registration after completion replays the terminal event once and never the others; the Android SDK replays
+        // through its executor rather than inline, so the replay is awaited.
         var failures = 0
         var cancellations = 0
-        task.addOnSuccessListener { successes++ }
         task.addOnFailureListener { failures++ }
         task.addOnCanceledListener { cancellations++ }
-        assertEquals(1, successes)
+        val replayed = CompletableDeferred<Long>()
+        task.addOnSuccessListener { replayed.complete(it.totalByteCount) }
+        assertEquals(1024, replayed.await())
+        assertEquals(1, calls)
         assertEquals(0, failures)
         assertEquals(0, cancellations)
     }
