@@ -11,6 +11,9 @@ import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusPause
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusProgress
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusResume
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageTaskStatusSuccess
+import platform.darwin.dispatch_get_main_queue
+import platform.darwin.dispatch_get_global_queue
+import platform.darwin.dispatch_async
 
 public actual abstract class FileDownloadTask internal constructor(
     override val reference: StorageReference,
@@ -89,4 +92,12 @@ internal class FileDownloadTaskImpl(reference: StorageReference, ios: FIRStorage
     init {
         start()
     }
+}
+
+internal actual fun inBackground(block: () -> Unit) {
+    dispatch_async(dispatch_get_global_queue(0, 0u)) { block() }
+}
+
+internal actual fun onCallbackThread(block: () -> Unit) {
+    dispatch_async(dispatch_get_main_queue()) { block() }
 }

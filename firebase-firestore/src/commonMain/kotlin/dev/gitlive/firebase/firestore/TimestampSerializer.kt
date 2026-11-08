@@ -17,8 +17,8 @@ public object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialVal
             else -> throw SerializationException("Cannot serialize $value")
         }
     },
-    fromNativeValue = { value ->
-        when (value) {
+    fromNativeValue = { raw ->
+        when (val value = raw?.toCompatSpecialValue()) {
             is NativeTimestamp -> Timestamp(value)
             FieldValue.serverTimestamp.nativeValue -> Timestamp.ServerTimestamp
             else -> throw SerializationException("Cannot deserialize $value")
@@ -30,8 +30,8 @@ public object BaseTimestampSerializer : KSerializer<BaseTimestamp> by SpecialVal
 public object TimestampSerializer : KSerializer<Timestamp> by SpecialValueSerializer(
     serialName = "Timestamp",
     toNativeValue = Timestamp::nativeValue,
-    fromNativeValue = { value ->
-        when (value) {
+    fromNativeValue = { raw ->
+        when (val value = raw?.toCompatSpecialValue()) {
             is NativeTimestamp -> Timestamp(value)
             else -> throw SerializationException("Cannot deserialize $value")
         }
@@ -59,8 +59,8 @@ public object DoubleAsTimestampSerializer : KSerializer<Double> by SpecialValueS
             else -> Timestamp.fromMilliseconds(value).nativeValue
         }
     },
-    fromNativeValue = { value ->
-        when (value) {
+    fromNativeValue = { raw ->
+        when (val value = raw?.toCompatSpecialValue()) {
             FieldValue.serverTimestamp.nativeValue -> SERVER_TIMESTAMP
             is NativeTimestamp -> Timestamp(value).toMilliseconds()
             is Double -> value

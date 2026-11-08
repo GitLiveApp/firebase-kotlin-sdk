@@ -23,7 +23,7 @@ publication:
   dependency graph — **without declaring any `swiftPMDependencies` of its own**. (Verified: a
   consumer depending only on `dev.gitlive:firebase-app` produced an aggregated
   `build/kotlin/swiftPMDependenciesMetadataForLockFiles` listing `firebase-ios-sdk` / `FirebaseCore`
-  / `12.17.0`.)
+  / `13.1.1`.)
 - The Kotlin Gradle plugin then generates a synthetic Swift package containing all transitive
   SwiftPM dependencies and provides the machine code when linking the app's framework / running
   Kotlin/Native tests (`generateSyntheticLinkageSwiftPMImportProject…`, `integrateEmbedAndSign`,

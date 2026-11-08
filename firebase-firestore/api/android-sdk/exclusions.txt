@@ -1,0 +1,44 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
+
+# Firestore Pipelines have no supported Objective-C API in the iOS SDK: the supported API is Swift, and the Objective-C side is
+# the `__`-prefixed FIRPipelineBridge classes, hidden as internal since 13.0.0 (FlutterFire and React Native Firebase build on
+# them anyway; firebase/firebase-ios-sdk#17013 asks for them to be formalised). In the pinned JS SDK they are a separate
+# preview entry point (firebase/firestore/pipelines).
+com.google.firebase.firestore.pipeline.*  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
+com.google.firebase.firestore.Pipeline*  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
+com.google.firebase.firestore.FirebaseFirestore#pipeline  // @unavailable Firestore Pipelines have no supported Objective-C API in the iOS SDK (firebase/firebase-ios-sdk#17013) and are a preview entry point in the JS SDK
+
+# The bundle result by class is Android-only (the task's result is the progress itself).
+com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
+
+# Activity-scoped and Executor overloads of the listeners.
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Activity, Runnable)  // @platform android.app.Activity
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Executor, Runnable)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Activity, OnCanceledListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Executor, OnCanceledListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Activity, OnCompleteListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Executor, OnCompleteListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Activity, OnFailureListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Executor, OnFailureListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Activity, OnProgressListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Executor, OnProgressListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Activity, OnSuccessListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Executor, OnSuccessListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWith(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWithTask(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#onSuccessTask(Executor, SuccessContinuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions#getActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions#getExecutor  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setExecutor  // @platform java.util.concurrent.Executor
+
+# Library-internal (@RestrictTo) member with no equivalent in the iOS and JS SDKs.
+com.google.firebase.firestore.DocumentReference#getFullPath  // @hide restricted to the Android SDK's own libraries

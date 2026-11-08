@@ -33,3 +33,8 @@ internal class FileDownloadTaskImpl(reference: StorageReference) : FileDownloadT
         reportFailure(UnsupportedOperationException(FILE_DOWNLOADS_UNSUPPORTED_ON_JS))
     }
 }
+
+/** JS has a single thread: the block runs at once. */
+internal actual fun inBackground(block: () -> Unit) = block()
+
+internal actual fun onCallbackThread(block: () -> Unit) = block()

@@ -20,12 +20,21 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.files.SystemTemporaryDirectory
+import kotlinx.io.buffered
+import kotlinx.io.readString
+import com.google.firebase.storage.getFile
 
 /** The URL of a file the platform test can write and read; on JS a bare name, as its SDK cannot use files. */
 expect fun temporaryFile(name: String): Uri
 
 /** Whether the platform SDK downloads to files; the JS SDK does not. */
 expect val supportsFileDownloads: Boolean
+
+/** Whether the platform SDK uploads from file URLs; the JS SDK does not, and on the JVM firebase-java-sdk's `ContentResolver` cannot open them yet. */
+expect val supportsFileUploads: Boolean
 
 /** The file download part of the `com.google.firebase.storage` layer; on JS, whose SDK has no file downloads, the download fails. */
 @OptIn(UnsupportedOnJs::class)
@@ -80,7 +89,25 @@ class FileDownloadTest {
         assertEquals(13, totalByteCount)
         assertEquals(13, bytesTransferred)
         assertTrue(ref.activeDownloadTasks.isEmpty())
+        if (!supportsFileUploads) return@runTest
         val reUploaded = ref.child("../compatReupload.txt").putFile(destination).await()
         assertEquals(13, reUploaded.totalByteCount)
+    }
+
+    @Test
+    fun testDownloadToPath() = runTest {
+        val ref = storage.getReference("test/compatPath.txt")
+        ref.putBytes("path contents".encodeToByteArray()).await()
+        // The temporary directory needs the platform file system, which the JS test (whose SDK has no file downloads) lacks.
+        val destination = if (supportsFileDownloads) Path(SystemTemporaryDirectory, "compatDownloadPath.txt") else Path("compatDownloadPath.txt")
+        val task: FileDownloadTask = ref.getFile(destination)
+        if (!supportsFileDownloads) {
+            assertIs<UnsupportedOperationException>(assertFails { task.await() })
+            return@runTest
+        }
+        val (bytesTransferred, totalByteCount) = task.await()
+        assertEquals(13, totalByteCount)
+        assertEquals(13, bytesTransferred)
+        assertEquals("path contents", SystemFileSystem.source(destination).buffered().use { it.readString() })
     }
 }
