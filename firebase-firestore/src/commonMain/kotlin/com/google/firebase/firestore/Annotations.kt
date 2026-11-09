@@ -14,37 +14,37 @@ package com.google.firebase.firestore
  */
 
 /** The SDK's annotation; [com.google.firebase.serialization.DocumentId] is read on every platform. */
-@Deprecated("FirebaseFormat reads com.google.firebase.serialization.DocumentId on every platform", ReplaceWith("DocumentId", "com.google.firebase.serialization.DocumentId"))
+@Deprecated("Only the Android SDK's reflective mapping reads this annotation; com.google.firebase.serialization.DocumentId is read on every platform", ReplaceWith("DocumentId", "com.google.firebase.serialization.DocumentId"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
 public annotation class DocumentId
 
 /** The SDK's exclusion annotation; [kotlinx.serialization.Transient] excludes a property on every platform. */
-@Deprecated("FirebaseFormat reads @Transient on every platform", ReplaceWith("Transient", "kotlinx.serialization.Transient"))
+@Deprecated("Only the Android SDK's reflective mapping reads @Exclude; kotlinx.serialization's @Transient excludes the property on every platform", ReplaceWith("Transient", "kotlinx.serialization.Transient"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
 public annotation class Exclude
 
 /** The SDK's annotation; [com.google.firebase.serialization.IgnoreExtraProperties] is read on every platform. */
-@Deprecated("FirebaseFormat reads com.google.firebase.serialization.IgnoreExtraProperties on every platform", ReplaceWith("IgnoreExtraProperties", "com.google.firebase.serialization.IgnoreExtraProperties"))
+@Deprecated("Only the Android SDK's reflective mapping reads this annotation; com.google.firebase.serialization.IgnoreExtraProperties is read on every platform", ReplaceWith("IgnoreExtraProperties", "com.google.firebase.serialization.IgnoreExtraProperties"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 public annotation class IgnoreExtraProperties
 
 /** The SDK's property name annotation; [kotlinx.serialization.SerialName] names a property on every platform. */
-@Deprecated("FirebaseFormat reads @SerialName on every platform", ReplaceWith("SerialName(value)", "kotlinx.serialization.SerialName"))
+@Deprecated("Only the Android SDK's reflective mapping reads @PropertyName; kotlinx.serialization's @SerialName names the property on every platform", ReplaceWith("SerialName(value)", "kotlinx.serialization.SerialName"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
 public annotation class PropertyName(val value: String)
 
 /** The SDK's annotation; [com.google.firebase.serialization.ServerTimestamp] is read on every platform. */
-@Deprecated("FirebaseFormat reads com.google.firebase.serialization.ServerTimestamp on every platform", ReplaceWith("ServerTimestamp", "com.google.firebase.serialization.ServerTimestamp"))
+@Deprecated("Only the Android SDK's reflective mapping reads this annotation; com.google.firebase.serialization.ServerTimestamp is read on every platform", ReplaceWith("ServerTimestamp", "com.google.firebase.serialization.ServerTimestamp"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.PROPERTY)
 public annotation class ServerTimestamp
 
 /** The SDK's annotation; [com.google.firebase.serialization.ThrowOnExtraProperties] is read on every platform. */
-@Deprecated("FirebaseFormat reads com.google.firebase.serialization.ThrowOnExtraProperties on every platform", ReplaceWith("ThrowOnExtraProperties", "com.google.firebase.serialization.ThrowOnExtraProperties"))
+@Deprecated("Only the Android SDK's reflective mapping reads this annotation; com.google.firebase.serialization.ThrowOnExtraProperties is read on every platform", ReplaceWith("ThrowOnExtraProperties", "com.google.firebase.serialization.ThrowOnExtraProperties"))
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 public annotation class ThrowOnExtraProperties
