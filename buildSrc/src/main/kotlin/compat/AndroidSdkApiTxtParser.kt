@@ -81,7 +81,7 @@ object AndroidSdkApiTxtParser {
         var typeVariables = classTypeVariables
         if (rest.startsWith("<")) {
             val length = TypeNames.stripGenericsPrefixLength(rest)
-            typeVariables = typeVariables + parseTypeVariables(rest.substring(0, length))
+            typeVariables = typeVariables + parseTypeVariables(rest.substring(0, length), typeVariables)
             rest = rest.substring(length).trim()
         }
         return when (kind) {
@@ -117,16 +117,24 @@ object AndroidSdkApiTxtParser {
 
     /**
      * The type variables declared by `<T extends Bound<T>, U>` (the text may continue past the closing `>`), each with
-     * the erasure the BCV dump shows for it: the first bound, or Object when there is none.
+     * the erasure the BCV dump shows for it: the first bound, or Object when there is none. A bound that is itself a type
+     * variable, of this declaration or of the enclosing class ([outer]), erases to that variable's erasure.
      */
-    private fun parseTypeVariables(text: String): Map<String, String> {
+    private fun parseTypeVariables(text: String, outer: Map<String, String> = emptyMap()): Map<String, String> {
         if (!text.startsWith("<")) return emptyMap()
         val declarations = text.substring(1, TypeNames.stripGenericsPrefixLength(text) - 1)
-        return splitTopLevel(declarations).associate { declaration ->
+        val bounds = splitTopLevel(declarations).associate { declaration ->
             val name = declaration.substringBefore(' ')
             val bound = declaration.substringAfter(" extends ", "").substringBefore(" & ").trim()
             name to if (bound.isEmpty()) "java.lang.Object" else TypeNames.fromApiTxt(bound)
         }
+        fun erasure(bound: String, seen: Set<String>): String = when {
+            bound in seen -> "java.lang.Object"
+            bound in bounds -> erasure(bounds.getValue(bound), seen + bound)
+            bound in outer -> outer.getValue(bound)
+            else -> bound
+        }
+        return bounds.mapValues { (name, bound) -> erasure(bound, setOf(name)) }
     }
 
     /** Splits on the commas outside angle brackets. */

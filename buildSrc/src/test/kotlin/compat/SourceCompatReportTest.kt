@@ -325,6 +325,15 @@ class SourceCompatReportTest {
                 method public void set(ResultT value);
                 method public void put(ResultT value);
               }
+              public final class Box<U, T extends U> {
+                method public T get();
+                method public void put(T value);
+                method public <V extends T> V pick();
+              }
+              public final class Chain<U extends com.google.firebase.test.Options<U>, T extends U> {
+                method public T first();
+                method public <V extends T> V pick();
+              }
             }
         """.trimIndent()
         val dump = """
@@ -340,6 +349,17 @@ class SourceCompatReportTest {
             	public fun set (Lcom/google/firebase/test/Task${'$'}ProvideError;)V
             	public fun put (Ljava/lang/Object;)V
             }
+
+            public final class com/google/firebase/test/Box {
+            	public final fun get ()Ljava/lang/Object;
+            	public final fun put (Ljava/lang/Object;)V
+            	public final fun pick ()Ljava/lang/Object;
+            }
+
+            public final class com/google/firebase/test/Chain {
+            	public final fun first ()Lcom/google/firebase/test/Options;
+            	public final fun pick ()Lcom/google/firebase/test/Options;
+            }
         """.trimIndent()
         val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
         assertTrue(report.contains("OK    T with(String, boolean)"), report) // T erases to its bound, Options
@@ -349,6 +369,11 @@ class SourceCompatReportTest {
         assertTrue(report.contains("OK    ResultT getSnapshot()"), report)
         assertTrue(report.contains("OK    void set(ResultT)"), report)
         assertTrue(report.contains("MISS  void put(ResultT)"), report) // Object is not the erasure of a bounded type variable
+        assertTrue(report.contains("OK    T get()"), report) // T extends U, which is unbounded: both erase to Object
+        assertTrue(report.contains("OK    void put(T)"), report)
+        assertTrue(report.contains("OK    V pick()"), report) // a method type variable bounded by a class type variable
+        assertTrue(report.contains("OK    T first()"), report) // T extends U extends Options: erases to Options
+        assertTrue(report.contains("Chain\n  OK    T first()\n  OK    V pick()"), report) // V extends T extends U extends Options
     }
 
     @Test
