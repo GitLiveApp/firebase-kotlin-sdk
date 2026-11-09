@@ -11,34 +11,61 @@ JVM the SDK adds nothing to your app: it depends on the official Firebase Androi
 the real classes exactly as before. On iOS, JS and Wasm the same declarations are implemented on top of the Firebase iOS
 SDK and the Firebase JS SDK.
 
-> This guide covers the `com.google.firebase` API only, and the modules migrated so far: `firebase-app` (`FirebaseApp`,
-> `FirebaseOptions`, `Timestamp`, the exceptions, `Task` and `Task.await()`) and `firebase-installations`. The Kotlin-first
-> `dev.gitlive.firebase` API, which the SDK also provides, is described in the [README](../README.md#kotlin-first-design).
+> This guide covers the `com.google.firebase` API only. Every module of the SDK provides it: `firebase-app` (`FirebaseApp`,
+> `FirebaseOptions`, `Timestamp`, the exceptions, `Task` and `Task.await()`), `firebase-installations`, `firebase-crashlytics`,
+> `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging`,
+> `firebase-storage`, `firebase-database` and `firebase-firestore`. The Kotlin-first `dev.gitlive.firebase` API, which the SDK
+> also provides, is described in the [README](../README.md#kotlin-first-design).
 
 ## Checklist for a migration
 
 Most Firebase code moves to `commonMain` unchanged. Before you start, look for the few things that cannot cross the
 platform boundary; the compiler will find them for you in step 3, but it helps to know what to expect.
 
-1. **JVM time types in your own signatures.** `java.util.Date` or `java.time.Instant` in a class you are moving must
-   become `kotlin.time.Instant`. `android.content.Context` can stay: the SDK provides the class in common code (on the
-   platforms that have no context it is a placeholder that platform code creates with `Context()`), so the members that
-   take or return a context keep the Android SDK's exact signatures.
-2. **Members that take or return a JVM time type.** `Timestamp(Date)`, `Timestamp(Instant)`, `toDate()` and
-   `toInstant()` exist in common code but are deprecated with an error whose message names the replacement, and where
-   the replacement is a drop-in expression the IDE quick-fix applies it. Android code in `androidMain` keeps calling
-   them as before.
-3. **`Parcelable`.** `Timestamp` is `Parcelable` on Android only. Passing it through an `Intent` or `Bundle` stays in
+1. **JVM types in your own signatures.** `java.util.Date` or `java.time.Instant` in a class you are moving must become
+   `kotlin.time.Instant`, `java.util.concurrent.TimeUnit` a `kotlin.time.Duration`, `java.io.File` a kotlinx-io `Path`,
+   `java.io.InputStream` a kotlinx-io `RawSource` and `java.nio.ByteBuffer` a `ByteArray`. `android.content.Context` can
+   stay: the SDK provides the class in common code (on the platforms that have no context it is a placeholder that
+   platform code creates with `Context()`), so the members that take or return a context keep the Android SDK's exact
+   signatures, and `android.net.Uri` and the subset of `android.os.Bundle` that analytics events use are provided too.
+2. **Members that take or return a JVM type.** `Timestamp(Date)`, `Timestamp(Instant)`, `toDate()`, `toInstant()`,
+   `DocumentSnapshot.getDate`, `loadBundle(InputStream)`, `getFile(File)`, `putStream(InputStream)`,
+   `setTimeout(Long, TimeUnit)` and the other members of this kind exist in common code but are deprecated with an error
+   whose message names the replacement (`Timestamp(Instant)` with a `kotlin.time.Instant`, `getFile(Path)`,
+   `putStream(RawSource)`, `setTimeout(Duration)`, and so on), and where the replacement is a drop-in expression the IDE
+   quick-fix applies it. Android code in `androidMain` keeps calling them as before.
+3. **Custom classes.** The Android SDK maps your model classes by reflection, which only exists on Android, so the
+   writes that take one (`set(Any)`, `update(Map)` and `add(Any)` on Firestore, `setValue(Any?)` and
+   `updateChildren(Map)` on the database) are deprecated with an error, and the class-taking reads (`toObject(Class)`,
+   `toObjects(Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`) are not declared in common code at all,
+   as `java.lang.Class` is JVM-only (see item 8), so they are reported as unresolved. The replacements map a
+   `@Serializable` class with kotlinx.serialization on every platform: `setData`, `updateData` and `addData`, and the
+   reified `toObject<T>()`, `toObjects<T>()`, `getField<T>()`, `dataObjects<T>()` and `getValue<T>()` in
+   `com.google.firebase.serialization`. Plain values and maps work through them too. The SDK's mapping annotations
+   (`@PropertyName`, `@Exclude`, `@DocumentId`, `@ServerTimestamp`, `@IgnoreExtraProperties`, `@ThrowOnExtraProperties`)
+   are deprecated with a `ReplaceWith` towards kotlinx.serialization's `@SerialName` and `@Transient` and the
+   `com.google.firebase.serialization` annotations of the same names. See [Custom classes](#custom-classes) below.
+4. **`Parcelable`.** `Timestamp` is `Parcelable` on Android only. Passing it through an `Intent` or `Bundle` stays in
    `androidMain`; a `@Parcelize` class of your own that holds a `Timestamp` field keeps working in common code, because
    the Parcelize plugin only runs in the Android compilation.
-4. **`Tasks` static helpers.** `Tasks.forResult`, `Tasks.await` and friends are not mirrored. Use `TaskCompletionSource`
+5. **`Tasks` static helpers.** `Tasks.forResult`, `Tasks.await` and friends are not mirrored. Use `TaskCompletionSource`
    to build a `Task`, and `kotlinx.coroutines.tasks.await` to wait for one.
-5. **`Task<Void>`.** Common code spells it `Task<Nothing?>`. A property or parameter you declared as `Task<Void>`
+6. **`Task<Void>`.** Common code spells it `Task<Nothing?>`. A property or parameter you declared as `Task<Void>`
    needs the new spelling; call sites that never named the type are unaffected.
+7. **Members the Firebase JS SDK has no counterpart for.** These are annotated `@UnsupportedOnJs`, an opt-in that warns
+   until you accept, with `@OptIn(UnsupportedOnJs::class)`, that the member does nothing on JS and Wasm, or fails where it
+   must return a value. Storage's `putFile(Uri)` and `getFile(Uri)` are an example: the JS SDK uploads and downloads
+   bytes, not files. The deprecation and opt-in messages, and each member's documentation, say what happens.
+8. **Members that are not declared at all.** A member bound to an Android type the other platforms cannot have (the
+   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`, `java.lang.Class`) or
+   to a feature the iOS and JS SDKs lack (Play Games sign-in, the Android-only messaging settings) is left out, so the
+   compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt` lists them with
+   the reason (`@platform` for the type, `@unavailable` for the feature).
 
-Everything else in the two modules, including every listener, continuation, builder and static accessor, is available
-with the same signature. Each module lists exactly which Android SDK members it provides in `api/android-sdk-compat.txt`
-([firebase-app](../firebase-app/api/android-sdk-compat.txt), [firebase-installations](../firebase-installations/api/android-sdk-compat.txt)).
+Everything else, including every listener, continuation, builder and static accessor, is available with the same
+signature. Each module lists exactly which Android SDK members it provides in its `api/android-sdk-compat.txt` (for
+example [firebase-firestore](../firebase-firestore/api/android-sdk-compat.txt)) and the members it leaves out, with the
+reason, in its `api/android-sdk/exclusions.txt`.
 
 ## Step 1: Prepare the environment
 
@@ -57,7 +84,8 @@ dependencies {
 }
 ```
 
-In the shared module, depend on the Firebase Kotlin SDK module instead, in `commonMain`:
+In the shared module, depend on the Firebase Kotlin SDK module instead, in `commonMain`; the module names match the
+Android SDK's (`firebase-installations`, `firebase-firestore`, `firebase-auth` and so on):
 
 ```kotlin
 // shared/build.gradle.kts, after
@@ -69,6 +97,9 @@ kotlin {
     }
 }
 ```
+
+A module whose code maps custom classes (Firestore, the database) also needs the kotlinx.serialization Gradle plugin on
+the shared module, so that your model classes can be `@Serializable`.
 
 What this changes per platform:
 
@@ -222,6 +253,80 @@ One group of members has no multiplatform replacement: the `Parcelable` members 
 > Code left in `androidMain` never sees the deprecations: the Android compilation binds to the Firebase Android SDK's own
 > classes, where `Timestamp(Date)` and the others are the real, undeprecated members.
 
+## Custom classes
+
+Firestore and Realtime Database code usually writes and reads model classes. The Android SDK maps them by reflection,
+which only exists on Android, so this repository compiles on Android but not for any other target:
+
+```kotlin
+// shared/src/commonMain/kotlin/com/example/BookRepository.kt, moved from the Android app
+package com.example
+
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.PropertyName
+import kotlinx.coroutines.tasks.await
+
+data class Book(
+    @get:PropertyName("book_title") val title: String = "",
+    val rating: Double = 0.0,
+)
+
+class BookRepository(private val firestore: FirebaseFirestore) {
+    suspend fun save(id: String, book: Book) = firestore.collection("books").document(id).set(book).await()
+    suspend fun load(id: String): Book? = firestore.collection("books").document(id).get().await().toObject(Book::class.java)
+}
+```
+
+```
+e: BookRepository.kt: 'fun set(data: Any): Task<Nothing?>' is deprecated. set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform
+e: BookRepository.kt: Unresolved reference 'toObject' on receiver of type 'DocumentSnapshot'.
+e: BookRepository.kt: Unresolved reference 'java' on receiver of type 'KClass<Book>'.
+```
+
+The write is deprecated with the message above; the class-taking read is unresolved, because neither `toObject(Class)`
+nor `Book::class.java` exists off the JVM. Once those are fixed the annotation gets its warning:
+
+```
+w: BookRepository.kt: 'annotation class PropertyName : Annotation' is deprecated. Only the Android SDK's reflective mapping reads @PropertyName; kotlinx.serialization's @SerialName names the property on every platform.
+```
+
+The fix is the same for every such member: make the class `@Serializable`,
+replace the write with its `Data` counterpart and the class-taking read with the reified one from
+`com.google.firebase.serialization`, and apply the `ReplaceWith` of the annotation. For the annotation, the quick-fix in
+step 4 does it; the members need the new name typed, and the IDE offers the import:
+
+```kotlin
+// shared/src/commonMain/kotlin/com/example/BookRepository.kt, after
+package com.example
+
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.serialization.setData
+import com.google.firebase.serialization.toObject
+import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Book(
+    @SerialName("book_title") val title: String = "",
+    val rating: Double = 0.0,
+)
+
+class BookRepository(private val firestore: FirebaseFirestore) {
+    suspend fun save(id: String, book: Book) = firestore.collection("books").document(id).setData(book).await()
+    suspend fun load(id: String): Book? = firestore.collection("books").document(id).get().await().toObject<Book>()
+}
+```
+
+The mapping follows the Android SDK's rules on every platform, Android included: the stored field name is the property's
+serial name, a `Timestamp`, `GeoPoint`, `VectorValue`, `DocumentReference` or `Blob` property needs `@Contextual`, and
+`@ServerTimestamp`, `@DocumentId`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` come from
+`com.google.firebase.serialization`. A property the Android SDK stored under its getter name (`isActive` as `active`)
+keeps that name with `@SerialName("active")`. Plain values and maps work through `setData` and the reified reads as
+well, so `set(mapOf(...))` becomes `setData(mapOf(...))` with no other change.
+
 ## Step 5: Initialise Firebase on each platform
 
 `ensureInitialized()` above is now callable from every platform's entry point. Android passes its context; the other
@@ -243,19 +348,24 @@ The [Initialization](../README.md#initialization) section of the README has the 
 ## Step 6: Run on iOS, JS and Wasm
 
 Run the shared module's tests on the other targets to confirm the migrated code behaves the same, for example
-`./gradlew :shared:iosSimulatorArm64Test :shared:jsTest :shared:wasmJsNodeTest`. Two behavioural differences to know about:
+`./gradlew :shared:iosSimulatorArm64Test :shared:jsTest :shared:wasmJsNodeTest`. Behavioural differences to know about:
 
 - `Task` listeners on iOS, JS and Wasm run on the thread that completes the task, where the Android SDK posts them to the
   main thread. Code that touches UI from a listener should switch to the main dispatcher explicitly, or use `await()`
   from a coroutine on the main dispatcher.
 - `InstallationTokenResult.tokenExpirationTimestamp` is `0` on JS and Wasm, because the Firebase JS SDK returns only the token string.
+- The `@UnsupportedOnJs` members do nothing, or fail, on JS and Wasm (see the checklist), and analytics is a no-op on the
+  JVM, where the Firebase Java SDK has no analytics.
+- Storage's `putFile` and `getFile` fail on JS and Wasm, where the SDK has no file operations; use `putBytes`, `getBytes`
+  or `getDownloadUrl` there, or the `dev.gitlive` wrapper's `putFile` with a browser `File`.
 
 ## What's next
 
 - New multiplatform code can use the Kotlin-first `dev.gitlive.firebase` API (suspend functions instead of `Task`,
   `Flow` instead of listeners), which is built on the same `com.google.firebase` layer; a `dev.gitlive` object exposes
   its `com.google` counterpart as `compat`. See [Kotlin-first design](../README.md#kotlin-first-design).
-- The other Firebase modules are being migrated to the same structure one at a time. Until a module is, its Android
-  SDK API is not available in common code and its `dev.gitlive` API is the multiplatform entry point.
+- Every module of the SDK provides its `com.google.firebase` API in common code, so the steps above apply to any
+  Firebase code in your app; the checklist names the members that differ, and each module's
+  `api/android-sdk-compat.txt` and `api/android-sdk/exclusions.txt` are the exact lists.
 - [Using the Firebase Android SDK API from common code](../README.md#using-the-firebase-android-sdk-api-from-common-code)
   in the README describes the rules of the compatibility layer and how its coverage is measured.
