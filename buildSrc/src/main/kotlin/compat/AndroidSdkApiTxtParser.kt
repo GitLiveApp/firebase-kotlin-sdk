@@ -16,6 +16,7 @@ object AndroidSdkApiTxtParser {
         var currentPackage = ""
         var currentClass: String? = null
         var currentDeprecated = false
+        var currentTypeVariables = emptyMap<String, String>()
         var members = mutableListOf<ApiMember>()
 
         fun flush() {
@@ -40,6 +41,8 @@ object AndroidSdkApiTxtParser {
                 val name = header.groupValues[4]
                 currentClass = "$currentPackage." + name.replace('.', '$')
                 currentDeprecated = line.contains("@Deprecated")
+                currentTypeVariables = Regex("""\b(?:class|interface|enum|@interface|annotation)\s+${Regex.escape(name)}""").find(line)
+                    ?.let { parseTypeVariables(line.substring(it.range.last + 1).trim()) }.orEmpty()
                 continue
             }
             if (line == "}") {
@@ -47,13 +50,13 @@ object AndroidSdkApiTxtParser {
                 continue
             }
             val className = currentClass ?: continue
-            parseMember(line, className)?.let { members += it }
+            parseMember(line, className, currentTypeVariables)?.let { members += it }
         }
         flush()
         return classes
     }
 
-    private fun parseMember(line: String, className: String): ApiMember? {
+    private fun parseMember(line: String, className: String, classTypeVariables: Map<String, String>): ApiMember? {
         val deprecated = line.contains("@Deprecated")
         val kind = line.substringBefore(' ')
         var rest = line.substringAfter(' ').removeSuffix(";").trim()
@@ -75,25 +78,30 @@ object AndroidSdkApiTxtParser {
             }
         }
         // generic method type parameters, e.g. "<T> T foo(...)"
-        if (rest.startsWith("<")) rest = rest.substring(TypeNames.stripGenericsPrefixLength(rest)).trim()
+        var typeVariables = classTypeVariables
+        if (rest.startsWith("<")) {
+            val length = TypeNames.stripGenericsPrefixLength(rest)
+            typeVariables = typeVariables + parseTypeVariables(rest.substring(0, length))
+            rest = rest.substring(length).trim()
+        }
         return when (kind) {
             "ctor" -> {
                 val params = parseParameters(rest.substringAfter('(').substringBeforeLast(')'))
-                ApiMember(ApiMember.Kind.CONSTRUCTOR, "<init>", params, null, false, deprecated)
+                ApiMember(ApiMember.Kind.CONSTRUCTOR, "<init>", params, null, false, deprecated, typeVariableBounds = typeVariables)
             }
             "method" -> {
                 val beforeParen = rest.substringBefore('(')
                 val name = beforeParen.substringAfterLast(' ')
                 val type = TypeNames.fromApiTxt(beforeParen.substringBeforeLast(' '))
                 val params = parseParameters(rest.substringAfter('(').substringBeforeLast(')'))
-                ApiMember(ApiMember.Kind.METHOD, name, params, type, isStatic, deprecated)
+                ApiMember(ApiMember.Kind.METHOD, name, params, type, isStatic, deprecated, typeVariableBounds = typeVariables)
             }
             "field", "enum_constant" -> {
                 val declaration = rest.substringBefore('=').trim()
                 val name = declaration.substringAfterLast(' ')
                 if (name == "Companion") return null // Kotlin companion holder, not part of the API surface
                 val type = TypeNames.fromApiTxt(declaration.substringBeforeLast(' '))
-                ApiMember(ApiMember.Kind.FIELD, name, emptyList(), type, isStatic || kind == "enum_constant", deprecated, isFinal = isFinal || kind == "enum_constant")
+                ApiMember(ApiMember.Kind.FIELD, name, emptyList(), type, isStatic || kind == "enum_constant", deprecated, isFinal = isFinal || kind == "enum_constant", typeVariableBounds = typeVariables)
             }
             "property" -> {
                 // Kotlin property: represented by its getter, which the BCV dump also shows.
@@ -101,27 +109,46 @@ object AndroidSdkApiTxtParser {
                 val name = declaration.substringAfterLast(' ')
                 val type = TypeNames.fromApiTxt(declaration.substringBeforeLast(' '))
                 val getter = if (type == "boolean" && name.startsWith("is")) name else "get" + name.replaceFirstChar { it.uppercase() }
-                ApiMember(ApiMember.Kind.METHOD, getter, emptyList(), type, isStatic, deprecated)
+                ApiMember(ApiMember.Kind.METHOD, getter, emptyList(), type, isStatic, deprecated, typeVariableBounds = typeVariables)
             }
             else -> null
         }
     }
 
-    private fun parseParameters(text: String): List<String> {
+    /**
+     * The type variables declared by `<T extends Bound<T>, U>` (the text may continue past the closing `>`), each with
+     * the erasure the BCV dump shows for it: the first bound, or Object when there is none.
+     */
+    private fun parseTypeVariables(text: String): Map<String, String> {
+        if (!text.startsWith("<")) return emptyMap()
+        val declarations = text.substring(1, TypeNames.stripGenericsPrefixLength(text) - 1)
+        return splitTopLevel(declarations).associate { declaration ->
+            val name = declaration.substringBefore(' ')
+            val bound = declaration.substringAfter(" extends ", "").substringBefore(" & ").trim()
+            name to if (bound.isEmpty()) "java.lang.Object" else TypeNames.fromApiTxt(bound)
+        }
+    }
+
+    /** Splits on the commas outside angle brackets. */
+    private fun splitTopLevel(text: String): List<String> {
         if (text.isBlank()) return emptyList()
-        val params = mutableListOf<String>()
+        val parts = mutableListOf<String>()
         var depth = 0
         val current = StringBuilder()
         for (c in text) {
             when {
                 c == '<' -> { depth++; current.append(c) }
                 c == '>' -> { depth--; current.append(c) }
-                c == ',' && depth == 0 -> { params += current.toString(); current.clear() }
+                c == ',' && depth == 0 -> { parts += current.toString().trim(); current.clear() }
                 else -> current.append(c)
             }
         }
-        params += current.toString()
-        return params.map { param ->
+        parts += current.toString().trim()
+        return parts
+    }
+
+    private fun parseParameters(text: String): List<String> {
+        return splitTopLevel(text).map { param ->
             // "Type name", "Type" or "Type name = default" (metalava includes the names, and the defaults, of Kotlin parameters)
             val cleaned = annotation.replace(param.trim(), "").substringBefore(" = ").trim()
             val type = cleaned.split(Regex("\\s+")).let { if (it.size > 1 && !cleaned.endsWith("...") && !cleaned.endsWith("]")) it.dropLast(1).joinToString(" ") else if (it.size > 1 && it.last().none { ch -> ch == '[' || ch == '.' }) it.dropLast(1).joinToString(" ") else cleaned }

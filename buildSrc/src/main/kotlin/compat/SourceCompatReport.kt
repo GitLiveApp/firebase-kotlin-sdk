@@ -146,8 +146,8 @@ object SourceCompatReport {
     }
 
     private fun classify(member: ApiMember, ourClass: ApiClass, oursByName: Map<String, ApiClass>): Pair<String, String?> {
-        if (member.kind == ApiMember.Kind.METHOD && !member.isStatic && ourClass.members.none { it.kind == member.kind && it.name == member.name && it.parameters.matches(member.parameters) }) {
-            val inherited = inheritedMembers(ourClass, oursByName).firstOrNull { it.kind == member.kind && it.name == member.name && it.parameters.matches(member.parameters) }
+        if (member.kind == ApiMember.Kind.METHOD && !member.isStatic && ourClass.members.none { it.kind == member.kind && it.name == member.name && member.parametersMatch(it.parameters) }) {
+            val inherited = inheritedMembers(ourClass, oursByName).firstOrNull { it.kind == member.kind && it.name == member.name && member.parametersMatch(it.parameters) }
             if (inherited != null) return "MAP" to "inherited"
         }
         // The constructor of an inner class takes the outer instance first in the JVM dump; api.txt does not list it.
@@ -162,12 +162,12 @@ object SourceCompatReport {
             }
             .filter { it.kind == member.kind && it.name == member.name }
         if (candidates.isEmpty() && member.kind == ApiMember.Kind.FIELD && !member.isStatic) return classifyFieldAsProperty(member, ourClass)
-        val match = candidates.firstOrNull { it.parameters.matches(member.parameters) } ?: return "MISS" to null
+        val match = candidates.firstOrNull { member.parametersMatch(it.parameters) } ?: return "MISS" to null
         val notes = mutableListOf<String>()
         if (member.kind != ApiMember.Kind.CONSTRUCTOR && member.isStatic != match.isStatic) {
             return "MISS" to (if (member.isStatic) "not static in this SDK" else "static in this SDK")
         }
-        if (member.type != null && match.type != null && member.type != match.type && !isAcceptedReturnType(member.type, match.type)) {
+        if (member.type != null && match.type != null && !member.acceptsType(match.type)) {
             notes += "returns ${match.type.substringAfterLast('.')}"
         }
         match.deprecation?.let { notes += "deprecated: $it" }
@@ -178,23 +178,35 @@ object SourceCompatReport {
     private fun classifyFieldAsProperty(field: ApiMember, ourClass: ApiClass): Pair<String, String?> {
         val capitalised = field.name.replaceFirstChar { it.uppercase() }
         val getterNames = if (field.type == "boolean" && field.name.startsWith("is")) setOf(field.name) else setOf("get$capitalised", "is$capitalised")
-        val getter = ourClass.members.firstOrNull { it.kind == ApiMember.Kind.METHOD && !it.isStatic && it.name in getterNames && it.parameters.isEmpty() && it.type == field.type }
+        val getter = ourClass.members.firstOrNull { it.kind == ApiMember.Kind.METHOD && !it.isStatic && it.name in getterNames && it.parameters.isEmpty() && it.type != null && field.acceptsType(it.type) }
             ?: return "MISS" to null
         if (!field.isFinal) {
-            ourClass.members.firstOrNull { it.kind == ApiMember.Kind.METHOD && !it.isStatic && it.name == "set$capitalised" && it.parameters == listOf(field.type) }
+            ourClass.members.firstOrNull { it.kind == ApiMember.Kind.METHOD && !it.isStatic && it.name == "set$capitalised" && it.parameters.size == 1 && field.acceptsType(it.parameters.single()) }
                 ?: return "MISS" to "read-only property in this SDK"
         }
         return "MAP" to "property ${getter.name}()"
     }
 
-    /** The Android SDK's parameters exactly, except that a type parameter (`T`, `ResultT`) matches its erasure, `Object`, in the dump. */
-    private fun List<String>.matches(theirs: List<String>): Boolean =
-        size == theirs.size && zip(theirs).all { (ours, theirs) -> ours == theirs || (isTypeVariable(theirs) && ours == "java.lang.Object") }
+    /**
+     * Whether this SDK's parameters [ours] match the Android SDK member's exactly, a type variable (`T`, `ResultT`) matching
+     * its erasure in the dump: its bound, or `Object`.
+     */
+    private fun ApiMember.parametersMatch(ours: List<String>): Boolean =
+        ours.size == parameters.size && ours.zip(parameters).all { (ours, theirs) -> ours == theirs || erasure(theirs) == ours }
 
-    private fun isAcceptedReturnType(theirs: String, ours: String): Boolean =
-        theirs == "java.lang.Void" && ours == "java.lang.Void" || (theirs == "java.util.List" && ours == "java.util.List") ||
-            (isTypeVariable(theirs) && ours == "java.lang.Object")
+    /**
+     * Whether this SDK's type [ours] provides the Android SDK member's [type]: the same type, or the erasure of a type
+     * variable (`T with(...)` of `AbstractOptions<T extends AbstractOptions<T>>` returns `AbstractOptions` in the dump).
+     * A type metalava could not resolve when the api.txt was generated (`error.NonExistentClass`) accepts any type.
+     */
+    private fun ApiMember.acceptsType(ours: String): Boolean = type == ours || type == UNRESOLVED_TYPE || erasure(type!!) == ours
 
-    /** A type parameter such as `T` or `ResultT`, which the BCV dump shows erased to Object. */
-    private fun isTypeVariable(type: String): Boolean = type.first().isUpperCase() && !type.contains('.') && !type.endsWith("[]")
+    /** The erasure of [type] when it is a type variable such as `T` or `ResultT`: its bound, or `Object`; null otherwise. */
+    private fun ApiMember.erasure(type: String): String? = when {
+        type in typeVariableBounds -> typeVariableBounds.getValue(type)
+        type.first().isUpperCase() && !type.contains('.') && !type.endsWith("[]") -> "java.lang.Object"
+        else -> null
+    }
+
+    private const val UNRESOLVED_TYPE = "error.NonExistentClass"
 }

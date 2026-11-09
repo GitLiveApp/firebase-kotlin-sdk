@@ -18,6 +18,13 @@ data class ApiMember(
     val deprecation: String? = null,
     /** For fields: false when the field is assignable (`public boolean x;` rather than `public final boolean x;`). */
     val isFinal: Boolean = true,
+    /**
+     * For the Android SDK's members: the erasure of each type variable in scope, the class's and the method's, which is
+     * what the BCV dump shows for this SDK's member. `T` of `AbstractOptions<T extends AbstractOptions<T>>` erases to
+     * `com.google.firebase.firestore.pipeline.AbstractOptions`; a type variable without a bound, or one not listed here,
+     * erases to `java.lang.Object`.
+     */
+    val typeVariableBounds: Map<String, String> = emptyMap(),
 ) {
     enum class Kind { CONSTRUCTOR, METHOD, FIELD }
 

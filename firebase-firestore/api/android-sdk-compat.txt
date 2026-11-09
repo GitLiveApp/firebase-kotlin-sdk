@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 1638 public members available (1583 identical, 55 mapped, 0 missing, 0 omitted)
+# 100% of 1638 public members available (1602 identical, 36 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -525,16 +525,16 @@ com.google.firebase.firestore.WriteBatch
 com.google.firebase.firestore.WriteBatch.Function
   OK    void apply(WriteBatch)
 com.google.firebase.firestore.pipeline.AbstractOptions
-  MAP   T adding(AbstractOptions)  [returns AbstractOptions]
-  MAP   T with(String, boolean)  [returns AbstractOptions]
-  MAP   T with(String, AbstractOptions)  [returns AbstractOptions]
-  MAP   T with(String, Field)  [returns AbstractOptions]
-  MAP   T with(String, RawOptions)  [returns AbstractOptions]
-  MAP   T with(String, double)  [returns AbstractOptions]
+  OK    T adding(AbstractOptions)
+  OK    T with(String, boolean)
+  OK    T with(String, AbstractOptions)
+  OK    T with(String, Field)
+  OK    T with(String, RawOptions)
+  OK    T with(String, double)
   PLAT  T with(String, NonExistentClass)
-  MAP   T with(String, String)  [returns AbstractOptions]
-  MAP   T with(String, String[])  [returns AbstractOptions]
-  MAP   T with(String, long)  [returns AbstractOptions]
+  OK    T with(String, String)
+  OK    T with(String, String[])
+  OK    T with(String, long)
 com.google.firebase.firestore.pipeline.AggregateFunction
   OK    AliasedAggregate alias(String)
   OK    static AggregateFunction arrayAgg(Expression)
@@ -1726,9 +1726,9 @@ com.google.firebase.firestore.pipeline.FindNearestOptions
 com.google.firebase.firestore.pipeline.FindNearestStage
 com.google.firebase.firestore.pipeline.FindNearestStage.Companion
 com.google.firebase.firestore.pipeline.FindNearestStage.DistanceMeasure
-  MAP   static NonExistentClass COSINE  [returns DistanceMeasure]
-  MAP   static NonExistentClass DOT_PRODUCT  [returns DistanceMeasure]
-  MAP   static NonExistentClass EUCLIDEAN  [returns DistanceMeasure]
+  OK    static NonExistentClass COSINE
+  OK    static NonExistentClass DOT_PRODUCT
+  OK    static NonExistentClass EUCLIDEAN
 com.google.firebase.firestore.pipeline.FindNearestStage.DistanceMeasure.Companion
 com.google.firebase.firestore.pipeline.FunctionExpression
 com.google.firebase.firestore.pipeline.Ordering
@@ -1763,8 +1763,8 @@ com.google.firebase.firestore.pipeline.SampleStage.Companion
   OK    SampleStage withPercentage(double)
 com.google.firebase.firestore.pipeline.SampleStage.Mode
 com.google.firebase.firestore.pipeline.SampleStage.Mode.Companion
-  MAP   NonExistentClass getDOCUMENTS()  [returns Mode]
-  MAP   NonExistentClass getPERCENT()  [returns Mode]
+  OK    NonExistentClass getDOCUMENTS()
+  OK    NonExistentClass getPERCENT()
 com.google.firebase.firestore.pipeline.SearchStage
   OK    SearchStage withAddFields(Selectable, Selectable[])
   OK    SearchStage withLanguageCode(String)
@@ -1780,12 +1780,12 @@ com.google.firebase.firestore.pipeline.SearchStage.Companion
 com.google.firebase.firestore.pipeline.Selectable
   OK    Selectable()
 com.google.firebase.firestore.pipeline.Stage
-  MAP   T withOption(String, boolean)  [returns Stage]
-  MAP   T withOption(String, Field)  [returns Stage]
-  MAP   T withOption(String, double)  [returns Stage]
+  OK    T withOption(String, boolean)
+  OK    T withOption(String, Field)
+  OK    T withOption(String, double)
   PLAT  T withOption(String, NonExistentClass)
-  MAP   T withOption(String, String)  [returns Stage]
-  MAP   T withOption(String, long)  [returns Stage]
+  OK    T withOption(String, String)
+  OK    T withOption(String, long)
 com.google.firebase.firestore.pipeline.Stage.Companion
 com.google.firebase.firestore.pipeline.SubcollectionSource
   OK    static SubcollectionSource of(String)

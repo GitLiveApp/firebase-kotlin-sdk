@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-storage
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 167 public members available (158 identical, 9 mapped, 0 missing, 0 omitted)
+# 100% of 167 public members available (159 identical, 8 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.storage.CancellableTask
   OK    CancellableTask()
@@ -176,7 +176,7 @@ com.google.firebase.storage.StorageTask
   MAP   Exception getException()  [inherited]
   MAP   ResultT getResult()  [inherited]
   PLAT  ResultT getResult(Class)
-  MAP   ResultT getSnapshot()  [returns ProvideError]
+  OK    ResultT getSnapshot()
   MAP   boolean isCanceled()  [inherited]
   MAP   boolean isComplete()  [inherited]
   OK    boolean isInProgress()
