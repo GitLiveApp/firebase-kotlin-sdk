@@ -19,6 +19,7 @@ import dev.gitlive.firebase.firestore.CONSTANT_OF_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.firestore.INTERNAL_CONSTRUCTOR
 import dev.gitlive.firebase.firestore.internal.pipeline.BooleanConstant
 import dev.gitlive.firebase.firestore.internal.pipeline.BooleanFunctionExpression
+import dev.gitlive.firebase.firestore.internal.pipeline.BooleanWrapper
 import dev.gitlive.firebase.firestore.internal.pipeline.Constant
 import dev.gitlive.firebase.firestore.internal.pipeline.Variable
 import dev.gitlive.firebase.firestore.internal.pipeline.aggregate
@@ -116,7 +117,11 @@ public abstract class Expression {
 
     public fun arrayTransformWithIndex(elementAlias: String, indexAlias: String, transform: Expression): Expression = Companion.arrayTransformWithIndex(this, elementAlias, indexAlias, transform)
 
-    public fun asBoolean(): BooleanExpression = this as? BooleanExpression ?: (this as FunctionExpression).let { BooleanFunctionExpression(it.name, it.params) }
+    public fun asBoolean(): BooleanExpression = when (this) {
+        is BooleanExpression -> this
+        is Field, is Constant -> BooleanWrapper(this)
+        else -> (this as FunctionExpression).let { BooleanFunctionExpression(it.name, it.params) }
+    }
 
     public fun ascending(): Ordering = Ordering.ascending(this)
 
@@ -577,10 +582,10 @@ public abstract class Expression {
         public fun arrayGet(arrayFieldName: String, offset: Int): Expression = function("array_get", field(arrayFieldName), offset)
 
         @JvmStatic
-        public fun arrayIndexOf(array: Expression, value: Any?): Expression = function("array_index_of", array, value)
+        public fun arrayIndexOf(array: Expression, value: Any?): Expression = function("array_index_of", array, value, constant("first"))
 
         @JvmStatic
-        public fun arrayIndexOf(arrayFieldName: String, value: Any?): Expression = function("array_index_of", field(arrayFieldName), value)
+        public fun arrayIndexOf(arrayFieldName: String, value: Any?): Expression = function("array_index_of", field(arrayFieldName), value, constant("first"))
 
         @JvmStatic
         public fun arrayIndexOfAll(array: Expression, value: Any?): Expression = function("array_index_of_all", array, value)
@@ -595,10 +600,10 @@ public abstract class Expression {
         public fun arrayLast(arrayFieldName: String): Expression = function("array_last", field(arrayFieldName))
 
         @JvmStatic
-        public fun arrayLastIndexOf(array: Expression, value: Any?): Expression = function("array_index_of", array, value)
+        public fun arrayLastIndexOf(array: Expression, value: Any?): Expression = function("array_index_of", array, value, constant("last"))
 
         @JvmStatic
-        public fun arrayLastIndexOf(arrayFieldName: String, value: Any?): Expression = function("array_index_of", field(arrayFieldName), value)
+        public fun arrayLastIndexOf(arrayFieldName: String, value: Any?): Expression = function("array_index_of", field(arrayFieldName), value, constant("last"))
 
         @JvmStatic
         public fun arrayLastN(array: Expression, n: Expression): Expression = function("array_last_n", array, n)
@@ -1175,7 +1180,7 @@ public abstract class Expression {
         public fun ltrim(stringExpression: Expression): Expression = function("ltrim", stringExpression)
 
         @JvmStatic
-        public fun ltrim(fieldName: String): Expression = function("ltrim", fieldName)
+        public fun ltrim(fieldName: String): Expression = function("ltrim", field(fieldName))
 
         @JvmStatic
         public fun ltrimValue(stringExpression: Expression, valuesToTrim: Expression): Expression = function("ltrim", stringExpression, valuesToTrim)
@@ -1184,10 +1189,10 @@ public abstract class Expression {
         public fun ltrimValue(stringExpression: Expression, valuesToTrim: String): Expression = function("ltrim", stringExpression, valuesToTrim)
 
         @JvmStatic
-        public fun ltrimValue(fieldName: String, valuesToTrim: Expression): Expression = function("ltrim", fieldName, valuesToTrim)
+        public fun ltrimValue(fieldName: String, valuesToTrim: Expression): Expression = function("ltrim", field(fieldName), valuesToTrim)
 
         @JvmStatic
-        public fun ltrimValue(fieldName: String, valuesToTrim: String): Expression = function("ltrim", fieldName, valuesToTrim)
+        public fun ltrimValue(fieldName: String, valuesToTrim: String): Expression = function("ltrim", field(fieldName), valuesToTrim)
 
         @JvmStatic
         public fun map(elements: Map<String, *>): Expression = function("map", *elements.flatMap { (key, value) -> listOf(constant(key), value) }.toTypedArray())
@@ -1196,7 +1201,7 @@ public abstract class Expression {
         public fun mapEntries(mapExpr: Expression): Expression = function("map_entries", mapExpr)
 
         @JvmStatic
-        public fun mapEntries(mapField: String): Expression = function("map_entries", mapField)
+        public fun mapEntries(mapField: String): Expression = function("map_entries", field(mapField))
 
         @JvmStatic
         public fun mapGet(mapExpression: Expression, keyExpression: Expression): Expression = function("map_get", mapExpression, keyExpression)
@@ -1214,7 +1219,7 @@ public abstract class Expression {
         public fun mapKeys(mapExpr: Expression): Expression = function("map_keys", mapExpr)
 
         @JvmStatic
-        public fun mapKeys(mapField: String): Expression = function("map_keys", mapField)
+        public fun mapKeys(mapField: String): Expression = function("map_keys", field(mapField))
 
         @JvmStatic
         public fun mapMerge(firstMap: Expression, secondMap: Expression, vararg otherMaps: Expression): Expression = function("map_merge", firstMap, secondMap, *otherMaps)
@@ -1241,16 +1246,16 @@ public abstract class Expression {
         public fun mapSet(mapExpr: Expression, key: String, value: Any?, vararg moreKeyValues: Any): Expression = function("map_set", mapExpr, key, value, *moreKeyValues)
 
         @JvmStatic
-        public fun mapSet(mapField: String, key: Expression, value: Expression, vararg moreKeyValues: Expression): Expression = function("map_set", mapField, key, value, *moreKeyValues)
+        public fun mapSet(mapField: String, key: Expression, value: Expression, vararg moreKeyValues: Expression): Expression = function("map_set", field(mapField), key, value, *moreKeyValues)
 
         @JvmStatic
-        public fun mapSet(mapField: String, key: String, value: Any?, vararg moreKeyValues: Any): Expression = function("map_set", mapField, key, value, *moreKeyValues)
+        public fun mapSet(mapField: String, key: String, value: Any?, vararg moreKeyValues: Any): Expression = function("map_set", field(mapField), key, value, *moreKeyValues)
 
         @JvmStatic
         public fun mapValues(mapExpr: Expression): Expression = function("map_values", mapExpr)
 
         @JvmStatic
-        public fun mapValues(mapField: String): Expression = function("map_values", mapField)
+        public fun mapValues(mapField: String): Expression = function("map_values", field(mapField))
 
         @JvmStatic
         public fun mod(dividend: Expression, divisor: Expression): Expression = function("mod", dividend, divisor)
@@ -1415,7 +1420,7 @@ public abstract class Expression {
         public fun rtrim(stringExpression: Expression): Expression = function("rtrim", stringExpression)
 
         @JvmStatic
-        public fun rtrim(fieldName: String): Expression = function("rtrim", fieldName)
+        public fun rtrim(fieldName: String): Expression = function("rtrim", field(fieldName))
 
         @JvmStatic
         public fun rtrimValue(stringExpression: Expression, valuesToTrim: Expression): Expression = function("rtrim", stringExpression, valuesToTrim)
@@ -1424,10 +1429,10 @@ public abstract class Expression {
         public fun rtrimValue(stringExpression: Expression, valuesToTrim: String): Expression = function("rtrim", stringExpression, valuesToTrim)
 
         @JvmStatic
-        public fun rtrimValue(fieldName: String, valuesToTrim: Expression): Expression = function("rtrim", fieldName, valuesToTrim)
+        public fun rtrimValue(fieldName: String, valuesToTrim: Expression): Expression = function("rtrim", field(fieldName), valuesToTrim)
 
         @JvmStatic
-        public fun rtrimValue(fieldName: String, valuesToTrim: String): Expression = function("rtrim", fieldName, valuesToTrim)
+        public fun rtrimValue(fieldName: String, valuesToTrim: String): Expression = function("rtrim", field(fieldName), valuesToTrim)
 
         @JvmStatic
         public fun score(): Expression = function("score")
@@ -1499,10 +1504,10 @@ public abstract class Expression {
         public fun stringIndexOf(stringExpression: Expression, substring: String): Expression = function("string_index_of", stringExpression, substring)
 
         @JvmStatic
-        public fun stringIndexOf(fieldName: String, substring: Expression): Expression = function("string_index_of", fieldName, substring)
+        public fun stringIndexOf(fieldName: String, substring: Expression): Expression = function("string_index_of", field(fieldName), substring)
 
         @JvmStatic
-        public fun stringIndexOf(fieldName: String, substring: String): Expression = function("string_index_of", fieldName, substring)
+        public fun stringIndexOf(fieldName: String, substring: String): Expression = function("string_index_of", field(fieldName), substring)
 
         @JvmStatic
         public fun stringRepeat(stringExpression: Expression, count: Expression): Expression = function("string_repeat", stringExpression, count)
@@ -1511,10 +1516,10 @@ public abstract class Expression {
         public fun stringRepeat(stringExpression: Expression, count: Int): Expression = function("string_repeat", stringExpression, count)
 
         @JvmStatic
-        public fun stringRepeat(fieldName: String, count: Expression): Expression = function("string_repeat", fieldName, count)
+        public fun stringRepeat(fieldName: String, count: Expression): Expression = function("string_repeat", field(fieldName), count)
 
         @JvmStatic
-        public fun stringRepeat(fieldName: String, count: Int): Expression = function("string_repeat", fieldName, count)
+        public fun stringRepeat(fieldName: String, count: Int): Expression = function("string_repeat", field(fieldName), count)
 
         @JvmStatic
         public fun stringReplaceAll(stringExpression: Expression, oldValue: Expression, newValue: Expression): Expression = function("string_replace_all", stringExpression, oldValue, newValue)
@@ -1523,10 +1528,10 @@ public abstract class Expression {
         public fun stringReplaceAll(stringExpression: Expression, oldValue: String, newValue: String): Expression = function("string_replace_all", stringExpression, oldValue, newValue)
 
         @JvmStatic
-        public fun stringReplaceAll(fieldName: String, oldValue: Expression, newValue: Expression): Expression = function("string_replace_all", fieldName, oldValue, newValue)
+        public fun stringReplaceAll(fieldName: String, oldValue: Expression, newValue: Expression): Expression = function("string_replace_all", field(fieldName), oldValue, newValue)
 
         @JvmStatic
-        public fun stringReplaceAll(fieldName: String, oldValue: String, newValue: String): Expression = function("string_replace_all", fieldName, oldValue, newValue)
+        public fun stringReplaceAll(fieldName: String, oldValue: String, newValue: String): Expression = function("string_replace_all", field(fieldName), oldValue, newValue)
 
         @JvmStatic
         public fun stringReplaceOne(stringExpression: Expression, oldValue: Expression, newValue: Expression): Expression = function("string_replace_one", stringExpression, oldValue, newValue)
@@ -1535,10 +1540,10 @@ public abstract class Expression {
         public fun stringReplaceOne(stringExpression: Expression, oldValue: String, newValue: String): Expression = function("string_replace_one", stringExpression, oldValue, newValue)
 
         @JvmStatic
-        public fun stringReplaceOne(fieldName: String, oldValue: Expression, newValue: Expression): Expression = function("string_replace_one", fieldName, oldValue, newValue)
+        public fun stringReplaceOne(fieldName: String, oldValue: Expression, newValue: Expression): Expression = function("string_replace_one", field(fieldName), oldValue, newValue)
 
         @JvmStatic
-        public fun stringReplaceOne(fieldName: String, oldValue: String, newValue: String): Expression = function("string_replace_one", fieldName, oldValue, newValue)
+        public fun stringReplaceOne(fieldName: String, oldValue: String, newValue: String): Expression = function("string_replace_one", field(fieldName), oldValue, newValue)
 
         @JvmStatic
         public fun stringReverse(str: Expression): Expression = function("string_reverse", str)
@@ -1667,10 +1672,10 @@ public abstract class Expression {
         public fun timestampTruncate(timestamp: Expression, granularity: String): Expression = function("timestamp_trunc", timestamp, granularity)
 
         @JvmStatic
-        public fun timestampTruncate(fieldName: String, granularity: Expression): Expression = function("timestamp_trunc", fieldName, granularity)
+        public fun timestampTruncate(fieldName: String, granularity: Expression): Expression = function("timestamp_trunc", field(fieldName), granularity)
 
         @JvmStatic
-        public fun timestampTruncate(fieldName: String, granularity: String): Expression = function("timestamp_trunc", fieldName, granularity)
+        public fun timestampTruncate(fieldName: String, granularity: String): Expression = function("timestamp_trunc", field(fieldName), granularity)
 
         @JvmStatic
         public fun timestampTruncateWithTimezone(timestamp: Expression, granularity: Expression, timezone: Expression): Expression = function("timestamp_trunc", timestamp, granularity, timezone)
@@ -1685,16 +1690,16 @@ public abstract class Expression {
         public fun timestampTruncateWithTimezone(timestamp: Expression, granularity: String, timezone: String): Expression = function("timestamp_trunc", timestamp, granularity, timezone)
 
         @JvmStatic
-        public fun timestampTruncateWithTimezone(fieldName: String, granularity: Expression, timezone: Expression): Expression = function("timestamp_trunc", fieldName, granularity, timezone)
+        public fun timestampTruncateWithTimezone(fieldName: String, granularity: Expression, timezone: Expression): Expression = function("timestamp_trunc", field(fieldName), granularity, timezone)
 
         @JvmStatic
-        public fun timestampTruncateWithTimezone(fieldName: String, granularity: Expression, timezone: String): Expression = function("timestamp_trunc", fieldName, granularity, timezone)
+        public fun timestampTruncateWithTimezone(fieldName: String, granularity: Expression, timezone: String): Expression = function("timestamp_trunc", field(fieldName), granularity, timezone)
 
         @JvmStatic
-        public fun timestampTruncateWithTimezone(fieldName: String, granularity: String, timezone: Expression): Expression = function("timestamp_trunc", fieldName, granularity, timezone)
+        public fun timestampTruncateWithTimezone(fieldName: String, granularity: String, timezone: Expression): Expression = function("timestamp_trunc", field(fieldName), granularity, timezone)
 
         @JvmStatic
-        public fun timestampTruncateWithTimezone(fieldName: String, granularity: String, timezone: String): Expression = function("timestamp_trunc", fieldName, granularity, timezone)
+        public fun timestampTruncateWithTimezone(fieldName: String, granularity: String, timezone: String): Expression = function("timestamp_trunc", field(fieldName), granularity, timezone)
 
         @JvmStatic
         public fun toLower(stringExpression: Expression): Expression = function("to_lower", stringExpression)

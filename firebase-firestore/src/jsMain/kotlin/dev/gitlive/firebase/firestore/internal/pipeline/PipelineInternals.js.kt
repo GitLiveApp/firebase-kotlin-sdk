@@ -51,7 +51,7 @@ import dev.gitlive.firebase.firestore.externals.variable as jsVariable
 
 internal actual fun executePipeline(pipeline: Pipeline, options: Pipeline.ExecuteOptions?): Task<Pipeline.Snapshot> = task {
     val js = pipeline.toJs()
-    val promise = if (options == null || options.options.isEmpty()) execute(js) else execute(json("pipeline" to js, *options.options.toJsOptions()))
+    val promise = if (options == null || options.options.isEmpty()) execute(js) else execute(json("pipeline" to js, "rawOptions" to json(*options.options.toRawOptions())))
     promise.then { snapshot ->
         Pipeline.Snapshot(snapshot.executionTime.toCompat() as Timestamp, snapshot.results.map { PipelineResult(it) })
     }
@@ -66,6 +66,7 @@ internal fun Expression.toJs(): JsExpression = when (this) {
     is Field -> jsField(fieldPath.toJsValue())
     is Constant -> jsConstant(value.toJsValue())
     is BooleanConstant -> jsConstant(value)
+    is BooleanWrapper -> expr.toJs().asBoolean()
     is Variable -> jsVariable(name)
     is PipelineExpression -> throw IllegalArgumentException("A pipeline is used in an expression through toArrayExpression() or toScalarExpression()")
     is BooleanFunctionExpression -> JsFunctionExpression(name, params.map { it.toJs() }.toTypedArray()).asBoolean()
@@ -99,16 +100,15 @@ private fun Any?.toJsOption(): Any? = when (this) {
     is Expression -> toJs()
     is Map<*, *> -> json(*entries.map { (key, value) -> key.toString() to value.toJsOption() }.toTypedArray())
     is List<*> -> map { it.toJsOption() }.toTypedArray()
+    is Long -> toDouble()
     else -> this
 }
 
-private fun OptionValues.toJsOptions(): Array<Pair<String, Any?>> = entries.map { (key, value) -> key.toJsOptionKey() to value.toJsOption() }.toTypedArray()
-
-/** The SDK names its options in camel case (`indexMode`) where the wire, and the Android SDK, use snake case. */
-private fun String.toJsOptionKey(): String = replace(Regex("_([a-z])")) { it.groupValues[1].uppercase() }
+/** The options as the SDK's `rawOptions`, which it sends to the backend as they are, keyed as on the wire. */
+private fun OptionValues.toRawOptions(): Array<Pair<String, Any?>> = entries.map { (key, value) -> key to value.toJsOption() }.toTypedArray()
 
 /** The stage's own arguments plus its options as the SDK's `rawOptions`. */
-private fun Stage<*>.stageOptions(vararg arguments: Pair<String, Any?>): Json = if (options.isEmpty()) json(*arguments) else json(*arguments, "rawOptions" to json(*options.toJsOptions()))
+private fun Stage<*>.stageOptions(vararg arguments: Pair<String, Any?>): Json = if (options.isEmpty()) json(*arguments) else json(*arguments, "rawOptions" to json(*options.toRawOptions()))
 
 internal fun Pipeline.toJs(): JsPipeline {
     var pipeline: JsPipeline? = null
@@ -148,9 +148,9 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
                 "field" to vectorField.toJs(),
                 "vectorValue" to ((vectorValue as? Constant)?.value?.toJsValue() ?: vectorValue.toJs()),
                 "distanceMeasure" to distanceMeasure.wire,
-                *(options["limit"]?.let { arrayOf("limit" to it) } ?: emptyArray()),
+                *(options["limit"]?.let { arrayOf("limit" to it.toJsOption()) } ?: emptyArray()),
                 *((options["distance_field"] as? Field)?.let { arrayOf("distanceField" to it.fieldPath.canonicalPath()) } ?: emptyArray()),
-                *((options - "limit" - "distance_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toJsOptions())) } ?: emptyArray()),
+                *((options - "limit" - "distance_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toRawOptions())) } ?: emptyArray()),
             ),
         )
         is SampleStage -> current().sample(stageOptions((if (mode == SampleStage.Mode.DOCUMENTS) "documents" else "percentage") to count))
@@ -158,7 +158,7 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
             json(
                 "selectable" to arrayWithAlias.toJsSelectable(),
                 *((options["index_field"] as? Field)?.let { arrayOf("indexField" to it.fieldPath.canonicalPath()) } ?: emptyArray()),
-                *((options - "index_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toJsOptions())) } ?: emptyArray()),
+                *((options - "index_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toRawOptions())) } ?: emptyArray()),
             ),
         )
         is SearchStage -> current().search(
@@ -166,15 +166,15 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
                 "query" to (query?.toJs() ?: rquery),
                 *listOfNotNull(
                     languageCode?.let { "languageCode" to it },
-                    retrievalDepth?.let { "retrievalDepth" to it },
-                    offset?.let { "offset" to it },
-                    limit?.let { "limit" to it },
+                    retrievalDepth?.let { "retrievalDepth" to it.toDouble() },
+                    offset?.let { "offset" to it.toDouble() },
+                    limit?.let { "limit" to it.toDouble() },
                     sort.takeIf { it.isNotEmpty() }?.let { orderings -> "sort" to orderings.map { it.toJs() }.toTypedArray() },
                     addFields.takeIf { it.isNotEmpty() }?.let { fields -> "addFields" to fields.map { it.toJsSelectable() }.toTypedArray() },
                 ).toTypedArray(),
             ),
         )
-        is RawStage -> if (options.isEmpty()) current().rawStage(name, arguments.map { toExprOrConstant(it).toJs() }.toTypedArray()) else current().rawStage(name, arguments.map { toExprOrConstant(it).toJs() }.toTypedArray(), json(*options.toJsOptions()))
+        is RawStage -> if (options.isEmpty()) current().rawStage(name, arguments.map { toExprOrConstant(it).toJs() }.toTypedArray()) else current().rawStage(name, arguments.map { toExprOrConstant(it).toJs() }.toTypedArray(), json(*options.toRawOptions()))
         else -> throw IllegalArgumentException("Unsupported stage: $name")
     }
 }

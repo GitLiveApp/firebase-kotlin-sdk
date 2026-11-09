@@ -71,10 +71,10 @@ class PipelineTest {
     }
 
     private suspend fun books() = firestore.collection("compat").document("test").collection("pipelineBooks").also { books ->
-        books.document("b1").setData(mapOf("title" to "Dune", "author" to "Herbert", "genre" to "sf", "rating" to 4.6, "year" to 1965, "tags" to listOf("classic", "space"))).await()
-        books.document("b2").setData(mapOf("title" to "Neuromancer", "author" to "Gibson", "genre" to "sf", "rating" to 4.1, "year" to 1984, "tags" to listOf("cyberpunk"))).await()
-        books.document("b3").setData(mapOf("title" to "Emma", "author" to "Austen", "genre" to "romance", "rating" to 4.0, "year" to 1815, "tags" to listOf("classic"))).await()
-        books.document("b4").setData(mapOf("title" to "Persuasion", "author" to "Austen", "genre" to "romance", "rating" to 4.2, "year" to 1817, "tags" to emptyList<String>())).await()
+        books.document("b1").setData(mapOf("title" to "Dune", "author" to "Herbert", "genre" to "sf", "rating" to 4.6, "year" to 1965, "inPrint" to true, "tags" to listOf("classic", "space"))).await()
+        books.document("b2").setData(mapOf("title" to "Neuromancer", "author" to "Gibson", "genre" to "sf", "rating" to 4.1, "year" to 1984, "inPrint" to false, "tags" to listOf("cyberpunk"))).await()
+        books.document("b3").setData(mapOf("title" to "Emma", "author" to "Austen", "genre" to "romance", "rating" to 4.0, "year" to 1815, "inPrint" to true, "tags" to listOf("classic"))).await()
+        books.document("b4").setData(mapOf("title" to "Persuasion", "author" to "Austen", "genre" to "romance", "rating" to 4.2, "year" to 1817, "inPrint" to true, "tags" to emptyList<String>())).await()
     }
 
     @Test
@@ -100,6 +100,27 @@ class PipelineTest {
         assertEquals(setOf("title", "score"), selected.getData().keys)
         assertEquals("Dune", selected.get("title"))
         assertEquals(46.0, (selected.get("score") as Number).toDouble(), 0.001)
+    }
+
+    @Test
+    fun testBooleanFieldAndFieldNameBuilders() = runTest {
+        val books = books()
+        // A boolean field is a condition through asBoolean(); the field-name overloads read the field, not the name
+        val results = firestore.pipeline().collection(books)
+            .where(Expression.field("inPrint").asBoolean())
+            .where(Expression.field("genre").equal("sf"))
+            .select(
+                Expression.stringRepeat("genre", 2).alias("twice"),
+                Expression.rtrim("title").alias("trimmed"),
+                Expression.arrayIndexOf("tags", "space").alias("space"),
+                Expression.arrayLastIndexOf("tags", "space").alias("lastSpace"),
+            )
+            .execute().await().results
+        val dune = results.single()
+        assertEquals("sfsf", dune.get("twice"))
+        assertEquals("Dune", dune.get("trimmed"))
+        assertEquals(1L, (dune.get("space") as Number).toLong())
+        assertEquals(1L, (dune.get("lastSpace") as Number).toLong())
     }
 
     @Test

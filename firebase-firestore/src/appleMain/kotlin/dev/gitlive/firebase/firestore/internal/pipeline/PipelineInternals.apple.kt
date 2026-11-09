@@ -65,6 +65,7 @@ import swiftPMImport.dev.gitlive.firebase.firestore.__FIRUnionStageBridge
 import swiftPMImport.dev.gitlive.firebase.firestore.__FIRUnnestStageBridge
 import swiftPMImport.dev.gitlive.firebase.firestore.__FIRVariableBridge
 import swiftPMImport.dev.gitlive.firebase.firestore.__FIRWhereStageBridge
+import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
 import platform.Foundation.numberWithDouble
 import platform.Foundation.numberWithLongLong
@@ -90,8 +91,9 @@ internal const val SUBCOLLECTION_PIPELINE = "This pipeline was created without a
 
 internal fun Expression.toIos(): __FIRExprBridge = when (this) {
     is Field -> __FIRFieldBridge(path = fieldPath.toIosValue())
-    is Constant -> __FIRConstantBridge(input = value.toIosValue())
+    is Constant -> __FIRConstantBridge(input = value.toIosValue() ?: NSNull.`null`())
     is BooleanConstant -> __FIRConstantBridge(input = value)
+    is BooleanWrapper -> expr.toIos()
     is Variable -> __FIRVariableBridge(name = name)
     is PipelineExpression -> __FIRPipelineExprBridge(stages = pipeline.stagesToIos())
     is BooleanFunctionExpression -> __FIRFunctionExprBridge(name = name, Args = params.map { it.toIos() }, Options = null)
@@ -100,15 +102,10 @@ internal fun Expression.toIos(): __FIRExprBridge = when (this) {
     else -> throw IllegalArgumentException("Unsupported expression: $this")
 }
 
-private fun Pipeline.stagesToIos(): List<__FIRStageBridge> {
-    val firestore = firestore
-    return stages.flatMap { stage ->
-        if (stage is SubcollectionSource) {
-            listOf(__FIRSubcollectionSourceStageBridge(path = stage.path).also { stage.rejectOptions() })
-        } else {
-            stage.toIos(firestore ?: throw IllegalStateException(SUBCOLLECTION_PIPELINE))
-        }
-    }
+/** The stages as bridges; a subcollection pipeline has no database of its own and takes the [enclosing] pipeline's where a stage needs one. */
+private fun Pipeline.stagesToIos(enclosing: FirebaseFirestore? = null): List<__FIRStageBridge> {
+    val database = firestore ?: enclosing
+    return stages.flatMap { it.toIos(database) }
 }
 
 private fun AggregateFunction.toIos(): __FIRAggregateFunctionBridge = __FIRAggregateFunctionBridge(name = name, Args = params.map { it.toIos() })
@@ -121,8 +118,8 @@ private fun Map<String, Expression>.toBridges(): Map<Any?, *> = mapValues { it.v
 private fun Any?.toIosOption(): __FIRExprBridge = when (this) {
     is Field -> toIos()
     is Expression -> toIos()
-    is Map<*, *> -> __FIRFunctionExprBridge(name = "map", Args = flatMap { (key, value) -> listOf(__FIRConstantBridge(input = key), value.toIosOption()) }, Options = null)
-    else -> __FIRConstantBridge(input = toIosValue())
+    is Map<*, *> -> __FIRFunctionExprBridge(name = "map", Args = flatMap { (key, value) -> listOf(__FIRConstantBridge(input = key.toString()), value.toIosOption()) }, Options = null)
+    else -> __FIRConstantBridge(input = toIosValue() ?: NSNull.`null`())
 }
 
 private fun OptionValues.toBridgeOptions(): Map<Any?, *> = mapValues { it.value.toIosOption() }
@@ -133,61 +130,71 @@ private fun Stage<*>.rejectOptions(vararg handled: String) {
     if (rest.isNotEmpty()) throw UnsupportedOperationException("The Firebase iOS SDK's pipeline bridge does not take the options $rest on a $name stage")
 }
 
+/** The `force_index` hint of a collection source, the one hint the bridge takes; any other hint is rejected rather than dropped. */
 @Suppress("UNCHECKED_CAST")
-private fun Stage<*>.forceIndex(): String? = (options["hints"] as? Map<String, Any?>)?.get("force_index") as? String
+private fun Stage<*>.forceIndex(): String? {
+    val hints = options["hints"] as? Map<String, Any?> ?: return null
+    val rest = hints.keys - "force_index"
+    if (rest.isNotEmpty()) throw UnsupportedOperationException("The Firebase iOS SDK's pipeline bridge does not take the hints $rest on a $name stage")
+    return hints["force_index"] as? String
+}
 
-private fun Stage<*>.toIos(firestore: FirebaseFirestore): List<__FIRStageBridge> = when (this) {
-    is CollectionSource -> listOf(__FIRCollectionSourceStageBridge(ref = firestore.ios.collectionWithPath(path), firestore = firestore.ios, forceIndex = forceIndex()).also { rejectOptions("hints") })
-    is CollectionGroupSource -> listOf(__FIRCollectionGroupSourceStageBridge(collectionId = collectionId, forceIndex = forceIndex()).also { rejectOptions("hints") })
-    is SubcollectionSource -> listOf(__FIRSubcollectionSourceStageBridge(path = path).also { rejectOptions() })
-    is DatabaseSource -> listOf(__FIRDatabaseSourceStageBridge().also { rejectOptions() })
-    is DocumentsSource -> listOf(__FIRDocumentsSourceStageBridge(documents = documents.map { it.ios }, firestore = firestore.ios).also { rejectOptions() })
-    is QuerySource -> __FIRPipelineBridge.createStageBridgesFromQuery(query.ios).map { it as __FIRStageBridge }.also { rejectOptions() }
-    is WhereStage -> listOf(__FIRWhereStageBridge(expr = condition.toIos()).also { rejectOptions() })
-    is LimitStage -> listOf(__FIRLimitStageBridge(limit = limit.toLong()).also { rejectOptions() })
-    is OffsetStage -> listOf(__FIROffsetStageBridge(offset = offset.toLong()).also { rejectOptions() })
-    is SelectStage -> listOf(__FIRSelectStageBridge(selections = selections.toBridges()).also { rejectOptions() })
-    is AddFieldsStage -> listOf(__FIRAddFieldsStageBridge(fields = fields.toBridges()).also { rejectOptions() })
-    is RemoveFieldsStage -> listOf(__FIRRemoveFieldsStageBridge(fields = fields.map { it.fieldPath.canonicalPath() }).also { rejectOptions() })
-    is DefineStage -> listOf(__FIRDefineStageBridge(variables = variables.toBridges()).also { rejectOptions() })
-    is DistinctStage -> listOf(__FIRDistinctStageBridge(groups = groups.toBridges()).also { rejectOptions() })
-    is SortStage -> listOf(__FIRSortStageBridge(orderings = orders.map { it.toIos() }).also { rejectOptions() })
-    is ReplaceWithStage -> listOf(__FIRReplaceWithStageBridge(expr = expr.toIos()).also { rejectOptions() })
-    is UnionStage -> listOf(__FIRUnionStageBridge(other = __FIRPipelineBridge(stages = other.stagesToIos(), db = firestore.ios)).also { rejectOptions() })
-    is AggregateStage -> listOf(__FIRAggregateStageBridge(accumulators = accumulators.mapValues { it.value.toIos() }, groups = groups.toBridges()).also { rejectOptions() })
-    is FindNearestStage -> listOf(
-        __FIRFindNearestStageBridge(
-            field = vectorField.toIos() as __FIRFieldBridge,
-            vectorValue = ((vectorValue as? Constant)?.value as? VectorValue ?: throw UnsupportedOperationException("The Firebase iOS SDK's pipeline bridge takes the vector of a findNearest stage as a value, not an expression")).toIosValue() as FIRVectorValue,
-            distanceMeasure = distanceMeasure.wire,
-            limit = (options["limit"] as? Long)?.let { NSNumber.numberWithLongLong(it) },
-            distanceField = (options["distance_field"] as? Field)?.toIos(),
-        ).also { rejectOptions("limit", "distance_field") },
-    )
-    is SampleStage -> listOf((if (mode == SampleStage.Mode.DOCUMENTS) __FIRSampleStageBridge(count = count.toLong()) else __FIRSampleStageBridge(percentage = count.toDouble())).also { rejectOptions() })
-    is UnnestStage -> listOf(
-        __FIRUnnestStageBridge(
-            field = arrayWithAlias.selectableExpr.toIos(),
-            alias = __FIRFieldBridge(name = arrayWithAlias.selectableAlias),
-            indexField = (options["index_field"] as? Field)?.toIos(),
-        ).also { rejectOptions("index_field") },
-    )
-    is SearchStage -> listOf(
-        __FIRSearchStageBridge(
-            options = buildMap<String, Any?> {
-                query?.let { put("query", it) } ?: rquery?.let { put("query", it) }
-                limit?.let { put("limit", it) }
-                offset?.let { put("offset", it) }
-                retrievalDepth?.let { put("retrieval_depth", it) }
-                languageCode?.let { put("language_code", it) }
-            }.toBridgeOptions(),
-            addFields = addFields.toBridges(),
-            select = emptyMap<Any?, Any?>(),
-            sort = sort.map { it.toIos() },
-        ).also { rejectOptions() },
-    )
-    is RawStage -> listOf(__FIRRawStageBridge(name = name, params = arguments.map { toExprOrConstant(it).toIos() }, options = options.toBridgeOptions()))
-    else -> throw IllegalArgumentException("Unsupported stage: $name")
+/** The stage as bridges; [firestore] is null in a subcollection pipeline, which only the stages that read the database reject. */
+private fun Stage<*>.toIos(firestore: FirebaseFirestore?): List<__FIRStageBridge> {
+    fun database(): FirebaseFirestore = firestore ?: throw IllegalStateException(SUBCOLLECTION_PIPELINE)
+    return when (this) {
+        is CollectionSource -> listOf(__FIRCollectionSourceStageBridge(ref = database().ios.collectionWithPath(path), firestore = database().ios, forceIndex = forceIndex()).also { rejectOptions("hints") })
+        is CollectionGroupSource -> listOf(__FIRCollectionGroupSourceStageBridge(collectionId = collectionId, forceIndex = forceIndex()).also { rejectOptions("hints") })
+        is SubcollectionSource -> listOf(__FIRSubcollectionSourceStageBridge(path = path).also { rejectOptions() })
+        is DatabaseSource -> listOf(__FIRDatabaseSourceStageBridge().also { rejectOptions() })
+        is DocumentsSource -> listOf(__FIRDocumentsSourceStageBridge(documents = documents.map { it.ios }, firestore = database().ios).also { rejectOptions() })
+        is QuerySource -> __FIRPipelineBridge.createStageBridgesFromQuery(query.ios).map { it as __FIRStageBridge }.also { rejectOptions() }
+        is WhereStage -> listOf(__FIRWhereStageBridge(expr = condition.toIos()).also { rejectOptions() })
+        is LimitStage -> listOf(__FIRLimitStageBridge(limit = limit.toLong()).also { rejectOptions() })
+        is OffsetStage -> listOf(__FIROffsetStageBridge(offset = offset.toLong()).also { rejectOptions() })
+        is SelectStage -> listOf(__FIRSelectStageBridge(selections = selections.toBridges()).also { rejectOptions() })
+        is AddFieldsStage -> listOf(__FIRAddFieldsStageBridge(fields = fields.toBridges()).also { rejectOptions() })
+        is RemoveFieldsStage -> listOf(__FIRRemoveFieldsStageBridge(fields = fields.map { it.fieldPath.canonicalPath() }).also { rejectOptions() })
+        is DefineStage -> listOf(__FIRDefineStageBridge(variables = variables.toBridges()).also { rejectOptions() })
+        is DistinctStage -> listOf(__FIRDistinctStageBridge(groups = groups.toBridges()).also { rejectOptions() })
+        is SortStage -> listOf(__FIRSortStageBridge(orderings = orders.map { it.toIos() }).also { rejectOptions() })
+        is ReplaceWithStage -> listOf(__FIRReplaceWithStageBridge(expr = expr.toIos()).also { rejectOptions() })
+        is UnionStage -> listOf(__FIRUnionStageBridge(other = __FIRPipelineBridge(stages = other.stagesToIos(firestore), db = database().ios)).also { rejectOptions() })
+        is AggregateStage -> listOf(__FIRAggregateStageBridge(accumulators = accumulators.mapValues { it.value.toIos() }, groups = groups.toBridges()).also { rejectOptions() })
+        is FindNearestStage -> listOf(
+            __FIRFindNearestStageBridge(
+                field = vectorField.toIos() as __FIRFieldBridge,
+                vectorValue = ((vectorValue as? Constant)?.value as? VectorValue ?: throw UnsupportedOperationException("The Firebase iOS SDK's pipeline bridge takes the vector of a findNearest stage as a value, not an expression")).toIosValue() as FIRVectorValue,
+                distanceMeasure = distanceMeasure.wire,
+                limit = (options["limit"] as? Long)?.let { NSNumber.numberWithLongLong(it) },
+                distanceField = (options["distance_field"] as? Field)?.toIos(),
+            ).also { rejectOptions("limit", "distance_field") },
+        )
+        is SampleStage -> listOf((if (mode == SampleStage.Mode.DOCUMENTS) __FIRSampleStageBridge(count = count.toLong()) else __FIRSampleStageBridge(percentage = count.toDouble())).also { rejectOptions() })
+        is UnnestStage -> listOf(
+            __FIRUnnestStageBridge(
+                field = arrayWithAlias.selectableExpr.toIos(),
+                alias = __FIRFieldBridge(name = arrayWithAlias.selectableAlias),
+                indexField = (options["index_field"] as? Field)?.toIos(),
+            ).also { rejectOptions("index_field") },
+        )
+        is SearchStage -> listOf(
+            __FIRSearchStageBridge(
+                options = buildMap<String, Any?> {
+                    query?.let { put("query", it) } ?: rquery?.let { put("query", it) }
+                    limit?.let { put("limit", it) }
+                    offset?.let { put("offset", it) }
+                    retrievalDepth?.let { put("retrieval_depth", it) }
+                    languageCode?.let { put("language_code", it) }
+                }.toBridgeOptions(),
+                addFields = addFields.toBridges(),
+                select = emptyMap<Any?, Any?>(),
+                sort = sort.map { it.toIos() },
+            ).also { rejectOptions() },
+        )
+        is RawStage -> listOf(__FIRRawStageBridge(name = name, params = arguments.map { toExprOrConstant(it).toIos() }, options = options.toBridgeOptions()))
+        else -> throw IllegalArgumentException("Unsupported stage: $name")
+    }
 }
 
 @Suppress("unused")

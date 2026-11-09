@@ -54,7 +54,7 @@ import dev.gitlive.firebase.firestore.externals.variable as jsVariable
 internal actual fun executePipeline(pipeline: Pipeline, options: Pipeline.ExecuteOptions?): Task<Pipeline.Snapshot> = task(
     start = {
         val js = pipeline.toJs()
-        if (options == null || options.options.isEmpty()) execute(js) else execute(json("pipeline" to js, *options.options.toJsOptions()))
+        if (options == null || options.options.isEmpty()) execute(js) else execute(json("pipeline" to js, "rawOptions" to json(*options.options.toRawOptions())))
     },
     result = { snapshot -> Pipeline.Snapshot(snapshot.executionTime.toCompat() as Timestamp, snapshot.results.toList().map { PipelineResult(it) }) },
 )
@@ -71,6 +71,7 @@ internal fun Expression.toJs(): JsExpression = when (this) {
     is Field -> jsField(fieldPath.toJsValue())
     is Constant -> jsConstant(value.toJsValue())
     is BooleanConstant -> jsConstant(value.toJsValue())
+    is BooleanWrapper -> expr.toJs().asBoolean()
     is Variable -> jsVariable(name)
     is PipelineExpression -> throw IllegalArgumentException("A pipeline is used in an expression through toArrayExpression() or toScalarExpression()")
     is BooleanFunctionExpression -> JsFunctionExpression(name, params.toJsArray()).asBoolean()
@@ -107,13 +108,11 @@ private fun Any?.toJsOption(): Any? = when (this) {
     else -> this
 }
 
-private fun OptionValues.toJsOptions(): Array<Pair<String, Any?>> = entries.map { (key, value) -> key.toJsOptionKey() to value.toJsOption() }.toTypedArray()
-
-/** The SDK names its options in camel case (`indexMode`) where the wire, and the Android SDK, use snake case. */
-private fun String.toJsOptionKey(): String = replace(Regex("_([a-z])")) { it.groupValues[1].uppercase() }
+/** The options as the SDK's `rawOptions`, which it sends to the backend as they are, keyed as on the wire. */
+private fun OptionValues.toRawOptions(): Array<Pair<String, Any?>> = entries.map { (key, value) -> key to value.toJsOption() }.toTypedArray()
 
 /** The stage's own arguments plus its options as the SDK's `rawOptions`. */
-private fun Stage<*>.stageOptions(vararg arguments: Pair<String, Any?>): JsAny = if (options.isEmpty()) json(*arguments) else json(*arguments, "rawOptions" to json(*options.toJsOptions()))
+private fun Stage<*>.stageOptions(vararg arguments: Pair<String, Any?>): JsAny = if (options.isEmpty()) json(*arguments) else json(*arguments, "rawOptions" to json(*options.toRawOptions()))
 
 internal fun Pipeline.toJs(): JsPipeline {
     var pipeline: JsPipeline? = null
@@ -155,7 +154,7 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
                 "distanceMeasure" to distanceMeasure.wire,
                 *(options["limit"]?.let { arrayOf("limit" to it) } ?: emptyArray()),
                 *((options["distance_field"] as? Field)?.let { arrayOf("distanceField" to it.fieldPath.canonicalPath()) } ?: emptyArray()),
-                *((options - "limit" - "distance_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toJsOptions())) } ?: emptyArray()),
+                *((options - "limit" - "distance_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toRawOptions())) } ?: emptyArray()),
             ),
         )
         is SampleStage -> current().sample(stageOptions((if (mode == SampleStage.Mode.DOCUMENTS) "documents" else "percentage") to count))
@@ -163,7 +162,7 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
             json(
                 "selectable" to arrayWithAlias.toJsSelectable(),
                 *((options["index_field"] as? Field)?.let { arrayOf("indexField" to it.fieldPath.canonicalPath()) } ?: emptyArray()),
-                *((options - "index_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toJsOptions())) } ?: emptyArray()),
+                *((options - "index_field").takeIf { it.isNotEmpty() }?.let { arrayOf("rawOptions" to json(*it.toRawOptions())) } ?: emptyArray()),
             ),
         )
         is SearchStage -> current().search(
@@ -181,7 +180,7 @@ private fun Stage<*>.toJs(pipeline: JsPipeline?, owner: Pipeline): JsPipeline {
         )
         is RawStage -> {
             val params = jsArrayOf(arguments.map { toExprOrConstant(it).toJs() })
-            if (options.isEmpty()) current().rawStage(name, params) else current().rawStage(name, params, json(*options.toJsOptions()))
+            if (options.isEmpty()) current().rawStage(name, params) else current().rawStage(name, params, json(*options.toRawOptions()))
         }
         else -> throw IllegalArgumentException("Unsupported stage: $name")
     }

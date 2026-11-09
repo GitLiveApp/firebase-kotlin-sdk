@@ -43,6 +43,9 @@ internal class Constant(internal val value: Any?) : Expression()
 /** A literal boolean, usable where a condition is. */
 internal class BooleanConstant(internal val value: Boolean) : BooleanExpression()
 
+/** A [Field] or [Constant] used as a condition, as `asBoolean()` wraps it (the SDK's BooleanField and BooleanConstant). */
+internal class BooleanWrapper(internal val expr: Expression) : BooleanExpression()
+
 /** A reference to a variable defined by an earlier `define` stage or an array transform. */
 internal class Variable(internal val name: String) : Expression()
 

@@ -12,13 +12,13 @@ import kotlin.js.Promise
  * arguments and the backend `rawOptions`.
  */
 
-public open external class Expression
+public open external class Expression {
+    public fun asBoolean(): BooleanExpression
+}
 
 public external class Field : Expression
 
-public external class FunctionExpression(name: String, params: Array<Expression>) : Expression {
-    public fun asBoolean(): BooleanExpression
-}
+public external class FunctionExpression(name: String, params: Array<Expression>) : Expression
 
 public external class BooleanExpression : Expression
 

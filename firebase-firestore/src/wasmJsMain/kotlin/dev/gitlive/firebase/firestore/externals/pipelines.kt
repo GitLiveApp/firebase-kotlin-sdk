@@ -9,13 +9,13 @@ import kotlin.js.Promise
  * declared with its options-object overload, which carries the stage's own arguments and the backend `rawOptions`.
  */
 
-public open external class Expression : JsAny
+public open external class Expression : JsAny {
+    public fun asBoolean(): BooleanExpression
+}
 
 public external class Field : Expression
 
-public external class FunctionExpression(name: String, params: JsArray<Expression>) : Expression {
-    public fun asBoolean(): BooleanExpression
-}
+public external class FunctionExpression(name: String, params: JsArray<Expression>) : Expression
 
 public external class BooleanExpression : Expression
 
