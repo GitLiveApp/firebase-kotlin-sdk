@@ -28,6 +28,10 @@ jobs:
       - name: Format Kotlin
         run: ./gradlew formatKotlin
 
+      # The metadata compilation only runs when publishing (and for the docs), so check it here rather than at release time.
+      - name: Compile the common metadata
+        run: ./gradlew compileCommonMainKotlinMetadata
+
       - name: Update API files for changed modules
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}

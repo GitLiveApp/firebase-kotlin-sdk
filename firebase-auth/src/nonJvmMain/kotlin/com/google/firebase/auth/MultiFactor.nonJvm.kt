@@ -34,12 +34,12 @@ public actual abstract class MultiFactorInfo actual constructor() {
 }
 
 public actual class PhoneMultiFactorInfo actual constructor(
-    override val uid: String,
-    override val displayName: String?,
-    override val enrollmentTimestamp: Long,
+    actual override val uid: String,
+    actual override val displayName: String?,
+    actual override val enrollmentTimestamp: Long,
     public actual val phoneNumber: String,
 ) : MultiFactorInfo() {
-    override val factorId: String get() = PhoneMultiFactorGenerator.FACTOR_ID
+    actual override val factorId: String get() = PhoneMultiFactorGenerator.FACTOR_ID
     override var native: Any? = null
         internal set
 
@@ -49,12 +49,12 @@ public actual class PhoneMultiFactorInfo actual constructor(
 }
 
 public actual class TotpMultiFactorInfo internal constructor(
-    override val uid: String,
-    override val displayName: String?,
-    override val enrollmentTimestamp: Long,
+    actual override val uid: String,
+    actual override val displayName: String?,
+    actual override val enrollmentTimestamp: Long,
     override val native: Any,
 ) : MultiFactorInfo() {
-    override val factorId: String get() = TotpMultiFactorGenerator.FACTOR_ID
+    actual override val factorId: String get() = TotpMultiFactorGenerator.FACTOR_ID
 }
 
 public actual abstract class MultiFactorSession actual constructor()
@@ -70,7 +70,7 @@ public actual abstract class MultiFactorResolver actual constructor() {
 
 /** @property credential The verified phone credential. */
 public actual class PhoneMultiFactorAssertion actual constructor(internal val credential: PhoneAuthCredential) : MultiFactorAssertion() {
-    override val factorId: String get() = PhoneMultiFactorGenerator.FACTOR_ID
+    actual override val factorId: String get() = PhoneMultiFactorGenerator.FACTOR_ID
     override val native: Any by lazy { nativePhoneMultiFactorAssertion(credential) }
 }
 
@@ -83,7 +83,7 @@ public actual class PhoneMultiFactorGenerator actual constructor() {
 }
 
 public actual class TotpMultiFactorAssertion internal constructor(override val native: Any) : MultiFactorAssertion() {
-    override val factorId: String get() = TotpMultiFactorGenerator.FACTOR_ID
+    actual override val factorId: String get() = TotpMultiFactorGenerator.FACTOR_ID
 }
 
 public actual class TotpMultiFactorGenerator private constructor() {

@@ -14,22 +14,40 @@ public expect abstract class AuthCredential {
 }
 
 /** An email and password, or email link, credential from [EmailAuthProvider]. */
-public expect class EmailAuthCredential : AuthCredential
+public expect class EmailAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+}
 
 /** A Facebook credential from [FacebookAuthProvider]. */
-public expect class FacebookAuthCredential : AuthCredential
+public expect class FacebookAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+}
 
 /** A GitHub credential from [GithubAuthProvider]. */
-public expect class GithubAuthCredential : AuthCredential
+public expect class GithubAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+}
 
 /** A Google credential from [GoogleAuthProvider]. */
-public expect class GoogleAuthCredential : AuthCredential
+public expect class GoogleAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+}
 
 /** A Twitter credential from [TwitterAuthProvider]. */
-public expect class TwitterAuthCredential : AuthCredential
+public expect class TwitterAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+}
 
 /** A phone number credential from [PhoneAuthProvider], mirroring `com.google.firebase.auth.PhoneAuthCredential`. */
 public expect class PhoneAuthCredential : AuthCredential {
+    override val provider: String
+    override val signInMethod: String
+
     /** The SMS code the credential was created with, or null when the SDK verified the number itself. */
     public val smsCode: String?
 }
