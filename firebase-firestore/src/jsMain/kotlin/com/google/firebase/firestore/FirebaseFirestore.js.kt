@@ -86,6 +86,8 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
 
     public actual fun collectionGroup(collectionId: String): Query = rethrow { Query(jsCollectionGroup(js, collectionId)) }
 
+    public actual fun pipeline(): PipelineSource = PipelineSource(this)
+
     public actual fun document(documentPath: String): DocumentReference = rethrow { DocumentReference(doc(js, documentPath)) }
 
     public actual fun batch(): WriteBatch = rethrow { WriteBatch(writeBatch(js)) }

@@ -35,6 +35,7 @@ public actual class FirebaseFirestore private constructor() {
     public actual val persistentCacheIndexManager: PersistentCacheIndexManager? get() = stub()
     public actual fun collection(collectionPath: String): CollectionReference = stub()
     public actual fun collectionGroup(collectionId: String): Query = stub()
+    public actual fun pipeline(): PipelineSource = stub()
     public actual fun document(documentPath: String): DocumentReference = stub()
     public actual fun batch(): WriteBatch = stub()
     public actual fun runBatch(batchFunction: WriteBatch.Function): Task<Nothing?> = stub()

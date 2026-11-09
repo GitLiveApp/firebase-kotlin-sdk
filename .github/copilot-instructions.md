@@ -290,6 +290,8 @@ Tests live in `commonTest` (shared) and platform-specific test source sets. A Fi
 firebase emulators:start
 ```
 
+The Firestore emulator runs in the Enterprise edition (`test/firebase.json`), which the pipeline tests need; use firebase-tools 15.14 or newer.
+
 Run tests per platform:
 
 ```bash

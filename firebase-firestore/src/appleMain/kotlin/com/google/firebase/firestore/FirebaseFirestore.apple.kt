@@ -54,6 +54,8 @@ public actual class FirebaseFirestore internal constructor(public val ios: FIRFi
 
     public actual fun collectionGroup(collectionId: String): Query = Query(ios.collectionGroupWithID(collectionId))
 
+    public actual fun pipeline(): PipelineSource = PipelineSource(this)
+
     public actual fun document(documentPath: String): DocumentReference = DocumentReference(ios.documentWithPath(documentPath))
 
     public actual fun batch(): WriteBatch = WriteBatch(ios.batch())

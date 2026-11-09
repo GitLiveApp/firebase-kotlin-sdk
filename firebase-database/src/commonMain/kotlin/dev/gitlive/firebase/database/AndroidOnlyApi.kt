@@ -7,6 +7,6 @@ package dev.gitlive.firebase.database
 // Deprecation messages of the com.google.firebase.database members that map custom classes with the Android SDK's
 // reflection; kept out of the stripped package, where a constant would be verified against the SDK's own facade.
 
-internal const val REFLECTIVE_WRITE = "setValue maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain values work through it too"
-internal const val REFLECTIVE_UPDATE = "updateChildren maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too"
-internal const val REFLECTIVE_READ = "Maps a custom class with the Android SDK's reflection on Android; com.google.firebase.serialization.getValue<T>() maps it through FirebaseFormat on every platform"
+internal const val REFLECTIVE_WRITE = "setValue maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain value, with kotlinx.serialization on every platform"
+internal const val REFLECTIVE_UPDATE = "updateChildren maps custom classes in the values with the Android SDK's reflection, which only exists on Android; updateData maps @Serializable classes and plain values with kotlinx.serialization on every platform"
+internal const val REFLECTIVE_READ = "Maps the class with the Android SDK's reflection, which only exists on Android; getValue<T>() in com.google.firebase.serialization maps a @Serializable class with kotlinx.serialization on every platform"
