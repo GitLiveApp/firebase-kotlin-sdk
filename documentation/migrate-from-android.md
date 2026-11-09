@@ -17,6 +17,10 @@ SDK and the Firebase JS SDK.
 > `firebase-storage`, `firebase-database` and `firebase-firestore`. The Kotlin-first `dev.gitlive.firebase` API, which the SDK
 > also provides, is described in the [README](../README.md#kotlin-first-design).
 
+> [samples/notes-android](../samples/notes-android) is an Android app written for this migration: its Firebase code is
+> already laid out as the shared module will be, and every line the port changes carries a `// KMP:` comment with its
+> replacement, one for each kind of change described below.
+
 ## Checklist for a migration
 
 Most Firebase code moves to `commonMain` unchanged. Before you start, look for the few things that cannot cross the

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Remote Config defaults as an Android XML resource. KMP: resources are Android-only; the defaults become a map in common
+     code, see NotesSettings. -->
+<defaultsMap>
+    <entry>
+        <key>max_note_length</key>
+        <value>280</value>
+    </entry>
+    <entry>
+        <key>backend_greeting</key>
+        <value>Hello from the defaults</value>
+    </entry>
+</defaultsMap>
