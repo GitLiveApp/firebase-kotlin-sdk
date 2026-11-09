@@ -1,0 +1,47 @@
+# Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
+
+# The bundle result by class is Android-only (the task's result is the progress itself).
+com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class
+
+# Activity-scoped and Executor overloads of the listeners.
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.DocumentReference#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Activity, MetadataChanges, EventListener)  // @platform android.app.Activity
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.Query#addSnapshotListener(Executor, MetadataChanges, EventListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Activity, Runnable)  // @platform android.app.Activity
+com.google.firebase.firestore.FirebaseFirestore#addSnapshotsInSyncListener(Executor, Runnable)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Activity, OnCanceledListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCanceledListener(Executor, OnCanceledListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Activity, OnCompleteListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnCompleteListener(Executor, OnCompleteListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Activity, OnFailureListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnFailureListener(Executor, OnFailureListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Activity, OnProgressListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnProgressListener(Executor, OnProgressListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Activity, OnSuccessListener)  // @platform android.app.Activity
+com.google.firebase.firestore.LoadBundleTask#addOnSuccessListener(Executor, OnSuccessListener)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWith(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#continueWithTask(Executor, Continuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.LoadBundleTask#onSuccessTask(Executor, SuccessContinuation)  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions#getActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions#getExecutor  // @platform java.util.concurrent.Executor
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setActivity  // @platform android.app.Activity
+com.google.firebase.firestore.SnapshotListenOptions$Builder#setExecutor  // @platform java.util.concurrent.Executor
+
+# Library-internal (@RestrictTo) member with no equivalent in the iOS and JS SDKs.
+com.google.firebase.firestore.DocumentReference#getFullPath  // @hide restricted to the Android SDK's own libraries
+
+# The pipeline API's protobuf-typed members (com.google.firestore.v1.Value is the Android SDK's wire type) and the
+# members the SDK compiles as Kotlin-internal (metalava lists them as public, the bytecode mangles them).
+com.google.firebase.firestore.pipeline.AbstractOptions#with(String, NonExistentClass)  // @platform com.google.firestore.v1.Value
+com.google.firebase.firestore.pipeline.Stage#withOption(String, NonExistentClass)  // @platform com.google.firestore.v1.Value
+com.google.firebase.firestore.pipeline.Ordering.Direction#getProto  // @platform com.google.firestore.v1.Value
+com.google.firebase.firestore.pipeline.AliasedExpression#getAlias  // @hide internal in the SDK's bytecode (getAlias$...)
+com.google.firebase.firestore.pipeline.AliasedExpression#getExpr  // @hide internal in the SDK's bytecode (getExpr$...)
+
+# The local pipeline evaluation engine's helpers; one takes a java.time.temporal.ChronoUnit.
+com.google.firebase.firestore.pipeline.evaluation.TimestampKt  // @platform the Android SDK's local evaluation of pipelines, with java.time types

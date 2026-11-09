@@ -10,7 +10,8 @@ import dev.gitlive.firebase.testContext
 
 actual val emulatorHost: String = "localhost"
 
-actual val context: Any = testContext
+// Accessed before the first request of every test class, so the emulator header fix is in place for all of them.
+actual val context: Any = testContext.also { CaseInsensitiveResponseHeaders.install() }
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 actual annotation class IgnoreForAndroidUnitTest

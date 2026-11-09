@@ -21,11 +21,16 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 expect val emulatorHost: String
 expect val context: Any
+
+/** Whether the platform SDK reads inside a transaction synchronously; the JS SDK does not. */
+expect val transactionGetIsSynchronous: Boolean
 
 /** @return a map extracted from the encoded data. */
 expect fun encodedAsMap(encoded: Any?): Map<String, Any?>
@@ -112,6 +117,24 @@ abstract class BaseFirebaseFirestoreTest {
 
 @IgnoreForAndroidUnitTest
 class FirebaseFirestoreTest : BaseFirebaseFirestoreTest() {
+
+    @Test
+    fun testSettingsHost() = runTest {
+        // The host of the wrapper's settings reaches the SDK (a builder property of the same name shadows it inside applyTo).
+        // On its own app: the Android and JVM SDK merges the emulator settings of useEmulator over any host set later.
+        val app = Firebase.initialize(context, firebaseApp.options, "firestoreHostTest${firebaseApp.name}")
+        try {
+            val plain = Firebase.firestore(app)
+            plain.settings = firestoreSettings {
+                host = "firestore.example.test"
+                sslEnabled = false
+            }
+            assertEquals("firestore.example.test", plain.compat.firestoreSettings.host)
+            assertFalse(plain.compat.firestoreSettings.isSslEnabled)
+        } finally {
+            app.delete()
+        }
+    }
 
     @Test
     fun testMultiple() = runTest {

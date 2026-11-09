@@ -4,13 +4,16 @@
 
 package com.google.firebase.storage
 
-import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
+import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
 
 /**
  * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
- * [android.net.Uri] (the firebase-app stand-in off Android): a `file:` URL, or a path on Apple platforms.
+ * [android.net.Uri] (the firebase-app stand-in off Android): a `file:` URL, or a path on Apple platforms. The members
+ * taking JDK types are declared through the error-deprecated `java.io.File` and `java.io.InputStream` stand-ins, pointing
+ * common code at the kotlinx-io `getFile(Path)` and `putStream(RawSource)` extensions (see `StorageSources.kt`).
  */
 public expect class StorageReference : Comparable<StorageReference> {
     /** The uploads to this reference that have not completed. */
@@ -69,6 +72,16 @@ public expect class StorageReference : Comparable<StorageReference> {
     /** Uploads [bytes] to this reference with [metadata]. */
     public fun putBytes(bytes: ByteArray, metadata: StorageMetadata): UploadTask
 
+    /** Android/JVM only: uploads a `java.io.InputStream`; common code uploads a kotlinx-io source through `putStream(RawSource)`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public fun putStream(stream: java.io.InputStream): UploadTask
+
+    /** Android/JVM only: uploads a `java.io.InputStream` with [metadata]; common code uses `putStream(RawSource, StorageMetadata)`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource(), metadata)", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
+    public fun putStream(stream: java.io.InputStream, metadata: StorageMetadata): UploadTask
+
     /** Updates the object's mutable metadata (the settable fields of [metadata]). */
     public fun updateMetadata(metadata: StorageMetadata): Task<StorageMetadata>
 
@@ -81,9 +94,9 @@ public expect class StorageReference : Comparable<StorageReference> {
     /** Downloads the object to the file at [destinationUri]. Fails on JS, whose SDK has no file downloads. */
     public fun getFile(destinationUri: Uri): FileDownloadTask
 
-    /** Downloads the object to [destinationFile]; Android and JVM only, common code uses [getFile] with a [Uri]. */
+    /** Android/JVM only: downloads to a `java.io.File`; common code downloads to a kotlinx-io `Path` through `getFile(Path)`, or to a [Uri]. */
     @Suppress("DEPRECATION_ERROR")
-    @Deprecated(GET_FILE_JVM_ONLY, level = DeprecationLevel.ERROR)
+    @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public fun getFile(destinationFile: java.io.File): FileDownloadTask
 
     /** The downloads from this reference that have not completed; always empty on JS. */

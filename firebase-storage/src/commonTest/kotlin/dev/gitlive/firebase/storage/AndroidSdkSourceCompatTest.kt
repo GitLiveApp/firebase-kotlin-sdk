@@ -30,6 +30,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.google.firebase.storage.putStream
+import kotlinx.io.Buffer
 
 /**
  * Exercises the `com.google.firebase.storage` layer exactly as Android app code would (the static accessors, the
@@ -126,6 +128,20 @@ class AndroidSdkSourceCompatTest {
     }
 
     @Test
+    fun testPutStream() = runTest {
+        val ref = storage.getReference("test").child("compatStream.txt")
+        val source = Buffer().apply { write("streamed".encodeToByteArray()) }
+        val uploaded: UploadTask.TaskSnapshot = ref.putStream(source, storageMetadata { contentType = "text/plain" }).await()
+        assertEquals(8, uploaded.bytesTransferred)
+        assertEquals("text/plain", uploaded.metadata?.contentType)
+        assertEquals("streamed", ref.getBytes(1024).await().decodeToString())
+
+        val plain: UploadTask.TaskSnapshot = ref.putStream(Buffer().apply { write("again".encodeToByteArray()) }).await()
+        assertEquals(5, plain.bytesTransferred)
+        assertEquals("again", ref.getBytes(1024).await().decodeToString())
+    }
+
+    @Test
     fun testTaskStateAndListeners() = runTest {
         val ref = storage.getReference("test/compatTask.bin")
         val task: UploadTask = ref.putBytes(ByteArray(256 * 1024) { it.toByte() })
@@ -149,6 +165,36 @@ class AndroidSdkSourceCompatTest {
         task.addOnCompleteListener { complete.complete(it.isSuccessful) }
         assertTrue(complete.await())
         assertTrue(ref.activeUploadTasks.isEmpty())
+    }
+
+    @Test
+    fun testListenersRegisteredDuringCompletion() = runTest {
+        val ref = storage.getReference("test/compatTaskNested.bin")
+        val task: UploadTask = ref.putBytes(ByteArray(1024))
+        // A listener registered from inside another's terminal callback is told exactly once.
+        val nestedCalls = CompletableDeferred<Int>()
+        var calls = 0
+        task.addOnSuccessListener {
+            task.addOnCompleteListener {
+                calls++
+                nestedCalls.complete(calls)
+            }
+        }
+        task.await()
+        assertEquals(1, nestedCalls.await())
+        assertEquals(1, calls)
+        // Registration after completion replays the terminal event once and never the others; the Android SDK replays
+        // through its executor rather than inline, so the replay is awaited.
+        var failures = 0
+        var cancellations = 0
+        task.addOnFailureListener { failures++ }
+        task.addOnCanceledListener { cancellations++ }
+        val replayed = CompletableDeferred<Long>()
+        task.addOnSuccessListener { replayed.complete(it.totalByteCount) }
+        assertEquals(1024, replayed.await())
+        assertEquals(1, calls)
+        assertEquals(0, failures)
+        assertEquals(0, cancellations)
     }
 
     @Test

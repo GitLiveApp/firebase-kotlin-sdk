@@ -1,11 +1,10 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-storage.
 com.google.firebase.storage.StreamDownloadTask*  // @platform streams to a java.io.InputStream (JVM-only)
 com.google.firebase.storage.StorageReference#getStream  // @platform returns a StreamDownloadTask (java.io.InputStream)
-com.google.firebase.storage.StorageReference#putStream  // @platform java.io.InputStream
-com.google.firebase.storage.StorageReference#putFile(Uri, StorageMetadata, Uri)  // @unavailable the Apple and JS SDKs cannot resume an upload session by its URL
 com.google.firebase.storage.StorageKt#component1(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
 com.google.firebase.storage.StorageKt#component2(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
 com.google.firebase.storage.StorageKt#component3(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream
+com.google.firebase.storage.StorageReference#putFile(Uri, StorageMetadata, Uri)  // @unavailable the Apple and JS SDKs cannot resume an upload session by its URL
 com.google.firebase.storage.StorageException#fromErrorStatus  // @platform com.google.android.gms.common.api.Status
 com.google.firebase.storage.StorageTask#getResult(Class)  // @platform java.lang.Class
 com.google.firebase.storage.StorageTask#syncObject  // @hide a protected lock, not an API

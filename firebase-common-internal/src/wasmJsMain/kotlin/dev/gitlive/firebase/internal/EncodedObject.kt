@@ -13,6 +13,9 @@ import dev.gitlive.firebase.externals.toKotlin
 
 public val EncodedObject.js: JsAny get() = json(*getRaw().entries.map { (key, value) -> key to value }.toTypedArray())
 
+/** The encoded data as the Kotlin map it is, for a layer that converts the values to the JS SDK's itself (a Kotlin value cannot be stored in a JS object). */
+public val EncodedObject.map: Map<String, Any?> get() = getRaw()
+
 @PublishedApi
 internal actual fun Any.asNativeMap(): Map<*, *>? {
     val obj: JsAny = when (this) {

@@ -14,17 +14,17 @@ The following libraries are available for the various Firebase products.
 
 | Service or Product	                                                             | Gradle Dependency                                                                                                              | API Coverage                                                                                                                                                             |
 |---------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/3.0.0-alpha02/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
-| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/3.0.0-alpha02/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
-| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-database/3.0.0-alpha02/pom)           | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
-| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/3.0.0-alpha02/pom)         | [![23%](https://img.shields.io/badge/-23%25-orange?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
-| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/3.0.0-alpha02/pom)         | [![93%](https://img.shields.io/badge/-93%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
-| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/3.0.0-alpha02/pom)         | [![96%](https://img.shields.io/badge/-96%25-green?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
-| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/3.0.0-alpha02/pom)             | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
-| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/3.0.0-alpha02/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
-| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-alpha02/pom)               | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
-| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/3.0.0-alpha02/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
-| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-alpha02`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-alpha02/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
+| [Analytics](https://firebase.google.com/docs/analytics)                         | [`dev.gitlive:firebase-analytics:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-analytics/3.0.0-beta1/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-analytics/src/commonMain/kotlin/dev/gitlive/firebase/analytics/analytics.kt)             |
+| [Authentication](https://firebase.google.com/docs/auth)                         | [`dev.gitlive:firebase-auth:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-auth/3.0.0-beta1/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-auth/src/commonMain/kotlin/dev/gitlive/firebase/auth/auth.kt)                            |
+| [Realtime Database](https://firebase.google.com/docs/database)                  | [`dev.gitlive:firebase-database:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-database/3.0.0-beta1/pom)           | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-database/src/commonMain/kotlin/dev/gitlive/firebase/database/database.kt)               |
+| [Cloud Firestore](https://firebase.google.com/docs/firestore)                   | [`dev.gitlive:firebase-firestore:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-firestore/3.0.0-beta1/pom)         | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt)            |
+| [Cloud Functions](https://firebase.google.com/docs/functions)                   | [`dev.gitlive:firebase-functions:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-functions/3.0.0-beta1/pom)         | [![93%](https://img.shields.io/badge/-93%25-green?style=flat-square)](/firebase-functions/src/commonMain/kotlin/dev/gitlive/firebase/functions/functions.kt)             |
+| [Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)             | [`dev.gitlive:firebase-messaging:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-messaging/3.0.0-beta1/pom)         | [![96%](https://img.shields.io/badge/-96%25-green?style=flat-square)](/firebase-messaging/src/commonMain/kotlin/dev/gitlive/firebase/messaging/messaging.kt)           |
+| [Cloud Storage](https://firebase.google.com/docs/storage)                       | [`dev.gitlive:firebase-storage:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-storage/3.0.0-beta1/pom)             | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-storage/src/commonMain/kotlin/dev/gitlive/firebase/storage/storage.kt)                  |
+| [Installations](https://firebase.google.com/docs/projects/manage-installations) | [`dev.gitlive:firebase-installations:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-installations/3.0.0-beta1/pom) | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-installations/src/commonMain/kotlin/dev/gitlive/firebase/installations/installations.kt) |
+| [Remote Config](https://firebase.google.com/docs/remote-config)                 | [`dev.gitlive:firebase-config:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-config/3.0.0-beta1/pom)               | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-config/src/commonMain/kotlin/dev/gitlive/firebase/remoteconfig/FirebaseRemoteConfig.kt) |
+| [Performance](https://firebase.google.com/docs/perf-mon)                        | [`dev.gitlive:firebase-perf:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-perf/3.0.0-beta1/pom)                   | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-perf/src/commonMain/kotlin/dev/gitlive/firebase/perf/performance.kt)                      |
+| [Crashlytics](https://firebase.google.com/docs/crashlytics)                     | [`dev.gitlive:firebase-crashlytics:3.0.0-beta1`](https://search.maven.org/artifact/dev.gitlive/firebase-crashlytics/3.0.0-beta1/pom)     | [![100%](https://img.shields.io/badge/-100%25-green?style=flat-square)](/firebase-crashlytics/src/commonMain/kotlin/dev/gitlive/firebase/crashlytics/crashlytics.kt)       |
 
 Is the Firebase library or API you need missing? [Create an issue](https://github.com/GitLiveApp/firebase-kotlin-sdk/issues/new?labels=API+coverage&template=increase-api-coverage.md&title=Add+%5Bclass+name%5D.%5Bfunction+name%5D+to+%5Blibrary+name%5D+for+%5Bplatform+names%5D) to request additional API coverage or be awesome and [submit a PR](https://github.com/GitLiveApp/firebase-kotlin-sdk/fork)
 
@@ -128,8 +128,10 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 ```
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
-`firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging`, `firebase-storage` and `firebase-database`;
-the other modules are migrated one by one. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
+`firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging`, `firebase-storage`, `firebase-database` and `firebase-firestore`;
+the other modules are migrated one by one. The Firestore pipeline API (`FirebaseFirestore.pipeline()` and the `com.google.firebase.firestore.pipeline`
+expressions, stages and options) is included, over the iOS SDK's pipeline bridge on Apple and the `firebase/firestore/pipelines` entry
+point on JS and wasmJs. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
 Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
 from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array), so
 `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
@@ -138,15 +140,18 @@ from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array)
 session ID and analytics data reset do nothing, as the JS SDK has no equivalent, and carry `@UnsupportedOnJs`. For a step-by-step walkthrough of moving Android SDK code
 into a shared module, including the compiler-guided replacement of the Android-only members, see
 [Migrating from the Firebase Android SDK](documentation/migrate-from-android.md). Custom classes are mapped by
-`com.google.firebase.serialization.FirebaseFormat` on every platform, Android included: a model class needs `@Serializable`,
-and the format applies the Android SDK's Realtime Database rules (the number handling, and the format's own
-`@IgnoreExtraProperties` and `@ThrowOnExtraProperties` in `com.google.firebase.serialization`) through the class's serializer,
-with kotlinx.serialization's `@SerialName` and `@Transient` naming and excluding properties. The Android SDK's reflective
-members (`setValue(Any?)`, `updateChildren(Map)`, `MutableData.value`'s setter and the reified `getValue<T>()` and `values<T>()`
-in common code, `getValue(Class)` and `getValue(GenericTypeIndicator)` on Android) are deprecated with an error towards the
-`setData`/`updateData` extensions and the reified `getValue<T>()` and `values<T>()` of `com.google.firebase.serialization`, which
-plain values and maps work through too (`setData` maps the value with its static type, so a generic class maps as well) (the reads keep the SDK's names but need that import: in the SDK's own package a call
-resolves to the SDK's reflective extension on Android). The SDK's mapping annotations are deprecated towards the ones the format
+`com.google.firebase.serialization.FirebaseFormat` on every platform, Android included: a model class needs `@Serializable`
+(and, for Cloud Firestore, `@Contextual` on `Timestamp`, `GeoPoint`, `VectorValue`, `DocumentReference` and `Blob` properties), and the format
+applies the Android SDK's Realtime Database or Cloud Firestore rules (the number handling, and the format's own `@ServerTimestamp`,
+`@DocumentId`, `@IgnoreExtraProperties` and `@ThrowOnExtraProperties` in `com.google.firebase.serialization`) through the class's
+serializer, with kotlinx.serialization's `@SerialName` and `@Transient` naming and excluding properties. The Android SDK's
+reflective members (`setValue(Any?)`, `updateChildren(Map)` and `MutableData.value`'s setter on the database, `set(Any)`,
+`update(Map)` and `add(Any)` on Firestore, the reified `getValue<T>()`, `values<T>()`, `toObject<T>()`, `toObjects<T>()`,
+`getField<T>()` and `dataObjects<T>()` in common code, and the `Class`- and `GenericTypeIndicator`-taking reads on Android) are
+deprecated with an error towards the `setData`/`updateData`/`addData` extensions and the reified reads of the same names in
+`com.google.firebase.serialization`, which plain values and maps work through too; `setData` maps the value with its static type,
+so a generic class maps as well, and the reads keep the SDK's names but need that import, as in the SDK's own package a call
+resolves to the SDK's reflective extension on Android. The SDK's mapping annotations are deprecated towards the ones the format
 reads (`@PropertyName` and `@Exclude` towards `@SerialName` and `@Transient`), as kotlinx.serialization cannot record the SDK's
 own annotation classes on Android. The stored name is the property's serial name: a property the Android SDK stored under its
 getter name (`isActive` as `active`) names it with `@SerialName("active")`.
@@ -523,6 +528,8 @@ To run the tests you can use the following gradle tasks:
 For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
 
 `firebase emulators:start`
+
+The Firestore emulator is configured in the Enterprise edition, which the pipeline tests need; that takes firebase-tools 15.14 or newer.
 
 ### Documentation
 For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
