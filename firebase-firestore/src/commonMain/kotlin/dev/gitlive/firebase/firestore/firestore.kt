@@ -10,10 +10,7 @@ import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.internal.EncodedObject
 import com.google.firebase.firestore.AggregateSource
-import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SnapshotListenOptions
-import com.google.firebase.firestore.aggregateAverage
-import com.google.firebase.firestore.aggregateSum
 import com.google.firebase.firestore.fieldPathDocumentId
 import com.google.firebase.firestore.fieldPathOf
 import com.google.firebase.firestore.setFirestoreLoggingEnabled
@@ -275,14 +272,14 @@ public open class Query internal constructor(public open val compat: CompatQuery
 
     public fun count(): AggregateQuery = AggregateQuery(compat.count())
 
-    public fun aggregate(aggregateField: com.google.firebase.firestore.AggregateField, vararg aggregateFields: com.google.firebase.firestore.AggregateField): AggregateQuery = AggregateQuery(
+    public fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): AggregateQuery = AggregateQuery(
         compat.aggregate(aggregateField, *aggregateFields),
     )
 
-    public val snapshots: Flow<QuerySnapshot> = snapshots()
+    public val snapshots: Flow<QuerySnapshot> get() = snapshots()
 
     public fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::QuerySnapshot)
-    public fun snapshots(listenOptions: SnapshotListenOptions = SnapshotListenOptions.Builder().build()): Flow<QuerySnapshot> = compat.snapshots(listenOptions).map(::QuerySnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = compat.snapshots(listenOptions).map(::QuerySnapshot)
 
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = QuerySnapshot(compat.get(source.toCompat()).await())
 
@@ -618,7 +615,7 @@ public data class DocumentReference internal constructor(public val compat: Comp
     val parent: CollectionReference get() = CollectionReference(compat.parent)
 
     public fun snapshots(includeMetadataChanges: Boolean): Flow<DocumentSnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::DocumentSnapshot)
-    public fun snapshots(listenOptions: SnapshotListenOptions = SnapshotListenOptions.Builder().build()): Flow<DocumentSnapshot> = compat.snapshots(listenOptions).map(::DocumentSnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = compat.snapshots(listenOptions).map(::DocumentSnapshot)
 
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(compat.collection(collectionPath))
     public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(compat.get(source.toCompat()).await())
