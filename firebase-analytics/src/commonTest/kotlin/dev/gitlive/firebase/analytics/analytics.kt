@@ -9,8 +9,6 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.apps
 import dev.gitlive.firebase.initialize
-import dev.gitlive.firebase.runBlockingTest
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,6 +23,8 @@ class FirebaseAnalyticsTest {
 
     lateinit var analytics: FirebaseAnalytics
 
+    // The app is initialised once and kept: on Android, analytics registers a Firebase Installation on a background thread,
+    // and deleting the app while that runs crashes the test process with "FirebaseApp was deleted".
     @BeforeTest
     fun initializeFirebase() {
         val app = Firebase.apps(context).firstOrNull() ?: Firebase.initialize(
@@ -40,13 +40,6 @@ class FirebaseAnalyticsTest {
         )
 
         analytics = Firebase.analytics(app)
-    }
-
-    @AfterTest
-    fun deinitializeFirebase() = runBlockingTest {
-        Firebase.apps(context).forEach {
-            it.delete()
-        }
     }
 
     @Test
