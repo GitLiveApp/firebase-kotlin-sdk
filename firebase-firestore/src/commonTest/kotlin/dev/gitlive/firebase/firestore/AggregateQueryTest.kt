@@ -91,7 +91,7 @@ open class AggregateQueryTest : BaseFirebaseFirestoreTest() {
             1,
             aggregate[sumTime]?.toInt(),
         )
-        assertEquals(0, aggregate[sumProp]?.toInt())
+        assertNull(aggregate[sumProp])
     }
 
     @Test

@@ -11,6 +11,8 @@ import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.internal.EncodedObject
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.SnapshotListenOptions
+import com.google.firebase.firestore.aggregateAverage
+import com.google.firebase.firestore.aggregateSum
 import com.google.firebase.firestore.fieldPathDocumentId
 import com.google.firebase.firestore.fieldPathOf
 import com.google.firebase.firestore.setFirestoreLoggingEnabled
@@ -390,18 +392,18 @@ public suspend fun Query.getCount(): Long = count().get().count
  * query matches no documents. To combine a sum with other aggregates in one round-trip, use [Query.aggregate]
  * with [AggregateField.sum] instead.
  */
-public suspend fun Query.sum(field: String): Double = aggregateDouble(AggregateField.sum(field)) ?: 0.0
+public suspend fun Query.sum(field: String): Double = aggregateDouble(aggregateSum(field)) ?: 0.0
 
-public suspend fun Query.sum(field: FieldPath): Double = aggregateDouble(AggregateField.sum(field.compat)) ?: 0.0
+public suspend fun Query.sum(field: FieldPath): Double = aggregateDouble(aggregateSum(field.compat)) ?: 0.0
 
 /**
  * Fetches the average of [field] across documents matching this [Query] in a single round-trip, or `null` if
  * the query matches no documents. To combine an average with other aggregates in one round-trip, use
  * [Query.aggregate] with [AggregateField.average] instead.
  */
-public suspend fun Query.average(field: String): Double? = aggregateDouble(AggregateField.average(field))
+public suspend fun Query.average(field: String): Double? = aggregateDouble(aggregateAverage(field))
 
-public suspend fun Query.average(field: FieldPath): Double? = aggregateDouble(AggregateField.average(field.compat))
+public suspend fun Query.average(field: FieldPath): Double? = aggregateDouble(aggregateAverage(field.compat))
 
 private suspend fun Query.aggregateDouble(aggregateField: AggregateField): Double? = aggregate(aggregateField).get().getDouble(aggregateField)
 
