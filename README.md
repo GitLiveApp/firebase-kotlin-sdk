@@ -129,7 +129,9 @@ val token = FirebaseInstallations.getInstance().getToken(false).await().token
 
 So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Timestamp`, exceptions, `Task`, `Task.await()`),
 `firebase-installations`, `firebase-crashlytics`, `firebase-config`, `firebase-functions`, `firebase-analytics`, `firebase-auth`, `firebase-perf`, `firebase-messaging`, `firebase-storage`, `firebase-database` and `firebase-firestore`;
-the other modules are migrated one by one. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
+the other modules are migrated one by one. The Firestore pipeline API (`FirebaseFirestore.pipeline()` and the `com.google.firebase.firestore.pipeline`
+expressions, stages and options) is included, over the iOS SDK's pipeline bridge on Apple and the `firebase/firestore/pipelines` entry
+point on JS and wasmJs. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
 Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
 from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array), so
 `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
@@ -526,6 +528,8 @@ To run the tests you can use the following gradle tasks:
 For some tests you need to have the firebase emulator suite running. After installing them you can run the following command inside the `test` directory:
 
 `firebase emulators:start`
+
+The Firestore emulator is configured in the Enterprise edition, which the pipeline tests need; that takes firebase-tools 15.14 or newer.
 
 ### Documentation
 For every publicly available class or function there needs to be documentation written in the [KDoc syntax](https://kotlinlang.org/docs/kotlin-doc.html).
