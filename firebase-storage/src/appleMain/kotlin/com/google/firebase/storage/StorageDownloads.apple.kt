@@ -15,14 +15,32 @@ import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_async
 
-public actual abstract class FileDownloadTask internal constructor(
-    override val reference: StorageReference,
-    private val ios: FIRStorageDownloadTask,
-) : StorageTask<FileDownloadTask.TaskSnapshot>() {
+/**
+ * Only the snapshot type is declared here: the `Task` members, and the platform hooks that the shared non-JVM [StorageTask]
+ * leaves abstract ([StorageTask.reference], [StorageTask.snapshotWith] and the `control` functions), are implemented by
+ * [FileDownloadTaskImpl]. The metadata compilation of this source set rejects an actual class that implements a member
+ * its expect class inherits as abstract from another source set's actual ("the modalities are different").
+ */
+public actual abstract class FileDownloadTask internal constructor() : StorageTask<FileDownloadTask.TaskSnapshot>() {
+    public actual inner class TaskSnapshot internal constructor(
+        error: Exception?,
+        public actual val bytesTransferred: Long,
+        public actual val totalByteCount: Long,
+    ) : SnapshotBase(error)
+}
+
+/** The [FileDownloadTask] of the iOS SDK. */
+internal class FileDownloadTaskImpl(override val reference: StorageReference, private val ios: FIRStorageDownloadTask) : FileDownloadTask() {
     private var bytesTransferred = 0L
     private var totalByteCount = 0L
 
-    internal fun start() {
+    override val isComplete: Boolean get() = completeState
+    override val isSuccessful: Boolean get() = successState
+    override val isCanceled: Boolean get() = canceledState
+    override val result: TaskSnapshot get() = resultState()
+    override val exception: Exception? get() = exceptionState
+
+    init {
         ActiveTasks.downloads += this
         addOnCompleteListener { ActiveTasks.downloads -= this }
         ios.observeStatus(FIRStorageTaskStatusProgress) { snapshot ->
@@ -72,25 +90,6 @@ public actual abstract class FileDownloadTask internal constructor(
     override fun controlCancel(): Boolean {
         ios.cancel()
         return true
-    }
-
-    public actual inner class TaskSnapshot internal constructor(
-        error: Exception?,
-        public actual val bytesTransferred: Long,
-        public actual val totalByteCount: Long,
-    ) : SnapshotBase(error)
-}
-
-/** The [FileDownloadTask] of the iOS SDK; [FileDownloadTask] itself is abstract, as the expect class leaves the `Task` members inherited. */
-internal class FileDownloadTaskImpl(reference: StorageReference, ios: FIRStorageDownloadTask) : FileDownloadTask(reference, ios) {
-    override val isComplete: Boolean get() = completeState
-    override val isSuccessful: Boolean get() = successState
-    override val isCanceled: Boolean get() = canceledState
-    override val result: TaskSnapshot get() = resultState()
-    override val exception: Exception? get() = exceptionState
-
-    init {
-        start()
     }
 }
 
