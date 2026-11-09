@@ -14,7 +14,6 @@ import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.fieldPathDocumentId
 import com.google.firebase.firestore.fieldPathOf
 import com.google.firebase.firestore.setFirestoreLoggingEnabled
-import com.google.firebase.firestore.snapshots
 import dev.gitlive.firebase.firestore.internal.SetOptions
 import dev.gitlive.firebase.firestore.internal.getAwait
 import dev.gitlive.firebase.firestore.internal.nativeData
@@ -279,7 +278,7 @@ public open class Query internal constructor(public open val compat: CompatQuery
     public val snapshots: Flow<QuerySnapshot> get() = snapshots()
 
     public fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::QuerySnapshot)
-    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = compat.snapshots(listenOptions).map(::QuerySnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = compat.wrapperSnapshots(listenOptions).map(::QuerySnapshot)
 
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = QuerySnapshot(compat.get(source.toCompat()).await())
 
@@ -615,7 +614,7 @@ public data class DocumentReference internal constructor(public val compat: Comp
     val parent: CollectionReference get() = CollectionReference(compat.parent)
 
     public fun snapshots(includeMetadataChanges: Boolean): Flow<DocumentSnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::DocumentSnapshot)
-    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = compat.snapshots(listenOptions).map(::DocumentSnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = compat.wrapperSnapshots(listenOptions).map(::DocumentSnapshot)
 
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(compat.collection(collectionPath))
     public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(compat.get(source.toCompat()).await())

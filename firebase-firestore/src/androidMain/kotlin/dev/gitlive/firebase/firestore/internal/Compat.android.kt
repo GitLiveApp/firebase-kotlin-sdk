@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.Transaction
 import dev.gitlive.firebase.internal.EncodedObject
 import dev.gitlive.firebase.internal.android
@@ -45,3 +46,7 @@ internal actual suspend fun Transaction.getAwait(documentRef: DocumentReference)
 internal actual fun Query.wrapperSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = addSnapshotListener(firestore.callbackExecutor, metadataChanges, listener)
 
 internal actual fun DocumentReference.wrapperSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = addSnapshotListener(firestore.callbackExecutor, metadataChanges, listener)
+
+internal actual fun Query.wrapperSnapshotListener(listenOptions: SnapshotListenOptions, listener: EventListener<QuerySnapshot>): ListenerRegistration = addSnapshotListener(listenOptions, listener)
+
+internal actual fun DocumentReference.wrapperSnapshotListener(listenOptions: SnapshotListenOptions, listener: EventListener<DocumentSnapshot>): ListenerRegistration = addSnapshotListener(listenOptions, listener)

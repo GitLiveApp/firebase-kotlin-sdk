@@ -62,31 +62,9 @@ public fun DocumentReference.snapshots(metadataChanges: MetadataChanges = Metada
     awaitClose { registration.remove() }
 }
 
-public fun DocumentReference.snapshots(listenOptions: SnapshotListenOptions): Flow<DocumentSnapshot> = callbackFlow {
-    val registration = addSnapshotListener(listenOptions) { snapshot, error ->
-        if (error != null) {
-            close(error)
-        } else if (snapshot != null) {
-            trySend(snapshot)
-        }
-    }
-    awaitClose { registration.remove() }
-}
-
 /** The query results and every change to them as a [Flow], which fails if the listener fails. */
 public fun Query.snapshots(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE): Flow<QuerySnapshot> = callbackFlow {
     val registration = addSnapshotListener(metadataChanges) { snapshot, error ->
-        if (error != null) {
-            close(error)
-        } else if (snapshot != null) {
-            trySend(snapshot)
-        }
-    }
-    awaitClose { registration.remove() }
-}
-
-public fun Query.snapshots(listenOptions: SnapshotListenOptions): Flow<QuerySnapshot> = callbackFlow {
-    val registration = addSnapshotListener(listenOptions) { snapshot, error ->
         if (error != null) {
             close(error)
         } else if (snapshot != null) {
