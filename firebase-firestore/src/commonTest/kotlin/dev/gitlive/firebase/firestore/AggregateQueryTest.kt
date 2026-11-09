@@ -1,5 +1,6 @@
 package dev.gitlive.firebase.firestore
 
+import com.google.firebase.firestore.AggregateField
 import dev.gitlive.firebase.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
