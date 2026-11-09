@@ -11,9 +11,8 @@ import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
 
 /**
  * @property js The underlying Firebase JS SDK object.
- * @property database The JS SDK database the snapshot belongs to.
  */
-public actual class DataSnapshot internal constructor(public val js: JsDataSnapshot, public val database: Database) {
+public actual class DataSnapshot internal constructor(public val js: JsDataSnapshot, internal val database: Database) {
     public actual fun exists(): Boolean = rethrow { js.exists() }
     public actual val key: String? get() = js.key
     public actual val ref: DatabaseReference get() = DatabaseReference(js.ref, database)
