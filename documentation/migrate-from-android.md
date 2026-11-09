@@ -34,7 +34,7 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    whose message names the replacement (`Timestamp(Instant)` with a `kotlin.time.Instant`, `getFile(Path)`,
    `putStream(RawSource)`, `setTimeout(Duration)`, and so on), and where the replacement is a drop-in expression the IDE
    quick-fix applies it. Android code in `androidMain` keeps calling them as before.
-3. **Custom classes.** The Android SDK maps your model classes by reflection, which only exists on Android, so the
+3. **Custom classes.** The Android SDK maps your model classes by reflection, which only exists on Android and the JVM, so the
    writes that take one (`set(Any)`, `update(Map)` and `add(Any)` on Firestore, `setValue(Any?)` and
    `updateChildren(Map)` on the database) are deprecated with an error, and the class-taking reads (`toObject(Class)`,
    `toObjects(Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`) are not declared in common code at all,
@@ -256,7 +256,7 @@ One group of members has no multiplatform replacement: the `Parcelable` members 
 ## Custom classes
 
 Firestore and Realtime Database code usually writes and reads model classes. The Android SDK maps them by reflection,
-which only exists on Android, so this repository compiles on Android but not for any other target:
+which only exists on Android and the JVM, so this repository compiles for those two targets but no other:
 
 ```kotlin
 // shared/src/commonMain/kotlin/com/example/BookRepository.kt, moved from the Android app
@@ -279,7 +279,7 @@ class BookRepository(private val firestore: FirebaseFirestore) {
 ```
 
 ```
-e: BookRepository.kt: 'fun set(data: Any): Task<Nothing?>' is deprecated. set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform
+e: BookRepository.kt: 'fun set(data: Any): Task<Nothing?>' is deprecated. set maps a custom class with the Android SDK's reflection, which only exists on Android and the JVM; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform
 e: BookRepository.kt: Unresolved reference 'toObject' on receiver of type 'DocumentSnapshot'.
 e: BookRepository.kt: Unresolved reference 'java' on receiver of type 'KClass<Book>'.
 ```
