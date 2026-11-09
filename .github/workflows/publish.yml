@@ -7,6 +7,11 @@ on:
   release:
     types: [ prereleased, released ]
   workflow_dispatch:
+    inputs:
+      skip:
+        description: 'Modules not to publish, space-separated (e.g. "firebase-analytics firebase-app" to finish a release that stopped part way)'
+        required: false
+        default: ''
 
 env:
   ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPEUSERNAME }}
@@ -31,32 +36,46 @@ jobs:
         with:
           xcode-version: '26.4.1'
       - name: Publish Firebase Analytics
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-analytics ') }}
         run: ./gradlew :firebase-analytics:publish
       - name: Publish Firebase App
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-app ') }}
         run: ./gradlew :firebase-app:publish
       - name: Publish Firebase Auth
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-auth ') }}
         run: ./gradlew :firebase-auth:publish
       - name: Publish Firebase Common
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-common ') }}
         run: ./gradlew :firebase-common:publish
       - name: Publish Firebase Common Internal
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-common-internal ') }}
         run: ./gradlew :firebase-common-internal:publish
       - name: Publish Firebase Config
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-config ') }}
         run: ./gradlew :firebase-config:publish
       - name: Publish Firebase Database
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-database ') }}
         run: ./gradlew :firebase-database:publish
       - name: Publish Firebase Firestore
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-firestore ') }}
         run: ./gradlew :firebase-firestore:publish
       - name: Publish Firebase Functions
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-functions ') }}
         run: ./gradlew :firebase-functions:publish
       - name: Publish Firebase Messaging
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-messaging ') }}
         run: ./gradlew :firebase-messaging:publish
       - name: Publish Firebase Storage
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-storage ') }}
         run: ./gradlew :firebase-storage:publish
       - name: Publish Firebase Installations
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-installations ') }}
         run: ./gradlew :firebase-installations:publish
       - name: Publish Firebase Performance
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-perf ') }}
         run: ./gradlew :firebase-perf:publish
       - name: Publish Firebase Crashlytics
+        if: ${{ !contains(format(' {0} ', inputs.skip), ' firebase-crashlytics ') }}
         run: ./gradlew :firebase-crashlytics:publish
   documentation:
     runs-on: macos-latest
