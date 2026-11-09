@@ -53,11 +53,20 @@ public expect abstract class MultiFactorInfo() {
 
 /** An enrolled phone factor, mirroring `com.google.firebase.auth.PhoneMultiFactorInfo`. */
 public expect class PhoneMultiFactorInfo(uid: String, displayName: String?, enrollmentTimestamp: Long, phoneNumber: String) : MultiFactorInfo {
+    override val displayName: String?
+    override val enrollmentTimestamp: Long
+    override val factorId: String
+    override val uid: String
     public val phoneNumber: String
 }
 
 /** An enrolled TOTP (authenticator app) factor, mirroring `com.google.firebase.auth.TotpMultiFactorInfo`. */
-public expect class TotpMultiFactorInfo : MultiFactorInfo
+public expect class TotpMultiFactorInfo : MultiFactorInfo {
+    override val displayName: String?
+    override val enrollmentTimestamp: Long
+    override val factorId: String
+    override val uid: String
+}
 
 /**
  * A session for enrolling a second factor or signing in with one, mirroring `com.google.firebase.auth.MultiFactorSession`.
@@ -82,7 +91,9 @@ public expect abstract class MultiFactorResolver() {
 }
 
 /** A verified phone factor, mirroring `com.google.firebase.auth.PhoneMultiFactorAssertion`. */
-public expect class PhoneMultiFactorAssertion(credential: PhoneAuthCredential) : MultiFactorAssertion
+public expect class PhoneMultiFactorAssertion(credential: PhoneAuthCredential) : MultiFactorAssertion {
+    override val factorId: String
+}
 
 /** Creates phone factor assertions, mirroring `com.google.firebase.auth.PhoneMultiFactorGenerator`. */
 public expect class PhoneMultiFactorGenerator() {
@@ -95,7 +106,9 @@ public expect class PhoneMultiFactorGenerator() {
 }
 
 /** A verified TOTP factor, mirroring `com.google.firebase.auth.TotpMultiFactorAssertion`. */
-public expect class TotpMultiFactorAssertion : MultiFactorAssertion
+public expect class TotpMultiFactorAssertion : MultiFactorAssertion {
+    override val factorId: String
+}
 
 /** Creates TOTP factor secrets and assertions, mirroring `com.google.firebase.auth.TotpMultiFactorGenerator`. */
 public expect class TotpMultiFactorGenerator {

@@ -157,38 +157,38 @@ public actual abstract class AuthCredential {
 
 @Suppress("DEPRECATION_ERROR")
 public actual class EmailAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
 public actual class FacebookAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
 public actual class GithubAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
 public actual class GoogleAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
 public actual class TwitterAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
 public actual class PhoneAuthCredential private constructor() : AuthCredential() {
-    override val provider: String get() = stub()
-    override val signInMethod: String get() = stub()
+    actual override val provider: String get() = stub()
+    actual override val signInMethod: String get() = stub()
     public actual val smsCode: String? get() = stub()
 }
 
@@ -404,18 +404,18 @@ public actual abstract class MultiFactorInfo actual constructor() {
 }
 
 public actual class PhoneMultiFactorInfo actual constructor(uid: String, displayName: String?, enrollmentTimestamp: Long, phoneNumber: String) : MultiFactorInfo() {
-    override val displayName: String? get() = stub()
-    override val enrollmentTimestamp: Long get() = stub()
-    override val factorId: String get() = stub()
-    override val uid: String get() = stub()
+    actual override val displayName: String? get() = stub()
+    actual override val enrollmentTimestamp: Long get() = stub()
+    actual override val factorId: String get() = stub()
+    actual override val uid: String get() = stub()
     public actual val phoneNumber: String get() = stub()
 }
 
 public actual class TotpMultiFactorInfo private constructor() : MultiFactorInfo() {
-    override val displayName: String? get() = stub()
-    override val enrollmentTimestamp: Long get() = stub()
-    override val factorId: String get() = stub()
-    override val uid: String get() = stub()
+    actual override val displayName: String? get() = stub()
+    actual override val enrollmentTimestamp: Long get() = stub()
+    actual override val factorId: String get() = stub()
+    actual override val uid: String get() = stub()
 }
 
 public actual abstract class MultiFactorSession actual constructor()
@@ -428,7 +428,7 @@ public actual abstract class MultiFactorResolver actual constructor() {
 }
 
 public actual class PhoneMultiFactorAssertion actual constructor(credential: PhoneAuthCredential) : MultiFactorAssertion() {
-    override val factorId: String get() = stub()
+    actual override val factorId: String get() = stub()
 }
 
 public actual class PhoneMultiFactorGenerator actual constructor() {
@@ -442,7 +442,7 @@ public actual class PhoneMultiFactorGenerator actual constructor() {
 }
 
 public actual class TotpMultiFactorAssertion private constructor() : MultiFactorAssertion() {
-    override val factorId: String get() = stub()
+    actual override val factorId: String get() = stub()
 }
 
 public actual class TotpMultiFactorGenerator private constructor() {
