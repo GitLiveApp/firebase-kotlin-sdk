@@ -1,0 +1,247 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.google.firebase.serialization</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-app:dokkaHtmlPartial/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-app:dokkaHtmlPartial/commonMain" data-filter=":firebase-app:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-app::com.google.firebase.serialization////PointingToDeclaration//-449027240">
+  <div class="breadcrumbs"><a href="../index.html">firebase-app</a><span class="delimiter">/</span><span class="current">com.google.firebase.serialization</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1385899037%2FClasslikes%2F-449027240" anchor-label="DocumentId" id="1385899037%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-document-id/index.html"><span>Document</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1385899037%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialInfo///PointingToDeclaration/"><span class="token annotation builtin">SerialInfo</span></span></div><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-document-id/index.html">DocumentId</a></div><div class="brief "><p class="paragraph">Marks a <code class="lang-kotlin">String</code> or <code class="lang-kotlin">DocumentReference</code> property that receives the document id when a Firestore document is mapped to a class.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1567096533%2FClasslikes%2F-449027240" anchor-label="FirebaseFormat" id="1567096533%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-format/index.html"><span>Firebase</span><wbr><span><span>Format</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1567096533%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-firebase-format/index.html">FirebaseFormat</a> : <span data-unresolved-link="kotlinx.serialization/SerialFormat///PointingToDeclaration/">SerialFormat</span></div><div class="brief "><p class="paragraph">The multiplatform counterpart of the class mappers inside the Firebase Android SDK: Firestore's and Realtime Database's <code class="lang-kotlin">CustomClassMapper</code> and Cloud Functions' <code class="lang-kotlin">Serializer</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1302416354%2FClasslikes%2F-449027240" anchor-label="IgnoreExtraProperties" id="-1302416354%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ignore-extra-properties/index.html"><span>Ignore</span><wbr><span>Extra</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1302416354%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialInfo///PointingToDeclaration/"><span class="token annotation builtin">SerialInfo</span></span></div><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-l-a-s-s/index.html">AnnotationTarget.CLASS</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-ignore-extra-properties/index.html">IgnoreExtraProperties</a></div><div class="brief "><p class="paragraph">Makes the mapper ignore properties of the data that the class does not have (they are logged otherwise).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1450080012%2FClasslikes%2F-449027240" anchor-label="PlainValue" id="1450080012%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-plain-value/index.html"><span>Plain</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1450080012%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-plain-value/index.html">PlainValue</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">A value a <a href="-firebase-format/index.html">FirebaseFormat</a> has already converted (the result of <a href="-firebase-format/convert-to-plain-value.html">FirebaseFormat.convertToPlainValue</a> or <a href="-firebase-format/encode-to-plain-value.html">FirebaseFormat.encodeToPlainValue</a>), which the formats pass through as it is: the <code class="lang-kotlin">com.google.firebase</code> layers convert what they are given in one place and hand the result on to platform code that converts whatever it receives, so this marks the values that need no second pass.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="476806396%2FClasslikes%2F-449027240" anchor-label="ServerTimestamp" id="476806396%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-server-timestamp/index.html"><span>Server</span><wbr><span><span>Timestamp</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="476806396%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialInfo///PointingToDeclaration/"><span class="token annotation builtin">SerialInfo</span></span></div><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-server-timestamp/index.html">ServerTimestamp</a></div><div class="brief "><p class="paragraph">Marks a Firestore <code class="lang-kotlin">Timestamp</code> or <code class="lang-kotlin">Instant</code> property written as the server timestamp when it is null.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1963655797%2FClasslikes%2F-449027240" anchor-label="ThrowOnExtraProperties" id="1963655797%2FClasslikes%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-throw-on-extra-properties/index.html"><span>Throw</span><wbr><span>On</span><wbr><span>Extra</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1963655797%2FClasslikes%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialInfo///PointingToDeclaration/"><span class="token annotation builtin">SerialInfo</span></span></div><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-l-a-s-s/index.html">AnnotationTarget.CLASS</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-throw-on-extra-properties/index.html">ThrowOnExtraProperties</a></div><div class="brief "><p class="paragraph">Makes the mapper fail on properties of the data that the class does not have.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-405648771%2FFunctions%2F-449027240" anchor-label="decodeFromPlainValue" id="-405648771%2FFunctions%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="decode-from-plain-value.html"><span>decode</span><wbr><span>From</span><wbr><span>Plain</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-405648771%2FFunctions%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="decode-from-plain-value.html">T</a><span class="token operator">&gt; </span><a href="-firebase-format/index.html">FirebaseFormat</a><span class="token punctuation">.</span><a href="decode-from-plain-value.html"><span class="token function">decodeFromPlainValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">documentReference<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="decode-from-plain-value.html">T</a></div><div class="brief "><p class="paragraph">Decodes plain values to a <code class="lang-kotlin">T</code> with the serializer of its type, where <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a> stands for any plain value.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-53947441%2FFunctions%2F-449027240" anchor-label="encodeToPlainValue" id="-53947441%2FFunctions%2F-449027240" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-app:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-app:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="encode-to-plain-value.html"><span>encode</span><wbr><span>To</span><wbr><span>Plain</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-53947441%2FFunctions%2F-449027240"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-app:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="encode-to-plain-value.html">T</a><span class="token operator">&gt; </span><a href="-firebase-format/index.html">FirebaseFormat</a><span class="token punctuation">.</span><a href="encode-to-plain-value.html"><span class="token function">encodeToPlainValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="encode-to-plain-value.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Encodes <a href="encode-to-plain-value.html">value</a> to plain values with the serializer of its type, where <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a> stands for any plain value.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

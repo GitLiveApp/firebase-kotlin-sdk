@@ -1,0 +1,574 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.google.firebase.database</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/appleMain">apple</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/nonJvmMain">nonJvm</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/androidMain" data-filter=":firebase-database:dokkaHtmlPartial/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/appleMain" data-filter=":firebase-database:dokkaHtmlPartial/appleMain">
+                                <span class="checkbox--icon"></span>
+                                apple
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/commonMain" data-filter=":firebase-database:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/jsMain" data-filter=":firebase-database:dokkaHtmlPartial/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/jvmMain" data-filter=":firebase-database:dokkaHtmlPartial/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-filter=":firebase-database:dokkaHtmlPartial/nonJvmMain">
+                                <span class="checkbox--icon"></span>
+                                nonJvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filter=":firebase-database:dokkaHtmlPartial/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-database::com.google.firebase.database////PointingToDeclaration//-1427099309">
+  <div class="breadcrumbs"><a href="../index.html">firebase-database</a><span class="delimiter">/</span><span class="current">com.google.firebase.database</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1286950462%2FClasslikes%2F1588087876" anchor-label="ChildEvent" id="1286950462%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-child-event/index.html"><span>Child</span><wbr><span><span>Event</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1286950462%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-child-event/index.html">ChildEvent</a></div><div class="brief "><p class="paragraph">A change to a child of a location, emitted by <a href="child-events.html">Query.childEvents</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-696934678%2FClasslikes%2F1588087876" anchor-label="ChildEventListener" id="-696934678%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-child-event-listener/index.html"><span>Child</span><wbr><span>Event</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-696934678%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-child-event-listener/index.html">ChildEventListener</a></div><div class="brief "><p class="paragraph">Receives the changes to the children of a location; see <a href="-query/add-child-event-listener.html">Query.addChildEventListener</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1287070599%2FClasslikes%2F-28351544" anchor-label="DatabaseError" id="-1287070599%2FClasslikes%2F-28351544" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-database-error/index.html"><span>Database</span><wbr><span><span>Error</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1287070599%2FClasslikes%2F-28351544"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-database-error/index.html">DatabaseError</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-database-error/index.html">DatabaseError</a></div><div class="brief "><p class="paragraph">A failed operation or cancelled listener, as the Android SDK's <code class="lang-kotlin">DatabaseError</code>; <a href="-database-error/code.html">code</a> is one of the constants.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-database-error/index.html">DatabaseError</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-database-error/index.html">DatabaseError</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2117237742%2FClasslikes%2F-28351544" anchor-label="DatabaseException" id="-2117237742%2FClasslikes%2F-28351544" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-database-exception/index.html"><span>Database</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2117237742%2FClasslikes%2F-28351544"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-exception/index.html">DatabaseException</a> : <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html">RuntimeException</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-exception/index.html">DatabaseException</a></div><div class="brief "><p class="paragraph">Thrown when an operation on the database fails, as the Android SDK's <code class="lang-kotlin">DatabaseException</code>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-exception/index.html">DatabaseException</a> : <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html">RuntimeException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-exception/index.html">DatabaseException</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1732749462%2FClasslikes%2F1092867387" anchor-label="DatabaseReference" id="1732749462%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-database-reference/index.html"><span>Database</span><wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1732749462%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div><div class="brief "><p class="paragraph">A location in the database that can be read and written, as the Android SDK's <code class="lang-kotlin">DatabaseReference</code>. Values are the platform's natural types: <code class="lang-kotlin">Map</code>, <code class="lang-kotlin">List</code>, <code class="lang-kotlin">String</code>, <code class="lang-kotlin">Boolean</code>, <code class="lang-kotlin">Long</code> and <code class="lang-kotlin">Double</code> (and the platform SDK's own types on Apple platforms and JS). A <code class="lang-kotlin">@Serializable</code> class is written with the setData and updateData extensions, which map it through <code class="lang-kotlin">FirebaseFormat.Database</code> on every platform; the SDK's <code class="lang-kotlin">setValue</code> and <code class="lang-kotlin">updateChildren</code>, which map a class by reflection on Android, are deprecated with an error towards them.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-database-reference/index.html">DatabaseReference</a> : <a href="-query/index.html">Query</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1892963534%2FClasslikes%2F1092867387" anchor-label="DataSnapshot" id="1892963534%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-data-snapshot/index.html"><span>Data</span><wbr><span><span>Snapshot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1892963534%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div><div class="brief "><p class="paragraph">An immutable copy of the data at a location, as the Android SDK's <code class="lang-kotlin">DataSnapshot</code>. <code class="lang-kotlin">value</code> is the natural type of the data: a <code class="lang-kotlin">Map</code>, a <code class="lang-kotlin">List</code>, a <code class="lang-kotlin">String</code>, a <code class="lang-kotlin">Boolean</code>, a <code class="lang-kotlin">Long</code>, a <code class="lang-kotlin">Double</code> or null. A custom class is read with the reified <code class="lang-kotlin">getValue&lt;T&gt;()</code> extension, which maps a <code class="lang-kotlin">@Serializable</code> class with the Android SDK's rules on every platform; the SDK's reflective <code class="lang-kotlin">getValue(Class)</code> and <code class="lang-kotlin">getValue(GenericTypeIndicator)</code> are deprecated with an error on Android.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-data-snapshot/index.html">DataSnapshot</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1723733940%2FClasslikes%2F1588087876" anchor-label="Exclude" id="-1723733940%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-exclude/index.html"><span><span>Exclude</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1723733940%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-i-e-l-d/index.html">AnnotationTarget.FIELD</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y_-g-e-t-t-e-r/index.html">AnnotationTarget.PROPERTY_GETTER</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y_-s-e-t-t-e-r/index.html">AnnotationTarget.PROPERTY_SETTER</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-exclude/index.html"><strike>Exclude</strike></a></div><div class="brief "><p class="paragraph">The SDK's exclusion annotation; <span data-unresolved-link="kotlinx.serialization/Transient///PointingToDeclaration/">kotlinx.serialization.Transient</span> excludes a property on every platform.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1979632454%2FClasslikes%2F1092867387" anchor-label="FirebaseDatabase" id="-1979632454%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-database/index.html"><span>Firebase</span><wbr><span><span>Database</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1979632454%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "><p class="paragraph">The entry point of the Realtime Database, as the Android SDK's <code class="lang-kotlin">com.google.firebase.database.FirebaseDatabase</code>. Persistence settings are accepted on every platform (the JS SDK has no disk persistence, so they are ignored there).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2077714434%2FClasslikes%2F1588087876" anchor-label="GenericTypeIndicator" id="-2077714434%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-generic-type-indicator/index.html"><span>Generic</span><wbr><span>Type</span><wbr><span><span>Indicator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2077714434%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-generic-type-indicator/index.html">GenericTypeIndicator</a><span class="token operator">&lt;</span><a href="-generic-type-indicator/index.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The Android SDK's <code class="lang-kotlin">GenericTypeIndicator</code>, kept so that its <code class="lang-kotlin">getValue(GenericTypeIndicator)</code> members compile (they are deprecated with an error towards the reified <code class="lang-kotlin">getValue&lt;T&gt;()</code>, which maps through the format on every platform).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1911635989%2FClasslikes%2F1588087876" anchor-label="IgnoreExtraProperties" id="1911635989%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ignore-extra-properties/index.html"><span>Ignore</span><wbr><span>Extra</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1911635989%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-l-a-s-s/index.html">AnnotationTarget.CLASS</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-ignore-extra-properties/index.html"><strike>IgnoreExtraProperties</strike></a></div><div class="brief "><p class="paragraph">The SDK's annotation; com.google.firebase.serialization.IgnoreExtraProperties is read on every platform.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2077462860%2FClasslikes%2F1588087876" anchor-label="Logger" id="2077462860%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-logger/index.html"><span><span>Logger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2077462860%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-logger/index.html">Logger</a></div><div class="brief "><p class="paragraph">The logging of the Realtime Database, as the Android SDK's <code class="lang-kotlin">Logger</code>; <a href="-logger/-level/index.html">Level</a> is passed to <a href="-firebase-database/set-log-level.html">FirebaseDatabase.setLogLevel</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1524764554%2FClasslikes%2F1092867387" anchor-label="MutableData" id="-1524764554%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-mutable-data/index.html"><span>Mutable</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1524764554%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div><div class="brief "><p class="paragraph">The data of a location inside a transaction, as the Android SDK's <code class="lang-kotlin">MutableData</code>: <a href="-mutable-data/value.html">value</a> is read and then set to the new data before the <a href="-transaction/-handler/index.html">Transaction.Handler</a> returns <a href="-transaction/-companion/success.html">Transaction.success</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div><div class="brief "><p class="paragraph">The data of a transaction as a JS value tree: the JS SDK's transaction receives the current value and returns the new one, so <a href="../../firebase-database/com.google.firebase.database/-mutable-data/root.html">root</a> holds the value being edited and each child refers to a path in it. A node with a priority is held in the SDK's <code class="lang-kotlin">{ ".value": data, ".priority": priority }</code> form, which every operation looks through. The tree is read and written through own properties only, so that a path such as <code class="lang-kotlin">__proto__</code> cannot reach the prototype chain.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-mutable-data/index.html">MutableData</a></div><div class="brief "><p class="paragraph">The data of a transaction as a JS value tree: the JS SDK's transaction receives the current value and returns the new one, so <a href="../../firebase-database/com.google.firebase.database/-mutable-data/root.html">root</a> holds the value being edited and each child refers to a path in it. A node with a priority is held in the SDK's <code class="lang-kotlin">{ ".value": data, ".priority": priority }</code> form, which every operation looks through. The tree is read and written through own properties only, so that a path such as <code class="lang-kotlin">__proto__</code> cannot reach the prototype chain.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2079228639%2FClasslikes%2F1092867387" anchor-label="OnDisconnect" id="-2079228639%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on-disconnect/index.html"><span>On</span><wbr><span><span>Disconnect</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2079228639%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div><div class="brief "><p class="paragraph">Writes the server applies when this client disconnects, as the Android SDK's <code class="lang-kotlin">OnDisconnect</code>; obtained from <a href="-database-reference/on-disconnect.html">DatabaseReference.onDisconnect</a>. Each operation completes once the server has registered it.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-on-disconnect/index.html">OnDisconnect</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="405380764%2FClasslikes%2F1588087876" anchor-label="PropertyName" id="405380764%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-property-name/index.html"><span>Property</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="405380764%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-i-e-l-d/index.html">AnnotationTarget.FIELD</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y_-g-e-t-t-e-r/index.html">AnnotationTarget.PROPERTY_GETTER</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y_-s-e-t-t-e-r/index.html">AnnotationTarget.PROPERTY_SETTER</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-property-name/index.html"><strike>PropertyName</strike></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The SDK's property name annotation; <span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/">kotlinx.serialization.SerialName</span> names a property on every platform.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1740612002%2FClasslikes%2F1092867387" anchor-label="Query" id="-1740612002%2FClasslikes%2F1092867387" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/appleMain,:firebase-database:dokkaHtmlPartial/jsMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-query/index.html"><span><span>Query</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1740612002%2FClasslikes%2F1092867387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/appleMain" data-toggle=":firebase-database:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jsMain" data-toggle=":firebase-database:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-database:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div><div class="brief "><p class="paragraph">A read of a location with ordering and filtering, as the Android SDK's <code class="lang-kotlin">Query</code>. Listeners are called on the thread the platform SDK delivers events on. <code class="lang-kotlin">keepSynced</code> is in nonJsMain (the JS SDK has no equivalent).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-query/index.html">Query</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="489037368%2FClasslikes%2F-28351544" anchor-label="ServerValue" id="489037368%2FClasslikes%2F-28351544" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-server-value/index.html"><span>Server</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="489037368%2FClasslikes%2F-28351544"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-server-value/index.html">ServerValue</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-server-value/index.html">ServerValue</a></div><div class="brief "><p class="paragraph">Values the server computes on write, as the Android SDK's <code class="lang-kotlin">ServerValue</code>; each is written like any other value.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-server-value/index.html">ServerValue</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-server-value/index.html">ServerValue</a></div><div class="brief "><p class="paragraph">The server values as the <code class="lang-kotlin">.sv</code> maps the platform SDKs and the backend understand.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1479936674%2FClasslikes%2F1588087876" anchor-label="ThrowOnExtraProperties" id="-1479936674%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-throw-on-extra-properties/index.html"><span>Throw</span><wbr><span>On</span><wbr><span>Extra</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1479936674%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-l-a-s-s/index.html">AnnotationTarget.CLASS</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-throw-on-extra-properties/index.html"><strike>ThrowOnExtraProperties</strike></a></div><div class="brief "><p class="paragraph">The SDK's annotation; com.google.firebase.serialization.ThrowOnExtraProperties is read on every platform.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-608666296%2FClasslikes%2F-28351544" anchor-label="Transaction" id="-608666296%2FClasslikes%2F-28351544" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain,:firebase-database:dokkaHtmlPartial/androidMain,:firebase-database:dokkaHtmlPartial/jvmMain,:firebase-database:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transaction/index.html"><span><span>Transaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-608666296%2FClasslikes%2F-28351544"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-database:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain" data-toggle=":firebase-database:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-database:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-transaction/index.html">Transaction</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-transaction/index.html">Transaction</a></div><div class="brief "><p class="paragraph">A transaction on a location, as the Android SDK's <code class="lang-kotlin">Transaction</code>: <a href="-transaction/-handler/do-transaction.html">Handler.doTransaction</a> returns <a href="-transaction/-companion/success.html">success</a> or <a href="-transaction/-companion/abort.html">abort</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-transaction/index.html">Transaction</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-database:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-transaction/index.html">Transaction</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="628839295%2FClasslikes%2F1588087876" anchor-label="ValueEventListener" id="628839295%2FClasslikes%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-value-event-listener/index.html"><span>Value</span><wbr><span>Event</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="628839295%2FClasslikes%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-value-event-listener/index.html">ValueEventListener</a></div><div class="brief "><p class="paragraph">Receives the data at a location and its changes; see <a href="-query/add-value-event-listener.html">Query.addValueEventListener</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-680268586%2FProperties%2F1588087876" anchor-label="childEvents" id="-680268586%2FProperties%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="child-events.html"><span>child</span><wbr><span><span>Events</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-680268586%2FProperties%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-query/index.html">Query</a><span class="token punctuation">.</span><a href="child-events.html">childEvents</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="-child-event/index.html">ChildEvent</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The changes to the children of this location as a <span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span>, which fails if the listener is cancelled.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1964351229%2FProperties%2F1588087876" anchor-label="database" id="1964351229%2FProperties%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="database.html"><span><span>database</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1964351229%2FProperties%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="database.html">database</a><span class="token operator">: </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-database/index.html">FirebaseDatabase</a> of the default FirebaseApp; the Android SDK's <code class="lang-kotlin">Firebase.database</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1668447548%2FProperties%2F1588087876" anchor-label="snapshots" id="1668447548%2FProperties%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="snapshots.html"><span><span>snapshots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1668447548%2FProperties%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-query/index.html">Query</a><span class="token punctuation">.</span><a href="snapshots.html">snapshots</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="-data-snapshot/index.html">DataSnapshot</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The data at this location and every change to it as a <span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span>, which fails if the listener is cancelled.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-136945546%2FFunctions%2F1588087876" anchor-label="database" id="-136945546%2FFunctions%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="database.html"><span><span>database</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-136945546%2FFunctions%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="database.html"><span class="token function">database</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-database/index.html">FirebaseDatabase</a> of <a href="database.html">app</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="database.html"><span class="token function">database</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-database/index.html">FirebaseDatabase</a> of the default FirebaseApp at <a href="database.html">url</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="database.html"><span class="token function">database</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-database/index.html">FirebaseDatabase</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-database/index.html">FirebaseDatabase</a> of <a href="database.html">app</a> at <a href="database.html">url</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="879730106%2FFunctions%2F1588087876" anchor-label="getValue" id="879730106%2FFunctions%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-value.html"><span>get</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="879730106%2FFunctions%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-value.html">T</a><span class="token operator">&gt; </span><a href="-data-snapshot/index.html">DataSnapshot</a><span class="token punctuation">.</span><a href="get-value.html"><span class="token function"><strike>getValue</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-value.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The SDK's reified <code class="lang-kotlin">getValue</code>, which maps a class by reflection on Android: deprecated with an error towards <a href="../com.google.firebase.serialization/get-value.html">com.google.firebase.serialization.getValue</a>, which maps through <code class="lang-kotlin">FirebaseFormat.Database</code> on every platform (see DatabaseMapping.kt for why it lives in that package).</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-value.html">T</a><span class="token operator">&gt; </span><a href="-mutable-data/index.html">MutableData</a><span class="token punctuation">.</span><a href="get-value.html"><span class="token function"><strike>getValue</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-value.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The SDK's reified <code class="lang-kotlin">getValue</code> (see <a href="-data-snapshot/get-value.html">DataSnapshot.getValue</a>); deprecated towards <a href="../com.google.firebase.serialization/get-value.html">com.google.firebase.serialization.getValue</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="565349173%2FFunctions%2F1588087876" anchor-label="values" id="565349173%2FFunctions%2F1588087876" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-database:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-database:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="values.html"><span><span>values</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="565349173%2FFunctions%2F1588087876"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-database:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="values.html">T</a><span class="token operator">&gt; </span><a href="-query/index.html">Query</a><span class="token punctuation">.</span><a href="values.html"><span class="token function"><strike>values</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="values.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The SDK's <code class="lang-kotlin">values</code> flow (see <a href="-data-snapshot/get-value.html">DataSnapshot.getValue</a>); deprecated towards <a href="../com.google.firebase.serialization/values.html">com.google.firebase.serialization.values</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

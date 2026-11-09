@@ -1,0 +1,584 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Notification</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filter=":firebase-messaging:dokkaHtmlPartial/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filter=":firebase-messaging:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filter=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+                                <span class="checkbox--icon"></span>
+                                nonAndroid
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="firebase-messaging::com.google.firebase.messaging/RemoteMessage.Notification///PointingToDeclaration//-1135662619">
+  <div class="breadcrumbs"><a href="../../../index.html">firebase-messaging</a><span class="delimiter">/</span><a href="../../index.html">com.google.firebase.messaging</a><span class="delimiter">/</span><a href="../index.html">RemoteMessage</a><span class="delimiter">/</span><span class="current">Notification</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Notification</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">Notification</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-messaging/src/androidMain/kotlin/com/google/firebase/messaging/FirebaseMessaging.android.kt#L68">source</a>)</span></span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="index.html">Notification</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-messaging/src/commonMain/kotlin/com/google/firebase/messaging/RemoteMessage.kt#L82">source</a>)</span></span></div><p class="paragraph">The notification payload of a message, as the Android SDK's <code class="lang-kotlin">RemoteMessage.Notification</code>; <a href="image-url.html">imageUrl</a> and <a href="link.html">link</a> are Uris (the firebase-app stand-in off Android).</p></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">Notification</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-messaging/src/nonAndroidMain/kotlin/com/google/firebase/messaging/RemoteMessage.nonAndroid.kt#L78">source</a>)</span></span></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="264502510%2FProperties%2F-1135662619" anchor-label="body" id="264502510%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="body.html"><span><span>body</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="264502510%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body.html">body</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="body.html">body</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The body text.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body.html">body</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1476593784%2FProperties%2F-1135662619" anchor-label="bodyLocalizationArgs" id="1476593784%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="body-localization-args.html"><span>body</span><wbr><span>Localization</span><wbr><span><span>Args</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1476593784%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body-localization-args.html">bodyLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="body-localization-args.html">bodyLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The arguments of the localized body.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body-localization-args.html">bodyLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="54586438%2FProperties%2F-1135662619" anchor-label="bodyLocalizationKey" id="54586438%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="body-localization-key.html"><span>body</span><wbr><span>Localization</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="54586438%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body-localization-key.html">bodyLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="body-localization-key.html">bodyLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key of the localized body in the app's string resources.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="body-localization-key.html">bodyLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1206445900%2FProperties%2F-1135662619" anchor-label="channelId" id="1206445900%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="channel-id.html"><span>channel</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1206445900%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="channel-id.html">channelId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="channel-id.html">channelId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The Android notification channel.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="channel-id.html">channelId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-546579540%2FProperties%2F-1135662619" anchor-label="clickAction" id="-546579540%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="click-action.html"><span>click</span><wbr><span><span>Action</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-546579540%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="click-action.html">clickAction</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="click-action.html">clickAction</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The action taken when the notification is tapped.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="click-action.html">clickAction</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1907903609%2FProperties%2F-1135662619" anchor-label="color" id="-1907903609%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="color.html"><span><span>color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1907903609%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="color.html">color</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="color.html">color</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The notification colour, as <code class="lang-kotlin">#rrggbb</code>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="color.html">color</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-712218952%2FProperties%2F-1135662619" anchor-label="defaultLightSettings" id="-712218952%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-light-settings.html"><span>default</span><wbr><span>Light</span><wbr><span><span>Settings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-712218952%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-light-settings.html">defaultLightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="default-light-settings.html">defaultLightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the default light settings are used.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-light-settings.html">defaultLightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="995305922%2FProperties%2F-1135662619" anchor-label="defaultSound" id="995305922%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-sound.html"><span>default</span><wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="995305922%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-sound.html">defaultSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="default-sound.html">defaultSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the default sound is used.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-sound.html">defaultSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-621406081%2FProperties%2F-1135662619" anchor-label="defaultVibrateSettings" id="-621406081%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-vibrate-settings.html"><span>default</span><wbr><span>Vibrate</span><wbr><span><span>Settings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-621406081%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-vibrate-settings.html">defaultVibrateSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="default-vibrate-settings.html">defaultVibrateSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the default vibration settings are used.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="default-vibrate-settings.html">defaultVibrateSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1228941411%2FProperties%2F-1135662619" anchor-label="eventTime" id="1228941411%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="event-time.html"><span>event</span><wbr><span><span>Time</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1228941411%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="event-time.html">eventTime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="event-time.html">eventTime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The event time, in milliseconds since the epoch.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="event-time.html">eventTime</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1229720055%2FProperties%2F-1135662619" anchor-label="icon" id="1229720055%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="icon.html"><span><span>icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1229720055%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="icon.html">icon</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="icon.html">icon</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The icon resource name.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="icon.html">icon</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-939632836%2FProperties%2F-1135662619" anchor-label="imageUrl" id="-939632836%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="image-url.html"><span>image</span><wbr><span><span>Url</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-939632836%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="image-url.html">imageUrl</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="image-url.html">imageUrl</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The URL of the notification image, if any.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="image-url.html">imageUrl</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="425633617%2FProperties%2F-1135662619" anchor-label="lightSettings" id="425633617%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="light-settings.html"><span>light</span><wbr><span><span>Settings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="425633617%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="light-settings.html">lightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="light-settings.html">lightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The LED colour, on and off durations.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="light-settings.html">lightSettings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="725932438%2FProperties%2F-1135662619" anchor-label="link" id="725932438%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="link.html"><span><span>link</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="725932438%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="link.html">link</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="link.html">link</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The link opened when the notification is tapped, if any.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="link.html">link</a><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="802125107%2FProperties%2F-1135662619" anchor-label="localOnly" id="802125107%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="local-only.html"><span>local</span><wbr><span><span>Only</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="802125107%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="local-only.html">localOnly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="local-only.html">localOnly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the notification is local to the device.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="local-only.html">localOnly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-27777114%2FProperties%2F-1135662619" anchor-label="notificationCount" id="-27777114%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notification-count.html"><span>notification</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-27777114%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="notification-count.html">notificationCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="notification-count.html">notificationCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The number of items the notification represents.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="notification-count.html">notificationCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-14230143%2FProperties%2F-1135662619" anchor-label="notificationPriority" id="-14230143%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="notification-priority.html"><span>notification</span><wbr><span><span>Priority</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-14230143%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="notification-priority.html">notificationPriority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="notification-priority.html">notificationPriority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The Android notification priority.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="notification-priority.html">notificationPriority</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1120398501%2FProperties%2F-1135662619" anchor-label="sound" id="-1120398501%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sound.html"><span><span>sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1120398501%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="sound.html">sound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="sound.html">sound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The sound resource name.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="sound.html">sound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1642448441%2FProperties%2F-1135662619" anchor-label="sticky" id="-1642448441%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sticky.html"><span><span>sticky</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1642448441%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="sticky.html">sticky</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="sticky.html">sticky</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the notification persists when tapped.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="sticky.html">sticky</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="978194032%2FProperties%2F-1135662619" anchor-label="tag" id="978194032%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tag.html"><span><span>tag</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="978194032%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="tag.html">tag</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="tag.html">tag</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The notification tag.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="tag.html">tag</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-714549306%2FProperties%2F-1135662619" anchor-label="ticker" id="-714549306%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ticker.html"><span><span>ticker</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-714549306%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="ticker.html">ticker</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="ticker.html">ticker</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The ticker text.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="ticker.html">ticker</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1684770354%2FProperties%2F-1135662619" anchor-label="title" id="1684770354%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title.html"><span><span>title</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1684770354%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The title.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="579310012%2FProperties%2F-1135662619" anchor-label="titleLocalizationArgs" id="579310012%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title-localization-args.html"><span>title</span><wbr><span>Localization</span><wbr><span><span>Args</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="579310012%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title-localization-args.html">titleLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="title-localization-args.html">titleLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The arguments of the localized title.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title-localization-args.html">titleLocalizationArgs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1965304450%2FProperties%2F-1135662619" anchor-label="titleLocalizationKey" id="1965304450%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title-localization-key.html"><span>title</span><wbr><span>Localization</span><wbr><span><span>Key</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1965304450%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title-localization-key.html">titleLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="title-localization-key.html">titleLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The key of the localized title in the app's string resources.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="title-localization-key.html">titleLocalizationKey</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-552387370%2FProperties%2F-1135662619" anchor-label="vibrateTimings" id="-552387370%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="vibrate-timings.html"><span>vibrate</span><wbr><span><span>Timings</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-552387370%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="vibrate-timings.html">vibrateTimings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="vibrate-timings.html">vibrateTimings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The vibration pattern.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="vibrate-timings.html">vibrateTimings</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-468560066%2FProperties%2F-1135662619" anchor-label="visibility" id="-468560066%2FProperties%2F-1135662619" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain,:firebase-messaging:dokkaHtmlPartial/androidMain,:firebase-messaging:dokkaHtmlPartial/nonAndroidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="visibility.html"><span><span>visibility</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-468560066%2FProperties%2F-1135662619"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-messaging:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/commonMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-filterable-set=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain" data-toggle=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain">nonAndroid</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="visibility.html">visibility</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-messaging:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">val </span><a href="visibility.html">visibility</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The Android notification visibility.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-messaging:dokkaHtmlPartial/nonAndroidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="visibility.html">visibility</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

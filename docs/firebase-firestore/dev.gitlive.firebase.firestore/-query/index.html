@@ -41,14 +41,11 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.8.0
+        <div class="library-version" id="library-version">3.0.0-beta1
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/appleMain">apple</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button>
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -57,32 +54,11 @@
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
-                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filter=":firebase-firestore:dokkaHtmlPartial/androidMain">
-                                <span class="checkbox--icon"></span>
-                                android
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/appleMain" data-filter=":firebase-firestore:dokkaHtmlPartial/appleMain">
-                                <span class="checkbox--icon"></span>
-                                apple
-                            </label>
-                        </li>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">
                                 <span class="checkbox--icon"></span>
                                 common
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filter=":firebase-firestore:dokkaHtmlPartial/jvmMain">
-                                <span class="checkbox--icon"></span>
-                                jvm
                             </label>
                         </li>
                 </ul>
@@ -119,7 +95,7 @@
   <div class="breadcrumbs"><a href="../../index.html">firebase-firestore</a><span class="delimiter">/</span><a href="../index.html">dev.gitlive.firebase.firestore</a><span class="delimiter">/</span><span class="current">Query</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Query</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">Query</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L249">source</a>)</span></span></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-collection-reference/index.html">CollectionReference</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">Query</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/commonMain/kotlin/dev/gitlive/firebase/firestore/firestore.kt#L264">source</a>)</span></span></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-collection-reference/index.html">CollectionReference</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
@@ -145,36 +121,17 @@
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-1155280734%2FProperties%2F-308253016" anchor-label="android" id="-1155280734%2FProperties%2F-308253016" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain,:firebase-firestore:dokkaHtmlPartial/jvmMain">
+        <div class="table"><a data-name="1344039794%2FProperties%2F-1515737202" anchor-label="compat" id="1344039794%2FProperties%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="../android.html"><span><span>android</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1155280734%2FProperties%2F-308253016"></span>
+                  <div><a href="compat.html"><span><span>compat</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1344039794%2FProperties%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-firestore:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html">Query</a><span class="token punctuation">.</span><a href="../android.html">android</a><span class="token operator">: </span><span data-unresolved-link="com.google.firebase.firestore/Query///PointingToDeclaration/">Query</span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-firestore:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html">Query</a><span class="token punctuation">.</span><a href="../android.html">android</a><span class="token operator">: </span><span data-unresolved-link="com.google.firebase.firestore/Query///PointingToDeclaration/">Query</span></div></div>                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-412319164%2FProperties%2F-1146671152" anchor-label="ios" id="-412319164%2FProperties%2F-1146671152" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/appleMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/appleMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="../ios.html"><span><span>ios</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-412319164%2FProperties%2F-1146671152"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/appleMain" data-active="" data-toggle=":firebase-firestore:dokkaHtmlPartial/appleMain">apple</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-731290133%2FMain%2F-1146671152">Query</a><span class="token punctuation">.</span><a href="../ios.html">ios</a><span class="token operator">: </span><a href="../../../firebase-firestore/dev.gitlive.firebase.firestore/-native-query/index.html">NativeQuery</a></div></div>                  </div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="compat.html">compat</a><span class="token operator">: </span><a href="../../com.google.firebase.firestore/-query/index.html">Query</a></div><div class="brief "><p class="paragraph">The Android-SDK-shaped <a href="../../com.google.firebase.firestore/-query/index.html">com.google.firebase.firestore.Query</a> this wraps.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -228,17 +185,17 @@
               </div>
             </div>
           </div>
-<a data-name="517840366%2FFunctions%2F-1515737202" anchor-label="endAt" id="517840366%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+<a data-name="-842746078%2FFunctions%2F-1515737202" anchor-label="endAt" id="-842746078%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="end-at.html"><span>end</span><wbr><span><span>At</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="517840366%2FFunctions%2F-1515737202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-842746078%2FFunctions%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function">endAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function"><strike>endAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function"><strike>endAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><a href="../../../firebase-app/dev.gitlive.firebase/-encode-settings/-builder/index.html">EncodeSettings.Builder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function">endAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function"><strike>endAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-at.html"><span class="token function"><strike>endAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -258,17 +215,17 @@
               </div>
             </div>
           </div>
-<a data-name="-1359434542%2FFunctions%2F-1515737202" anchor-label="endBefore" id="-1359434542%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+<a data-name="-2019560490%2FFunctions%2F-1515737202" anchor-label="endBefore" id="-2019560490%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="end-before.html"><span>end</span><wbr><span><span>Before</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1359434542%2FFunctions%2F-1515737202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2019560490%2FFunctions%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function">endBefore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function"><strike>endBefore</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function"><strike>endBefore</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><a href="../../../firebase-app/dev.gitlive.firebase/-encode-settings/-builder/index.html">EncodeSettings.Builder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function">endBefore</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function"><strike>endBefore</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="end-before.html"><span class="token function"><strike>endBefore</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -288,6 +245,21 @@
               </div>
             </div>
           </div>
+<a data-name="-705014003%2FFunctions%2F-1515737202" anchor-label="equals" id="-705014003%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-705014003%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="-1864476138%2FFunctions%2F-1515737202" anchor-label="get" id="-1864476138%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
@@ -299,6 +271,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">source<span class="token operator">: </span><a href="../-source/index.html">Source</a><span class="token operator"> = </span>Source.DEFAULT</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-query-snapshot/index.html">QuerySnapshot</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-543015111%2FFunctions%2F-1515737202" anchor-label="hashCode" id="-543015111%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-543015111%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -333,12 +320,12 @@
               </div>
             </div>
           </div>
-<a data-name="1518863884%2FFunctions%2F-1515737202" anchor-label="orderBy" id="1518863884%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+<a data-name="-1519138414%2FFunctions%2F-1515737202" anchor-label="orderBy" id="-1519138414%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="order-by.html"><span>order</span><wbr><span><span>By</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1518863884%2FFunctions%2F-1515737202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1519138414%2FFunctions%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -363,17 +350,17 @@
               </div>
             </div>
           </div>
-<a data-name="1213832808%2FFunctions%2F-1515737202" anchor-label="startAfter" id="1213832808%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+<a data-name="-1464322244%2FFunctions%2F-1515737202" anchor-label="startAfter" id="-1464322244%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="start-after.html"><span>start</span><wbr><span><span>After</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1213832808%2FFunctions%2F-1515737202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1464322244%2FFunctions%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function">startAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function"><strike>startAfter</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function"><strike>startAfter</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><a href="../../../firebase-app/dev.gitlive.firebase/-encode-settings/-builder/index.html">EncodeSettings.Builder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function">startAfter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function"><strike>startAfter</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-after.html"><span class="token function"><strike>startAfter</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -393,17 +380,17 @@
               </div>
             </div>
           </div>
-<a data-name="269843075%2FFunctions%2F-1515737202" anchor-label="startAt" id="269843075%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+<a data-name="77851867%2FFunctions%2F-1515737202" anchor-label="startAt" id="77851867%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="start-at.html"><span>start</span><wbr><span><span>At</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="269843075%2FFunctions%2F-1515737202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="77851867%2FFunctions%2F-1515737202"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function">startAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function"><strike>startAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function"><strike>startAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><a href="../../../firebase-app/dev.gitlive.firebase/-encode-settings/-builder/index.html">EncodeSettings.Builder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function">startAt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">document<span class="token operator">: </span><a href="../-document-snapshot/index.html">DocumentSnapshot</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function"><strike>startAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="start-at.html"><span class="token function"><strike>startAt</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>fieldValues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">buildSettings<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Query</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -434,6 +421,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sum.html"><span class="token function">sum</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="../-field-path/index.html">FieldPath</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="sum.html"><span class="token function">sum</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-721181176%2FFunctions%2F-1515737202" anchor-label="toString" id="-721181176%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-721181176%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>

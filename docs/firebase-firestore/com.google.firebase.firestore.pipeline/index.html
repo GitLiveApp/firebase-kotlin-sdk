@@ -1,0 +1,543 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.google.firebase.firestore.pipeline</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-firestore::com.google.firebase.firestore.pipeline////PointingToDeclaration//-1515737202">
+  <div class="breadcrumbs"><a href="../index.html">firebase-firestore</a><span class="delimiter">/</span><span class="current">com.google.firebase.firestore.pipeline</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-1494681088%2FClasslikes%2F-1515737202" anchor-label="AbstractOptions" id="-1494681088%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-abstract-options/index.html"><span>Abstract</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1494681088%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-abstract-options/index.html">T</a><span class="token operator"> : </span><a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-abstract-options/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A set of options of the pipeline API, built by the <code class="lang-kotlin">with</code> functions; <a href="-abstract-options/index.html">T</a> is the concrete options class, which they return.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-822305531%2FClasslikes%2F-1515737202" anchor-label="AggregateFunction" id="-822305531%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aggregate-function/index.html"><span>Aggregate</span><wbr><span><span>Function</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-822305531%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aggregate-function/index.html">AggregateFunction</a></div><div class="brief "><p class="paragraph">An accumulator for <code class="lang-kotlin">aggregate</code> stages: a function name and its arguments, as the Android SDK's <code class="lang-kotlin">AggregateFunction</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-422795079%2FClasslikes%2F-1515737202" anchor-label="AggregateHints" id="-422795079%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aggregate-hints/index.html"><span>Aggregate</span><wbr><span><span>Hints</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-422795079%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aggregate-hints/index.html">AggregateHints</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-aggregate-hints/index.html">AggregateHints</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Hints for an <code class="lang-kotlin">aggregate</code> stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1929379879%2FClasslikes%2F-1515737202" anchor-label="AggregateOptions" id="1929379879%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aggregate-options/index.html"><span>Aggregate</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1929379879%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aggregate-options/index.html">AggregateOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-aggregate-options/index.html">AggregateOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of an <code class="lang-kotlin">aggregate</code> stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1997083847%2FClasslikes%2F-1515737202" anchor-label="AggregateStage" id="1997083847%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aggregate-stage/index.html"><span>Aggregate</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1997083847%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aggregate-stage/index.html">AggregateStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-aggregate-stage/index.html">AggregateStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Groups the documents by <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-aggregate-stage/groups.html">groups</a> and computes <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-aggregate-stage/accumulators.html">accumulators</a> over each group.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="333392278%2FClasslikes%2F-1515737202" anchor-label="AliasedAggregate" id="333392278%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aliased-aggregate/index.html"><span>Aliased</span><wbr><span><span>Aggregate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="333392278%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aliased-aggregate/index.html">AliasedAggregate</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">alias<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">aggregate<span class="token operator">: </span><a href="-aggregate-function/index.html">AggregateFunction</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An <a href="-aggregate-function/index.html">AggregateFunction</a> whose result is named in an <code class="lang-kotlin">aggregate</code> stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1156299477%2FClasslikes%2F-1515737202" anchor-label="AliasedExpression" id="1156299477%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-aliased-expression/index.html"><span>Aliased</span><wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1156299477%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-aliased-expression/index.html">AliasedExpression</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">alias<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">expr<span class="token operator">: </span><a href="-expression/index.html">Expression</a></span></span><span class="token punctuation">)</span> : <a href="-selectable/index.html">Selectable</a></div><div class="brief "><p class="paragraph">An <a href="-expression/index.html">Expression</a> selected under an alias.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1992029444%2FClasslikes%2F-1515737202" anchor-label="BooleanExpression" id="-1992029444%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-boolean-expression/index.html"><span>Boolean</span><wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1992029444%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-boolean-expression/index.html">BooleanExpression</a> : <a href="-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">An <a href="-expression/index.html">Expression</a> evaluating to a boolean, usable as a filter in <code class="lang-kotlin">where</code> stages and in conditions.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1488979671%2FClasslikes%2F-1515737202" anchor-label="CollectionGroupOptions" id="-1488979671%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-group-options/index.html"><span>Collection</span><wbr><span>Group</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1488979671%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-collection-group-options/index.html">CollectionGroupOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-collection-group-options/index.html">CollectionGroupOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of a collection group source stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1680555040%2FClasslikes%2F-1515737202" anchor-label="CollectionGroupSource" id="-1680555040%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-group-source/index.html"><span>Collection</span><wbr><span>Group</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1680555040%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-collection-group-source/index.html">CollectionGroupSource</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-collection-group-source/index.html">CollectionGroupSource</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">All documents of the collections named <a href="-collection-group-source/collection-id.html">collectionId</a>, anywhere in the database.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-157195378%2FClasslikes%2F-1515737202" anchor-label="CollectionHints" id="-157195378%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-hints/index.html"><span>Collection</span><wbr><span><span>Hints</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157195378%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-collection-hints/index.html">CollectionHints</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-collection-hints/index.html">CollectionHints</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Hints for a collection or collection group source stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1398506733%2FClasslikes%2F-1515737202" anchor-label="CollectionSource" id="1398506733%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-source/index.html"><span>Collection</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1398506733%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-collection-source/index.html">CollectionSource</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-collection-source/index.html">CollectionSource</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">All documents of a collection.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-878975177%2FClasslikes%2F-1515737202" anchor-label="CollectionSourceOptions" id="-878975177%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-source-options/index.html"><span>Collection</span><wbr><span>Source</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-878975177%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-collection-source-options/index.html">CollectionSourceOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-collection-source-options/index.html">CollectionSourceOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of a collection source stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1679796402%2FClasslikes%2F-1515737202" anchor-label="Expression" id="-1679796402%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-expression/index.html"><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1679796402%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">An expression of the Firestore pipeline API: a field, a constant or a function of other expressions, built here and sent to the backend as part of a stage. Mirrors the Firebase Android SDK's <code class="lang-kotlin">Expression</code>, whose static functions are the companion's.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="124095650%2FClasslikes%2F-1515737202" anchor-label="Field" id="124095650%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-field/index.html"><span><span>Field</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="124095650%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-field/index.html">Field</a> : <a href="-selectable/index.html">Selectable</a></div><div class="brief "><p class="paragraph">A document field.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1039195763%2FClasslikes%2F-1515737202" anchor-label="FindNearestOptions" id="-1039195763%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-find-nearest-options/index.html"><span>Find</span><wbr><span>Nearest</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1039195763%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-find-nearest-options/index.html">FindNearestOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-find-nearest-options/index.html">FindNearestOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of a <code class="lang-kotlin">findNearest</code> stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="975001517%2FClasslikes%2F-1515737202" anchor-label="FindNearestStage" id="975001517%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-find-nearest-stage/index.html"><span>Find</span><wbr><span>Nearest</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="975001517%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-find-nearest-stage/index.html">FindNearestStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-find-nearest-stage/index.html">FindNearestStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">The documents whose <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-find-nearest-stage/vector-field.html">vectorField</a> is nearest to <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-find-nearest-stage/vector-value.html">vectorValue</a> by <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-find-nearest-stage/distance-measure.html">distanceMeasure</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1599203498%2FClasslikes%2F-1515737202" anchor-label="FunctionExpression" id="-1599203498%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-function-expression/index.html"><span>Function</span><wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1599203498%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-function-expression/index.html">FunctionExpression</a> : <a href="-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">A function applied to <a href="../../firebase-firestore/com.google.firebase.firestore.pipeline/-function-expression/params.html">params</a>, named as the backend knows it.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1017820974%2FClasslikes%2F-1515737202" anchor-label="Ordering" id="-1017820974%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ordering/index.html"><span><span>Ordering</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1017820974%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-ordering/index.html">Ordering</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>expr<span class="token operator">: </span><a href="-expression/index.html">Expression</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dir<span class="token operator">: </span><a href="-ordering/-direction/index.html">Ordering.Direction</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An ordering of a <code class="lang-kotlin">sort</code> stage: <a href="-ordering/expr.html">expr</a> in <a href="-ordering/dir.html">dir</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-407440816%2FClasslikes%2F-1515737202" anchor-label="RawOptions" id="-407440816%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-raw-options/index.html"><span>Raw</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-407440816%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-raw-options/index.html">RawOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-raw-options/index.html">RawOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options with no predefined keys, for <code class="lang-kotlin">with</code> on any options class.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-369590992%2FClasslikes%2F-1515737202" anchor-label="RawStage" id="-369590992%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-raw-stage/index.html"><span>Raw</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-369590992%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-raw-stage/index.html">RawStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-raw-stage/index.html">RawStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A stage the SDK has no class for, by name and arguments.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1255561432%2FClasslikes%2F-1515737202" anchor-label="SampleStage" id="-1255561432%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sample-stage/index.html"><span>Sample</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1255561432%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-sample-stage/index.html">SampleStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-sample-stage/index.html">SampleStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A random sample of the documents: a number of them, or a percentage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-473495898%2FClasslikes%2F-1515737202" anchor-label="SearchStage" id="-473495898%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-search-stage/index.html"><span>Search</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-473495898%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-search-stage/index.html">SearchStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-search-stage/index.html">SearchStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A search over the documents, in preview.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1836830544%2FClasslikes%2F-1515737202" anchor-label="Selectable" id="1836830544%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-selectable/index.html"><span><span>Selectable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1836830544%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-selectable/index.html">Selectable</a> : <a href="-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">An expression that can be given an alias in <code class="lang-kotlin">select</code>, <code class="lang-kotlin">addFields</code> and similar stages.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-157747426%2FClasslikes%2F-1515737202" anchor-label="Stage" id="-157747426%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-stage/index.html"><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157747426%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-stage/index.html">T</a><span class="token operator"> : </span><a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-stage/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A stage of a Pipeline; <a href="-stage/index.html">T</a> is the concrete stage, which the <code class="lang-kotlin">withOption</code> functions return.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="174781603%2FClasslikes%2F-1515737202" anchor-label="SubcollectionSource" id="174781603%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-subcollection-source/index.html"><span>Subcollection</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="174781603%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-subcollection-source/index.html">SubcollectionSource</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-subcollection-source/index.html">SubcollectionSource</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">The documents of a subcollection of each document of the enclosing pipeline, for <code class="lang-kotlin">union</code> and <code class="lang-kotlin">unnest</code> sub-pipelines.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2115907313%2FClasslikes%2F-1515737202" anchor-label="UnnestOptions" id="-2115907313%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-unnest-options/index.html"><span>Unnest</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2115907313%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-unnest-options/index.html">UnnestOptions</a> : <a href="-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-unnest-options/index.html">UnnestOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of an <code class="lang-kotlin">unnest</code> stage.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1636171857%2FClasslikes%2F-1515737202" anchor-label="UnnestStage" id="-1636171857%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-unnest-stage/index.html"><span>Unnest</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1636171857%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-unnest-stage/index.html">UnnestStage</a> : <a href="-stage/index.html">Stage</a><span class="token operator">&lt;</span><a href="-unnest-stage/index.html">UnnestStage</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Replaces each document by one per element of an array field, the element under alias.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

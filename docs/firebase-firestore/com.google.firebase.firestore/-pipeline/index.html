@@ -1,0 +1,458 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Pipeline</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filter=":firebase-firestore:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="firebase-firestore::com.google.firebase.firestore/Pipeline///PointingToDeclaration//-1515737202">
+  <div class="breadcrumbs"><a href="../../index.html">firebase-firestore</a><span class="delimiter">/</span><a href="../index.html">com.google.firebase.firestore</a><span class="delimiter">/</span><span class="current">Pipeline</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Pipeline</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Pipeline</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/GitLiveApp/firebase-kotlin-sdk/tree/master/firebase-firestore/src/commonMain/kotlin/com/google/firebase/firestore/Pipeline.kt#L65">source</a>)</span></span></div><p class="paragraph">A sequence of stages that transforms a set of documents; built from a <a href="../-pipeline-source/index.html">PipelineSource</a> and run with <a href="execute.html">execute</a>.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1720174687%2FClasslikes%2F-1515737202" anchor-label="ExecuteOptions" id="1720174687%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-execute-options/index.html"><span>Execute</span><wbr><span><span>Options</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1720174687%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-execute-options/index.html">ExecuteOptions</a> : <a href="../../com.google.firebase.firestore.pipeline/-abstract-options/index.html">AbstractOptions</a><span class="token operator">&lt;</span><a href="-execute-options/index.html">Pipeline.ExecuteOptions</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Options of <a href="execute.html">execute</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1476891228%2FClasslikes%2F-1515737202" anchor-label="Snapshot" id="-1476891228%2FClasslikes%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-snapshot/index.html"><span><span>Snapshot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1476891228%2FClasslikes%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-snapshot/index.html">Snapshot</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>executionTime<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>results<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pipeline-result/index.html">PipelineResult</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../-pipeline-result/index.html">PipelineResult</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">The results of an execution, in order.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-501837684%2FFunctions%2F-1515737202" anchor-label="addFields" id="-501837684%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-fields.html"><span>add</span><wbr><span><span>Fields</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-501837684%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="add-fields.html"><span class="token function">addFields</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalFields<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-784821739%2FFunctions%2F-1515737202" anchor-label="aggregate" id="-784821739%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="aggregate.html"><span><span>aggregate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-784821739%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="aggregate.html"><span class="token function">aggregate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">aggregateStage<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aggregate-stage/index.html">AggregateStage</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="aggregate.html"><span class="token function">aggregate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">aggregateStage<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aggregate-stage/index.html">AggregateStage</a><span class="token punctuation">, </span></span><span class="parameter ">options<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aggregate-options/index.html">AggregateOptions</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="aggregate.html"><span class="token function">aggregate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">accumulator<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aliased-aggregate/index.html">AliasedAggregate</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalAccumulators<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aliased-aggregate/index.html">AliasedAggregate</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1226100403%2FFunctions%2F-1515737202" anchor-label="define" id="1226100403%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="define.html"><span><span>define</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1226100403%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="define.html"><span class="token function">define</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">aliasedExpression<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aliased-expression/index.html">AliasedExpression</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalExpressions<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-aliased-expression/index.html">AliasedExpression</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1351706556%2FFunctions%2F-1515737202" anchor-label="distinct" id="1351706556%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="distinct.html"><span><span>distinct</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1351706556%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="distinct.html"><span class="token function">distinct</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">group<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalGroups<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="distinct.html"><span class="token function">distinct</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">groupField<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalGroups<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1468242397%2FFunctions%2F-1515737202" anchor-label="execute" id="-1468242397%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="execute.html"><span><span>execute</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1468242397%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="execute.html"><span class="token function">execute</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><a href="-snapshot/index.html">Pipeline.Snapshot</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs the pipeline and completes with its results.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="execute.html"><span class="token function">execute</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">options<span class="token operator">: </span><a href="-execute-options/index.html">Pipeline.ExecuteOptions</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&lt;</span><a href="-snapshot/index.html">Pipeline.Snapshot</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs the pipeline with <a href="execute.html">options</a> and completes with its results.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-42845856%2FFunctions%2F-1515737202" anchor-label="findNearest" id="-42845856%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="find-nearest.html"><span>find</span><wbr><span><span>Nearest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-42845856%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="find-nearest.html"><span class="token function">findNearest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">vectorField<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-field/index.html">Field</a><span class="token punctuation">, </span></span><span class="parameter ">vectorValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double-array/index.html">DoubleArray</a><span class="token punctuation">, </span></span><span class="parameter ">distanceMeasure<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-find-nearest-stage/-distance-measure/index.html">FindNearestStage.DistanceMeasure</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="find-nearest.html"><span class="token function">findNearest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">vectorField<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">vectorValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double-array/index.html">DoubleArray</a><span class="token punctuation">, </span></span><span class="parameter ">distanceMeasure<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-find-nearest-stage/-distance-measure/index.html">FindNearestStage.DistanceMeasure</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="find-nearest.html"><span class="token function">findNearest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">vectorField<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">vectorValue<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-expression/index.html">Expression</a><span class="token punctuation">, </span></span><span class="parameter ">distanceMeasure<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-find-nearest-stage/-distance-measure/index.html">FindNearestStage.DistanceMeasure</a><span class="token punctuation">, </span></span><span class="parameter ">options<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-find-nearest-options/index.html">FindNearestOptions</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-71202358%2FFunctions%2F-1515737202" anchor-label="limit" id="-71202358%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="limit.html"><span><span>limit</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-71202358%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="limit.html"><span class="token function">limit</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">limit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1442126178%2FFunctions%2F-1515737202" anchor-label="offset" id="-1442126178%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="offset.html"><span><span>offset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1442126178%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="offset.html"><span class="token function">offset</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offset<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-825059387%2FFunctions%2F-1515737202" anchor-label="rawStage" id="-825059387%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="raw-stage.html"><span>raw</span><wbr><span><span>Stage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-825059387%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="raw-stage.html"><span class="token function">rawStage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rawStage<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-raw-stage/index.html">RawStage</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="622638580%2FFunctions%2F-1515737202" anchor-label="removeFields" id="622638580%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-fields.html"><span>remove</span><wbr><span><span>Fields</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="622638580%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="remove-fields.html"><span class="token function">removeFields</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-field/index.html">Field</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalFields<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-field/index.html">Field</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="remove-fields.html"><span class="token function">removeFields</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalFields<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1618966434%2FFunctions%2F-1515737202" anchor-label="replaceWith" id="-1618966434%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="replace-with.html"><span>replace</span><wbr><span><span>With</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1618966434%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="replace-with.html"><span class="token function">replaceWith</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">mapValue<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-expression/index.html">Expression</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="replace-with.html"><span class="token function">replaceWith</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">field<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="638284442%2FFunctions%2F-1515737202" anchor-label="sample" id="638284442%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sample.html"><span><span>sample</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="638284442%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="sample.html"><span class="token function">sample</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sample<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-sample-stage/index.html">SampleStage</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="sample.html"><span class="token function">sample</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">documents<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-628779777%2FFunctions%2F-1515737202" anchor-label="search" id="-628779777%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="search.html"><span><span>search</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-628779777%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="search.html"><span class="token function">search</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">searchStage<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-search-stage/index.html">SearchStage</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="832915708%2FFunctions%2F-1515737202" anchor-label="select" id="832915708%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="select.html"><span><span>select</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="832915708%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="select.html"><span class="token function">select</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">selection<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalSelections<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="select.html"><span class="token function">select</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fieldName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalSelections<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1716349564%2FFunctions%2F-1515737202" anchor-label="sort" id="-1716349564%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sort.html"><span><span>sort</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1716349564%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="sort.html"><span class="token function">sort</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">order<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-ordering/index.html">Ordering</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>additionalOrders<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-ordering/index.html">Ordering</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-436699535%2FFunctions%2F-1515737202" anchor-label="toArrayExpression" id="-436699535%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-array-expression.html"><span>to</span><wbr><span>Array</span><wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-436699535%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="to-array-expression.html"><span class="token function">toArrayExpression</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">This pipeline's results as an array, for use in an enclosing pipeline's expression.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-906644012%2FFunctions%2F-1515737202" anchor-label="toScalarExpression" id="-906644012%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-scalar-expression.html"><span>to</span><wbr><span>Scalar</span><wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-906644012%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="to-scalar-expression.html"><span class="token function">toScalarExpression</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-expression/index.html">Expression</a></div><div class="brief "><p class="paragraph">This pipeline's single result, for use in an enclosing pipeline's expression.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1150974804%2FFunctions%2F-1515737202" anchor-label="union" id="1150974804%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="union.html"><span><span>union</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1150974804%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="union.html"><span class="token function">union</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Pipeline</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-840353744%2FFunctions%2F-1515737202" anchor-label="unnest" id="-840353744%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="unnest.html"><span><span>unnest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-840353744%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="unnest.html"><span class="token function">unnest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">arrayWithAlias<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="unnest.html"><span class="token function">unnest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">unnestStage<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-unnest-stage/index.html">UnnestStage</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="unnest.html"><span class="token function">unnest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">arrayWithAlias<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-selectable/index.html">Selectable</a><span class="token punctuation">, </span></span><span class="parameter ">options<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-unnest-options/index.html">UnnestOptions</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="unnest.html"><span class="token function">unnest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">arrayField<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">alias<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1106491146%2FFunctions%2F-1515737202" anchor-label="where" id="1106491146%2FFunctions%2F-1515737202" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-firestore:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-firestore:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="where.html"><span><span>where</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1106491146%2FFunctions%2F-1515737202"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-firestore:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="where.html"><span class="token function">where</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">condition<span class="token operator">: </span><a href="../../com.google.firebase.firestore.pipeline/-boolean-expression/index.html">BooleanExpression</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Pipeline</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

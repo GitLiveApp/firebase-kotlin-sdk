@@ -1,0 +1,546 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>com.google.firebase.storage</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Firebase Kotlin SDK
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.0.0-beta1
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/androidMain">android</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/appleMain">apple</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/jsMain">js</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":firebase-storage:dokkaHtmlPartial/wasmJsMain">wasmJs</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/androidMain" data-filter=":firebase-storage:dokkaHtmlPartial/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/appleMain" data-filter=":firebase-storage:dokkaHtmlPartial/appleMain">
+                                <span class="checkbox--icon"></span>
+                                apple
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/commonMain" data-filter=":firebase-storage:dokkaHtmlPartial/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/jsMain" data-filter=":firebase-storage:dokkaHtmlPartial/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filter=":firebase-storage:dokkaHtmlPartial/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filter=":firebase-storage:dokkaHtmlPartial/nonJvmMain">
+                                <span class="checkbox--icon"></span>
+                                nonJvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filter=":firebase-storage:dokkaHtmlPartial/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+                <a class="navigation-controls--btn navigation-controls--btn_homepage" id="homepage-link" href="https://github.com/GitLiveApp/firebase-kotlin-sdk"></a>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Firebase Kotlin SDK
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="package" id="content" pageids="firebase-storage::com.google.firebase.storage////PointingToDeclaration//-100760187">
+  <div class="breadcrumbs"><a href="../index.html">firebase-storage</a><span class="delimiter">/</span><span class="current">com.google.firebase.storage</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="-2054077517%2FClasslikes%2F-2021679728" anchor-label="CancellableTask" id="-2054077517%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cancellable-task/index.html"><span>Cancellable</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2054077517%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="../../firebase-app/com.google.android.gms.tasks/-task/index.html">Task</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A Task that can be cancelled and reports progress, as the Android SDK's <code class="lang-kotlin">CancellableTask</code>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="../../firebase-app/com.google.android.gms.tasks/-task/index.html">Task</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-cancellable-task/index.html">StateT</a><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-526825200%2FClasslikes%2F-2021679728" anchor-label="ControllableTask" id="-526825200%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-controllable-task/index.html"><span>Controllable</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-526825200%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A <a href="-cancellable-task/index.html">CancellableTask</a> that can also be paused and resumed, as the Android SDK's <code class="lang-kotlin">ControllableTask</code>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt;</span> : <a href="-cancellable-task/index.html">CancellableTask</a><span class="token operator">&lt;</span><a href="-controllable-task/index.html">StateT</a><span class="token operator">&gt; </span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-10495659%2FClasslikes%2F-1776614605" anchor-label="FileDownloadTask" id="-10495659%2FClasslikes%2F-1776614605" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-download-task/index.html"><span>File</span><wbr><span>Download</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-10495659%2FClasslikes%2F-1776614605"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/appleMain" data-toggle=":firebase-storage:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Only the snapshot type is declared here: the <code class="lang-kotlin">Task</code> members, and the platform hooks that the shared non-JVM <a href="-storage-task/index.html">StorageTask</a> leaves abstract (<a href="../../firebase-storage/com.google.firebase.storage/-storage-task/reference.html">StorageTask.reference</a>, <a href="../../firebase-storage/com.google.firebase.storage/-storage-task/snapshot-with.html">StorageTask.snapshotWith</a> and the <code class="lang-kotlin">control</code> functions), are implemented by <a href="../../firebase-storage/com.google.firebase.storage/-file-download-task-impl/index.html">FileDownloadTaskImpl</a>. The metadata compilation of this source set rejects an actual class that implements a member its expect class inherits as abstract from another source set's actual ("the modalities are different").</p></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A download to a file, as the Android SDK's <code class="lang-kotlin">FileDownloadTask</code>; <a href="-file-download-task/-task-snapshot/index.html">TaskSnapshot</a> reports its progress.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A download to a file on JS, which the SDK cannot do: the task fails at once with UnsupportedOperationException.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-file-download-task/index.html">FileDownloadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A download to a file on JS, which the SDK cannot do: the task fails at once with UnsupportedOperationException.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="711300048%2FClasslikes%2F-1776614605" anchor-label="FirebaseStorage" id="711300048%2FClasslikes%2F-1776614605" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-firebase-storage/index.html"><span>Firebase</span><wbr><span><span>Storage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="711300048%2FClasslikes%2F-1776614605"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/appleMain" data-toggle=":firebase-storage:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "><p class="paragraph">Cloud Storage for Firebase, as the Android SDK's <code class="lang-kotlin">com.google.firebase.storage.FirebaseStorage</code>. The download retry time, file downloads and <code class="lang-kotlin">FileDownloadTask</code> exist on Android, the JVM and Apple platforms (nonJsMain); the JS SDK downloads through URLs only.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="893716163%2FClasslikes%2F-2021679728" anchor-label="ListResult" id="893716163%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-list-result/index.html"><span>List</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="893716163%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-list-result/index.html">ListResult</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-list-result/index.html">ListResult</a></div><div class="brief "><p class="paragraph">A page of the items and prefixes (folders) under a reference, as the Android SDK's <code class="lang-kotlin">ListResult</code>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-list-result/index.html">ListResult</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-list-result/index.html">ListResult</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1823440291%2FClasslikes%2F615877310" anchor-label="OnPausedListener" id="-1823440291%2FClasslikes%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on-paused-listener/index.html"><span>On</span><wbr><span>Paused</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1823440291%2FClasslikes%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-on-paused-listener/index.html">OnPausedListener</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="-on-paused-listener/index.html">ProgressT</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Receives the snapshots of a paused task; the Android SDK's <code class="lang-kotlin">OnPausedListener</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1494552130%2FClasslikes%2F615877310" anchor-label="OnProgressListener" id="-1494552130%2FClasslikes%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-on-progress-listener/index.html"><span>On</span><wbr><span>Progress</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1494552130%2FClasslikes%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-on-progress-listener/index.html">OnProgressListener</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="-on-progress-listener/index.html">ProgressT</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Receives the snapshots of a task as it makes progress; the Android SDK's <code class="lang-kotlin">OnProgressListener</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1897335146%2FClasslikes%2F-2021679728" anchor-label="StorageException" id="1897335146%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-storage-exception/index.html"><span>Storage</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1897335146%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-storage-exception/index.html">StorageException</a> : <a href="../../firebase-app/com.google.firebase/-firebase-exception/index.html">FirebaseException</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-storage-exception/index.html">StorageException</a></div><div class="brief "><p class="paragraph">An error of Cloud Storage, as the Android SDK's <code class="lang-kotlin">StorageException</code>; <a href="-storage-exception/error-code.html">errorCode</a> is one of the <code class="lang-kotlin">ERROR_*</code> constants.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-storage-exception/index.html">StorageException</a> : <a href="../../firebase-app/com.google.firebase/-firebase-exception/index.html">FirebaseException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-storage-exception/index.html">StorageException</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="263154746%2FClasslikes%2F-2021679728" anchor-label="StorageMetadata" id="263154746%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-storage-metadata/index.html"><span>Storage</span><wbr><span><span>Metadata</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="263154746%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-metadata/index.html">StorageMetadata</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-storage-metadata/index.html">StorageMetadata</a></div><div class="brief "><p class="paragraph">The metadata of an object in Cloud Storage, as the Android SDK's <code class="lang-kotlin">StorageMetadata</code>: the server-set fields are read from a fetched object, the settable fields are built with <a href="-storage-metadata/-builder/index.html">Builder</a> (chained setters or, from Kotlin, properties: <code class="lang-kotlin">storageMetadata { contentType = "text/plain" }</code>).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-metadata/index.html">StorageMetadata</a></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-metadata/index.html">StorageMetadata</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1452355054%2FClasslikes%2F-1776614605" anchor-label="StorageReference" id="1452355054%2FClasslikes%2F-1776614605" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-storage-reference/index.html"><span>Storage</span><wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1452355054%2FClasslikes%2F-1776614605"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/appleMain" data-toggle=":firebase-storage:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A reference to an object or folder in Cloud Storage, as the Android SDK's <code class="lang-kotlin">StorageReference</code>. Files are given as android.net.Uri (the firebase-app stand-in off Android): a <code class="lang-kotlin">file:</code> URL, or a path on Apple platforms. The members taking JDK types are declared through the error-deprecated <code class="lang-kotlin">java.io.File</code> and <code class="lang-kotlin">java.io.InputStream</code> stand-ins, pointing common code at the kotlinx-io <code class="lang-kotlin">getFile(Path)</code> and <code class="lang-kotlin">putStream(RawSource)</code> extensions (see <code class="lang-kotlin">StorageSources.kt</code>).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-storage-reference/index.html">StorageReference</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt; </span></div><div class="brief "></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1043516068%2FClasslikes%2F-2021679728" anchor-label="StorageTask" id="1043516068%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-storage-task/index.html"><span>Storage</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1043516068%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator"> : </span><a href="-storage-task/-provide-error/index.html">StorageTask.ProvideError</a><span class="token operator">&gt;</span> : <a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator"> : </span><a href="-storage-task/-provide-error/index.html">StorageTask.ProvideError</a><span class="token operator">&gt;</span> : <a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">A long-running Cloud Storage operation with progress, pause, resume and cancel, as the Android SDK's <code class="lang-kotlin">StorageTask</code>. Listeners are called on the thread that completes or progresses the task on Apple platforms and JS. The <code class="lang-kotlin">Task</code> members (<code class="lang-kotlin">isComplete</code>, <code class="lang-kotlin">result</code>, <code class="lang-kotlin">exception</code>, ...) are inherited; the task subclasses are abstract, as instances only come from a <a href="-storage-reference/index.html">StorageReference</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator"> : </span><a href="-storage-task/-provide-error/index.html">StorageTask.ProvideError</a><span class="token operator">&gt;</span> : <a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator"> : </span><a href="-storage-task/-provide-error/index.html">StorageTask.ProvideError</a><span class="token operator">&gt;</span> : <a href="-controllable-task/index.html">ControllableTask</a><span class="token operator">&lt;</span><a href="-storage-task/index.html">ResultT</a><span class="token operator">&gt; </span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-492646024%2FClasslikes%2F615877310" anchor-label="TaskState" id="-492646024%2FClasslikes%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-task-state/index.html"><span>Task</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-492646024%2FClasslikes%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-task-state/index.html">TaskState</a><span class="token operator">&lt;</span><a href="-task-state/index.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The state of a <a href="-storage-task/index.html">StorageTask</a> as emitted by <a href="task-state.html">taskState</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1299454040%2FClasslikes%2F-2021679728" anchor-label="UploadTask" id="1299454040%2FClasslikes%2F-2021679728" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain,:firebase-storage:dokkaHtmlPartial/nonJvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-upload-task/index.html"><span>Upload</span><wbr><span><span>Task</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1299454040%2FClasslikes%2F-2021679728"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/nonJvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-upload-task/index.html">UploadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-upload-task/index.html">UploadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">An upload to a <a href="-storage-reference/index.html">StorageReference</a>, as the Android SDK's <code class="lang-kotlin">UploadTask</code>; <a href="-upload-task/-task-snapshot/index.html">TaskSnapshot</a> reports its progress.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-upload-task/index.html">UploadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-upload-task/index.html">UploadTask</a> : <a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token operator">&gt; </span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="EXTENSION_PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1455455635%2FProperties%2F615877310" anchor-label="storage" id="1455455635%2FProperties%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storage.html"><span><span>storage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1455455635%2FProperties%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="storage.html">storage</a><span class="token operator">: </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-storage/index.html">FirebaseStorage</a> of the default FirebaseApp; the Android SDK's <code class="lang-kotlin">Firebase.storage</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1107940220%2FProperties%2F615877310" anchor-label="taskState" id="-1107940220%2FProperties%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="task-state.html"><span>task</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1107940220%2FProperties%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span class="token operator">&lt;</span><a href="task-state.html">T</a><span class="token operator"> : </span><a href="-storage-task/-provide-error/index.html">StorageTask.ProvideError</a><span class="token operator">&gt; </span><a href="-storage-task/index.html">StorageTask</a><span class="token operator">&lt;</span><a href="task-state.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="task-state.html">taskState</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="-task-state/index.html">TaskState</a><span class="token operator">&lt;</span><a href="task-state.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The progress and pauses of this task as a <span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span>, which completes with the task.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1372662207%2FFunctions%2F615877310" anchor-label="component1" id="-1372662207%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component1.html"><span><span>component1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1372662207%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The bytes downloaded so far.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-list-result/index.html">ListResult</a><span class="token punctuation">.</span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The items of the page.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The bytes uploaded so far.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="212842530%2FFunctions%2F615877310" anchor-label="component2" id="212842530%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component2.html"><span><span>component2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="212842530%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-file-download-task/-task-snapshot/index.html">FileDownloadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component2.html"><span class="token function">component2</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The total size of the download.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-list-result/index.html">ListResult</a><span class="token punctuation">.</span><a href="component2.html"><span class="token function">component2</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-storage-reference/index.html">StorageReference</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The prefixes of the page.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component2.html"><span class="token function">component2</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The total size of the upload.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="268874180%2FFunctions%2F615877310" anchor-label="component3" id="268874180%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component3.html"><span><span>component3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="268874180%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-list-result/index.html">ListResult</a><span class="token punctuation">.</span><a href="component3.html"><span class="token function">component3</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The token of the next page.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component3.html"><span class="token function">component3</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-storage-metadata/index.html">StorageMetadata</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The metadata of the uploaded object, once complete.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1292749041%2FFunctions%2F615877310" anchor-label="component4" id="1292749041%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component4.html"><span><span>component4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1292749041%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="-upload-task/-task-snapshot/index.html">UploadTask.TaskSnapshot</a><span class="token punctuation">.</span><a href="component4.html"><span class="token function">component4</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The resumable upload session URL, Android only.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="941457426%2FFunctions%2F-1776614605" anchor-label="getFile" id="941457426%2FFunctions%2F-1776614605" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain,:firebase-storage:dokkaHtmlPartial/appleMain,:firebase-storage:dokkaHtmlPartial/jsMain,:firebase-storage:dokkaHtmlPartial/wasmJsMain,:firebase-storage:dokkaHtmlPartial/androidMain,:firebase-storage:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-file.html"><span>get</span><wbr><span><span>File</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="941457426%2FFunctions%2F-1776614605"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/androidMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":firebase-storage:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/appleMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/appleMain" data-toggle=":firebase-storage:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain" data-toggle=":firebase-storage:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/jvmMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/jvmMain" data-toggle=":firebase-storage:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/wasmJsMain" data-toggle=":firebase-storage:dokkaHtmlPartial/wasmJsMain">wasmJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div><div class="brief "><p class="paragraph">The SDK's own file form. Shipped (see keepClasses in build.gradle.kts).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/appleMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div><div class="brief "><p class="paragraph">Downloads the object to the file at <a href="get-file.html">destination</a>; the kotlinx-io form of <code class="lang-kotlin">getFile(File)</code>. Fails on JS, whose SDK has no file downloads (behind <code class="lang-kotlin">@UnsupportedOnJs</code> there).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div><div class="brief "><p class="paragraph">Fails: the JS SDK downloads through URLs, not to files; use <a href="-storage-reference/get-bytes.html">StorageReference.getBytes</a> or <a href="-storage-reference/get-download-url.html">StorageReference.getDownloadUrl</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div><div class="brief "><p class="paragraph">The SDK's own file form. Shipped (see keepClasses in build.gradle.kts).</p></div></div><div class="content sourceset-dependent-content" data-togglable=":firebase-storage:dokkaHtmlPartial/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="get-file.html"><span class="token function">getFile</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">destination<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-file-download-task/index.html">FileDownloadTask</a></div><div class="brief "><p class="paragraph">Fails: the JS SDK downloads through URLs, not to files; use <a href="-storage-reference/get-bytes.html">StorageReference.getBytes</a> or <a href="-storage-reference/get-download-url.html">StorageReference.getDownloadUrl</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="124159637%2FFunctions%2F615877310" anchor-label="putStream" id="124159637%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="put-stream.html"><span>put</span><wbr><span><span>Stream</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="124159637%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="put-stream.html"><span class="token function">putStream</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">source<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-upload-task/index.html">UploadTask</a></div><div class="brief "><p class="paragraph">Uploads the bytes of <a href="put-stream.html">source</a> to this reference, closing it; the kotlinx-io form of <code class="lang-kotlin">putStream(InputStream)</code>. On Android and the JVM the SDK streams the source as it uploads; the Apple and JS SDKs upload whole buffers, so there the source is read to its end first (off the caller's thread on Apple platforms, at once on JS).</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="-storage-reference/index.html">StorageReference</a><span class="token punctuation">.</span><a href="put-stream.html"><span class="token function">putStream</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">source<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">metadata<span class="token operator">: </span><a href="-storage-metadata/index.html">StorageMetadata</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-upload-task/index.html">UploadTask</a></div><div class="brief "><p class="paragraph">Uploads the bytes of <a href="put-stream.html">source</a> to this reference with <a href="put-stream.html">metadata</a>; see <a href="put-stream.html">putStream</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1395205580%2FFunctions%2F615877310" anchor-label="storage" id="-1395205580%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storage.html"><span><span>storage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1395205580%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="storage.html"><span class="token function">storage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-storage/index.html">FirebaseStorage</a> of <a href="storage.html">app</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="storage.html"><span class="token function">storage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-storage/index.html">FirebaseStorage</a> of the default FirebaseApp for the bucket of <a href="storage.html">url</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">.</span><a href="storage.html"><span class="token function">storage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">app<span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-firebase-storage/index.html">FirebaseStorage</a></div><div class="brief "><p class="paragraph">The <a href="-firebase-storage/index.html">FirebaseStorage</a> of <a href="storage.html">app</a> for the bucket of <a href="storage.html">url</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-275711695%2FFunctions%2F615877310" anchor-label="storageMetadata" id="-275711695%2FFunctions%2F615877310" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":firebase-storage:dokkaHtmlPartial/commonMain" data-filterable-set=":firebase-storage:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storage-metadata.html"><span>storage</span><wbr><span><span>Metadata</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-275711695%2FFunctions%2F615877310"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":firebase-storage:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="storage-metadata.html"><span class="token function">storageMetadata</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">init<span class="token operator">: </span><a href="-storage-metadata/-builder/index.html">StorageMetadata.Builder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-storage-metadata/index.html">StorageMetadata</a></div><div class="brief "><p class="paragraph">Builds <a href="-storage-metadata/index.html">StorageMetadata</a> with <a href="storage-metadata.html">init</a> applied to a <a href="-storage-metadata/-builder/index.html">StorageMetadata.Builder</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 GitLive Ltd.</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
