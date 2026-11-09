@@ -33,7 +33,7 @@ com.google.firebase.firestore.Blob
   OK    static Blob fromBytes(byte[])
   OK    byte[] toBytes()
 com.google.firebase.firestore.CollectionReference
-  MAP   Task add(Object)  [deprecated: add maps a custom class with the Android SDK's reflection on Android; addData maps it through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   Task add(Object)  [deprecated: add maps a custom class with the Android SDK's reflection, which only exists on Android; addData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
   OK    DocumentReference document()
   OK    DocumentReference document(String)
   OK    String getId()
@@ -66,9 +66,9 @@ com.google.firebase.firestore.DocumentReference
   OK    String getId()
   OK    CollectionReference getParent()
   OK    String getPath()
-  MAP   Task set(Object)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   Task set(Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   Task update(Map)  [deprecated: update(Map) maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   Task set(Object)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   Task set(Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   Task update(Map)  [deprecated: update maps custom classes in the values with the Android SDK's reflection, which only exists on Android; updateData maps @Serializable classes and plain values with kotlinx.serialization on every platform]
   OK    Task update(FieldPath, Object, Object[])
   OK    Task update(String, Object, Object[])
 com.google.firebase.firestore.DocumentSnapshot
@@ -78,11 +78,11 @@ com.google.firebase.firestore.DocumentSnapshot
   OK    Object get(FieldPath)
   OK    Object get(String)
   OK    Object get(FieldPath, ServerTimestampBehavior)
-  MAP   T get(FieldPath, Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
+  MAP   T get(FieldPath, Class)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
   OK    Object get(String, ServerTimestampBehavior)
-  MAP   T get(String, Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
-  MAP   T get(FieldPath, Class, ServerTimestampBehavior)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
-  MAP   T get(String, Class, ServerTimestampBehavior)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
+  MAP   T get(String, Class)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
+  MAP   T get(FieldPath, Class, ServerTimestampBehavior)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
+  MAP   T get(String, Class, ServerTimestampBehavior)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
   OK    Blob getBlob(String)
   OK    Boolean getBoolean(String)
   OK    Map getData()
@@ -100,8 +100,8 @@ com.google.firebase.firestore.DocumentSnapshot
   OK    Timestamp getTimestamp(String)
   OK    Timestamp getTimestamp(String, ServerTimestampBehavior)
   OK    VectorValue getVectorValue(String)
-  MAP   T toObject(Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
-  MAP   T toObject(Class, ServerTimestampBehavior)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
+  MAP   T toObject(Class)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
+  MAP   T toObject(Class, ServerTimestampBehavior)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
 com.google.firebase.firestore.DocumentSnapshot.ServerTimestampBehavior
   OK    static ServerTimestampBehavior ESTIMATE
   OK    static ServerTimestampBehavior NONE
@@ -467,8 +467,8 @@ com.google.firebase.firestore.QuerySnapshot
   OK    boolean isEmpty()
   OK    Iterator iterator()
   OK    int size()
-  MAP   List toObjects(Class)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
-  MAP   List toObjects(Class, ServerTimestampBehavior)  [deprecated: Maps a custom class with the Android SDK's reflection on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map it through FirebaseFormat on every platform]
+  MAP   List toObjects(Class)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
+  MAP   List toObjects(Class, ServerTimestampBehavior)  [deprecated: Maps the class with the Android SDK's reflection, which only exists on Android; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform]
 com.google.firebase.firestore.ServerTimestamp
 com.google.firebase.firestore.SetOptions
   OK    static SetOptions merge()
@@ -498,9 +498,9 @@ com.google.firebase.firestore.ThrowOnExtraProperties
 com.google.firebase.firestore.Transaction
   OK    Transaction delete(DocumentReference)
   OK    DocumentSnapshot get(DocumentReference)
-  MAP   Transaction set(DocumentReference, Object)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   Transaction set(DocumentReference, Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   Transaction update(DocumentReference, Map)  [deprecated: update(Map) maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   Transaction set(DocumentReference, Object)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   Transaction set(DocumentReference, Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   Transaction update(DocumentReference, Map)  [deprecated: update maps custom classes in the values with the Android SDK's reflection, which only exists on Android; updateData maps @Serializable classes and plain values with kotlinx.serialization on every platform]
   OK    Transaction update(DocumentReference, FieldPath, Object, Object[])
   OK    Transaction update(DocumentReference, String, Object, Object[])
 com.google.firebase.firestore.Transaction.Function
@@ -517,9 +517,9 @@ com.google.firebase.firestore.VectorValue
 com.google.firebase.firestore.WriteBatch
   OK    Task commit()
   OK    WriteBatch delete(DocumentReference)
-  MAP   WriteBatch set(DocumentReference, Object)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   WriteBatch set(DocumentReference, Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection on Android; setData maps it through FirebaseFormat on every platform, and plain maps work through it too]
-  MAP   WriteBatch update(DocumentReference, Map)  [deprecated: update(Map) maps custom classes with the Android SDK's reflection on Android; updateData maps them through FirebaseFormat on every platform, and plain maps work through it too]
+  MAP   WriteBatch set(DocumentReference, Object)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   WriteBatch set(DocumentReference, Object, SetOptions)  [deprecated: set maps a custom class with the Android SDK's reflection, which only exists on Android; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform]
+  MAP   WriteBatch update(DocumentReference, Map)  [deprecated: update maps custom classes in the values with the Android SDK's reflection, which only exists on Android; updateData maps @Serializable classes and plain values with kotlinx.serialization on every platform]
   OK    WriteBatch update(DocumentReference, FieldPath, Object, Object[])
   OK    WriteBatch update(DocumentReference, String, Object, Object[])
 com.google.firebase.firestore.WriteBatch.Function
