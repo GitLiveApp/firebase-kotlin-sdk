@@ -18,7 +18,7 @@ import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
  *
  * The `loadBundle` overloads taking JVM streams are declared through the error-deprecated `java.io.InputStream` and
  * `java.nio.ByteBuffer` stand-ins, pointing common code at the kotlinx-io `loadBundle(RawSource)` extension (see
- * `Bundles.kt`) and at `loadBundle(ByteArray)`. Not mirrored: the pipeline API (see `api/android-sdk/exclusions.txt`).
+ * `Bundles.kt`) and at `loadBundle(ByteArray)`. The pipeline API is mirrored in `Pipeline.kt` and the `pipeline` package.
  */
 public expect class FirebaseFirestore {
     /** The [FirebaseApp] this instance belongs to. */
@@ -35,6 +35,9 @@ public expect class FirebaseFirestore {
 
     /** A [Query] over every collection named [collectionId]. */
     public fun collectionGroup(collectionId: String): Query
+
+    /** The source stages a [Pipeline] can start from. */
+    public fun pipeline(): PipelineSource
 
     /** A [DocumentReference] for the document at [documentPath]. */
     public fun document(documentPath: String): DocumentReference

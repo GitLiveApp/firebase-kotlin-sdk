@@ -18,3 +18,10 @@ internal const val GET_DATE_ANDROID_ONLY = "getDate returns a java.util.Date, wh
 // The bundle loaders from JVM streams, which only Android and the JVM can call (java.io.InputStream and java.nio.ByteBuffer are error-deprecated stand-ins in common code).
 internal const val LOAD_BUNDLE_STREAM_ANDROID_ONLY = "loadBundle(InputStream) is JVM-only; use loadBundle(RawSource) (kotlinx-io), on the JVM with bundleData.asSource()"
 internal const val LOAD_BUNDLE_BUFFER_ANDROID_ONLY = "loadBundle(ByteBuffer) is JVM-only; use loadBundle(ByteArray) with the buffer's bytes"
+
+// The pipeline API's java.util.Date constant, which only Android and the JVM can call.
+internal const val CONSTANT_OF_DATE_ANDROID_ONLY = "Expression.constant(java.util.Date) is JVM-only; use constant(Timestamp)"
+
+// The constructors of the pipeline classes that the Android SDK builds through its API only: internal here, and
+// error-deprecated so that the header stub verification does not look for them on the SDK's classes.
+internal const val INTERNAL_CONSTRUCTOR = "Internal constructor; the class is built through the pipeline API"
