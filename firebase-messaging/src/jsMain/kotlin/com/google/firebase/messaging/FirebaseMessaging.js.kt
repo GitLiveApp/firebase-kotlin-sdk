@@ -8,6 +8,9 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseException
 import dev.gitlive.firebase.UnsupportedOnJs
+import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.REGISTER_NOT_AVAILABLE
 import dev.gitlive.firebase.messaging.externals.Messaging
 import dev.gitlive.firebase.messaging.externals.deleteToken
 import dev.gitlive.firebase.messaging.externals.getMessaging
@@ -33,6 +36,24 @@ public actual class FirebaseMessaging internal constructor(public val js: Messag
     public actual var isAutoInitEnabled: Boolean
         get() = false
         set(_) = Unit
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun deliveryMetricsExportToBigQueryEnabled(): Boolean = throw UnsupportedOperationException(DELIVERY_METRICS_ANDROID_ONLY)
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setDeliveryMetricsExportToBigQuery(enable: Boolean): Unit = throw UnsupportedOperationException(DELIVERY_METRICS_ANDROID_ONLY)
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun isNotificationDelegationEnabled(): Boolean = throw UnsupportedOperationException(NOTIFICATION_DELEGATION_ANDROID_ONLY)
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setNotificationDelegationEnabled(enable: Boolean): Task<Nothing?> = throw UnsupportedOperationException(NOTIFICATION_DELEGATION_ANDROID_ONLY)
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun register(): Task<Nothing?> = throw UnsupportedOperationException(REGISTER_NOT_AVAILABLE)
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun unregister(): Task<Nothing?> = throw UnsupportedOperationException(REGISTER_NOT_AVAILABLE)
 
     override fun equals(other: Any?): Boolean = other is FirebaseMessaging && other.js == js
 

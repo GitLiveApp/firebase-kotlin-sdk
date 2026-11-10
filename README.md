@@ -132,7 +132,8 @@ So far this layer covers `firebase-app` (`FirebaseApp`, `FirebaseOptions`, `Time
 the other modules are migrated one by one. The Firestore pipeline API (`FirebaseFirestore.pipeline()` and the `com.google.firebase.firestore.pipeline`
 expressions, stages and options) is included, over the iOS SDK's pipeline bridge on Apple and the `firebase/firestore/pipelines` entry
 point on JS and wasmJs. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
-Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
+Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count; it is still declared, with an
+error-level deprecation that says so, so a call from common code fails with that message rather than as an unresolved reference. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
 from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array), so
 `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
 `logEvent(name, Bundle().apply { putString(...) })` work in common code. On the JVM analytics is a no-op, as the

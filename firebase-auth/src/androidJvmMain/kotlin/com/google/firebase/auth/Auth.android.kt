@@ -9,6 +9,9 @@ import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import dev.gitlive.firebase.auth.TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_QR_CODE_URL_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_SECRET_PARAMETERS_ANDROID_ONLY
 import dev.gitlive.firebase.auth.stub
 import java.util.concurrent.TimeUnit
 
@@ -442,6 +445,11 @@ public actual class PhoneMultiFactorGenerator actual constructor() {
 }
 
 public actual class TotpMultiFactorAssertion private constructor() : MultiFactorAssertion() {
+    @Deprecated(TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual constructor(oneTimePassword: String, secret: TotpSecret, enrollmentId: String) : this() {
+        stub()
+    }
+
     actual override val factorId: String get() = stub()
 }
 
@@ -466,23 +474,24 @@ public actual interface TotpSecret {
     public actual fun generateQrCodeUrl(accountName: String, issuer: String): String
     public actual fun openInOtpApp(qrCodeUrl: String)
 
-    /** Android only. */
-    public val codeIntervalSeconds: Int
+    // The Android-only parameters, deprecated with an error so that common code cannot call them; Android code binds to the real interface.
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val codeIntervalSeconds: Int
 
-    /** Android only. */
-    public val codeLength: Int
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val codeLength: Int
 
-    /** Android only. */
-    public val enrollmentCompletionDeadline: Long
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val enrollmentCompletionDeadline: Long
 
-    /** Android only. */
-    public val hashAlgorithm: String
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val hashAlgorithm: String
 
-    /** Android only. */
-    public val sessionInfo: String
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val sessionInfo: String
 
-    /** Android only. */
-    public fun generateQrCodeUrl(): String
+    @Deprecated(TOTP_QR_CODE_URL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun generateQrCodeUrl(): String
 
     /** Android only. */
     public fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: Activity)

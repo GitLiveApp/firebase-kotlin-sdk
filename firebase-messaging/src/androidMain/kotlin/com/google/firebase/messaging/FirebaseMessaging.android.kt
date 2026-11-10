@@ -6,6 +6,9 @@ package com.google.firebase.messaging
 
 import android.net.Uri
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.REGISTER_NOT_AVAILABLE
 import dev.gitlive.firebase.messaging.stub
 
 /*
@@ -22,6 +25,24 @@ public actual class FirebaseMessaging private constructor() {
     public actual var isAutoInitEnabled: Boolean
         get() = stub()
         set(_) = stub()
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun deliveryMetricsExportToBigQueryEnabled(): Boolean = stub()
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setDeliveryMetricsExportToBigQuery(enable: Boolean): Unit = stub()
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun isNotificationDelegationEnabled(): Boolean = stub()
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setNotificationDelegationEnabled(enable: Boolean): Task<Nothing?> = stub()
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun register(): Task<Nothing?> = stub()
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun unregister(): Task<Nothing?> = stub()
 
     public actual companion object {
         @Deprecated("The registration token has no scope any more; getToken() returns the FCM token")

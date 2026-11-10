@@ -60,11 +60,15 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    until you accept, with `@OptIn(UnsupportedOnJs::class)`, that the member does nothing on JS and Wasm, or fails where it
    must return a value. Storage's `putFile(Uri)` and `getFile(Uri)` are an example: the JS SDK uploads and downloads
    bytes, not files. The deprecation and opt-in messages, and each member's documentation, say what happens.
-8. **Members that are not declared at all.** A member bound to an Android type the other platforms cannot have (the
-   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`, `java.lang.Class`) or
-   to a feature the iOS and JS SDKs lack (Play Games sign-in, the Android-only messaging settings) is left out, so the
-   compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt` lists them with
-   the reason (`@platform` for the type, `@unavailable` for the feature).
+8. **Members of features the iOS and JS SDKs lack.** Play Games sign-in, the TOTP secret's parameters, the Android-only
+   messaging settings, storage's chunk retry time limit and upload resumption, `FirebaseMessagingService` and the streaming
+   `StreamResponse` are declared with an error-level deprecation whose message says the member is Android-only and where
+   the call belongs (`androidMain`), so common code using one fails with that message. They are listed in each module's
+   `api/android-sdk/exclusions.txt` as `@unavailable` and left out of the coverage count.
+9. **Members that are not declared at all.** A member bound to an Android type the other platforms cannot have (the
+   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`, `java.lang.Class`) is
+   left out, so the compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt`
+   lists them as `@platform`, with the type.
 
 Everything else, including every listener, continuation, builder and static accessor, is available with the same
 signature. Each module lists exactly which Android SDK members it provides in its `api/android-sdk-compat.txt` (for

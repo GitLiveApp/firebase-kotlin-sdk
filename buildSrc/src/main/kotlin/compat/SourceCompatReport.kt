@@ -91,10 +91,14 @@ object SourceCompatReport {
             for (member in sdkClass.members.sortedWith(compareBy({ it.kind }, { it.name }, { it.parameters.size }))) {
                 val rendered = member.render(sdkClass.name)
                 val exclusion = classExclusion ?: exclusions.firstOrNull { it.matchesMember(sdkClass.name, member) }
+                // An excluded member the layer declares with an error-level deprecation, so common code gets its message.
+                val declaredDeprecation = ourClass?.members
+                    ?.firstOrNull { it.kind == member.kind && it.name == member.name && member.parametersMatch(it.parameters) }
+                    ?.deprecation?.let { "  [deprecated: $it]" }.orEmpty()
                 when {
                     member.isDeprecated -> body.appendLine("  SKIP  $rendered")
-                    exclusion?.uncountedStatus != null -> body.appendLine("  ${exclusion.uncountedStatus}  $rendered")
-                    exclusion != null -> { omitted++; body.appendLine("  OMIT  $rendered") }
+                    exclusion?.uncountedStatus != null -> body.appendLine("  ${exclusion.uncountedStatus}  $rendered$declaredDeprecation")
+                    exclusion != null -> { omitted++; body.appendLine("  OMIT  $rendered$declaredDeprecation") }
                     ourClass == null -> { missing++; body.appendLine("  MISS  $rendered") }
                     else -> {
                         val (status, detail) = classify(member, ourClass, oursByName)
