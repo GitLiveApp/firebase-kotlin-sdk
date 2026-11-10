@@ -13,6 +13,7 @@ import dev.gitlive.firebase.firestore.externals.DocumentChange as JsDocumentChan
 import dev.gitlive.firebase.firestore.externals.DocumentSnapshot as JsDocumentSnapshot
 import dev.gitlive.firebase.firestore.externals.QuerySnapshot as JsQuerySnapshot
 import dev.gitlive.firebase.firestore.externals.SnapshotMetadata as JsSnapshotMetadata
+import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 
 private fun DocumentSnapshot.ServerTimestampBehavior.toJs(): Json = json("serverTimestamps" to name.lowercase())
 
@@ -50,6 +51,30 @@ public actual class DocumentChange internal constructor(public val js: JsDocumen
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual open class DocumentSnapshot internal constructor(public open val js: JsDocumentSnapshot) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public actual open fun <T> toObject(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public actual open fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(field: String, valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(field: String, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual val id: String get() = js.id
     public actual val reference: DocumentReference get() = DocumentReference(js.ref)
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
@@ -121,10 +146,26 @@ private inline fun <reified T> typed(field: String, value: Any?): T? = when (val
 }
 
 /** @property js The underlying Firebase JS SDK object. */
-public actual class QueryDocumentSnapshot internal constructor(js: JsDocumentSnapshot) : DocumentSnapshot(js)
+public actual class QueryDocumentSnapshot internal constructor(js: JsDocumentSnapshot) : DocumentSnapshot(js) {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    actual override fun <T> toObject(valueType: java.lang.Class<T>): T = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    actual override fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T = throw UnsupportedOperationException(REFLECTIVE_READ)
+}
 
 /** @property js The underlying Firebase JS SDK object. */
 public actual class QuerySnapshot internal constructor(public val js: JsQuerySnapshot) : Iterable<QueryDocumentSnapshot> {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public actual fun <T> toObjects(clazz: java.lang.Class<T>): List<T> = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public actual fun <T> toObjects(clazz: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual val query: Query get() = Query(js.query)
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(js.metadata)
     public actual val documents: List<DocumentSnapshot> get() = js.docs.map { DocumentSnapshot(it) }

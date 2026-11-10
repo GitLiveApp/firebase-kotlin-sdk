@@ -7,7 +7,10 @@ package com.google.firebase.serialization
 import android.util.Log
 import kotlin.reflect.KClass
 
-internal actual fun javaClassNameOf(type: KClass<*>): String = type.java.name
+// Class.toString() is "class <name>" or "interface <name>" (a primitive is just its name): the Java name without calling
+// Class.getName(), which this module's compilation cannot see because common code declares an error-deprecated java.lang.Class
+// stand-in that shadows the JDK's class here. The runtime object is the JDK's, so toString() dispatches to it.
+internal actual fun javaClassNameOf(type: KClass<*>): String = type.java.toString().substringAfter(' ')
 
 internal actual fun logWarning(tag: String, message: String) {
     Log.w(tag, message)

@@ -4,6 +4,8 @@
 
 package com.google.firebase.database
 
+import dev.gitlive.firebase.database.REFLECTIVE_READ
+
 /**
  * An immutable copy of the data at a location, as the Android SDK's `DataSnapshot`. `value` is the natural type of the
  * data: a `Map`, a `List`, a `String`, a `Boolean`, a `Long`, a `Double` or null. A custom class is read with the
@@ -11,6 +13,17 @@ package com.google.firebase.database
  * the SDK's reflective `getValue(Class)` and `getValue(GenericTypeIndicator)` are deprecated with an error on Android.
  */
 public expect class DataSnapshot {
+
+    // The Android SDK's reflective reads, deprecated with an error towards the reified getValue<T>() in com.google.firebase.serialization;
+    // java.lang.Class is an error-deprecated stand-in in common code, where Foo::class.java is unresolved as well.
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(t: GenericTypeIndicator<T>): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(valueType: java.lang.Class<T>): T?
+
     /** Whether there is data at the location. */
     public fun exists(): Boolean
 

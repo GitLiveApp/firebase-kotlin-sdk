@@ -4,6 +4,8 @@
 
 package com.google.android.gms.tasks
 
+import dev.gitlive.firebase.GET_RESULT_CLASS_JVM_ONLY
+
 /**
  * Represents an asynchronous operation, mirroring the Play Services Tasks API so that code written against the
  * Firebase Android SDK compiles unchanged on every platform.
@@ -27,6 +29,11 @@ public expect abstract class Task<TResult>() {
     public abstract fun <TContinuationResult> continueWith(continuation: Continuation<TResult, TContinuationResult>): Task<TContinuationResult>
     public abstract fun <TContinuationResult> continueWithTask(continuation: Continuation<TResult, Task<TContinuationResult>>): Task<TContinuationResult>
     public abstract fun <TContinuationResult> onSuccessTask(successContinuation: SuccessContinuation<TResult, TContinuationResult>): Task<TContinuationResult>
+
+    /** Android/JVM only: the result, rethrowing a failure of type [exceptionType] as is; use [result] and [exception] in common code. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_RESULT_CLASS_JVM_ONLY, ReplaceWith("result"), DeprecationLevel.ERROR)
+    public fun <X : Throwable> getResult(exceptionType: java.lang.Class<X>): TResult
 }
 
 public fun interface OnCompleteListener<TResult> {

@@ -28,6 +28,12 @@ internal const val TO_INSTANT_ANDROID_ONLY =
  * exist so that the SDK members taking them can be declared with their exact signatures, and cannot be used.
  */
 
+internal const val CLASS_JVM_ONLY =
+    "java.lang.Class is JVM-only: the members taking one map a class by reflection, which only exists on Android and the JVM; " +
+        "the reified reads in com.google.firebase.serialization (toObject<T>(), toObjects<T>(), getField<T>(), getValue<T>()) map a " +
+        "@Serializable class with kotlinx.serialization on every platform"
+internal const val GET_RESULT_CLASS_JVM_ONLY =
+    "getResult(Class) is JVM-only; use result, which throws the task's failure as a RuntimeExecutionException, or exception"
 internal const val DATE_JVM_ONLY =
     "java.util.Date is JVM-only and only stands in for the Firebase Android SDK members taking one; use kotlin.time.Instant in common code"
 

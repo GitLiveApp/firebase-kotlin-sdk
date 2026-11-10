@@ -5,12 +5,24 @@
 package com.google.firebase.database
 
 import dev.gitlive.firebase.database.REFLECTIVE_WRITE
+import dev.gitlive.firebase.database.REFLECTIVE_READ
 
 /**
  * The data of a location inside a transaction, as the Android SDK's `MutableData`: [value] is read and then set to the
  * new data before the [Transaction.Handler] returns [Transaction.success].
  */
 public expect class MutableData {
+
+    // The Android SDK's reflective reads, deprecated with an error towards the reified getValue<T>() in com.google.firebase.serialization;
+    // java.lang.Class is an error-deprecated stand-in in common code, where Foo::class.java is unresolved as well.
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(t: GenericTypeIndicator<T>): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public fun <T> getValue(valueType: java.lang.Class<T>): T?
+
     /** The last segment of the path, or null at the root. */
     public val key: String?
 

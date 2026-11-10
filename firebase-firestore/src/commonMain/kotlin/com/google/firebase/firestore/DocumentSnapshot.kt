@@ -6,6 +6,7 @@ package com.google.firebase.firestore
 
 import com.google.firebase.Timestamp
 import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 
 /**
  * The data of a document read from Firestore, mirroring `com.google.firebase.firestore.DocumentSnapshot` from the
@@ -14,10 +15,37 @@ import dev.gitlive.firebase.firestore.GET_DATE_ANDROID_ONLY
  *
  * A custom class is read with the reified `toObject<T>()` and `getField<T>()` extensions, which map a `@Serializable`
  * class with the Android SDK's rules on every platform; the SDK's reflective `toObject(Class)` and `get(field, Class)`
- * are deprecated with an error on Android. The `java.util.Date` accessors are declared through the error-deprecated
+ * are declared through the error-deprecated `java.lang.Class` stand-in and deprecated with an error naming them. The `java.util.Date` accessors are declared through the error-deprecated
  * stand-in, as `Timestamp.toDate()` is, so common code is pointed at [getTimestamp].
  */
 public expect open class DocumentSnapshot {
+
+    // The Android SDK's reflective reads, deprecated with an error towards the reified extensions in com.google.firebase.serialization;
+    // java.lang.Class is an error-deprecated stand-in in common code, where Foo::class.java is unresolved as well.
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public open fun <T> toObject(valueType: java.lang.Class<T>): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public open fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public fun <T> get(field: String, valueType: java.lang.Class<T>): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public fun <T> get(field: String, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>): T?
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T?
+
     /** The document id. */
     public val id: String
 
@@ -86,10 +114,29 @@ public expect open class DocumentSnapshot {
 }
 
 /** A [DocumentSnapshot] from a query, which is guaranteed to exist. */
-public expect class QueryDocumentSnapshot : DocumentSnapshot
+public expect class QueryDocumentSnapshot : DocumentSnapshot {
+    // A query document exists, so the SDK's overrides return a value.
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    override fun <T> toObject(valueType: java.lang.Class<T>): T
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    override fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T
+}
 
 /** The results of a [Query], mirroring the Android SDK's `QuerySnapshot`: the documents and the changes since the previous snapshot. */
 public expect class QuerySnapshot : Iterable<QueryDocumentSnapshot> {
+
+    // The Android SDK's reflective reads, deprecated with an error towards the reified toObjects<T>() in com.google.firebase.serialization.
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public fun <T> toObjects(clazz: java.lang.Class<T>): List<T>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public fun <T> toObjects(clazz: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T>
+
     /** The query the results belong to. */
     public val query: Query
 

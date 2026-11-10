@@ -5,6 +5,7 @@
 package com.google.android.gms.tasks
 
 import dev.gitlive.firebase.stub
+import dev.gitlive.firebase.GET_RESULT_CLASS_JVM_ONLY
 
 /*
  * Header stubs for the Play Services Tasks API.
@@ -29,6 +30,10 @@ public actual abstract class Task<TResult> actual constructor() {
     public actual abstract fun <TContinuationResult> continueWith(continuation: Continuation<TResult, TContinuationResult>): Task<TContinuationResult>
     public actual abstract fun <TContinuationResult> continueWithTask(continuation: Continuation<TResult, Task<TContinuationResult>>): Task<TContinuationResult>
     public actual abstract fun <TContinuationResult> onSuccessTask(successContinuation: SuccessContinuation<TResult, TContinuationResult>): Task<TContinuationResult>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(GET_RESULT_CLASS_JVM_ONLY, ReplaceWith("result"), DeprecationLevel.ERROR)
+    public actual fun <X : Throwable> getResult(exceptionType: java.lang.Class<X>): TResult = stub()
 }
 
 public actual class TaskCompletionSource<TResult> actual constructor() {
