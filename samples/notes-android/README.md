@@ -50,14 +50,14 @@ compiler will ask for appears at least once:
 
 | Kind of change | Where | What it becomes |
 | --- | --- | --- |
-| The dependency | `app/build.gradle.kts` | `dev.gitlive:firebase-<module>` in the shared module's `commonMain`; the BoM and `kotlinx-coroutines-play-services` go |
+| The dependency | `app/build.gradle.kts` | `api("dev.gitlive:firebase-<module>")` in the shared module's `commonMain`, so the app still sees the Firebase types it uses; the BoM and `kotlinx-coroutines-play-services` go |
 | A member deprecated with an error because it maps a class by reflection | `NotesRepository.add`, `save` | `addData`, `setData` from `com.google.firebase.serialization` |
 | A class-taking read that is not declared, as `java.lang.Class` is JVM-only | `NotesRepository.load`, `listen` | the reified `toObject<Note>()`, `toObjects<Note>()` |
 | The mapping annotations | `Note` | `@Serializable`, kotlinx.serialization's `@SerialName` and `@Transient`, and `@DocumentId`/`@ServerTimestamp` from `com.google.firebase.serialization` |
 | A member deprecated with an error because it takes or returns a JVM type | `NotesRepository.createdOn`, `NoteAttachments.upload`, `NotesBackend.echo` | `toKotlinInstant()`, `putStream(RawSource)`, `setTimeout(Duration)` |
 | An Android resource in the API | `NotesSettings.load` | `setDefaultsAsync(Map)` |
 | `Task<Void>` named in a signature | `NotesRepository.save` | `Task<Nothing?>`; inferred types, as in `rename`, need nothing |
-| An Android type in the signature, so the member is not declared | `platform/ActivityScopedNotes.kt` | stays in `androidMain`, or the plain `addSnapshotListener(listener)` with `remove()` in `onStop` |
+| An Android type in the signature, so the member is not declared | `platform/ActivityScopedNotes.kt` | stays in `androidMain` (its read still becomes `toObjects<Note>()`, as the reflective read ignores the serialization annotations), or the plain `addSnapshotListener(listener)` with `remove()` in `onStop` |
 | A feature the iOS and JS SDKs lack, so the member is not declared | `platform/MessagingExports.kt` | an `expect` function in `commonMain` whose Android `actual` keeps the call and whose other actuals are empty |
 | An Android component | `platform/NotesMessagingService.kt` | stays in `androidMain`, declared in the Android manifest as before |
 

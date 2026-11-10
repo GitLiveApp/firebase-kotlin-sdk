@@ -21,16 +21,20 @@ object NotesFirebase {
     /** The host the Firebase emulators are reached on from the Android emulator; null to use the real project. */
     val EMULATOR_HOST: String? = "10.0.2.2"
 
-    fun ensureInitialized(context: Context): FirebaseApp =
-        FirebaseApp.getApps(context).firstOrNull() ?: FirebaseApp.initializeApp(
+    fun ensureInitialized(context: Context): FirebaseApp {
+        FirebaseApp.getApps(context).firstOrNull()?.let { return it }
+        val app = FirebaseApp.initializeApp(
             context,
             FirebaseOptions.Builder()
                 .setApiKey("AIzaSyCK87dcMFhzCz_kJVs2cT2AVlqOTLuyWV0")
-                .setApplicationId("1:846484016111:android:4c0dd0b6c0d4e1b8")
+                .setApplicationId("1:846484016111:android:4c0dd0b6c0d4e1b8") // the same id as the google_app_id resource Analytics reads
                 .setProjectId("fir-kotlin-sdk")
                 .setStorageBucket("fir-kotlin-sdk.appspot.com")
                 .build(),
-        ).also { if (EMULATOR_HOST != null) useEmulators(EMULATOR_HOST) }
+        )
+        if (EMULATOR_HOST != null) useEmulators(EMULATOR_HOST)
+        return app
+    }
 
     private fun useEmulators(host: String) {
         FirebaseAuth.getInstance().useEmulator(host, 9099)

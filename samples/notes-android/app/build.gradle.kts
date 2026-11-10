@@ -33,9 +33,10 @@ kotlin {
 
 dependencies {
     // KMP: implementation(project(":shared")) replaces the Firebase dependencies below, which move to
-    // shared/build.gradle.kts as `commonMain.dependencies { implementation("dev.gitlive:firebase-<module>:3.0.0-beta1") }`,
-    // one per module, without the BoM. On Android each Firebase Kotlin SDK module depends on the same
-    // com.google.firebase:firebase-<module>, so the app's classpath is unchanged.
+    // shared/build.gradle.kts as `commonMain.dependencies { api("dev.gitlive:firebase-<module>:3.0.0-beta1") }`, one per
+    // module, without the BoM: `api`, because the app keeps using Task, FirebaseUser and Task.await() through the shared
+    // classes (or keep the app's direct dependencies below as well). On Android each Firebase Kotlin SDK module depends
+    // on the same com.google.firebase:firebase-<module>, so the app's classpath is unchanged.
     implementation(platform("com.google.firebase:firebase-bom:34.18.0")) // KMP: remove
     implementation("com.google.firebase:firebase-analytics") // KMP: dev.gitlive:firebase-analytics in shared commonMain
     implementation("com.google.firebase:firebase-auth") // KMP: dev.gitlive:firebase-auth

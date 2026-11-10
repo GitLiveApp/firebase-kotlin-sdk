@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Firebase Notes</string>
+
+    <!-- Analytics on Android reads the app id from this resource, not from FirebaseOptions; it matches NotesFirebase. -->
+    <string name="google_app_id" translatable="false">1:846484016111:android:4c0dd0b6c0d4e1b8</string>
+
+    <!-- Crashlytics requires a build id, which its Gradle plugin would generate; the sample does not apply the plugin. -->
+    <string name="com.crashlytics.android.build_id" translatable="false">notes-android-sample</string>
 </resources>

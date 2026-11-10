@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,6 +17,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The google_app_id resource that Analytics needs would also let FirebaseInitProvider initialise the default app
+             from resources, ahead of NotesFirebase and without the emulator setup; the sample initialises in code instead. -->
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove" />
 
         <!-- Android-only: a FirebaseMessagingService is an android.app.Service. KMP: the service stays declared here and
              its class moves to shared/src/androidMain (or stays in the app); see NotesMessagingService. -->

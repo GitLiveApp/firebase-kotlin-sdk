@@ -40,6 +40,8 @@ class MainActivity : Activity() {
     private lateinit var input: EditText
     private lateinit var status: TextView
     private lateinit var list: TextView
+    private var started = false
+    private var listening = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +52,7 @@ class MainActivity : Activity() {
             try {
                 val user = telemetry.traced("sign_in") { session.signIn() }
                 telemetry.identify(user)
+                listenIfVisible()
                 settings.load()
                 input.hint = "A note of up to ${settings.maxNoteLength} characters"
                 status.text = "Signed in as ${user.uid.take(8)}, installation ${telemetry.installationId().take(8)}, messaging token ${messaging.token().take(8)}"
@@ -62,7 +65,20 @@ class MainActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        // The Activity-scoped listener is removed automatically when the activity stops.
+        started = true
+        listenIfVisible()
+    }
+
+    override fun onStop() {
+        started = false
+        listening = false // the Activity-scoped listener removes itself when the activity stops
+        super.onStop()
+    }
+
+    /** Listens to the signed-in user's notes while the activity is visible; on a fresh install the user arrives after onStart. */
+    private fun listenIfVisible() {
+        if (!started || listening || session.user == null) return
+        listening = true
         repository.listenWhile(this, ::showNotes) { status.text = "Listening failed: ${it.message}" }
     }
 
