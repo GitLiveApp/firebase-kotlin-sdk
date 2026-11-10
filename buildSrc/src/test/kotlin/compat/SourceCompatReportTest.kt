@@ -377,6 +377,39 @@ class SourceCompatReportTest {
     }
 
     @Test
+    fun showsTheDeprecationOfAnExcludedMemberTheLayerDeclares() {
+        val apiTxt = """
+            package com.google.firebase.test {
+              public final class Messaging {
+                method public boolean deliveryMetricsExportToBigQueryEnabled();
+                method public void setDeliveryMetricsExportToBigQuery(boolean);
+                method public com.google.android.gms.tasks.Task<Void!> register();
+                method public String getToken();
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public final class com/google/firebase/test/Messaging {
+            	public final fun deliveryMetricsExportToBigQueryEnabled ()Z  // deprecated: Android-only; a call belongs in androidMain
+            	public final fun setDeliveryMetricsExportToBigQuery (Z)V  // deprecated: Android-only; a call belongs in androidMain
+            	public final fun register ()Lcom/google/android/gms/tasks/Task;  // deprecated: not available yet
+            	public final fun getToken ()Ljava/lang/String;
+            }
+        """.trimIndent()
+        val exclusions = listOf(
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#deliveryMetricsExportToBigQueryEnabled"), "UNAV"),
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#setDeliveryMetricsExportToBigQuery"), "UNAV"),
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#register"), null),
+        )
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), exclusions)
+        assertTrue(report.contains("UNAV  boolean deliveryMetricsExportToBigQueryEnabled()  [deprecated: Android-only; a call belongs in androidMain]"), report)
+        assertTrue(report.contains("UNAV  void setDeliveryMetricsExportToBigQuery(boolean)  [deprecated: Android-only; a call belongs in androidMain]"), report)
+        assertTrue(report.contains("OMIT  Task register()  [deprecated: not available yet]"), report) // still counted as omitted
+        assertTrue(report.contains("OK    String getToken()"), report)
+        assertTrue(report.contains("# 50% of 2 public members available (1 identical, 0 mapped, 0 missing, 1 omitted)"), report)
+    }
+
+    @Test
     fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",

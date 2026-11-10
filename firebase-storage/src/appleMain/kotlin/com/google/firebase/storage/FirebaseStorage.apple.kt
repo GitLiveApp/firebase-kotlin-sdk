@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY
+
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorage
@@ -32,6 +34,11 @@ public actual class FirebaseStorage internal constructor(public val ios: FIRStor
         set(value) {
             ios.setMaxDownloadRetryTime(value / MILLIS_PER_SECOND)
         }
+
+    @Deprecated(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual var maxChunkUploadRetry: Long
+        get() = throw UnsupportedOperationException(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY)
+        set(_) = throw UnsupportedOperationException(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY)
 
     public actual val reference: StorageReference get() = StorageReference(ios.reference())
 

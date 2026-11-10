@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY
+
 import com.google.firebase.FirebaseApp
 
 /**
@@ -23,6 +25,10 @@ public expect class FirebaseStorage {
 
     /** The maximum time to retry downloads, in milliseconds; kept but without effect on JS, whose SDK has no file downloads. */
     public var maxDownloadRetryTimeMillis: Long
+
+    /** Android only: how many times a failed chunk of an upload is retried; the iOS and JS SDKs have no such setting. */
+    @Deprecated(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public var maxChunkUploadRetry: Long
 
     /** A reference to the root of the default bucket. */
     public val reference: StorageReference

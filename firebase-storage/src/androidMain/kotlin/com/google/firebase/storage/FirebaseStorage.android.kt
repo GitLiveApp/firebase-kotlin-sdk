@@ -19,6 +19,8 @@ import java.io.File
 import java.io.InputStream
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import dev.gitlive.firebase.storage.MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY
+import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
 
 /*
  * Header stubs for com.google.firebase:firebase-storage (see buildSrc utils/HeaderStubs.kt): compiled against,
@@ -36,6 +38,11 @@ public actual class FirebaseStorage private constructor() {
         set(_) = stub()
 
     public actual var maxDownloadRetryTimeMillis: Long
+        get() = stub()
+        set(_) = stub()
+
+    @Deprecated(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual var maxChunkUploadRetry: Long
         get() = stub()
         set(_) = stub()
     public actual val reference: StorageReference get() = stub()
@@ -81,6 +88,9 @@ public actual class StorageReference private constructor() : Comparable<StorageR
 
     public actual fun putFile(uri: Uri): UploadTask = stub()
     public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = stub()
+
+    @Deprecated(RESUME_UPLOAD_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata, existingUploadUri: Uri): UploadTask = stub()
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = stub()
 
     @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)

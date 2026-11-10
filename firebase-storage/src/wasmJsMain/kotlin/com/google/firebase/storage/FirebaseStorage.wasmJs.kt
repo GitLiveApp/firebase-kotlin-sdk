@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY
+
 import dev.gitlive.firebase.UnsupportedOnJs
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.storage.externals.connectStorageEmulator
@@ -24,6 +26,11 @@ public actual class FirebaseStorage internal constructor(public val js: JsFireba
     /** Kept in memory with no effect: the JS SDK has no file downloads. */
     @UnsupportedOnJs
     public actual var maxDownloadRetryTimeMillis: Long = DEFAULT_RETRY_TIME_MILLIS
+
+    @Deprecated(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual var maxChunkUploadRetry: Long
+        get() = throw UnsupportedOperationException(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY)
+        set(_) = throw UnsupportedOperationException(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY)
 
     public actual var maxUploadRetryTimeMillis: Long
         get() = js.maxUploadRetryTime.toLong()

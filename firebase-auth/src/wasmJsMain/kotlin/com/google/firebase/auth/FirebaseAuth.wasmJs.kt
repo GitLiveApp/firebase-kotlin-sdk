@@ -333,7 +333,7 @@ internal class MultiFactorResolverImpl(public val js: JsMultiFactorResolver, ove
     override fun resolveSignIn(assertion: MultiFactorAssertion): Task<AuthResult> = task(firebaseAuth, { js.resolveSignIn(assertion.native.asJsAny() as JsMultiFactorAssertion) }) { toAuthResult(it, firebaseAuth) }
 }
 
-internal class TotpSecretImpl(public val js: JsTotpSecret) : TotpSecret {
+internal class TotpSecretImpl(public val js: JsTotpSecret) : TotpSecretBase() {
     override val sharedSecretKey: String get() = js.secretKey
 
     override fun generateQrCodeUrl(accountName: String, issuer: String): String = js.generateQrCodeUrl(accountName, issuer)

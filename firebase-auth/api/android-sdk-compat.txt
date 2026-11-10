@@ -328,7 +328,7 @@ com.google.firebase.auth.PhoneMultiFactorInfo
 com.google.firebase.auth.SignInMethodQueryResult
   OK    List getSignInMethods()
 com.google.firebase.auth.TotpMultiFactorAssertion
-  UNAV  TotpMultiFactorAssertion(String, TotpSecret, String)
+  UNAV  TotpMultiFactorAssertion(String, TotpSecret, String)  [deprecated: Constructing a TotpMultiFactorAssertion is Android-only: the Firebase iOS and JS SDKs only create assertions through TotpMultiFactorGenerator; use getAssertionForEnrollment(secret, oneTimePassword) or getAssertionForSignIn(enrollmentId, oneTimePassword)]
   OK    String getFactorId()
 com.google.firebase.auth.TotpMultiFactorGenerator
   OK    static Task generateSecret(MultiFactorSession)
@@ -342,13 +342,13 @@ com.google.firebase.auth.TotpMultiFactorInfo
   OK    String getUid()
   PLAT  JSONObject toJson()
 com.google.firebase.auth.TotpSecret
-  UNAV  String generateQrCodeUrl()
+  UNAV  String generateQrCodeUrl()  [deprecated: generateQrCodeUrl() without arguments is Android-only: the Firebase iOS SDK requires the account name and issuer; use generateQrCodeUrl(accountName, issuer)]
   OK    String generateQrCodeUrl(String, String)
-  UNAV  int getCodeIntervalSeconds()
-  UNAV  int getCodeLength()
-  UNAV  long getEnrollmentCompletionDeadline()
-  UNAV  String getHashAlgorithm()
-  UNAV  String getSessionInfo()
+  UNAV  int getCodeIntervalSeconds()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
+  UNAV  int getCodeLength()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
+  UNAV  long getEnrollmentCompletionDeadline()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
+  UNAV  String getHashAlgorithm()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
+  UNAV  String getSessionInfo()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
   OK    String getSharedSecretKey()
   OK    void openInOtpApp(String)
   PLAT  void openInOtpApp(String, String, Activity)

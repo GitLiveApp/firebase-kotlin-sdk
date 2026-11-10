@@ -27,14 +27,14 @@ com.google.firebase.storage.FirebaseStorage
   OK    static FirebaseStorage getInstance(FirebaseApp)
   OK    static FirebaseStorage getInstance(String)
   OK    static FirebaseStorage getInstance(FirebaseApp, String)
-  UNAV  long getMaxChunkUploadRetry()
+  UNAV  long getMaxChunkUploadRetry()  [deprecated: The chunk upload retry count is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis is available on every platform); a call belongs in androidMain]
   OK    long getMaxDownloadRetryTimeMillis()
   OK    long getMaxOperationRetryTimeMillis()
   OK    long getMaxUploadRetryTimeMillis()
   OK    StorageReference getReference()
   OK    StorageReference getReference(String)
   OK    StorageReference getReferenceFromUrl(String)
-  UNAV  void setMaxChunkUploadRetry(long)
+  UNAV  void setMaxChunkUploadRetry(long)  [deprecated: The chunk upload retry count is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis is available on every platform); a call belongs in androidMain]
   OK    void setMaxDownloadRetryTimeMillis(long)
   OK    void setMaxOperationRetryTimeMillis(long)
   OK    void setMaxUploadRetryTimeMillis(long)
@@ -144,7 +144,7 @@ com.google.firebase.storage.StorageReference
   OK    UploadTask putBytes(byte[], StorageMetadata)
   OK    UploadTask putFile(Uri)
   OK    UploadTask putFile(Uri, StorageMetadata)
-  UNAV  UploadTask putFile(Uri, StorageMetadata, Uri)
+  UNAV  UploadTask putFile(Uri, StorageMetadata, Uri)  [deprecated: Resuming an upload session by its URL is Android-only: the Firebase iOS and JS SDKs cannot resume a session; putFile(uri, metadata) or putBytes start a new upload]
   MAP   UploadTask putStream(InputStream)  [deprecated: putStream(java.io.InputStream) is Android/JVM-only; use putStream(RawSource) (kotlinx-io), on the JVM with stream.asSource()]
   MAP   UploadTask putStream(InputStream, StorageMetadata)  [deprecated: putStream(java.io.InputStream) is Android/JVM-only; use putStream(RawSource) (kotlinx-io), on the JVM with stream.asSource()]
   OK    Task updateMetadata(StorageMetadata)

@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
+
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
@@ -98,6 +100,9 @@ public actual class StorageReference internal constructor(public val js: JsStora
     /** Fails: the JS SDK cannot read a file by its URL; use [putBytes], or the dev.gitlive wrapper's `putFile` with a browser `File`. */
     @UnsupportedOnJs
     public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = failedFileUpload()
+
+    @Deprecated(RESUME_UPLOAD_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata, existingUploadUri: Uri): UploadTask = throw UnsupportedOperationException(RESUME_UPLOAD_ANDROID_ONLY)
 
     /** Fails: the JS SDK downloads through URLs, not to files; use [getBytes] or [getDownloadUrl]. */
     @UnsupportedOnJs

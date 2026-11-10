@@ -4,18 +4,18 @@
 #
 com.google.firebase.messaging.FirebaseMessaging
   SKIP  Task deleteToken()
-  UNAV  boolean deliveryMetricsExportToBigQueryEnabled()
+  UNAV  boolean deliveryMetricsExportToBigQueryEnabled()  [deprecated: Exporting delivery metrics to BigQuery is an Android SDK setting with no counterpart in the Firebase iOS and JS SDKs, which configure it on their own side; a call belongs in androidMain]
   OK    static FirebaseMessaging getInstance()
   SKIP  Task getToken()
   OK    boolean isAutoInitEnabled()
-  UNAV  boolean isNotificationDelegationEnabled()
-  OMIT  Task register()
+  UNAV  boolean isNotificationDelegationEnabled()  [deprecated: Notification delegation (proxy notifications) is an Android feature with no counterpart in the Firebase iOS and JS SDKs; a call belongs in androidMain]
+  OMIT  Task register()  [deprecated: register() and unregister() were added to the Firebase Android SDK after firebase-messaging 25.1.2, the version this SDK depends on, and are not available yet]
   SKIP  void send(RemoteMessage)
   OK    void setAutoInitEnabled(boolean)
-  UNAV  void setDeliveryMetricsExportToBigQuery(boolean)
-  UNAV  Task setNotificationDelegationEnabled(boolean)
+  UNAV  void setDeliveryMetricsExportToBigQuery(boolean)  [deprecated: Exporting delivery metrics to BigQuery is an Android SDK setting with no counterpart in the Firebase iOS and JS SDKs, which configure it on their own side; a call belongs in androidMain]
+  UNAV  Task setNotificationDelegationEnabled(boolean)  [deprecated: Notification delegation (proxy notifications) is an Android feature with no counterpart in the Firebase iOS and JS SDKs; a call belongs in androidMain]
   OK    Task subscribeToTopic(String)
-  OMIT  Task unregister()
+  OMIT  Task unregister()  [deprecated: register() and unregister() were added to the Firebase Android SDK after firebase-messaging 25.1.2, the version this SDK depends on, and are not available yet]
   OK    Task unsubscribeFromTopic(String)
   SKIP  static String INSTANCE_ID_SCOPE
 com.google.firebase.messaging.MessagingKt

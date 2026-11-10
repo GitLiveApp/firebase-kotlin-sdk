@@ -8,6 +8,7 @@ import android.net.Uri
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
 
 /**
  * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
@@ -90,6 +91,10 @@ public expect class StorageReference : Comparable<StorageReference> {
 
     /** Uploads the file at [uri] to this reference with [metadata]. Fails on JS, whose SDK cannot read a file by its URL. */
     public fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask
+
+    /** Android only: resumes the upload session at [existingUploadUri]; the iOS and JS SDKs cannot resume a session. */
+    @Deprecated(RESUME_UPLOAD_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun putFile(uri: Uri, metadata: StorageMetadata, existingUploadUri: Uri): UploadTask
 
     /** Downloads the object to the file at [destinationUri]. Fails on JS, whose SDK has no file downloads. */
     public fun getFile(destinationUri: Uri): FileDownloadTask

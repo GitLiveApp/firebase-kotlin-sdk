@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
+
 import android.net.Uri
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageMetadata
 import swiftPMImport.dev.gitlive.firebase.storage.FIRStorageReference
@@ -86,6 +88,9 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     public actual fun putFile(uri: Uri): UploadTask = putFileUrl(uri.toNSURL(), null)
 
     public actual fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask = putFileUrl(uri.toNSURL(), metadata)
+
+    @Deprecated(RESUME_UPLOAD_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun putFile(uri: Uri, metadata: StorageMetadata, existingUploadUri: Uri): UploadTask = throw UnsupportedOperationException(RESUME_UPLOAD_ANDROID_ONLY)
 
     public actual fun getFile(destinationUri: Uri): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(destinationUri.toNSURL()))
 
