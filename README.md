@@ -148,7 +148,8 @@ applies the Android SDK's Realtime Database or Cloud Firestore rules (the number
 serializer, with kotlinx.serialization's `@SerialName` and `@Transient` naming and excluding properties. The Android SDK's
 reflective members (`setValue(Any?)`, `updateChildren(Map)` and `MutableData.value`'s setter on the database, `set(Any)`,
 `update(Map)` and `add(Any)` on Firestore, the reified `getValue<T>()`, `values<T>()`, `toObject<T>()`, `toObjects<T>()`,
-`getField<T>()` and `dataObjects<T>()` in common code, and the `Class`- and `GenericTypeIndicator`-taking reads on Android) are
+`getField<T>()` and `dataObjects<T>()` in common code, and the `Class`- and `GenericTypeIndicator`-taking reads, declared through an
+error-deprecated stand-in for `java.lang.Class`) are
 deprecated with an error towards the `setData`/`updateData`/`addData` extensions and the reified reads of the same names in
 `com.google.firebase.serialization`, which plain values and maps work through too; `setData` maps the value with its static type,
 so a generic class maps as well, and the reads keep the SDK's names but need that import, as in the SDK's own package a call

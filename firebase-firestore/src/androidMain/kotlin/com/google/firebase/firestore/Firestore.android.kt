@@ -289,22 +289,22 @@ public actual open class DocumentSnapshot {
 
     // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    public open fun <T> toObject(valueType: Class<T>): T? = stub()
+    public actual open fun <T> toObject(valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    public open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(field: String, valueType: Class<T>): T? = stub()
+    public actual fun <T> get(field: String, valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
+    public actual fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     public actual enum class ServerTimestampBehavior {
         NONE,
@@ -317,10 +317,10 @@ public actual open class DocumentSnapshot {
 public actual class QueryDocumentSnapshot private constructor() : DocumentSnapshot() {
     // A query document exists, so the SDK's overrides return a value.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    override fun <T> toObject(valueType: Class<T>): T = stub()
+    actual override fun <T> toObject(valueType: Class<T>): T = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
+    actual override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
 }
 
 public actual class QuerySnapshot private constructor() : Iterable<QueryDocumentSnapshot> {
@@ -334,10 +334,10 @@ public actual class QuerySnapshot private constructor() : Iterable<QueryDocument
 
     // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
-    public fun <T> toObjects(clazz: Class<T>): List<T> = stub()
+    public actual fun <T> toObjects(clazz: Class<T>): List<T> = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
-    public fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
+    public actual fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
 
     actual override fun iterator(): Iterator<QueryDocumentSnapshot> = stub()
 }

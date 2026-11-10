@@ -40,9 +40,12 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    quick-fix applies it. Android code in `androidMain` keeps calling them as before.
 3. **Custom classes.** The Android SDK maps your model classes by reflection, which only exists on Android and the JVM, so the
    writes that take one (`set(Any)`, `update(Map)` and `add(Any)` on Firestore, `setValue(Any?)` and
-   `updateChildren(Map)` on the database) are deprecated with an error, and the class-taking reads (`toObject(Class)`,
-   `toObjects(Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`) are not declared in common code at all,
-   as `java.lang.Class` is JVM-only (see item 8), so they are reported as unresolved. The replacements map a
+   `updateChildren(Map)` on the database) are deprecated with an error, and so are the class-taking reads (`toObject(Class)`,
+   `toObjects(Class)`, `get(field, Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`), which are declared
+   through an error-deprecated stand-in for `java.lang.Class`, the way `java.util.Date` is (item 2). A call such as
+   `toObject(Book::class.java)` therefore shows two errors: the deprecation on `toObject`, naming the replacement, and
+   an unresolved `java` on the argument, as `KClass.java` is a JVM-only extension that cannot be declared in common
+   code; replacing the call fixes both. The replacements map a
    `@Serializable` class with kotlinx.serialization on every platform: `setData`, `updateData` and `addData`, and the
    reified `toObject<T>()`, `toObjects<T>()`, `getField<T>()`, `dataObjects<T>()` and `getValue<T>()` in
    `com.google.firebase.serialization`. Plain values and maps work through them too. The SDK's mapping annotations
@@ -66,9 +69,9 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    the call belongs (`androidMain`), so common code using one fails with that message. They are listed in each module's
    `api/android-sdk/exclusions.txt` as `@unavailable` and left out of the coverage count.
 9. **Members that are not declared at all.** A member bound to an Android type the other platforms cannot have (the
-   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`, `java.lang.Class`) is
-   left out, so the compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt`
-   lists them as `@platform`, with the type.
+   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`) is left out, so the
+   compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt` lists them as
+   `@platform`, with the type.
 
 Everything else, including every listener, continuation, builder and static accessor, is available with the same
 signature. Each module lists exactly which Android SDK members it provides in its `api/android-sdk-compat.txt` (for
@@ -288,12 +291,13 @@ class BookRepository(private val firestore: FirebaseFirestore) {
 
 ```
 e: BookRepository.kt: 'fun set(data: Any): Task<Nothing?>' is deprecated. set maps a custom class with the Android SDK's reflection, which only exists on Android and the JVM; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform
-e: BookRepository.kt: Unresolved reference 'toObject' on receiver of type 'DocumentSnapshot'.
+e: BookRepository.kt: 'fun <T> toObject(valueType: Class<T>): T?' is deprecated. Maps the class with the Android SDK's reflection, which only exists on Android and the JVM; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform
 e: BookRepository.kt: Unresolved reference 'java' on receiver of type 'KClass<Book>'.
 ```
 
-The write is deprecated with the message above; the class-taking read is unresolved, because neither `toObject(Class)`
-nor `Book::class.java` exists off the JVM. Once those are fixed the annotation gets its warning:
+Both members are deprecated with a message naming the replacement; the read also reports its argument, because
+`Book::class.java` does not exist off the JVM, and the one replacement removes both errors. Once those are fixed the
+annotation gets its warning:
 
 ```
 w: BookRepository.kt: 'annotation class PropertyName : Annotation' is deprecated. Only the Android SDK's reflective mapping reads @PropertyName; kotlinx.serialization's @SerialName names the property on every platform.

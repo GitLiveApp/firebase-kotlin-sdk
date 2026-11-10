@@ -158,10 +158,10 @@ public actual class DataSnapshot private constructor() {
     public actual fun getValue(useExportFormat: Boolean): Any? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
-    public fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
-    public fun <T> getValue(valueType: Class<T>): T? = stub()
+    public actual fun <T> getValue(valueType: Class<T>): T? = stub()
     public actual val priority: Any? get() = stub()
     public actual fun child(path: String): DataSnapshot = stub()
     public actual fun hasChild(path: String): Boolean = stub()
@@ -179,10 +179,10 @@ public actual class MutableData private constructor() {
         set(_) = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
-    public fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
-    public fun <T> getValue(valueType: Class<T>): T? = stub()
+    public actual fun <T> getValue(valueType: Class<T>): T? = stub()
     public actual var priority: Any?
         get() = stub()
         set(_) = stub()

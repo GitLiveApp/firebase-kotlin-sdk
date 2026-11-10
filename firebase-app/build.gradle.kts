@@ -212,7 +212,7 @@ tasks.withType<JavaCompile>().configureEach {
 // Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
 // kotlinx-coroutines-play-services classes and the platform's own types are used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("android/content", "android/net", "java/io", "java/net", "java/nio", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    packageDirs = listOf("android/content", "android/net", "java/io", "java/lang", "java/net", "java/nio", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
         val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
