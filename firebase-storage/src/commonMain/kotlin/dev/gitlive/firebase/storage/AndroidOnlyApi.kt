@@ -9,8 +9,8 @@ package dev.gitlive.firebase.storage
 
 internal const val GET_FILE_JVM_ONLY = "getFile(java.io.File) is Android/JVM-only; use getFile(Path) (kotlinx-io), on the JVM with Path(destinationFile.path), or getFile(Uri)"
 internal const val MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY =
-    "The chunk upload retry count is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis is " +
-        "available on every platform); a call belongs in androidMain"
+    "The time limit for retrying a failed chunk of an upload is Android-only: the Firebase iOS and JS SDKs have no such setting " +
+        "(maxUploadRetryTimeMillis, the limit for the whole upload, is available on every platform); a call belongs in androidMain"
 internal const val RESUME_UPLOAD_ANDROID_ONLY =
     "Resuming an upload session by its URL is Android-only: the Firebase iOS and JS SDKs cannot resume a session; " +
         "putFile(uri, metadata) or putBytes start a new upload"

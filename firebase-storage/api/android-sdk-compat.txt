@@ -27,14 +27,14 @@ com.google.firebase.storage.FirebaseStorage
   OK    static FirebaseStorage getInstance(FirebaseApp)
   OK    static FirebaseStorage getInstance(String)
   OK    static FirebaseStorage getInstance(FirebaseApp, String)
-  UNAV  long getMaxChunkUploadRetry()  [deprecated: The chunk upload retry count is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis is available on every platform); a call belongs in androidMain]
+  UNAV  long getMaxChunkUploadRetry()  [deprecated: The time limit for retrying a failed chunk of an upload is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis, the limit for the whole upload, is available on every platform); a call belongs in androidMain]
   OK    long getMaxDownloadRetryTimeMillis()
   OK    long getMaxOperationRetryTimeMillis()
   OK    long getMaxUploadRetryTimeMillis()
   OK    StorageReference getReference()
   OK    StorageReference getReference(String)
   OK    StorageReference getReferenceFromUrl(String)
-  UNAV  void setMaxChunkUploadRetry(long)  [deprecated: The chunk upload retry count is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis is available on every platform); a call belongs in androidMain]
+  UNAV  void setMaxChunkUploadRetry(long)  [deprecated: The time limit for retrying a failed chunk of an upload is Android-only: the Firebase iOS and JS SDKs have no such setting (maxUploadRetryTimeMillis, the limit for the whole upload, is available on every platform); a call belongs in androidMain]
   OK    void setMaxDownloadRetryTimeMillis(long)
   OK    void setMaxOperationRetryTimeMillis(long)
   OK    void setMaxUploadRetryTimeMillis(long)

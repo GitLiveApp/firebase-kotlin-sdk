@@ -61,7 +61,7 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    must return a value. Storage's `putFile(Uri)` and `getFile(Uri)` are an example: the JS SDK uploads and downloads
    bytes, not files. The deprecation and opt-in messages, and each member's documentation, say what happens.
 8. **Members of features the iOS and JS SDKs lack.** Play Games sign-in, the TOTP secret's parameters, the Android-only
-   messaging settings, storage's chunk retry count and upload resumption, `FirebaseMessagingService` and the streaming
+   messaging settings, storage's chunk retry time limit and upload resumption, `FirebaseMessagingService` and the streaming
    `StreamResponse` are declared with an error-level deprecation whose message says the member is Android-only and where
    the call belongs (`androidMain`), so common code using one fails with that message. They are listed in each module's
    `api/android-sdk/exclusions.txt` as `@unavailable` and left out of the coverage count.

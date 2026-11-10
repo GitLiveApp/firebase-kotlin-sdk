@@ -157,7 +157,7 @@ public expect interface TotpSecret {
     @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public val codeLength: Int
 
-    /** Android only: the time by which enrollment must be completed, in milliseconds since the epoch. */
+    /** Android only: the time by which enrollment must be completed, in seconds since the epoch. */
     @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public val enrollmentCompletionDeadline: Long
 

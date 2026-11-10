@@ -26,7 +26,7 @@ public expect class FirebaseStorage {
     /** The maximum time to retry downloads, in milliseconds; kept but without effect on JS, whose SDK has no file downloads. */
     public var maxDownloadRetryTimeMillis: Long
 
-    /** Android only: how many times a failed chunk of an upload is retried; the iOS and JS SDKs have no such setting. */
+    /** Android only: how long, in milliseconds, a failed chunk of an upload is retried for; the iOS and JS SDKs have no such setting. */
     @Deprecated(MAX_CHUNK_UPLOAD_RETRY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public var maxChunkUploadRetry: Long
 
