@@ -243,10 +243,14 @@ public external interface Query : JsAny {
 public external interface QueryConstraint : JsAny
 
 public external interface AggregateQuerySnapshot : JsAny {
+    public val query: Query
+
     public fun data(): JsAny
 }
 
 public external interface AggregateField : JsAny
+
+public external fun count(): AggregateField
 
 public external fun sum(field: String): AggregateField
 
@@ -412,8 +416,6 @@ public external fun disablePersistentCacheIndexAutoCreation(indexManager: Persis
 public external fun deleteAllPersistentCacheIndexes(indexManager: PersistentCacheIndexManager)
 
 public external fun onSnapshotsInSync(firestore: Firestore, onSync: () -> Unit): Unsubscribe
-
-public external fun count(): AggregateField
 
 public external fun queryEqual(left: Query, right: Query): Boolean
 

@@ -181,7 +181,7 @@ public actual class AggregateQuery internal constructor(public actual val query:
         }
     }
 
-    private fun AggregateField.toJs(): JsAggregateField = when (this) {
+    private fun AggregateField.toJs(): JsAggregateField<*> = when (this) {
         is AggregateField.SumAggregateField -> jsSum(aggregatedField!!.toJs())
         is AggregateField.AverageAggregateField -> jsAverage(aggregatedField!!.toJs())
         else -> jsCount()

@@ -7,6 +7,7 @@ package dev.gitlive.firebase.firestore.internal
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.filterAnd
 import com.google.firebase.firestore.filterArrayContains
 import com.google.firebase.firestore.filterArrayContainsAny
@@ -71,6 +72,11 @@ internal expect fun CompatQuery.wrapperSnapshotListener(metadataChanges: Metadat
 /** Listens to the document on the executor configured through the settings on Android, the SDK's default elsewhere. */
 internal expect fun CompatDocumentReference.wrapperSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<CompatDocumentSnapshot>): ListenerRegistration
 
+// The SDK has no executor overload for SnapshotListenOptions (unlike MetadataChanges), so these listen on the SDK's
+// default executor on every platform including Android.
+internal expect fun CompatQuery.wrapperSnapshotListener(listenOptions: SnapshotListenOptions, listener: EventListener<CompatQuerySnapshot>): ListenerRegistration
+internal expect fun CompatDocumentReference.wrapperSnapshotListener(listenOptions: SnapshotListenOptions, listener: EventListener<CompatDocumentSnapshot>): ListenerRegistration
+
 internal fun CompatQuery.wrapperSnapshots(includeMetadataChanges: Boolean): Flow<CompatQuerySnapshot> = callbackFlow {
     val registration = wrapperSnapshotListener(if (includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE) { snapshot, error ->
         if (error != null) {
@@ -84,6 +90,28 @@ internal fun CompatQuery.wrapperSnapshots(includeMetadataChanges: Boolean): Flow
 
 internal fun CompatDocumentReference.wrapperSnapshots(includeMetadataChanges: Boolean): Flow<CompatDocumentSnapshot> = callbackFlow {
     val registration = wrapperSnapshotListener(if (includeMetadataChanges) MetadataChanges.INCLUDE else MetadataChanges.EXCLUDE) { snapshot, error ->
+        if (error != null) {
+            close(error)
+        } else if (snapshot != null) {
+            trySend(snapshot)
+        }
+    }
+    awaitClose { registration.remove() }
+}
+
+internal fun CompatQuery.wrapperSnapshots(listenOptions: SnapshotListenOptions): Flow<CompatQuerySnapshot> = callbackFlow {
+    val registration = wrapperSnapshotListener(listenOptions) { snapshot, error ->
+        if (error != null) {
+            close(error)
+        } else if (snapshot != null) {
+            trySend(snapshot)
+        }
+    }
+    awaitClose { registration.remove() }
+}
+
+internal fun CompatDocumentReference.wrapperSnapshots(listenOptions: SnapshotListenOptions): Flow<CompatDocumentSnapshot> = callbackFlow {
+    val registration = wrapperSnapshotListener(listenOptions) { snapshot, error ->
         if (error != null) {
             close(error)
         } else if (snapshot != null) {

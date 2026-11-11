@@ -4,10 +4,13 @@
 
 package dev.gitlive.firebase.firestore
 
+import com.google.firebase.firestore.AggregateField
+import com.google.firebase.firestore.AggregateField.AverageAggregateField
 import dev.gitlive.firebase.DecodeSettings
 import dev.gitlive.firebase.EncodeSettings
 import dev.gitlive.firebase.internal.EncodedObject
 import com.google.firebase.firestore.AggregateSource
+import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.aggregateAverage
 import com.google.firebase.firestore.aggregateSum
 import com.google.firebase.firestore.fieldPathDocumentId
@@ -268,16 +271,17 @@ public open class Query internal constructor(public open val compat: CompatQuery
     public fun limit(limit: Number): Query = Query(compat.limit(limit.toLong()))
     public fun limitToLast(limit: Number): Query = Query(compat.limitToLast(limit.toLong()))
 
-    public suspend fun count(): Long = compat.count().get(AggregateSource.SERVER).await().count
-    public suspend fun sum(field: String): Double = aggregate(aggregateSum(field)) ?: 0.0
-    public suspend fun sum(field: FieldPath): Double = aggregate(aggregateSum(field.compat)) ?: 0.0
-    public suspend fun average(field: String): Double? = aggregate(aggregateAverage(field))
-    public suspend fun average(field: FieldPath): Double? = aggregate(aggregateAverage(field.compat))
+    public fun count(): AggregateQuery = AggregateQuery(compat.count())
 
-    private suspend fun aggregate(field: com.google.firebase.firestore.AggregateField): Double? = compat.aggregate(field).get(AggregateSource.SERVER).await().getDouble(field)
+    public fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): AggregateQuery = AggregateQuery(
+        compat.aggregate(aggregateField, *aggregateFields),
+    )
 
     public val snapshots: Flow<QuerySnapshot> get() = snapshots()
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<QuerySnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map { QuerySnapshot(it) }
+
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<QuerySnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::QuerySnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<QuerySnapshot> = compat.wrapperSnapshots(listenOptions).map(::QuerySnapshot)
+
     public suspend fun get(source: Source = Source.DEFAULT): QuerySnapshot = QuerySnapshot(compat.get(source.toCompat()).await())
 
     public fun where(builder: FilterBuilder.() -> Filter?): Query = builder(FilterBuilder())?.let { Query(compat.where(it.toCompat())) } ?: this
@@ -375,6 +379,55 @@ public open class Query internal constructor(public open val compat: CompatQuery
     override fun hashCode(): Int = compat.hashCode()
 
     override fun toString(): String = compat.toString()
+}
+
+/**
+ * Fetches the number of documents matching this [Query] in a single round-trip. A convenience shortcut for
+ * `count().get().count`; use [Query.count] directly if you need the [AggregateQuerySnapshot] itself.
+ */
+public suspend fun Query.getCount(): Long = count().get().count
+
+/**
+ * Fetches the sum of [field] across documents matching this [Query] in a single round-trip, or `0.0` if the
+ * query matches no documents. To combine a sum with other aggregates in one round-trip, use [Query.aggregate]
+ * with [AggregateField.sum] instead.
+ */
+public suspend fun Query.sum(field: String): Double = aggregateDouble(aggregateSum(field)) ?: 0.0
+
+public suspend fun Query.sum(field: FieldPath): Double = aggregateDouble(aggregateSum(field.compat)) ?: 0.0
+
+/**
+ * Fetches the average of [field] across documents matching this [Query] in a single round-trip, or `null` if
+ * the query matches no documents. To combine an average with other aggregates in one round-trip, use
+ * [Query.aggregate] with [AggregateField.average] instead.
+ */
+public suspend fun Query.average(field: String): Double? = aggregateDouble(aggregateAverage(field))
+
+public suspend fun Query.average(field: FieldPath): Double? = aggregateDouble(aggregateAverage(field.compat))
+
+private suspend fun Query.aggregateDouble(aggregateField: AggregateField): Double? = aggregate(aggregateField).get().getDouble(aggregateField)
+
+public class AggregateQuery internal constructor(public val compat: com.google.firebase.firestore.AggregateQuery) {
+
+    public companion object {}
+
+    public val query: Query get() = Query(compat.query)
+
+    public suspend fun get(source: AggregateSource = AggregateSource.SERVER): AggregateQuerySnapshot = AggregateQuerySnapshot(compat.get(source).await())
+}
+
+public class AggregateQuerySnapshot internal constructor(public val compat: com.google.firebase.firestore.AggregateQuerySnapshot) {
+
+    public companion object {}
+
+    public val query: AggregateQuery get() = AggregateQuery(compat.query)
+    public val count: Long get() = compat.count
+
+    public operator fun get(aggregateField: AggregateField): Number? = compat.get(aggregateField) as? Number
+    public operator fun get(averageAggregateField: AverageAggregateField): Double? = compat.get(averageAggregateField)
+    public operator fun get(countAggregateField: AggregateField.CountAggregateField): Long = compat.get(countAggregateField)
+    public fun getDouble(aggregateField: AggregateField): Double? = compat.getDouble(aggregateField)
+    public fun getLong(aggregateField: AggregateField): Long? = compat.getLong(aggregateField)
 }
 
 @Deprecated("Deprecated in favor of using a [FilterBuilder]", replaceWith = ReplaceWith("where { field equalTo equalTo }", "dev.gitlive.firebase.firestore"))
@@ -561,7 +614,9 @@ public data class DocumentReference internal constructor(public val compat: Comp
     val path: String get() = compat.path
     val snapshots: Flow<DocumentSnapshot> get() = snapshots()
     val parent: CollectionReference get() = CollectionReference(compat.parent)
-    public fun snapshots(includeMetadataChanges: Boolean = false): Flow<DocumentSnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::DocumentSnapshot)
+
+    public fun snapshots(includeMetadataChanges: Boolean): Flow<DocumentSnapshot> = compat.wrapperSnapshots(includeMetadataChanges).map(::DocumentSnapshot)
+    public fun snapshots(listenOptions: SnapshotListenOptions = snapshotListenOptions()): Flow<DocumentSnapshot> = compat.wrapperSnapshots(listenOptions).map(::DocumentSnapshot)
 
     public fun collection(collectionPath: String): CollectionReference = CollectionReference(compat.collection(collectionPath))
     public suspend fun get(source: Source = Source.DEFAULT): DocumentSnapshot = DocumentSnapshot(compat.get(source.toCompat()).await())
