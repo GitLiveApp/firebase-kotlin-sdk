@@ -4,6 +4,8 @@
 
 package com.google.firebase.functions
 
+import dev.gitlive.firebase.functions.USE_FUNCTIONS_EMULATOR_DEPRECATED
+import dev.gitlive.firebase.functions.STREAM_JVM_ONLY
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
@@ -28,6 +30,9 @@ public actual class FirebaseFunctions private constructor() {
     public actual fun getHttpsCallableFromUrl(url: URL, options: HttpsCallableOptions): HttpsCallableReference = stub()
 
     public actual fun useEmulator(host: String, port: Int): Unit = stub()
+
+    @Deprecated(USE_FUNCTIONS_EMULATOR_DEPRECATED, ReplaceWith("useEmulator(host, port)"))
+    public actual fun useFunctionsEmulator(origin: String): Unit = stub()
 
     public actual companion object {
         @JvmStatic
@@ -54,6 +59,14 @@ public actual class HttpsCallableReference private constructor() {
 
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
     public actual fun withTimeout(timeout: Long, units: TimeUnit): HttpsCallableReference = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun stream(): org.reactivestreams.Publisher<StreamResponse> = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun stream(data: Any?): org.reactivestreams.Publisher<StreamResponse> = stub()
 }
 
 public actual class HttpsCallableResult private constructor() {

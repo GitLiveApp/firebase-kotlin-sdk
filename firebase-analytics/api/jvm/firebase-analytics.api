@@ -30,6 +30,7 @@ public final class com/google/firebase/analytics/FirebaseAnalytics {
 	public final fun resetAnalyticsData ()V
 	public final fun setAnalyticsCollectionEnabled (Z)V
 	public final fun setConsent (Ljava/util/Map;)V
+	public final fun setCurrentScreen (Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V
 	public final fun setDefaultEventParameters (Landroid/os/Bundle;)V
 	public final fun setSessionTimeoutDuration (J)V
 	public final fun setUserId (Ljava/lang/String;)V
@@ -193,6 +194,11 @@ public class com/google/firebase/analytics/FirebaseAnalytics$UserProperty {
 }
 
 public final class com/google/firebase/analytics/FirebaseAnalytics$UserProperty$Companion {
+}
+
+public final class com/google/firebase/analytics/GoogleAnalyticsServerPreviewActivity {
+	public fun <init> ()V
+	public final fun onCreate (Landroid/os/Bundle;)V
 }
 
 public final class com/google/firebase/analytics/ParametersBuilder {

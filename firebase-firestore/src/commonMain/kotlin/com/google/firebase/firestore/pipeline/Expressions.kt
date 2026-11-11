@@ -4,6 +4,7 @@
 
 package com.google.firebase.firestore.pipeline
 
+import dev.gitlive.firebase.firestore.DIRECTION_PROTO_ANDROID_ONLY
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.GeoPoint
 import dev.gitlive.firebase.firestore.INTERNAL_CONSTRUCTOR
@@ -79,6 +80,12 @@ public class Ordering public constructor(public val expr: Expression, public val
     public enum class Direction(internal val wire: String) {
         ASCENDING("ascending"),
         DESCENDING("descending"),
+        ;
+
+        /** Android/JVM only: the direction as the SDK's protobuf value. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(DIRECTION_PROTO_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public val proto: com.google.firestore.v1.Value get() = throw UnsupportedOperationException(DIRECTION_PROTO_ANDROID_ONLY)
     }
 
     public companion object {

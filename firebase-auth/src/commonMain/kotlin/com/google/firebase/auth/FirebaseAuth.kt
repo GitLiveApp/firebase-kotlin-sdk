@@ -4,6 +4,10 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY
+import dev.gitlive.firebase.auth.AUTO_RETRIEVED_SMS_ANDROID_ONLY
+import dev.gitlive.firebase.auth.FORCE_RECAPTCHA_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PENDING_AUTH_RESULT_ANDROID_ONLY
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 
@@ -105,6 +109,15 @@ public expect class FirebaseAuth {
     /** Signs in with [credential] from a provider. */
     public fun signInWithCredential(credential: AuthCredential): Task<AuthResult>
 
+    /** Android only: signs in with [provider] through a web flow started from [activity]; use [signInWithCredential] with the provider's credential. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("signInWithCredential(credential)"), DeprecationLevel.ERROR)
+    public fun startActivityForSignInWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult>
+
+    /** Android only: the result of a provider flow interrupted by the app being recreated, or null. */
+    @Deprecated(PENDING_AUTH_RESULT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val pendingAuthResult: Task<AuthResult>?
+
     /** Signs in with a custom [token] minted by the Admin SDK. */
     public fun signInWithCustomToken(token: String): Task<AuthResult>
 
@@ -142,9 +155,18 @@ public expect class FirebaseAuth {
 /**
  * Test settings of a [FirebaseAuth] instance, mirroring `com.google.firebase.auth.FirebaseAuthSettings`.
  *
- * Not mirrored: `forceRecaptchaFlowForTesting` and `setAutoRetrievedSmsCodeForPhoneNumber`, which the iOS and JS SDKs do not have.
+ * `forceRecaptchaFlowForTesting` and `setAutoRetrievedSmsCodeForPhoneNumber`, which the iOS and JS SDKs do not have, are
+ * Android-only and deprecated with an error saying so.
  */
 public expect abstract class FirebaseAuthSettings() {
     /** Disables app verification for phone authentication, so that tests need no reCAPTCHA or Play Integrity. */
     public abstract fun setAppVerificationDisabledForTesting(disabled: Boolean)
+
+    /** Android only: forces the reCAPTCHA verification flow in tests. */
+    @Deprecated(FORCE_RECAPTCHA_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun forceRecaptchaFlowForTesting(forceRecaptchaFlow: Boolean)
+
+    /** Android only: makes the SDK auto-retrieve [smsCode] for [phoneNumber] in tests. */
+    @Deprecated(AUTO_RETRIEVED_SMS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber: String, smsCode: String)
 }

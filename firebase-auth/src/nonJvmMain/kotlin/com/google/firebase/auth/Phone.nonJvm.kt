@@ -4,9 +4,19 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.PHONE_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PHONE_TIMEOUT_ANDROID_ONLY
+import dev.gitlive.firebase.auth.VERIFY_PHONE_NUMBER_DEPRECATED
 import com.google.firebase.FirebaseException
 
 public actual class PhoneAuthProvider internal constructor(internal val firebaseAuth: FirebaseAuth) {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public actual fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: java.util.concurrent.TimeUnit, activity: android.app.Activity, callbacks: OnVerificationStateChangedCallbacks): Unit = throw UnsupportedOperationException(VERIFY_PHONE_NUMBER_DEPRECATED)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public actual fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: java.util.concurrent.TimeUnit, activity: android.app.Activity, callbacks: OnVerificationStateChangedCallbacks, forceResendingToken: ForceResendingToken): Unit = throw UnsupportedOperationException(VERIFY_PHONE_NUMBER_DEPRECATED)
 
     /** Resends the code of the verification [options] with the same options. */
     public actual class ForceResendingToken internal constructor(internal val options: PhoneAuthOptions)
@@ -75,6 +85,14 @@ public actual class PhoneAuthOptions internal constructor(
         public actual fun setMultiFactorHint(hint: PhoneMultiFactorInfo): Builder = apply { multiFactorHint = hint }
         public actual fun setMultiFactorSession(session: MultiFactorSession): Builder = apply { multiFactorSession = session }
         public actual fun requireSmsValidation(requireSmsValidation: Boolean): Builder = apply { this.requireSmsValidation = requireSmsValidation }
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_ACTIVITY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun setActivity(activity: android.app.Activity): Builder = throw UnsupportedOperationException(PHONE_ACTIVITY_ANDROID_ONLY)
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_TIMEOUT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun setTimeout(timeout: Long?, unit: java.util.concurrent.TimeUnit): Builder = throw UnsupportedOperationException(PHONE_TIMEOUT_ANDROID_ONLY)
         public actual fun build(): PhoneAuthOptions {
             require(phoneNumber != null || multiFactorHint != null) { "You must specify a phone number or a multi-factor hint." }
             return PhoneAuthOptions(firebaseAuth, phoneNumber, requireNotNull(callbacks) { "You must specify the callbacks." }, multiFactorHint, multiFactorSession, requireSmsValidation, verificationContext)

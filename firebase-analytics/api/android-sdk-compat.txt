@@ -29,7 +29,7 @@ com.google.firebase.analytics.FirebaseAnalytics
   OK    void resetAnalyticsData()
   OK    void setAnalyticsCollectionEnabled(boolean)
   OK    void setConsent(Map)
-  SKIP  void setCurrentScreen(Activity, String, String)
+  SKIP  void setCurrentScreen(Activity, String, String)  [deprecated: Deprecated in the Firebase Android SDK and Android-only (it takes an android.app.Activity); log a SCREEN_VIEW event with the SCREEN_NAME and SCREEN_CLASS parameters instead]
   OK    void setDefaultEventParameters(Bundle)
   OK    void setSessionTimeoutDuration(long)
   OK    void setUserId(String)

@@ -4,6 +4,7 @@
 
 package com.google.firebase.perf.metrics
 
+import dev.gitlive.firebase.perf.TRACE_PARCELABLE_ANDROID_ONLY
 import com.google.firebase.perf.session.PerfSession
 import dev.gitlive.firebase.perf.stub
 import kotlin.jvm.JvmField
@@ -19,6 +20,14 @@ public actual class Trace private constructor() {
     public actual fun putAttribute(attribute: String, value: String): Unit = stub()
     public actual fun putMetric(metricName: String, value: Long): Unit = stub()
     public actual fun removeAttribute(attribute: String): Unit = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun describeContents(): Int = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = stub()
 
     /** Android-only (hidden in the SDK's API); reached by the `dev.gitlive` wrapper's `Trace.updateSession`. */
     public fun updateSession(session: PerfSession): Unit = stub()
@@ -39,5 +48,9 @@ public actual class Trace private constructor() {
         /** Maximum length of a trace name. */
         @JvmField
         public actual val MAX_TRACE_NAME_LENGTH: Int = 100
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual val CREATOR: android.os.Parcelable.Creator<Trace> get() = stub()
     }
 }

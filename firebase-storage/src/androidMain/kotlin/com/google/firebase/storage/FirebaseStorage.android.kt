@@ -4,6 +4,10 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.STREAM_DOWNLOAD_JVM_ONLY
+import dev.gitlive.firebase.storage.TASK_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.storage.TASK_LISTENER_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.storage.FROM_ERROR_STATUS_ANDROID_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
@@ -96,6 +100,14 @@ public actual class StorageReference private constructor() : Comparable<StorageR
     @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: File): FileDownloadTask = stub()
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public actual fun getStream(): StreamDownloadTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = stub()
+
     @Deprecated(PUT_STREAM_JVM_ONLY, ReplaceWith("putStream(stream.asSource())", "kotlinx.io.asSource"), DeprecationLevel.ERROR)
     public actual fun putStream(stream: InputStream): UploadTask = stub()
 
@@ -108,6 +120,14 @@ public actual abstract class CancellableTask<StateT> actual constructor() : Task
     public actual abstract fun cancel(): Boolean
     public actual abstract val isInProgress: Boolean
     public actual abstract fun addOnProgressListener(listener: OnProgressListener<StateT>): CancellableTask<StateT>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<StateT>): CancellableTask<StateT> = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<StateT>): CancellableTask<StateT> = stub()
 }
 
 public actual abstract class ControllableTask<StateT> actual constructor() : CancellableTask<StateT>() {
@@ -115,6 +135,14 @@ public actual abstract class ControllableTask<StateT> actual constructor() : Can
     public actual abstract fun pause(): Boolean
     public actual abstract fun resume(): Boolean
     public actual abstract fun addOnPausedListener(listener: OnPausedListener<StateT>): ControllableTask<StateT>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnPausedListener(executor: java.util.concurrent.Executor, listener: OnPausedListener<StateT>): ControllableTask<StateT> = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnPausedListener(activity: android.app.Activity, listener: OnPausedListener<StateT>): ControllableTask<StateT> = stub()
 }
 
 public actual abstract class StorageTask<ResultT : StorageTask.ProvideError> protected actual constructor() : ControllableTask<ResultT>() {
@@ -270,6 +298,11 @@ public actual open class StorageException private constructor() : FirebaseExcept
 
         @JvmStatic
         public actual fun fromExceptionAndHttpCode(exception: Throwable?, httpResultCode: Int): StorageException? = stub()
+
+        @JvmStatic
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(FROM_ERROR_STATUS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun fromErrorStatus(status: com.google.android.gms.common.api.Status): StorageException = stub()
     }
 }
 

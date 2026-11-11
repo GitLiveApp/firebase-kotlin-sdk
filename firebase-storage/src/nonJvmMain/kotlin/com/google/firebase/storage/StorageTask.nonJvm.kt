@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.TASK_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.storage.TASK_LISTENER_EXECUTOR_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
@@ -28,6 +30,14 @@ public actual abstract class CancellableTask<StateT> actual constructor() : Task
     public actual abstract fun cancel(): Boolean
     public actual abstract val isInProgress: Boolean
     public actual abstract fun addOnProgressListener(listener: OnProgressListener<StateT>): CancellableTask<StateT>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<StateT>): CancellableTask<StateT> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<StateT>): CancellableTask<StateT> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
 }
 
 public actual abstract class ControllableTask<StateT> actual constructor() : CancellableTask<StateT>() {
@@ -35,6 +45,14 @@ public actual abstract class ControllableTask<StateT> actual constructor() : Can
     public actual abstract fun pause(): Boolean
     public actual abstract fun resume(): Boolean
     public actual abstract fun addOnPausedListener(listener: OnPausedListener<StateT>): ControllableTask<StateT>
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnPausedListener(executor: java.util.concurrent.Executor, listener: OnPausedListener<StateT>): ControllableTask<StateT> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnPausedListener(activity: android.app.Activity, listener: OnPausedListener<StateT>): ControllableTask<StateT> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
 }
 
 private enum class TaskStatus { QUEUED, IN_PROGRESS, PAUSED, SUCCESS, FAILURE, CANCELED }

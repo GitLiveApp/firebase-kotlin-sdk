@@ -4,6 +4,8 @@
 
 package com.google.firebase.perf.metrics
 
+import dev.gitlive.firebase.perf.TRACE_PARCELABLE_ANDROID_ONLY
+
 /**
  * A custom trace: a period of time between [start] and [stop] that is reported with its metrics and custom attributes,
  * as the Android SDK's `com.google.firebase.perf.metrics.Trace`.
@@ -42,6 +44,16 @@ public expect class Trace {
     /** Removes the custom attribute [attribute]. */
     public fun removeAttribute(attribute: String)
 
+    /** Android only: `Parcelable.describeContents`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun describeContents(): Int
+
+    /** Android only: `Parcelable.writeToParcel`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun writeToParcel(dest: android.os.Parcel, flags: Int)
+
     public companion object {
         /** Maximum length of a custom attribute key. */
         public val MAX_ATTRIBUTE_KEY_LENGTH: Int
@@ -54,5 +66,10 @@ public expect class Trace {
 
         /** Maximum length of a trace name. */
         public val MAX_TRACE_NAME_LENGTH: Int
+
+        /** Android only: the `Parcelable.Creator`. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public val CREATOR: android.os.Parcelable.Creator<Trace>
     }
 }

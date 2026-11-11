@@ -4,6 +4,8 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PENDING_AUTH_RESULT_ANDROID_ONLY
 import android.net.Uri
 import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeInfo
 import swiftPMImport.dev.gitlive.firebase.auth.FIRActionCodeOperation
@@ -148,6 +150,13 @@ public actual class FirebaseAuth internal constructor(public val ios: FIRAuth) {
         ios.signInAnonymouslyWithCompletion { result, error -> completion(result?.toCompat(this), error) }
     }
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("signInWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForSignInWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
+
+    @Deprecated(PENDING_AUTH_RESULT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val pendingAuthResult: Task<AuthResult>? get() = throw UnsupportedOperationException(PENDING_AUTH_RESULT_ANDROID_ONLY)
+
     public actual fun signInWithCredential(credential: AuthCredential): Task<AuthResult> = task(this) { completion ->
         ios.signInWithCredential(credential.ios) { result, error -> completion(result?.toCompat(this), error) }
     }
@@ -219,6 +228,14 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
             completion(result?.let { NativeGetTokenResult(it.token(), it.claims().entries.associate { (key, value) -> key.toString() to value.toKotlinValue() }, it) }, error)
         }
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("linkWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForLinkWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("reauthenticateAndRetrieveData(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForReauthenticateWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
 
     public actual fun linkWithCredential(credential: AuthCredential): Task<AuthResult> = task(auth) { completion ->
         ios.linkWithCredential(credential.ios) { result, error -> completion(result?.toCompat(auth), error) }

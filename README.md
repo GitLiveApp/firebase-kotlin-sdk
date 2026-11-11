@@ -133,7 +133,10 @@ the other modules are migrated one by one. The Firestore pipeline API (`Firebase
 expressions, stages and options) is included, over the iOS SDK's pipeline bridge on Apple and the `firebase/firestore/pipelines` entry
 point on JS and wasmJs. A member marked `@unavailable` in a module's `api/android-sdk/exclusions.txt` (such as
 Play Games sign-in) does not exist in the pinned iOS or JS SDK and is left out of the coverage count; it is still declared, with an
-error-level deprecation that says so, so a call from common code fails with that message rather than as an unresolved reference. `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
+error-level deprecation that says so, so a call from common code fails with that message rather than as an unresolved reference. The same goes for a
+member marked `@platform`, whose signature involves an Android or JVM type (`Activity`, `Executor`, `Parcel`, `JSONObject`, `Class`, `Date`, ...): it is declared
+through an error-deprecated stand-in for the type, so that nothing public in the Android SDK's `api.txt` is unresolved in common code except what the SDK hides from
+apps (`@hide`). `firebase-analytics` also provides the subset of `android.os.Bundle` that events are built
 from (`putString`, `putLong`, `putDouble`, nested bundles and the `items` array), so
 `logEvent(FirebaseAnalytics.Event.PURCHASE) { param(FirebaseAnalytics.Param.VALUE, 9.99) }` and
 `logEvent(name, Bundle().apply { putString(...) })` work in common code. On the JVM analytics is a no-op, as the

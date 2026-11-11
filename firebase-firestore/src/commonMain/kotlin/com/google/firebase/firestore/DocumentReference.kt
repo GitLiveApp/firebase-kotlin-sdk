@@ -4,6 +4,8 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTENER_EXECUTOR_JVM_ONLY
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
 import dev.gitlive.firebase.firestore.REFLECTIVE_SET
@@ -15,7 +17,8 @@ import dev.gitlive.firebase.firestore.REFLECTIVE_SET
  * platform; the SDK's `set` and `update(Map)`, which map a class by reflection on Android, are deprecated with an error
  * towards them.
  *
- * Not mirrored: the `Activity` and `Executor` overloads of `addSnapshotListener` (see `api/android-sdk/exclusions.txt`).
+ * The `Activity` and `Executor` overloads of `addSnapshotListener` are Android/JVM only, declared through the error-deprecated
+ * stand-ins (see `api/android-sdk/exclusions.txt`).
  */
 public expect class DocumentReference {
     /** The [FirebaseFirestore] this reference belongs to. */
@@ -68,4 +71,24 @@ public expect class DocumentReference {
 
     /** Listens to the document with [options]. */
     public fun addSnapshotListener(options: SnapshotListenOptions, listener: EventListener<DocumentSnapshot>): ListenerRegistration
+
+    /** JVM only: [addSnapshotListener] called on [executor]; the multiplatform listener is called on the delivering thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public fun addSnapshotListener(executor: java.util.concurrent.Executor, listener: EventListener<DocumentSnapshot>): ListenerRegistration
+
+    /** JVM only: [addSnapshotListener] called on [executor]; the multiplatform listener is called on the delivering thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public fun addSnapshotListener(executor: java.util.concurrent.Executor, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration
+
+    /** Android only: [addSnapshotListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public fun addSnapshotListener(activity: android.app.Activity, listener: EventListener<DocumentSnapshot>): ListenerRegistration
+
+    /** Android only: [addSnapshotListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public fun addSnapshotListener(activity: android.app.Activity, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration
 }

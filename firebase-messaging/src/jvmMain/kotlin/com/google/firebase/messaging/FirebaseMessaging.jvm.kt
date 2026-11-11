@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
 import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
@@ -13,6 +14,9 @@ import com.google.android.gms.tasks.TaskCompletionSource
 /** firebase-java-sdk has no Cloud Messaging: every operation fails with an [UnsupportedOperationException]. */
 public actual class FirebaseMessaging private constructor() {
     public actual fun deleteToken(): Task<Nothing?> = unsupported()
+
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public actual fun send(message: RemoteMessage): Unit = throw UnsupportedOperationException(UPSTREAM_SEND_DECOMMISSIONED)
 
     public actual fun getToken(): Task<String> = unsupported()
 

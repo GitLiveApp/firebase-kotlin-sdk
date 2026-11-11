@@ -6,6 +6,7 @@ package com.google.firebase
 
 import dev.gitlive.firebase.TIMESTAMP_OF_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TIMESTAMP_OF_INSTANT_ANDROID_ONLY
+import dev.gitlive.firebase.TIMESTAMP_PARCELABLE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_INSTANT_ANDROID_ONLY
 
@@ -15,7 +16,8 @@ import dev.gitlive.firebase.TO_INSTANT_ANDROID_ONLY
  * The `Date` and `Instant` constructors, `toDate` and `toInstant` keep the SDK's signatures through the error-deprecated
  * `java.util.Date` and `java.time.Instant` stand-ins and can only be called from Android/JVM code: from common code they
  * fail to compile with a message naming the `kotlin.time.Instant` counterparts, the top-level `Timestamp(Instant)`
- * function and [toKotlinInstant]. The `Parcelable` members are not mirrored.
+ * function and [toKotlinInstant]. The `Parcelable` members (`describeContents`, `writeToParcel`, `CREATOR`) are declared
+ * the same way, through the `android.os.Parcel` and `Parcelable` stand-ins, and are Android-only.
  *
  * @param seconds seconds since the Unix epoch, between `-62135596800` and `253402300799` inclusive
  * @param nanoseconds fraction of a second in nanoseconds, between `0` and `999999999` inclusive
@@ -49,8 +51,23 @@ public expect class Timestamp(seconds: Long, nanoseconds: Int) : Comparable<Time
     @Deprecated(TO_INSTANT_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
     public fun toInstant(): java.time.Instant
 
+    /** Android only: `Parcelable.describeContents`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun describeContents(): Int
+
+    /** Android only: `Parcelable.writeToParcel`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun writeToParcel(dest: android.os.Parcel, flags: Int)
+
     public companion object {
         /** The current time. */
         public fun now(): Timestamp
+
+        /** Android only: the `Parcelable.Creator`. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public val CREATOR: android.os.Parcelable.Creator<Timestamp>
     }
 }

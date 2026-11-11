@@ -111,7 +111,7 @@ com.google.firebase.auth.FirebaseAuth
   OK    static FirebaseAuth getInstance()
   OK    static FirebaseAuth getInstance(FirebaseApp)
   OK    String getLanguageCode()
-  PLAT  Task getPendingAuthResult()
+  PLAT  Task getPendingAuthResult()  [deprecated: pendingAuthResult is the result of an Activity-based provider flow interrupted by the app being recreated, and is Android-only]
   OK    String getTenantId()
   HIDE  String getUid()
   OK    Task initializeRecaptchaConfig()
@@ -132,7 +132,7 @@ com.google.firebase.auth.FirebaseAuth
   OK    Task signInWithEmailAndPassword(String, String)
   OK    Task signInWithEmailLink(String, String)
   OK    void signOut()
-  PLAT  Task startActivityForSignInWithProvider(Activity, FederatedAuthProvider)
+  PLAT  Task startActivityForSignInWithProvider(Activity, FederatedAuthProvider)  [deprecated: startActivityForSignInWithProvider, startActivityForLinkWithProvider and startActivityForReauthenticateWithProvider start a web flow from an android.app.Activity and are Android-only; use signInWithCredential, linkWithCredential or reauthenticateAndRetrieveData with the provider's credential, or call them from androidMain]
   OK    Task updateCurrentUser(FirebaseUser)
   OK    void useAppLanguage()
   OK    void useEmulator(String, int)
@@ -163,9 +163,9 @@ com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
   OK    FirebaseAuthRecentLoginRequiredException(String, String)
 com.google.firebase.auth.FirebaseAuthSettings
   OK    FirebaseAuthSettings()
-  PLAT  void forceRecaptchaFlowForTesting(boolean)
+  PLAT  void forceRecaptchaFlowForTesting(boolean)  [deprecated: forceRecaptchaFlowForTesting forces the Android SDK's reCAPTCHA verification and is Android-only; setAppVerificationDisabledForTesting is available on every platform]
   OK    void setAppVerificationDisabledForTesting(boolean)
-  PLAT  void setAutoRetrievedSmsCodeForPhoneNumber(String, String)
+  PLAT  void setAutoRetrievedSmsCodeForPhoneNumber(String, String)  [deprecated: setAutoRetrievedSmsCodeForPhoneNumber fakes the Android SDK's SMS auto-retrieval and is Android-only; off Android the user always enters the code]
 com.google.firebase.auth.FirebaseAuthUserCollisionException
   OK    FirebaseAuthUserCollisionException(String, String)
   OK    String getEmail()
@@ -196,8 +196,8 @@ com.google.firebase.auth.FirebaseUser
   OK    Task reload()
   OK    Task sendEmailVerification()
   OK    Task sendEmailVerification(ActionCodeSettings)
-  PLAT  Task startActivityForLinkWithProvider(Activity, FederatedAuthProvider)
-  PLAT  Task startActivityForReauthenticateWithProvider(Activity, FederatedAuthProvider)
+  PLAT  Task startActivityForLinkWithProvider(Activity, FederatedAuthProvider)  [deprecated: startActivityForSignInWithProvider, startActivityForLinkWithProvider and startActivityForReauthenticateWithProvider start a web flow from an android.app.Activity and are Android-only; use signInWithCredential, linkWithCredential or reauthenticateAndRetrieveData with the provider's credential, or call them from androidMain]
+  PLAT  Task startActivityForReauthenticateWithProvider(Activity, FederatedAuthProvider)  [deprecated: startActivityForSignInWithProvider, startActivityForLinkWithProvider and startActivityForReauthenticateWithProvider start a web flow from an android.app.Activity and are Android-only; use signInWithCredential, linkWithCredential or reauthenticateAndRetrieveData with the provider's credential, or call them from androidMain]
   OK    Task unlink(String)
   SKIP  Task updateEmail(String)
   OK    Task updatePassword(String)
@@ -245,7 +245,7 @@ com.google.firebase.auth.MultiFactorInfo
   OK    long getEnrollmentTimestamp()
   OK    String getFactorId()
   OK    String getUid()
-  PLAT  JSONObject toJson()
+  PLAT  JSONObject toJson()  [deprecated: toJson returns an org.json.JSONObject and is Android-only; the Firebase iOS and JS SDKs have no JSON form of a MultiFactorInfo]
   OK    static String FACTOR_ID_KEY
 com.google.firebase.auth.MultiFactorResolver
   OK    MultiFactorResolver()
@@ -287,20 +287,20 @@ com.google.firebase.auth.PhoneAuthOptions.Builder
   OK    Builder(FirebaseAuth)
   OK    PhoneAuthOptions build()
   OK    Builder requireSmsValidation(boolean)
-  PLAT  Builder setActivity(Activity)
+  PLAT  Builder setActivity(Activity)  [deprecated: PhoneAuthOptions.Builder.setActivity attaches the verification to an android.app.Activity and is Android-only; on iOS and JS the dev.gitlive.firebase.auth layer attaches the platform's verifier]
   OK    Builder setCallbacks(OnVerificationStateChangedCallbacks)
   OK    Builder setForceResendingToken(ForceResendingToken)
   OK    Builder setMultiFactorHint(PhoneMultiFactorInfo)
   OK    Builder setMultiFactorSession(MultiFactorSession)
   OK    Builder setPhoneNumber(String)
-  PLAT  Builder setTimeout(Long, TimeUnit)
+  PLAT  Builder setTimeout(Long, TimeUnit)  [deprecated: PhoneAuthOptions.Builder.setTimeout sets the Android SDK's SMS auto-retrieval timeout and is Android-only; the other platforms have no auto-retrieval]
 com.google.firebase.auth.PhoneAuthProvider
   OK    static PhoneAuthCredential getCredential(String, String)
   SKIP  static PhoneAuthProvider getInstance()
   SKIP  static PhoneAuthProvider getInstance(FirebaseAuth)
   OK    static void verifyPhoneNumber(PhoneAuthOptions)
-  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks)
-  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks, ForceResendingToken)
+  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks)  [deprecated: Deprecated in the Firebase Android SDK and Android-only (it takes a java.util.concurrent.TimeUnit and an android.app.Activity); use PhoneAuthProvider.verifyPhoneNumber(PhoneAuthOptions)]
+  SKIP  void verifyPhoneNumber(String, long, TimeUnit, Activity, OnVerificationStateChangedCallbacks, ForceResendingToken)  [deprecated: Deprecated in the Firebase Android SDK and Android-only (it takes a java.util.concurrent.TimeUnit and an android.app.Activity); use PhoneAuthProvider.verifyPhoneNumber(PhoneAuthOptions)]
   OK    static String PHONE_SIGN_IN_METHOD
   OK    static String PROVIDER_ID
 com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
@@ -324,7 +324,7 @@ com.google.firebase.auth.PhoneMultiFactorInfo
   OK    String getFactorId()
   OK    String getPhoneNumber()
   OK    String getUid()
-  PLAT  JSONObject toJson()
+  PLAT  JSONObject toJson()  [deprecated: toJson returns an org.json.JSONObject and is Android-only; the Firebase iOS and JS SDKs have no JSON form of a MultiFactorInfo]
 com.google.firebase.auth.SignInMethodQueryResult
   OK    List getSignInMethods()
 com.google.firebase.auth.TotpMultiFactorAssertion
@@ -340,7 +340,7 @@ com.google.firebase.auth.TotpMultiFactorInfo
   OK    long getEnrollmentTimestamp()
   OK    String getFactorId()
   OK    String getUid()
-  PLAT  JSONObject toJson()
+  PLAT  JSONObject toJson()  [deprecated: toJson returns an org.json.JSONObject and is Android-only; the Firebase iOS and JS SDKs have no JSON form of a MultiFactorInfo]
 com.google.firebase.auth.TotpSecret
   UNAV  String generateQrCodeUrl()  [deprecated: generateQrCodeUrl() without arguments is Android-only: the Firebase iOS SDK requires the account name and issuer; use generateQrCodeUrl(accountName, issuer)]
   OK    String generateQrCodeUrl(String, String)
@@ -351,7 +351,7 @@ com.google.firebase.auth.TotpSecret
   UNAV  String getSessionInfo()  [deprecated: The TOTP secret's parameters (codeLength, codeIntervalSeconds, hashAlgorithm, enrollmentCompletionDeadline, sessionInfo) are Android-only: the Firebase iOS SDK does not expose them; sharedSecretKey, generateQrCodeUrl(accountName, issuer) and openInOtpApp(qrCodeUrl) are available on every platform, and a call that needs the parameters belongs in androidMain]
   OK    String getSharedSecretKey()
   OK    void openInOtpApp(String)
-  PLAT  void openInOtpApp(String, String, Activity)
+  PLAT  void openInOtpApp(String, String, Activity)  [deprecated: openInOtpApp(qrCodeUrl, fallbackUrl, activity) is Android-only; use openInOtpApp(qrCodeUrl)]
 com.google.firebase.auth.TwitterAuthCredential
   OK    String getProvider()
   OK    String getSignInMethod()

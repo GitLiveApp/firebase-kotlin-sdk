@@ -230,7 +230,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 stripHeaderStubs(
-    packageDirs = listOf("com/google/firebase"),
+    packageDirs = listOf("com/google/firebase", "com/google/firestore"),
     androidReferenceJars = files({
         configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")

@@ -5,15 +5,15 @@
 com.google.firebase.storage.CancellableTask
   OK    CancellableTask()
   OK    CancellableTask addOnProgressListener(OnProgressListener)
-  PLAT  CancellableTask addOnProgressListener(Activity, OnProgressListener)
-  PLAT  CancellableTask addOnProgressListener(Executor, OnProgressListener)
+  PLAT  CancellableTask addOnProgressListener(Activity, OnProgressListener)  [deprecated: The Activity overloads of the task listeners are Android-only, where the listener is dropped when the Activity stops; use the overload without an Activity and remove the listener yourself]
+  PLAT  CancellableTask addOnProgressListener(Executor, OnProgressListener)  [deprecated: The Executor overloads of the task listeners are JVM-only; the multiplatform task calls its listeners on the thread that progresses it: use the overload without an Executor and dispatch from the listener]
   OK    boolean cancel()
   OK    boolean isInProgress()
 com.google.firebase.storage.ControllableTask
   OK    ControllableTask()
   OK    ControllableTask addOnPausedListener(OnPausedListener)
-  PLAT  ControllableTask addOnPausedListener(Activity, OnPausedListener)
-  PLAT  ControllableTask addOnPausedListener(Executor, OnPausedListener)
+  PLAT  ControllableTask addOnPausedListener(Activity, OnPausedListener)  [deprecated: The Activity overloads of the task listeners are Android-only, where the listener is dropped when the Activity stops; use the overload without an Activity and remove the listener yourself]
+  PLAT  ControllableTask addOnPausedListener(Executor, OnPausedListener)  [deprecated: The Executor overloads of the task listeners are JVM-only; the multiplatform task calls its listeners on the thread that progresses it: use the overload without an Executor and dispatch from the listener]
   OK    boolean isPaused()
   OK    boolean pause()
   OK    boolean resume()
@@ -48,7 +48,7 @@ com.google.firebase.storage.OnPausedListener
 com.google.firebase.storage.OnProgressListener
   OK    void onProgress(ProgressT)
 com.google.firebase.storage.StorageException
-  PLAT  static StorageException fromErrorStatus(Status)
+  PLAT  static StorageException fromErrorStatus(Status)  [deprecated: fromErrorStatus(Status) takes a Play Services Status, which is Android-only; use fromException or fromExceptionAndHttpCode]
   OK    static StorageException fromException(Throwable)
   OK    static StorageException fromExceptionAndHttpCode(Throwable, int)
   OK    int getErrorCode()
@@ -68,14 +68,14 @@ com.google.firebase.storage.StorageException.ErrorCode
 com.google.firebase.storage.StorageKt
   OK    static long component1(TaskSnapshot)
   OK    static List component1(ListResult)
-  PLAT  static long component1(TaskSnapshot)
+  PLAT  static long component1(TaskSnapshot)  [deprecated: StreamDownloadTask streams the object to a java.io.InputStream, which is JVM-only; common code downloads with getBytes(maxDownloadSizeBytes), getFile(Path) (kotlinx-io) or getFile(Uri)]
   OK    static long component1(TaskSnapshot)
   OK    static long component2(TaskSnapshot)
   OK    static List component2(ListResult)
-  PLAT  static long component2(TaskSnapshot)
+  PLAT  static long component2(TaskSnapshot)  [deprecated: StreamDownloadTask streams the object to a java.io.InputStream, which is JVM-only; common code downloads with getBytes(maxDownloadSizeBytes), getFile(Path) (kotlinx-io) or getFile(Uri)]
   OK    static long component2(TaskSnapshot)
   OK    static String component3(ListResult)
-  PLAT  static InputStream component3(TaskSnapshot)
+  PLAT  static InputStream component3(TaskSnapshot)  [deprecated: StreamDownloadTask streams the object to a java.io.InputStream, which is JVM-only; common code downloads with getBytes(maxDownloadSizeBytes), getFile(Path) (kotlinx-io) or getFile(Uri)]
   OK    static StorageMetadata component3(TaskSnapshot)
   OK    static Uri component4(TaskSnapshot)
   OK    static FirebaseStorage getStorage(Firebase)
@@ -135,8 +135,8 @@ com.google.firebase.storage.StorageReference
   OK    String getPath()
   OK    StorageReference getRoot()
   OK    FirebaseStorage getStorage()
-  PLAT  StreamDownloadTask getStream()
-  PLAT  StreamDownloadTask getStream(StreamProcessor)
+  PLAT  StreamDownloadTask getStream()  [deprecated: StreamDownloadTask streams the object to a java.io.InputStream, which is JVM-only; common code downloads with getBytes(maxDownloadSizeBytes), getFile(Path) (kotlinx-io) or getFile(Uri)]
+  PLAT  StreamDownloadTask getStream(StreamProcessor)  [deprecated: StreamDownloadTask streams the object to a java.io.InputStream, which is JVM-only; common code downloads with getBytes(maxDownloadSizeBytes), getFile(Path) (kotlinx-io) or getFile(Uri)]
   OK    Task list(int)
   OK    Task list(int, String)
   OK    Task listAll()
@@ -151,31 +151,31 @@ com.google.firebase.storage.StorageReference
 com.google.firebase.storage.StorageTask
   OK    StorageTask()
   OK    StorageTask addOnCanceledListener(OnCanceledListener)
-  PLAT  StorageTask addOnCanceledListener(Activity, OnCanceledListener)
-  PLAT  StorageTask addOnCanceledListener(Executor, OnCanceledListener)
+  PLAT  StorageTask addOnCanceledListener(Activity, OnCanceledListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  StorageTask addOnCanceledListener(Executor, OnCanceledListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    StorageTask addOnCompleteListener(OnCompleteListener)
-  PLAT  StorageTask addOnCompleteListener(Activity, OnCompleteListener)
-  PLAT  StorageTask addOnCompleteListener(Executor, OnCompleteListener)
+  PLAT  StorageTask addOnCompleteListener(Activity, OnCompleteListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  StorageTask addOnCompleteListener(Executor, OnCompleteListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    StorageTask addOnFailureListener(OnFailureListener)
-  PLAT  StorageTask addOnFailureListener(Activity, OnFailureListener)
-  PLAT  StorageTask addOnFailureListener(Executor, OnFailureListener)
+  PLAT  StorageTask addOnFailureListener(Activity, OnFailureListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  StorageTask addOnFailureListener(Executor, OnFailureListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    StorageTask addOnPausedListener(OnPausedListener)
-  PLAT  StorageTask addOnPausedListener(Activity, OnPausedListener)
-  PLAT  StorageTask addOnPausedListener(Executor, OnPausedListener)
+  PLAT  StorageTask addOnPausedListener(Activity, OnPausedListener)  [deprecated: The Activity overloads of the task listeners are Android-only, where the listener is dropped when the Activity stops; use the overload without an Activity and remove the listener yourself]
+  PLAT  StorageTask addOnPausedListener(Executor, OnPausedListener)  [deprecated: The Executor overloads of the task listeners are JVM-only; the multiplatform task calls its listeners on the thread that progresses it: use the overload without an Executor and dispatch from the listener]
   OK    StorageTask addOnProgressListener(OnProgressListener)
-  PLAT  StorageTask addOnProgressListener(Activity, OnProgressListener)
-  PLAT  StorageTask addOnProgressListener(Executor, OnProgressListener)
+  PLAT  StorageTask addOnProgressListener(Activity, OnProgressListener)  [deprecated: The Activity overloads of the task listeners are Android-only, where the listener is dropped when the Activity stops; use the overload without an Activity and remove the listener yourself]
+  PLAT  StorageTask addOnProgressListener(Executor, OnProgressListener)  [deprecated: The Executor overloads of the task listeners are JVM-only; the multiplatform task calls its listeners on the thread that progresses it: use the overload without an Executor and dispatch from the listener]
   OK    StorageTask addOnSuccessListener(OnSuccessListener)
-  PLAT  StorageTask addOnSuccessListener(Activity, OnSuccessListener)
-  PLAT  StorageTask addOnSuccessListener(Executor, OnSuccessListener)
+  PLAT  StorageTask addOnSuccessListener(Activity, OnSuccessListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  StorageTask addOnSuccessListener(Executor, OnSuccessListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    boolean cancel()
   OK    Task continueWith(Continuation)
-  PLAT  Task continueWith(Executor, Continuation)
+  PLAT  Task continueWith(Executor, Continuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    Task continueWithTask(Continuation)
-  PLAT  Task continueWithTask(Executor, Continuation)
+  PLAT  Task continueWithTask(Executor, Continuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Exception getException()  [inherited]
   MAP   ResultT getResult()  [inherited]
-  PLAT  ResultT getResult(Class)
+  PLAT  ResultT getResult(Class)  [deprecated: getResult(Class) is JVM-only (error-deprecated in com.google.android.gms.tasks.Task); use result or exception]
   OK    ResultT getSnapshot()
   MAP   boolean isCanceled()  [inherited]
   MAP   boolean isComplete()  [inherited]
@@ -189,7 +189,7 @@ com.google.firebase.storage.StorageTask
   OK    void onQueued()
   OK    void onSuccess()
   OK    Task onSuccessTask(SuccessContinuation)
-  PLAT  Task onSuccessTask(Executor, SuccessContinuation)
+  PLAT  Task onSuccessTask(Executor, SuccessContinuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    boolean pause()
   OK    StorageTask removeOnCanceledListener(OnCanceledListener)
   OK    StorageTask removeOnCompleteListener(OnCompleteListener)

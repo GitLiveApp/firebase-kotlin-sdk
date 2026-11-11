@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.FROM_ERROR_STATUS_ANDROID_ONLY
 import com.google.firebase.FirebaseException
 
 private const val NO_HTTP_RESULT = -1
@@ -54,6 +55,10 @@ public actual open class StorageException internal constructor(
                 StorageException(exception?.message ?: messageOf(code), exception, code, httpResultCode)
             }
         }
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(FROM_ERROR_STATUS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun fromErrorStatus(status: com.google.android.gms.common.api.Status): StorageException = throw UnsupportedOperationException(FROM_ERROR_STATUS_ANDROID_ONLY)
 
         /** A [StorageException] for [errorCode], with the Android SDK's message for it. */
         internal fun of(errorCode: Int, cause: Throwable? = null, httpResultCode: Int = NO_HTTP_RESULT, message: String? = null): StorageException = StorageException(message ?: messageOf(errorCode), cause, errorCode, httpResultCode)

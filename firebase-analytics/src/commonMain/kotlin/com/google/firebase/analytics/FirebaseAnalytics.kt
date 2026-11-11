@@ -4,6 +4,7 @@
 
 package com.google.firebase.analytics
 
+import dev.gitlive.firebase.analytics.SET_CURRENT_SCREEN_DEPRECATED
 import android.content.Context
 import android.os.Bundle
 import com.google.android.gms.tasks.Task
@@ -29,6 +30,11 @@ public expect class FirebaseAnalytics {
 
     /** Logs [name] with [params] (see [Event] and [Param] for the recommended names). */
     public fun logEvent(name: String, params: Bundle?)
+
+    /** Deprecated in the SDK and Android-only: sets the current screen; log a `SCREEN_VIEW` event instead. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(SET_CURRENT_SCREEN_DEPRECATED, level = DeprecationLevel.ERROR)
+    public fun setCurrentScreen(activity: android.app.Activity, screenName: String?, screenClassOverride: String?)
 
     /** Parameters added to every event; null clears them. */
     public fun setDefaultEventParameters(parameters: Bundle?)

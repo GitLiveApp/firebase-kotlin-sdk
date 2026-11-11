@@ -1,5 +1,10 @@
 package compat
 
+
+// The Android/JVM-only members of Task are error-deprecated in firebase-app with messages naming the replacement; these notes
+// stand in for them on the inherited rows of the Task subclasses.
+private const val TASK_SCOPED_OVERLOADS = "the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)"
+private const val TASK_GET_RESULT_CLASS = "getResult(Class) is JVM-only (error-deprecated in com.google.android.gms.tasks.Task); use result or exception"
 /**
  * A line of a module's `api/android-sdk/exclusions.txt`: a class pattern, a `class#member` pattern, or a
  * `class#member(Type, Type)` pattern that selects one overload by the simple names of its parameter types
@@ -91,12 +96,18 @@ object SourceCompatReport {
             for (member in sdkClass.members.sortedWith(compareBy({ it.kind }, { it.name }, { it.parameters.size }))) {
                 val rendered = member.render(sdkClass.name)
                 val exclusion = classExclusion ?: exclusions.firstOrNull { it.matchesMember(sdkClass.name, member) }
-                // An excluded member the layer declares with an error-level deprecation, so common code gets its message.
-                val declaredDeprecation = ourClass?.members
-                    ?.firstOrNull { it.kind == member.kind && it.name == member.name && member.parametersMatch(it.parameters) }
-                    ?.deprecation?.let { "  [deprecated: $it]" }.orEmpty()
+                // An excluded or SDK-deprecated member the layer declares with a deprecation, so common code gets its message.
+                val declared = ourClass?.let { declaredMember(member, it, oursByName) }
+                val declaredDeprecation = declared?.deprecation?.let { "  [deprecated: $it]" }.orEmpty()
                 when {
-                    member.isDeprecated -> body.appendLine("  SKIP  $rendered")
+                    member.isDeprecated -> {
+                        val note = when {
+                            declaredDeprecation.isNotEmpty() -> declaredDeprecation
+                            ourClass == null || (declared == null && classify(member, ourClass, oursByName).first == "MISS") -> "  [not declared]"
+                            else -> ""
+                        }
+                        body.appendLine("  SKIP  $rendered$note")
+                    }
                     exclusion?.uncountedStatus != null -> body.appendLine("  ${exclusion.uncountedStatus}  $rendered$declaredDeprecation")
                     exclusion != null -> { omitted++; body.appendLine("  OMIT  $rendered$declaredDeprecation") }
                     ourClass == null -> { missing++; body.appendLine("  MISS  $rendered") }
@@ -139,7 +150,43 @@ object SourceCompatReport {
         ApiMember(ApiMember.Kind.METHOD, "continueWith", listOf("com.google.android.gms.tasks.Continuation"), "com.google.android.gms.tasks.Task", false),
         ApiMember(ApiMember.Kind.METHOD, "continueWithTask", listOf("com.google.android.gms.tasks.Continuation"), "com.google.android.gms.tasks.Task", false),
         ApiMember(ApiMember.Kind.METHOD, "onSuccessTask", listOf("com.google.android.gms.tasks.SuccessContinuation"), "com.google.android.gms.tasks.Task", false),
-    )
+        ApiMember(ApiMember.Kind.METHOD, "getResult", listOf("java.lang.Class"), "java.lang.Object", false, deprecation = TASK_GET_RESULT_CLASS),
+    ) + listOf(
+        "addOnSuccessListener" to "com.google.android.gms.tasks.OnSuccessListener",
+        "addOnFailureListener" to "com.google.android.gms.tasks.OnFailureListener",
+        "addOnCompleteListener" to "com.google.android.gms.tasks.OnCompleteListener",
+        "addOnCanceledListener" to "com.google.android.gms.tasks.OnCanceledListener",
+    ).flatMap { (name, listener) ->
+        listOf("java.util.concurrent.Executor", "android.app.Activity").map { scope ->
+            ApiMember(ApiMember.Kind.METHOD, name, listOf(scope, listener), "com.google.android.gms.tasks.Task", false, deprecation = TASK_SCOPED_OVERLOADS)
+        }
+    } + listOf(
+        "continueWith" to "com.google.android.gms.tasks.Continuation",
+        "continueWithTask" to "com.google.android.gms.tasks.Continuation",
+        "onSuccessTask" to "com.google.android.gms.tasks.SuccessContinuation",
+    ).map { (name, continuation) ->
+        ApiMember(ApiMember.Kind.METHOD, name, listOf("java.util.concurrent.Executor", continuation), "com.google.android.gms.tasks.Task", false, deprecation = TASK_SCOPED_OVERLOADS)
+    }
+
+
+    /**
+     * The layer's declaration of [member] on [ourClass]: its own or an inherited one, or, for a static field, the getter of
+     * a companion property of the same name (a `val CREATOR` with a getter).
+     */
+    private fun declaredMember(member: ApiMember, ourClass: ApiClass, oursByName: Map<String, ApiClass>): ApiMember? {
+        val matches = { it: ApiMember -> it.kind == member.kind && it.name == member.name && member.parametersMatch(it.parameters) }
+        // An unresolved api.txt parameter type matches any of ours: prefer the exact overload, then a deprecated one.
+        val preferred = compareByDescending<ApiMember> { it.parameters == member.parameters }.thenByDescending { it.deprecation != null }
+        val companion = oursByName["${ourClass.name}\$Companion"]?.members.orEmpty()
+        return ourClass.members.filter(matches).sortedWith(preferred).firstOrNull()
+            ?: inheritedMembers(ourClass, oursByName).filter(matches).sortedWith(preferred).firstOrNull()
+            ?: when {
+                // a static field or method provided by the companion: a `val CREATOR` getter, or a function without @JvmStatic
+                member.kind == ApiMember.Kind.FIELD && member.isStatic -> companion.firstOrNull { it.kind == ApiMember.Kind.METHOD && it.name == "get${member.name}" && it.parameters.isEmpty() }
+                member.kind == ApiMember.Kind.METHOD && member.isStatic -> companion.filter(matches).sortedWith(preferred).firstOrNull()
+                else -> null
+            }
+    }
 
     /** The members [ourClass] inherits: from its supertypes in [oursByName], or from Task when the chain reaches it. */
     private fun inheritedMembers(ourClass: ApiClass, oursByName: Map<String, ApiClass>): List<ApiMember> = ourClass.superTypes.flatMap { superType ->
@@ -196,7 +243,7 @@ object SourceCompatReport {
      * its erasure in the dump: its bound, or `Object`.
      */
     private fun ApiMember.parametersMatch(ours: List<String>): Boolean =
-        ours.size == parameters.size && ours.zip(parameters).all { (ours, theirs) -> ours == theirs || erasure(theirs) == ours }
+        ours.size == parameters.size && ours.zip(parameters).all { (ours, theirs) -> ours == theirs || theirs == UNRESOLVED_TYPE || erasure(theirs) == ours }
 
     /**
      * Whether this SDK's type [ours] provides the Android SDK member's [type]: the same type, or the erasure of a type
@@ -213,4 +260,5 @@ object SourceCompatReport {
     }
 
     private const val UNRESOLVED_TYPE = "error.NonExistentClass"
+
 }

@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
 import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
@@ -23,6 +24,10 @@ public expect class FirebaseMessaging {
 
     /** The registration token of this app instance, requested from the backend if needed. */
     public fun getToken(): Task<String>
+
+    /** Deprecated in the SDK and Android-only: sends an upstream message, a feature FCM decommissioned. */
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public fun send(message: RemoteMessage)
 
     /** Subscribes this app instance to [topic]. A no-op on JS, whose SDK has no client-side topic subscription. */
     public fun subscribeToTopic(topic: String): Task<Nothing?>

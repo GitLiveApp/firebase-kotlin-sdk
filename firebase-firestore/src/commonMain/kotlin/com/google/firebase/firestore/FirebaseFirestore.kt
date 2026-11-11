@@ -4,6 +4,11 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.INDEX_CONFIGURATION_DEPRECATED
+import dev.gitlive.firebase.firestore.LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTENER_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_EXECUTOR_JVM_ONLY
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
 
 import com.google.android.gms.tasks.Task
@@ -56,6 +61,20 @@ public expect class FirebaseFirestore {
 
     /** Registers [runnable] to be called whenever all the active snapshot listeners are in sync. */
     public fun addSnapshotsInSyncListener(runnable: Runnable): ListenerRegistration
+
+    /** JVM only: [addSnapshotsInSyncListener] called on [executor]; the multiplatform runnable is called on the delivering thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public fun addSnapshotsInSyncListener(executor: java.util.concurrent.Executor, runnable: Runnable): ListenerRegistration
+
+    /** Android only: [addSnapshotsInSyncListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public fun addSnapshotsInSyncListener(activity: android.app.Activity, runnable: Runnable): ListenerRegistration
+
+    /** Deprecated in the SDK and Android-only: configures the cache indexes from a JSON string; use [persistentCacheIndexManager]. */
+    @Deprecated(INDEX_CONFIGURATION_DEPRECATED, ReplaceWith("persistentCacheIndexManager?.enableIndexAutoCreation()"), DeprecationLevel.ERROR)
+    public fun setIndexConfiguration(json: String): Task<Nothing?>
 
     /** Loads a Firestore bundle into the local cache. */
     public fun loadBundle(bundleData: ByteArray): LoadBundleTask
@@ -128,6 +147,16 @@ public expect class PersistentCacheIndexManager {
 public expect abstract class LoadBundleTask : Task<LoadBundleTaskProgress> {
     /** Registers [listener] for the progress of the loading; it is also called with the final progress. */
     public fun addOnProgressListener(listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask
+
+    /** JVM only: [addOnProgressListener] called on [executor]; the multiplatform listener is called on the reporting thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask
+
+    /** Android only: [addOnProgressListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask
 }
 
 /** The progress of a [LoadBundleTask]. */

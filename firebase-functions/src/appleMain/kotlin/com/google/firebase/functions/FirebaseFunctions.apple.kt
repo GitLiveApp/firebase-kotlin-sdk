@@ -4,6 +4,9 @@
 
 package com.google.firebase.functions
 
+import dev.gitlive.firebase.functions.USE_FUNCTIONS_EMULATOR_DEPRECATED
+import dev.gitlive.firebase.functions.parseEmulatorOrigin
+import dev.gitlive.firebase.functions.STREAM_JVM_ONLY
 import swiftPMImport.dev.gitlive.firebase.functions.FIRFunctions
 import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallable
 import swiftPMImport.dev.gitlive.firebase.functions.FIRHTTPSCallableOptions
@@ -34,6 +37,12 @@ public actual class FirebaseFunctions internal constructor(public val ios: FIRFu
 
     public actual fun useEmulator(host: String, port: Int) {
         ios.useEmulatorWithHost(host, port.toLong())
+    }
+
+    @Deprecated(USE_FUNCTIONS_EMULATOR_DEPRECATED, ReplaceWith("useEmulator(host, port)"))
+    public actual fun useFunctionsEmulator(origin: String) {
+        val (host, port) = parseEmulatorOrigin(origin)
+        useEmulator(host, port)
     }
 
     override fun equals(other: Any?): Boolean = other is FirebaseFunctions && other.ios == ios
@@ -93,6 +102,14 @@ public actual class HttpsCallableReference internal constructor(private val crea
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
     public actual fun withTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): HttpsCallableReference = throw UnsupportedOperationException(WITH_TIMEOUT_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun stream(): org.reactivestreams.Publisher<StreamResponse> = throw UnsupportedOperationException(STREAM_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun stream(data: Any?): org.reactivestreams.Publisher<StreamResponse> = throw UnsupportedOperationException(STREAM_JVM_ONLY)
 
     internal fun setTimeoutSeconds(seconds: Double) {
         ios.setTimeoutInterval(seconds)

@@ -6,6 +6,8 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PENDING_AUTH_RESULT_ANDROID_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
@@ -202,6 +204,13 @@ public actual class FirebaseAuth internal constructor(public val js: Auth) {
 
     public actual fun signInAnonymously(): Task<AuthResult> = task(this, { signInAnonymously(js) }) { toAuthResult(it, this) }
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("signInWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForSignInWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
+
+    @Deprecated(PENDING_AUTH_RESULT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val pendingAuthResult: Task<AuthResult>? get() = throw UnsupportedOperationException(PENDING_AUTH_RESULT_ANDROID_ONLY)
+
     public actual fun signInWithCredential(credential: AuthCredential): Task<AuthResult> = task(this, { signInWithCredential(js, credential.js) }) { toAuthResult(it, this) }
 
     public actual fun signInWithCustomToken(token: String): Task<AuthResult> = task(this, { signInWithCustomToken(js, token) }) { toAuthResult(it, this) }
@@ -255,6 +264,14 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     public actual fun getIdToken(forceRefresh: Boolean): Task<GetTokenResult> = task(auth, { getIdTokenResult(js, forceRefresh) }) { result ->
         NativeGetTokenResult(result.token, result.claims.toKotlinValue() as Map<String, Any?>, result)
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("linkWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForLinkWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("reauthenticateAndRetrieveData(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForReauthenticateWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult> = throw UnsupportedOperationException(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY)
 
     public actual fun linkWithCredential(credential: AuthCredential): Task<AuthResult> = task(auth, { linkWithCredential(js, credential.js) }) { toAuthResult(it, auth) }
 

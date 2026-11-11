@@ -4,6 +4,7 @@
 
 package com.google.firebase.perf.metrics
 
+import dev.gitlive.firebase.perf.TRACE_PARCELABLE_ANDROID_ONLY
 import com.google.firebase.perf.rethrow
 import dev.gitlive.firebase.perf.externals.PerformanceTrace
 import kotlin.js.Json
@@ -32,6 +33,14 @@ public actual class Trace internal constructor(public val js: PerformanceTrace) 
 
     public actual fun removeAttribute(attribute: String): Unit = rethrow { js.removeAttribute(attribute) }
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun describeContents(): Int = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
+
     override fun equals(other: Any?): Boolean = other is Trace && other.js == js
 
     override fun hashCode(): Int = js.hashCode()
@@ -50,5 +59,9 @@ public actual class Trace internal constructor(public val js: PerformanceTrace) 
 
         /** Maximum length of a trace name. */
         public actual val MAX_TRACE_NAME_LENGTH: Int = 100
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual val CREATOR: android.os.Parcelable.Creator<Trace> get() = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
     }
 }

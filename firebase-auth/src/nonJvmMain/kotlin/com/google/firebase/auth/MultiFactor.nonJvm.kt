@@ -4,6 +4,8 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.TO_JSON_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.auth.TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY
 import dev.gitlive.firebase.auth.TOTP_QR_CODE_URL_ANDROID_ONLY
@@ -25,6 +27,10 @@ public actual abstract class MultiFactorAssertion actual constructor() {
 
 /** @property native The platform SDK's info, when the SDK produced it. */
 public actual abstract class MultiFactorInfo actual constructor() {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TO_JSON_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual open fun toJson(): org.json.JSONObject = throw UnsupportedOperationException(TO_JSON_ANDROID_ONLY)
+
     public actual abstract val displayName: String?
     public actual abstract val enrollmentTimestamp: Long
     public actual abstract val factorId: String
@@ -111,6 +117,10 @@ public actual interface TotpSecret {
     public actual fun generateQrCodeUrl(accountName: String, issuer: String): String
     public actual fun openInOtpApp(qrCodeUrl: String)
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY, ReplaceWith("openInOtpApp(qrCodeUrl)"), DeprecationLevel.ERROR)
+    public actual fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: android.app.Activity)
+
     // The Android-only parameters, which the iOS and JS SDKs do not expose; implemented by [TotpSecretBase].
     @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     public actual val codeIntervalSeconds: Int
@@ -150,4 +160,8 @@ internal abstract class TotpSecretBase : TotpSecret {
 
     @Deprecated(TOTP_QR_CODE_URL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
     override fun generateQrCodeUrl(): String = throw UnsupportedOperationException(TOTP_QR_CODE_URL_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY, ReplaceWith("openInOtpApp(qrCodeUrl)"), DeprecationLevel.ERROR)
+    override fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: android.app.Activity): Unit = throw UnsupportedOperationException(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY)
 }

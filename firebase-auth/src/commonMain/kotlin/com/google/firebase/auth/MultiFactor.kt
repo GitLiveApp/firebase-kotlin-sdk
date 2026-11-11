@@ -4,6 +4,8 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.TO_JSON_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.auth.TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY
 import dev.gitlive.firebase.auth.TOTP_QR_CODE_URL_ANDROID_ONLY
@@ -37,9 +39,15 @@ public expect abstract class MultiFactorAssertion() {
 }
 
 /**
- * An enrolled second factor, mirroring `com.google.firebase.auth.MultiFactorInfo`. Its JSON form is Android-only.
+ * An enrolled second factor, mirroring `com.google.firebase.auth.MultiFactorInfo`. Its JSON form, [toJson], is Android-only
+ * and declared through the error-deprecated `org.json.JSONObject` stand-in.
  */
 public expect abstract class MultiFactorInfo() {
+    /** Android only: the factor as JSON. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TO_JSON_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public open fun toJson(): org.json.JSONObject
+
     public abstract val displayName: String?
 
     /** When the factor was enrolled, in milliseconds since the epoch. */
@@ -148,6 +156,11 @@ public expect interface TotpSecret {
 
     /** Opens [qrCodeUrl] in the authenticator app. */
     public fun openInOtpApp(qrCodeUrl: String)
+
+    /** Android only: opens [qrCodeUrl] in the authenticator app from [activity], or [fallbackUrl] when there is none. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY, ReplaceWith("openInOtpApp(qrCodeUrl)"), DeprecationLevel.ERROR)
+    public fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: android.app.Activity)
 
     /** Android only: the interval, in seconds, after which the one-time password changes. */
     @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)

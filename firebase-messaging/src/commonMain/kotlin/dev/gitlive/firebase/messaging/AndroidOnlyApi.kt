@@ -19,3 +19,8 @@ internal const val REGISTER_NOT_AVAILABLE =
 internal const val MESSAGING_SERVICE_ANDROID_ONLY =
     "FirebaseMessagingService is an android.app.Service: declare the subclass in androidMain and register it in the Android " +
         "manifest; on iOS messages are received by the app delegate, and on JS by the service worker"
+
+internal const val WRITE_TO_PARCEL_ANDROID_ONLY =
+    "writeToParcel implements android.os.Parcelable, which is Android-only; a RemoteMessage is rebuilt with RemoteMessage.Builder on every platform"
+internal const val UPSTREAM_SEND_DECOMMISSIONED =
+    "Upstream messaging through Firebase Cloud Messaging was decommissioned in June 2024 and send() is Android-only; send messages from your own backend"

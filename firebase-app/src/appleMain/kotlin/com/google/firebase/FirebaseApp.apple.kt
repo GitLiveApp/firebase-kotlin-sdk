@@ -4,6 +4,7 @@
 
 package com.google.firebase
 
+import dev.gitlive.firebase.RECAPTCHA_SITE_KEY_DEPRECATED
 import android.content.Context
 import swiftPMImport.dev.gitlive.firebase.app.FIRApp
 import swiftPMImport.dev.gitlive.firebase.app.FIROptions
@@ -102,6 +103,10 @@ public actual class FirebaseOptions internal constructor(public val ios: FIROpti
         public actual fun setProjectId(projectId: String?): Builder = apply { this.projectId = projectId }
         public actual fun setStorageBucket(storageBucket: String?): Builder = apply { this.storageBucket = storageBucket }
         public actual fun setGaTrackingId(gaTrackingId: String?): Builder = apply { this.gaTrackingId = gaTrackingId }
+
+        /** Deprecated in the Android SDK, which no longer reads the key; kept for signature parity and ignored. */
+        @Deprecated(RECAPTCHA_SITE_KEY_DEPRECATED)
+        public actual fun setRecaptchaSiteKey(recaptchaSiteKey: String?): Builder = this
 
         public actual fun build(): FirebaseOptions = FirebaseOptions(
             FIROptions(requireNotNull(applicationId) { "ApplicationId must be set." }, gcmSenderId ?: "").apply {

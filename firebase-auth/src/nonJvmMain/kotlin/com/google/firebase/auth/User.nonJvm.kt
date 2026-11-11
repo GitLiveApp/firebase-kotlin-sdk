@@ -4,6 +4,8 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.AUTO_RETRIEVED_SMS_ANDROID_ONLY
+import dev.gitlive.firebase.auth.FORCE_RECAPTCHA_ANDROID_ONLY
 import android.net.Uri
 
 public actual interface UserInfo {
@@ -42,6 +44,12 @@ internal class SignInMethodQueryResultImpl(override val signInMethods: List<Stri
 
 public actual abstract class FirebaseAuthSettings actual constructor() {
     public actual abstract fun setAppVerificationDisabledForTesting(disabled: Boolean)
+
+    @Deprecated(FORCE_RECAPTCHA_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun forceRecaptchaFlowForTesting(forceRecaptchaFlow: Boolean): Unit = throw UnsupportedOperationException(FORCE_RECAPTCHA_ANDROID_ONLY)
+
+    @Deprecated(AUTO_RETRIEVED_SMS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber: String, smsCode: String): Unit = throw UnsupportedOperationException(AUTO_RETRIEVED_SMS_ANDROID_ONLY)
 }
 
 /**
