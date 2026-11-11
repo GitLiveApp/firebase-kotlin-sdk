@@ -9,7 +9,7 @@ import dev.gitlive.firebase.PARCEL_ANDROID_ONLY
 /**
  * Stands in for `android.os.Parcelable` so that the `CREATOR` fields of the Firebase Android SDK's `Parcelable`
  * implementations (`Timestamp`, `Trace`) can be declared in common code with their `Parcelable.Creator` type, deprecated with
- * an error. Nothing implements it in common code. On Android the interface is a header stub that is stripped from the output
+ * an error. Nothing implements it in common code. On Android and the JVM the interface is a header stub that is stripped from the output
  * (see buildSrc utils/HeaderStubs.kt), so code there uses the platform's.
  */
 @Deprecated(PARCEL_ANDROID_ONLY, level = DeprecationLevel.ERROR)

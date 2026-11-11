@@ -1,6 +1,3 @@
-public final class android/os/Parcel {
-}
-
 public final class com/google/firebase/TimestampInstantKt {
 	public static final fun Timestamp (Lkotlin/time/Instant;)Lcom/google/firebase/Timestamp;
 	public static final fun toKotlinInstant (Lcom/google/firebase/Timestamp;)Lkotlin/time/Instant;

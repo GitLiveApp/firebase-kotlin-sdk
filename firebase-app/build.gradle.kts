@@ -225,9 +225,6 @@ stripHeaderStubs(
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
     keepClasses = listOf("com/google/firebase/TimestampInstantKt.class"),
-    // firebase-java-sdk has no android.os.Parcel: the stand-in is shipped on the JVM so that the modules whose JVM code is real
-    // (messaging, perf) can declare the SDK's writeToParcel(Parcel, Int) there too.
-    jvmKeepClasses = listOf("android/os/Parcel.class"),
     // FirebaseFormat, the multiplatform counterpart of the Android SDK's (internal) class mappers.
     keepPackageDirs = listOf("com/google/firebase/serialization"),
 )
