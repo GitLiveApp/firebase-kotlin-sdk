@@ -1,13 +1,3 @@
-public final class com/google/firebase/auth/AuthKt {
-	public static final fun actionCodeSettings (Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/auth/ActionCodeSettings;
-	public static final fun auth (Lcom/google/firebase/Firebase;Lcom/google/firebase/FirebaseApp;)Lcom/google/firebase/auth/FirebaseAuth;
-	public static final fun getAuth (Lcom/google/firebase/Firebase;)Lcom/google/firebase/auth/FirebaseAuth;
-	public static final fun oAuthCredential (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/auth/AuthCredential;
-	public static final fun oAuthProvider (Ljava/lang/String;Lcom/google/firebase/auth/FirebaseAuth;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/auth/OAuthProvider;
-	public static final fun oAuthProvider (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/auth/OAuthProvider;
-	public static final fun userProfileChangeRequest (Lkotlin/jvm/functions/Function1;)Lcom/google/firebase/auth/UserProfileChangeRequest;
-}
-
 public abstract class dev/gitlive/firebase/auth/ActionCodeResult {
 }
 

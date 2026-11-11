@@ -276,8 +276,6 @@ stripHeaderStubs(
         "com/google/firebase/auth/AuthInternalsKt.class",
         "com/google/firebase/auth/AuthStatics.class",
     ),
-    // firebase-java-sdk has no AuthKt facade (Firebase.auth), so this module's own is shipped on the JVM.
-    jvmKeepClasses = listOf("com/google/firebase/auth/AuthKt.class"),
 )
 // firebase-auth is not open source, so its api.txt is generated from the published classes rather than downloaded.
 registerAndroidSourceCompat(
